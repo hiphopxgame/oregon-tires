@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Check, Star, Clock, Award } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 
 interface AboutProps {
@@ -15,53 +15,10 @@ const OregonTiresAbout: React.FC<AboutProps> = ({ translations, primaryColor }) 
     <section id="about" className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-6" style={{ color: primaryColor }}>{t.about}</h2>
+          <h2 className="text-4xl font-bold mb-6" style={{ color: primaryColor }}>About Us</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             {t.aboutSubtitle}
           </p>
-        </div>
-
-        {/* Key Features Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          <Card className="text-center p-6 hover:shadow-lg transition-shadow border-0 bg-gray-50">
-            <CardContent className="p-0">
-              <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Award className="h-10 w-10" style={{ color: primaryColor }} />
-              </div>
-              <h3 className="text-xl font-bold mb-4" style={{ color: primaryColor }}>Expert Team</h3>
-              <p className="text-gray-600 leading-relaxed">Over 15 years of automotive experience with ASE certified technicians</p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center p-6 hover:shadow-lg transition-shadow border-0 bg-gray-50">
-            <CardContent className="p-0">
-              <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Star className="h-10 w-10" style={{ color: primaryColor }} />
-              </div>
-              <h3 className="text-xl font-bold mb-4" style={{ color: primaryColor }}>Quality Service</h3>
-              <p className="text-gray-600 leading-relaxed">Premium parts and comprehensive warranty on all our work</p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center p-6 hover:shadow-lg transition-shadow border-0 bg-gray-50">
-            <CardContent className="p-0">
-              <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Clock className="h-10 w-10" style={{ color: primaryColor }} />
-              </div>
-              <h3 className="text-xl font-bold mb-4" style={{ color: primaryColor }}>Fast Service</h3>
-              <p className="text-gray-600 leading-relaxed">Most services completed same day with competitive pricing</p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center p-6 hover:shadow-lg transition-shadow border-0 bg-gray-50">
-            <CardContent className="p-0">
-              <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Check className="h-10 w-10" style={{ color: primaryColor }} />
-              </div>
-              <h3 className="text-xl font-bold mb-4" style={{ color: primaryColor }}>Full Service</h3>
-              <p className="text-gray-600 leading-relaxed">Complete automotive solutions from tires to maintenance</p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Main Content */}
