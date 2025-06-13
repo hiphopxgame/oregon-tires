@@ -1,0 +1,57 @@
+
+const translations = {
+  english: {
+    title: "Oregon Tires Auto Care",
+    subtitle: "Professional Tire & Auto Services",
+    heroTitle: "Your Trusted Auto Care Experts in Portland",
+    heroSubtitle: "Professional tire installation, repair, and complete automotive services. We speak Spanish and English!",
+    contactButton: "Contact Us",
+    appointmentButton: "Book Appointment",
+    scheduleService: "Schedule Service",
+    services: "Services",
+    about: "About",
+    contact: "Contact",
+    tireInstallation: "Tire Installation",
+    tireRepair: "Tire Repair",
+    wheelAlignment: "Wheel Alignment", 
+    brakeService: "Brake Service",
+    oilChange: "Oil Change",
+    monSat: "Mon-Sat 8AM-6PM",
+    contactInfo: "Contact Information",
+    quickContact: "Quick Contact",
+    readyToHelp: "Ready to help with all your automotive needs",
+    contactUs: "Contact Us",
+    allRightsReserved: "All rights reserved",
+    aboutSubtitle: "Serving Portland with honest, reliable automotive services since 2008",
+    formSuccess: "Message sent successfully!",
+    formError: "Error sending message. Please try again."
+  },
+  spanish: {
+    title: "Oregon Tires Auto Care",
+    subtitle: "Servicios Profesionales de Llantas y Autos",
+    heroTitle: "Sus Expertos de Confianza en Cuidado Automotriz en Portland",
+    heroSubtitle: "Instalación profesional de llantas, reparación y servicios automotrices completos. ¡Hablamos español e inglés!",
+    contactButton: "Contáctanos",
+    appointmentButton: "Reservar Cita",
+    scheduleService: "Programar Servicio",
+    services: "Servicios",
+    about: "Acerca de",
+    contact: "Contacto",
+    tireInstallation: "Instalación de Llantas",
+    tireRepair: "Reparación de Llantas",
+    wheelAlignment: "Alineación de Ruedas",
+    brakeService: "Servicio de Frenos",
+    oilChange: "Cambio de Aceite",
+    monSat: "Lun-Sáb 8AM-6PM",
+    contactInfo: "Información de Contacto",
+    quickContact: "Contacto Rápido",
+    readyToHelp: "Listos para ayudar con todas sus necesidades automotrices",
+    contactUs: "Contáctanos",
+    allRightsReserved: "Todos los derechos reservados",
+    aboutSubtitle: "Sirviendo a Portland con servicios automotrices honestos y confiables desde 2008",
+    formSuccess: "¡Mensaje enviado exitosamente!",
+    formError: "Error al enviar mensaje. Por favor intente de nuevo."
+  }
+};
+
+export default translations;

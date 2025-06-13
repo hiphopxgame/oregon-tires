@@ -6,10 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface TestimonialsProps {
+  translations: any;
   primaryColor: string;
 }
 
-const OregonTiresTestimonials: React.FC<TestimonialsProps> = ({ primaryColor }) => {
+const OregonTiresTestimonials: React.FC<TestimonialsProps> = ({ translations, primaryColor }) => {
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
