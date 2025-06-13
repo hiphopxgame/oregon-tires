@@ -91,16 +91,13 @@ const OregonTiresContact: React.FC<ContactProps> = ({
             </div>
 
             <div className="mt-8 p-6 bg-green-50 rounded-lg">
-              <h4 className="text-xl font-bold mb-2" style={{ color: primaryColor }}>{t.visitLocation}</h4>
-              <p className="text-gray-600 mb-4">8536 SE 82nd Ave, Portland, OR 97266</p>
-              <Button
-                variant="outline"
-                style={{ borderColor: primaryColor, color: primaryColor }}
-                onClick={() => window.open('https://maps.google.com/?q=8536+SE+82nd+Ave,+Portland,+OR+97266', '_blank')}
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                {t.getDirections}
-              </Button>
+              <h4 className="text-xl font-bold mb-4" style={{ color: primaryColor }}>High Quality Tires</h4>
+              <img 
+                src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=80" 
+                alt="High Quality Tires" 
+                className="w-full h-64 object-cover rounded-lg shadow-lg"
+              />
+              <p className="text-gray-600 mt-4">Premium tire installation and service for all vehicle types</p>
             </div>
           </div>
 

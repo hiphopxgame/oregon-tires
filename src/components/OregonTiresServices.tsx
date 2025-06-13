@@ -1,19 +1,21 @@
 
 import React from 'react';
-import { Phone, Calendar, Check } from 'lucide-react';
+import { Wrench, Clock, Shield, Users } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ServicesProps {
   translations: any;
   primaryColor: string;
-  openScheduleForm: () => void;
+  secondaryColor: string;
+  openContactForm: () => void;
 }
 
 const OregonTiresServices: React.FC<ServicesProps> = ({
   translations,
   primaryColor,
-  openScheduleForm
+  secondaryColor,
+  openContactForm
 }) => {
   const t = translations;
 
@@ -21,112 +23,133 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
     <section id="services" className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4" style={{ color: primaryColor }}>{t.services}</h2>
+          <h2 className="text-4xl font-bold mb-4" style={{ color: primaryColor }}>
+            {t.services}
+          </h2>
           <p className="text-xl text-gray-600">{t.servicesSubtitle}</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          <Card className="border-2 hover:shadow-lg transition-shadow">
+        {/* Key Features */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle style={{ color: primaryColor }}>Tire Sales & Installation</CardTitle>
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Wrench className="h-8 w-8" style={{ color: primaryColor }} />
+              </div>
+              <CardTitle style={{ color: primaryColor }}>{t.expertService}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">Premium tire brands including Michelin, Goodyear, Bridgestone, and more. Professional mounting, balancing, and alignment services.</p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>New & Used Tires</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Tire Repair</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Wheel Alignment</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Tire Rotation</span>
-                </li>
-              </ul>
+              <p className="text-gray-600">{t.expertServiceDesc}</p>
             </CardContent>
           </Card>
 
-          <Card className="border-2 hover:shadow-lg transition-shadow">
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle style={{ color: primaryColor }}>Brake Services</CardTitle>
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="h-8 w-8" style={{ color: primaryColor }} />
+              </div>
+              <CardTitle style={{ color: primaryColor }}>{t.quickService}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">Complete brake system services including inspection, pad replacement, rotor resurfacing, and brake fluid changes.</p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Brake Inspection</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Pad Replacement</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Rotor Service</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Brake Fluid</span>
-                </li>
-              </ul>
+              <p className="text-gray-600">{t.quickServiceDesc}</p>
             </CardContent>
           </Card>
 
-          <Card className="border-2 hover:shadow-lg transition-shadow">
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle style={{ color: primaryColor }}>Oil Changes & Maintenance</CardTitle>
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-8 w-8" style={{ color: primaryColor }} />
+              </div>
+              <CardTitle style={{ color: primaryColor }}>{t.qualityParts}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">Regular maintenance services to keep your vehicle running at peak performance with quality oils and filters.</p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Oil Changes</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Filter Replacement</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Fluid Checks</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" style={{ color: primaryColor }} />
-                  <span>Multi-Point Inspection</span>
-                </li>
-              </ul>
+              <p className="text-gray-600">{t.qualityPartsDesc}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center">
+            <CardHeader>
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="h-8 w-8" style={{ color: primaryColor }} />
+              </div>
+              <CardTitle style={{ color: primaryColor }}>{t.bilingualService}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">{t.bilingualServiceDesc}</p>
             </CardContent>
           </Card>
         </div>
 
-        <div className="text-center mt-12">
-          <div className="bg-white p-8 rounded-lg shadow-lg inline-block">
-            <h3 className="text-2xl font-bold mb-4" style={{ color: primaryColor }}>{t.needServiceTitle}</h3>
-            <p className="text-gray-600 mb-6">{t.needServiceSubtitle}</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="text-white" style={{ backgroundColor: primaryColor }}>
-                <Phone className="h-4 w-4 mr-2" />
-                {t.callButton}
-              </Button>
+        {/* Service Categories */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <Card>
+            <CardHeader>
+              <CardTitle style={{ color: primaryColor }}>{t.tireServices}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-gray-600">
+                <li>• {t.tireInstallation}</li>
+                <li>• {t.tireRepair}</li>
+                <li>• {t.tireRotation}</li>
+                <li>• {t.wheelAlignment}</li>
+                <li>• {t.tireBalancing}</li>
+              </ul>
               <Button 
-                variant="outline" 
-                style={{ borderColor: primaryColor, color: primaryColor }}
-                onClick={openScheduleForm}
+                className="mt-4 w-full text-white"
+                style={{ backgroundColor: primaryColor }}
+                onClick={openContactForm}
               >
-                <Calendar className="h-4 w-4 mr-2" />
-                {t.scheduleServiceButton}
+                {t.contactUs}
               </Button>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle style={{ color: primaryColor }}>{t.autoMaintenance}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-gray-600">
+                <li>• {t.oilChange}</li>
+                <li>• {t.brakeService}</li>
+                <li>• {t.batteryService}</li>
+                <li>• {t.engineDiagnostics}</li>
+                <li>• {t.fluidChecks}</li>
+              </ul>
+              <Button 
+                className="mt-4 w-full text-white"
+                style={{ backgroundColor: primaryColor }}
+                onClick={openContactForm}
+              >
+                {t.contactUs}
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle style={{ color: primaryColor }}>{t.emergencyService}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-gray-600">
+                <li>• {t.roadSideAssistance}</li>
+                <li>• {t.flatTireRepair}</li>
+                <li>• {t.jumpStart}</li>
+                <li>• {t.emergencyTowing}</li>
+                <li>• {t.lockoutService}</li>
+              </ul>
+              <div className="mt-4 p-4 bg-red-50 rounded-lg">
+                <p className="text-red-700 font-semibold mb-2">{t.needServiceToday}</p>
+                <Button 
+                  className="w-full text-white"
+                  style={{ backgroundColor: primaryColor }}
+                  onClick={openContactForm}
+                >
+                  {t.scheduleService}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
