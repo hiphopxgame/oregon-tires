@@ -23,8 +23,8 @@ const OregonTires = () => {
     preferred_time: ''
   });
   const [currentDesign, setCurrentDesign] = useState({
-    primaryColor: '#22c55e',
-    secondaryColor: '#a7f3d0',
+    primaryColor: '#007030',
+    secondaryColor: '#FEE11A',
     backgroundColor: '#f0fdf4',
     textColor: '#000000',
   });
@@ -149,9 +149,11 @@ const OregonTires = () => {
       />
 
       <OregonTiresFooter
+        language={language}
         translations={t}
         primaryColor={currentDesign.primaryColor}
         openContactForm={openContactForm}
+        toggleLanguage={toggleLanguage}
       />
     </div>
   );

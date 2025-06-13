@@ -44,7 +44,7 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
               </div>
             </div>
             <button onClick={toggleLanguage} className="text-white hover:text-yellow-200">
-              {language === 'english' ? '🇺🇸 English' : '🇲🇽 Español'}
+              🇺🇸 English | 🇲🇽 Español
             </button>
           </div>
         </div>

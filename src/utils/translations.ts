@@ -24,7 +24,25 @@ const translations = {
     allRightsReserved: "All rights reserved",
     aboutSubtitle: "Serving Portland with honest, reliable automotive services since 2008",
     formSuccess: "Message sent successfully!",
-    formError: "Error sending message. Please try again."
+    formError: "Error sending message. Please try again.",
+    phone: "Phone",
+    businessHours: "Business Hours",
+    sunday: "Sunday: Closed",
+    firstName: "First Name",
+    lastName: "Last Name",
+    email: "Email",
+    message: "Message",
+    serviceNeeded: "Service Needed",
+    selectService: "Select a service",
+    preferredDate: "Preferred Date",
+    preferredTime: "Preferred Time",
+    selectTime: "Select a time",
+    scheduleAppointment: "Schedule Appointment",
+    sendMessage: "Send Message",
+    toggleToContact: "Switch to Contact",
+    toggleToSchedule: "Switch to Schedule",
+    contactSubtitle: "Get in touch with us for all your automotive needs",
+    visitLocation: "Visit Our Location"
   },
   spanish: {
     title: "Oregon Tires Auto Care",
@@ -50,7 +68,25 @@ const translations = {
     allRightsReserved: "Todos los derechos reservados",
     aboutSubtitle: "Sirviendo a Portland con servicios automotrices honestos y confiables desde 2008",
     formSuccess: "¡Mensaje enviado exitosamente!",
-    formError: "Error al enviar mensaje. Por favor intente de nuevo."
+    formError: "Error al enviar mensaje. Por favor intente de nuevo.",
+    phone: "Teléfono",
+    businessHours: "Horarios de Atención",
+    sunday: "Domingo: Cerrado",
+    firstName: "Nombre",
+    lastName: "Apellido",
+    email: "Correo Electrónico",
+    message: "Mensaje",
+    serviceNeeded: "Servicio Necesario",
+    selectService: "Selecciona un servicio",
+    preferredDate: "Fecha Preferida",
+    preferredTime: "Hora Preferida",
+    selectTime: "Selecciona una hora",
+    scheduleAppointment: "Programar Cita",
+    sendMessage: "Enviar Mensaje",
+    toggleToContact: "Cambiar a Contacto",
+    toggleToSchedule: "Cambiar a Programar",
+    contactSubtitle: "Ponte en contacto con nosotros para todas tus necesidades automotrices",
+    visitLocation: "Visita Nuestra Ubicación"
   }
 };
 

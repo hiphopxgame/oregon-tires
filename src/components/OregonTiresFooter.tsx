@@ -4,22 +4,26 @@ import { Phone, MapPin, Clock } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 interface FooterProps {
+  language: string;
   translations: any;
   primaryColor: string;
   openContactForm: () => void;
+  toggleLanguage: () => void;
 }
 
 const OregonTiresFooter: React.FC<FooterProps> = ({
+  language,
   translations,
   primaryColor,
-  openContactForm
+  openContactForm,
+  toggleLanguage
 }) => {
   const t = translations;
 
   return (
     <footer style={{ backgroundColor: primaryColor }} className="text-white py-12">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4">{t.contactInfo}</h3>
             <div className="space-y-2">
@@ -59,6 +63,16 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
             >
               {t.contactUs}
             </Button>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-bold mb-4">Language / Idioma</h3>
+            <button 
+              onClick={toggleLanguage} 
+              className="text-white hover:text-yellow-200 text-left"
+            >
+              🇺🇸 English | 🇲🇽 Español
+            </button>
           </div>
         </div>
 

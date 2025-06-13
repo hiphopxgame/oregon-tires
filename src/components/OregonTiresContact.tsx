@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Phone, MapPin, Clock, MessageCircle, Calendar } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -76,28 +75,6 @@ const OregonTiresContact: React.FC<ContactProps> = ({
                   <p className="text-gray-600">{t.sunday}</p>
                 </div>
               </div>
-
-              <div className="flex items-center gap-4">
-                <div className="bg-green-100 p-3 rounded-full">
-                  <MessageCircle className="h-6 w-6" style={{ color: primaryColor }} />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-800">Language / Idioma</h4>
-                  <button onClick={toggleLanguage} className="text-gray-600 hover:text-green-700">
-                    {language === 'english' ? '🇺🇸 English' : '🇲🇽 Español'}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 p-6 bg-green-50 rounded-lg">
-              <h4 className="text-xl font-bold mb-4" style={{ color: primaryColor }}>High Quality Tires</h4>
-              <img 
-                src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=80" 
-                alt="High Quality Tires" 
-                className="w-full h-64 object-cover rounded-lg shadow-lg"
-              />
-              <p className="text-gray-600 mt-4">Premium tire installation and service for all vehicle types</p>
             </div>
           </div>
 
@@ -280,9 +257,12 @@ const OregonTiresContact: React.FC<ContactProps> = ({
           </div>
         </div>
 
-        {/* Google Map - Always Visible */}
+        {/* Visit Our Location Section */}
         <div className="mt-12">
-          <h3 className="text-2xl font-bold mb-6 text-center" style={{ color: primaryColor }}>{t.visitLocation}</h3>
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold mb-2" style={{ color: primaryColor }}>{t.visitLocation}</h3>
+            <p className="text-lg text-gray-600">8536 SE 82nd Ave, Portland, OR 97266</p>
+          </div>
           <div className="bg-gray-200 h-96 rounded-lg flex items-center justify-center">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.8567891234567!2d-122.57895!3d45.46123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5495a0b91234567%3A0x1234567890abcdef!2s8536%20SE%2082nd%20Ave%2C%20Portland%2C%20OR%2097266!5e0!3m2!1sen!2sus!4v1234567890123"
