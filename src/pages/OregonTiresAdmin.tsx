@@ -84,13 +84,13 @@ const OregonTiresAdmin = () => {
     try {
       const { error } = await supabase
         .from('oregon_tires_appointments')
-        .update({ status })
+        .update({ status: status.toLowerCase() })
         .eq('id', id);
 
       if (error) throw error;
 
       setAppointments(prev => 
-        prev.map(apt => apt.id === id ? { ...apt, status } : apt)
+        prev.map(apt => apt.id === id ? { ...apt, status: status.toLowerCase() } : apt)
       );
 
       toast({
@@ -110,13 +110,13 @@ const OregonTiresAdmin = () => {
     try {
       const { error } = await supabase
         .from('oregon_tires_contact_messages')
-        .update({ status })
+        .update({ status: status.toLowerCase() })
         .eq('id', id);
 
       if (error) throw error;
 
       setContactMessages(prev => 
-        prev.map(msg => msg.id === id ? { ...msg, status } : msg)
+        prev.map(msg => msg.id === id ? { ...msg, status: status.toLowerCase() } : msg)
       );
 
       toast({
@@ -133,18 +133,14 @@ const OregonTiresAdmin = () => {
   };
 
   const getStatusBadge = (status: string) => {
+    const normalizedStatus = status.toLowerCase();
     const variants = {
-      pending: { className: 'bg-[#FEE11A] text-black', text: 'pending' },
-      confirmed: { className: 'bg-[#007030] text-white', text: 'confirmed' },
-      completed: { className: 'bg-gray-500 text-white', text: 'completed' },
-      cancelled: { className: 'bg-red-500 text-white', text: 'cancelled' },
-      rejected: { className: 'bg-red-500 text-white', text: 'rejected' },
-      new: { className: 'bg-[#FEE11A] text-black', text: 'new' },
-      read: { className: 'bg-[#007030] text-white', text: 'read' },
-      replied: { className: 'bg-gray-500 text-white', text: 'replied' }
+      new: { className: 'bg-[#FEE11A] text-black', text: 'New' },
+      priority: { className: 'bg-red-500 text-white', text: 'Priority' },
+      completed: { className: 'bg-[#007030] text-white', text: 'Completed' }
     } as const;
 
-    const variant = variants[status as keyof typeof variants] || variants.pending;
+    const variant = variants[normalizedStatus as keyof typeof variants] || variants.new;
     return (
       <span className={`px-2 py-1 rounded text-xs font-medium ${variant.className}`}>
         {variant.text}
@@ -160,7 +156,7 @@ const OregonTiresAdmin = () => {
   const selectedDateAppointments = getAppointmentsForDate(selectedDate);
 
   // Get dates that have appointments for calendar highlighting
-  const appointmentDates = appointments.map(apt => new Date(apt.preferred_date));
+  const appointmentDates = appointments.map(apt => new Date(apt.preferred_date + 'T00:00:00'));
 
   if (loading) {
     return (
@@ -178,16 +174,6 @@ const OregonTiresAdmin = () => {
           <Link to="/" className="inline-block">
             <h1 className="text-3xl font-bold hover:text-yellow-200">Oregon Tires Management</h1>
           </Link>
-          <div className="mt-2 flex gap-6">
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="h-5 w-5" />
-              <span>Appointments ({appointments.length})</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
-              <span>Messages ({contactMessages.length})</span>
-            </div>
-          </div>
         </div>
       </header>
 
@@ -299,18 +285,16 @@ const OregonTiresAdmin = () => {
                                 </TableCell>
                                 <TableCell>
                                   <Select
-                                    value={appointment.status}
+                                    value={appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                                     onValueChange={(value) => updateAppointmentStatus(appointment.id, value)}
                                   >
                                     <SelectTrigger className="w-32">
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="pending">Pending</SelectItem>
-                                      <SelectItem value="confirmed">Confirmed</SelectItem>
-                                      <SelectItem value="completed">Completed</SelectItem>
-                                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                                      <SelectItem value="rejected">Rejected</SelectItem>
+                                      <SelectItem value="New">New</SelectItem>
+                                      <SelectItem value="Priority">Priority</SelectItem>
+                                      <SelectItem value="Completed">Completed</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </TableCell>
@@ -373,16 +357,16 @@ const OregonTiresAdmin = () => {
                                 </TableCell>
                                 <TableCell>
                                   <Select
-                                    value={message.status}
+                                    value={message.status.charAt(0).toUpperCase() + message.status.slice(1)}
                                     onValueChange={(value) => updateMessageStatus(message.id, value)}
                                   >
                                     <SelectTrigger className="w-32">
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="new">New</SelectItem>
-                                      <SelectItem value="read">Read</SelectItem>
-                                      <SelectItem value="replied">Replied</SelectItem>
+                                      <SelectItem value="New">New</SelectItem>
+                                      <SelectItem value="Priority">Priority</SelectItem>
+                                      <SelectItem value="Completed">Completed</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </TableCell>
