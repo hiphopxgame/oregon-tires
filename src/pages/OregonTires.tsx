@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import OregonTiresHeader from "@/components/OregonTiresHeader";
 import OregonTiresHero from "@/components/OregonTiresHero";
@@ -9,6 +8,7 @@ import OregonTiresContact from "@/components/OregonTiresContact";
 import OregonTiresFooter from "@/components/OregonTiresFooter";
 import translations from "@/utils/translations";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const OregonTires = () => {
   const [language, setLanguage] = useState('english');
@@ -83,6 +83,12 @@ const OregonTires = () => {
           .insert(appointmentData);
 
         if (error) throw error;
+        
+        toast({
+          title: "Appointment Scheduled!",
+          description: t.formSuccess,
+          variant: "default",
+        });
       } else {
         // Contact message
         const { error } = await supabase
@@ -90,9 +96,14 @@ const OregonTires = () => {
           .insert(formData);
 
         if (error) throw error;
+        
+        toast({
+          title: "Message Sent!",
+          description: t.formSuccess,
+          variant: "default",
+        });
       }
 
-      alert(t.formSuccess);
       setContactForm({
         firstName: '',
         lastName: '',
@@ -105,7 +116,11 @@ const OregonTires = () => {
       });
     } catch (error) {
       console.error("Form submission error:", error);
-      alert(t.formError);
+      toast({
+        title: "Error",
+        description: t.formError,
+        variant: "destructive",
+      });
     }
   };
 
