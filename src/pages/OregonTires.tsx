@@ -17,11 +17,13 @@ const OregonTires = () => {
   });
 
   const [appointmentForm, setAppointmentForm] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     phone: '',
     email: '',
     service: '',
     preferred_date: '',
+    preferred_time: '',
     message: ''
   });
 
@@ -60,11 +62,13 @@ const OregonTires = () => {
       const { error } = await supabase
         .from('oregon_tires_appointments')
         .insert([{
-          name: appointmentForm.name,
+          first_name: appointmentForm.firstName,
+          last_name: appointmentForm.lastName,
           phone: appointmentForm.phone,
           email: appointmentForm.email,
           service: appointmentForm.service,
           preferred_date: appointmentForm.preferred_date,
+          preferred_time: appointmentForm.preferred_time,
           message: appointmentForm.message,
           status: 'pending'
         }]);
@@ -73,11 +77,13 @@ const OregonTires = () => {
 
       toast.success("Appointment request submitted! We'll contact you to confirm.");
       setAppointmentForm({
-        name: '',
+        firstName: '',
+        lastName: '',
         phone: '',
         email: '',
         service: '',
         preferred_date: '',
+        preferred_time: '',
         message: ''
       });
     } catch (error) {
@@ -536,7 +542,7 @@ const OregonTires = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-800">Address</h4>
-                    <p className="text-gray-600">Portland, OR</p>
+                    <p className="text-gray-600">8536 SE 82nd Ave, Portland, OR 97266</p>
                   </div>
                 </div>
 
@@ -563,7 +569,7 @@ const OregonTires = () => {
 
               <div className="mt-8 p-6 bg-green-50 rounded-lg">
                 <h4 className="text-xl font-bold mb-2" style={{ color: '#007030' }}>Visit Our Location</h4>
-                <p className="text-gray-600">Portland, OR</p>
+                <p className="text-gray-600">8536 SE 82nd Ave, Portland, OR 97266</p>
               </div>
             </div>
 
@@ -625,7 +631,7 @@ const OregonTires = () => {
                       <input
                         type="email"
                         required
-                        placeholder="tu@email.com"
+                        placeholder="your@email.com"
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         value={contactForm.email}
                         onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
@@ -673,18 +679,33 @@ const OregonTires = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleAppointmentSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Your full name"
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                      value={appointmentForm.name}
-                      onChange={(e) => setAppointmentForm({...appointmentForm, name: e.target.value})}
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        First Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Your first name"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        value={appointmentForm.firstName}
+                        onChange={(e) => setAppointmentForm({...appointmentForm, firstName: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Last Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Your last name"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        value={appointmentForm.lastName}
+                        onChange={(e) => setAppointmentForm({...appointmentForm, lastName: e.target.value})}
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -737,16 +758,45 @@ const OregonTires = () => {
                     </select>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Preferred Date
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                      value={appointmentForm.preferred_date}
-                      onChange={(e) => setAppointmentForm({...appointmentForm, preferred_date: e.target.value})}
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Preferred Date *
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        value={appointmentForm.preferred_date}
+                        onChange={(e) => setAppointmentForm({...appointmentForm, preferred_date: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Preferred Time *
+                      </label>
+                      <select
+                        required
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        value={appointmentForm.preferred_time}
+                        onChange={(e) => setAppointmentForm({...appointmentForm, preferred_time: e.target.value})}
+                      >
+                        <option value="">Select time</option>
+                        <option value="07:00">7:00 AM</option>
+                        <option value="08:00">8:00 AM</option>
+                        <option value="09:00">9:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="18:00">6:00 PM</option>
+                        <option value="19:00">7:00 PM</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div>
