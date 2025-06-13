@@ -11,6 +11,7 @@ interface HeaderProps {
   toggleLanguage: () => void;
   scrollToSection: (id: string) => void;
   openScheduleForm: () => void;
+  openContactForm: () => void;
 }
 
 const OregonTiresHeader: React.FC<HeaderProps> = ({
@@ -19,7 +20,8 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
   primaryColor,
   toggleLanguage,
   scrollToSection,
-  openScheduleForm
+  openScheduleForm,
+  openContactForm
 }) => {
   const t = translations;
 
@@ -68,7 +70,7 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
             <button onClick={() => scrollToSection('home')} className="text-gray-700 hover:text-green-700 font-medium">Home</button>
             <button onClick={() => scrollToSection('services')} className="text-gray-700 hover:text-green-700 font-medium">{t.services}</button>
             <button onClick={() => scrollToSection('about')} className="text-gray-700 hover:text-green-700 font-medium">{t.about}</button>
-            <button onClick={() => scrollToSection('contact')} className="text-gray-700 hover:text-green-700 font-medium">{t.contact}</button>
+            <button onClick={openContactForm} className="text-gray-700 hover:text-green-700 font-medium">{t.contact}</button>
             <Button 
               className="text-white font-medium"
               style={{ backgroundColor: primaryColor }}

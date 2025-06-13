@@ -112,7 +112,12 @@ const OregonTires = () => {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const headerHeight = 120; // Account for sticky header
+      const elementPosition = element.offsetTop - headerHeight;
+      window.scrollTo({ 
+        top: elementPosition, 
+        behavior: 'smooth' 
+      });
     }
   };
 
@@ -125,44 +130,52 @@ const OregonTires = () => {
         toggleLanguage={toggleLanguage}
         scrollToSection={scrollToSection}
         openScheduleForm={openScheduleForm}
-      />
-
-      <OregonTiresHero
-        translations={t}
-        primaryColor={currentDesign.primaryColor}
-        secondaryColor={currentDesign.secondaryColor}
-        openContactForm={openContactForm}
-        openScheduleForm={openScheduleForm}
-      />
-
-      <OregonTiresServices
-        translations={t}
-        primaryColor={currentDesign.primaryColor}
-        secondaryColor={currentDesign.secondaryColor}
         openContactForm={openContactForm}
       />
 
-      <OregonTiresAbout
-        translations={t}
-        primaryColor={currentDesign.primaryColor}
-      />
+      <div id="home">
+        <OregonTiresHero
+          translations={t}
+          primaryColor={currentDesign.primaryColor}
+          secondaryColor={currentDesign.secondaryColor}
+          openContactForm={openContactForm}
+          openScheduleForm={openScheduleForm}
+        />
+      </div>
+
+      <div id="services">
+        <OregonTiresServices
+          translations={t}
+          primaryColor={currentDesign.primaryColor}
+          secondaryColor={currentDesign.secondaryColor}
+        />
+      </div>
+
+      <div id="about">
+        <OregonTiresAbout
+          translations={t}
+          primaryColor={currentDesign.primaryColor}
+        />
+      </div>
 
       <OregonTiresTestimonials
         translations={t}
         primaryColor={currentDesign.primaryColor}
       />
 
-      <OregonTiresContact
-        language={language}
-        translations={t}
-        primaryColor={currentDesign.primaryColor}
-        isScheduleMode={isScheduleMode}
-        setIsScheduleMode={setIsScheduleMode}
-        contactForm={contactForm}
-        setContactForm={setContactForm}
-        handleContactSubmit={handleContactSubmit}
-        toggleLanguage={toggleLanguage}
-      />
+      <div id="contact">
+        <OregonTiresContact
+          language={language}
+          translations={t}
+          primaryColor={currentDesign.primaryColor}
+          isScheduleMode={isScheduleMode}
+          setIsScheduleMode={setIsScheduleMode}
+          contactForm={contactForm}
+          setContactForm={setContactForm}
+          handleContactSubmit={handleContactSubmit}
+          toggleLanguage={toggleLanguage}
+        />
+      </div>
 
       <OregonTiresFooter
         language={language}
