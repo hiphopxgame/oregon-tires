@@ -98,6 +98,7 @@ const OregonTiresAdmin = () => {
         description: "Appointment status has been updated.",
       });
     } catch (error) {
+      console.error('Error updating appointment status:', error);
       toast({
         title: "Error",
         description: "Failed to update status",
@@ -124,6 +125,7 @@ const OregonTiresAdmin = () => {
         description: "Message status has been updated.",
       });
     } catch (error) {
+      console.error('Error updating message status:', error);
       toast({
         title: "Error",
         description: "Failed to update status",
@@ -146,6 +148,10 @@ const OregonTiresAdmin = () => {
         {variant.text}
       </span>
     );
+  };
+
+  const capitalizeStatus = (status: string) => {
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   };
 
   const getAppointmentsForDate = (date: Date) => {
@@ -285,7 +291,7 @@ const OregonTiresAdmin = () => {
                                 </TableCell>
                                 <TableCell>
                                   <Select
-                                    value={appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                                    value={capitalizeStatus(appointment.status)}
                                     onValueChange={(value) => updateAppointmentStatus(appointment.id, value)}
                                   >
                                     <SelectTrigger className="w-32">
@@ -357,7 +363,7 @@ const OregonTiresAdmin = () => {
                                 </TableCell>
                                 <TableCell>
                                   <Select
-                                    value={message.status.charAt(0).toUpperCase() + message.status.slice(1)}
+                                    value={capitalizeStatus(message.status)}
                                     onValueChange={(value) => updateMessageStatus(message.id, value)}
                                   >
                                     <SelectTrigger className="w-32">
