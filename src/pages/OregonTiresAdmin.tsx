@@ -82,6 +82,8 @@ const OregonTiresAdmin = () => {
 
   const updateAppointmentStatus = async (id: string, status: string) => {
     try {
+      console.log('Updating appointment status:', { id, status: status.toLowerCase() });
+      
       const { error } = await supabase
         .from('oregon_tires_appointments')
         .update({ status: status.toLowerCase() })
@@ -109,6 +111,8 @@ const OregonTiresAdmin = () => {
 
   const updateMessageStatus = async (id: string, status: string) => {
     try {
+      console.log('Updating message status:', { id, status: status.toLowerCase() });
+      
       const { error } = await supabase
         .from('oregon_tires_contact_messages')
         .update({ status: status.toLowerCase() })
