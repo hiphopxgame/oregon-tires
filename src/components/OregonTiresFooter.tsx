@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Phone, MapPin, Clock } from 'lucide-react';
-import { Button } from "@/components/ui/button";
 
 interface FooterProps {
   language: string;
@@ -23,7 +22,7 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
   return (
     <footer style={{ backgroundColor: primaryColor }} className="text-white py-12">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4">{t.contactInfo}</h3>
             <div className="space-y-2">
@@ -54,18 +53,6 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
           </div>
 
           <div>
-            <h3 className="text-xl font-bold mb-4">{t.quickContact}</h3>
-            <p className="text-gray-200 mb-4">{t.readyToHelp}</p>
-            <Button 
-              variant="outline" 
-              className="border-white text-white hover:bg-white hover:text-green-700"
-              onClick={openContactForm}
-            >
-              {t.contactUs}
-            </Button>
-          </div>
-
-          <div>
             <h3 className="text-xl font-bold mb-4">Language / Idioma</h3>
             <button 
               onClick={toggleLanguage} 
@@ -77,7 +64,7 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
         </div>
 
         <div className="border-t border-green-600 mt-8 pt-8 text-center text-gray-200">
-          <p>&copy; 2024 Oregon Tires Auto Care. {t.allRightsReserved}</p>
+          <p>&copy; 2025 Oregon Tires Auto Care. {t.allRightsReserved}</p>
         </div>
       </div>
     </footer>

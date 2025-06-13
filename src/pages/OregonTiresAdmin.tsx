@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar as CalendarIcon, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import translations from '@/utils/translations';
 
 interface Appointment {
   id: string;
@@ -45,6 +46,14 @@ const OregonTiresAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [activeTab, setActiveTab] = useState('appointments');
+  const [language, setLanguage] = useState('english');
+  const [t, setT] = useState(translations['english']);
+
+  const toggleLanguage = () => {
+    const newLanguage = language === 'english' ? 'spanish' : 'english';
+    setLanguage(newLanguage);
+    setT(translations[newLanguage]);
+  };
 
   useEffect(() => {
     fetchData();
@@ -180,10 +189,16 @@ const OregonTiresAdmin = () => {
     <div className="min-h-screen bg-white text-black">
       {/* Header */}
       <header style={{ backgroundColor: '#007030' }} className="text-white py-6 shadow-lg">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 flex justify-between items-center">
           <Link to="/" className="inline-block">
             <h1 className="text-3xl font-bold hover:text-yellow-200">Oregon Tires Management</h1>
           </Link>
+          <button 
+            onClick={toggleLanguage} 
+            className="text-white hover:text-yellow-200"
+          >
+            🇺🇸 English | 🇲🇽 Español
+          </button>
         </div>
       </header>
 
@@ -229,6 +244,19 @@ const OregonTiresAdmin = () => {
                           <div className="text-gray-600">{apt.service} - {apt.preferred_time}</div>
                           <div className="flex items-center gap-2 mt-1">
                             {getStatusBadge(apt.status)}
+                            <Select
+                              value={capitalizeStatus(apt.status)}
+                              onValueChange={(value) => updateAppointmentStatus(apt.id, value)}
+                            >
+                              <SelectTrigger className="w-24 h-6 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="New">New</SelectItem>
+                                <SelectItem value="Priority">Priority</SelectItem>
+                                <SelectItem value="Completed">Completed</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
                       ))}
@@ -396,8 +424,14 @@ const OregonTiresAdmin = () => {
 
       {/* Footer */}
       <footer style={{ backgroundColor: '#007030' }} className="text-white py-4 mt-12">
-        <div className="container mx-auto px-4 text-center">
-          <p>Oregon Tires Management System</p>
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <p>Oregon Tires Management System - &copy; 2025 All rights reserved</p>
+          <button 
+            onClick={toggleLanguage} 
+            className="text-white hover:text-yellow-200"
+          >
+            🇺🇸 English | 🇲🇽 Español
+          </button>
         </div>
       </footer>
     </div>

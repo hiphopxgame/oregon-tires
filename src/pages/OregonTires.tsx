@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import OregonTiresHeader from "@/components/OregonTiresHeader";
 import OregonTiresHero from "@/components/OregonTiresHero";
@@ -7,6 +8,7 @@ import OregonTiresTestimonials from "@/components/OregonTiresTestimonials";
 import OregonTiresContact from "@/components/OregonTiresContact";
 import OregonTiresFooter from "@/components/OregonTiresFooter";
 import translations from "@/utils/translations";
+import { supabase } from "@/integrations/supabase/client";
 
 const OregonTires = () => {
   const [language, setLanguage] = useState('english');
@@ -57,36 +59,50 @@ const OregonTires = () => {
     e.preventDefault();
 
     const formData = {
-      ...contactForm,
-      status: 'new',
-      type: isScheduleMode ? 'appointment' : 'contact'
+      first_name: contactForm.firstName,
+      last_name: contactForm.lastName,
+      phone: contactForm.phone,
+      email: contactForm.email,
+      message: contactForm.message,
+      language: language,
+      status: 'new'
     };
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/${isScheduleMode ? 'oregon_tires_appointments' : 'oregon_tires_contact_messages'}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-        },
-        body: JSON.stringify(formData)
-      });
+      if (isScheduleMode) {
+        // Add schedule-specific fields
+        const appointmentData = {
+          ...formData,
+          service: contactForm.service,
+          preferred_date: contactForm.preferred_date,
+          preferred_time: contactForm.preferred_time
+        };
 
-      if (res.ok) {
-        alert(t.formSuccess);
-        setContactForm({
-          firstName: '',
-          lastName: '',
-          phone: '',
-          email: '',
-          message: '',
-          service: '',
-          preferred_date: '',
-          preferred_time: ''
-        });
+        const { error } = await supabase
+          .from('oregon_tires_appointments')
+          .insert(appointmentData);
+
+        if (error) throw error;
       } else {
-        alert(t.formError);
+        // Contact message
+        const { error } = await supabase
+          .from('oregon_tires_contact_messages')
+          .insert(formData);
+
+        if (error) throw error;
       }
+
+      alert(t.formSuccess);
+      setContactForm({
+        firstName: '',
+        lastName: '',
+        phone: '',
+        email: '',
+        message: '',
+        service: '',
+        preferred_date: '',
+        preferred_time: ''
+      });
     } catch (error) {
       console.error("Form submission error:", error);
       alert(t.formError);
