@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar as CalendarIcon, MessageCircle, Clock, User } from 'lucide-react';
+import { Calendar as CalendarIcon, MessageCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface Appointment {
   id: string;
@@ -42,6 +44,7 @@ const OregonTiresAdmin = () => {
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [activeTab, setActiveTab] = useState('appointments');
 
   useEffect(() => {
     fetchData();
@@ -149,16 +152,15 @@ const OregonTiresAdmin = () => {
     );
   };
 
-  const getLanguageFlag = (language: string) => {
-    return language === 'spanish' ? '🇲🇽' : '🇺🇸';
-  };
-
   const getAppointmentsForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
     return appointments.filter(apt => apt.preferred_date === dateStr);
   };
 
   const selectedDateAppointments = getAppointmentsForDate(selectedDate);
+
+  // Get dates that have appointments for calendar highlighting
+  const appointmentDates = appointments.map(apt => new Date(apt.preferred_date));
 
   if (loading) {
     return (
@@ -173,7 +175,9 @@ const OregonTiresAdmin = () => {
       {/* Header */}
       <header style={{ backgroundColor: '#007030' }} className="text-white py-6 shadow-lg">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold">Oregon Tires Management</h1>
+          <Link to="/" className="inline-block">
+            <h1 className="text-3xl font-bold hover:text-yellow-200">Oregon Tires Management</h1>
+          </Link>
           <div className="mt-2 flex gap-6">
             <div className="flex items-center gap-2">
               <CalendarIcon className="h-5 w-5" />
@@ -204,6 +208,12 @@ const OregonTiresAdmin = () => {
                   selected={selectedDate}
                   onSelect={(date) => date && setSelectedDate(date)}
                   className="w-full"
+                  modifiers={{
+                    hasAppointment: appointmentDates
+                  }}
+                  modifiersStyles={{
+                    hasAppointment: { backgroundColor: '#FEE11A', color: '#000', fontWeight: 'bold' }
+                  }}
                 />
                 
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg">
@@ -223,7 +233,6 @@ const OregonTiresAdmin = () => {
                           <div className="text-gray-600">{apt.service} - {apt.preferred_time}</div>
                           <div className="flex items-center gap-2 mt-1">
                             {getStatusBadge(apt.status)}
-                            <span>{getLanguageFlag(apt.language)}</span>
                           </div>
                         </div>
                       ))}
@@ -234,191 +243,159 @@ const OregonTiresAdmin = () => {
             </Card>
           </div>
 
-          {/* Appointments Section */}
+          {/* Main Content with Tabs */}
           <div className="lg:col-span-2">
-            <Card className="border-2" style={{ borderColor: '#007030' }}>
-              <CardHeader style={{ backgroundColor: '#007030' }} className="text-white">
-                <CardTitle>Service Appointments</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                {appointments.length === 0 ? (
-                  <p className="text-gray-500 p-6">No appointments found.</p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow style={{ backgroundColor: '#FEE11A' }}>
-                          <TableHead className="text-black font-semibold">Customer</TableHead>
-                          <TableHead className="text-black font-semibold">Service</TableHead>
-                          <TableHead className="text-black font-semibold">Date & Time</TableHead>
-                          <TableHead className="text-black font-semibold">Status</TableHead>
-                          <TableHead className="text-black font-semibold">Language</TableHead>
-                          <TableHead className="text-black font-semibold">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {appointments.map((appointment) => (
-                          <TableRow key={appointment.id} className="hover:bg-gray-50">
-                            <TableCell>
-                              <div>
-                                <p className="font-medium text-[#007030]">
-                                  {appointment.first_name} {appointment.last_name}
-                                </p>
-                                <p className="text-sm text-gray-600">{appointment.phone}</p>
-                                <p className="text-sm text-gray-600">{appointment.email}</p>
-                                {appointment.message && (
-                                  <p className="text-sm text-gray-500 mt-1 truncate max-w-[200px]">
-                                    {appointment.message}
-                                  </p>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <span className="font-medium">{appointment.service}</span>
-                            </TableCell>
-                            <TableCell>
-                              <div className="text-sm">
-                                <p className="font-medium">{appointment.preferred_date}</p>
-                                <p className="text-gray-600">{appointment.preferred_time}</p>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              {getStatusBadge(appointment.status)}
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-lg">{getLanguageFlag(appointment.language)}</span>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex gap-2">
-                                {appointment.status === 'pending' && (
-                                  <>
-                                    <Button
-                                      size="sm"
-                                      style={{ backgroundColor: '#007030' }}
-                                      className="text-white hover:opacity-90"
-                                      onClick={() => updateAppointmentStatus(appointment.id, 'confirmed')}
-                                    >
-                                      Confirm
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="destructive"
-                                      onClick={() => updateAppointmentStatus(appointment.id, 'rejected')}
-                                    >
-                                      Reject
-                                    </Button>
-                                  </>
-                                )}
-                                {appointment.status === 'confirmed' && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => updateAppointmentStatus(appointment.id, 'completed')}
-                                  >
-                                    Complete
-                                  </Button>
-                                )}
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  style={{ borderColor: '#007030', color: '#007030' }}
-                                  className="hover:bg-[#007030] hover:text-white"
-                                >
-                                  View Details
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="appointments">Appointments</TabsTrigger>
+                <TabsTrigger value="messages">Messages</TabsTrigger>
+              </TabsList>
 
-            {/* Contact Messages Section */}
-            <Card className="mt-8 border-2" style={{ borderColor: '#007030' }}>
-              <CardHeader style={{ backgroundColor: '#007030' }} className="text-white">
-                <CardTitle>Contact Messages</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                {contactMessages.length === 0 ? (
-                  <p className="text-gray-500 p-6">No messages found.</p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow style={{ backgroundColor: '#FEE11A' }}>
-                          <TableHead className="text-black font-semibold">Customer</TableHead>
-                          <TableHead className="text-black font-semibold">Contact</TableHead>
-                          <TableHead className="text-black font-semibold">Message</TableHead>
-                          <TableHead className="text-black font-semibold">Date</TableHead>
-                          <TableHead className="text-black font-semibold">Status</TableHead>
-                          <TableHead className="text-black font-semibold">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {contactMessages.map((message) => (
-                          <TableRow key={message.id} className="hover:bg-gray-50">
-                            <TableCell>
-                              <div>
-                                <p className="font-medium text-[#007030]">
-                                  {message.first_name} {message.last_name}
-                                </p>
-                                <span className="text-lg">{getLanguageFlag(message.language)}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="text-sm">
-                                <p>{message.email}</p>
-                                {message.phone && <p>{message.phone}</p>}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <p className="text-sm max-w-[300px] truncate">
-                                {message.message}
-                              </p>
-                            </TableCell>
-                            <TableCell>
-                              <p className="text-sm">
-                                {new Date(message.created_at).toLocaleDateString()}
-                              </p>
-                            </TableCell>
-                            <TableCell>
-                              {getStatusBadge(message.status)}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex gap-2">
-                                {message.status === 'new' && (
-                                  <Button
-                                    size="sm"
-                                    style={{ backgroundColor: '#007030' }}
-                                    className="text-white hover:opacity-90"
-                                    onClick={() => updateMessageStatus(message.id, 'read')}
+              {/* Appointments Tab */}
+              <TabsContent value="appointments">
+                <Card className="border-2" style={{ borderColor: '#007030' }}>
+                  <CardHeader style={{ backgroundColor: '#007030' }} className="text-white">
+                    <CardTitle>Service Appointments</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    {appointments.length === 0 ? (
+                      <p className="text-gray-500 p-6">No appointments found.</p>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow style={{ backgroundColor: '#FEE11A' }}>
+                              <TableHead className="text-black font-semibold">Customer</TableHead>
+                              <TableHead className="text-black font-semibold">Service</TableHead>
+                              <TableHead className="text-black font-semibold">Date & Time</TableHead>
+                              <TableHead className="text-black font-semibold">Status</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {appointments.map((appointment) => (
+                              <TableRow key={appointment.id} className="hover:bg-gray-50">
+                                <TableCell>
+                                  <div>
+                                    <p className="font-medium text-[#007030]">
+                                      {appointment.first_name} {appointment.last_name}
+                                    </p>
+                                    <p className="text-sm text-gray-600">{appointment.phone}</p>
+                                    <p className="text-sm text-gray-600">{appointment.email}</p>
+                                    {appointment.message && (
+                                      <p className="text-sm text-gray-500 mt-1 truncate max-w-[200px]">
+                                        {appointment.message}
+                                      </p>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <span className="font-medium">{appointment.service}</span>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="text-sm">
+                                    <p className="font-medium">{appointment.preferred_date}</p>
+                                    <p className="text-gray-600">{appointment.preferred_time}</p>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Select
+                                    value={appointment.status}
+                                    onValueChange={(value) => updateAppointmentStatus(appointment.id, value)}
                                   >
-                                    Mark Read
-                                  </Button>
-                                )}
-                                {message.status === 'read' && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => updateMessageStatus(message.id, 'replied')}
+                                    <SelectTrigger className="w-32">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="pending">Pending</SelectItem>
+                                      <SelectItem value="confirmed">Confirmed</SelectItem>
+                                      <SelectItem value="completed">Completed</SelectItem>
+                                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                                      <SelectItem value="rejected">Rejected</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Messages Tab */}
+              <TabsContent value="messages">
+                <Card className="border-2" style={{ borderColor: '#007030' }}>
+                  <CardHeader style={{ backgroundColor: '#007030' }} className="text-white">
+                    <CardTitle>Contact Messages</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    {contactMessages.length === 0 ? (
+                      <p className="text-gray-500 p-6">No messages found.</p>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow style={{ backgroundColor: '#FEE11A' }}>
+                              <TableHead className="text-black font-semibold">Customer</TableHead>
+                              <TableHead className="text-black font-semibold">Contact</TableHead>
+                              <TableHead className="text-black font-semibold">Message</TableHead>
+                              <TableHead className="text-black font-semibold">Date</TableHead>
+                              <TableHead className="text-black font-semibold">Status</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {contactMessages.map((message) => (
+                              <TableRow key={message.id} className="hover:bg-gray-50">
+                                <TableCell>
+                                  <div>
+                                    <p className="font-medium text-[#007030]">
+                                      {message.first_name} {message.last_name}
+                                    </p>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="text-sm">
+                                    <p>{message.email}</p>
+                                    {message.phone && <p>{message.phone}</p>}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <p className="text-sm max-w-[300px] truncate">
+                                    {message.message}
+                                  </p>
+                                </TableCell>
+                                <TableCell>
+                                  <p className="text-sm">
+                                    {new Date(message.created_at).toLocaleDateString()}
+                                  </p>
+                                </TableCell>
+                                <TableCell>
+                                  <Select
+                                    value={message.status}
+                                    onValueChange={(value) => updateMessageStatus(message.id, value)}
                                   >
-                                    Mark Replied
-                                  </Button>
-                                )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                                    <SelectTrigger className="w-32">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="new">New</SelectItem>
+                                      <SelectItem value="read">Read</SelectItem>
+                                      <SelectItem value="replied">Replied</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>

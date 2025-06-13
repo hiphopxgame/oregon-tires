@@ -5,89 +5,93 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 const OregonTires = () => {
+  const [language, setLanguage] = useState('english');
+  const [showAppointmentFields, setShowAppointmentFields] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  
   const [contactForm, setContactForm] = useState({
     firstName: '',
     lastName: '',
     phone: '',
     email: '',
-    message: ''
-  });
-
-  const [appointmentForm, setAppointmentForm] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    email: '',
+    message: '',
     service: '',
     preferred_date: '',
-    preferred_time: '',
-    message: ''
+    preferred_time: ''
   });
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'english' ? 'spanish' : 'english');
+  };
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error } = await supabase
-        .from('oregon_tires_contact_messages')
-        .insert([{
-          first_name: contactForm.firstName,
-          last_name: contactForm.lastName,
-          phone: contactForm.phone,
-          email: contactForm.email,
-          message: contactForm.message
-        }]);
+      if (showAppointmentFields) {
+        // Submit as appointment
+        const { error } = await supabase
+          .from('oregon_tires_appointments')
+          .insert([{
+            first_name: contactForm.firstName,
+            last_name: contactForm.lastName,
+            phone: contactForm.phone,
+            email: contactForm.email,
+            service: contactForm.service,
+            preferred_date: contactForm.preferred_date,
+            preferred_time: contactForm.preferred_time,
+            message: contactForm.message,
+            status: 'pending',
+            language: language
+          }]);
 
-      if (error) throw error;
+        if (error) throw error;
+        toast.success("Appointment request submitted! We'll contact you to confirm.");
+      } else {
+        // Submit as contact message
+        const { error } = await supabase
+          .from('oregon_tires_contact_messages')
+          .insert([{
+            first_name: contactForm.firstName,
+            last_name: contactForm.lastName,
+            phone: contactForm.phone,
+            email: contactForm.email,
+            message: contactForm.message,
+            language: language
+          }]);
 
-      toast.success("Message sent successfully! We'll get back to you soon.");
+        if (error) throw error;
+        toast.success("Message sent successfully! We'll get back to you soon.");
+      }
+
       setContactForm({
         firstName: '',
         lastName: '',
         phone: '',
         email: '',
-        message: ''
+        message: '',
+        service: '',
+        preferred_date: '',
+        preferred_time: ''
       });
+      setShowAppointmentFields(false);
     } catch (error) {
-      console.error('Error submitting contact form:', error);
-      toast.error("Failed to send message. Please try again.");
+      console.error('Error submitting form:', error);
+      toast.error("Failed to submit. Please try again.");
     }
   };
 
-  const handleAppointmentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const { error } = await supabase
-        .from('oregon_tires_appointments')
-        .insert([{
-          first_name: appointmentForm.firstName,
-          last_name: appointmentForm.lastName,
-          phone: appointmentForm.phone,
-          email: appointmentForm.email,
-          service: appointmentForm.service,
-          preferred_date: appointmentForm.preferred_date,
-          preferred_time: appointmentForm.preferred_time,
-          message: appointmentForm.message,
-          status: 'pending'
-        }]);
-
-      if (error) throw error;
-
-      toast.success("Appointment request submitted! We'll contact you to confirm.");
-      setAppointmentForm({
-        firstName: '',
-        lastName: '',
-        phone: '',
-        email: '',
-        service: '',
-        preferred_date: '',
-        preferred_time: '',
-        message: ''
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      const headerHeight = 120; // Account for sticky header
+      const elementPosition = element.offsetTop - headerHeight;
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
       });
-    } catch (error) {
-      console.error('Error submitting appointment:', error);
-      toast.error("Failed to submit appointment. Please try again.");
     }
   };
 
@@ -96,30 +100,32 @@ const OregonTires = () => {
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3">
-          {/* Top Bar */}
-          <div className="flex flex-col lg:flex-row justify-between items-center mb-4 text-sm">
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-2 lg:mb-0">
-              <div className="flex items-center gap-1 text-gray-700">
-                <Phone className="h-4 w-4" />
-                (503) 367-9714
+          {/* Top Bar with Green Background */}
+          <div style={{ backgroundColor: '#007030' }} className="text-white py-2 px-4 rounded-md mb-4">
+            <div className="flex flex-col lg:flex-row justify-between items-center text-sm">
+              <div className="flex flex-col sm:flex-row items-center gap-4 mb-2 lg:mb-0">
+                <div className="flex items-center gap-1">
+                  <Phone className="h-4 w-4" />
+                  (503) 367-9714
+                </div>
+                <div className="flex items-center gap-1">
+                  <MapPin className="h-4 w-4" />
+                  8536 SE 82nd Ave, Portland, OR 97266
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  Mon-Sat: 7AM-7PM
+                </div>
               </div>
-              <div className="flex items-center gap-1 text-gray-700">
-                <MapPin className="h-4 w-4" />
-                8536 SE 82nd Ave, Portland, OR 97266
-              </div>
-              <div className="flex items-center gap-1 text-gray-700">
-                <Clock className="h-4 w-4" />
-                Mon-Sat: 7AM-7PM
-              </div>
-            </div>
-            <div className="text-gray-700">
-              🇺🇸 English
+              <button onClick={toggleLanguage} className="text-white hover:text-yellow-200">
+                {language === 'english' ? '🇺🇸 English' : '🇲🇽 Español'}
+              </button>
             </div>
           </div>
 
           {/* Main Header */}
           <div className="flex flex-col lg:flex-row justify-between items-center">
-            <div className="flex items-center gap-4 mb-4 lg:mb-0">
+            <Link to="/" className="flex items-center gap-4 mb-4 lg:mb-0">
               <img 
                 src="/lovable-uploads/f000a232-32e4-4f91-8b69-f7e61ac811f2.png" 
                 alt="Oregon Tires Logo" 
@@ -129,18 +135,18 @@ const OregonTires = () => {
                 <h1 className="text-2xl font-bold" style={{ color: '#007030' }}>Oregon Tires</h1>
                 <p className="text-lg text-gray-600">High Quality Auto Care</p>
               </div>
-            </div>
+            </Link>
 
             {/* Navigation */}
             <nav className="flex flex-wrap items-center gap-6">
-              <a href="#home" className="text-gray-700 hover:text-green-700 font-medium">Home</a>
-              <a href="#services" className="text-gray-700 hover:text-green-700 font-medium">Services</a>
-              <a href="#about" className="text-gray-700 hover:text-green-700 font-medium">About</a>
-              <a href="#contact" className="text-gray-700 hover:text-green-700 font-medium">Contact</a>
+              <button onClick={() => scrollToSection('home')} className="text-gray-700 hover:text-green-700 font-medium">Home</button>
+              <button onClick={() => scrollToSection('services')} className="text-gray-700 hover:text-green-700 font-medium">Services</button>
+              <button onClick={() => scrollToSection('about')} className="text-gray-700 hover:text-green-700 font-medium">About</button>
+              <button onClick={() => scrollToSection('contact')} className="text-gray-700 hover:text-green-700 font-medium">Contact</button>
               <Button 
                 className="text-white font-medium"
                 style={{ backgroundColor: '#007030' }}
-                onClick={() => document.getElementById('appointment')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => scrollToSection('contact')}
               >
                 Schedule Service
               </Button>
@@ -164,15 +170,15 @@ const OregonTires = () => {
                 size="lg" 
                 className="text-black font-bold"
                 style={{ backgroundColor: '#FEE11A' }}
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => scrollToSection('contact')}
               >
                 Contact Oregon Tires
               </Button>
               <Button 
                 size="lg" 
-                variant="outline" 
-                className="text-white border-white hover:bg-white hover:text-green-700"
-                onClick={() => document.getElementById('appointment')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-black border-2 hover:bg-white hover:text-green-700"
+                style={{ backgroundColor: '#FEE11A', borderColor: '#FEE11A' }}
+                onClick={() => scrollToSection('contact')}
               >
                 Book an Appointment
               </Button>
@@ -503,7 +509,11 @@ const OregonTires = () => {
                 ))}
               </div>
               <div className="text-gray-600 mb-4">Based on 150+ Google Reviews</div>
-              <Button variant="outline" style={{ borderColor: '#007030', color: '#007030' }}>
+              <Button 
+                variant="outline" 
+                style={{ borderColor: '#007030', color: '#007030' }}
+                onClick={() => window.open('https://www.google.com/search?sca_esv=6df4d1ed451ac289&sxsrf=AE3TifMy55UssDOtrXR8Esz2eSH5UOyS1g:1749792496572&si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-E5EWQrHl7sppkcD-zb5r0m0iiLtgu2v1wQWQGknmEKiRI73YX7qCtCCI7-B3ifffNSZe3WdLtoEC-Pkklqk7IsNFtUDY&q=Oregon+Tires+Reviews&sa=X&ved=2ahUKEwizl8GB1e2NAxV_JkQIHZgPD8QQ0bkNegQIQRAD&biw=1537&bih=932&dpr=2', '_blank')}
+              >
                 View All Reviews on Google
               </Button>
             </div>
@@ -561,22 +571,32 @@ const OregonTires = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-800">Language / Idioma</h4>
-                    <p className="text-gray-600">🇺🇸 English</p>
+                    <button onClick={toggleLanguage} className="text-gray-600 hover:text-green-700">
+                      {language === 'english' ? '🇺🇸 English' : '🇲🇽 Español'}
+                    </button>
                   </div>
                 </div>
               </div>
 
               <div className="mt-8 p-6 bg-green-50 rounded-lg">
                 <h4 className="text-xl font-bold mb-2" style={{ color: '#007030' }}>Visit Our Location</h4>
-                <p className="text-gray-600">8536 SE 82nd Ave, Portland, OR 97266</p>
+                <p className="text-gray-600 mb-4">8536 SE 82nd Ave, Portland, OR 97266</p>
+                <Button
+                  variant="outline"
+                  style={{ borderColor: '#007030', color: '#007030' }}
+                  onClick={() => setShowMap(!showMap)}
+                >
+                  <MapPin className="h-4 w-4 mr-2" />
+                  {showMap ? 'Hide Map' : 'Get Directions'}
+                </Button>
               </div>
             </div>
 
-            {/* Contact Form */}
+            {/* Combined Contact Form */}
             <div>
               <Card>
                 <CardHeader>
-                  <CardTitle style={{ color: '#007030' }}>Send Message</CardTitle>
+                  <CardTitle style={{ color: '#007030' }}>Contact & Schedule Service</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleContactSubmit} className="space-y-4">
@@ -651,178 +671,126 @@ const OregonTires = () => {
                       />
                     </div>
 
-                    <Button 
-                      type="submit" 
-                      className="w-full text-white"
-                      style={{ backgroundColor: '#007030' }}
-                    >
-                      Send Message
-                    </Button>
+                    {showAppointmentFields && (
+                      <>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Service Needed *
+                          </label>
+                          <select
+                            required
+                            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            value={contactForm.service}
+                            onChange={(e) => setContactForm({...contactForm, service: e.target.value})}
+                          >
+                            <option value="">Select a service</option>
+                            <option value="Tire Installation">Tire Installation</option>
+                            <option value="Tire Repair">Tire Repair</option>
+                            <option value="Wheel Alignment">Wheel Alignment</option>
+                            <option value="Brake Service">Brake Service</option>
+                            <option value="Oil Change">Oil Change</option>
+                            <option value="General Maintenance">General Maintenance</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Preferred Date *
+                            </label>
+                            <input
+                              type="date"
+                              required
+                              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                              value={contactForm.preferred_date}
+                              onChange={(e) => setContactForm({...contactForm, preferred_date: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Preferred Time *
+                            </label>
+                            <select
+                              required
+                              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                              value={contactForm.preferred_time}
+                              onChange={(e) => setContactForm({...contactForm, preferred_time: e.target.value})}
+                            >
+                              <option value="">Select time</option>
+                              <option value="07:00">7:00 AM</option>
+                              <option value="08:00">8:00 AM</option>
+                              <option value="09:00">9:00 AM</option>
+                              <option value="10:00">10:00 AM</option>
+                              <option value="11:00">11:00 AM</option>
+                              <option value="12:00">12:00 PM</option>
+                              <option value="13:00">1:00 PM</option>
+                              <option value="14:00">2:00 PM</option>
+                              <option value="15:00">3:00 PM</option>
+                              <option value="16:00">4:00 PM</option>
+                              <option value="17:00">5:00 PM</option>
+                              <option value="18:00">6:00 PM</option>
+                              <option value="19:00">7:00 PM</option>
+                            </select>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    <div className="flex gap-2">
+                      {!showAppointmentFields ? (
+                        <>
+                          <Button 
+                            type="submit" 
+                            className="flex-1 text-white"
+                            style={{ backgroundColor: '#007030' }}
+                          >
+                            Send Message
+                          </Button>
+                          <Button 
+                            type="button"
+                            className="flex-1 text-black"
+                            style={{ backgroundColor: '#FEE11A' }}
+                            onClick={() => setShowAppointmentFields(true)}
+                          >
+                            Schedule Service
+                          </Button>
+                        </>
+                      ) : (
+                        <Button 
+                          type="submit" 
+                          className="w-full text-white"
+                          style={{ backgroundColor: '#007030' }}
+                        >
+                          <Calendar className="h-4 w-4 mr-2" />
+                          Schedule Appointment
+                        </Button>
+                      )}
+                    </div>
                   </form>
                 </CardContent>
               </Card>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Appointment Section */}
-      <section id="appointment" className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-center text-2xl" style={{ color: '#007030' }}>
-                  Schedule Your Service
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleAppointmentSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        First Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Your first name"
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        value={appointmentForm.firstName}
-                        onChange={(e) => setAppointmentForm({...appointmentForm, firstName: e.target.value})}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Last Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Your last name"
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        value={appointmentForm.lastName}
-                        onChange={(e) => setAppointmentForm({...appointmentForm, lastName: e.target.value})}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="(503) 123-4567"
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        value={appointmentForm.phone}
-                        onChange={(e) => setAppointmentForm({...appointmentForm, phone: e.target.value})}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="your@email.com"
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        value={appointmentForm.email}
-                        onChange={(e) => setAppointmentForm({...appointmentForm, email: e.target.value})}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Service Needed *
-                    </label>
-                    <select
-                      required
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                      value={appointmentForm.service}
-                      onChange={(e) => setAppointmentForm({...appointmentForm, service: e.target.value})}
-                    >
-                      <option value="">Select a service</option>
-                      <option value="Tire Installation">Tire Installation</option>
-                      <option value="Tire Repair">Tire Repair</option>
-                      <option value="Wheel Alignment">Wheel Alignment</option>
-                      <option value="Brake Service">Brake Service</option>
-                      <option value="Oil Change">Oil Change</option>
-                      <option value="General Maintenance">General Maintenance</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Preferred Date *
-                      </label>
-                      <input
-                        type="date"
-                        required
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        value={appointmentForm.preferred_date}
-                        onChange={(e) => setAppointmentForm({...appointmentForm, preferred_date: e.target.value})}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Preferred Time *
-                      </label>
-                      <select
-                        required
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        value={appointmentForm.preferred_time}
-                        onChange={(e) => setAppointmentForm({...appointmentForm, preferred_time: e.target.value})}
-                      >
-                        <option value="">Select time</option>
-                        <option value="07:00">7:00 AM</option>
-                        <option value="08:00">8:00 AM</option>
-                        <option value="09:00">9:00 AM</option>
-                        <option value="10:00">10:00 AM</option>
-                        <option value="11:00">11:00 AM</option>
-                        <option value="12:00">12:00 PM</option>
-                        <option value="13:00">1:00 PM</option>
-                        <option value="14:00">2:00 PM</option>
-                        <option value="15:00">3:00 PM</option>
-                        <option value="16:00">4:00 PM</option>
-                        <option value="17:00">5:00 PM</option>
-                        <option value="18:00">6:00 PM</option>
-                        <option value="19:00">7:00 PM</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Additional Information
-                    </label>
-                    <textarea
-                      rows={3}
-                      placeholder="Tell us more about your vehicle or service needs..."
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                      value={appointmentForm.message}
-                      onChange={(e) => setAppointmentForm({...appointmentForm, message: e.target.value})}
-                    />
-                  </div>
-
-                  <Button 
-                    type="submit" 
-                    className="w-full text-white"
-                    style={{ backgroundColor: '#007030' }}
-                  >
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Schedule Appointment
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Google Map */}
+          {showMap && (
+            <div className="mt-12">
+              <h3 className="text-2xl font-bold mb-6 text-center" style={{ color: '#007030' }}>Our Location</h3>
+              <div className="bg-gray-200 h-96 rounded-lg flex items-center justify-center">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.8567891234567!2d-122.57895!3d45.46123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5495a0b91234567%3A0x1234567890abcdef!2s8536%20SE%2082nd%20Ave%2C%20Portland%2C%20OR%2097266!5e0!3m2!1sen!2sus!4v1234567890123"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="rounded-lg"
+                ></iframe>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -863,8 +831,8 @@ const OregonTires = () => {
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
                   <div>
-                    <div>Portland, Oregon</div>
-                    <div className="text-xs text-gray-300">Greater Portland Area</div>
+                    <div>8536 SE 82nd Ave, Portland, OR 97266</div>
+                    <div className="text-xs text-gray-300">Visit our location</div>
                   </div>
                 </div>
               </div>
