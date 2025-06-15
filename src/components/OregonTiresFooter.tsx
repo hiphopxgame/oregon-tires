@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Phone, MapPin, Clock } from 'lucide-react';
+import { Phone, MapPin, Clock, ExternalLink } from 'lucide-react';
 
 interface FooterProps {
   language: string;
@@ -56,10 +56,23 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
             <h3 className="text-xl font-bold mb-4">Language / Idioma</h3>
             <button 
               onClick={toggleLanguage} 
-              className="text-white hover:text-yellow-200 text-left"
+              className="text-white hover:text-yellow-200 text-left mb-4"
             >
               🇺🇸 English | 🇲🇽 Español
             </button>
+            
+            <div className="mt-4">
+              <h4 className="text-lg font-semibold mb-2">Static Version</h4>
+              <a 
+                href="/oregon-tires.html" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-yellow-200 flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                HTML Page
+              </a>
+            </div>
           </div>
         </div>
 
