@@ -1,0 +1,761 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oregon Tires Management Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #007030;
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+
+        .header h1:hover {
+            color: #FEE11A;
+        }
+
+        .language-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .language-toggle:hover {
+            color: #FEE11A;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border: 2px solid #007030;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: #007030;
+            color: white;
+            padding: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .card-description {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0.25rem 0 0 0;
+        }
+
+        .card-content {
+            padding: 1rem;
+        }
+
+        /* Calendar Styles */
+        .calendar {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .calendar table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .calendar th,
+        .calendar td {
+            padding: 0.5rem;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .calendar th {
+            background-color: #f9fafb;
+            font-weight: bold;
+        }
+
+        .calendar td {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .calendar td:hover {
+            background-color: #f3f4f6;
+        }
+
+        .calendar .today {
+            background-color: #007030;
+            color: white;
+        }
+
+        .calendar .has-appointment {
+            background-color: #FEE11A;
+            color: black;
+            font-weight: bold;
+        }
+
+        .selected-date-info {
+            background-color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .appointment-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007030;
+            margin: 0.5rem 0;
+        }
+
+        .appointment-item {
+            background: white;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border-radius: 0.25rem;
+            border-left: 4px solid #007030;
+        }
+
+        /* Tabs Styles */
+        .tabs {
+            margin-bottom: 1rem;
+        }
+
+        .tab-list {
+            display: flex;
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+        }
+
+        .tab-trigger {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .tab-trigger.active {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .table th {
+            background-color: #FEE11A;
+            color: black;
+            font-weight: 600;
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-new {
+            background-color: #FEE11A;
+            color: black;
+        }
+
+        .status-priority {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .status-completed {
+            background-color: #007030;
+            color: white;
+        }
+
+        /* Select Styles */
+        .status-select {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #007030;
+            color: white;
+            padding: 1rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50vh;
+            color: #007030;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .customer-name {
+            font-weight: 500;
+            color: #007030;
+        }
+
+        .contact-info {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .message-truncate {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">
+        <p>Loading admin dashboard...</p>
+    </div>
+
+    <div id="main-content" class="hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <h1>Oregon Tires Management</h1>
+                    <button class="language-toggle" onclick="toggleLanguage()">
+                        🇺🇸 English | 🇲🇽 Español
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="container main-content">
+            <div class="dashboard-grid">
+                <!-- Calendar Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Appointment Calendar</h2>
+                        <p class="card-description" id="calendar-month">December 2024</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="calendar">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Sun</th>
+                                        <th>Mon</th>
+                                        <th>Tue</th>
+                                        <th>Wed</th>
+                                        <th>Thu</th>
+                                        <th>Fri</th>
+                                        <th>Sat</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="calendar-body">
+                                    <!-- Calendar will be generated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="selected-date-info">
+                            <h3 style="color: #007030; margin-bottom: 0.5rem;">
+                                Appointments for <span id="selected-date">Today</span>
+                            </h3>
+                            <div class="appointment-count" id="appointment-count">0 appointments</div>
+                            <div id="appointment-list">
+                                <p style="color: #6b7280; font-size: 0.875rem;">No appointments scheduled for this date</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs Section -->
+                <div>
+                    <div class="tabs">
+                        <div class="tab-list">
+                            <button class="tab-trigger active" onclick="switchTab('appointments')">Appointments</button>
+                            <button class="tab-trigger" onclick="switchTab('messages')">Messages</button>
+                        </div>
+                    </div>
+
+                    <!-- Appointments Tab -->
+                    <div id="appointments-tab" class="tab-content active">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Service Appointments</h2>
+                            </div>
+                            <div class="card-content" style="padding: 0;">
+                                <div class="table-container">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Service</th>
+                                                <th>Date & Time</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="appointments-table">
+                                            <!-- Appointments will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages Tab -->
+                    <div id="messages-tab" class="tab-content">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Contact Messages</h2>
+                            </div>
+                            <div class="card-content" style="padding: 0;">
+                                <div class="table-container">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Contact</th>
+                                                <th>Message</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="messages-table">
+                                            <!-- Messages will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <p>Oregon Tires Management System - © 2025 All rights reserved</p>
+                    <button class="language-toggle" onclick="toggleLanguage()">
+                        🇺🇸 English | 🇲🇽 Español
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Sample data
+        const sampleAppointments = [
+            {
+                id: '1',
+                first_name: 'Juan',
+                last_name: 'Rodriguez',
+                email: 'juan@email.com',
+                phone: '(503) 123-4567',
+                service: 'Tire Installation',
+                preferred_date: '2024-12-15',
+                preferred_time: '10:00 AM',
+                message: 'Need new winter tires installed',
+                status: 'new',
+                created_at: '2024-12-10T10:00:00Z'
+            },
+            {
+                id: '2',
+                first_name: 'Maria',
+                last_name: 'Garcia',
+                email: 'maria@email.com',
+                phone: '(503) 234-5678',
+                service: 'Brake Service',
+                preferred_date: '2024-12-16',
+                preferred_time: '2:00 PM',
+                message: 'Brakes making noise',
+                status: 'priority',
+                created_at: '2024-12-09T14:00:00Z'
+            },
+            {
+                id: '3',
+                first_name: 'Carlos',
+                last_name: 'Martinez',
+                email: 'carlos@email.com',
+                phone: '(503) 345-6789',
+                service: 'Oil Change',
+                preferred_date: '2024-12-15',
+                preferred_time: '3:00 PM',
+                message: '',
+                status: 'completed',
+                created_at: '2024-12-08T09:00:00Z'
+            }
+        ];
+
+        const sampleMessages = [
+            {
+                id: '1',
+                first_name: 'Ana',
+                last_name: 'Lopez',
+                email: 'ana@email.com',
+                phone: '(503) 456-7890',
+                message: 'I need information about tire prices for my Honda Civic.',
+                status: 'new',
+                created_at: '2024-12-14T11:00:00Z'
+            },
+            {
+                id: '2',
+                first_name: 'Roberto',
+                last_name: 'Silva',
+                email: 'roberto@email.com',
+                phone: '(503) 567-8901',
+                message: 'My car is making a strange noise when I brake. Can you help?',
+                status: 'priority',
+                created_at: '2024-12-13T16:30:00Z'
+            }
+        ];
+
+        let currentLanguage = 'english';
+        let selectedDate = new Date();
+        let currentTab = 'appointments';
+
+        // Initialize the page
+        function init() {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                
+                generateCalendar();
+                loadAppointments();
+                loadMessages();
+                updateSelectedDateInfo();
+            }, 1000);
+        }
+
+        // Language toggle
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'english' ? 'spanish' : 'english';
+            // In a real implementation, this would update all text content
+            console.log('Language switched to:', currentLanguage);
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab triggers
+            document.querySelectorAll('.tab-trigger').forEach(trigger => {
+                trigger.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            currentTab = tabName;
+        }
+
+        // Calendar generation
+        function generateCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            
+            // Update month display
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            document.getElementById('calendar-month').textContent = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            const calendarBody = document.getElementById('calendar-body');
+            calendarBody.innerHTML = '';
+
+            for (let week = 0; week < 6; week++) {
+                const row = document.createElement('tr');
+                
+                for (let day = 0; day < 7; day++) {
+                    const cell = document.createElement('td');
+                    const cellDate = new Date(startDate);
+                    cellDate.setDate(startDate.getDate() + (week * 7) + day);
+                    
+                    cell.textContent = cellDate.getDate();
+                    cell.onclick = () => selectDate(cellDate);
+
+                    // Add classes for styling
+                    if (cellDate.getMonth() !== month) {
+                        cell.style.color = '#d1d5db';
+                    }
+                    
+                    if (cellDate.toDateString() === now.toDateString()) {
+                        cell.classList.add('today');
+                    }
+
+                    // Check if date has appointments
+                    const dateStr = cellDate.toISOString().split('T')[0];
+                    if (sampleAppointments.some(apt => apt.preferred_date === dateStr)) {
+                        cell.classList.add('has-appointment');
+                    }
+
+                    row.appendChild(cell);
+                }
+                
+                calendarBody.appendChild(row);
+            }
+        }
+
+        // Date selection
+        function selectDate(date) {
+            selectedDate = date;
+            updateSelectedDateInfo();
+        }
+
+        // Update selected date info
+        function updateSelectedDateInfo() {
+            const dateStr = selectedDate.toLocaleDateString();
+            document.getElementById('selected-date').textContent = dateStr;
+
+            const dateIsoStr = selectedDate.toISOString().split('T')[0];
+            const dayAppointments = sampleAppointments.filter(apt => apt.preferred_date === dateIsoStr);
+            
+            document.getElementById('appointment-count').textContent = `${dayAppointments.length} appointments`;
+
+            const appointmentList = document.getElementById('appointment-list');
+            if (dayAppointments.length === 0) {
+                appointmentList.innerHTML = '<p style="color: #6b7280; font-size: 0.875rem;">No appointments scheduled for this date</p>';
+            } else {
+                appointmentList.innerHTML = dayAppointments.map(apt => `
+                    <div class="appointment-item">
+                        <div style="font-weight: 500;">${apt.first_name} ${apt.last_name}</div>
+                        <div style="color: #6b7280;">${apt.service} - ${apt.preferred_time}</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem;">
+                            <span class="status-badge status-${apt.status}">${capitalizeStatus(apt.status)}</span>
+                            <select class="status-select" onchange="updateStatus('appointment', '${apt.id}', this.value)">
+                                <option value="new" ${apt.status === 'new' ? 'selected' : ''}>New</option>
+                                <option value="priority" ${apt.status === 'priority' ? 'selected' : ''}>Priority</option>
+                                <option value="completed" ${apt.status === 'completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Load appointments
+        function loadAppointments() {
+            const tbody = document.getElementById('appointments-table');
+            
+            if (sampleAppointments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="color: #6b7280; padding: 1.5rem;">No appointments found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = sampleAppointments.map(appointment => `
+                <tr>
+                    <td>
+                        <div>
+                            <p class="customer-name">${appointment.first_name} ${appointment.last_name}</p>
+                            <p class="contact-info">${appointment.phone}</p>
+                            <p class="contact-info">${appointment.email}</p>
+                            ${appointment.message ? `<p class="contact-info message-truncate" style="margin-top: 0.25rem;">${appointment.message}</p>` : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <span style="font-weight: 500;">${appointment.service}</span>
+                    </td>
+                    <td>
+                        <div style="font-size: 0.875rem;">
+                            <p style="font-weight: 500;">${appointment.preferred_date}</p>
+                            <p style="color: #6b7280;">${appointment.preferred_time}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <select class="status-select" onchange="updateStatus('appointment', '${appointment.id}', this.value)">
+                            <option value="new" ${appointment.status === 'new' ? 'selected' : ''}>New</option>
+                            <option value="priority" ${appointment.status === 'priority' ? 'selected' : ''}>Priority</option>
+                            <option value="completed" ${appointment.status === 'completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Load messages
+        function loadMessages() {
+            const tbody = document.getElementById('messages-table');
+            
+            if (sampleMessages.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="color: #6b7280; padding: 1.5rem;">No messages found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = sampleMessages.map(message => `
+                <tr>
+                    <td>
+                        <div>
+                            <p class="customer-name">${message.first_name} ${message.last_name}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-size: 0.875rem;">
+                            <p>${message.email}</p>
+                            ${message.phone ? `<p>${message.phone}</p>` : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <p style="font-size: 0.875rem; max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${message.message}</p>
+                    </td>
+                    <td>
+                        <p style="font-size: 0.875rem;">${new Date(message.created_at).toLocaleDateString()}</p>
+                    </td>
+                    <td>
+                        <select class="status-select" onchange="updateStatus('message', '${message.id}', this.value)">
+                            <option value="new" ${message.status === 'new' ? 'selected' : ''}>New</option>
+                            <option value="priority" ${message.status === 'priority' ? 'selected' : ''}>Priority</option>
+                            <option value="completed" ${message.status === 'completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update status
+        function updateStatus(type, id, newStatus) {
+            console.log(`Updating ${type} ${id} status to ${newStatus}`);
+            
+            if (type === 'appointment') {
+                const appointment = sampleAppointments.find(apt => apt.id === id);
+                if (appointment) {
+                    appointment.status = newStatus;
+                    updateSelectedDateInfo(); // Refresh the calendar info
+                }
+            } else if (type === 'message') {
+                const message = sampleMessages.find(msg => msg.id === id);
+                if (message) {
+                    message.status = newStatus;
+                }
+            }
+            
+            // Show success message (in a real app, this would be a toast)
+            console.log('Status updated successfully');
+        }
+
+        // Utility functions
+        function capitalizeStatus(status) {
+            return status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        // Initialize the page when loaded
+        window.onload = init;
+    </script>
+</body>
+</html>
