@@ -451,94 +451,143 @@
         </footer>
     </div>
 
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
-        // Sample data
-        const sampleAppointments = [
-            {
-                id: '1',
-                first_name: 'Juan',
-                last_name: 'Rodriguez',
-                email: 'juan@email.com',
-                phone: '(503) 123-4567',
-                service: 'Tire Installation',
-                preferred_date: '2024-12-15',
-                preferred_time: '10:00 AM',
-                message: 'Need new winter tires installed',
-                status: 'new',
-                created_at: '2024-12-10T10:00:00Z'
-            },
-            {
-                id: '2',
-                first_name: 'Maria',
-                last_name: 'Garcia',
-                email: 'maria@email.com',
-                phone: '(503) 234-5678',
-                service: 'Brake Service',
-                preferred_date: '2024-12-16',
-                preferred_time: '2:00 PM',
-                message: 'Brakes making noise',
-                status: 'priority',
-                created_at: '2024-12-09T14:00:00Z'
-            },
-            {
-                id: '3',
-                first_name: 'Carlos',
-                last_name: 'Martinez',
-                email: 'carlos@email.com',
-                phone: '(503) 345-6789',
-                service: 'Oil Change',
-                preferred_date: '2024-12-15',
-                preferred_time: '3:00 PM',
-                message: '',
-                status: 'completed',
-                created_at: '2024-12-08T09:00:00Z'
-            }
-        ];
+        // Supabase configuration
+        const SUPABASE_URL = 'https://vtknmauyvmuaryttnenx.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0a25tYXV5dm11YXJ5dHRuZW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1MDE1MDgsImV4cCI6MjA2NTA3NzUwOH0._bOyuxj1nRBw3U7Q3qCsDubBNg_EM-VLhQB0y5p9okY';
+        
+        // Initialize Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const sampleMessages = [
-            {
-                id: '1',
-                first_name: 'Ana',
-                last_name: 'Lopez',
-                email: 'ana@email.com',
-                phone: '(503) 456-7890',
-                message: 'I need information about tire prices for my Honda Civic.',
-                status: 'new',
-                created_at: '2024-12-14T11:00:00Z'
-            },
-            {
-                id: '2',
-                first_name: 'Roberto',
-                last_name: 'Silva',
-                email: 'roberto@email.com',
-                phone: '(503) 567-8901',
-                message: 'My car is making a strange noise when I brake. Can you help?',
-                status: 'priority',
-                created_at: '2024-12-13T16:30:00Z'
-            }
-        ];
-
+        // Global variables
+        let appointments = [];
+        let contactMessages = [];
         let currentLanguage = 'english';
         let selectedDate = new Date();
         let currentTab = 'appointments';
 
         // Initialize the page
-        function init() {
-            setTimeout(() => {
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
+        async function init() {
+            try {
+                await fetchDataFromSupabase();
                 
-                generateCalendar();
-                loadAppointments();
-                loadMessages();
-                updateSelectedDateInfo();
-            }, 1000);
+                setTimeout(() => {
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('main-content').classList.remove('hidden');
+                    
+                    generateCalendar();
+                    loadAppointments();
+                    loadMessages();
+                    updateSelectedDateInfo();
+                }, 500);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('loading').innerHTML = '<p style="color: red;">Error loading dashboard data. Please refresh the page.</p>';
+            }
+        }
+
+        // Fetch data from Supabase
+        async function fetchDataFromSupabase() {
+            console.log('Fetching data from Supabase...');
+            
+            try {
+                // Fetch appointments
+                const { data: appointmentsData, error: appointmentsError } = await supabaseClient
+                    .from('oregon_tires_appointments')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (appointmentsError) {
+                    console.error('Error fetching appointments:', appointmentsError);
+                    throw appointmentsError;
+                }
+
+                // Fetch contact messages
+                const { data: messagesData, error: messagesError } = await supabaseClient
+                    .from('oregon_tires_contact_messages')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (messagesError) {
+                    console.error('Error fetching messages:', messagesError);
+                    throw messagesError;
+                }
+
+                appointments = appointmentsData || [];
+                contactMessages = messagesData || [];
+                
+                console.log('Fetched appointments:', appointments.length);
+                console.log('Fetched messages:', contactMessages.length);
+            } catch (error) {
+                console.error('Supabase fetch error:', error);
+                throw error;
+            }
+        }
+
+        // Update appointment status in Supabase
+        async function updateAppointmentStatus(id, newStatus) {
+            try {
+                console.log('Updating appointment status:', { id, status: newStatus.toLowerCase() });
+                
+                const { error } = await supabaseClient
+                    .from('oregon_tires_appointments')
+                    .update({ status: newStatus.toLowerCase() })
+                    .eq('id', id);
+
+                if (error) {
+                    console.error('Error updating appointment status:', error);
+                    throw error;
+                }
+
+                // Update local data
+                const appointment = appointments.find(apt => apt.id === id);
+                if (appointment) {
+                    appointment.status = newStatus.toLowerCase();
+                    updateSelectedDateInfo(); // Refresh the calendar info
+                }
+                
+                console.log('Status updated successfully');
+            } catch (error) {
+                console.error('Failed to update appointment status:', error);
+                alert('Failed to update status. Please try again.');
+            }
+        }
+
+        // Update message status in Supabase
+        async function updateMessageStatus(id, newStatus) {
+            try {
+                console.log('Updating message status:', { id, status: newStatus.toLowerCase() });
+                
+                const { error } = await supabaseClient
+                    .from('oregon_tires_contact_messages')
+                    .update({ status: newStatus.toLowerCase() })
+                    .eq('id', id);
+
+                if (error) {
+                    console.error('Error updating message status:', error);
+                    throw error;
+                }
+
+                // Update local data
+                const message = contactMessages.find(msg => msg.id === id);
+                if (message) {
+                    message.status = newStatus.toLowerCase();
+                }
+                
+                console.log('Message status updated successfully');
+            } catch (error) {
+                console.error('Failed to update message status:', error);
+                alert('Failed to update status. Please try again.');
+            }
         }
 
         // Language toggle
         function toggleLanguage() {
             currentLanguage = currentLanguage === 'english' ? 'spanish' : 'english';
-            // In a real implementation, this would update all text content
             console.log('Language switched to:', currentLanguage);
         }
 
@@ -602,7 +651,7 @@
 
                     // Check if date has appointments
                     const dateStr = cellDate.toISOString().split('T')[0];
-                    if (sampleAppointments.some(apt => apt.preferred_date === dateStr)) {
+                    if (appointments.some(apt => apt.preferred_date === dateStr)) {
                         cell.classList.add('has-appointment');
                     }
 
@@ -625,7 +674,7 @@
             document.getElementById('selected-date').textContent = dateStr;
 
             const dateIsoStr = selectedDate.toISOString().split('T')[0];
-            const dayAppointments = sampleAppointments.filter(apt => apt.preferred_date === dateIsoStr);
+            const dayAppointments = appointments.filter(apt => apt.preferred_date === dateIsoStr);
             
             document.getElementById('appointment-count').textContent = `${dayAppointments.length} appointments`;
 
@@ -654,12 +703,12 @@
         function loadAppointments() {
             const tbody = document.getElementById('appointments-table');
             
-            if (sampleAppointments.length === 0) {
+            if (appointments.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" style="color: #6b7280; padding: 1.5rem;">No appointments found.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = sampleAppointments.map(appointment => `
+            tbody.innerHTML = appointments.map(appointment => `
                 <tr>
                     <td>
                         <div>
@@ -693,12 +742,12 @@
         function loadMessages() {
             const tbody = document.getElementById('messages-table');
             
-            if (sampleMessages.length === 0) {
+            if (contactMessages.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" style="color: #6b7280; padding: 1.5rem;">No messages found.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = sampleMessages.map(message => `
+            tbody.innerHTML = contactMessages.map(message => `
                 <tr>
                     <td>
                         <div>
@@ -728,25 +777,13 @@
             `).join('');
         }
 
-        // Update status
-        function updateStatus(type, id, newStatus) {
-            console.log(`Updating ${type} ${id} status to ${newStatus}`);
-            
+        // Update status (unified function for both appointments and messages)
+        async function updateStatus(type, id, newStatus) {
             if (type === 'appointment') {
-                const appointment = sampleAppointments.find(apt => apt.id === id);
-                if (appointment) {
-                    appointment.status = newStatus;
-                    updateSelectedDateInfo(); // Refresh the calendar info
-                }
+                await updateAppointmentStatus(id, newStatus);
             } else if (type === 'message') {
-                const message = sampleMessages.find(msg => msg.id === id);
-                if (message) {
-                    message.status = newStatus;
-                }
+                await updateMessageStatus(id, newStatus);
             }
-            
-            // Show success message (in a real app, this would be a toast)
-            console.log('Status updated successfully');
         }
 
         // Utility functions
