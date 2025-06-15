@@ -20,7 +20,7 @@ export const AdminHeader = ({ language, toggleLanguage, currentView, setCurrentV
     <header style={{ backgroundColor: '#007030' }} className="text-white py-6 shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-4">
-          <Link to="/" className="inline-block">
+          <Link to="/home.html" className="inline-block">
             <h1 className="text-3xl font-bold hover:text-yellow-200">Oregon Tires Management</h1>
           </Link>
           <button 
