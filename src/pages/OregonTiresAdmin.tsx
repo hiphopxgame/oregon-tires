@@ -1,13 +1,15 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ExternalLink } from 'lucide-react';
 import translations from '@/utils/translations';
 import { AdminHeader } from '@/components/admin/AdminHeader';
-import { AdminCalendar } from '@/components/admin/AdminCalendar';
-import { AdminTabs } from '@/components/admin/AdminTabs';
 import { AdminFooter } from '@/components/admin/AdminFooter';
+import { DashboardView } from '@/components/admin/DashboardView';
+import { AppointmentsView } from '@/components/admin/AppointmentsView';
+import { MessagesView } from '@/components/admin/MessagesView';
+import { AnalyticsView } from '@/components/admin/AnalyticsView';
 
 interface Appointment {
   id: string;
@@ -45,6 +47,7 @@ const OregonTiresAdmin = () => {
   const [activeTab, setActiveTab] = useState('appointments');
   const [language, setLanguage] = useState('english');
   const [t, setT] = useState(translations['english']);
+  const [currentView, setCurrentView] = useState('dashboard');
 
   const toggleLanguage = () => {
     const newLanguage = language === 'english' ? 'spanish' : 'english';
@@ -152,6 +155,62 @@ const OregonTiresAdmin = () => {
   const selectedDateAppointments = getAppointmentsForDate(selectedDate);
   const appointmentDates = appointments.map(apt => new Date(apt.preferred_date + 'T00:00:00'));
 
+  const renderCurrentView = () => {
+    switch (currentView) {
+      case 'dashboard':
+        return (
+          <DashboardView
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            appointmentDates={appointmentDates}
+            selectedDateAppointments={selectedDateAppointments}
+            updateAppointmentStatus={updateAppointmentStatus}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            appointments={appointments}
+            contactMessages={contactMessages}
+            updateMessageStatus={updateMessageStatus}
+          />
+        );
+      case 'appointments':
+        return (
+          <AppointmentsView
+            appointments={appointments}
+            updateAppointmentStatus={updateAppointmentStatus}
+          />
+        );
+      case 'messages':
+        return (
+          <MessagesView
+            contactMessages={contactMessages}
+            updateMessageStatus={updateMessageStatus}
+          />
+        );
+      case 'analytics':
+        return (
+          <AnalyticsView
+            appointments={appointments}
+            contactMessages={contactMessages}
+          />
+        );
+      default:
+        return (
+          <DashboardView
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            appointmentDates={appointmentDates}
+            selectedDateAppointments={selectedDateAppointments}
+            updateAppointmentStatus={updateAppointmentStatus}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            appointments={appointments}
+            contactMessages={contactMessages}
+            updateMessageStatus={updateMessageStatus}
+          />
+        );
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -162,29 +221,15 @@ const OregonTiresAdmin = () => {
 
   return (
     <div className="min-h-screen bg-white text-black">
-      <AdminHeader language={language} toggleLanguage={toggleLanguage} />
+      <AdminHeader 
+        language={language} 
+        toggleLanguage={toggleLanguage}
+        currentView={currentView}
+        setCurrentView={setCurrentView}
+      />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <AdminCalendar
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            appointmentDates={appointmentDates}
-            selectedDateAppointments={selectedDateAppointments}
-            updateAppointmentStatus={updateAppointmentStatus}
-          />
-
-          <div className="lg:col-span-2">
-            <AdminTabs
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              appointments={appointments}
-              contactMessages={contactMessages}
-              updateAppointmentStatus={updateAppointmentStatus}
-              updateMessageStatus={updateMessageStatus}
-            />
-          </div>
-        </div>
+        {renderCurrentView()}
       </div>
 
       <AdminFooter language={language} toggleLanguage={toggleLanguage} />
