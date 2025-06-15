@@ -1,0 +1,307 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: white;
+    color: black;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Header Styles */
+.header {
+    background-color: #007030;
+    color: white;
+    padding: 1.5rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 1.875rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+}
+
+.header h1:hover {
+    color: #FEE11A;
+}
+
+.language-toggle {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.language-toggle:hover {
+    color: #FEE11A;
+}
+
+/* Main Content */
+.main-content {
+    padding: 2rem 0;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card Styles */
+.card {
+    background: white;
+    border: 2px solid #007030;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #007030;
+    color: white;
+    padding: 1rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.card-description {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0.25rem 0 0 0;
+}
+
+.card-content {
+    padding: 1rem;
+}
+
+/* Calendar Styles */
+.calendar {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.calendar table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.calendar th,
+.calendar td {
+    padding: 0.5rem;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+}
+
+.calendar th {
+    background-color: #f9fafb;
+    font-weight: bold;
+}
+
+.calendar td {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar td:hover {
+    background-color: #f3f4f6;
+}
+
+.calendar .today {
+    background-color: #007030;
+    color: white;
+}
+
+.calendar .has-appointment {
+    background-color: #FEE11A;
+    color: black;
+    font-weight: bold;
+}
+
+.selected-date-info {
+    background-color: #f9fafb;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+}
+
+.appointment-count {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007030;
+    margin: 0.5rem 0;
+}
+
+.appointment-item {
+    background: white;
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    border-radius: 0.25rem;
+    border-left: 4px solid #007030;
+}
+
+/* Tabs Styles */
+.tabs {
+    margin-bottom: 1rem;
+}
+
+.tab-list {
+    display: flex;
+    background-color: #f3f4f6;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+}
+
+.tab-trigger {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    background: none;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tab-trigger.active {
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.table th {
+    background-color: #FEE11A;
+    color: black;
+    font-weight: 600;
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Status Badge */
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-new {
+    background-color: #FEE11A;
+    color: black;
+}
+
+.status-priority {
+    background-color: #dc2626;
+    color: white;
+}
+
+.status-completed {
+    background-color: #007030;
+    color: white;
+}
+
+/* Select Styles */
+.status-select {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    background: white;
+    cursor: pointer;
+}
+
+/* Footer */
+.footer {
+    background-color: #007030;
+    color: white;
+    padding: 1rem 0;
+    margin-top: 3rem;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    color: #007030;
+}
+
+.hidden {
+    display: none;
+}
+
+.customer-name {
+    font-weight: 500;
+    color: #007030;
+}
+
+.contact-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.message-truncate {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
