@@ -1,17 +1,6 @@
 
 import { MessagesTab } from './MessagesTab';
-
-interface ContactMessage {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  message: string;
-  status: string;
-  language: string;
-  created_at: string;
-}
+import { ContactMessage } from '@/types/admin';
 
 interface MessagesViewProps {
   contactMessages: ContactMessage[];

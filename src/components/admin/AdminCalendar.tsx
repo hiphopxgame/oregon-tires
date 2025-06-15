@@ -2,15 +2,7 @@
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-interface Appointment {
-  id: string;
-  first_name: string;
-  last_name: string;
-  service: string;
-  preferred_time: string;
-  status: string;
-}
+import { Appointment } from '@/types/admin';
 
 interface AdminCalendarProps {
   selectedDate: Date;

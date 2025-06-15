@@ -2,17 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-interface ContactMessage {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  message: string;
-  status: string;
-  created_at: string;
-}
+import { ContactMessage } from '@/types/admin';
 
 interface MessagesTabProps {
   contactMessages: ContactMessage[];

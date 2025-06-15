@@ -2,19 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-interface Appointment {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  service: string;
-  preferred_date: string;
-  preferred_time: string;
-  message: string;
-  status: string;
-}
+import { Appointment } from '@/types/admin';
 
 interface AppointmentsTabProps {
   appointments: Appointment[];
