@@ -4,110 +4,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oregon Tires Auto Care - Professional Tire & Auto Services</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title id="site-title">Oregon Tires Auto Care</title>
+    <meta id="site-subtitle" name="description" content="Professional Tire & Auto Services">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="oregon-tires-styles.css">
 </head>
-<body class="min-h-screen bg-green-50">
+<body>
     <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <!-- Top Bar -->
-        <div class="bg-primary text-white py-2 px-4 rounded-md mb-4">
-            <div class="flex flex-col lg:flex-row justify-between items-center text-sm">
-                <div class="flex flex-col sm:flex-row items-center gap-4 mb-2 lg:mb-0">
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="phone" class="h-4 w-4"></i>
-                        (503) 367-9714
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="map-pin" class="h-4 w-4"></i>
-                        8536 SE 82nd Ave, Portland, OR 97266
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="clock" class="h-4 w-4"></i>
-                        <span id="hours-text">Mon-Sat 7AM-7PM</span>
-                    </div>
+    <header class="hero-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 id="site-title" class="text-2xl font-bold">Oregon Tires Auto Care</h1>
+                    <p id="site-subtitle" class="text-white/80">Professional Tire & Auto Services</p>
                 </div>
                 <button onclick="toggleLanguage()" class="text-white hover:text-yellow-200">
-                    🇺🇸 English | 🇲🇽 Español
+                    English | Español
                 </button>
             </div>
         </div>
-
-        <!-- Main Header -->
-        <div class="flex flex-col lg:flex-row justify-between items-center">
-            <div class="flex items-center gap-4 mb-4 lg:mb-0">
-                <img src="/lovable-uploads/f000a232-32e4-4f91-8b69-f7e61ac811f2.png" alt="Oregon Tires Logo" class="h-16 w-16">
-                <div>
-                    <h1 class="text-2xl font-bold text-primary" id="site-title">Oregon Tires Auto Care</h1>
-                    <p class="text-lg text-gray-600" id="site-subtitle">Professional Tire & Auto Services</p>
-                </div>
-            </div>
-
-            <!-- Navigation -->
-            <nav class="flex flex-wrap items-center gap-6">
-                <button onclick="scrollToSection('home')" class="text-gray-700 hover:text-green-700 font-medium">Home</button>
-                <button onclick="scrollToSection('services')" class="text-gray-700 hover:text-green-700 font-medium" id="nav-services">Services</button>
-                <button onclick="scrollToSection('about')" class="text-gray-700 hover:text-green-700 font-medium" id="nav-about">About</button>
-                <button onclick="scrollToSection('contact')" class="text-gray-700 hover:text-green-700 font-medium" id="nav-contact">Contact</button>
-                <button class="bg-primary text-white font-medium px-4 py-2 rounded hover:bg-primary" onclick="openScheduleForm()" id="schedule-btn">Schedule Service</button>
-            </nav>
-        </div>
     </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="py-20 hero-bg">
-        <div class="container mx-auto px-4 text-center">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-5xl font-bold text-white mb-4" id="hero-title">Your Trusted Auto Care Experts in Portland</h2>
-                <p class="text-xl text-white mb-8" id="hero-subtitle">Professional tire installation, repair, and complete automotive services. We speak Spanish and English!</p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button class="bg-yellow-400 text-black font-bold px-6 py-3 rounded text-lg" onclick="openContactForm()" id="contact-btn">Contact Us</button>
-                    <button class="bg-yellow-400 text-black font-bold px-6 py-3 rounded text-lg border-2 border-yellow-400 hover:bg-white hover:text-green-700" onclick="openScheduleForm()" id="appointment-btn">Book Appointment</button>
-                </div>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center space-x-8 py-4">
+                <a href="#services" onclick="scrollToSection('services')" id="nav-services" class="text-primary hover:text-green-700 font-medium">Services</a>
+                <a href="#about" onclick="scrollToSection('about')" id="nav-about" class="text-primary hover:text-green-700 font-medium">About</a>
+                <a href="#testimonials" onclick="scrollToSection('testimonials')" id="nav-testimonials" class="text-primary hover:text-green-700 font-medium">Reviews</a>
+                <a href="#contact" onclick="scrollToSection('contact')" id="nav-contact" class="text-primary hover:text-green-700 font-medium">Contact</a>
             </div>
         </div>
-    </section>
+    </nav>
 
-    <!-- Hero Image Section -->
-    <section class="py-12">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-8">
-                <img src="/lovable-uploads/92683d6e-fdfc-4bcc-935d-357e68ebfc33.png" alt="Oregon Tires Auto Care - Spanish & English Speaking" class="mx-auto max-w-full h-auto rounded-lg shadow-lg">
+    <!-- Hero Section -->
+    <section class="hero-bg text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h1 id="hero-title" class="text-5xl font-bold mb-6">Your Trusted Auto Care Experts in Portland</h1>
+            <p id="hero-subtitle" class="text-xl mb-8 max-w-3xl mx-auto">Professional tire installation, repair, and complete automotive services. We speak Spanish and English!</p>
+            <div class="flex justify-center gap-4 flex-wrap">
+                <button onclick="openContactForm()" id="contact-btn" class="secondary-color text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors">Contact Us</button>
+                <button onclick="openScheduleForm()" id="appointment-btn" class="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">Book Appointment</button>
             </div>
         </div>
     </section>
 
     <!-- Services Section -->
-    <section id="services" class="py-16 bg-white">
+    <section id="services" class="py-16 bg-gray-50">
         <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-6 text-primary" id="services-title">Services</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed" id="services-subtitle">Comprehensive automotive services you can trust</p>
+            <div class="text-center mb-12">
+                <h2 id="services-title" class="text-4xl font-bold primary-color mb-4">Services</h2>
+                <p id="services-subtitle" class="text-xl text-gray-600">Comprehensive automotive services you can trust</p>
             </div>
+            
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="text-center p-6 bg-gray-50 rounded-lg">
-                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="wrench" class="h-8 w-8 text-primary"></i>
+                <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i data-lucide="circle" class="h-8 w-8 text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 text-primary" id="tire-services">Tire Services</h3>
-                    <p class="text-gray-600">Professional tire installation, repair, rotation and balancing</p>
+                    <h3 id="tire-services" class="text-xl font-semibold mb-3 text-center">Tire Services</h3>
+                    <ul class="text-gray-600 space-y-2">
+                        <li id="footer-tire-installation">Tire Installation</li>
+                        <li id="footer-tire-repair">Tire Repair</li>
+                        <li>Tire Rotation & Balancing</li>
+                    </ul>
                 </div>
-                <div class="text-center p-6 bg-gray-50 rounded-lg">
-                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="car" class="h-8 w-8 text-primary"></i>
+                
+                <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i data-lucide="wrench" class="h-8 w-8 text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 text-primary" id="auto-maintenance">Auto Maintenance</h3>
-                    <p class="text-gray-600">Oil changes, brake service, engine diagnostics and more</p>
+                    <h3 id="auto-maintenance" class="text-xl font-semibold mb-3 text-center">Auto Maintenance</h3>
+                    <ul class="text-gray-600 space-y-2">
+                        <li id="footer-wheel-alignment">Wheel Alignment</li>
+                        <li id="footer-brake-service">Brake Service</li>
+                        <li id="footer-oil-change">Oil Change</li>
+                    </ul>
                 </div>
-                <div class="text-center p-6 bg-gray-50 rounded-lg">
-                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="phone" class="h-8 w-8 text-primary"></i>
+                
+                <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i data-lucide="phone" class="h-8 w-8 text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 text-primary" id="emergency-service">Emergency Services</h3>
-                    <p class="text-gray-600">Roadside assistance, flat tire repair, jump start service</p>
+                    <h3 id="emergency-service" class="text-xl font-semibold mb-3 text-center">Emergency Services</h3>
+                    <ul class="text-gray-600 space-y-2">
+                        <li>24/7 Emergency Repair</li>
+                        <li>Roadside Assistance</li>
+                        <li>Mobile Tire Service</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -116,72 +102,22 @@
     <!-- About Section -->
     <section id="about" class="py-16 bg-white">
         <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-6 text-primary">About Us</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed" id="about-subtitle">Serving Portland with honest, reliable automotive services since 2008</p>
-            </div>
-
-            <!-- Main Content -->
-            <div class="grid lg:grid-cols-2 gap-16 items-start">
-                <div class="space-y-8">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl font-bold primary-color mb-6">About Oregon Tires Auto Care</h2>
+                <p id="about-subtitle" class="text-xl text-gray-600 mb-8">Serving Portland with honest, reliable automotive services since 2008</p>
+                <div class="grid md:grid-cols-2 gap-8 text-left">
                     <div>
-                        <h3 class="text-3xl font-bold mb-6 text-primary">Our Story</h3>
-                        <div class="space-y-4 text-gray-700 leading-relaxed">
-                            <p>Oregon Tires has been serving the Portland community since 2008. What started as a small tire shop has grown into a full-service automotive center, but we've never forgotten our roots or our commitment to treating every customer like family.</p>
-                            <p>We believe in honest, transparent service. Our certified technicians will always explain what your vehicle needs and why, giving you the information you need to make the best decision for your safety and budget.</p>
-                        </div>
+                        <h3 class="text-2xl font-semibold primary-color mb-4">Our Mission</h3>
+                        <p class="text-gray-600 mb-4">To provide exceptional automotive services with honest pricing and reliable results. We treat every customer like family and every vehicle with the care it deserves.</p>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-8 pt-6">
-                        <div class="text-center">
-                            <div class="text-5xl font-bold mb-3 text-primary">15+</div>
-                            <div class="text-gray-600 font-medium">Years Experience</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-5xl font-bold mb-3 text-primary">5000+</div>
-                            <div class="text-gray-600 font-medium">Happy Customers</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-8">
                     <div>
-                        <h3 class="text-3xl font-bold mb-6 text-primary">Why Choose Us?</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                                <i data-lucide="check" class="h-6 w-6 mt-1 flex-shrink-0 text-primary"></i>
-                                <div>
-                                    <h4 class="font-semibold text-gray-800 mb-1">ASE Certified Technicians</h4>
-                                    <p class="text-gray-600 text-sm">Our team holds industry certifications and stays current with automotive technology.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                                <i data-lucide="check" class="h-6 w-6 mt-1 flex-shrink-0 text-primary"></i>
-                                <div>
-                                    <h4 class="font-semibold text-gray-800 mb-1">Same Day Service Available</h4>
-                                    <p class="text-gray-600 text-sm">Most repairs and services can be completed while you wait.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                                <i data-lucide="check" class="h-6 w-6 mt-1 flex-shrink-0 text-primary"></i>
-                                <div>
-                                    <h4 class="font-semibold text-gray-800 mb-1">Family Owned & Operated</h4>
-                                    <p class="text-gray-600 text-sm">Local business committed to our Portland community.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                                <i data-lucide="check" class="h-6 w-6 mt-1 flex-shrink-0 text-primary"></i>
-                                <div>
-                                    <h4 class="font-semibold text-gray-800 mb-1">Comprehensive Auto Care</h4>
-                                    <p class="text-gray-600 text-sm">From routine maintenance to complex repairs, we handle it all.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="p-6 border-l-4 border-primary bg-gray-50 rounded">
-                        <h4 class="text-xl font-bold mb-3 text-primary">Our Promise</h4>
-                        <p class="text-gray-600 leading-relaxed">We guarantee quality workmanship and stand behind every service with our comprehensive warranty. Your satisfaction and safety are our top priorities.</p>
+                        <h3 class="text-2xl font-semibold primary-color mb-4">Why Choose Us</h3>
+                        <ul class="text-gray-600 space-y-2">
+                            <li>• Bilingual staff (English & Spanish)</li>
+                            <li>• Honest, transparent pricing</li>
+                            <li>• Quality workmanship guaranteed</li>
+                            <li>• Fast, reliable service</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -189,20 +125,20 @@
     </section>
 
     <!-- Testimonials Section -->
-    <section class="py-16 bg-white">
+    <section id="testimonials" class="py-16 bg-gray-50">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold mb-4 text-primary" id="testimonials-title">Customer Reviews</h2>
-                <p class="text-xl text-gray-600" id="testimonials-subtitle">What our customers say about our service</p>
+                <h2 id="testimonials-title" class="text-4xl font-bold primary-color mb-4">Customer Reviews</h2>
+                <p id="testimonials-subtitle" class="text-xl text-gray-600">What our customers say about our service</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-6 mb-12" id="reviews-container">
+            <div id="reviews-container" class="grid md:grid-cols-3 gap-6 mb-12">
                 <!-- Reviews will be populated by JavaScript -->
             </div>
 
             <div class="text-center">
-                <div class="inline-block bg-gray-50 p-8 rounded-lg shadow-lg">
-                    <div class="text-5xl font-bold mb-2 text-primary">4.8</div>
+                <div class="inline-block bg-white p-8 rounded-lg shadow-lg">
+                    <div class="text-5xl font-bold primary-color mb-2">4.8</div>
                     <div class="text-gray-600 mb-3">out of 5 stars</div>
                     <div class="flex justify-center mb-3">
                         <i data-lucide="star" class="h-6 w-6 fill-current text-yellow-400"></i>
@@ -212,10 +148,7 @@
                         <i data-lucide="star" class="h-6 w-6 fill-current text-yellow-400"></i>
                     </div>
                     <div class="text-gray-600 mb-6">Based on 150+ Google Reviews</div>
-                    <button 
-                        onclick="window.open('https://www.google.com/search?sca_esv=6df4d1ed451ac289&sxsrf=AE3TifMy55UssDOtrXR8Esz2eSH5UOyS1g:1749792496572&si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-E5EWQrHl7sppkcD-zb5r0m0iiLtgu2v1wQWQGknmEKiRI73YX7qCtCCI7-B3ifffNSZe3WdLtoEC-Pkklqk7IsNFtUDY&q=Oregon+Tires+Reviews&sa=X&ved=2ahUKEwizl8GB1e2NAxV_JkQIHZgPD8QQ0bkNegQIQRAD&biw=1537&bih=932&dpr=2', '_blank')"
-                        class="border-2 border-primary text-primary bg-white hover:bg-green-50 py-3 px-6 rounded-md transition-colors"
-                    >
+                    <button onclick="window.open('https://www.google.com/search?q=Oregon+Tires+Reviews', '_blank')" class="border-2 border-primary text-primary px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors">
                         View All Reviews on Google
                     </button>
                 </div>
@@ -224,151 +157,137 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-16">
+    <section id="contact" class="py-16 bg-white">
         <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold mb-4 text-primary" id="contact-title">Contact</h2>
-                <p class="text-xl text-gray-600" id="contact-subtitle">Get in touch with us for all your automotive needs</p>
-            </div>
-
-            <div class="grid lg:grid-cols-2 gap-12">
-                <!-- Contact Information -->
-                <div>
-                    <h3 class="text-2xl font-bold mb-6 text-primary" id="contact-info">Contact Information</h3>
-                    
-                    <div class="space-y-6">
-                        <div class="flex items-center gap-4">
-                            <div class="bg-green-100 p-3 rounded-full">
-                                <i data-lucide="phone" class="h-6 w-6 text-primary"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800" id="phone-label">Phone</h4>
-                                <p class="text-gray-600">(503) 367-9714</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-4">
-                            <div class="bg-green-100 p-3 rounded-full">
-                                <i data-lucide="map-pin" class="h-6 w-6 text-primary"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">Address</h4>
-                                <p class="text-gray-600">8536 SE 82nd Ave, Portland, OR 97266</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-4">
-                            <div class="bg-green-100 p-3 rounded-full">
-                                <i data-lucide="clock" class="h-6 w-6 text-primary"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800" id="business-hours">Business Hours</h4>
-                                <p class="text-gray-600" id="hours-mon-sat">Mon-Sat 7AM-7PM</p>
-                                <p class="text-gray-600" id="hours-sunday">Sunday: Closed</p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 id="contact-title" class="text-4xl font-bold primary-color mb-4">Contact</h2>
+                    <p id="contact-subtitle" class="text-xl text-gray-600">Get in touch with us for all your automotive needs</p>
                 </div>
 
-                <!-- Contact Form -->
-                <div>
-                    <div class="bg-white border rounded-lg shadow-sm">
-                        <div class="p-6 border-b">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-xl font-bold text-primary" id="form-title">Contact</h3>
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="schedule-mode" onchange="toggleScheduleMode()">
-                                    <label for="schedule-mode" class="text-sm font-medium" id="toggle-label">Switch to Schedule</label>
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <!-- Contact Information -->
+                    <div>
+                        <h3 id="contact-info" class="text-2xl font-semibold primary-color mb-6">Contact Information</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="phone" class="h-5 w-5 text-primary"></i>
+                                <div>
+                                    <p class="font-medium" id="phone-label">Phone</p>
+                                    <p class="text-gray-600">(503) 367-9714</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="map-pin" class="h-5 w-5 text-primary"></i>
+                                <div>
+                                    <p class="font-medium">Address</p>
+                                    <p class="text-gray-600">8536 SE 82nd Ave, Portland, OR 97266</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="clock" class="h-5 w-5 text-primary"></i>
+                                <div>
+                                    <p class="font-medium" id="business-hours">Business Hours</p>
+                                    <p class="text-gray-600" id="hours-mon-sat">Mon-Sat 7AM-7PM</p>
+                                    <p class="text-gray-600" id="hours-sunday">Sunday: Closed</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="p-6">
-                            <form id="contact-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
+
+                        <div class="mt-8">
+                            <button onclick="window.open('https://maps.google.com/?q=8536+SE+82nd+Ave,+Portland,+OR+97266', '_blank')" id="visit-location" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                                Visit Our Location
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="bg-gray-50 p-8 rounded-lg">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 id="form-title" class="text-2xl font-semibold primary-color">Contact</h3>
+                            <div class="flex items-center gap-2">
+                                <span id="toggle-label" class="text-sm text-gray-600">Switch to Schedule</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="schedule-mode" class="sr-only peer" onchange="toggleScheduleMode()">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <form onsubmit="handleFormSubmit(event)">
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="firstName" id="first-name-label" class="block text-gray-700 font-medium mb-2">First Name *</label>
+                                    <input type="text" id="firstName" name="firstName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label for="lastName" id="last-name-label" class="block text-gray-700 font-medium mb-2">Last Name *</label>
+                                    <input type="text" id="lastName" name="lastName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="phone" id="phone-label-form" class="block text-gray-700 font-medium mb-2">Phone *</label>
+                                    <input type="tel" id="phone" name="phone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label for="email" id="email-label" class="block text-gray-700 font-medium mb-2">Email *</label>
+                                    <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                            </div>
+
+                            <!-- Schedule-specific fields -->
+                            <div id="schedule-fields" style="display: none;">
+                                <div class="mb-4">
+                                    <label for="service" id="service-label" class="block text-gray-700 font-medium mb-2">Service Needed *</label>
+                                    <select id="service" name="service" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="" id="select-service">Select a service</option>
+                                        <option value="tire-installation">Tire Installation</option>
+                                        <option value="tire-repair">Tire Repair</option>
+                                        <option value="wheel-alignment">Wheel Alignment</option>
+                                        <option value="brake-service">Brake Service</option>
+                                        <option value="oil-change">Oil Change</option>
+                                        <option value="general-maintenance">General Maintenance</option>
+                                    </select>
+                                </div>
+
+                                <div class="grid md:grid-cols-2 gap-4 mb-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1" id="first-name-label">First Name *</label>
-                                        <input type="text" required placeholder="First Name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" id="firstName" name="firstName">
+                                        <label for="preferred_date" id="preferred-date-label" class="block text-gray-700 font-medium mb-2">Preferred Date *</label>
+                                        <input type="date" id="preferred_date" name="preferred_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1" id="last-name-label">Last Name *</label>
-                                        <input type="text" required placeholder="Last Name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" id="lastName" name="lastName">
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1" id="phone-label-form">Phone *</label>
-                                    <input type="tel" required placeholder="(503) 123-4567" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" id="phone" name="phone">
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1" id="email-label">Email *</label>
-                                    <input type="email" required placeholder="your@email.com" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" id="email" name="email">
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1" id="message-label">Message *</label>
-                                    <textarea required rows="4" placeholder="Message..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" id="message" name="message"></textarea>
-                                </div>
-
-                                <div id="schedule-fields" style="display: none;">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1" id="service-label">Service Needed *</label>
-                                        <select class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" id="service" name="service">
-                                            <option value="" id="select-service">Select a service</option>
-                                            <option value="Tire Installation">Tire Installation</option>
-                                            <option value="Tire Repair">Tire Repair</option>
-                                            <option value="Wheel Alignment">Wheel Alignment</option>
-                                            <option value="Brake Service">Brake Service</option>
-                                            <option value="Oil Change">Oil Change</option>
-                                            <option value="General Maintenance">General Maintenance</option>
-                                            <option value="Other">Other</option>
+                                        <label for="preferred_time" id="preferred-time-label" class="block text-gray-700 font-medium mb-2">Preferred Time *</label>
+                                        <select id="preferred_time" name="preferred_time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <option value="" id="select-time">Select a time</option>
+                                            <option value="07:00">7:00 AM</option>
+                                            <option value="08:00">8:00 AM</option>
+                                            <option value="09:00">9:00 AM</option>
+                                            <option value="10:00">10:00 AM</option>
+                                            <option value="11:00">11:00 AM</option>
+                                            <option value="12:00">12:00 PM</option>
+                                            <option value="13:00">1:00 PM</option>
+                                            <option value="14:00">2:00 PM</option>
+                                            <option value="15:00">3:00 PM</option>
+                                            <option value="16:00">4:00 PM</option>
+                                            <option value="17:00">5:00 PM</option>
+                                            <option value="18:00">6:00 PM</option>
                                         </select>
                                     </div>
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1" id="preferred-date-label">Preferred Date *</label>
-                                            <input type="date" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" id="preferred_date" name="preferred_date">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1" id="preferred-time-label">Preferred Time *</label>
-                                            <select class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" id="preferred_time" name="preferred_time">
-                                                <option value="" id="select-time">Select a time</option>
-                                                <option value="07:00">7:00 AM</option>
-                                                <option value="08:00">8:00 AM</option>
-                                                <option value="09:00">9:00 AM</option>
-                                                <option value="10:00">10:00 AM</option>
-                                                <option value="11:00">11:00 AM</option>
-                                                <option value="12:00">12:00 PM</option>
-                                                <option value="13:00">1:00 PM</option>
-                                                <option value="14:00">2:00 PM</option>
-                                                <option value="15:00">3:00 PM</option>
-                                                <option value="16:00">4:00 PM</option>
-                                                <option value="17:00">5:00 PM</option>
-                                                <option value="18:00">6:00 PM</option>
-                                                <option value="19:00">7:00 PM</option>
-                                            </select>
-                                        </div>
-                                    </div>
                                 </div>
+                            </div>
 
-                                <button type="submit" class="w-full bg-primary text-white py-3 px-6 rounded-md hover:bg-primary transition-colors" id="submit-btn">
-                                    <span id="submit-text">Send Message</span>
-                                </button>
-                            </form>
-                        </div>
+                            <div class="mb-6">
+                                <label for="message" id="message-label" class="block text-gray-700 font-medium mb-2">Message *</label>
+                                <textarea id="message" name="message" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                            </div>
+
+                            <button type="submit" id="submit-text" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                                Send Message
+                            </button>
+                        </form>
                     </div>
-                </div>
-            </div>
-
-            <!-- Visit Our Location Section -->
-            <div class="mt-12">
-                <div class="text-center mb-6">
-                    <h3 class="text-2xl font-bold mb-2 text-primary" id="visit-location">Visit Our Location</h3>
-                    <p class="text-lg text-gray-600">8536 SE 82nd Ave, Portland, OR 97266</p>
-                </div>
-                <div class="bg-gray-200 h-96 rounded-lg flex items-center justify-center">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.8567891234567!2d-122.57895!3d45.46123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5495a0b91234567%3A0x1234567890abcdef!2s8536%20SE%2082nd%20Ave%2C%20Portland%2C%20OR%2097266!5e0!3m2!1sen!2sus!4v1234567890123" width="100%" height="100%" style="border: 0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="rounded-lg"></iframe>
                 </div>
             </div>
         </div>
@@ -377,7 +296,7 @@
     <!-- Footer -->
     <footer class="bg-primary text-white py-12">
         <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-4 gap-8">
                 <div>
                     <h3 class="text-xl font-bold mb-4" id="footer-contact-info">Contact Information</h3>
                     <div class="space-y-2">
@@ -409,9 +328,23 @@
 
                 <div>
                     <h3 class="text-xl font-bold mb-4">Language / Idioma</h3>
-                    <button onclick="toggleLanguage()" class="text-white hover:text-yellow-200 text-left">
-                        🇺🇸 English | 🇲🇽 Español
+                    <button onclick="toggleLanguage()" class="text-white hover:text-yellow-200 text-left mb-4">
+                        English | Español
                     </button>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Other Versions</h3>
+                    <div class="space-y-2">
+                        <a href="/oregon-tires" class="text-white hover:text-yellow-200 flex items-center gap-2 block">
+                            <i data-lucide="external-link" class="h-4 w-4"></i>
+                            React Version
+                        </a>
+                        <a href="/oregon-tires-dashboard.html" class="text-white hover:text-yellow-200 flex items-center gap-2 block">
+                            <i data-lucide="external-link" class="h-4 w-4"></i>
+                            Admin Dashboard
+                        </a>
+                    </div>
                 </div>
             </div>
 

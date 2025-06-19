@@ -22,7 +22,7 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
   return (
     <footer style={{ backgroundColor: primaryColor }} className="text-white py-12">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4">{t.contactInfo}</h3>
             <div className="space-y-2">
@@ -58,11 +58,13 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
               onClick={toggleLanguage} 
               className="text-white hover:text-yellow-200 text-left mb-4"
             >
-              🇺🇸 English | 🇲🇽 Español
+              English | Español
             </button>
-            
-            <div className="mt-4">
-              <h4 className="text-lg font-semibold mb-2">Static Version</h4>
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-bold mb-4">Other Versions</h3>
+            <div className="space-y-2">
               <a 
                 href="/oregon-tires.html" 
                 target="_blank"
@@ -70,7 +72,16 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
                 className="text-white hover:text-yellow-200 flex items-center gap-2"
               >
                 <ExternalLink className="h-4 w-4" />
-                HTML Page
+                Static HTML Page
+              </a>
+              <a 
+                href="/oregon-tires-dashboard.html" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-yellow-200 flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Admin Dashboard
               </a>
             </div>
           </div>

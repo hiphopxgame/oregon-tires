@@ -5,6 +5,7 @@ import { useAdminView } from '@/hooks/useAdminView';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminFooter } from '@/components/admin/AdminFooter';
 import { DashboardView } from '@/components/admin/DashboardView';
+import { DayView } from '@/components/admin/DayView';
 import { AppointmentsView } from '@/components/admin/AppointmentsView';
 import { MessagesView } from '@/components/admin/MessagesView';
 import { AnalyticsView } from '@/components/admin/AnalyticsView';
@@ -46,6 +47,25 @@ const OregonTiresAdmin = () => {
             contactMessages={contactMessages}
             updateMessageStatus={updateMessageStatus}
           />
+        );
+      case 'dayview':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-[#007030]">Day View</h2>
+              <input
+                type="date"
+                value={selectedDate.toISOString().split('T')[0]}
+                onChange={(e) => setSelectedDate(new Date(e.target.value + 'T00:00:00'))}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#007030] focus:border-transparent"
+              />
+            </div>
+            <DayView
+              appointments={appointments}
+              selectedDate={selectedDate}
+              updateAppointmentStatus={updateAppointmentStatus}
+            />
+          </div>
         );
       case 'appointments':
         return (

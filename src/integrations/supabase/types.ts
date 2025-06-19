@@ -9,6 +9,388 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      dc_ad_stats: {
+        Row: {
+          ad_id: string
+          created_at: string
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          ad_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          ad_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dc_ad_stats_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "dc_advertisements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dc_advertisements: {
+        Row: {
+          cash_spent: number
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          target_url: string
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          cash_spent?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          target_url: string
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          cash_spent?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          target_url?: string
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      dc_business_comments: {
+        Row: {
+          content: string
+          created_at: string
+          discussion_id: string
+          id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          discussion_id: string
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          discussion_id?: string
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dc_business_comments_discussion_id_fkey"
+            columns: ["discussion_id"]
+            isOneToOne: false
+            referencedRelation: "dc_business_discussions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dc_business_directory: {
+        Row: {
+          address: string | null
+          business_description: string | null
+          business_name: string
+          cash_amount: number
+          category: string
+          city: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_approved: boolean
+          is_featured: boolean
+          phone: string | null
+          state: string | null
+          tags: string[] | null
+          updated_at: string
+          user_id: string | null
+          website: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_description?: string | null
+          business_name: string
+          cash_amount?: number
+          category: string
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_approved?: boolean
+          is_featured?: boolean
+          phone?: string | null
+          state?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_description?: string | null
+          business_name?: string
+          cash_amount?: number
+          category?: string
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_approved?: boolean
+          is_featured?: boolean
+          phone?: string | null
+          state?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      dc_business_discussions: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          id: string
+          is_pinned: boolean
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      dc_business_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          linkedin_access_token: string | null
+          updated_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          linkedin_access_token?: string | null
+          updated_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          linkedin_access_token?: string | null
+          updated_at?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      dc_user_cash: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      "hiphop-orders": {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string | null
+          id: string
+          metadata: Json | null
+          product_type: string
+          quantity: number | null
+          status: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          metadata?: Json | null
+          product_type: string
+          quantity?: number | null
+          status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          metadata?: Json | null
+          product_type?: string
+          quantity?: number | null
+          status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      "hiphop-profiles": {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          hip_hop_cards_owned: number | null
+          hip_hop_cash_balance: number | null
+          hip_hop_land_owned: number | null
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          hip_hop_cards_owned?: number | null
+          hip_hop_cash_balance?: number | null
+          hip_hop_land_owned?: number | null
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          hip_hop_cards_owned?: number | null
+          hip_hop_cash_balance?: number | null
+          hip_hop_land_owned?: number | null
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      "hiphop-subscribers": {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          subscribed: boolean
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       oregon_tires_appointments: {
         Row: {
           created_at: string
