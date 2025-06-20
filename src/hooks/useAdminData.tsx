@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -38,6 +37,10 @@ export const useAdminData = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const refetchData = async () => {
+    await fetchData();
   };
 
   const updateAppointmentStatus = async (id: string, status: string) => {
@@ -107,6 +110,7 @@ export const useAdminData = () => {
     contactMessages,
     loading,
     updateAppointmentStatus,
-    updateMessageStatus
+    updateMessageStatus,
+    refetchData
   };
 };

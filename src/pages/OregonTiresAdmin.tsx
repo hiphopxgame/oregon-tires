@@ -17,7 +17,8 @@ const OregonTiresAdmin = () => {
     contactMessages,
     loading,
     updateAppointmentStatus,
-    updateMessageStatus
+    updateMessageStatus,
+    refetchData
   } = useAdminData();
   
   const {
@@ -64,6 +65,7 @@ const OregonTiresAdmin = () => {
               appointments={appointments}
               selectedDate={selectedDate}
               updateAppointmentStatus={updateAppointmentStatus}
+              onDataRefresh={refetchData}
             />
           </div>
         );

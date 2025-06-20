@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
 import { Appointment } from '@/types/admin';
@@ -19,6 +18,7 @@ interface DayViewTimeSlotProps {
   getStatusColor: (status: string) => string;
   capitalizeStatus: (status: string) => string;
   updateAppointmentStatus: (id: string, status: string) => void;
+  onAppointmentUpdated?: () => void;
 }
 
 export const DayViewTimeSlot = ({
@@ -28,7 +28,8 @@ export const DayViewTimeSlot = ({
   formatDuration,
   getStatusColor,
   capitalizeStatus,
-  updateAppointmentStatus
+  updateAppointmentStatus,
+  onAppointmentUpdated
 }: DayViewTimeSlotProps) => {
   return (
     <Card 
@@ -80,6 +81,7 @@ export const DayViewTimeSlot = ({
                   getStatusColor={getStatusColor}
                   capitalizeStatus={capitalizeStatus}
                   updateAppointmentStatus={updateAppointmentStatus}
+                  onAppointmentUpdated={onAppointmentUpdated}
                 />
               );
             })}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,6 +9,7 @@ interface DayViewProps {
   appointments: Appointment[];
   selectedDate: Date;
   updateAppointmentStatus: (id: string, status: string) => void;
+  onDataRefresh?: () => void;
 }
 
 interface TimeSlot {
@@ -19,7 +19,7 @@ interface TimeSlot {
   conflictReason?: string;
 }
 
-export const DayView = ({ appointments, selectedDate, updateAppointmentStatus }: DayViewProps) => {
+export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, onDataRefresh }: DayViewProps) => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [overlapWarnings, setOverlapWarnings] = useState<string[]>([]);
 
@@ -156,6 +156,12 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus }:
     setOverlapWarnings(warnings);
   };
 
+  const handleAppointmentUpdated = () => {
+    if (onDataRefresh) {
+      onDataRefresh();
+    }
+  };
+
   useEffect(() => {
     const dateStr = selectedDate.toISOString().split('T')[0];
     const dayAppointments = appointments.filter(apt => apt.preferred_date === dateStr);
@@ -219,6 +225,7 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus }:
             getStatusColor={getStatusColor}
             capitalizeStatus={capitalizeStatus}
             updateAppointmentStatus={updateAppointmentStatus}
+            onAppointmentUpdated={handleAppointmentUpdated}
           />
         ))}
       </div>

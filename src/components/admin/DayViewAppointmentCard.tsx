@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +20,7 @@ interface DayViewAppointmentCardProps {
   getStatusColor: (status: string) => string;
   capitalizeStatus: (status: string) => string;
   updateAppointmentStatus: (id: string, status: string) => void;
+  onAppointmentUpdated?: () => void;
 }
 
 export const DayViewAppointmentCard = ({
@@ -29,7 +29,8 @@ export const DayViewAppointmentCard = ({
   formatDuration,
   getStatusColor,
   capitalizeStatus,
-  updateAppointmentStatus
+  updateAppointmentStatus,
+  onAppointmentUpdated
 }: DayViewAppointmentCardProps) => {
   const [editingAppointment, setEditingAppointment] = useState<EditingAppointment | null>(null);
   const { toast } = useToast();
@@ -51,8 +52,13 @@ export const DayViewAppointmentCard = ({
         description: "Date and time have been successfully updated.",
       });
 
-      // Don't reload the page, just close the editing state
+      // Close the editing state
       setEditingAppointment(null);
+      
+      // Trigger data refresh
+      if (onAppointmentUpdated) {
+        onAppointmentUpdated();
+      }
     } catch (error) {
       console.error('Error updating appointment:', error);
       toast({
