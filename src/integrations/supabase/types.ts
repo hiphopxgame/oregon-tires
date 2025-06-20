@@ -648,6 +648,210 @@ export type Database = {
         }
         Relationships: []
       }
+      poreve_api_sync_log: {
+        Row: {
+          api_source: string
+          completed_at: string | null
+          error_message: string | null
+          events_added: number | null
+          events_processed: number | null
+          events_updated: number | null
+          id: string
+          started_at: string
+          status: string
+          sync_type: string
+        }
+        Insert: {
+          api_source: string
+          completed_at?: string | null
+          error_message?: string | null
+          events_added?: number | null
+          events_processed?: number | null
+          events_updated?: number | null
+          id?: string
+          started_at?: string
+          status?: string
+          sync_type: string
+        }
+        Update: {
+          api_source?: string
+          completed_at?: string | null
+          error_message?: string | null
+          events_added?: number | null
+          events_processed?: number | null
+          events_updated?: number | null
+          id?: string
+          started_at?: string
+          status?: string
+          sync_type?: string
+        }
+        Relationships: []
+      }
+      poreve_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      poreve_events: {
+        Row: {
+          api_source: string
+          category: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          external_id: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          organizer_name: string | null
+          organizer_url: string | null
+          price_display: string | null
+          price_max: number | null
+          price_min: number | null
+          start_date: string
+          tags: string[] | null
+          ticket_url: string | null
+          title: string
+          updated_at: string
+          venue_address: string | null
+          venue_city: string | null
+          venue_name: string
+          venue_state: string | null
+          venue_zip: string | null
+        }
+        Insert: {
+          api_source: string
+          category: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          external_id: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          organizer_name?: string | null
+          organizer_url?: string | null
+          price_display?: string | null
+          price_max?: number | null
+          price_min?: number | null
+          start_date: string
+          tags?: string[] | null
+          ticket_url?: string | null
+          title: string
+          updated_at?: string
+          venue_address?: string | null
+          venue_city?: string | null
+          venue_name: string
+          venue_state?: string | null
+          venue_zip?: string | null
+        }
+        Update: {
+          api_source?: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          external_id?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          organizer_name?: string | null
+          organizer_url?: string | null
+          price_display?: string | null
+          price_max?: number | null
+          price_min?: number | null
+          start_date?: string
+          tags?: string[] | null
+          ticket_url?: string | null
+          title?: string
+          updated_at?: string
+          venue_address?: string | null
+          venue_city?: string | null
+          venue_name?: string
+          venue_state?: string | null
+          venue_zip?: string | null
+        }
+        Relationships: []
+      }
+      poreve_venues: {
+        Row: {
+          address: string | null
+          capacity: number | null
+          city: string | null
+          created_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          phone: string | null
+          state: string | null
+          updated_at: string
+          venue_type: string | null
+          website: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          capacity?: number | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string
+          venue_type?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          capacity?: number | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string
+          venue_type?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
       pormar_consultation_requests: {
         Row: {
           additional_guests: number | null

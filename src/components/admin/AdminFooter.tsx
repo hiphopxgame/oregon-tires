@@ -15,7 +15,7 @@ export const AdminFooter = ({ language, toggleLanguage }: AdminFooterProps) => {
           onClick={toggleLanguage} 
           className="text-white hover:text-yellow-200"
         >
-          🇺🇸 English | 🇲🇽 Español
+          English | Español
         </button>
       </div>
     </footer>
