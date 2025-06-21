@@ -19,9 +19,16 @@ interface TimeSlot {
   conflictReason?: string;
 }
 
+interface ConflictDetail {
+  timeSlot: string;
+  appointments: Appointment[];
+  conflictType: string;
+}
+
 export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, onDataRefresh }: DayViewProps) => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [overlapWarnings, setOverlapWarnings] = useState<string[]>([]);
+  const [detailedConflicts, setDetailedConflicts] = useState<ConflictDetail[]>([]);
 
   // Get service duration in hours
   const getServiceDuration = (service: string) => {
@@ -84,6 +91,7 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, o
   // Check for appointment overlaps and conflicts
   const checkOverlaps = (dayAppointments: Appointment[]) => {
     const warnings: string[] = [];
+    const conflicts: ConflictDetail[] = [];
     const slots = generateTimeSlots();
 
     // Sort appointments by time
@@ -116,8 +124,8 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, o
 
     // Check for overlaps (max 2 simultaneous appointments)
     for (let i = 0; i < appointmentIntervals.length; i++) {
-      let overlapping = 0;
       const currentInterval = appointmentIntervals[i];
+      const overlappingAppointments = [currentInterval.appointment];
       
       for (let j = 0; j < appointmentIntervals.length; j++) {
         if (i === j) continue;
@@ -127,12 +135,25 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, o
         // Check if intervals overlap
         if (currentInterval.startMinutes < otherInterval.endMinutes && 
             currentInterval.endMinutes > otherInterval.startMinutes) {
-          overlapping++;
+          overlappingAppointments.push(otherInterval.appointment);
         }
       }
       
-      if (overlapping >= 2) {
-        warnings.push(`${currentInterval.appointment.first_name} ${currentInterval.appointment.last_name}'s appointment at ${currentInterval.appointment.preferred_time} conflicts with 2+ other appointments (maximum 2 simultaneous allowed)`);
+      // If more than 2 appointments overlap, it's a conflict
+      if (overlappingAppointments.length > 2) {
+        const timeSlot = currentInterval.appointment.preferred_time.substring(0, 5);
+        
+        // Check if we've already recorded this conflict
+        const existingConflict = conflicts.find(c => c.timeSlot === timeSlot);
+        if (!existingConflict) {
+          conflicts.push({
+            timeSlot,
+            appointments: overlappingAppointments,
+            conflictType: `${overlappingAppointments.length} appointments overlapping (max 2 allowed)`
+          });
+        }
+        
+        warnings.push(`${currentInterval.appointment.first_name} ${currentInterval.appointment.last_name}'s appointment at ${currentInterval.appointment.preferred_time} conflicts with ${overlappingAppointments.length - 1} other appointments (maximum 2 simultaneous allowed)`);
       }
     }
 
@@ -152,8 +173,10 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, o
       }
     });
 
+    console.log('Detailed Conflicts Found:', conflicts);
     setTimeSlots(slots);
     setOverlapWarnings(warnings);
+    setDetailedConflicts(conflicts);
   };
 
   const handleAppointmentUpdated = () => {
@@ -185,7 +208,37 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, o
         </CardHeader>
       </Card>
 
-      {/* Overlap Warnings */}
+      {/* Detailed Conflict Information */}
+      {detailedConflicts.length > 0 && (
+        <Alert variant="destructive" className="border-red-200 bg-red-50">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <div className="font-semibold mb-3">Detailed Scheduling Conflicts:</div>
+            {detailedConflicts.map((conflict, index) => (
+              <div key={index} className="mb-4 p-3 bg-white rounded border border-red-200">
+                <div className="font-medium text-red-800 mb-2">
+                  Time Slot {conflict.timeSlot}: {conflict.conflictType}
+                </div>
+                <div className="space-y-2">
+                  {conflict.appointments.map((apt, aptIndex) => (
+                    <div key={apt.id} className="pl-4 border-l-2 border-red-300">
+                      <div className="font-medium">{aptIndex + 1}. {apt.first_name} {apt.last_name}</div>
+                      <div className="text-sm text-gray-600">
+                        Service: {apt.service} | Phone: {apt.phone} | Status: {apt.status}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Scheduled: {apt.preferred_date} at {apt.preferred_time}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Original Overlap Warnings */}
       {overlapWarnings.length > 0 && (
         <Alert variant="destructive" className="border-red-200 bg-red-50">
           <AlertTriangle className="h-4 w-4" />
