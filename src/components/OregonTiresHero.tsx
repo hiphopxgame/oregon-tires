@@ -1,12 +1,10 @@
 
 import { useLanguage } from '@/hooks/useLanguage';
-import { translations } from '@/utils/translations';
 import { Button } from '@/components/ui/button';
 import { Calendar, Phone } from 'lucide-react';
 
 export const OregonTiresHero = () => {
   const { language } = useLanguage();
-  const t = translations[language];
 
   const scrollToContact = () => {
     const contactSection = document.getElementById('contact');
@@ -23,10 +21,10 @@ export const OregonTiresHero = () => {
     <section className="relative py-20 px-4 bg-gradient-to-br from-white to-green-50">
       <div className="container mx-auto text-center">
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-          {t.heroTitle}
+          Oregon Tires - Professional Tire Services
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          {t.heroSubtitle}
+          Expert tire installation, repair, and maintenance services in Portland, Oregon
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -35,7 +33,7 @@ export const OregonTiresHero = () => {
             className="bg-[#007030] hover:bg-[#005825] text-white px-8 py-3 text-lg flex items-center gap-2"
           >
             <Phone className="h-5 w-5" />
-            {t.contactButton}
+            Contact Us
           </Button>
           
           <Button 
@@ -77,3 +75,5 @@ export const OregonTiresHero = () => {
     </section>
   );
 };
+
+export default OregonTiresHero;
