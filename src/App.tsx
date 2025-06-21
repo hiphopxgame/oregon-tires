@@ -4,9 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import OregonTires from "./pages/OregonTires";
-import OregonTiresAdmin from "./pages/OregonTiresAdmin";
-import NotFound from "./pages/NotFound";
+import { navItems } from "./nav-items";
+import AppointmentAvailability from "./pages/AppointmentAvailability";
 
 const queryClient = new QueryClient();
 
@@ -17,10 +16,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<OregonTiresAdmin />} />
-          <Route path="/home.html" element={<OregonTires />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          {navItems.map(({ to, page }) => (
+            <Route key={to} path={to} element={page} />
+          ))}
+          <Route path="/availability" element={<AppointmentAvailability />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
