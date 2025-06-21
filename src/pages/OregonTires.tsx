@@ -37,13 +37,7 @@ const OregonTires = () => {
       />
 
       <div id="home">
-        <OregonTiresHero
-          translations={t}
-          primaryColor={currentDesign.primaryColor}
-          secondaryColor={currentDesign.secondaryColor}
-          openContactForm={openContactForm}
-          openScheduleForm={openScheduleForm}
-        />
+        <OregonTiresHero />
       </div>
 
       <div id="services">
