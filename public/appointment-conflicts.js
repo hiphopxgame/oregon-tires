@@ -51,22 +51,30 @@ async function checkAppointmentConflicts(date, time, service) {
             };
         }
 
-        // Count overlapping appointments
+        // Count overlapping appointments - fix circular reference issue
         let overlappingCount = 0;
         const conflictingAppointments = [];
 
-        appointments.forEach(apt => {
-            const aptStartMinutes = timeToMinutes(apt.preferred_time.substring(0, 5));
-            const aptDuration = serviceDurations[apt.service] || 1.5;
-            const aptEndMinutes = aptStartMinutes + (aptDuration * 60);
+        if (appointments && appointments.length > 0) {
+            appointments.forEach(apt => {
+                const aptTimeStr = apt.preferred_time;
+                const aptStartMinutes = timeToMinutes(aptTimeStr.substring(0, 5));
+                const aptDuration = serviceDurations[apt.service] || 1.5;
+                const aptEndMinutes = aptStartMinutes + (aptDuration * 60);
 
-            // Check if appointments overlap
-            if (slotStartMinutes < aptEndMinutes && slotEndMinutes > aptStartMinutes) {
-                overlappingCount++;
-                conflictingAppointments.push(`${apt.first_name} ${apt.last_name} (${apt.service})`);
-                console.log(`Conflict found with ${apt.first_name} ${apt.last_name} (${apt.service})`);
-            }
-        });
+                // Check if appointments overlap
+                if (slotStartMinutes < aptEndMinutes && slotEndMinutes > aptStartMinutes) {
+                    overlappingCount++;
+                    // Store minimal appointment info to avoid circular references
+                    conflictingAppointments.push({
+                        name: `${apt.first_name} ${apt.last_name}`,
+                        service: apt.service,
+                        time: aptTimeStr
+                    });
+                    console.log(`Conflict found with ${apt.first_name} ${apt.last_name} (${apt.service})`);
+                }
+            });
+        }
 
         console.log(`Found ${overlappingCount} overlapping appointments`);
 
@@ -74,7 +82,8 @@ async function checkAppointmentConflicts(date, time, service) {
         if (overlappingCount >= 2) {
             return {
                 hasConflict: true,
-                message: `This time slot is fully booked (${overlappingCount} appointments already scheduled). Maximum 2 appointments allowed simultaneously. Please choose a different time.`
+                message: `This time slot is fully booked (${overlappingCount} appointments already scheduled). Maximum 2 appointments allowed simultaneously. Please choose a different time.`,
+                conflictingAppointments: conflictingAppointments
             };
         }
 
@@ -82,7 +91,8 @@ async function checkAppointmentConflicts(date, time, service) {
             return {
                 hasConflict: false,
                 message: `Limited availability: 1 appointment slot remaining for this time.`,
-                isLimited: true
+                isLimited: true,
+                conflictingAppointments: conflictingAppointments
             };
         }
 
@@ -106,12 +116,20 @@ async function updateTimeSlotAvailability() {
     const dateField = document.getElementById('preferred_date');
     const timeField = document.getElementById('preferred_time');
     
+    if (!serviceField || !dateField || !timeField) {
+        console.log('Required form fields not found');
+        return;
+    }
+
     if (!serviceField.value || !dateField.value) {
+        console.log('Service or date not selected');
         return;
     }
 
     const service = serviceField.value;
     const date = dateField.value;
+    
+    console.log('Updating time slot availability for:', service, date);
     
     // Clear existing options except the first one
     const firstOption = timeField.options[0];

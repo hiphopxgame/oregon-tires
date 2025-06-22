@@ -19,6 +19,12 @@ function toggleScheduleMode() {
         // Add event listeners for dynamic updates
         serviceField.addEventListener('change', window.updateTimeSlotAvailability);
         preferredDateField.addEventListener('change', window.updateTimeSlotAvailability);
+        
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        preferredDateField.min = today;
+        
+        console.log('Schedule mode enabled');
     } else {
         scheduleFields.style.display = 'none';
         serviceField.required = false;
@@ -28,14 +34,19 @@ function toggleScheduleMode() {
         // Remove event listeners
         serviceField.removeEventListener('change', window.updateTimeSlotAvailability);
         preferredDateField.removeEventListener('change', window.updateTimeSlotAvailability);
+        
+        console.log('Schedule mode disabled');
     }
     
-    window.updateTranslations();
+    if (window.updateTranslations) {
+        window.updateTranslations();
+    }
 }
 
 // Handle form submission
 async function handleFormSubmit(event) {
     event.preventDefault();
+    console.log('Form submission started');
     
     const formData = new FormData(event.target);
     const data = {
@@ -44,7 +55,7 @@ async function handleFormSubmit(event) {
         phone: formData.get('phone'),
         email: formData.get('email'),
         message: formData.get('message'),
-        language: window.currentLanguage,
+        language: window.currentLanguage || 'english',
         status: isScheduleMode ? 'pending' : 'new'
     };
 
@@ -55,6 +66,8 @@ async function handleFormSubmit(event) {
             data.preferred_date = formData.get('preferred_date');
             data.preferred_time = formData.get('preferred_time');
 
+            console.log('Checking for conflicts before submitting appointment:', data);
+
             // Check for conflicts before submitting
             const conflict = await window.checkAppointmentConflicts(
                 data.preferred_date, 
@@ -63,9 +76,15 @@ async function handleFormSubmit(event) {
             );
 
             if (conflict.hasConflict) {
-                alert(conflict.message);
+                alert(window.currentLanguage === 'english' ? 
+                    `Cannot book appointment: ${conflict.message}` :
+                    `No se puede reservar la cita: ${conflict.message}`
+                );
+                console.log('Appointment blocked due to conflict:', conflict.message);
                 return;
             }
+
+            console.log('No conflicts found, submitting appointment');
 
             const { error } = await window.supabaseClient
                 .from('oregon_tires_appointments')
@@ -73,25 +92,43 @@ async function handleFormSubmit(event) {
 
             if (error) throw error;
             
-            alert(window.currentLanguage === 'english' ? 'Appointment scheduled successfully!' : '¡Cita programada exitosamente!');
+            alert(window.currentLanguage === 'english' ? 
+                'Appointment scheduled successfully!' : 
+                '¡Cita programada exitosamente!'
+            );
+            console.log('Appointment scheduled successfully');
         } else {
             // Contact message
+            console.log('Submitting contact message');
             const { error } = await window.supabaseClient
                 .from('oregon_tires_contact_messages')
                 .insert(data);
 
             if (error) throw error;
             
-            alert(window.currentLanguage === 'english' ? 'Message sent successfully!' : '¡Mensaje enviado exitosamente!');
+            alert(window.currentLanguage === 'english' ? 
+                'Message sent successfully!' : 
+                '¡Mensaje enviado exitosamente!'
+            );
+            console.log('Contact message sent successfully');
         }
 
         // Reset form
         event.target.reset();
         document.getElementById('schedule-mode').checked = false;
         toggleScheduleMode();
+        
+        // Refresh appointment preview if it exists
+        if (window.updatePreviewTimeSlots) {
+            window.updatePreviewTimeSlots();
+        }
+        
     } catch (error) {
         console.error('Form submission error:', error);
-        alert(window.currentLanguage === 'english' ? 'Error sending message. Please try again.' : 'Error al enviar mensaje. Por favor intente de nuevo.');
+        alert(window.currentLanguage === 'english' ? 
+            'Error sending message. Please try again.' : 
+            'Error al enviar mensaje. Por favor intente de nuevo.'
+        );
     }
 }
 
