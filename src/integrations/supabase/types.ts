@@ -277,6 +277,235 @@ export type Database = {
         }
         Relationships: []
       }
+      hiphop_bingo_game_participants: {
+        Row: {
+          board_data: Json
+          claimed_bingo_at: string | null
+          game_id: string
+          id: string
+          joined_at: string
+          marked_positions: Json
+          user_id: string
+        }
+        Insert: {
+          board_data: Json
+          claimed_bingo_at?: string | null
+          game_id: string
+          id?: string
+          joined_at?: string
+          marked_positions?: Json
+          user_id: string
+        }
+        Update: {
+          board_data?: Json
+          claimed_bingo_at?: string | null
+          game_id?: string
+          id?: string
+          joined_at?: string
+          marked_positions?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hiphop_bingo_game_participants_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "hiphop_bingo_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hiphop_bingo_games: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          current_video_index: number
+          host_user_id: string
+          id: string
+          playlist_id: string
+          status: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          current_video_index?: number
+          host_user_id: string
+          id?: string
+          playlist_id: string
+          status?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          current_video_index?: number
+          host_user_id?: string
+          id?: string
+          playlist_id?: string
+          status?: string
+          winner_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hiphop_bingo_games_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "hiphop_bingo_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hiphop_bingo_playlist_videos: {
+        Row: {
+          created_at: string
+          id: string
+          playlist_id: string
+          position: number
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          playlist_id: string
+          position: number
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          playlist_id?: string
+          position?: number
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hiphop_bingo_playlist_videos_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "hiphop_bingo_playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hiphop_bingo_playlist_videos_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "hiphop_bingo_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hiphop_bingo_playlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          name: string
+          updated_at: string
+          user_id: string
+          video_count: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+          video_count?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+          video_count?: number
+        }
+        Relationships: []
+      }
+      hiphop_bingo_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          is_admin: boolean
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_admin?: boolean
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_admin?: boolean
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      hiphop_bingo_videos: {
+        Row: {
+          approved_by: string | null
+          artist: string
+          created_at: string
+          duration: number | null
+          id: string
+          status: string
+          submitted_by: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          youtube_id: string
+          youtube_url: string
+        }
+        Insert: {
+          approved_by?: string | null
+          artist: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          status?: string
+          submitted_by?: string | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          youtube_id: string
+          youtube_url: string
+        }
+        Update: {
+          approved_by?: string | null
+          artist?: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          status?: string
+          submitted_by?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          youtube_id?: string
+          youtube_url?: string
+        }
+        Relationships: []
+      }
       "hiphop-orders": {
         Row: {
           amount: number
