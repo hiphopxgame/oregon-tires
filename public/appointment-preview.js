@@ -6,9 +6,9 @@ async function updatePreviewTimeSlots() {
     const serviceSelect = document.getElementById('preview-service');
     const dateInput = document.getElementById('preview-date');
     const timeSlotsContainer = document.getElementById('time-slots-container');
-    const timeSlotsGrid = document.getElementById('time-slots-grid');
+    const availableTimesList = document.getElementById('available-times-list');
 
-    if (!serviceSelect || !dateInput || !timeSlotsContainer || !timeSlotsGrid) return;
+    if (!serviceSelect || !dateInput || !timeSlotsContainer || !availableTimesList) return;
 
     const service = serviceSelect.value;
     const date = dateInput.value;
@@ -21,13 +21,13 @@ async function updatePreviewTimeSlots() {
     // Check if selected date is Sunday
     const selectedDate = new Date(date);
     if (selectedDate.getDay() === 0) {
-        timeSlotsGrid.innerHTML = '<div class="col-span-full text-center text-red-600 py-8">We are closed on Sundays</div>';
+        availableTimesList.innerHTML = '<div class="text-center text-red-600 py-8">We are closed on Sundays</div>';
         timeSlotsContainer.style.display = 'block';
         return;
     }
 
     // Show loading
-    timeSlotsGrid.innerHTML = '<div class="col-span-full text-center py-8">Loading availability...</div>';
+    availableTimesList.innerHTML = '<div class="text-center py-8">Loading availability...</div>';
     timeSlotsContainer.style.display = 'block';
 
     try {
@@ -38,8 +38,11 @@ async function updatePreviewTimeSlots() {
             timeSlots.push(`${hour.toString().padStart(2, '0')}:30`);
         }
 
-        // Check availability for each slot
-        const slotElements = [];
+        // Check availability for each slot and build lists
+        const availableTimes = [];
+        const limitedTimes = [];
+        const unavailableTimes = [];
+
         for (const time of timeSlots) {
             const conflict = await window.checkAppointmentConflicts(date, time, service);
             
@@ -49,36 +52,138 @@ async function updatePreviewTimeSlots() {
             const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
             const timeDisplay = `${displayHour}:${minute} ${ampm}`;
 
-            let buttonClass = 'w-full h-16 flex flex-col items-center justify-center text-xs rounded-lg border-2 transition-colors cursor-pointer';
-            let statusText = '';
-            let clickHandler = '';
+            const timeInfo = {
+                time: time,
+                display: timeDisplay,
+                conflict: conflict
+            };
 
             if (conflict.hasConflict) {
-                buttonClass += ' bg-red-100 border-red-300 text-red-800 cursor-not-allowed';
-                statusText = 'Unavailable';
+                unavailableTimes.push(timeInfo);
             } else if (conflict.isLimited) {
-                buttonClass += ' bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200';
-                statusText = 'Limited';
-                clickHandler = `onclick="bookAppointmentSlot('${time}')"`;
+                limitedTimes.push(timeInfo);
             } else {
-                buttonClass += ' bg-green-100 border-green-300 text-green-800 hover:bg-green-200';
-                statusText = 'Available';
-                clickHandler = `onclick="bookAppointmentSlot('${time}')"`;
+                availableTimes.push(timeInfo);
             }
-
-            slotElements.push(`
-                <button class="${buttonClass}" ${clickHandler} ${conflict.hasConflict ? 'disabled' : ''}>
-                    <div class="font-semibold">${timeDisplay}</div>
-                    <div class="text-xs opacity-75">${statusText}</div>
-                </button>
-            `);
         }
 
-        timeSlotsGrid.innerHTML = slotElements.join('');
+        // Build the display
+        let html = '';
+
+        // Available times section
+        if (availableTimes.length > 0) {
+            html += `
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold text-green-700 mb-3 flex items-center">
+                        <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                        Available Times (${availableTimes.length} slots)
+                    </h4>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        ${availableTimes.map(timeinfo => `
+                            <button 
+                                class="bg-green-100 border-2 border-green-300 text-green-800 px-4 py-3 rounded-lg font-medium hover:bg-green-200 transition-colors"
+                                onclick="bookAppointmentSlot('${timeinfo.time}')"
+                            >
+                                ${timeinfo.display}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Limited availability times section
+        if (limitedTimes.length > 0) {
+            html += `
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold text-yellow-700 mb-3 flex items-center">
+                        <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                        Limited Availability (${limitedTimes.length} slots - 1 spot left each)
+                    </h4>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        ${limitedTimes.map(timeinfo => `
+                            <button 
+                                class="bg-yellow-100 border-2 border-yellow-300 text-yellow-800 px-4 py-3 rounded-lg font-medium hover:bg-yellow-200 transition-colors"
+                                onclick="bookAppointmentSlot('${timeinfo.time}')"
+                            >
+                                ${timeinfo.display}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Unavailable times section (collapsed by default)
+        if (unavailableTimes.length > 0) {
+            html += `
+                <div class="mb-6">
+                    <button 
+                        class="text-lg font-semibold text-red-700 mb-3 flex items-center w-full text-left hover:text-red-800"
+                        onclick="toggleUnavailableSection()"
+                        id="unavailable-toggle"
+                    >
+                        <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                        Unavailable Times (${unavailableTimes.length} slots)
+                        <svg class="w-4 h-4 ml-2 transform transition-transform" id="unavailable-arrow">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 hidden" id="unavailable-times">
+                        ${unavailableTimes.map(timeinfo => `
+                            <div 
+                                class="bg-red-100 border-2 border-red-300 text-red-800 px-4 py-3 rounded-lg font-medium cursor-not-allowed opacity-75"
+                                title="${timeinfo.conflict.message}"
+                            >
+                                ${timeinfo.display}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Summary
+        const totalAvailable = availableTimes.length + limitedTimes.length;
+        if (totalAvailable === 0) {
+            html = `
+                <div class="text-center py-8">
+                    <div class="text-red-600 text-lg font-semibold mb-2">No Available Times</div>
+                    <p class="text-gray-600">All time slots are fully booked for this date and service. Please try a different date.</p>
+                </div>
+            `;
+        } else {
+            html = `
+                <div class="bg-blue-50 border-2 border-blue-200 p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold text-blue-800 mb-2">Available Times Summary:</h3>
+                    <p class="text-blue-700 text-sm">
+                        Found <strong>${totalAvailable} available time slots</strong> for ${serviceSelect.options[serviceSelect.selectedIndex].text} on ${new Date(date).toLocaleDateString()}
+                    </p>
+                </div>
+            ` + html;
+        }
+
+        availableTimesList.innerHTML = html;
 
     } catch (error) {
         console.error('Error updating time slots:', error);
-        timeSlotsGrid.innerHTML = '<div class="col-span-full text-center text-red-600 py-8">Error loading availability. Please try again.</div>';
+        availableTimesList.innerHTML = '<div class="text-center text-red-600 py-8">Error loading availability. Please try again.</div>';
+    }
+}
+
+// Toggle unavailable times section
+function toggleUnavailableSection() {
+    const unavailableTimes = document.getElementById('unavailable-times');
+    const arrow = document.getElementById('unavailable-arrow');
+    
+    if (unavailableTimes && arrow) {
+        if (unavailableTimes.classList.contains('hidden')) {
+            unavailableTimes.classList.remove('hidden');
+            arrow.classList.add('rotate-90');
+        } else {
+            unavailableTimes.classList.add('hidden');
+            arrow.classList.remove('rotate-90');
+        }
     }
 }
 
@@ -102,9 +207,15 @@ function bookAppointmentSlot(time) {
     scrollToSection('contact');
 
     // Show confirmation
+    const hour = parseInt(time.split(':')[0]);
+    const minute = time.split(':')[1];
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+    const timeDisplay = `${displayHour}:${minute} ${ampm}`;
+
     alert(window.currentLanguage === 'english' ? 
-        `Selected ${time} for ${serviceSelect.options[serviceSelect.selectedIndex].text}. Please fill out the contact form below to complete your booking.` :
-        `Seleccionado ${time} para ${serviceSelect.options[serviceSelect.selectedIndex].text}. Por favor complete el formulario de contacto a continuación para completar su reserva.`
+        `Selected ${timeDisplay} for ${serviceSelect.options[serviceSelect.selectedIndex].text}. Please fill out the contact form below to complete your booking.` :
+        `Seleccionado ${timeDisplay} para ${serviceSelect.options[serviceSelect.selectedIndex].text}. Por favor complete el formulario de contacto a continuación para completar su reserva.`
     );
 }
 
@@ -165,27 +276,11 @@ function addAppointmentPreview() {
                     </div>
                 </div>
 
-                <!-- Time Slots Grid -->
+                <!-- Available Times List -->
                 <div id="time-slots-container" class="bg-white p-6 rounded-lg shadow-lg" style="display: none;">
                     <h3 class="text-xl font-semibold mb-4">Available Time Slots</h3>
-                    <div id="time-slots-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
-                        <!-- Time slots will be populated here -->
-                    </div>
-                    
-                    <!-- Legend -->
-                    <div class="flex flex-wrap gap-4 justify-center text-sm">
-                        <div class="flex items-center gap-2">
-                            <div class="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
-                            <span>Available (2 slots)</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div>
-                            <span>Limited (1 slot left)</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
-                            <span>Unavailable</span>
-                        </div>
+                    <div id="available-times-list">
+                        <!-- Available times will be populated here -->
                     </div>
                 </div>
 
@@ -214,3 +309,4 @@ function addAppointmentPreview() {
 window.addAppointmentPreview = addAppointmentPreview;
 window.bookAppointmentSlot = bookAppointmentSlot;
 window.updatePreviewTimeSlots = updatePreviewTimeSlots;
+window.toggleUnavailableSection = toggleUnavailableSection;
