@@ -53,7 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
         'checkAppointmentConflicts',
         'updateTimeSlotAvailability', 
         'toggleScheduleMode',
-        'handleFormSubmit'
+        'handleFormSubmit',
+        'generateTimeSlots',
+        'checkAllTimeSlotAvailability',
+        'bookAppointmentSlot',
+        'updatePreviewTimeSlots'
     ];
     
     requiredFunctions.forEach(func => {
