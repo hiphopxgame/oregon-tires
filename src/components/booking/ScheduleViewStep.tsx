@@ -58,12 +58,20 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
     return hours * 60 + minutes;
   };
 
-  const checkTimeSlotAvailability = async () => {
+  const minutesToTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+  };
+
+  const checkConsecutiveSlotAvailability = async () => {
     try {
       setLoading(true);
       
+      // Fix date parsing - ensure we use the correct date format
+      const selectedDate = new Date(customerInfo.preferredDate + 'T00:00:00');
+      
       // Check if selected date is Sunday
-      const selectedDate = new Date(customerInfo.preferredDate);
       if (selectedDate.getDay() === 0) {
         setTimeSlots([]);
         setLoading(false);
@@ -80,57 +88,74 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
       if (error) throw error;
 
       const serviceDuration = serviceDurations[customerInfo.service] || 1.5;
+      const serviceDurationMinutes = serviceDuration * 60;
       const slots = generateTimeSlots();
-      const processedSlots: TimeSlot[] = [];
+      const availableSlots: TimeSlot[] = [];
 
-      slots.forEach(time => {
-        const slotStartMinutes = timeToMinutes(time);
-        const slotEndMinutes = slotStartMinutes + (serviceDuration * 60);
+      // For each possible starting time slot, check if we can fit the entire service
+      slots.forEach(startTime => {
+        const startMinutes = timeToMinutes(startTime);
+        const endMinutes = startMinutes + serviceDurationMinutes;
         const closingTime = 19 * 60; // 7 PM
 
-        let conflictCount = 0;
         let status: 'available' | 'limited' | 'unavailable' = 'available';
+        let conflictCount = 0;
         let message = '';
 
         // Check if service extends beyond closing time
-        if (slotEndMinutes > closingTime) {
+        if (endMinutes > closingTime) {
           status = 'unavailable';
           message = 'Service would extend beyond closing time (7 PM)';
         } else {
-          // Count overlapping appointments
-          appointments?.forEach(apt => {
-            const aptTimeStr = apt.preferred_time;
-            const aptStartMinutes = timeToMinutes(aptTimeStr.substring(0, 5));
-            const aptDuration = serviceDurations[apt.service] || 1.5;
-            const aptEndMinutes = aptStartMinutes + (aptDuration * 60);
+          // Check for conflicts during the entire service duration
+          let hasConflict = false;
+          let limitedSlots = 0;
 
-            // Check if appointments overlap
-            if (slotStartMinutes < aptEndMinutes && slotEndMinutes > aptStartMinutes) {
-              conflictCount++;
+          // Check every 30-minute slot that this service would occupy
+          for (let checkMinutes = startMinutes; checkMinutes < endMinutes; checkMinutes += 30) {
+            let slotConflicts = 0;
+            
+            appointments?.forEach(apt => {
+              const aptTimeStr = apt.preferred_time;
+              const aptStartMinutes = timeToMinutes(aptTimeStr.substring(0, 5));
+              const aptDuration = serviceDurations[apt.service] || 1.5;
+              const aptEndMinutes = aptStartMinutes + (aptDuration * 60);
+
+              // Check if this 30-minute slot overlaps with the appointment
+              if (checkMinutes < aptEndMinutes && (checkMinutes + 30) > aptStartMinutes) {
+                slotConflicts++;
+              }
+            });
+
+            if (slotConflicts >= 2) {
+              hasConflict = true;
+              break;
+            } else if (slotConflicts === 1) {
+              limitedSlots++;
             }
-          });
+          }
 
-          if (conflictCount >= 2) {
+          if (hasConflict) {
             status = 'unavailable';
-            message = `Fully booked (${conflictCount} appointments scheduled)`;
-          } else if (conflictCount === 1) {
+            message = 'Time slot conflict - fully booked during service period';
+          } else if (limitedSlots > 0) {
             status = 'limited';
-            message = '1 appointment slot remaining';
+            message = `Limited availability - ${limitedSlots} slots with existing appointments`;
           } else {
-            message = 'Available';
+            message = `Available (${formatTimeDisplay(startTime)} to ${formatTimeDisplay(minutesToTime(endMinutes))})`;
           }
         }
 
-        processedSlots.push({
-          time,
-          display: formatTimeDisplay(time),
+        availableSlots.push({
+          time: startTime,
+          display: `${formatTimeDisplay(startTime)} to ${formatTimeDisplay(minutesToTime(endMinutes))}`,
           status,
           conflictCount,
           message
         });
       });
 
-      setTimeSlots(processedSlots);
+      setTimeSlots(availableSlots);
     } catch (error) {
       console.error('Error checking availability:', error);
       toast({
@@ -144,7 +169,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
   };
 
   useEffect(() => {
-    checkTimeSlotAvailability();
+    checkConsecutiveSlotAvailability();
   }, [customerInfo.preferredDate, customerInfo.service]);
 
   const handleBookAppointment = async () => {
@@ -196,7 +221,8 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
     }
   };
 
-  const selectedDate = new Date(customerInfo.preferredDate);
+  // Fix date display - ensure proper date parsing
+  const selectedDate = new Date(customerInfo.preferredDate + 'T00:00:00');
   const isSunday = selectedDate.getDay() === 0;
 
   if (loading) {
@@ -276,18 +302,19 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           {availableSlots.length > 0 && (
             <div className="mb-6">
               <h4 className="font-semibold text-green-700 mb-3">Available Times</h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {availableSlots.map(slot => (
                   <button
                     key={slot.time}
                     onClick={() => setSelectedTime(slot.time)}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
+                    className={`p-3 rounded-lg border-2 transition-colors text-left ${
                       selectedTime === slot.time
                         ? 'bg-green-600 text-white border-green-600'
                         : 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200'
                     }`}
                   >
-                    {slot.display}
+                    <div className="font-medium">{slot.display}</div>
+                    <div className="text-xs opacity-75">{slot.message}</div>
                   </button>
                 ))}
               </div>
@@ -298,18 +325,19 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           {limitedSlots.length > 0 && (
             <div className="mb-6">
               <h4 className="font-semibold text-yellow-700 mb-3">Limited Availability</h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {limitedSlots.map(slot => (
                   <button
                     key={slot.time}
                     onClick={() => setSelectedTime(slot.time)}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
+                    className={`p-3 rounded-lg border-2 transition-colors text-left ${
                       selectedTime === slot.time
                         ? 'bg-yellow-600 text-white border-yellow-600'
                         : 'bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200'
                     }`}
                   >
-                    {slot.display}
+                    <div className="font-medium">{slot.display}</div>
+                    <div className="text-xs opacity-75">{slot.message}</div>
                   </button>
                 ))}
               </div>
@@ -320,14 +348,15 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           {unavailableSlots.length > 0 && (
             <div>
               <h4 className="font-semibold text-red-700 mb-3">Unavailable Times</h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {unavailableSlots.map(slot => (
                   <div
                     key={slot.time}
                     className="p-3 rounded-lg border-2 bg-red-100 border-red-300 text-red-800 opacity-75 cursor-not-allowed"
                     title={slot.message}
                   >
-                    {slot.display}
+                    <div className="font-medium">{slot.display}</div>
+                    <div className="text-xs opacity-75">{slot.message}</div>
                   </div>
                 ))}
               </div>
@@ -338,7 +367,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           {selectedTime && (
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <p className="text-sm mb-3">
-                Selected time: <strong>{formatTimeDisplay(selectedTime)}</strong>
+                Selected time: <strong>{timeSlots.find(slot => slot.time === selectedTime)?.display}</strong>
               </p>
               <Button 
                 onClick={handleBookAppointment}
