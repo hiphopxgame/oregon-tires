@@ -12,6 +12,7 @@ export interface CustomerInfo {
   email: string;
   service: string;
   preferredDate: string;
+  message: string;
 }
 
 const AppointmentBooking = () => {
@@ -22,11 +23,18 @@ const AppointmentBooking = () => {
     phone: '',
     email: '',
     service: '',
-    preferredDate: ''
+    preferredDate: '',
+    message: ''
   });
 
-  const handleNext = (info: CustomerInfo) => {
-    setCustomerInfo(info);
+  const handleInputChange = (field: keyof CustomerInfo, value: string) => {
+    setCustomerInfo(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleNext = () => {
     setCurrentStep(2);
   };
 
@@ -46,25 +54,25 @@ const AppointmentBooking = () => {
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               )}
-              <h1 className="text-3xl font-bold text-[#007030]">
+              <h1 className="text-3xl font-bold text-[#0C3B1B]">
                 Book Your Appointment
               </h1>
             </div>
             
             {/* Step indicator */}
             <div className="flex items-center gap-4">
-              <div className={`flex items-center gap-2 ${currentStep >= 1 ? 'text-[#007030]' : 'text-gray-400'}`}>
+              <div className={`flex items-center gap-2 ${currentStep >= 1 ? 'text-[#0C3B1B]' : 'text-gray-400'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                  currentStep >= 1 ? 'bg-[#007030] text-white' : 'bg-gray-200'
+                  currentStep >= 1 ? 'bg-[#0C3B1B] text-white' : 'bg-gray-200'
                 }`}>
                   1
                 </div>
                 <span>Customer Info</span>
               </div>
-              <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-[#007030]' : 'bg-gray-200'}`}></div>
-              <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-[#007030]' : 'text-gray-400'}`}>
+              <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-[#0C3B1B]' : 'bg-gray-200'}`}></div>
+              <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-[#0C3B1B]' : 'text-gray-400'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                  currentStep >= 2 ? 'bg-[#007030] text-white' : 'bg-gray-200'
+                  currentStep >= 2 ? 'bg-[#0C3B1B] text-white' : 'bg-gray-200'
                 }`}>
                   2
                 </div>
@@ -75,7 +83,11 @@ const AppointmentBooking = () => {
 
           {/* Step content */}
           {currentStep === 1 && (
-            <CustomerInfoStep onNext={handleNext} initialData={customerInfo} />
+            <CustomerInfoStep 
+              customerInfo={customerInfo} 
+              onInputChange={handleInputChange}
+              onNext={handleNext} 
+            />
           )}
           
           {currentStep === 2 && (

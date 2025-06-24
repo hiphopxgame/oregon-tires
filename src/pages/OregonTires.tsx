@@ -58,6 +58,7 @@ const OregonTires = () => {
         <OregonTiresAbout
           translations={t}
           primaryColor={currentDesign.primaryColor}
+          secondaryColor={currentDesign.secondaryColor}
         />
       </div>
 
