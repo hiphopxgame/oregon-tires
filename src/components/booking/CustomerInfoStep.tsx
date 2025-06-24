@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,141 +7,129 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CustomerInfo } from '@/pages/AppointmentBooking';
 
 interface CustomerInfoStepProps {
-  onNext: (info: CustomerInfo) => void;
-  initialData: CustomerInfo;
+  customerInfo: CustomerInfo;
+  onInputChange: (field: keyof CustomerInfo, value: string) => void;
+  onNext: () => void;
 }
 
-export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({ onNext, initialData }) => {
-  const [formData, setFormData] = useState<CustomerInfo>(initialData);
-  const [errors, setErrors] = useState<Partial<CustomerInfo>>({});
-
-  const validateForm = () => {
-    const newErrors: Partial<CustomerInfo> = {};
-    
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
-    if (!formData.service) newErrors.service = 'Service selection is required';
-    if (!formData.preferredDate) newErrors.preferredDate = 'Date is required';
-    
-    // Email validation
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      onNext(formData);
-    }
-  };
-
-  const updateFormData = (field: keyof CustomerInfo, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  // Set minimum date to today
-  const today = new Date().toISOString().split('T')[0];
+export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
+  customerInfo,
+  onInputChange,
+  onNext
+}) => {
+  const isFormValid = 
+    customerInfo.firstName.trim() !== '' &&
+    customerInfo.lastName.trim() !== '' &&
+    customerInfo.email.trim() !== '' &&
+    customerInfo.phone.trim() !== '' &&
+    customerInfo.service !== '' &&
+    customerInfo.preferredDate !== '';
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="firstName">First Name *</Label>
-          <Input
-            id="firstName"
-            value={formData.firstName}
-            onChange={(e) => updateFormData('firstName', e.target.value)}
-            className={errors.firstName ? 'border-red-500' : ''}
-          />
-          {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+    <div className="max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold text-[#0C3B1B] mb-6">Customer Information</h2>
+      
+      <div className="space-y-6">
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="firstName">First Name *</Label>
+            <Input
+              id="firstName"
+              type="text"
+              value={customerInfo.firstName}
+              onChange={(e) => onInputChange('firstName', e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="lastName">Last Name *</Label>
+            <Input
+              id="lastName"
+              type="text"
+              value={customerInfo.lastName}
+              onChange={(e) => onInputChange('lastName', e.target.value)}
+              required
+            />
+          </div>
         </div>
-        
-        <div>
-          <Label htmlFor="lastName">Last Name *</Label>
-          <Input
-            id="lastName"
-            value={formData.lastName}
-            onChange={(e) => updateFormData('lastName', e.target.value)}
-            className={errors.lastName ? 'border-red-500' : ''}
-          />
-          {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="email">Email *</Label>
+            <Input
+              id="email"
+              type="email"
+              value={customerInfo.email}
+              onChange={(e) => onInputChange('email', e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="phone">Phone *</Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={customerInfo.phone}
+              onChange={(e) => onInputChange('phone', e.target.value)}
+              required
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="email">Email *</Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => updateFormData('email', e.target.value)}
-            className={errors.email ? 'border-red-500' : ''}
-          />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          <Label htmlFor="service">Service Needed *</Label>
+          <Select
+            value={customerInfo.service}
+            onValueChange={(value) => onInputChange('service', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a service" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="new-or-used-tires">New or Used Tires (2 hours)</SelectItem>
+              <SelectItem value="mount-and-balance-tires">Mount and Balance Tires (2 hours)</SelectItem>
+              <SelectItem value="tire-repair">Tire Repair (1 hour)</SelectItem>
+              <SelectItem value="oil-change">Oil Change (1.25 hours)</SelectItem>
+              <SelectItem value="front-or-back-brake-change">Front or Back Brake Change (2 hours)</SelectItem>
+              <SelectItem value="full-brake-change">Full Brake Change (3.5 hours)</SelectItem>
+              <SelectItem value="tuneup">Tuneup (5 hours)</SelectItem>
+              <SelectItem value="alignment">Alignment (2 hours)</SelectItem>
+              <SelectItem value="mechanical-inspection-and-estimate">Mechanical Inspection and Estimate (2.5 hours)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        
+
         <div>
-          <Label htmlFor="phone">Phone *</Label>
+          <Label htmlFor="preferredDate">Preferred Date *</Label>
           <Input
-            id="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => updateFormData('phone', e.target.value)}
-            className={errors.phone ? 'border-red-500' : ''}
+            id="preferredDate"
+            type="date"
+            value={customerInfo.preferredDate}
+            onChange={(e) => onInputChange('preferredDate', e.target.value)}
+            required
           />
-          {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
         </div>
-      </div>
 
-      <div>
-        <Label htmlFor="service">Service Type *</Label>
-        <Select value={formData.service} onValueChange={(value) => updateFormData('service', value)}>
-          <SelectTrigger className={errors.service ? 'border-red-500' : ''}>
-            <SelectValue placeholder="Select a service" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="tire-installation">Tire Installation (1.5h)</SelectItem>
-            <SelectItem value="tire-repair">Tire Repair (1.5h)</SelectItem>
-            <SelectItem value="wheel-alignment">Wheel Alignment (1.5h)</SelectItem>
-            <SelectItem value="brake-service">Brake Service (2.5h)</SelectItem>
-            <SelectItem value="brake-repair">Brake Repair (2.5h)</SelectItem>
-            <SelectItem value="oil-change">Oil Change (3.5h)</SelectItem>
-            <SelectItem value="general-maintenance">General Maintenance (3.5h)</SelectItem>
-            <SelectItem value="diagnostic">Diagnostic Service (3.5h)</SelectItem>
-          </SelectContent>
-        </Select>
-        {errors.service && <p className="text-red-500 text-sm mt-1">{errors.service}</p>}
-      </div>
+        <div>
+          <Label htmlFor="message">Additional Message</Label>
+          <textarea
+            id="message"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C3B1B] focus:border-transparent"
+            rows={4}
+            value={customerInfo.message}
+            onChange={(e) => onInputChange('message', e.target.value)}
+            placeholder="Any additional details about your service needs..."
+          />
+        </div>
 
-      <div>
-        <Label htmlFor="preferredDate">Preferred Date *</Label>
-        <Input
-          id="preferredDate"
-          type="date"
-          min={today}
-          value={formData.preferredDate}
-          onChange={(e) => updateFormData('preferredDate', e.target.value)}
-          className={errors.preferredDate ? 'border-red-500' : ''}
-        />
-        {errors.preferredDate && <p className="text-red-500 text-sm mt-1">{errors.preferredDate}</p>}
-      </div>
-
-      <div className="flex justify-end pt-4">
-        <Button type="submit" className="bg-[#007030] hover:bg-[#005a26] px-8">
-          Next: Review Schedule
+        <Button
+          onClick={onNext}
+          disabled={!isFormValid}
+          className="w-full bg-[#0C3B1B] hover:bg-[#083018] text-white"
+        >
+          Continue to Schedule Review
         </Button>
       </div>
-    </form>
+    </div>
   );
 };

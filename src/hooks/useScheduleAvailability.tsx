@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -21,14 +20,15 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
   const [loading, setLoading] = useState(true);
 
   const serviceDurations: Record<string, number> = {
-    'tire-installation': 1.5,
-    'tire-repair': 1.5,
-    'wheel-alignment': 1.5,
-    'brake-service': 2.5,
-    'brake-repair': 2.5,
-    'oil-change': 3.5,
-    'general-maintenance': 3.5,
-    'diagnostic': 3.5
+    'new-or-used-tires': 2,
+    'mount-and-balance-tires': 2,
+    'tire-repair': 1,
+    'oil-change': 1.25,
+    'front-or-back-brake-change': 2,
+    'full-brake-change': 3.5,
+    'tuneup': 5,
+    'alignment': 2,
+    'mechanical-inspection-and-estimate': 2.5
   };
 
   const generateTimeSlots = () => {

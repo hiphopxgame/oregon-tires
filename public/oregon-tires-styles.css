@@ -1,22 +1,22 @@
 
 .hero-bg {
-    background-color: #007030;
+    background-color: #0C3B1B;
 }
 .secondary-color {
-    background-color: #FEE11A;
+    background-color: #FFFE03;
 }
 .primary-color {
-    color: #007030;
+    color: #0C3B1B;
 }
 .bg-primary {
-    background-color: #007030;
+    background-color: #0C3B1B;
 }
 .text-primary {
-    color: #007030;
+    color: #0C3B1B;
 }
 .border-primary {
-    border-color: #007030;
+    border-color: #0C3B1B;
 }
 .hover\:bg-primary:hover {
-    background-color: #005020;
+    background-color: #083018;
 }

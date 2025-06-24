@@ -86,40 +86,35 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                 <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
                   <Car className="h-6 w-6" style={{ color: primaryColor }} />
                 </div>
-                <CardTitle className="text-xl" style={{ color: primaryColor }}>{t.tireServices}</CardTitle>
+                <CardTitle className="text-xl" style={{ color: primaryColor }}>Tire Services</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.tireInstallation}
+                  New or Used Tires
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">Professional installation of new tires with proper balancing and alignment checks.</p>
+                <p className="text-gray-600 text-sm mb-1">Professional installation of new and used tires with quality guarantee.</p>
+                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 2 hours</p>
               </div>
               
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.tireRepair}
+                  Mount and Balance Tires
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">Expert tire patching and repair services to extend tire life safely.</p>
+                <p className="text-gray-600 text-sm mb-1">Expert tire mounting and balancing for smooth, vibration-free driving.</p>
+                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 2 hours</p>
               </div>
 
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.wheelAlignment}
+                  Tire Repair
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">Precision wheel alignment to ensure even tire wear and optimal vehicle handling.</p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.tireBalancing}
-                </h4>
-                <p className="text-gray-600 text-sm">Professional tire balancing for smooth, vibration-free driving.</p>
+                <p className="text-gray-600 text-sm mb-1">Professional tire patching and repair services to extend tire life safely.</p>
+                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 1 hour</p>
               </div>
             </CardContent>
           </Card>
@@ -131,73 +126,70 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                 <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
                   <Settings className="h-6 w-6" style={{ color: primaryColor }} />
                 </div>
-                <CardTitle className="text-xl" style={{ color: primaryColor }}>{t.autoMaintenance}</CardTitle>
+                <CardTitle className="text-xl" style={{ color: primaryColor }}>Auto Maintenance</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.oilChange}
+                  Oil Change
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">Quick and efficient oil changes using high-quality motor oils and filters.</p>
+                <p className="text-gray-600 text-sm mb-1">Quick and efficient oil changes using high-quality motor oils and filters.</p>
+                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 1.25 hours</p>
               </div>
 
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.brakeService}
+                  Brake Services
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">Complete brake system inspection, repair, and replacement services.</p>
+                <p className="text-gray-600 text-sm mb-1">Front/Back brake change (2 hrs) or Full brake change (3.5 hrs).</p>
+                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 2-3.5 hours</p>
               </div>
 
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.batteryService}
+                  Tuneup
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">Battery testing, replacement, and electrical system diagnostics.</p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  General Maintenance
-                </h4>
-                <p className="text-gray-600 text-sm">Comprehensive vehicle inspections and routine maintenance services.</p>
+                <p className="text-gray-600 text-sm mb-1">Comprehensive vehicle tuneup for optimal performance.</p>
+                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 5 hours</p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Emergency Services */}
+          {/* Specialized Services */}
           <Card className="hover:shadow-lg transition-shadow border-0">
             <CardHeader>
               <div className="flex items-center gap-3 mb-4">
-                <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                  <Zap className="h-6 w-6 text-red-600" />
+                <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
+                  <Zap className="h-6 w-6" style={{ color: primaryColor }} />
                 </div>
-                <CardTitle className="text-xl" style={{ color: primaryColor }}>{t.emergencyService}</CardTitle>
+                <CardTitle className="text-xl" style={{ color: primaryColor }}>Specialized Services</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.roadSideAssistance}
+                  Alignment
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">24/7 roadside assistance for emergencies and breakdowns.</p>
+                <p className="text-gray-600 text-sm mb-1">Precision wheel alignment to ensure even tire wear and optimal handling.</p>
+                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 2 hours</p>
               </div>
 
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.flatTireRepair}
+                  Mechanical Inspection
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">On-site flat tire repair and replacement services.</p>
+                <p className="text-gray-600 text-sm mb-1">Comprehensive vehicle inspection and detailed repair estimate.</p>
+                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 2.5 hours</p>
               </div>
 
               <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500 mt-6">
-                <p className="text-red-700 font-semibold text-sm mb-2">{t.needServiceToday}</p>
+                <p className="text-red-700 font-semibold text-sm mb-2">Need Service Today?</p>
                 <p className="text-red-600 text-sm">Call us immediately at (503) 367-9714</p>
                 <p className="text-red-600 text-xs mt-1">Available Mon-Sat 7AM-7PM</p>
               </div>
