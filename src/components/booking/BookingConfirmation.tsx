@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 interface TimeSlot {
   time: string;
   display: string;
-  status: 'available' | 'limited' | 'unavailable';
+  status: 'available' | 'unavailable';
   conflictCount: number;
   message?: string;
 }
@@ -35,7 +35,7 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
       <Button 
         onClick={onConfirm}
         disabled={submitting}
-        className="bg-[#007030] hover:bg-[#005a26]"
+        className="bg-[#0C3B1B] hover:bg-[#083018]"
       >
         {submitting ? 'Booking...' : 'Confirm Appointment'}
       </Button>

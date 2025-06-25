@@ -4,7 +4,7 @@ import React from 'react';
 interface TimeSlot {
   time: string;
   display: string;
-  status: 'available' | 'limited' | 'unavailable';
+  status: 'available' | 'unavailable';
   conflictCount: number;
   message?: string;
 }
@@ -17,7 +17,6 @@ interface TimeSlotGridProps {
 
 export const TimeSlotGrid: React.FC<TimeSlotGridProps> = ({ timeSlots, selectedTime, onTimeSelect }) => {
   const availableSlots = timeSlots.filter(slot => slot.status === 'available');
-  const limitedSlots = timeSlots.filter(slot => slot.status === 'limited');
   const unavailableSlots = timeSlots.filter(slot => slot.status === 'unavailable');
 
   const renderSlotGroup = (
@@ -31,7 +30,7 @@ export const TimeSlotGrid: React.FC<TimeSlotGridProps> = ({ timeSlots, selectedT
 
     return (
       <div className="mb-6">
-        <h4 className={`font-semibold mb-3 ${title.includes('Available') ? 'text-green-700' : title.includes('Limited') ? 'text-yellow-700' : 'text-red-700'}`}>
+        <h4 className={`font-semibold mb-3 ${title.includes('Available') ? 'text-green-700' : 'text-red-700'}`}>
           {title}
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -74,10 +73,6 @@ export const TimeSlotGrid: React.FC<TimeSlotGridProps> = ({ timeSlots, selectedT
           <span>Available ({availableSlots.length})</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div>
-          <span>Limited ({limitedSlots.length})</span>
-        </div>
-        <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
           <span>Unavailable ({unavailableSlots.length})</span>
         </div>
@@ -89,14 +84,6 @@ export const TimeSlotGrid: React.FC<TimeSlotGridProps> = ({ timeSlots, selectedT
         'Available Times',
         'bg-green-100 border-green-300 text-green-800',
         'bg-green-600 text-white border-green-600'
-      )}
-
-      {/* Limited times */}
-      {renderSlotGroup(
-        limitedSlots,
-        'Limited Availability',
-        'bg-yellow-100 border-yellow-300 text-yellow-800',
-        'bg-yellow-600 text-white border-yellow-600'
       )}
 
       {/* Unavailable times */}

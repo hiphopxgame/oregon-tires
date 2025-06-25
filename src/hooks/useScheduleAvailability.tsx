@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -5,7 +6,7 @@ import { toast } from '@/hooks/use-toast';
 interface TimeSlot {
   time: string;
   display: string;
-  status: 'available' | 'limited' | 'unavailable';
+  status: 'available' | 'unavailable';
   conflictCount: number;
   message?: string;
 }
@@ -59,6 +60,14 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
   };
 
+  const isPastTime = (date: string, time: string) => {
+    // Create a date object for the appointment time in Pacific Time
+    const appointmentDateTime = new Date(`${date}T${time}:00-08:00`); // PST is UTC-8
+    const now = new Date();
+    
+    return appointmentDateTime < now;
+  };
+
   const checkConsecutiveSlotAvailability = async () => {
     try {
       setLoading(true);
@@ -89,16 +98,19 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
         const endMinutes = startMinutes + serviceDurationMinutes;
         const closingTime = 19 * 60;
 
-        let status: 'available' | 'limited' | 'unavailable' = 'available';
+        let status: 'available' | 'unavailable' = 'available';
         let conflictCount = 0;
         let message = '';
 
-        if (endMinutes > closingTime) {
+        // Check if time is in the past
+        if (isPastTime(preferredDate, startTime)) {
+          status = 'unavailable';
+          message = 'Time has passed';
+        } else if (endMinutes > closingTime) {
           status = 'unavailable';
           message = 'Service would extend beyond closing time (7 PM)';
         } else {
           let hasConflict = false;
-          let limitedSlots = 0;
 
           for (let checkMinutes = startMinutes; checkMinutes < endMinutes; checkMinutes += 30) {
             let slotConflicts = 0;
@@ -117,18 +129,14 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
             if (slotConflicts >= 2) {
               hasConflict = true;
               break;
-            } else if (slotConflicts === 1) {
-              limitedSlots++;
             }
           }
 
           if (hasConflict) {
             status = 'unavailable';
             message = 'Time slot conflict - fully booked during service period';
-          } else if (limitedSlots > 0) {
-            status = 'limited';
-            message = `Limited availability - ${limitedSlots} slots with existing appointments`;
           } else {
+            // Both available and limited availability slots are now just "available"
             message = `Available (${formatTimeDisplay(startTime)} to ${formatTimeDisplay(minutesToTime(endMinutes))})`;
           }
         }
