@@ -42,6 +42,7 @@
                 <a href="#about" onclick="scrollToSection('about')" id="nav-about" class="text-primary hover:text-green-700 font-medium">About</a>
                 <a href="#testimonials" onclick="scrollToSection('testimonials')" id="nav-testimonials" class="text-primary hover:text-green-700 font-medium">Reviews</a>
                 <a href="#contact" onclick="scrollToSection('contact')" id="nav-contact" class="text-primary hover:text-green-700 font-medium">Contact</a>
+                <a href="#schedule" onclick="scrollToSection('schedule')" id="nav-schedule" class="text-primary hover:text-green-700 font-medium">Schedule</a>
             </div>
         </div>
     </nav>
@@ -53,7 +54,7 @@
             <p id="hero-subtitle" class="text-xl mb-8 max-w-3xl mx-auto">Professional tire installation, repair, and complete automotive services. We speak Spanish and English!</p>
             <div class="flex justify-center gap-4 flex-wrap">
                 <button onclick="openContactForm()" id="contact-btn" class="secondary-color text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors">Contact Us</button>
-                <a href="/book-appointment" id="appointment-btn" class="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block">Book Appointment</a>
+                <button onclick="scrollToSection('schedule')" id="appointment-btn" class="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">Book Appointment</button>
             </div>
         </div>
     </section>
@@ -163,13 +164,44 @@
         </div>
     </section>
 
+    <!-- Schedule Service Section -->
+    <section id="schedule" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold primary-color mb-4">Schedule Your Service</h2>
+                <p class="text-xl text-gray-600">Book your appointment online - it's quick and easy!</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-gray-50 rounded-lg p-8">
+                    <iframe 
+                        src="/book-appointment" 
+                        class="w-full h-[800px] border-0 rounded-lg"
+                        title="Book Appointment"
+                        loading="lazy">
+                    </iframe>
+                    
+                    <!-- Fallback for browsers that don't support iframes -->
+                    <noscript>
+                        <div class="text-center py-8">
+                            <p class="text-gray-600 mb-4">Please enable JavaScript or visit our booking page directly:</p>
+                            <a href="/book-appointment" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors inline-block">
+                                Go to Booking Page
+                            </a>
+                        </div>
+                    </noscript>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact Section -->
-    <section id="contact" class="py-16 bg-white">
+    <section id="contact" class="py-16 bg-gray-50">
         <div class="container mx-auto px-4">
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-12">
                     <h2 id="contact-title" class="text-4xl font-bold primary-color mb-4">Contact</h2>
-                    <p id="contact-subtitle" class="text-xl text-gray-600">Get in touch with us for all your automotive needs</p>
+                    <p id="contact-subtitle" class="text-xl text-gray-600">Get in touch with us for questions or general inquiries</p>
                 </div>
 
                 <div class="grid lg:grid-cols-2 gap-12">
@@ -209,13 +241,13 @@
                     </div>
 
                     <!-- Contact Form -->
-                    <div class="bg-gray-50 p-8 rounded-lg">
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
                         <div class="mb-6">
-                            <h3 id="form-title" class="text-2xl font-semibold primary-color mb-4">Contact Us</h3>
-                            <p class="text-gray-600">For appointment scheduling, please use our <a href="/book-appointment" class="text-primary hover:underline font-medium">online booking system</a>.</p>
+                            <h3 id="form-title" class="text-2xl font-semibold primary-color mb-4">Send Us a Message</h3>
+                            <p class="text-gray-600">For appointment scheduling, please use the <a href="#schedule" onclick="scrollToSection('schedule')" class="text-primary hover:underline font-medium">booking form above</a>.</p>
                         </div>
 
-                        <form onsubmit="handleFormSubmit(event)">
+                        <form onsubmit="handleContactFormSubmit(event)">
                             <div class="grid md:grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label for="firstName" id="first-name-label" class="block text-gray-700 font-medium mb-2">First Name *</label>
@@ -324,5 +356,45 @@
     <script src="appointment-preview.js"></script>
     <script src="form-handler.js"></script>
     <script src="oregon-tires-script.js"></script>
+    
+    <script>
+        // Handle contact form submission (separate from appointment booking)
+        async function handleContactFormSubmit(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = {
+                first_name: formData.get('firstName'),
+                last_name: formData.get('lastName'),
+                phone: formData.get('phone'),
+                email: formData.get('email'),
+                message: formData.get('message'),
+                language: window.currentLanguage || 'english',
+                status: 'new'
+            };
+
+            try {
+                const { error } = await window.supabaseClient
+                    .from('oregon_tires_contact_messages')
+                    .insert(data);
+
+                if (error) throw error;
+                
+                alert(window.currentLanguage === 'english' ? 
+                    'Message sent successfully!' : 
+                    '¡Mensaje enviado exitosamente!'
+                );
+                
+                event.target.reset();
+                
+            } catch (error) {
+                console.error('Contact form submission error:', error);
+                alert(window.currentLanguage === 'english' ? 
+                    'Error sending message. Please try again.' : 
+                    'Error al enviar mensaje. Por favor intente de nuevo.'
+                );
+            }
+        }
+    </script>
 </body>
 </html>
