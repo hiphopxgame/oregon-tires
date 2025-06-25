@@ -253,10 +253,47 @@ export type Database = {
         }
         Relationships: []
       }
+      dc_credit_purchases: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          credits_purchased: number
+          currency: string | null
+          id: string
+          status: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_paid: number
+          created_at?: string
+          credits_purchased: number
+          currency?: string | null
+          id?: string
+          status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          credits_purchased?: number
+          currency?: string | null
+          id?: string
+          status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       dc_user_cash: {
         Row: {
           balance: number
           created_at: string
+          credits: number | null
           id: string
           updated_at: string
           user_id: string
@@ -264,6 +301,7 @@ export type Database = {
         Insert: {
           balance?: number
           created_at?: string
+          credits?: number | null
           id?: string
           updated_at?: string
           user_id: string
@@ -271,6 +309,7 @@ export type Database = {
         Update: {
           balance?: number
           created_at?: string
+          credits?: number | null
           id?: string
           updated_at?: string
           user_id?: string
