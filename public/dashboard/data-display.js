@@ -1,5 +1,5 @@
 
-import { state } from './config.js';
+import { state, serviceDurations } from './config.js';
 
 // Load appointments
 export function loadAppointments() {
@@ -85,16 +85,5 @@ export function loadMessages() {
 
 // Get service duration
 function getServiceDuration(service) {
-    const serviceDurations = {
-        'Tire Installation (4 tires)': 60,
-        'Tire Installation (2 tires)': 45,
-        'Tire Installation (1 tire)': 30,
-        'Tire Repair': 30,
-        'Tire Rotation & Balancing': 45,
-        'Wheel Alignment': 60,
-        'Brake Service': 90,
-        'Oil Change': 30,
-        'Other Service': 60
-    };
-    return serviceDurations[service] || 60;
+    return serviceDurations[service] || 120; // Default to 2 hours if service not found
 }
