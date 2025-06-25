@@ -1144,6 +1144,99 @@ export type Database = {
         }
         Relationships: []
       }
+      user_events: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_time: string | null
+          id: string
+          image_url: string | null
+          is_recurring: boolean | null
+          organizer_email: string | null
+          organizer_name: string | null
+          organizer_phone: string | null
+          price_display: string | null
+          price_max: number | null
+          price_min: number | null
+          recurrence_end_date: string | null
+          recurrence_pattern: string | null
+          recurrence_type: string | null
+          start_date: string
+          start_time: string | null
+          status: string | null
+          ticket_url: string | null
+          title: string
+          updated_at: string
+          venue_address: string | null
+          venue_city: string | null
+          venue_name: string
+          venue_state: string | null
+          venue_zip: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          image_url?: string | null
+          is_recurring?: boolean | null
+          organizer_email?: string | null
+          organizer_name?: string | null
+          organizer_phone?: string | null
+          price_display?: string | null
+          price_max?: number | null
+          price_min?: number | null
+          recurrence_end_date?: string | null
+          recurrence_pattern?: string | null
+          recurrence_type?: string | null
+          start_date: string
+          start_time?: string | null
+          status?: string | null
+          ticket_url?: string | null
+          title: string
+          updated_at?: string
+          venue_address?: string | null
+          venue_city?: string | null
+          venue_name: string
+          venue_state?: string | null
+          venue_zip?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          image_url?: string | null
+          is_recurring?: boolean | null
+          organizer_email?: string | null
+          organizer_name?: string | null
+          organizer_phone?: string | null
+          price_display?: string | null
+          price_max?: number | null
+          price_min?: number | null
+          recurrence_end_date?: string | null
+          recurrence_pattern?: string | null
+          recurrence_type?: string | null
+          start_date?: string
+          start_time?: string | null
+          status?: string | null
+          ticket_url?: string | null
+          title?: string
+          updated_at?: string
+          venue_address?: string | null
+          venue_city?: string | null
+          venue_name?: string
+          venue_state?: string | null
+          venue_zip?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

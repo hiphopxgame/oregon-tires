@@ -46,7 +46,7 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
               </div>
             </div>
             <button onClick={toggleLanguage} className="text-white hover:text-yellow-200">
-              🇺🇸 English | 🇲🇽 Español
+              English | Español
             </button>
           </div>
         </div>
@@ -71,13 +71,14 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
             <button onClick={() => scrollToSection('services')} className="text-gray-700 hover:text-green-700 font-medium">{t.services}</button>
             <button onClick={() => scrollToSection('about')} className="text-gray-700 hover:text-green-700 font-medium">{t.about}</button>
             <button onClick={openContactForm} className="text-gray-700 hover:text-green-700 font-medium">{t.contact}</button>
-            <Button 
-              className="text-white font-medium"
-              style={{ backgroundColor: primaryColor }}
-              onClick={openScheduleForm}
-            >
-              {t.scheduleService}
-            </Button>
+            <Link to="/book-appointment">
+              <Button 
+                className="text-white font-medium"
+                style={{ backgroundColor: primaryColor }}
+              >
+                {t.scheduleService}
+              </Button>
+            </Link>
           </nav>
         </div>
       </div>

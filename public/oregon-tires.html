@@ -53,7 +53,7 @@
             <p id="hero-subtitle" class="text-xl mb-8 max-w-3xl mx-auto">Professional tire installation, repair, and complete automotive services. We speak Spanish and English!</p>
             <div class="flex justify-center gap-4 flex-wrap">
                 <button onclick="openContactForm()" id="contact-btn" class="secondary-color text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors">Contact Us</button>
-                <button onclick="openScheduleForm()" id="appointment-btn" class="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">Book Appointment</button>
+                <a href="/book-appointment" id="appointment-btn" class="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block">Book Appointment</a>
             </div>
         </div>
     </section>
@@ -210,15 +210,9 @@
 
                     <!-- Contact Form -->
                     <div class="bg-gray-50 p-8 rounded-lg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 id="form-title" class="text-2xl font-semibold primary-color">Contact</h3>
-                            <div class="flex items-center gap-2">
-                                <span id="toggle-label" class="text-sm text-gray-600">Switch to Schedule</span>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="schedule-mode" class="sr-only peer" onchange="toggleScheduleMode()">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                                </label>
-                            </div>
+                        <div class="mb-6">
+                            <h3 id="form-title" class="text-2xl font-semibold primary-color mb-4">Contact Us</h3>
+                            <p class="text-gray-600">For appointment scheduling, please use our <a href="/book-appointment" class="text-primary hover:underline font-medium">online booking system</a>.</p>
                         </div>
 
                         <form onsubmit="handleFormSubmit(event)">
@@ -241,47 +235,6 @@
                                 <div>
                                     <label for="email" id="email-label" class="block text-gray-700 font-medium mb-2">Email *</label>
                                     <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                </div>
-                            </div>
-
-                            <!-- Schedule-specific fields -->
-                            <div id="schedule-fields" style="display: none;">
-                                <div class="mb-4">
-                                    <label for="service" id="service-label" class="block text-gray-700 font-medium mb-2">Service Needed *</label>
-                                    <select id="service" name="service" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                        <option value="" id="select-service">Select a service</option>
-                                        <option value="tire-installation">Tire Installation</option>
-                                        <option value="tire-repair">Tire Repair</option>
-                                        <option value="wheel-alignment">Wheel Alignment</option>
-                                        <option value="brake-service">Brake Service</option>
-                                        <option value="oil-change">Oil Change</option>
-                                        <option value="general-maintenance">General Maintenance</option>
-                                    </select>
-                                </div>
-
-                                <div class="grid md:grid-cols-2 gap-4 mb-4">
-                                    <div>
-                                        <label for="preferred_date" id="preferred-date-label" class="block text-gray-700 font-medium mb-2">Preferred Date *</label>
-                                        <input type="date" id="preferred_date" name="preferred_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    </div>
-                                    <div>
-                                        <label for="preferred_time" id="preferred-time-label" class="block text-gray-700 font-medium mb-2">Preferred Time *</label>
-                                        <select id="preferred_time" name="preferred_time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                            <option value="" id="select-time">Select a time</option>
-                                            <option value="07:00">7:00 AM</option>
-                                            <option value="08:00">8:00 AM</option>
-                                            <option value="09:00">9:00 AM</option>
-                                            <option value="10:00">10:00 AM</option>
-                                            <option value="11:00">11:00 AM</option>
-                                            <option value="12:00">12:00 PM</option>
-                                            <option value="13:00">1:00 PM</option>
-                                            <option value="14:00">2:00 PM</option>
-                                            <option value="15:00">3:00 PM</option>
-                                            <option value="16:00">4:00 PM</option>
-                                            <option value="17:00">5:00 PM</option>
-                                            <option value="18:00">6:00 PM</option>
-                                        </select>
-                                    </div>
                                 </div>
                             </div>
 
