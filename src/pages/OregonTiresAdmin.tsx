@@ -6,8 +6,6 @@ import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminFooter } from '@/components/admin/AdminFooter';
 import { DashboardView } from '@/components/admin/DashboardView';
 import { DayView } from '@/components/admin/DayView';
-import { AppointmentsView } from '@/components/admin/AppointmentsView';
-import { MessagesView } from '@/components/admin/MessagesView';
 import { AnalyticsView } from '@/components/admin/AnalyticsView';
 
 const OregonTiresAdmin = () => {
@@ -49,11 +47,11 @@ const OregonTiresAdmin = () => {
             updateMessageStatus={updateMessageStatus}
           />
         );
-      case 'dayview':
+      case 'appointments':
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-[#007030]">Day View</h2>
+              <h2 className="text-2xl font-bold text-[#007030]">Appointments</h2>
               <input
                 type="date"
                 value={selectedDate.toISOString().split('T')[0]}
@@ -68,20 +66,6 @@ const OregonTiresAdmin = () => {
               onDataRefresh={refetchData}
             />
           </div>
-        );
-      case 'appointments':
-        return (
-          <AppointmentsView
-            appointments={appointments}
-            updateAppointmentStatus={updateAppointmentStatus}
-          />
-        );
-      case 'messages':
-        return (
-          <MessagesView
-            contactMessages={contactMessages}
-            updateMessageStatus={updateMessageStatus}
-          />
         );
       case 'analytics':
         return (

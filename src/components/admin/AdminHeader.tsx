@@ -1,5 +1,6 @@
 
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 interface AdminHeaderProps {
   language: string;
@@ -16,9 +17,7 @@ export const AdminHeader = ({
 }: AdminHeaderProps) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard' },
-    { id: 'dayview', label: 'Day View' },
     { id: 'appointments', label: 'Appointments' },
-    { id: 'messages', label: 'Messages' },
     { id: 'analytics', label: 'Analytics' }
   ];
 
@@ -27,8 +26,10 @@ export const AdminHeader = ({
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-3xl font-bold">Oregon Tires Admin</h1>
-            <p className="text-white/80">Management Dashboard</p>
+            <Link to="/" className="hover:opacity-80">
+              <h1 className="text-3xl font-bold">Oregon Tires Admin</h1>
+              <p className="text-white/80">Management Dashboard</p>
+            </Link>
           </div>
           <button 
             onClick={toggleLanguage} 

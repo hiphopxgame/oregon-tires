@@ -14,6 +14,19 @@ let currentLanguage = 'english';
 let selectedDate = new Date();
 let currentTab = 'appointments';
 
+// Service duration mapping (in minutes) - updated to match booking form
+const serviceDurations = {
+    'Tire Installation (4 tires)': 60,
+    'Tire Installation (2 tires)': 45,
+    'Tire Installation (1 tire)': 30,
+    'Tire Repair': 30,
+    'Tire Rotation & Balancing': 45,
+    'Wheel Alignment': 60,
+    'Brake Service': 90,
+    'Oil Change': 30,
+    'Other Service': 60
+};
+
 // Initialize the page
 async function init() {
     try {
@@ -70,6 +83,11 @@ async function fetchDataFromSupabase() {
         console.error('Supabase fetch error:', error);
         throw error;
     }
+}
+
+// Get service duration
+function getServiceDuration(service) {
+    return serviceDurations[service] || 60; // Default to 60 minutes if service not found
 }
 
 // Update appointment status in Supabase
@@ -226,20 +244,23 @@ function updateSelectedDateInfo() {
     if (dayAppointments.length === 0) {
         appointmentList.innerHTML = '<p style="color: #6b7280; font-size: 0.875rem;">No appointments scheduled for this date</p>';
     } else {
-        appointmentList.innerHTML = dayAppointments.map(apt => `
-            <div class="appointment-item">
-                <div style="font-weight: 500;">${apt.first_name} ${apt.last_name}</div>
-                <div style="color: #6b7280;">${apt.service} - ${apt.preferred_time}</div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem;">
-                    <span class="status-badge status-${apt.status}">${capitalizeStatus(apt.status)}</span>
-                    <select class="status-select" onchange="updateStatus('appointment', '${apt.id}', this.value)">
-                        <option value="new" ${apt.status === 'new' ? 'selected' : ''}>New</option>
-                        <option value="priority" ${apt.status === 'priority' ? 'selected' : ''}>Priority</option>
-                        <option value="completed" ${apt.status === 'completed' ? 'selected' : ''}>Completed</option>
-                    </select>
+        appointmentList.innerHTML = dayAppointments.map(apt => {
+            const duration = getServiceDuration(apt.service);
+            return `
+                <div class="appointment-item">
+                    <div style="font-weight: 500;">${apt.first_name} ${apt.last_name}</div>
+                    <div style="color: #6b7280;">${apt.service} - ${apt.preferred_time} (${duration} min)</div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem;">
+                        <span class="status-badge status-${apt.status}">${capitalizeStatus(apt.status)}</span>
+                        <select class="status-select" onchange="updateStatus('appointment', '${apt.id}', this.value)">
+                            <option value="new" ${apt.status === 'new' ? 'selected' : ''}>New</option>
+                            <option value="priority" ${apt.status === 'priority' ? 'selected' : ''}>Priority</option>
+                            <option value="completed" ${apt.status === 'completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 }
 
@@ -252,34 +273,38 @@ function loadAppointments() {
         return;
     }
 
-    tbody.innerHTML = appointments.map(appointment => `
-        <tr>
-            <td>
-                <div>
-                    <p class="customer-name">${appointment.first_name} ${appointment.last_name}</p>
-                    <p class="contact-info">${appointment.phone}</p>
-                    <p class="contact-info">${appointment.email}</p>
-                    ${appointment.message ? `<p class="contact-info message-truncate" style="margin-top: 0.25rem;">${appointment.message}</p>` : ''}
-                </div>
-            </td>
-            <td>
-                <span style="font-weight: 500;">${appointment.service}</span>
-            </td>
-            <td>
-                <div style="font-size: 0.875rem;">
-                    <p style="font-weight: 500;">${appointment.preferred_date}</p>
-                    <p style="color: #6b7280;">${appointment.preferred_time}</p>
-                </div>
-            </td>
-            <td>
-                <select class="status-select" onchange="updateStatus('appointment', '${appointment.id}', this.value)">
-                    <option value="new" ${appointment.status === 'new' ? 'selected' : ''}>New</option>
-                    <option value="priority" ${appointment.status === 'priority' ? 'selected' : ''}>Priority</option>
-                    <option value="completed" ${appointment.status === 'completed' ? 'selected' : ''}>Completed</option>
-                </select>
-            </td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = appointments.map(appointment => {
+        const duration = getServiceDuration(appointment.service);
+        return `
+            <tr>
+                <td>
+                    <div>
+                        <p class="customer-name">${appointment.first_name} ${appointment.last_name}</p>
+                        <p class="contact-info">${appointment.phone}</p>
+                        <p class="contact-info">${appointment.email}</p>
+                        ${appointment.message ? `<p class="contact-info message-truncate" style="margin-top: 0.25rem;">${appointment.message}</p>` : ''}
+                    </div>
+                </td>
+                <td>
+                    <span style="font-weight: 500;">${appointment.service}</span>
+                    <div style="font-size: 0.875rem; color: #6b7280;">${duration} minutes</div>
+                </td>
+                <td>
+                    <div style="font-size: 0.875rem;">
+                        <p style="font-weight: 500;">${appointment.preferred_date}</p>
+                        <p style="color: #6b7280;">${appointment.preferred_time}</p>
+                    </div>
+                </td>
+                <td>
+                    <select class="status-select" onchange="updateStatus('appointment', '${appointment.id}', this.value)">
+                        <option value="new" ${appointment.status === 'new' ? 'selected' : ''}>New</option>
+                        <option value="priority" ${appointment.status === 'priority' ? 'selected' : ''}>Priority</option>
+                        <option value="completed" ${appointment.status === 'completed' ? 'selected' : ''}>Completed</option>
+                    </select>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 // Load messages
