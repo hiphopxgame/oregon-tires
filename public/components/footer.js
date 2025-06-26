@@ -57,11 +57,11 @@ function createFooter() {
                     <div>
                         <h3 class="text-xl font-bold mb-4">Other Versions</h3>
                         <div class="space-y-2">
-                            <a href="/oregon-tires" class="text-white hover:text-yellow-200 flex items-center gap-2 block">
+                            <a href="/" class="text-white hover:text-yellow-200 flex items-center gap-2 block">
                                 <i data-lucide="external-link" class="h-4 w-4"></i>
                                 React Version
                             </a>
-                            <a href="/oregon-tires-dashboard.html" class="text-white hover:text-yellow-200 flex items-center gap-2 block">
+                            <a href="/dashboard.html" class="text-white hover:text-yellow-200 flex items-center gap-2 block">
                                 <i data-lucide="external-link" class="h-4 w-4"></i>
                                 Admin Dashboard
                             </a>

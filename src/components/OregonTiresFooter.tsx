@@ -53,13 +53,36 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
           </div>
 
           <div>
-            <h3 className="text-xl font-bold mb-4">Language / Idioma</h3>
-            <button 
-              onClick={toggleLanguage} 
-              className="text-white hover:text-yellow-200 text-left mb-4"
-            >
-              English | Español
-            </button>
+            <h3 className="text-xl font-bold mb-4">Follow Us</h3>
+            <div className="space-y-3">
+              <a 
+                href="https://www.facebook.com/people/Oregon-Tires/61571913202998/?_rdr" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-yellow-200 flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Facebook
+              </a>
+              <a 
+                href="https://www.instagram.com/oregontires" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-yellow-200 flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Instagram
+              </a>
+            </div>
+            <div className="mt-4">
+              <h3 className="text-xl font-bold mb-4">Language / Idioma</h3>
+              <button 
+                onClick={toggleLanguage} 
+                className="text-white hover:text-yellow-200 text-left mb-4"
+              >
+                English | Español
+              </button>
+            </div>
           </div>
           
           <div>
@@ -75,7 +98,7 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
                 Static HTML Page
               </a>
               <a 
-                href="/oregon-tires-dashboard.html" 
+                href="/dashboard.html" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-yellow-200 flex items-center gap-2"

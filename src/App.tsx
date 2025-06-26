@@ -18,8 +18,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<OregonTiresAdmin />} />
-          <Route path="/home.html" element={<OregonTires />} />
+          <Route path="/" element={<OregonTires />} />
+          <Route path="/dashboard.html" element={<OregonTiresAdmin />} />
           <Route path="/book-appointment" element={<AppointmentBooking />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
