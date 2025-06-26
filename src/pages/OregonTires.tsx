@@ -16,6 +16,8 @@ const OregonTires = () => {
   const { language, t, toggleLanguage } = useLanguage();
   const { currentDesign } = useDesignTheme();
   const { 
+    isScheduleMode, 
+    setIsScheduleMode, 
     scrollToSection, 
     openContactForm, 
     openScheduleForm 
@@ -34,7 +36,7 @@ const OregonTires = () => {
         openContactForm={openContactForm}
       />
 
-      <section id="home" className="pt-8">
+      <div id="home">
         <OregonTiresHero
           translations={t}
           primaryColor={currentDesign.primaryColor}
@@ -42,38 +44,42 @@ const OregonTires = () => {
           openContactForm={openContactForm}
           openScheduleForm={openScheduleForm}
         />
-      </section>
+      </div>
 
-      <section id="services" className="pt-8">
+      <div id="services">
         <OregonTiresServices
           translations={t}
           primaryColor={currentDesign.primaryColor}
           secondaryColor={currentDesign.secondaryColor}
         />
-      </section>
+      </div>
 
-      <OregonTiresAbout
-        translations={t}
-        primaryColor={currentDesign.primaryColor}
-        secondaryColor={currentDesign.secondaryColor}
-      />
+      <div id="about">
+        <OregonTiresAbout
+          translations={t}
+          primaryColor={currentDesign.primaryColor}
+          secondaryColor={currentDesign.secondaryColor}
+        />
+      </div>
 
       <OregonTiresTestimonials
         translations={t}
         primaryColor={currentDesign.primaryColor}
       />
 
-      <section id="contact" className="pt-8">
+      <div id="contact">
         <OregonTiresContact
           language={language}
           translations={t}
           primaryColor={currentDesign.primaryColor}
+          isScheduleMode={isScheduleMode}
+          setIsScheduleMode={setIsScheduleMode}
           contactForm={contactForm}
           setContactForm={setContactForm}
-          handleContactSubmit={handleContactSubmit}
+          handleContactSubmit={(e) => handleContactSubmit(e, isScheduleMode)}
           toggleLanguage={toggleLanguage}
         />
-      </section>
+      </div>
 
       <OregonTiresFooter
         language={language}

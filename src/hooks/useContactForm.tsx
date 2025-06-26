@@ -9,6 +9,9 @@ interface ContactFormData {
   phone: string;
   email: string;
   message: string;
+  service: string;
+  preferred_date: string;
+  preferred_time: string;
 }
 
 export const useContactForm = (language: string, t: any) => {
@@ -17,10 +20,13 @@ export const useContactForm = (language: string, t: any) => {
     lastName: '',
     phone: '',
     email: '',
-    message: ''
+    message: '',
+    service: '',
+    preferred_date: '',
+    preferred_time: ''
   });
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent, isScheduleMode: boolean) => {
     e.preventDefault();
 
     const formData = {
@@ -34,24 +40,48 @@ export const useContactForm = (language: string, t: any) => {
     };
 
     try {
-      const { error } = await supabase
-        .from('oregon_tires_contact_messages')
-        .insert(formData);
+      if (isScheduleMode) {
+        const appointmentData = {
+          ...formData,
+          service: contactForm.service,
+          preferred_date: contactForm.preferred_date,
+          preferred_time: contactForm.preferred_time
+        };
 
-      if (error) throw error;
-      
-      toast({
-        title: "Message Sent!",
-        description: t.formSuccess,
-        variant: "default",
-      });
+        const { error } = await supabase
+          .from('oregon_tires_appointments')
+          .insert(appointmentData);
+
+        if (error) throw error;
+        
+        toast({
+          title: "Appointment Scheduled!",
+          description: t.formSuccess,
+          variant: "default",
+        });
+      } else {
+        const { error } = await supabase
+          .from('oregon_tires_contact_messages')
+          .insert(formData);
+
+        if (error) throw error;
+        
+        toast({
+          title: "Message Sent!",
+          description: t.formSuccess,
+          variant: "default",
+        });
+      }
 
       setContactForm({
         firstName: '',
         lastName: '',
         phone: '',
         email: '',
-        message: ''
+        message: '',
+        service: '',
+        preferred_date: '',
+        preferred_time: ''
       });
     } catch (error) {
       console.error("Form submission error:", error);

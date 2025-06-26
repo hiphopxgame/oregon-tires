@@ -12,7 +12,6 @@ export function loadAppointments() {
 
     tbody.innerHTML = state.appointments.map(appointment => {
         const duration = getServiceDuration(appointment.service);
-        const formattedDuration = formatDuration(duration);
         return `
             <tr>
                 <td>
@@ -25,7 +24,7 @@ export function loadAppointments() {
                 </td>
                 <td>
                     <span style="font-weight: 500;">${appointment.service}</span>
-                    <div style="font-size: 0.875rem; color: #6b7280;">${formattedDuration}</div>
+                    <div style="font-size: 0.875rem; color: #6b7280;">${duration} minutes</div>
                 </td>
                 <td>
                     <div style="font-size: 0.875rem;">
@@ -87,19 +86,4 @@ export function loadMessages() {
 // Get service duration
 function getServiceDuration(service) {
     return serviceDurations[service] || 120; // Default to 2 hours if service not found
-}
-
-// Format duration in a readable way (hours and minutes)
-function formatDuration(minutes) {
-    if (minutes < 60) {
-        return `${minutes} minutes`;
-    } else {
-        const hours = Math.floor(minutes / 60);
-        const remainingMinutes = minutes % 60;
-        if (remainingMinutes === 0) {
-            return hours === 1 ? '1 hour' : `${hours} hours`;
-        } else {
-            return `${hours}h ${remainingMinutes}m`;
-        }
-    }
 }

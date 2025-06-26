@@ -35,19 +35,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
 
     setSubmitting(true);
     try {
-      console.log('Booking appointment with data:', {
-        first_name: customerInfo.firstName,
-        last_name: customerInfo.lastName,
-        phone: customerInfo.phone,
-        email: customerInfo.email,
-        service: customerInfo.service,
-        preferred_date: customerInfo.preferredDate,
-        preferred_time: selectedTime,
-        status: 'pending',
-        language: 'english'
-      });
-
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('oregon_tires_appointments')
         .insert({
           first_name: customerInfo.firstName,
@@ -59,19 +47,13 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           preferred_time: selectedTime,
           status: 'pending',
           language: 'english'
-        })
-        .select();
+        });
 
-      if (error) {
-        console.error('Database error:', error);
-        throw error;
-      }
-
-      console.log('Appointment booked successfully:', data);
+      if (error) throw error;
 
       toast({
         title: "Success!",
-        description: "Your appointment has been scheduled successfully. We will contact you to confirm the details.",
+        description: "Your appointment has been scheduled successfully.",
         variant: "default",
       });
 
@@ -81,7 +63,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
       console.error('Error booking appointment:', error);
       toast({
         title: "Error",
-        description: "Failed to book appointment. Please try again or contact us directly.",
+        description: "Failed to book appointment. Please try again.",
         variant: "destructive",
       });
     } finally {
