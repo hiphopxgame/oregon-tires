@@ -1,6 +1,3 @@
 
-// Load the main dashboard module
-const script = document.createElement('script');
-script.type = 'module';
-script.src = './dashboard/main.js';
-document.head.appendChild(script);
+// Main dashboard script - now imports from modular components
+import './dashboard/main.js';

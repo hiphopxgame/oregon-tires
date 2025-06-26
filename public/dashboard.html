@@ -18,13 +18,8 @@
             <div class="container">
                 <div class="header-content">
                     <h1>Oregon Tires Management</h1>
-                    <nav class="main-nav">
-                        <button class="nav-button active" onclick="switchView('dashboard')">Dashboard</button>
-                        <button class="nav-button" onclick="switchView('appointments')">Day View</button>
-                        <button class="nav-button" onclick="switchView('analytics')">Analytics</button>
-                    </nav>
                     <button class="language-toggle" onclick="toggleLanguage()">
-                        English | Español
+                        🇺🇸 English | 🇲🇽 Español
                     </button>
                 </div>
             </div>
@@ -32,157 +27,103 @@
 
         <!-- Main Content -->
         <div class="container main-content">
-            <!-- Dashboard View -->
-            <div id="dashboard-view" class="view-content active">
-                <div class="dashboard-grid">
-                    <!-- Calendar Section -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Appointment Calendar</h2>
-                            <p class="card-description" id="calendar-month">December 2024</p>
-                        </div>
-                        <div class="card-content">
-                            <div class="calendar">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Sun</th>
-                                            <th>Mon</th>
-                                            <th>Tue</th>
-                                            <th>Wed</th>
-                                            <th>Thu</th>
-                                            <th>Fri</th>
-                                            <th>Sat</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="calendar-body">
-                                        <!-- Calendar will be generated here -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            <div class="selected-date-info">
-                                <h3 style="color: #007030; margin-bottom: 0.5rem;">
-                                    Appointments for <span id="selected-date">Today</span>
-                                </h3>
-                                <div class="appointment-count" id="appointment-count">0 appointments</div>
-                                <div id="appointment-list">
-                                    <p style="color: #6b7280; font-size: 0.875rem;">No appointments scheduled for this date</p>
-                                </div>
-                            </div>
-                        </div>
+            <div class="dashboard-grid">
+                <!-- Calendar Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Appointment Calendar</h2>
+                        <p class="card-description" id="calendar-month">December 2024</p>
                     </div>
-
-                    <!-- Tabs Section -->
-                    <div>
-                        <div class="tabs">
-                            <div class="tab-list">
-                                <button class="tab-trigger active" onclick="switchTab('appointments')">Appointments</button>
-                                <button class="tab-trigger" onclick="switchTab('messages')">Messages</button>
-                            </div>
+                    <div class="card-content">
+                        <div class="calendar">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Sun</th>
+                                        <th>Mon</th>
+                                        <th>Tue</th>
+                                        <th>Wed</th>
+                                        <th>Thu</th>
+                                        <th>Fri</th>
+                                        <th>Sat</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="calendar-body">
+                                    <!-- Calendar will be generated here -->
+                                </tbody>
+                            </table>
                         </div>
-
-                        <!-- Appointments Tab -->
-                        <div id="appointments-tab" class="tab-content active">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h2 class="card-title">Service Appointments</h2>
-                                </div>
-                                <div class="card-content" style="padding: 0;">
-                                    <div class="table-container">
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Customer</th>
-                                                    <th>Service</th>
-                                                    <th>Date & Time</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="appointments-table">
-                                                <!-- Appointments will be loaded here -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Messages Tab -->
-                        <div id="messages-tab" class="tab-content">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h2 class="card-title">Contact Messages</h2>
-                                </div>
-                                <div class="card-content" style="padding: 0;">
-                                    <div class="table-container">
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Customer</th>
-                                                    <th>Contact</th>
-                                                    <th>Message</th>
-                                                    <th>Date</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="messages-table">
-                                                <!-- Messages will be loaded here -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                        
+                        <div class="selected-date-info">
+                            <h3 style="color: #007030; margin-bottom: 0.5rem;">
+                                Appointments for <span id="selected-date">Today</span>
+                            </h3>
+                            <div class="appointment-count" id="appointment-count">0 appointments</div>
+                            <div id="appointment-list">
+                                <p style="color: #6b7280; font-size: 0.875rem;">No appointments scheduled for this date</p>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Day View -->
-            <div id="appointments-view" class="view-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Day View - <span id="day-view-date">Today</span></h2>
-                        <input type="date" id="day-view-date-picker" onchange="updateDayView()" style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
-                    </div>
-                    <div class="card-content">
-                        <div id="day-view-content">
-                            <!-- Day view appointments will be loaded here -->
+                <!-- Tabs Section -->
+                <div>
+                    <div class="tabs">
+                        <div class="tab-list">
+                            <button class="tab-trigger active" onclick="switchTab('appointments')">Appointments</button>
+                            <button class="tab-trigger" onclick="switchTab('messages')">Messages</button>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Analytics View -->
-            <div id="analytics-view" class="view-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Analytics Dashboard</h2>
-                        <p class="card-description">Overview of your business metrics</p>
-                    </div>
-                    <div class="card-content">
-                        <div class="analytics-grid">
-                            <div class="metric-card">
-                                <h3>Total Appointments</h3>
-                                <div class="metric-value" id="total-appointments">0</div>
+                    <!-- Appointments Tab -->
+                    <div id="appointments-tab" class="tab-content active">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Service Appointments</h2>
                             </div>
-                            <div class="metric-card">
-                                <h3>Pending Appointments</h3>
-                                <div class="metric-value" id="pending-appointments">0</div>
-                            </div>
-                            <div class="metric-card">
-                                <h3>Completed Appointments</h3>
-                                <div class="metric-value" id="completed-appointments">0</div>
-                            </div>
-                            <div class="metric-card">
-                                <h3>Total Messages</h3>
-                                <div class="metric-value" id="total-messages">0</div>
+                            <div class="card-content" style="padding: 0;">
+                                <div class="table-container">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Service</th>
+                                                <th>Date & Time</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="appointments-table">
+                                            <!-- Appointments will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                        <div class="popular-services">
-                            <h3>Popular Services</h3>
-                            <div id="popular-services-list">
-                                <!-- Popular services will be loaded here -->
+                    </div>
+
+                    <!-- Messages Tab -->
+                    <div id="messages-tab" class="tab-content">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Contact Messages</h2>
+                            </div>
+                            <div class="card-content" style="padding: 0;">
+                                <div class="table-container">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Contact</th>
+                                                <th>Message</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="messages-table">
+                                            <!-- Messages will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -196,7 +137,7 @@
                 <div class="footer-content">
                     <p>Oregon Tires Management System - © 2025 All rights reserved</p>
                     <button class="language-toggle" onclick="toggleLanguage()">
-                        English | Español
+                        🇺🇸 English | 🇲🇽 Español
                     </button>
                 </div>
             </div>
@@ -205,6 +146,6 @@
 
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="./dashboard/main.js"></script>
+    <script src="dashboard-script.js"></script>
 </body>
 </html>
