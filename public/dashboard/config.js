@@ -30,5 +30,6 @@ export const state = {
     contactMessages: [],
     currentLanguage: 'english',
     selectedDate: new Date(),
-    currentTab: 'appointments'
+    currentTab: 'appointments',
+    currentView: 'dashboard'
 };
