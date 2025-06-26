@@ -2,8 +2,6 @@
 import { useState } from 'react';
 
 export const useNavigation = () => {
-  const [isScheduleMode, setIsScheduleMode] = useState(false);
-
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -17,18 +15,15 @@ export const useNavigation = () => {
   };
 
   const openContactForm = () => {
-    setIsScheduleMode(false);
     scrollToSection('contact');
   };
 
   const openScheduleForm = () => {
-    setIsScheduleMode(true);
-    scrollToSection('contact');
+    // Redirect to the dedicated booking page
+    window.location.href = '/book-appointment';
   };
 
   return {
-    isScheduleMode,
-    setIsScheduleMode,
     scrollToSection,
     openContactForm,
     openScheduleForm

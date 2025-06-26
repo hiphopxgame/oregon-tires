@@ -16,8 +16,6 @@ const OregonTires = () => {
   const { language, t, toggleLanguage } = useLanguage();
   const { currentDesign } = useDesignTheme();
   const { 
-    isScheduleMode, 
-    setIsScheduleMode, 
     scrollToSection, 
     openContactForm, 
     openScheduleForm 
@@ -72,11 +70,9 @@ const OregonTires = () => {
           language={language}
           translations={t}
           primaryColor={currentDesign.primaryColor}
-          isScheduleMode={isScheduleMode}
-          setIsScheduleMode={setIsScheduleMode}
           contactForm={contactForm}
           setContactForm={setContactForm}
-          handleContactSubmit={(e) => handleContactSubmit(e, isScheduleMode)}
+          handleContactSubmit={handleContactSubmit}
           toggleLanguage={toggleLanguage}
         />
       </div>
