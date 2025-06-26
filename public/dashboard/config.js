@@ -7,15 +7,15 @@ export const SUPABASE_CONFIG = {
 
 // Service duration mapping (in minutes)
 export const serviceDurations = {
-    'Tire Repair': 60,
-    'Oil Change': 75,
-    'Alignment': 120,
-    'Brake Change (Front or Back)': 120,
-    'Tires (New or Used)': 120,
-    'Tire Mount and Balance': 120,
-    'Mechanical Inspection and Estimate': 150,
-    'Brake Change (Front and Back)': 210,
-    'Tuneup': 300,
+    'Tire Repair': 60,           // 1 hour
+    'Oil Change': 75,            // 1.25 hours
+    'Alignment': 120,            // 2 hours
+    'Brake Change (Front or Back)': 120,    // 2 hours
+    'Tires (New or Used)': 120,  // 2 hours
+    'Tire Mount and Balance': 120,   // 2 hours
+    'Mechanical Inspection and Estimate': 150,  // 2.5 hours
+    'Brake Change (Front and Back)': 210,   // 3.5 hours
+    'Tuneup': 300,               // 5 hours
     // Legacy mappings for backward compatibility
     'Tire Installation': 120,
     'Tire Rotation & Balancing': 120,
