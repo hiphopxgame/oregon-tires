@@ -36,7 +36,7 @@ const OregonTires = () => {
         openContactForm={openContactForm}
       />
 
-      <div id="home">
+      <div id="home" className="scroll-mt-24">
         <OregonTiresHero
           translations={t}
           primaryColor={currentDesign.primaryColor}
@@ -46,37 +46,33 @@ const OregonTires = () => {
         />
       </div>
 
-      <div id="services">
-        <OregonTiresServices
-          translations={t}
-          primaryColor={currentDesign.primaryColor}
-          secondaryColor={currentDesign.secondaryColor}
-        />
-      </div>
+      <OregonTiresServices
+        translations={t}
+        primaryColor={currentDesign.primaryColor}
+        secondaryColor={currentDesign.secondaryColor}
+      />
 
-      <div id="about">
-        <OregonTiresAbout
-          translations={t}
-          primaryColor={currentDesign.primaryColor}
-          secondaryColor={currentDesign.secondaryColor}
-        />
-      </div>
+      <OregonTiresAbout
+        translations={t}
+        primaryColor={currentDesign.primaryColor}
+        secondaryColor={currentDesign.secondaryColor}
+      />
 
       <OregonTiresTestimonials
         translations={t}
         primaryColor={currentDesign.primaryColor}
       />
 
-      <div id="contact">
+      <div id="contact" className="scroll-mt-24">
         <OregonTiresContact
           language={language}
           translations={t}
           primaryColor={currentDesign.primaryColor}
-          isScheduleMode={isScheduleMode}
+          isScheduleMode={false}
           setIsScheduleMode={setIsScheduleMode}
           contactForm={contactForm}
           setContactForm={setContactForm}
-          handleContactSubmit={(e) => handleContactSubmit(e, isScheduleMode)}
+          handleContactSubmit={(e) => handleContactSubmit(e, false)}
           toggleLanguage={toggleLanguage}
         />
       </div>

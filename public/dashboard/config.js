@@ -1,4 +1,5 @@
 
+
 // Dashboard configuration
 export const SUPABASE_CONFIG = {
     URL: 'https://vtknmauyvmuaryttnenx.supabase.co',
@@ -32,3 +33,4 @@ export const state = {
     selectedDate: new Date(),
     currentTab: 'appointments'
 };
+

@@ -17,7 +17,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
   const t = translations;
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section id="services" className="py-16 bg-gray-50 scroll-mt-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-6" style={{ color: primaryColor }}>
@@ -95,8 +95,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                   New or Used Tires
                 </h4>
-                <p className="text-gray-600 text-sm mb-1">Professional installation of new and used tires with quality guarantee.</p>
-                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 2 hours</p>
+                <p className="text-gray-600 text-sm">Professional installation of new and used tires with quality guarantee.</p>
               </div>
               
               <div>
@@ -104,8 +103,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                   Mount and Balance Tires
                 </h4>
-                <p className="text-gray-600 text-sm mb-1">Expert tire mounting and balancing for smooth, vibration-free driving.</p>
-                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 2 hours</p>
+                <p className="text-gray-600 text-sm">Expert tire mounting and balancing for smooth, vibration-free driving.</p>
               </div>
 
               <div>
@@ -113,8 +111,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                   Tire Repair
                 </h4>
-                <p className="text-gray-600 text-sm mb-1">Professional tire patching and repair services to extend tire life safely.</p>
-                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 1 hour</p>
+                <p className="text-gray-600 text-sm">Professional tire patching and repair services to extend tire life safely.</p>
               </div>
             </CardContent>
           </Card>
@@ -135,8 +132,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                   Oil Change
                 </h4>
-                <p className="text-gray-600 text-sm mb-1">Quick and efficient oil changes using high-quality motor oils and filters.</p>
-                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 1.25 hours</p>
+                <p className="text-gray-600 text-sm">Quick and efficient oil changes using high-quality motor oils and filters.</p>
               </div>
 
               <div>
@@ -144,8 +140,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                   Brake Services
                 </h4>
-                <p className="text-gray-600 text-sm mb-1">Front/Back brake change (2 hrs) or Full brake change (3.5 hrs).</p>
-                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 2-3.5 hours</p>
+                <p className="text-gray-600 text-sm">Complete brake services including front, back, or full brake system replacement.</p>
               </div>
 
               <div>
@@ -153,8 +148,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                   Tuneup
                 </h4>
-                <p className="text-gray-600 text-sm mb-1">Comprehensive vehicle tuneup for optimal performance.</p>
-                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 5 hours</p>
+                <p className="text-gray-600 text-sm">Comprehensive vehicle tuneup for optimal performance.</p>
               </div>
             </CardContent>
           </Card>
@@ -175,8 +169,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                   Alignment
                 </h4>
-                <p className="text-gray-600 text-sm mb-1">Precision wheel alignment to ensure even tire wear and optimal handling.</p>
-                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 2 hours</p>
+                <p className="text-gray-600 text-sm">Precision wheel alignment to ensure even tire wear and optimal handling.</p>
               </div>
 
               <div>
@@ -184,8 +177,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                   Mechanical Inspection
                 </h4>
-                <p className="text-gray-600 text-sm mb-1">Comprehensive vehicle inspection and detailed repair estimate.</p>
-                <p className="text-sm font-medium" style={{ color: primaryColor }}>Duration: 2.5 hours</p>
+                <p className="text-gray-600 text-sm">Comprehensive vehicle inspection and detailed repair estimate.</p>
               </div>
 
               <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500 mt-6">
