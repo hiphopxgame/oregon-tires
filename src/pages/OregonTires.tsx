@@ -34,7 +34,7 @@ const OregonTires = () => {
         openContactForm={openContactForm}
       />
 
-      <div id="home">
+      <section id="home" className="pt-8">
         <OregonTiresHero
           translations={t}
           primaryColor={currentDesign.primaryColor}
@@ -42,30 +42,28 @@ const OregonTires = () => {
           openContactForm={openContactForm}
           openScheduleForm={openScheduleForm}
         />
-      </div>
+      </section>
 
-      <div id="services">
+      <section id="services" className="pt-8">
         <OregonTiresServices
           translations={t}
           primaryColor={currentDesign.primaryColor}
           secondaryColor={currentDesign.secondaryColor}
         />
-      </div>
+      </section>
 
-      <div id="about">
-        <OregonTiresAbout
-          translations={t}
-          primaryColor={currentDesign.primaryColor}
-          secondaryColor={currentDesign.secondaryColor}
-        />
-      </div>
+      <OregonTiresAbout
+        translations={t}
+        primaryColor={currentDesign.primaryColor}
+        secondaryColor={currentDesign.secondaryColor}
+      />
 
       <OregonTiresTestimonials
         translations={t}
         primaryColor={currentDesign.primaryColor}
       />
 
-      <div id="contact">
+      <section id="contact" className="pt-8">
         <OregonTiresContact
           language={language}
           translations={t}
@@ -75,7 +73,7 @@ const OregonTires = () => {
           handleContactSubmit={handleContactSubmit}
           toggleLanguage={toggleLanguage}
         />
-      </div>
+      </section>
 
       <OregonTiresFooter
         language={language}

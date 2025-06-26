@@ -5,7 +5,9 @@ export const useNavigation = () => {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      const headerHeight = 120;
+      // Get the actual header height dynamically
+      const header = document.querySelector('header');
+      const headerHeight = header ? header.offsetHeight + 20 : 140; // Add extra padding
       const elementPosition = element.offsetTop - headerHeight;
       window.scrollTo({ 
         top: elementPosition, 
