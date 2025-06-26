@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -45,17 +46,17 @@ export const useAdminData = () => {
 
   const updateAppointmentStatus = async (id: string, status: string) => {
     try {
-      console.log('Updating appointment status:', { id, status: status.toLowerCase() });
+      console.log('Updating appointment status:', { id, status });
       
       const { error } = await supabase
         .from('oregon_tires_appointments')
-        .update({ status: status.toLowerCase() })
+        .update({ status })
         .eq('id', id);
 
       if (error) throw error;
 
       setAppointments(prev => 
-        prev.map(apt => apt.id === id ? { ...apt, status: status.toLowerCase() } : apt)
+        prev.map(apt => apt.id === id ? { ...apt, status } : apt)
       );
 
       toast({
@@ -74,17 +75,17 @@ export const useAdminData = () => {
 
   const updateMessageStatus = async (id: string, status: string) => {
     try {
-      console.log('Updating message status:', { id, status: status.toLowerCase() });
+      console.log('Updating message status:', { id, status });
       
       const { error } = await supabase
         .from('oregon_tires_contact_messages')
-        .update({ status: status.toLowerCase() })
+        .update({ status })
         .eq('id', id);
 
       if (error) throw error;
 
       setContactMessages(prev => 
-        prev.map(msg => msg.id === id ? { ...msg, status: status.toLowerCase() } : msg)
+        prev.map(msg => msg.id === id ? { ...msg, status } : msg)
       );
 
       toast({
