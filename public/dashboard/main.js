@@ -3,7 +3,7 @@ import { state } from './config.js';
 import { fetchDataFromSupabase } from './supabase-client.js';
 import { generateCalendar, updateSelectedDateInfo } from './calendar.js';
 import { loadAppointments, loadMessages } from './data-display.js';
-import { toggleLanguage, switchTab, updateStatus } from './ui-controls.js';
+import { toggleLanguage, switchTab, updateStatus, switchView, updateDayView, updateAnalytics } from './ui-controls.js';
 
 // Initialize the page
 async function init() {
@@ -20,6 +20,10 @@ async function init() {
             loadAppointments();
             loadMessages();
             updateSelectedDateInfo();
+            
+            // Set default date for day view
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('day-view-date-picker').value = today;
         }, 500);
     } catch (error) {
         console.error('Error loading data:', error);
@@ -31,6 +35,9 @@ async function init() {
 window.toggleLanguage = toggleLanguage;
 window.switchTab = switchTab;
 window.updateStatus = updateStatus;
+window.switchView = switchView;
+window.updateDayView = updateDayView;
+window.updateAnalytics = updateAnalytics;
 
 // Initialize the page when loaded
 window.onload = init;
