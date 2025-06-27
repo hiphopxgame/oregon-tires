@@ -10,10 +10,6 @@ interface MessagesTabProps {
 }
 
 export const MessagesTab = ({ contactMessages, updateMessageStatus }: MessagesTabProps) => {
-  const capitalizeStatus = (status: string) => {
-    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
-  };
-
   return (
     <Card className="border-2" style={{ borderColor: '#007030' }}>
       <CardHeader style={{ backgroundColor: '#007030' }} className="text-white">
@@ -62,16 +58,16 @@ export const MessagesTab = ({ contactMessages, updateMessageStatus }: MessagesTa
                     </TableCell>
                     <TableCell>
                       <Select
-                        value={capitalizeStatus(message.status)}
-                        onValueChange={(value) => updateMessageStatus(message.id, value.toLowerCase())}
+                        value={message.status}
+                        onValueChange={(value) => updateMessageStatus(message.id, value)}
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="New">New</SelectItem>
-                          <SelectItem value="Priority">Priority</SelectItem>
-                          <SelectItem value="Completed">Completed</SelectItem>
+                          <SelectItem value="new">New</SelectItem>
+                          <SelectItem value="in_progress">In Progress</SelectItem>
+                          <SelectItem value="resolved">Resolved</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>

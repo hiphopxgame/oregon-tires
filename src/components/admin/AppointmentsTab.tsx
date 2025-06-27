@@ -61,17 +61,17 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus }: Appoi
                     </TableCell>
                     <TableCell>
                       <Select
-                        value={capitalizeStatus(appointment.status)}
-                        onValueChange={(value) => updateAppointmentStatus(appointment.id, value.toLowerCase())}
+                        value={appointment.status}
+                        onValueChange={(value) => updateAppointmentStatus(appointment.id, value)}
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Pending">Pending</SelectItem>
-                          <SelectItem value="New">New</SelectItem>
-                          <SelectItem value="Priority">Priority</SelectItem>
-                          <SelectItem value="Completed">Completed</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="confirmed">Confirmed</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>

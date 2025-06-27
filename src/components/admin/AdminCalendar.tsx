@@ -22,21 +22,18 @@ export const AdminCalendar = ({
   const getStatusBadge = (status: string) => {
     const normalizedStatus = status.toLowerCase();
     const variants = {
-      new: { className: 'bg-[#FEE11A] text-black', text: 'New' },
-      priority: { className: 'bg-red-500 text-white', text: 'Priority' },
-      completed: { className: 'bg-[#007030] text-white', text: 'Completed' }
+      pending: { className: 'bg-[#FEE11A] text-black', text: 'Pending' },
+      confirmed: { className: 'bg-blue-500 text-white', text: 'Confirmed' },
+      completed: { className: 'bg-[#007030] text-white', text: 'Completed' },
+      cancelled: { className: 'bg-red-500 text-white', text: 'Cancelled' }
     } as const;
 
-    const variant = variants[normalizedStatus as keyof typeof variants] || variants.new;
+    const variant = variants[normalizedStatus as keyof typeof variants] || variants.pending;
     return (
       <span className={`px-2 py-1 rounded text-xs font-medium ${variant.className}`}>
         {variant.text}
       </span>
     );
-  };
-
-  const capitalizeStatus = (status: string) => {
-    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   };
 
   return (
@@ -80,16 +77,17 @@ export const AdminCalendar = ({
                     <div className="flex items-center gap-2 mt-1">
                       {getStatusBadge(apt.status)}
                       <Select
-                        value={capitalizeStatus(apt.status)}
-                        onValueChange={(value) => updateAppointmentStatus(apt.id, value.toLowerCase())}
+                        value={apt.status}
+                        onValueChange={(value) => updateAppointmentStatus(apt.id, value)}
                       >
                         <SelectTrigger className="w-24 h-6 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="New">New</SelectItem>
-                          <SelectItem value="Priority">Priority</SelectItem>
-                          <SelectItem value="Completed">Completed</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="confirmed">Confirmed</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
