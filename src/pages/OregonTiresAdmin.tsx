@@ -44,6 +44,7 @@ const OregonTiresAdmin = () => {
             setActiveTab={setActiveTab}
             contactMessages={contactMessages}
             updateMessageStatus={updateMessageStatus}
+            appointments={appointments}
           />
         );
       case 'appointments':
@@ -85,6 +86,7 @@ const OregonTiresAdmin = () => {
             setActiveTab={setActiveTab}
             contactMessages={contactMessages}
             updateMessageStatus={updateMessageStatus}
+            appointments={appointments}
           />
         );
     }

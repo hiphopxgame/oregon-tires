@@ -13,6 +13,7 @@ interface DashboardViewProps {
   setActiveTab: (tab: string) => void;
   contactMessages: ContactMessage[];
   updateMessageStatus: (id: string, status: string) => void;
+  appointments: Appointment[];
 }
 
 export const DashboardView = ({
@@ -24,7 +25,8 @@ export const DashboardView = ({
   activeTab,
   setActiveTab,
   contactMessages,
-  updateMessageStatus
+  updateMessageStatus,
+  appointments
 }: DashboardViewProps) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -42,6 +44,8 @@ export const DashboardView = ({
           setActiveTab={setActiveTab}
           contactMessages={contactMessages}
           updateMessageStatus={updateMessageStatus}
+          appointments={appointments}
+          updateAppointmentStatus={updateAppointmentStatus}
         />
       </div>
     </div>
