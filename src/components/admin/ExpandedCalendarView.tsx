@@ -27,10 +27,16 @@ export const ExpandedCalendarView = ({
 }: ExpandedCalendarViewProps) => {
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
 
-  // Get appointments for selected date
+  // Get appointments for selected date - fix the date comparison
   const getAppointmentsForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
-    return appointments.filter(apt => apt.preferred_date === dateStr);
+    console.log('Looking for appointments on date:', dateStr);
+    const filteredAppointments = appointments.filter(apt => {
+      console.log('Comparing appointment date:', apt.preferred_date, 'with selected:', dateStr);
+      return apt.preferred_date === dateStr;
+    });
+    console.log('Found appointments for date:', filteredAppointments);
+    return filteredAppointments;
   };
 
   const selectedDateAppointments = getAppointmentsForDate(selectedDate);
@@ -46,11 +52,22 @@ export const ExpandedCalendarView = ({
 
   const timeSlots = generateTimeSlots();
 
-  // Get appointments for specific time slot
+  // Get appointments for specific time slot - fix the time matching
   const getAppointmentsForTimeSlot = (timeSlot: string) => {
-    return selectedDateAppointments.filter(apt => 
-      apt.preferred_time.startsWith(timeSlot)
-    );
+    console.log('Looking for appointments at time slot:', timeSlot);
+    const slotAppointments = selectedDateAppointments.filter(apt => {
+      // Convert time slot to match appointment time format
+      const appointmentTime = apt.preferred_time;
+      console.log('Comparing appointment time:', appointmentTime, 'with slot:', timeSlot);
+      
+      // Handle both "HH:MM:SS" and "HH:MM" formats
+      const appointmentHour = appointmentTime.split(':')[0];
+      const slotHour = timeSlot.split(':')[0];
+      
+      return appointmentHour === slotHour;
+    });
+    console.log('Found appointments for time slot:', slotAppointments);
+    return slotAppointments;
   };
 
   // Format time for display
@@ -212,6 +229,13 @@ export const ExpandedCalendarView = ({
                 </div>
               </div>
 
+              {/* Debug info - remove this later */}
+              <div className="mb-4 p-2 bg-blue-50 rounded text-xs">
+                <p>Selected Date: {selectedDate.toISOString().split('T')[0]}</p>
+                <p>Total Appointments: {appointments.length}</p>
+                <p>Appointments for this date: {selectedDateAppointments.length}</p>
+              </div>
+
               {/* Time Slots */}
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {timeSlots.map((timeSlot) => {
@@ -260,6 +284,11 @@ export const ExpandedCalendarView = ({
                                   <div className="text-sm text-gray-600 mb-2">
                                     <strong>Time:</strong> {appointment.preferred_time}
                                   </div>
+                                  {appointment.message && (
+                                    <div className="text-sm text-gray-600 mb-2">
+                                      <strong>Message:</strong> {appointment.message}
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="flex flex-col gap-2">
                                   <Badge className={getStatusColor(appointment.status)}>
