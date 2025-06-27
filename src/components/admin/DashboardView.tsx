@@ -11,7 +11,6 @@ interface DashboardViewProps {
   updateAppointmentStatus: (id: string, status: string) => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  appointments: Appointment[];
   contactMessages: ContactMessage[];
   updateMessageStatus: (id: string, status: string) => void;
 }
@@ -24,7 +23,6 @@ export const DashboardView = ({
   updateAppointmentStatus,
   activeTab,
   setActiveTab,
-  appointments,
   contactMessages,
   updateMessageStatus
 }: DashboardViewProps) => {
@@ -42,9 +40,7 @@ export const DashboardView = ({
         <AdminTabs
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          appointments={appointments}
           contactMessages={contactMessages}
-          updateAppointmentStatus={updateAppointmentStatus}
           updateMessageStatus={updateMessageStatus}
         />
       </div>
