@@ -39,14 +39,24 @@ export const DashboardView = ({
       />
 
       <div className="lg:col-span-2">
-        <AdminTabs
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          contactMessages={contactMessages}
-          updateMessageStatus={updateMessageStatus}
-          appointments={appointments}
-          updateAppointmentStatus={updateAppointmentStatus}
-        />
+        {activeTab === 'calendar' ? (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-[#007030]">Calendar View</h2>
+            <p className="text-gray-600">
+              Select a date from the calendar to view appointments for that day.
+              The calendar shows highlighted dates with scheduled appointments.
+            </p>
+          </div>
+        ) : (
+          <AdminTabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            contactMessages={contactMessages}
+            updateMessageStatus={updateMessageStatus}
+            appointments={appointments}
+            updateAppointmentStatus={updateAppointmentStatus}
+          />
+        )}
       </div>
     </div>
   );
