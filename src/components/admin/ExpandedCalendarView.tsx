@@ -237,7 +237,7 @@ export const ExpandedCalendarView = ({
               </div>
 
               {/* Time Slots */}
-              <div className="space-y-2 max-h-[600px] overflow-y-auto">
+              <div className="space-y-2">
                 {timeSlots.map((timeSlot) => {
                   const slotAppointments = getAppointmentsForTimeSlot(timeSlot);
                   
