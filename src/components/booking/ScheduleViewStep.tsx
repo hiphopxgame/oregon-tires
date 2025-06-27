@@ -4,12 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerInfo } from '@/pages/AppointmentBooking';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Clock, AlertTriangle, CheckCircle, Home, Calendar } from 'lucide-react';
 import { useScheduleAvailability } from '@/hooks/useScheduleAvailability';
 import { BookingSummary } from './BookingSummary';
 import { TimeSlotGrid } from './TimeSlotGrid';
 import { BookingConfirmation } from './BookingConfirmation';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 interface ScheduleViewStepProps {
   customerInfo: CustomerInfo;
@@ -61,11 +62,6 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
         description: "Your appointment has been scheduled successfully.",
         variant: "default",
       });
-
-      // Redirect to home page after 3 seconds
-      setTimeout(() => {
-        navigate('/');
-      }, 3000);
       
     } catch (error) {
       console.error('Error booking appointment:', error);
@@ -109,9 +105,9 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           Thank you, {customerInfo.firstName}! Your appointment has been successfully scheduled.
         </p>
         <p className="text-gray-600 mb-6">
-          We'll contact you soon to confirm the details. You'll be redirected to the home page shortly.
+          We'll contact you soon to confirm the details.
         </p>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto mb-8">
           <h3 className="font-semibold text-green-800 mb-2">Appointment Details:</h3>
           <p className="text-sm text-green-700">
             <strong>Service:</strong> {customerInfo.service.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -122,6 +118,24 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           <p className="text-sm text-green-700">
             <strong>Time:</strong> {timeSlots.find(slot => slot.time === selectedTime)?.display}
           </p>
+        </div>
+        
+        <div className="flex justify-center gap-4">
+          <Button 
+            onClick={() => navigate('/')}
+            className="bg-[#007030] hover:bg-[#005a26] text-white flex items-center gap-2"
+          >
+            <Home className="h-4 w-4" />
+            Go to Home
+          </Button>
+          <Button 
+            onClick={() => window.location.reload()}
+            variant="outline"
+            className="border-[#007030] text-[#007030] hover:bg-[#007030] hover:text-white flex items-center gap-2"
+          >
+            <Calendar className="h-4 w-4" />
+            Book Another Appointment
+          </Button>
         </div>
       </div>
     );
