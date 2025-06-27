@@ -66,8 +66,8 @@ export const MessagesTab = ({ contactMessages, updateMessageStatus }: MessagesTa
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="new">New</SelectItem>
-                          <SelectItem value="in_progress">In Progress</SelectItem>
-                          <SelectItem value="resolved">Resolved</SelectItem>
+                          <SelectItem value="priority">Priority</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
