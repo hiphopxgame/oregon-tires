@@ -14,11 +14,45 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus }: Appoi
   // Log appointments data for debugging
   useEffect(() => {
     console.log('AppointmentsTab received appointments:', appointments.length);
+    console.log('Appointments data:', appointments);
   }, [appointments]);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     console.log('Updating appointment status:', { id, status: newStatus });
     await updateAppointmentStatus(id, newStatus);
+  };
+
+  const formatStatus = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'new':
+        return 'New';
+      case 'pending':
+        return 'Pending';
+      case 'confirmed':
+        return 'Confirmed';
+      case 'completed':
+        return 'Completed';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'new':
+      case 'pending':
+        return 'text-yellow-600 bg-yellow-50';
+      case 'confirmed':
+        return 'text-blue-600 bg-blue-50';
+      case 'completed':
+        return 'text-green-600 bg-green-50';
+      case 'cancelled':
+        return 'text-red-600 bg-red-50';
+      default:
+        return 'text-gray-600 bg-gray-50';
+    }
   };
 
   return (
@@ -67,21 +101,27 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus }: Appoi
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Select
-                        key={`${appointment.id}-${appointment.status}`}
-                        value={appointment.status}
-                        onValueChange={(value) => handleStatusChange(appointment.id, value)}
-                      >
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="confirmed">Confirmed</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex flex-col gap-2">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(appointment.status)}`}>
+                          {formatStatus(appointment.status)}
+                        </span>
+                        <Select
+                          key={`${appointment.id}-${appointment.status}`}
+                          value={appointment.status}
+                          onValueChange={(value) => handleStatusChange(appointment.id, value)}
+                        >
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="new">New</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="confirmed">Confirmed</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

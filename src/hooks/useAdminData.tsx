@@ -28,6 +28,7 @@ export const useAdminData = () => {
       if (contactRes.error) throw contactRes.error;
 
       console.log('Fetched appointments:', appointmentsRes.data?.length || 0);
+      console.log('Appointments data:', appointmentsRes.data);
       console.log('Fetched messages:', contactRes.data?.length || 0);
 
       setAppointments(appointmentsRes.data || []);
@@ -46,6 +47,7 @@ export const useAdminData = () => {
 
   const refetchData = async () => {
     console.log('Refetching admin data...');
+    setLoading(true);
     await fetchData();
   };
 
@@ -60,7 +62,7 @@ export const useAdminData = () => {
 
       if (error) throw error;
 
-      // Update local state immediately
+      // Update local state immediately for better UX
       setAppointments(prev => 
         prev.map(apt => apt.id === id ? { ...apt, status } : apt)
       );
@@ -70,8 +72,10 @@ export const useAdminData = () => {
         description: "Appointment status has been updated.",
       });
 
-      // Refetch data to ensure consistency
-      await refetchData();
+      // Force a fresh data fetch to ensure consistency
+      setTimeout(() => {
+        refetchData();
+      }, 500);
     } catch (error) {
       console.error('Error updating appointment status:', error);
       toast({
@@ -79,6 +83,8 @@ export const useAdminData = () => {
         description: "Failed to update status",
         variant: "destructive",
       });
+      // Revert local state on error
+      await refetchData();
     }
   };
 
@@ -103,8 +109,10 @@ export const useAdminData = () => {
         description: "Message status has been updated.",
       });
 
-      // Refetch data to ensure consistency
-      await refetchData();
+      // Force a fresh data fetch to ensure consistency
+      setTimeout(() => {
+        refetchData();
+      }, 500);
     } catch (error) {
       console.error('Error updating message status:', error);
       toast({
@@ -112,6 +120,8 @@ export const useAdminData = () => {
         description: "Failed to update status",
         variant: "destructive",
       });
+      // Revert local state on error
+      await refetchData();
     }
   };
 
