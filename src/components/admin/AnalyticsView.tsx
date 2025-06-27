@@ -10,14 +10,16 @@ interface AnalyticsViewProps {
   contactMessages: ContactMessage[];
 }
 
-type DetailView = 'total' | 'pending' | 'completed' | 'thisweek' | null;
+type DetailView = 'total' | 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'thisweek' | null;
 
 export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewProps) => {
   const [detailView, setDetailView] = useState<DetailView>(null);
   
   const totalAppointments = appointments.length;
   const pendingAppointments = appointments.filter(apt => apt.status === 'new' || apt.status === 'pending').length;
+  const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmed').length;
   const completedAppointments = appointments.filter(apt => apt.status === 'completed').length;
+  const cancelledAppointments = appointments.filter(apt => apt.status === 'cancelled').length;
   
   const totalMessages = contactMessages.length;
   const unreadMessages = contactMessages.filter(msg => msg.status === 'new').length;
@@ -32,8 +34,12 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
         return appointments;
       case 'pending':
         return appointments.filter(apt => apt.status === 'new' || apt.status === 'pending');
+      case 'confirmed':
+        return appointments.filter(apt => apt.status === 'confirmed');
       case 'completed':
         return appointments.filter(apt => apt.status === 'completed');
+      case 'cancelled':
+        return appointments.filter(apt => apt.status === 'cancelled');
       case 'thisweek':
         return recentAppointments;
       default:
@@ -47,8 +53,12 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
         return 'All Appointments';
       case 'pending':
         return 'Pending Appointments';
+      case 'confirmed':
+        return 'Confirmed Appointments';
       case 'completed':
         return 'Completed Appointments';
+      case 'cancelled':
+        return 'Cancelled Appointments';
       case 'thisweek':
         return 'This Week\'s Appointments';
       default:
@@ -65,10 +75,14 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
       case 'new': 
       case 'pending': 
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'confirmed':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'priority': 
         return 'bg-red-100 text-red-800 border-red-200';
       case 'completed': 
         return 'bg-green-100 text-green-800 border-green-200';
+      case 'cancelled':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
       default: 
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -167,21 +181,29 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
           <p className="text-green-100">Overview of your business metrics</p>
         </div>
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <button
-              onClick={() => setDetailView('total')}
-              className="bg-blue-50 p-4 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors text-left"
+              onClick={() => setDetailView('thisweek')}
+              className="bg-purple-50 p-4 rounded-lg border border-purple-200 hover:bg-purple-100 transition-colors text-left"
             >
-              <h3 className="font-semibold text-blue-800">Total Appointments</h3>
-              <p className="text-2xl font-bold text-blue-900">{totalAppointments}</p>
+              <h3 className="font-semibold text-purple-800">This Week</h3>
+              <p className="text-2xl font-bold text-purple-900">{recentAppointments.length}</p>
             </button>
             
             <button
               onClick={() => setDetailView('pending')}
               className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 hover:bg-yellow-100 transition-colors text-left"
             >
-              <h3 className="font-semibold text-yellow-800">Pending Appointments</h3>
+              <h3 className="font-semibold text-yellow-800">Pending</h3>
               <p className="text-2xl font-bold text-yellow-900">{pendingAppointments}</p>
+            </button>
+            
+            <button
+              onClick={() => setDetailView('confirmed')}
+              className="bg-blue-50 p-4 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors text-left"
+            >
+              <h3 className="font-semibold text-blue-800">Confirmed</h3>
+              <p className="text-2xl font-bold text-blue-900">{confirmedAppointments}</p>
             </button>
             
             <button
@@ -193,11 +215,19 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
             </button>
             
             <button
-              onClick={() => setDetailView('thisweek')}
-              className="bg-purple-50 p-4 rounded-lg border border-purple-200 hover:bg-purple-100 transition-colors text-left"
+              onClick={() => setDetailView('cancelled')}
+              className="bg-red-50 p-4 rounded-lg border border-red-200 hover:bg-red-100 transition-colors text-left"
             >
-              <h3 className="font-semibold text-purple-800">This Week</h3>
-              <p className="text-2xl font-bold text-purple-900">{recentAppointments.length}</p>
+              <h3 className="font-semibold text-red-800">Cancelled</h3>
+              <p className="text-2xl font-bold text-red-900">{cancelledAppointments}</p>
+            </button>
+            
+            <button
+              onClick={() => setDetailView('total')}
+              className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors text-left"
+            >
+              <h3 className="font-semibold text-gray-800">Total Appointments</h3>
+              <p className="text-2xl font-bold text-gray-900">{totalAppointments}</p>
             </button>
           </div>
           
