@@ -17,7 +17,6 @@ export const AdminHeader = ({
 }: AdminHeaderProps) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard' },
-    { id: 'appointments', label: 'Appointments' },
     { id: 'analytics', label: 'Analytics' }
   ];
 
