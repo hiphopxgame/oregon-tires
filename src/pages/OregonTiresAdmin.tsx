@@ -42,7 +42,6 @@ const OregonTiresAdmin = () => {
             updateAppointmentStatus={updateAppointmentStatus}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
-            appointments={appointments}
             contactMessages={contactMessages}
             updateMessageStatus={updateMessageStatus}
           />
@@ -84,7 +83,6 @@ const OregonTiresAdmin = () => {
             updateAppointmentStatus={updateAppointmentStatus}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
-            appointments={appointments}
             contactMessages={contactMessages}
             updateMessageStatus={updateMessageStatus}
           />
