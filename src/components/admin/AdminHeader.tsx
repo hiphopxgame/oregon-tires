@@ -16,7 +16,9 @@ export const AdminHeader = ({
   setCurrentView 
 }: AdminHeaderProps) => {
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'calendar', label: 'Calendar' },
+    { id: 'appointments', label: 'Appointments' },
+    { id: 'messages', label: 'Messages' },
     { id: 'analytics', label: 'Analytics' }
   ];
 

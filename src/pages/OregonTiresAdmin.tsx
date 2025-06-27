@@ -7,6 +7,8 @@ import { AdminFooter } from '@/components/admin/AdminFooter';
 import { DashboardView } from '@/components/admin/DashboardView';
 import { DayView } from '@/components/admin/DayView';
 import { AnalyticsView } from '@/components/admin/AnalyticsView';
+import { AppointmentsView } from '@/components/admin/AppointmentsView';
+import { MessagesView } from '@/components/admin/MessagesView';
 
 const OregonTiresAdmin = () => {
   const { language, toggleLanguage } = useLanguage();
@@ -32,7 +34,7 @@ const OregonTiresAdmin = () => {
 
   const renderCurrentView = () => {
     switch (currentView) {
-      case 'dashboard':
+      case 'calendar':
         return (
           <DashboardView
             selectedDate={selectedDate}
@@ -49,23 +51,17 @@ const OregonTiresAdmin = () => {
         );
       case 'appointments':
         return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-[#007030]">Appointments</h2>
-              <input
-                type="date"
-                value={selectedDate.toISOString().split('T')[0]}
-                onChange={(e) => setSelectedDate(new Date(e.target.value + 'T00:00:00'))}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#007030] focus:border-transparent"
-              />
-            </div>
-            <DayView
-              appointments={appointments}
-              selectedDate={selectedDate}
-              updateAppointmentStatus={updateAppointmentStatus}
-              onDataRefresh={refetchData}
-            />
-          </div>
+          <AppointmentsView
+            appointments={appointments}
+            updateAppointmentStatus={updateAppointmentStatus}
+          />
+        );
+      case 'messages':
+        return (
+          <MessagesView
+            contactMessages={contactMessages}
+            updateMessageStatus={updateMessageStatus}
+          />
         );
       case 'analytics':
         return (

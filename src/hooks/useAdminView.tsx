@@ -5,7 +5,7 @@ import { Appointment } from '@/types/admin';
 export const useAdminView = (appointments: Appointment[]) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [activeTab, setActiveTab] = useState('calendar');
-  const [currentView, setCurrentView] = useState('dashboard');
+  const [currentView, setCurrentView] = useState('calendar');
 
   const getAppointmentsForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
