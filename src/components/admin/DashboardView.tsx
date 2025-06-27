@@ -1,6 +1,7 @@
 
 import { AdminCalendar } from './AdminCalendar';
 import { AdminTabs } from './AdminTabs';
+import { DayView } from './DayView';
 import { Appointment, ContactMessage } from '@/types/admin';
 
 interface DashboardViewProps {
@@ -40,13 +41,11 @@ export const DashboardView = ({
 
       <div className="lg:col-span-2">
         {activeTab === 'calendar' ? (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[#007030]">Calendar View</h2>
-            <p className="text-gray-600">
-              Select a date from the calendar to view appointments for that day.
-              The calendar shows highlighted dates with scheduled appointments.
-            </p>
-          </div>
+          <DayView
+            appointments={appointments}
+            selectedDate={selectedDate}
+            updateAppointmentStatus={updateAppointmentStatus}
+          />
         ) : (
           <AdminTabs
             activeTab={activeTab}
