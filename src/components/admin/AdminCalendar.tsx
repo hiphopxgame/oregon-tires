@@ -81,7 +81,7 @@ export const AdminCalendar = ({
                       {getStatusBadge(apt.status)}
                       <Select
                         value={capitalizeStatus(apt.status)}
-                        onValueChange={(value) => updateAppointmentStatus(apt.id, value)}
+                        onValueChange={(value) => updateAppointmentStatus(apt.id, value.toLowerCase())}
                       >
                         <SelectTrigger className="w-24 h-6 text-xs">
                           <SelectValue />

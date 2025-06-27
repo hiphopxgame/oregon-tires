@@ -63,7 +63,7 @@ export const MessagesTab = ({ contactMessages, updateMessageStatus }: MessagesTa
                     <TableCell>
                       <Select
                         value={capitalizeStatus(message.status)}
-                        onValueChange={(value) => updateMessageStatus(message.id, value)}
+                        onValueChange={(value) => updateMessageStatus(message.id, value.toLowerCase())}
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
