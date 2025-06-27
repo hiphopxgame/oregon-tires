@@ -4,7 +4,7 @@ import { useAdminData } from '@/hooks/useAdminData';
 import { useAdminView } from '@/hooks/useAdminView';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminFooter } from '@/components/admin/AdminFooter';
-import { DashboardView } from '@/components/admin/DashboardView';
+import { AdminCalendar } from '@/components/admin/AdminCalendar';
 import { DayView } from '@/components/admin/DayView';
 import { AnalyticsView } from '@/components/admin/AnalyticsView';
 import { AppointmentsView } from '@/components/admin/AppointmentsView';
@@ -36,18 +36,15 @@ const OregonTiresAdmin = () => {
     switch (currentView) {
       case 'calendar':
         return (
-          <DashboardView
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            appointmentDates={appointmentDates}
-            selectedDateAppointments={selectedDateAppointments}
-            updateAppointmentStatus={updateAppointmentStatus}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            contactMessages={contactMessages}
-            updateMessageStatus={updateMessageStatus}
-            appointments={appointments}
-          />
+          <div className="max-w-4xl mx-auto">
+            <AdminCalendar
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              appointmentDates={appointmentDates}
+              selectedDateAppointments={selectedDateAppointments}
+              updateAppointmentStatus={updateAppointmentStatus}
+            />
+          </div>
         );
       case 'appointments':
         return (
@@ -72,18 +69,15 @@ const OregonTiresAdmin = () => {
         );
       default:
         return (
-          <DashboardView
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            appointmentDates={appointmentDates}
-            selectedDateAppointments={selectedDateAppointments}
-            updateAppointmentStatus={updateAppointmentStatus}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            contactMessages={contactMessages}
-            updateMessageStatus={updateMessageStatus}
-            appointments={appointments}
-          />
+          <div className="max-w-4xl mx-auto">
+            <AdminCalendar
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              appointmentDates={appointmentDates}
+              selectedDateAppointments={selectedDateAppointments}
+              updateAppointmentStatus={updateAppointmentStatus}
+            />
+          </div>
         );
     }
   };
