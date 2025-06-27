@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Appointment } from '@/types/admin';
+import { useEffect } from 'react';
 
 interface AppointmentsTabProps {
   appointments: Appointment[];
@@ -10,14 +11,20 @@ interface AppointmentsTabProps {
 }
 
 export const AppointmentsTab = ({ appointments, updateAppointmentStatus }: AppointmentsTabProps) => {
-  const capitalizeStatus = (status: string) => {
-    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  // Log appointments data for debugging
+  useEffect(() => {
+    console.log('AppointmentsTab received appointments:', appointments.length);
+  }, [appointments]);
+
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    console.log('Updating appointment status:', { id, status: newStatus });
+    await updateAppointmentStatus(id, newStatus);
   };
 
   return (
     <Card className="border-2" style={{ borderColor: '#007030' }}>
       <CardHeader style={{ backgroundColor: '#007030' }} className="text-white">
-        <CardTitle>Service Appointments</CardTitle>
+        <CardTitle>Service Appointments ({appointments.length})</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         {appointments.length === 0 ? (
@@ -61,8 +68,9 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus }: Appoi
                     </TableCell>
                     <TableCell>
                       <Select
+                        key={`${appointment.id}-${appointment.status}`}
                         value={appointment.status}
-                        onValueChange={(value) => updateAppointmentStatus(appointment.id, value)}
+                        onValueChange={(value) => handleStatusChange(appointment.id, value)}
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />

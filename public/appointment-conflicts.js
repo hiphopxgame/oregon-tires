@@ -1,14 +1,26 @@
 
 // Service durations (in hours)
 const serviceDurations = {
-    'tire-installation': 1.5,
-    'tire-repair': 1.5,
-    'wheel-alignment': 1.5,
-    'brake-service': 2.5,
-    'brake-repair': 2.5,
-    'oil-change': 3.5,
-    'general-maintenance': 3.5,
-    'diagnostic': 3.5
+    'tire-repair': 1,
+    'oil-change': 1.25,
+    'wheel-alignment': 2,
+    'alignment': 2,
+    'brake-change-front': 2,
+    'brake-change-back': 2,
+    'brake-change-front-or-back': 2,
+    'tire-installation': 2,
+    'tires-new': 2,
+    'tires-used': 2,
+    'tire-mount-balance': 2,
+    'mechanical-inspection': 2.5,
+    'brake-change-front-and-back': 3.5,
+    'tuneup': 5,
+    // Legacy mappings for backward compatibility
+    'tire-installation': 2,
+    'brake-service': 2,
+    'brake-repair': 2,
+    'general-maintenance': 2.5,
+    'diagnostic': 2.5
 };
 
 // Convert time string to minutes from start of day

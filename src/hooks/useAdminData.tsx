@@ -12,6 +12,7 @@ export const useAdminData = () => {
 
   const fetchData = async () => {
     try {
+      console.log('Fetching admin data...');
       const [appointmentsRes, contactRes] = await Promise.all([
         supabase
           .from('oregon_tires_appointments')
@@ -25,6 +26,9 @@ export const useAdminData = () => {
 
       if (appointmentsRes.error) throw appointmentsRes.error;
       if (contactRes.error) throw contactRes.error;
+
+      console.log('Fetched appointments:', appointmentsRes.data?.length || 0);
+      console.log('Fetched messages:', contactRes.data?.length || 0);
 
       setAppointments(appointmentsRes.data || []);
       setContactMessages(contactRes.data || []);
@@ -41,6 +45,7 @@ export const useAdminData = () => {
   };
 
   const refetchData = async () => {
+    console.log('Refetching admin data...');
     await fetchData();
   };
 
@@ -55,6 +60,7 @@ export const useAdminData = () => {
 
       if (error) throw error;
 
+      // Update local state immediately
       setAppointments(prev => 
         prev.map(apt => apt.id === id ? { ...apt, status } : apt)
       );
@@ -63,6 +69,9 @@ export const useAdminData = () => {
         title: "Status Updated",
         description: "Appointment status has been updated.",
       });
+
+      // Refetch data to ensure consistency
+      await refetchData();
     } catch (error) {
       console.error('Error updating appointment status:', error);
       toast({
@@ -84,6 +93,7 @@ export const useAdminData = () => {
 
       if (error) throw error;
 
+      // Update local state immediately
       setContactMessages(prev => 
         prev.map(msg => msg.id === id ? { ...msg, status } : msg)
       );
@@ -92,6 +102,9 @@ export const useAdminData = () => {
         title: "Status Updated",
         description: "Message status has been updated.",
       });
+
+      // Refetch data to ensure consistency
+      await refetchData();
     } catch (error) {
       console.error('Error updating message status:', error);
       toast({
