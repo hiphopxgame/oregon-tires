@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Phone, MapPin, Clock, ExternalLink } from 'lucide-react';
+import { Phone, MapPin, Clock } from 'lucide-react';
 
 interface FooterProps {
   language: string;
@@ -22,7 +22,7 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
   return (
     <footer style={{ backgroundColor: primaryColor }} className="text-white py-12">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4">{t.contactInfo}</h3>
             <div className="space-y-2">
@@ -60,30 +60,6 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
             >
               English | Español
             </button>
-          </div>
-          
-          <div>
-            <h3 className="text-xl font-bold mb-4">Other Versions</h3>
-            <div className="space-y-2">
-              <a 
-                href="/oregon-tires.html" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-yellow-200 flex items-center gap-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Static HTML Page
-              </a>
-              <a 
-                href="/oregon-tires-dashboard.html" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-yellow-200 flex items-center gap-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Admin Dashboard
-              </a>
-            </div>
           </div>
         </div>
 
