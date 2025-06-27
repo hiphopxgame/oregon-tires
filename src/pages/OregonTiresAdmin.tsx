@@ -9,6 +9,7 @@ import { DayView } from '@/components/admin/DayView';
 import { AnalyticsView } from '@/components/admin/AnalyticsView';
 import { AppointmentsView } from '@/components/admin/AppointmentsView';
 import { MessagesView } from '@/components/admin/MessagesView';
+import { ExpandedCalendarView } from '@/components/admin/ExpandedCalendarView';
 
 const OregonTiresAdmin = () => {
   const { language, toggleLanguage } = useLanguage();
@@ -36,28 +37,14 @@ const OregonTiresAdmin = () => {
     switch (currentView) {
       case 'calendar':
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Calendar Selector - Left Side */}
-            <div className="lg:col-span-1">
-              <AdminCalendar
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                appointmentDates={appointmentDates}
-                selectedDateAppointments={selectedDateAppointments}
-                updateAppointmentStatus={updateAppointmentStatus}
-              />
-            </div>
-            
-            {/* Day View - Right Side */}
-            <div className="lg:col-span-3">
-              <DayView
-                appointments={appointments}
-                selectedDate={selectedDate}
-                updateAppointmentStatus={updateAppointmentStatus}
-                onDataRefresh={refetchData}
-              />
-            </div>
-          </div>
+          <ExpandedCalendarView
+            appointments={appointments}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            appointmentDates={appointmentDates}
+            updateAppointmentStatus={updateAppointmentStatus}
+            onDataRefresh={refetchData}
+          />
         );
       case 'appointments':
         return (
@@ -82,25 +69,14 @@ const OregonTiresAdmin = () => {
         );
       default:
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-1">
-              <AdminCalendar
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                appointmentDates={appointmentDates}
-                selectedDateAppointments={selectedDateAppointments}
-                updateAppointmentStatus={updateAppointmentStatus}
-              />
-            </div>
-            <div className="lg:col-span-3">
-              <DayView
-                appointments={appointments}
-                selectedDate={selectedDate}
-                updateAppointmentStatus={updateAppointmentStatus}
-                onDataRefresh={refetchData}
-              />
-            </div>
-          </div>
+          <ExpandedCalendarView
+            appointments={appointments}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            appointmentDates={appointmentDates}
+            updateAppointmentStatus={updateAppointmentStatus}
+            onDataRefresh={refetchData}
+          />
         );
     }
   };
