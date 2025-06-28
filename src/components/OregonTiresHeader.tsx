@@ -27,9 +27,9 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3">
-        {/* Top Bar */}
-        <div style={{ backgroundColor: primaryColor }} className="text-white py-2 px-4 rounded-md mb-4">
+      <div className="container mx-auto px-4 py-2 md:py-3">
+        {/* Top Bar - Hidden on mobile */}
+        <div style={{ backgroundColor: primaryColor }} className="hidden md:block text-white py-2 px-4 rounded-md mb-4">
           <div className="flex flex-col lg:flex-row justify-between items-center text-sm">
             <div className="flex flex-col sm:flex-row items-center gap-4 mb-2 lg:mb-0">
               <div className="flex items-center gap-1">
@@ -51,29 +51,37 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Main Header */}
-        <div className="flex flex-col lg:flex-row justify-between items-center">
-          <Link to="/" className="flex items-center gap-4 mb-4 lg:mb-0">
+        {/* Main Header - Compact on mobile */}
+        <div className="flex flex-col md:flex-row md:justify-between items-center">
+          <Link to="/" className="flex items-center gap-2 md:gap-4 mb-2 md:mb-0">
             <img 
               src="/lovable-uploads/f000a232-32e4-4f91-8b69-f7e61ac811f2.png" 
               alt="Oregon Tires Logo" 
-              className="h-16 w-16"
+              className="h-12 w-12 md:h-16 md:w-16"
             />
-            <div>
-              <h1 className="text-2xl font-bold" style={{ color: primaryColor }}>{t.title}</h1>
-              <p className="text-lg text-gray-600">{t.subtitle}</p>
+            <div className="text-center md:text-left">
+              <h1 className="text-lg md:text-2xl font-bold" style={{ color: primaryColor }}>{t.title}</h1>
+              <p className="text-sm md:text-lg text-gray-600">{t.subtitle}</p>
             </div>
           </Link>
 
-          {/* Navigation */}
-          <nav className="flex flex-wrap items-center gap-6">
+          {/* Mobile Language Toggle - Visible only on mobile */}
+          <button 
+            onClick={toggleLanguage} 
+            className="md:hidden text-sm text-gray-600 hover:text-green-700 mb-2"
+          >
+            English | Español
+          </button>
+
+          {/* Navigation - Responsive layout */}
+          <nav className="flex flex-wrap items-center justify-center md:justify-end gap-3 md:gap-6 text-sm md:text-base">
             <button onClick={() => scrollToSection('home')} className="text-gray-700 hover:text-green-700 font-medium">Home</button>
             <button onClick={() => scrollToSection('services')} className="text-gray-700 hover:text-green-700 font-medium">{t.services}</button>
             <button onClick={() => scrollToSection('about')} className="text-gray-700 hover:text-green-700 font-medium">{t.about}</button>
             <button onClick={openContactForm} className="text-gray-700 hover:text-green-700 font-medium">{t.contact}</button>
             <Link to="/book-appointment">
               <Button 
-                className="text-white font-medium"
+                className="text-white font-medium text-sm md:text-base px-3 py-1 md:px-4 md:py-2"
                 style={{ backgroundColor: primaryColor }}
               >
                 {t.scheduleService}
