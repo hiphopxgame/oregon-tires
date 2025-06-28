@@ -10,7 +10,7 @@ interface DesignTheme {
 
 export const useDesignTheme = () => {
   const [currentDesign, setCurrentDesign] = useState<DesignTheme>({
-    primaryColor: '#0C3B1B',
+    primaryColor: '#0D3618',
     secondaryColor: '#FFFE03',
     backgroundColor: '#f0fdf4',
     textColor: '#000000',
