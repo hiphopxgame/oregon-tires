@@ -126,13 +126,13 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
               <CardContent className="p-8">
                 <div className="text-center">
                   <h3 className="text-2xl font-semibold mb-4" style={{ color: primaryColor }}>
-                    {t.whyChooseUs}
+                    {t.whyChooseUs || "Why Choose Us"}
                   </h3>
                   <ul className="text-gray-600 space-y-2 inline-block text-left">
-                    <li>• {t.bilingualStaff}</li>
-                    <li>• {t.honestPricing}</li>
-                    <li>• {t.qualityWorkmanship}</li>
-                    <li>• {t.fastReliableService}</li>
+                    <li>• {t.bilingualStaff || "Bilingual staff (English & Spanish)"}</li>
+                    <li>• {t.honestPricing || "Honest, transparent pricing"}</li>
+                    <li>• {t.qualityWorkmanship || "Quality workmanship guaranteed"}</li>
+                    <li>• {t.fastReliableService || "Fast and reliable service"}</li>
                   </ul>
                 </div>
               </CardContent>
