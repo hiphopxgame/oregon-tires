@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -21,7 +20,8 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
   const [loading, setLoading] = useState(true);
 
   const serviceDurations: Record<string, number> = {
-    'new-or-used-tires': 2,
+    'new-tires': 2,
+    'used-tires': 2,
     'mount-and-balance-tires': 2,
     'tire-repair': 1,
     'oil-change': 1.25,
