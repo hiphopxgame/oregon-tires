@@ -71,37 +71,6 @@ const AppointmentBooking = () => {
         </div>
       </header>
 
-      {/* Navigation Bar */}
-      <nav className="bg-white shadow-md">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center space-x-8 py-4">
-            <Link 
-              to="/#services" 
-              className="text-[#007030] hover:text-green-700 font-medium flex items-center gap-2"
-            >
-              Services
-            </Link>
-            <Link 
-              to="/#about" 
-              className="text-[#007030] hover:text-green-700 font-medium flex items-center gap-2"
-            >
-              About
-            </Link>
-            <Link 
-              to="/#contact" 
-              className="text-[#007030] hover:text-green-700 font-medium flex items-center gap-2"
-            >
-              <Phone className="h-4 w-4" />
-              Contact
-            </Link>
-            <span className="text-[#007030] font-medium flex items-center gap-2 border-b-2 border-[#007030]">
-              <Calendar className="h-4 w-4" />
-              Schedule
-            </span>
-          </div>
-        </div>
-      </nav>
-
       <div className="py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="bg-white rounded-lg shadow-lg p-6">

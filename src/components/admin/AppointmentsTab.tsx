@@ -14,13 +14,12 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus }: Appoi
   const getStatusBadge = (status: string) => {
     const normalizedStatus = status.toLowerCase();
     const variants = {
-      pending: { variant: 'secondary' as const, className: 'bg-[#FEE11A] text-black' },
       confirmed: { variant: 'default' as const, className: 'bg-blue-500 text-white' },
       completed: { variant: 'default' as const, className: 'bg-[#007030] text-white' },
       cancelled: { variant: 'destructive' as const, className: 'bg-red-500 text-white' }
     };
 
-    const variant = variants[normalizedStatus as keyof typeof variants] || variants.pending;
+    const variant = variants[normalizedStatus as keyof typeof variants] || variants.confirmed;
     return (
       <Badge variant={variant.variant} className={variant.className}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -95,7 +94,6 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus }: Appoi
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
                       <SelectItem value="confirmed">Confirmed</SelectItem>
                       <SelectItem value="completed">Completed</SelectItem>
                       <SelectItem value="cancelled">Cancelled</SelectItem>
