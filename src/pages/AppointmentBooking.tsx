@@ -70,31 +70,31 @@ const AppointmentBooking = () => {
       <nav className="bg-white shadow-md">
         <div className="container mx-auto px-4">
           <div className="flex justify-center space-x-8 py-4">
-            <a 
-              href="/#services" 
+            <Link 
+              to="/#services" 
               className="text-[#007030] hover:text-green-700 font-medium flex items-center gap-2"
             >
               Services
-            </a>
-            <a 
-              href="/#about" 
+            </Link>
+            <Link 
+              to="/#about" 
               className="text-[#007030] hover:text-green-700 font-medium flex items-center gap-2"
             >
               About
-            </a>
-            <a 
-              href="/#testimonials" 
+            </Link>
+            <Link 
+              to="/#testimonials" 
               className="text-[#007030] hover:text-green-700 font-medium flex items-center gap-2"
             >
               Reviews
-            </a>
-            <a 
-              href="/#contact" 
+            </Link>
+            <Link 
+              to="/#contact" 
               className="text-[#007030] hover:text-green-700 font-medium flex items-center gap-2"
             >
               <Phone className="h-4 w-4" />
               Contact
-            </a>
+            </Link>
             <span className="text-[#007030] font-medium flex items-center gap-2 border-b-2 border-[#007030]">
               <Calendar className="h-4 w-4" />
               Schedule

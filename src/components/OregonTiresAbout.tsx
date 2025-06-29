@@ -43,7 +43,7 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
             </div>
           </div>
 
-          <div className="mb-8">
+          <div className="mb-6">
             <h3 className="text-2xl font-semibold mb-4" style={{ color: primaryColor }}>
               {t.ourCommitment}
             </h3>
@@ -55,8 +55,8 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
             </div>
           </div>
 
-          {/* Logo added after the commitment section */}
-          <div className="flex items-center justify-center gap-6 mb-8">
+          {/* Logo added after the commitment section with reduced margin */}
+          <div className="flex items-center justify-center gap-6 mb-4">
             <img 
               src="/lovable-uploads/a6d722d4-02c0-4283-bb68-2c206fd7ef55.png" 
               alt="Oregon Tires Auto Care Logo" 
