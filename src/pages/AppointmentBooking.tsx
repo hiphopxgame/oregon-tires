@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CustomerInfoStep } from '@/components/booking/CustomerInfoStep';
 import { ScheduleViewStep } from '@/components/booking/ScheduleViewStep';
@@ -81,12 +80,6 @@ const AppointmentBooking = () => {
               className="text-[#007030] hover:text-green-700 font-medium flex items-center gap-2"
             >
               About
-            </a>
-            <a 
-              href="/#testimonials" 
-              className="text-[#007030] hover:text-green-700 font-medium flex items-center gap-2"
-            >
-              Reviews
             </a>
             <a 
               href="/#contact" 
