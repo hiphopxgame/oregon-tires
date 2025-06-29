@@ -120,27 +120,26 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
             </div>
           </div>
 
-          {/* Why Choose Us Section */}
-          <div className="mb-8">
+          {/* Why Choose Us & Experience Sections - Side by Side */}
+          <div className="mb-8 grid md:grid-cols-2 gap-6">
+            {/* Why Choose Us Section */}
             <Card className="border-0 shadow-lg" style={{ backgroundColor: `${primaryColor}05` }}>
               <CardContent className="p-8">
                 <div className="text-center">
                   <h3 className="text-2xl font-semibold mb-4" style={{ color: primaryColor }}>
-                    {t.whyChooseUs || "Why Choose Us"}
+                    Why Choose Us
                   </h3>
                   <ul className="text-gray-600 space-y-2 inline-block text-left">
-                    <li>• {t.bilingualStaff || "Bilingual staff (English & Spanish)"}</li>
-                    <li>• {t.honestPricing || "Honest, transparent pricing"}</li>
-                    <li>• {t.qualityWorkmanship || "Quality workmanship guaranteed"}</li>
-                    <li>• {t.fastReliableService || "Fast and reliable service"}</li>
+                    <li>• Bilingual staff (English & Spanish)</li>
+                    <li>• Honest, transparent pricing</li>
+                    <li>• Quality workmanship guaranteed</li>
+                    <li>• Fast and reliable service</li>
                   </ul>
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Experience Section */}
-          <div className="mb-8">
+            {/* Experience Section */}
             <Card className="border-0 shadow-lg" style={{ backgroundColor: `${primaryColor}08` }}>
               <CardContent className="p-8">
                 <div className="text-center">
