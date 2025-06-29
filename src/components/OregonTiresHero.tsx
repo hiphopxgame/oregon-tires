@@ -35,14 +35,22 @@ const OregonTiresHero: React.FC<HeroProps> = ({
         
         <h1 className="text-5xl font-bold mb-6">{t.heroTitle}</h1>
         
-        {/* Updated tagline section with logo */}
+        {/* Updated tagline section without logo */}
+        <div className="mb-8">
+          <p className="text-xl max-w-3xl mx-auto">{t.heroSubtitle}</p>
+        </div>
+        
+        {/* New section with logo next to "Serving Portland Since 2008" text */}
         <div className="flex items-center justify-center gap-6 mb-8">
           <img 
             src="/lovable-uploads/95d0baa7-ee82-44bc-817a-34d47eb2e553.png" 
             alt="Oregon Tires Logo" 
             className="h-16 w-16"
           />
-          <p className="text-xl max-w-3xl">{t.heroSubtitle}</p>
+          <div className="text-left">
+            <h2 className="text-2xl font-bold mb-2">Serving Portland Since 2008</h2>
+            <p className="text-lg max-w-2xl">With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.</p>
+          </div>
         </div>
         
         <div className="flex justify-center gap-4 flex-wrap">
