@@ -23,13 +23,12 @@ const OregonTiresHero: React.FC<HeroProps> = ({
   return (
     <section className="text-white py-20" style={{ backgroundColor: primaryColor }}>
       <div className="container mx-auto px-4 text-center">
-        {/* Logo Image */}
-        <div className="mb-8">
+        {/* Logo Image - Full Width */}
+        <div className="mb-8 -mx-4">
           <img 
             src="/lovable-uploads/b5b7fac4-56f8-4e79-bb2e-57fe29b15867.png" 
             alt="Oregon Tires Auto Care - Spanish & English Speaking" 
-            className="mx-auto max-w-full h-auto"
-            style={{ maxHeight: '300px' }}
+            className="w-full h-auto"
           />
         </div>
         
