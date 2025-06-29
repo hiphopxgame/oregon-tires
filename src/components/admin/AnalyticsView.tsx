@@ -10,14 +10,13 @@ interface AnalyticsViewProps {
   contactMessages: ContactMessage[];
 }
 
-type DetailView = 'total' | 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'thisweek' | null;
+type DetailView = 'total' | 'confirmed' | 'completed' | 'cancelled' | 'thisweek' | null;
 
 export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewProps) => {
   const [detailView, setDetailView] = useState<DetailView>(null);
   
   const totalAppointments = appointments.length;
-  const pendingAppointments = appointments.filter(apt => apt.status === 'new' || apt.status === 'pending').length;
-  const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmed').length;
+  const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmed' || apt.status === 'pending').length;
   const completedAppointments = appointments.filter(apt => apt.status === 'completed').length;
   const cancelledAppointments = appointments.filter(apt => apt.status === 'cancelled').length;
   
@@ -32,10 +31,8 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
     switch (type) {
       case 'total':
         return appointments;
-      case 'pending':
-        return appointments.filter(apt => apt.status === 'new' || apt.status === 'pending');
       case 'confirmed':
-        return appointments.filter(apt => apt.status === 'confirmed');
+        return appointments.filter(apt => apt.status === 'confirmed' || apt.status === 'pending');
       case 'completed':
         return appointments.filter(apt => apt.status === 'completed');
       case 'cancelled':
@@ -51,8 +48,6 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
     switch (type) {
       case 'total':
         return 'All Appointments';
-      case 'pending':
-        return 'Pending Appointments';
       case 'confirmed':
         return 'Confirmed Appointments';
       case 'completed':
@@ -74,7 +69,6 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
     switch (status.toLowerCase()) {
       case 'new': 
       case 'pending': 
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'confirmed':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'priority': 
@@ -188,14 +182,6 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
             >
               <h3 className="font-semibold text-purple-800">This Week</h3>
               <p className="text-2xl font-bold text-purple-900">{recentAppointments.length}</p>
-            </button>
-            
-            <button
-              onClick={() => setDetailView('pending')}
-              className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 hover:bg-yellow-100 transition-colors text-left"
-            >
-              <h3 className="font-semibold text-yellow-800">Pending</h3>
-              <p className="text-2xl font-bold text-yellow-900">{pendingAppointments}</p>
             </button>
             
             <button

@@ -22,19 +22,29 @@ export const AdminCalendar = ({
   const getStatusBadge = (status: string) => {
     const normalizedStatus = status.toLowerCase();
     const variants = {
-      pending: { className: 'bg-[#FEE11A] text-black', text: 'Pending' },
       confirmed: { className: 'bg-blue-500 text-white', text: 'Confirmed' },
-      completed: { className: 'bg-[#007030] text-white', text: 'Completed' },
+      pending: { className: 'bg-blue-500 text-white', text: 'Confirmed' }, // Treat pending as confirmed
+      completed: { className: 'bg-green-500 text-white', text: 'Completed' },
       cancelled: { className: 'bg-red-500 text-white', text: 'Cancelled' }
     } as const;
 
-    const variant = variants[normalizedStatus as keyof typeof variants] || variants.pending;
+    const variant = variants[normalizedStatus as keyof typeof variants] || variants.confirmed;
     return (
       <span className={`px-2 py-1 rounded text-xs font-medium ${variant.className}`}>
         {variant.text}
       </span>
     );
   };
+
+  const getStatusCounts = () => {
+    const confirmed = selectedDateAppointments.filter(apt => apt.status === 'confirmed' || apt.status === 'pending').length;
+    const completed = selectedDateAppointments.filter(apt => apt.status === 'completed').length;
+    const cancelled = selectedDateAppointments.filter(apt => apt.status === 'cancelled').length;
+    
+    return { confirmed, completed, cancelled };
+  };
+
+  const statusCounts = getStatusCounts();
 
   return (
     <div className="lg:col-span-1">
@@ -63,9 +73,26 @@ export const AdminCalendar = ({
             <h3 className="font-semibold text-[#007030] mb-2">
               Appointments for {selectedDate.toLocaleDateString()}
             </h3>
-            <div className="text-2xl font-bold text-[#007030] mb-1">
+            <div className="text-2xl font-bold text-[#007030] mb-3">
               {selectedDateAppointments.length} appointments
             </div>
+            
+            {/* Status Statistics */}
+            <div className="grid grid-cols-3 gap-2 mb-4 text-center">
+              <div className="bg-blue-50 p-2 rounded">
+                <div className="text-sm font-medium text-blue-800">Confirmed</div>
+                <div className="text-lg font-bold text-blue-600">{statusCounts.confirmed}</div>
+              </div>
+              <div className="bg-green-50 p-2 rounded">
+                <div className="text-sm font-medium text-green-800">Completed</div>
+                <div className="text-lg font-bold text-green-600">{statusCounts.completed}</div>
+              </div>
+              <div className="bg-red-50 p-2 rounded">
+                <div className="text-sm font-medium text-red-800">Cancelled</div>
+                <div className="text-lg font-bold text-red-600">{statusCounts.cancelled}</div>
+              </div>
+            </div>
+
             {selectedDateAppointments.length === 0 ? (
               <p className="text-gray-500 text-sm">No appointments scheduled for this date</p>
             ) : (
@@ -84,7 +111,6 @@ export const AdminCalendar = ({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
                           <SelectItem value="confirmed">Confirmed</SelectItem>
                           <SelectItem value="completed">Completed</SelectItem>
                           <SelectItem value="cancelled">Cancelled</SelectItem>

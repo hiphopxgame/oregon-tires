@@ -17,21 +17,21 @@ export const DailySummary = ({ appointments }: DailySummaryProps) => {
         </div>
         <div>
           <div className="text-2xl font-bold text-blue-600">
-            {appointments.filter(apt => apt.status === 'confirmed').length}
+            {appointments.filter(apt => apt.status === 'confirmed' || apt.status === 'pending').length}
           </div>
           <div className="text-sm text-gray-600">Confirmed</div>
-        </div>
-        <div>
-          <div className="text-2xl font-bold text-yellow-600">
-            {appointments.filter(apt => apt.status === 'pending').length}
-          </div>
-          <div className="text-sm text-gray-600">Pending</div>
         </div>
         <div>
           <div className="text-2xl font-bold text-green-600">
             {appointments.filter(apt => apt.status === 'completed').length}
           </div>
           <div className="text-sm text-gray-600">Completed</div>
+        </div>
+        <div>
+          <div className="text-2xl font-bold text-red-600">
+            {appointments.filter(apt => apt.status === 'cancelled').length}
+          </div>
+          <div className="text-sm text-gray-600">Cancelled</div>
         </div>
       </div>
     </div>
