@@ -133,13 +133,20 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
                 <li>• {t.fastReliableService}</li>
               </ul>
             </div>
-            <div>
-              <h3 className="text-2xl font-semibold mb-4" style={{ color: primaryColor }}>
-                Serving Portland Since 2008
-              </h3>
-              <p className="text-gray-600">
-                With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.
-              </p>
+            <div className="flex items-start gap-6">
+              <img 
+                src="/lovable-uploads/a14c9135-54d9-4c00-b3d2-a9efe3b28390.png" 
+                alt="Oregon Tires Auto Care Logo" 
+                className="w-24 h-24 flex-shrink-0"
+              />
+              <div>
+                <h3 className="text-2xl font-semibold mb-4" style={{ color: primaryColor }}>
+                  Serving Portland Since 2008
+                </h3>
+                <p className="text-gray-600">
+                  With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.
+                </p>
+              </div>
             </div>
           </div>
         </div>
