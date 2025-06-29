@@ -10,14 +10,14 @@ export const DailySummary = ({ appointments }: DailySummaryProps) => {
     <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
         <div>
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-2xl font-bold text-black">
             {appointments.length}
           </div>
           <div className="text-sm text-gray-600">Total Appointments</div>
         </div>
         <div>
           <div className="text-2xl font-bold text-blue-600">
-            {appointments.filter(apt => apt.status === 'confirmed' || apt.status === 'pending').length}
+            {appointments.filter(apt => apt.status === 'confirmed').length}
           </div>
           <div className="text-sm text-gray-600">Confirmed</div>
         </div>

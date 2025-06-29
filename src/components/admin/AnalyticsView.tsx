@@ -10,13 +10,13 @@ interface AnalyticsViewProps {
   contactMessages: ContactMessage[];
 }
 
-type DetailView = 'total' | 'confirmed' | 'completed' | 'cancelled' | 'thisweek' | null;
+type DetailView = 'total' | 'confirmed' | 'completed' | 'cancelled' | 'thisweek' | 'allmessages' | 'unreadmessages' | null;
 
 export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewProps) => {
   const [detailView, setDetailView] = useState<DetailView>(null);
   
   const totalAppointments = appointments.length;
-  const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmed' || apt.status === 'pending').length;
+  const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmed').length;
   const completedAppointments = appointments.filter(apt => apt.status === 'completed').length;
   const cancelledAppointments = appointments.filter(apt => apt.status === 'cancelled').length;
   
@@ -27,20 +27,24 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
   thisWeek.setDate(thisWeek.getDate() - 7);
   const recentAppointments = appointments.filter(apt => new Date(apt.created_at) > thisWeek);
 
-  const getDetailedAppointments = (type: DetailView) => {
+  const getDetailedData = (type: DetailView) => {
     switch (type) {
       case 'total':
-        return appointments;
+        return { type: 'appointments', data: appointments };
       case 'confirmed':
-        return appointments.filter(apt => apt.status === 'confirmed' || apt.status === 'pending');
+        return { type: 'appointments', data: appointments.filter(apt => apt.status === 'confirmed') };
       case 'completed':
-        return appointments.filter(apt => apt.status === 'completed');
+        return { type: 'appointments', data: appointments.filter(apt => apt.status === 'completed') };
       case 'cancelled':
-        return appointments.filter(apt => apt.status === 'cancelled');
+        return { type: 'appointments', data: appointments.filter(apt => apt.status === 'cancelled') };
       case 'thisweek':
-        return recentAppointments;
+        return { type: 'appointments', data: recentAppointments };
+      case 'allmessages':
+        return { type: 'messages', data: contactMessages };
+      case 'unreadmessages':
+        return { type: 'messages', data: contactMessages.filter(msg => msg.status === 'new') };
       default:
-        return [];
+        return { type: 'appointments', data: [] };
     }
   };
 
@@ -56,6 +60,10 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
         return 'Cancelled Appointments';
       case 'thisweek':
         return 'This Week\'s Appointments';
+      case 'allmessages':
+        return 'All Messages';
+      case 'unreadmessages':
+        return 'Unread Messages';
       default:
         return '';
     }
@@ -83,7 +91,7 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
   };
 
   if (detailView) {
-    const detailedAppointments = getDetailedAppointments(detailView);
+    const detailedData = getDetailedData(detailView);
     
     return (
       <div className="space-y-6">
@@ -99,66 +107,108 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
             </Button>
             <div>
               <h2 className="text-2xl font-bold">{getDetailTitle(detailView)}</h2>
-              <p className="text-green-100">{detailedAppointments.length} appointment{detailedAppointments.length !== 1 ? 's' : ''}</p>
+              <p className="text-green-100">{detailedData.data.length} {detailedData.type === 'appointments' ? 'appointment' : 'message'}{detailedData.data.length !== 1 ? 's' : ''}</p>
             </div>
           </div>
           <div className="p-6">
-            {detailedAppointments.length === 0 ? (
+            {detailedData.data.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No appointments found</p>
+                <p>No {detailedData.type} found</p>
               </div>
             ) : (
               <div className="space-y-4">
-                {detailedAppointments.map((appointment) => (
-                  <Card key={appointment.id} className="border border-gray-200">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <User className="h-5 w-5 text-gray-500" />
-                          <div>
-                            <h3 className="font-semibold text-lg text-gray-900">
-                              {appointment.first_name} {appointment.last_name}
-                            </h3>
-                            <p className="text-sm text-gray-600">{appointment.email}</p>
-                            {appointment.phone && (
-                              <p className="text-sm text-gray-600">{appointment.phone}</p>
-                            )}
+                {detailedData.type === 'appointments' ? (
+                  (detailedData.data as Appointment[]).map((appointment) => (
+                    <Card key={appointment.id} className="border border-gray-200">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <User className="h-5 w-5 text-gray-500" />
+                            <div>
+                              <h3 className="font-semibold text-lg text-gray-900">
+                                {appointment.first_name} {appointment.last_name}
+                              </h3>
+                              <p className="text-sm text-gray-600">{appointment.email}</p>
+                              {appointment.phone && (
+                                <p className="text-sm text-gray-600">{appointment.phone}</p>
+                              )}
+                            </div>
+                          </div>
+                          <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(appointment.status)}`}>
+                            {formatStatus(appointment.status)}
                           </div>
                         </div>
-                        <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(appointment.status)}`}>
-                          {formatStatus(appointment.status)}
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Service</p>
+                            <p className="font-medium">{appointment.service}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Date</p>
+                            <p className="font-medium">{appointment.preferred_date}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Time</p>
+                            <p className="font-medium">{appointment.preferred_time}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Created</p>
+                            <p className="font-medium">{new Date(appointment.created_at).toLocaleDateString()}</p>
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
-                        <div>
-                          <p className="text-xs text-gray-500 uppercase tracking-wide">Service</p>
-                          <p className="font-medium">{appointment.service}</p>
+                        
+                        {appointment.message && (
+                          <div className="mt-3 p-3 bg-gray-50 rounded">
+                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Message</p>
+                            <p className="text-sm text-gray-700 italic">"{appointment.message}"</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  (detailedData.data as ContactMessage[]).map((message) => (
+                    <Card key={message.id} className="border border-gray-200">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <MessageSquare className="h-5 w-5 text-gray-500" />
+                            <div>
+                              <h3 className="font-semibold text-lg text-gray-900">
+                                {message.first_name} {message.last_name}
+                              </h3>
+                              <p className="text-sm text-gray-600">{message.email}</p>
+                              {message.phone && (
+                                <p className="text-sm text-gray-600">{message.phone}</p>
+                              )}
+                            </div>
+                          </div>
+                          <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(message.status)}`}>
+                            {formatStatus(message.status)}
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-500 uppercase tracking-wide">Date</p>
-                          <p className="font-medium">{appointment.preferred_date}</p>
+                        
+                        <div className="grid grid-cols-2 gap-4 mb-3">
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Language</p>
+                            <p className="font-medium">{message.language}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Created</p>
+                            <p className="font-medium">{new Date(message.created_at).toLocaleDateString()}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-500 uppercase tracking-wide">Time</p>
-                          <p className="font-medium">{appointment.preferred_time}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500 uppercase tracking-wide">Created</p>
-                          <p className="font-medium">{new Date(appointment.created_at).toLocaleDateString()}</p>
-                        </div>
-                      </div>
-                      
-                      {appointment.message && (
+                        
                         <div className="mt-3 p-3 bg-gray-50 rounded">
                           <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Message</p>
-                          <p className="text-sm text-gray-700 italic">"{appointment.message}"</p>
+                          <p className="text-sm text-gray-700">"{message.message}"</p>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
             )}
           </div>
@@ -175,7 +225,16 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
           <p className="text-green-100">Overview of your business metrics</p>
         </div>
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Top row: Total Appointments & This Week */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <button
+              onClick={() => setDetailView('total')}
+              className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors text-left"
+            >
+              <h3 className="font-semibold text-black">Total Appointments</h3>
+              <p className="text-2xl font-bold text-black">{totalAppointments}</p>
+            </button>
+            
             <button
               onClick={() => setDetailView('thisweek')}
               className="bg-purple-50 p-4 rounded-lg border border-purple-200 hover:bg-purple-100 transition-colors text-left"
@@ -183,7 +242,10 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
               <h3 className="font-semibold text-purple-800">This Week</h3>
               <p className="text-2xl font-bold text-purple-900">{recentAppointments.length}</p>
             </button>
-            
+          </div>
+
+          {/* Bottom row: Status-based appointments */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <button
               onClick={() => setDetailView('confirmed')}
               className="bg-blue-50 p-4 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors text-left"
@@ -207,31 +269,29 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
               <h3 className="font-semibold text-red-800">Cancelled</h3>
               <p className="text-2xl font-bold text-red-900">{cancelledAppointments}</p>
             </button>
-            
-            <button
-              onClick={() => setDetailView('total')}
-              className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors text-left"
-            >
-              <h3 className="font-semibold text-gray-800">Total Appointments</h3>
-              <p className="text-2xl font-bold text-gray-900">{totalAppointments}</p>
-            </button>
           </div>
           
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <MessageSquare className="h-5 w-5" />
                 Message Statistics
               </h3>
               <div className="space-y-2">
-                <div className="flex justify-between">
+                <button
+                  onClick={() => setDetailView('allmessages')}
+                  className="w-full flex justify-between hover:bg-gray-100 p-2 rounded transition-colors"
+                >
                   <span>Total Messages:</span>
                   <span className="font-bold">{totalMessages}</span>
-                </div>
-                <div className="flex justify-between">
+                </button>
+                <button
+                  onClick={() => setDetailView('unreadmessages')}
+                  className="w-full flex justify-between hover:bg-gray-100 p-2 rounded transition-colors"
+                >
                   <span>Unread Messages:</span>
                   <span className="font-bold text-red-600">{unreadMessages}</span>
-                </div>
+                </button>
               </div>
             </div>
             
