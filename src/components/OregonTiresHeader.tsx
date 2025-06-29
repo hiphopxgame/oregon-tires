@@ -2,6 +2,7 @@
 import React from 'react';
 import { Phone, MapPin, Clock, Globe, Instagram, Facebook, Mail } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   language: string;
@@ -45,7 +46,7 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span className="hidden lg:inline">{t.hours}</span>
+                <span className="hidden lg:inline">Mon-Sat 7AM-7PM</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -82,12 +83,19 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
       <div className="py-4">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold" style={{ color: primaryColor }}>
-                Oregon Tires Auto Care
-              </h1>
-              <p className="text-gray-600">{t.tagline}</p>
-            </div>
+            <Link to="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
+              <img 
+                src="/lovable-uploads/95d0baa7-ee82-44bc-817a-34d47eb2e553.png" 
+                alt="Oregon Tires Auto Care Logo" 
+                className="h-12 w-12"
+              />
+              <div>
+                <h1 className="text-3xl font-bold" style={{ color: primaryColor }}>
+                  Oregon Tires Auto Care
+                </h1>
+                <p className="text-gray-600">{t.tagline}</p>
+              </div>
+            </Link>
             <nav className="hidden md:flex items-center space-x-6">
               <button 
                 onClick={() => scrollToSection('home')}
@@ -124,12 +132,13 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
               >
                 {t.contact}
               </button>
-              <Button
-                onClick={openScheduleForm}
-                className="bg-yellow-400 text-black hover:bg-yellow-500 px-6 py-2 rounded-lg font-semibold"
-              >
-                {t.scheduleService}
-              </Button>
+              <Link to="/book-appointment">
+                <Button
+                  className="bg-yellow-400 text-black hover:bg-yellow-500 px-6 py-2 rounded-lg font-semibold"
+                >
+                  {t.scheduleService}
+                </Button>
+              </Link>
             </nav>
           </div>
         </div>

@@ -34,7 +34,17 @@ const OregonTiresHero: React.FC<HeroProps> = ({
         </div>
         
         <h1 className="text-5xl font-bold mb-6">{t.heroTitle}</h1>
-        <p className="text-xl mb-8 max-w-3xl mx-auto">{t.heroSubtitle}</p>
+        
+        {/* Updated tagline section with logo */}
+        <div className="flex items-center justify-center gap-6 mb-8">
+          <img 
+            src="/lovable-uploads/95d0baa7-ee82-44bc-817a-34d47eb2e553.png" 
+            alt="Oregon Tires Logo" 
+            className="h-16 w-16"
+          />
+          <p className="text-xl max-w-3xl">{t.heroSubtitle}</p>
+        </div>
+        
         <div className="flex justify-center gap-4 flex-wrap">
           <Button
             onClick={openContactForm}
