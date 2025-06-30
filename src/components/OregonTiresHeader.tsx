@@ -83,18 +83,12 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
       <div className="py-4">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
+            <Link to="/" className="hover:opacity-80 transition-opacity">
               <img 
-                src="/lovable-uploads/95d0baa7-ee82-44bc-817a-34d47eb2e553.png" 
-                alt="Oregon Tires Auto Care Logo" 
-                className="h-12 w-12"
+                src="/lovable-uploads/e39b3dfb-6a85-431d-975d-c8e5804ce5e3.png" 
+                alt="Oregon Tires Auto Care - Spanish & English Speaking" 
+                className="h-16 w-auto"
               />
-              <div>
-                <h1 className="text-3xl font-bold" style={{ color: primaryColor }}>
-                  Oregon Tires Auto Care
-                </h1>
-                <p className="text-gray-600">{t.tagline}</p>
-              </div>
             </Link>
             <nav className="hidden md:flex items-center space-x-6">
               <button 
