@@ -85,7 +85,7 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
           <div className="flex justify-between items-center">
             <Link to="/" className="hover:opacity-80 transition-opacity">
               <img 
-                src="/lovable-uploads/e39b3dfb-6a85-431d-975d-c8e5804ce5e3.png" 
+                src="/lovable-uploads/1290fb5e-e45c-4fc3-b523-e71d756ec1ef.png" 
                 alt="Oregon Tires Auto Care - Spanish & English Speaking" 
                 className="h-16 w-auto"
               />
