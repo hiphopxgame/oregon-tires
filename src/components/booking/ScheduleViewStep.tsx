@@ -145,7 +145,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
     <div className="space-y-6">
       <BookingSummary customerInfo={customerInfo} serviceDuration={serviceDuration} />
 
-      {/* Moved BookingConfirmation above TimeSlotGrid */}
+      {/* Booking confirmation above time slots */}
       <BookingConfirmation
         selectedTime={selectedTime}
         timeSlots={timeSlots}
@@ -168,6 +168,14 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           />
         </CardContent>
       </Card>
+
+      {/* Booking confirmation below time slots */}
+      <BookingConfirmation
+        selectedTime={selectedTime}
+        timeSlots={timeSlots}
+        submitting={submitting}
+        onConfirm={handleBookAppointment}
+      />
     </div>
   );
 };
