@@ -25,7 +25,7 @@ const OregonTiresHero: React.FC<HeroProps> = ({
       className="text-white py-20 relative"
       style={{ 
         backgroundColor: primaryColor,
-        backgroundImage: `linear-gradient(rgba(13, 54, 24, 0.7), rgba(13, 54, 24, 0.7)), url('/lovable-uploads/a4caf67d-ee79-4bfd-9e0a-7aef4278d086.png')`,
+        backgroundImage: `url('/lovable-uploads/a4caf67d-ee79-4bfd-9e0a-7aef4278d086.png')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
