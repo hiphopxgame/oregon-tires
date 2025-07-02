@@ -1,5 +1,3 @@
-
-
 const translations = {
   english: {
     title: "Oregon Tires Auto Care",
@@ -156,7 +154,7 @@ const translations = {
     jumpStart: "Servicio de Arranque",
     emergencyTowing: "Remolque de Emergencia",
     lockoutService: "Servicio de Cerrajería Automotriz",
-    needServiceToday: "¿Necesitas Servicio de Emergencia Hoy?",
+    needServiceToday: "¿Necesita servicio hoy?",
     customerReviews: "Lo Que Dicen Nuestros Clientes",
     customerReviewsSubtitle: "Reseñas reales de clientes satisfechos en Portland",
     // Detailed service descriptions
@@ -180,4 +178,3 @@ const translations = {
 };
 
 export default translations;
-
