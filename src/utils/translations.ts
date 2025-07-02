@@ -1,4 +1,5 @@
 
+
 const translations = {
   english: {
     title: "Oregon Tires Auto Care",
@@ -67,9 +68,26 @@ const translations = {
     jumpStart: "Jump Start Service",
     emergencyTowing: "Emergency Towing",
     lockoutService: "Lockout Service",
-    needServiceToday: "Need Emergency Service Today?",
+    needServiceToday: "Need Service Today?",
     customerReviews: "What Our Customers Say",
-    customerReviewsSubtitle: "Real reviews from satisfied customers in Portland"
+    customerReviewsSubtitle: "Real reviews from satisfied customers in Portland",
+    // Detailed service descriptions
+    newUsedTires: "New or Used Tires",
+    newUsedTiresDesc: "Professional installation of new and used tires with quality guarantee.",
+    mountBalanceTires: "Mount and Balance Tires",
+    mountBalanceTiresDesc: "Expert tire mounting and balancing for smooth, vibration-free driving.",
+    tireRepairDesc: "Professional tire patching and repair services to extend tire life safely.",
+    oilChangeDesc: "Quick and efficient oil changes using high-quality motor oils and filters.",
+    brakeServicesDesc: "Complete brake services including front, back, or full brake system replacement.",
+    tuneup: "Tuneup",
+    tuneupDesc: "Comprehensive vehicle tuneup for optimal performance.",
+    specializedServices: "Specialized Services",
+    alignment: "Alignment",
+    alignmentDesc: "Precision wheel alignment to ensure even tire wear and optimal handling.",
+    mechanicalInspection: "Mechanical Inspection",
+    mechanicalInspectionDesc: "Comprehensive vehicle inspection and detailed repair estimate.",
+    needServiceTodayDesc: "Call us immediately at (503) 367-9714",
+    availableHours: "Available Mon-Sat 7AM-7PM"
   },
   spanish: {
     title: "Oregon Tires Auto Care",
@@ -140,8 +158,26 @@ const translations = {
     lockoutService: "Servicio de Cerrajería Automotriz",
     needServiceToday: "¿Necesitas Servicio de Emergencia Hoy?",
     customerReviews: "Lo Que Dicen Nuestros Clientes",
-    customerReviewsSubtitle: "Reseñas reales de clientes satisfechos en Portland"
+    customerReviewsSubtitle: "Reseñas reales de clientes satisfechos en Portland",
+    // Detailed service descriptions
+    newUsedTires: "Llantas Nuevas o Usadas",
+    newUsedTiresDesc: "Instalación profesional de llantas nuevas y usadas con garantía de calidad.",
+    mountBalanceTires: "Montaje y Balanceo de Llantas",
+    mountBalanceTiresDesc: "Montaje y balanceo de llantas por expertos para una conducción suave y sin vibraciones.",
+    tireRepairDesc: "Servicios profesionales de parchado y reparación de llantas para prolongar su vida útil de forma segura.",
+    oilChangeDesc: "Cambios de aceite rápidos y eficientes con aceites de motor y filtros de alta calidad.",
+    brakeServicesDesc: "Servicio completo de frenos, incluyendo reemplazo del sistema de frenos delantero, trasero o completo.",
+    tuneup: "Puesta a Punto",
+    tuneupDesc: "Puesta a Punto integral del vehículo para un rendimiento óptimo.",
+    specializedServices: "Servicios Especializados",
+    alignment: "Alineación",
+    alignmentDesc: "Alineación de ruedas de precisión para garantizar un desgaste uniforme de las llantas y un manejo óptimo.",
+    mechanicalInspection: "Inspección Mecánica",
+    mechanicalInspectionDesc: "Inspección completa del vehículo y presupuesto detallado de reparación.",
+    needServiceTodayDesc: "Llámenos de inmediato al (503) 367-9714",
+    availableHours: "Disponible de lunes a sábado de 7:00 a. m. a 7:00 p. m."
   }
 };
 
 export default translations;
+
