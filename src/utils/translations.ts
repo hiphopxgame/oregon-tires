@@ -1,3 +1,4 @@
+
 const translations = {
   english: {
     title: "Oregon Tires Auto Care",
@@ -85,7 +86,32 @@ const translations = {
     mechanicalInspection: "Mechanical Inspection",
     mechanicalInspectionDesc: "Comprehensive vehicle inspection and detailed repair estimate.",
     needServiceTodayDesc: "Call us immediately at (503) 367-9714",
-    availableHours: "Available Mon-Sat 7AM-7PM"
+    availableHours: "Available Mon-Sat 7AM-7PM",
+    // Service Promise section
+    servicePromise: "Our Service Promise",
+    servicePromiseDesc: "Every service comes with our commitment to quality, transparency, and customer satisfaction. We provide detailed estimates, use only premium parts, and back our work with comprehensive warranties.",
+    qualityGuarantee: "Quality Guarantee",
+    fairPricing: "Fair Pricing",
+    expertServiceShort: "Expert Service",
+    // About section content
+    aboutOregonTires: "About Oregon Tires",
+    aboutTagline: "We take care of your car, you enjoy the road.",
+    vision: "Vision",
+    visionDesc: "To be the most trusted tire shop in Portland, Oregon. We aim to be recognized for our quality, honesty, and prompt service that keeps our customers safe and satisfied on the road.",
+    mission: "Mission",
+    missionDesc: "At Oregon Tires, we are dedicated to offering high-quality new and used tires, reliable mechanical services, and personalized attention. We work every day to provide fast and effective solutions that ensure the best performance and safety for our customers' vehicles.",
+    goals: "Goals",
+    goal1: "To offer quality service that exceeds our customers' expectations with every visit.",
+    goal2: "Maintain a varied stock of new and used tires, ensuring immediate availability.",
+    goal3: "Provide preventive and corrective mechanical services efficiently and safely.",
+    goal4: "Foster long-term relationships with our customers through trust and continued satisfaction.",
+    goal5: "Continuously train our team to stay ahead in automotive technology and best practices.",
+    goal6: "Implement promotions and loyalty programs that reward our customers' preference.",
+    goal7: "Operate in a sustainable and environmentally responsible manner.",
+    whyChooseUs: "Why Choose Us",
+    whyChooseUsList: "• Bilingual staff (English & Spanish)\n• Honest, transparent pricing\n• Quality workmanship guaranteed\n• Fast and reliable service",
+    servingPortlandSince: "Serving Portland Since 2008",
+    servingPortlandDesc: "With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family."
   },
   spanish: {
     title: "Oregon Tires Auto Care",
@@ -173,7 +199,32 @@ const translations = {
     mechanicalInspection: "Inspección Mecánica",
     mechanicalInspectionDesc: "Inspección completa del vehículo y presupuesto detallado de reparación.",
     needServiceTodayDesc: "Llámenos de inmediato al (503) 367-9714",
-    availableHours: "Disponible de lunes a sábado de 7:00 a. m. a 7:00 p. m."
+    availableHours: "Disponible de lunes a sábado de 7:00 a. m. a 7:00 p. m.",
+    // Service Promise section
+    servicePromise: "Nuestra Promesa de Servicio",
+    servicePromiseDesc: "Cada servicio viene con nuestro compromiso de calidad, transparencia y satisfacción del cliente. Proporcionamos estimaciones detalladas, usamos solo partes premium y respaldamos nuestro trabajo con garantías integrales.",
+    qualityGuarantee: "Garantía de Calidad",
+    fairPricing: "Precios Justos",
+    expertServiceShort: "Servicio Experto",
+    // About section content
+    aboutOregonTires: "Acerca de Oregon Tires",
+    aboutTagline: "Nosotros cuidamos tu auto, tú disfruta el camino.",
+    vision: "Visión",
+    visionDesc: "Ser el taller de llantas más confiable en Portland, Oregon. Buscamos ser reconocidos por nuestra calidad, honestidad y servicio rápido que mantiene a nuestros clientes seguros y satisfechos en la carretera.",
+    mission: "Misión",
+    missionDesc: "En Oregon Tires, nos dedicamos a ofrecer llantas nuevas y usadas de alta calidad, servicios mecánicos confiables y atención personalizada. Trabajamos todos los días para brindar soluciones rápidas y efectivas que aseguren el mejor rendimiento y seguridad para los vehículos de nuestros clientes.",
+    goals: "Objetivos",
+    goal1: "Ofrecer un servicio de calidad que supere las expectativas de nuestros clientes en cada visita.",
+    goal2: "Mantener un stock variado de llantas nuevas y usadas, garantizando disponibilidad inmediata.",
+    goal3: "Proporcionar servicios mecánicos preventivos y correctivos de manera eficiente y segura.",
+    goal4: "Fomentar relaciones a largo plazo con nuestros clientes a través de la confianza y satisfacción continua.",
+    goal5: "Capacitar continuamente a nuestro equipo para mantenerse a la vanguardia en tecnología automotriz y mejores prácticas.",
+    goal6: "Implementar promociones y programas de lealtad que recompensen la preferencia de nuestros clientes.",
+    goal7: "Operar de manera sostenible y ambientalmente responsable.",
+    whyChooseUs: "Por Qué Elegirnos",
+    whyChooseUsList: "• Personal bilingüe (inglés y español)\n• Precios honestos y transparentes\n• Trabajo de calidad garantizado\n• Servicio rápido y confiable",
+    servingPortlandSince: "Sirviendo a Portland Desde 2008",
+    servingPortlandDesc: "Con más de 15 años de experiencia sirviendo a la comunidad de Portland, hemos construido nuestra reputación en base a servicio honesto, trabajo de calidad y tratar a cada cliente como familia."
   }
 };
 
