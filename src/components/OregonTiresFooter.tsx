@@ -40,7 +40,7 @@ const OregonTiresFooter: React.FC<FooterProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span>Mon-Sat 7AM-7PM</span>
+                <span>{t.monSat}</span>
               </div>
             </div>
           </div>

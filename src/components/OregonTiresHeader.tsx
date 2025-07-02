@@ -46,7 +46,7 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span className="hidden lg:inline">Mon-Sat 7AM-7PM</span>
+                <span className="hidden lg:inline">{t.monSat}</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">
