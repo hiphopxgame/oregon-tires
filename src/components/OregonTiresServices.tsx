@@ -86,32 +86,32 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                 <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
                   <Car className="h-6 w-6" style={{ color: primaryColor }} />
                 </div>
-                <CardTitle className="text-xl" style={{ color: primaryColor }}>Tire Services</CardTitle>
+                <CardTitle className="text-xl" style={{ color: primaryColor }}>{t.tireServices}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  New or Used Tires
+                  {t.newOrUsedTires}
                 </h4>
-                <p className="text-gray-600 text-sm">Professional installation of new and used tires with quality guarantee.</p>
+                <p className="text-gray-600 text-sm">{t.newOrUsedTiresDesc}</p>
               </div>
               
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  Mount and Balance Tires
+                  {t.mountAndBalance}
                 </h4>
-                <p className="text-gray-600 text-sm">Expert tire mounting and balancing for smooth, vibration-free driving.</p>
+                <p className="text-gray-600 text-sm">{t.mountAndBalanceDesc}</p>
               </div>
 
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  Tire Repair
+                  {t.tireRepairService}
                 </h4>
-                <p className="text-gray-600 text-sm">Professional tire patching and repair services to extend tire life safely.</p>
+                <p className="text-gray-600 text-sm">{t.tireRepairServiceDesc}</p>
               </div>
             </CardContent>
           </Card>
@@ -123,32 +123,32 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                 <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
                   <Settings className="h-6 w-6" style={{ color: primaryColor }} />
                 </div>
-                <CardTitle className="text-xl" style={{ color: primaryColor }}>Auto Maintenance</CardTitle>
+                <CardTitle className="text-xl" style={{ color: primaryColor }}>{t.autoMaintenance}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  Oil Change
+                  {t.oilChangeService}
                 </h4>
-                <p className="text-gray-600 text-sm">Quick and efficient oil changes using high-quality motor oils and filters.</p>
+                <p className="text-gray-600 text-sm">{t.oilChangeServiceDesc}</p>
               </div>
 
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  Brake Services
+                  {t.brakeServices}
                 </h4>
-                <p className="text-gray-600 text-sm">Complete brake services including front, back, or full brake system replacement.</p>
+                <p className="text-gray-600 text-sm">{t.brakeServicesDesc}</p>
               </div>
 
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  Tuneup
+                  {t.tuneup}
                 </h4>
-                <p className="text-gray-600 text-sm">Comprehensive vehicle tuneup for optimal performance.</p>
+                <p className="text-gray-600 text-sm">{t.tuneupDesc}</p>
               </div>
             </CardContent>
           </Card>
@@ -160,28 +160,28 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                 <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
                   <Zap className="h-6 w-6" style={{ color: primaryColor }} />
                 </div>
-                <CardTitle className="text-xl" style={{ color: primaryColor }}>Specialized Services</CardTitle>
+                <CardTitle className="text-xl" style={{ color: primaryColor }}>{t.specializedServices}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  Alignment
+                  {t.alignment}
                 </h4>
-                <p className="text-gray-600 text-sm">Precision wheel alignment to ensure even tire wear and optimal handling.</p>
+                <p className="text-gray-600 text-sm">{t.alignmentDesc}</p>
               </div>
 
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  Mechanical Inspection
+                  {t.mechanicalInspection}
                 </h4>
-                <p className="text-gray-600 text-sm">Comprehensive vehicle inspection and detailed repair estimate.</p>
+                <p className="text-gray-600 text-sm">{t.mechanicalInspectionDesc}</p>
               </div>
 
               <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500 mt-6">
-                <p className="text-red-700 font-semibold text-sm mb-2">Need Service Today?</p>
+                <p className="text-red-700 font-semibold text-sm mb-2">{t.needServiceToday}</p>
                 <p className="text-red-600 text-sm">Call us immediately at (503) 367-9714</p>
                 <p className="text-red-600 text-xs mt-1">Available Mon-Sat 7AM-7PM</p>
               </div>

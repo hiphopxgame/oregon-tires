@@ -78,7 +78,25 @@ const translations = {
     goals: "Goals",
     whyChooseUs: "Why Choose Us",
     servingPortland: "Serving Portland Since 2008",
-    servingPortlandText: "With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family."
+    servingPortlandText: "With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.",
+    // Detailed service sections
+    specializedServices: "Specialized Services",
+    newOrUsedTires: "New or Used Tires",
+    newOrUsedTiresDesc: "Professional installation of new and used tires with quality guarantee.",
+    mountAndBalance: "Mount and Balance Tires",
+    mountAndBalanceDesc: "Expert tire mounting and balancing for smooth, vibration-free driving.",
+    tireRepairService: "Tire Repair",
+    tireRepairServiceDesc: "Professional tire patching and repair services to extend tire life safely.",
+    oilChangeService: "Oil Change",
+    oilChangeServiceDesc: "Quick and efficient oil changes using high-quality motor oils and filters.",
+    brakeServices: "Brake Services",
+    brakeServicesDesc: "Complete brake services including front, back, or full brake system replacement.",
+    tuneup: "Tuneup",
+    tuneupDesc: "Comprehensive vehicle tuneup for optimal performance.",
+    alignment: "Alignment",
+    alignmentDesc: "Precision wheel alignment to ensure even tire wear and optimal handling.",
+    mechanicalInspection: "Mechanical Inspection",
+    mechanicalInspectionDesc: "Comprehensive vehicle inspection and detailed repair estimate."
   },
   spanish: {
     title: "Oregon Tires Auto Care",
@@ -158,7 +176,25 @@ const translations = {
     goals: "Objetivos",
     whyChooseUs: "Por Qué Elegirnos",
     servingPortland: "Sirviendo a Portland Desde 2008",
-    servingPortlandText: "Con más de 15 años de experiencia sirviendo a la comunidad de Portland, hemos construido nuestra reputación en servicio honesto, trabajo de calidad y tratar a cada cliente como familia."
+    servingPortlandText: "Con más de 15 años de experiencia sirviendo a la comunidad de Portland, hemos construido nuestra reputación en servicio honesto, trabajo de calidad y tratar a cada cliente como familia.",
+    // Detailed service sections
+    specializedServices: "Servicios Especializados",
+    newOrUsedTires: "Llantas Nuevas o Usadas",
+    newOrUsedTiresDesc: "Instalación profesional de llantas nuevas y usadas con garantía de calidad.",
+    mountAndBalance: "Montaje y Balanceado de Llantas",
+    mountAndBalanceDesc: "Montaje y balanceado experto de llantas para una conducción suave y sin vibraciones.",
+    tireRepairService: "Reparación de Llantas",
+    tireRepairServiceDesc: "Servicios profesionales de parchado y reparación de llantas para extender la vida útil de manera segura.",
+    oilChangeService: "Cambio de Aceite",
+    oilChangeServiceDesc: "Cambios de aceite rápidos y eficientes usando aceites de motor y filtros de alta calidad.",
+    brakeServices: "Servicios de Frenos",
+    brakeServicesDesc: "Servicios completos de frenos incluyendo reemplazo frontal, trasero o del sistema completo de frenos.",
+    tuneup: "Afinación",
+    tuneupDesc: "Afinación completa del vehículo para un rendimiento óptimo.",
+    alignment: "Alineación",
+    alignmentDesc: "Alineación de ruedas de precisión para asegurar desgaste uniforme de llantas y manejo óptimo.",
+    mechanicalInspection: "Inspección Mecánica",
+    mechanicalInspectionDesc: "Inspección completa del vehículo y estimado detallado de reparación."
   }
 };
 

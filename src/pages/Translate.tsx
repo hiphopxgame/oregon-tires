@@ -98,6 +98,104 @@ const Translate = () => {
               spanishKey={translations.spanish.tireServices} 
             />
             <TranslationRow 
+              labelKey="autoMaintenance" 
+              englishKey={translations.english.autoMaintenance} 
+              spanishKey={translations.spanish.autoMaintenance} 
+            />
+            <TranslationRow 
+              labelKey="specializedServices" 
+              englishKey={translations.english.specializedServices} 
+              spanishKey={translations.spanish.specializedServices} 
+            />
+
+            <SectionHeader title="Tire Services" />
+            <TranslationRow 
+              labelKey="newOrUsedTires" 
+              englishKey={translations.english.newOrUsedTires} 
+              spanishKey={translations.spanish.newOrUsedTires} 
+            />
+            <TranslationRow 
+              labelKey="newOrUsedTiresDesc" 
+              englishKey={translations.english.newOrUsedTiresDesc} 
+              spanishKey={translations.spanish.newOrUsedTiresDesc} 
+            />
+            <TranslationRow 
+              labelKey="mountAndBalance" 
+              englishKey={translations.english.mountAndBalance} 
+              spanishKey={translations.spanish.mountAndBalance} 
+            />
+            <TranslationRow 
+              labelKey="mountAndBalanceDesc" 
+              englishKey={translations.english.mountAndBalanceDesc} 
+              spanishKey={translations.spanish.mountAndBalanceDesc} 
+            />
+            <TranslationRow 
+              labelKey="tireRepairService" 
+              englishKey={translations.english.tireRepairService} 
+              spanishKey={translations.spanish.tireRepairService} 
+            />
+            <TranslationRow 
+              labelKey="tireRepairServiceDesc" 
+              englishKey={translations.english.tireRepairServiceDesc} 
+              spanishKey={translations.spanish.tireRepairServiceDesc} 
+            />
+
+            <SectionHeader title="Auto Maintenance" />
+            <TranslationRow 
+              labelKey="oilChangeService" 
+              englishKey={translations.english.oilChangeService} 
+              spanishKey={translations.spanish.oilChangeService} 
+            />
+            <TranslationRow 
+              labelKey="oilChangeServiceDesc" 
+              englishKey={translations.english.oilChangeServiceDesc} 
+              spanishKey={translations.spanish.oilChangeServiceDesc} 
+            />
+            <TranslationRow 
+              labelKey="brakeServices" 
+              englishKey={translations.english.brakeServices} 
+              spanishKey={translations.spanish.brakeServices} 
+            />
+            <TranslationRow 
+              labelKey="brakeServicesDesc" 
+              englishKey={translations.english.brakeServicesDesc} 
+              spanishKey={translations.spanish.brakeServicesDesc} 
+            />
+            <TranslationRow 
+              labelKey="tuneup" 
+              englishKey={translations.english.tuneup} 
+              spanishKey={translations.spanish.tuneup} 
+            />
+            <TranslationRow 
+              labelKey="tuneupDesc" 
+              englishKey={translations.english.tuneupDesc} 
+              spanishKey={translations.spanish.tuneupDesc} 
+            />
+
+            <SectionHeader title="Specialized Services" />
+            <TranslationRow 
+              labelKey="alignment" 
+              englishKey={translations.english.alignment} 
+              spanishKey={translations.spanish.alignment} 
+            />
+            <TranslationRow 
+              labelKey="alignmentDesc" 
+              englishKey={translations.english.alignmentDesc} 
+              spanishKey={translations.spanish.alignmentDesc} 
+            />
+            <TranslationRow 
+              labelKey="mechanicalInspection" 
+              englishKey={translations.english.mechanicalInspection} 
+              spanishKey={translations.spanish.mechanicalInspection} 
+            />
+            <TranslationRow 
+              labelKey="mechanicalInspectionDesc" 
+              englishKey={translations.english.mechanicalInspectionDesc} 
+              spanishKey={translations.spanish.mechanicalInspectionDesc} 
+            />
+
+            <SectionHeader title="General Services" />
+            <TranslationRow 
               labelKey="tireInstallation" 
               englishKey={translations.english.tireInstallation} 
               spanishKey={translations.spanish.tireInstallation} 
@@ -116,11 +214,6 @@ const Translate = () => {
               labelKey="tireBalancing" 
               englishKey={translations.english.tireBalancing} 
               spanishKey={translations.spanish.tireBalancing} 
-            />
-            <TranslationRow 
-              labelKey="autoMaintenance" 
-              englishKey={translations.english.autoMaintenance} 
-              spanishKey={translations.spanish.autoMaintenance} 
             />
             <TranslationRow 
               labelKey="oilChange" 
