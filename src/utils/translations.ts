@@ -118,11 +118,11 @@ const translations = {
     // Services section content
     servicesSubtitle: "Servicios automotrices integrales en los que puedes confiar",
     expertService: "Técnicos Expertos",
-    expertServiceDesc: "Nuestros mecánicos certificados tienen años de experiencia con todas las marcas y modelos.",
+    expertServiceDesc: "Nuestros mecánicos certificados tienen años de experiencia con todas las marcas y modelos de vehículos.",
     quickService: "Servicio Rápido",
-    quickServiceDesc: "La mayoría de servicios se completan mientras esperas. Valoramos tu tiempo.",
+    quickServiceDesc: "La mayoría de servicios se completan mientras esperas. Valoramos tu tiempo y te devolvemos a la carretera rápidamente.",
     qualityParts: "Partes de Calidad",
-    qualityPartsDesc: "Usamos solo partes y materiales premium para garantizar reparaciones duraderas.",
+    qualityPartsDesc: "Usamos solo partes y materiales premium para garantizar reparaciones duraderas y rendimiento óptimo.",
     bilingualService: "Soporte Bilingüe",
     bilingualServiceDesc: "Fluidos en inglés y español para servir a nuestra diversa comunidad de Portland.",
     tireServices: "Servicios de Llantas",
@@ -137,7 +137,7 @@ const translations = {
     flatTireRepair: "Reparación de Llanta Ponchada",
     jumpStart: "Servicio de Arranque",
     emergencyTowing: "Remolque de Emergencia",
-    lockoutService: "Servicio de Cerrajería",
+    lockoutService: "Servicio de Cerrajería Automotriz",
     needServiceToday: "¿Necesitas Servicio de Emergencia Hoy?",
     customerReviews: "Lo Que Dicen Nuestros Clientes",
     customerReviewsSubtitle: "Reseñas reales de clientes satisfechos en Portland"
