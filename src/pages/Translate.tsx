@@ -63,11 +63,6 @@ const Translate = () => {
               englishKey={translations.english.contact} 
               spanishKey={translations.spanish.contact} 
             />
-            <TranslationRow 
-              labelKey="home" 
-              englishKey={translations.english.home} 
-              spanishKey={translations.spanish.home} 
-            />
 
             <SectionHeader title="Hero Section" />
             <TranslationRow 
@@ -200,31 +195,6 @@ const Translate = () => {
               labelKey="aboutSubtitle" 
               englishKey={translations.english.aboutSubtitle} 
               spanishKey={translations.spanish.aboutSubtitle} 
-            />
-            <TranslationRow 
-              labelKey="vision" 
-              englishKey={translations.english.vision} 
-              spanishKey={translations.spanish.vision} 
-            />
-            <TranslationRow 
-              labelKey="mission" 
-              englishKey={translations.english.mission} 
-              spanishKey={translations.spanish.mission} 
-            />
-            <TranslationRow 
-              labelKey="goals" 
-              englishKey={translations.english.goals} 
-              spanishKey={translations.spanish.goals} 
-            />
-            <TranslationRow 
-              labelKey="whyChooseUs" 
-              englishKey={translations.english.whyChooseUs} 
-              spanishKey={translations.spanish.whyChooseUs} 
-            />
-            <TranslationRow 
-              labelKey="servingPortland" 
-              englishKey={translations.english.servingPortland} 
-              spanishKey={translations.spanish.servingPortland} 
             />
 
             <SectionHeader title="Testimonials" />
