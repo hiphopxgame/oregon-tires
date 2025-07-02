@@ -196,6 +196,46 @@ const Translate = () => {
               englishKey={translations.english.aboutSubtitle} 
               spanishKey={translations.spanish.aboutSubtitle} 
             />
+            <TranslationRow 
+              labelKey="vision" 
+              englishKey={translations.english.vision} 
+              spanishKey={translations.spanish.vision} 
+            />
+            <TranslationRow 
+              labelKey="visionText" 
+              englishKey={translations.english.visionText} 
+              spanishKey={translations.spanish.visionText} 
+            />
+            <TranslationRow 
+              labelKey="mission" 
+              englishKey={translations.english.mission} 
+              spanishKey={translations.spanish.mission} 
+            />
+            <TranslationRow 
+              labelKey="missionText" 
+              englishKey={translations.english.missionText} 
+              spanishKey={translations.spanish.missionText} 
+            />
+            <TranslationRow 
+              labelKey="goals" 
+              englishKey={translations.english.goals} 
+              spanishKey={translations.spanish.goals} 
+            />
+            <TranslationRow 
+              labelKey="whyChooseUs" 
+              englishKey={translations.english.whyChooseUs} 
+              spanishKey={translations.spanish.whyChooseUs} 
+            />
+            <TranslationRow 
+              labelKey="servingPortland" 
+              englishKey={translations.english.servingPortland} 
+              spanishKey={translations.spanish.servingPortland} 
+            />
+            <TranslationRow 
+              labelKey="servingPortlandText" 
+              englishKey={translations.english.servingPortlandText} 
+              spanishKey={translations.spanish.servingPortlandText} 
+            />
 
             <SectionHeader title="Testimonials" />
             <TranslationRow 

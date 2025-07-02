@@ -69,7 +69,16 @@ const translations = {
     lockoutService: "Lockout Service",
     needServiceToday: "Need Emergency Service Today?",
     customerReviews: "What Our Customers Say",
-    customerReviewsSubtitle: "Real reviews from satisfied customers in Portland"
+    customerReviewsSubtitle: "Real reviews from satisfied customers in Portland",
+    // About section content
+    vision: "Vision",
+    visionText: "To be the most trusted tire shop in Portland, Oregon. We aim to be recognized for our quality, honesty, and prompt service that keeps our customers safe and satisfied on the road.",
+    mission: "Mission",
+    missionText: "At Oregon Tires, we are dedicated to offering high-quality new and used tires, reliable mechanical services, and personalized attention. We work every day to provide fast and effective solutions that ensure the best performance and safety for our customers' vehicles.",
+    goals: "Goals",
+    whyChooseUs: "Why Choose Us",
+    servingPortland: "Serving Portland Since 2008",
+    servingPortlandText: "With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family."
   },
   spanish: {
     title: "Oregon Tires Auto Care",
@@ -140,7 +149,16 @@ const translations = {
     lockoutService: "Servicio de Cerrajería",
     needServiceToday: "¿Necesitas Servicio de Emergencia Hoy?",
     customerReviews: "Lo Que Dicen Nuestros Clientes",
-    customerReviewsSubtitle: "Reseñas reales de clientes satisfechos en Portland"
+    customerReviewsSubtitle: "Reseñas reales de clientes satisfechos en Portland",
+    // About section content
+    vision: "Visión",
+    visionText: "Ser la tienda de llantas más confiable en Portland, Oregon. Aspiramos a ser reconocidos por nuestra calidad, honestidad y servicio rápido que mantiene a nuestros clientes seguros y satisfechos en la carretera.",
+    mission: "Misión",
+    missionText: "En Oregon Tires, nos dedicamos a ofrecer llantas nuevas y usadas de alta calidad, servicios mecánicos confiables y atención personalizada. Trabajamos cada día para brindar soluciones rápidas y efectivas que aseguren el mejor rendimiento y seguridad para los vehículos de nuestros clientes.",
+    goals: "Objetivos",
+    whyChooseUs: "Por Qué Elegirnos",
+    servingPortland: "Sirviendo a Portland Desde 2008",
+    servingPortlandText: "Con más de 15 años de experiencia sirviendo a la comunidad de Portland, hemos construido nuestra reputación en servicio honesto, trabajo de calidad y tratar a cada cliente como familia."
   }
 };
 
