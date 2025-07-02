@@ -21,8 +21,17 @@ const OregonTiresHero: React.FC<HeroProps> = ({
   const t = translations;
 
   return (
-    <section className="text-white py-20" style={{ backgroundColor: primaryColor }}>
-      <div className="container mx-auto px-4 text-center">
+    <section 
+      className="text-white py-20 relative"
+      style={{ 
+        backgroundColor: primaryColor,
+        backgroundImage: `linear-gradient(rgba(13, 54, 24, 0.7), rgba(13, 54, 24, 0.7)), url('/lovable-uploads/a4caf67d-ee79-4bfd-9e0a-7aef4278d086.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="container mx-auto px-4 text-center relative z-10">
         <h1 className="text-5xl font-bold mb-6">{t.heroTitle}</h1>
         
         {/* Updated tagline section */}
