@@ -105,7 +105,20 @@ const translations = {
     fairPricing: "Fair Pricing",
     expertServicePromise: "Expert Service",
     aboutOregonTires: "About Oregon Tires",
-    careCatchphrase: "We take care of your car, you enjoy the road."
+    careCatchphrase: "We take care of your car, you enjoy the road.",
+    // Goals content
+    goal1: "To offer quality service that exceeds our customers' expectations with every visit.",
+    goal2: "Maintain a varied stock of new and used tires, ensuring immediate availability.",
+    goal3: "Provide preventive and corrective mechanical services efficiently and safely.",
+    goal4: "Foster long-term relationships with our customers through trust and continued satisfaction.",
+    goal5: "Continuously train our team to stay ahead in automotive technology and best practices.",
+    goal6: "Implement promotions and loyalty programs that reward our customers' preference.",
+    goal7: "Operate in a sustainable and environmentally responsible manner.",
+    // Why Choose Us bullet points
+    bilingualStaff: "Bilingual staff (English & Spanish)",
+    honestPricing: "Honest, transparent pricing", 
+    qualityWorkmanship: "Quality workmanship guaranteed",
+    fastReliableService: "Fast and reliable service"
   },
   spanish: {
     title: "Oregon Tires Auto Care",
@@ -212,7 +225,20 @@ const translations = {
     fairPricing: "Precios Justos",
     expertServicePromise: "Servicio Experto",
     aboutOregonTires: "Acerca de Oregon Tires",
-    careCatchphrase: "Nosotros cuidamos tu auto, tú disfruta el camino."
+    careCatchphrase: "Nosotros cuidamos tu auto, tú disfruta el camino.",
+    // Goals content
+    goal1: "Ofrecer un servicio de calidad que supere las expectativas de nuestros clientes en cada visita.",
+    goal2: "Mantener un stock variado de llantas nuevas y usadas, asegurando disponibilidad inmediata.",
+    goal3: "Proporcionar servicios mecánicos preventivos y correctivos de manera eficiente y segura.",
+    goal4: "Fomentar relaciones a largo plazo con nuestros clientes a través de la confianza y satisfacción continua.",
+    goal5: "Entrenar continuamente a nuestro equipo para mantenerse a la vanguardia en tecnología automotriz y mejores prácticas.",
+    goal6: "Implementar promociones y programas de lealtad que recompensen la preferencia de nuestros clientes.",
+    goal7: "Operar de manera sustentable y ambientalmente responsable.",
+    // Why Choose Us bullet points
+    bilingualStaff: "Personal bilingüe (inglés y español)",
+    honestPricing: "Precios honestos y transparentes",
+    qualityWorkmanship: "Trabajo de calidad garantizado",
+    fastReliableService: "Servicio rápido y confiable"
   }
 };
 

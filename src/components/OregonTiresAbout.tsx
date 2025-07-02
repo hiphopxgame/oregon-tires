@@ -65,7 +65,7 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
               <Card className="h-full">
                 <CardContent className="p-6">
                   <p className="text-gray-700">
-                    To offer quality service that exceeds our customers' expectations with every visit.
+                    {t.goal1}
                   </p>
                 </CardContent>
               </Card>
@@ -73,7 +73,7 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
               <Card className="h-full">
                 <CardContent className="p-6">
                   <p className="text-gray-700">
-                    Maintain a varied stock of new and used tires, ensuring immediate availability.
+                    {t.goal2}
                   </p>
                 </CardContent>
               </Card>
@@ -81,7 +81,7 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
               <Card className="h-full">
                 <CardContent className="p-6">
                   <p className="text-gray-700">
-                    Provide preventive and corrective mechanical services efficiently and safely.
+                    {t.goal3}
                   </p>
                 </CardContent>
               </Card>
@@ -89,7 +89,7 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
               <Card className="h-full">
                 <CardContent className="p-6">
                   <p className="text-gray-700">
-                    Foster long-term relationships with our customers through trust and continued satisfaction.
+                    {t.goal4}
                   </p>
                 </CardContent>
               </Card>
@@ -97,7 +97,7 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
               <Card className="h-full">
                 <CardContent className="p-6">
                   <p className="text-gray-700">
-                    Continuously train our team to stay ahead in automotive technology and best practices.
+                    {t.goal5}
                   </p>
                 </CardContent>
               </Card>
@@ -105,7 +105,7 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
               <Card className="h-full">
                 <CardContent className="p-6">
                   <p className="text-gray-700">
-                    Implement promotions and loyalty programs that reward our customers' preference.
+                    {t.goal6}
                   </p>
                 </CardContent>
               </Card>
@@ -113,7 +113,7 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
               <Card className="h-full md:col-span-2 lg:col-span-3">
                 <CardContent className="p-6">
                   <p className="text-gray-700 text-center">
-                    Operate in a sustainable and environmentally responsible manner.
+                    {t.goal7}
                   </p>
                 </CardContent>
               </Card>
@@ -130,10 +130,10 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
                     {t.whyChooseUs}
                   </h3>
                   <ul className="text-gray-600 space-y-2 inline-block text-left">
-                    <li>• Bilingual staff (English & Spanish)</li>
-                    <li>• Honest, transparent pricing</li>
-                    <li>• Quality workmanship guaranteed</li>
-                    <li>• Fast and reliable service</li>
+                    <li>• {t.bilingualStaff}</li>
+                    <li>• {t.honestPricing}</li>
+                    <li>• {t.qualityWorkmanship}</li>
+                    <li>• {t.fastReliableService}</li>
                   </ul>
                 </div>
               </CardContent>

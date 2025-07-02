@@ -546,6 +546,65 @@ const Translate = () => {
               englishKey={translations.english.expertServicePromise} 
               spanishKey={translations.spanish.expertServicePromise} 
             />
+
+            <SectionHeader title="Goals Content" />
+            <TranslationRow 
+              labelKey="goal1" 
+              englishKey={translations.english.goal1} 
+              spanishKey={translations.spanish.goal1} 
+            />
+            <TranslationRow 
+              labelKey="goal2" 
+              englishKey={translations.english.goal2} 
+              spanishKey={translations.spanish.goal2} 
+            />
+            <TranslationRow 
+              labelKey="goal3" 
+              englishKey={translations.english.goal3} 
+              spanishKey={translations.spanish.goal3} 
+            />
+            <TranslationRow 
+              labelKey="goal4" 
+              englishKey={translations.english.goal4} 
+              spanishKey={translations.spanish.goal4} 
+            />
+            <TranslationRow 
+              labelKey="goal5" 
+              englishKey={translations.english.goal5} 
+              spanishKey={translations.spanish.goal5} 
+            />
+            <TranslationRow 
+              labelKey="goal6" 
+              englishKey={translations.english.goal6} 
+              spanishKey={translations.spanish.goal6} 
+            />
+            <TranslationRow 
+              labelKey="goal7" 
+              englishKey={translations.english.goal7} 
+              spanishKey={translations.spanish.goal7} 
+            />
+
+            <SectionHeader title="Why Choose Us Bullet Points" />
+            <TranslationRow 
+              labelKey="bilingualStaff" 
+              englishKey={translations.english.bilingualStaff} 
+              spanishKey={translations.spanish.bilingualStaff} 
+            />
+            <TranslationRow 
+              labelKey="honestPricing" 
+              englishKey={translations.english.honestPricing} 
+              spanishKey={translations.spanish.honestPricing} 
+            />
+            <TranslationRow 
+              labelKey="qualityWorkmanship" 
+              englishKey={translations.english.qualityWorkmanship} 
+              spanishKey={translations.spanish.qualityWorkmanship} 
+            />
+            <TranslationRow 
+              labelKey="fastReliableService" 
+              englishKey={translations.english.fastReliableService} 
+              spanishKey={translations.spanish.fastReliableService} 
+            />
           </div>
         </div>
       </div>
