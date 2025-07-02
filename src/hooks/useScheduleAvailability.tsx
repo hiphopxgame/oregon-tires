@@ -32,9 +32,9 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
     'mechanical-inspection-and-estimate': 2.5
   };
 
-  const generateTimeSlots = () => {
+  const generateTimeSlots = (startHour: number = 7, endHour: number = 19) => {
     const slots = [];
-    for (let hour = 7; hour < 19; hour++) {
+    for (let hour = startHour; hour < endHour; hour++) {
       slots.push(`${hour.toString().padStart(2, '0')}:00`);
       slots.push(`${hour.toString().padStart(2, '0')}:30`);
     }
@@ -72,9 +72,32 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
     try {
       setLoading(true);
       
-      const selectedDate = new Date(preferredDate + 'T00:00:00');
-      
-      if (selectedDate.getDay() === 0) {
+      // Check for custom hours for this date
+      const { data: customHours } = await supabase
+        .from('oregon_tires_custom_hours')
+        .select('*')
+        .eq('date', preferredDate)
+        .single();
+
+      let openingHour = 7;
+      let closingHour = 19;
+      let isClosed = false;
+
+      if (customHours) {
+        isClosed = customHours.is_closed;
+        if (!isClosed && customHours.opening_time && customHours.closing_time) {
+          openingHour = parseInt(customHours.opening_time.split(':')[0]);
+          closingHour = parseInt(customHours.closing_time.split(':')[0]);
+        }
+      } else {
+        // Default logic: Sunday closed, Mon-Sat 7AM-7PM
+        const selectedDate = new Date(preferredDate + 'T00:00:00');
+        if (selectedDate.getDay() === 0) {
+          isClosed = true;
+        }
+      }
+
+      if (isClosed) {
         setTimeSlots([]);
         setLoading(false);
         return;
@@ -90,13 +113,13 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
 
       const serviceDuration = serviceDurations[service] || 1.5;
       const serviceDurationMinutes = serviceDuration * 60;
-      const slots = generateTimeSlots();
+      const slots = generateTimeSlots(openingHour, closingHour);
       const availableSlots: TimeSlot[] = [];
 
       slots.forEach(startTime => {
         const startMinutes = timeToMinutes(startTime);
         const endMinutes = startMinutes + serviceDurationMinutes;
-        const closingTime = 19 * 60;
+        const closingTimeMinutes = closingHour * 60;
 
         let status: 'available' | 'unavailable' = 'available';
         let conflictCount = 0;
@@ -106,9 +129,9 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
         if (isPastTime(preferredDate, startTime)) {
           status = 'unavailable';
           message = 'Time has passed';
-        } else if (endMinutes > closingTime) {
+        } else if (endMinutes > closingTimeMinutes) {
           status = 'unavailable';
-          message = 'Service would extend beyond closing time (7 PM)';
+          message = `Service would extend beyond closing time (${closingHour === 12 ? '12:00 PM' : closingHour > 12 ? `${closingHour - 12}:00 PM` : `${closingHour}:00 AM`})`;
         } else {
           let hasConflict = false;
 

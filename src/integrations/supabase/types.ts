@@ -746,6 +746,36 @@ export type Database = {
         }
         Relationships: []
       }
+      oregon_tires_custom_hours: {
+        Row: {
+          closing_time: string | null
+          created_at: string
+          date: string
+          id: string
+          is_closed: boolean
+          opening_time: string | null
+          updated_at: string
+        }
+        Insert: {
+          closing_time?: string | null
+          created_at?: string
+          date: string
+          id?: string
+          is_closed?: boolean
+          opening_time?: string | null
+          updated_at?: string
+        }
+        Update: {
+          closing_time?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          is_closed?: boolean
+          opening_time?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       oretir_admin_notifications: {
         Row: {
           appointment_id: string | null

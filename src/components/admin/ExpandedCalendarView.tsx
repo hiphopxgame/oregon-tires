@@ -4,6 +4,7 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { Appointment } from '@/types/admin';
 import { CalendarPanel } from './CalendarPanel';
 import { DaySchedulePanel } from './DaySchedulePanel';
+import { HoursEditor } from './HoursEditor';
 
 interface ExpandedCalendarViewProps {
   appointments: Appointment[];
@@ -63,13 +64,16 @@ export const ExpandedCalendarView = ({
         </div>
 
         {/* Day Schedule Panel */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
           <DaySchedulePanel
             selectedDate={selectedDate}
             appointments={selectedDateAppointments}
             navigateDate={navigateDate}
             updateAppointmentStatus={updateAppointmentStatus}
           />
+          
+          {/* Hours Editor */}
+          <HoursEditor selectedDate={selectedDate} />
         </div>
       </div>
     </div>
