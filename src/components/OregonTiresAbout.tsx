@@ -33,10 +33,10 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
             <Card className="border-0" style={{ backgroundColor: `${primaryColor}10` }}>
               <CardContent className="p-8">
                 <h3 className="text-3xl font-bold mb-4 text-center" style={{ color: primaryColor }}>
-                  Vision
+                  {t.vision}
                 </h3>
                 <p className="text-lg text-gray-700 leading-relaxed text-center">
-                  To be the most trusted tire shop in Portland, Oregon. We aim to be recognized for our quality, honesty, and prompt service that keeps our customers safe and satisfied on the road.
+                  {t.visionText}
                 </p>
               </CardContent>
             </Card>
@@ -47,10 +47,10 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
             <Card className="border-0" style={{ backgroundColor: `${primaryColor}08` }}>
               <CardContent className="p-8">
                 <h3 className="text-3xl font-bold mb-4 text-center" style={{ color: primaryColor }}>
-                  Mission
+                  {t.mission}
                 </h3>
                 <p className="text-lg text-gray-700 leading-relaxed text-center">
-                  At Oregon Tires, we are dedicated to offering high-quality new and used tires, reliable mechanical services, and personalized attention. We work every day to provide fast and effective solutions that ensure the best performance and safety for our customers' vehicles.
+                  {t.missionText}
                 </p>
               </CardContent>
             </Card>
@@ -59,7 +59,7 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
           {/* Goals Section */}
           <div className="mb-12">
             <h3 className="text-3xl font-bold mb-8 text-center" style={{ color: primaryColor }}>
-              Goals
+              {t.goals}
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="h-full">
@@ -127,7 +127,7 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
               <CardContent className="p-8">
                 <div className="text-center">
                   <h3 className="text-2xl font-semibold mb-4" style={{ color: primaryColor }}>
-                    Why Choose Us
+                    {t.whyChooseUs}
                   </h3>
                   <ul className="text-gray-600 space-y-2 inline-block text-left">
                     <li>• Bilingual staff (English & Spanish)</li>
@@ -144,10 +144,10 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
               <CardContent className="p-8">
                 <div className="text-center">
                   <h3 className="text-2xl font-semibold mb-4" style={{ color: primaryColor }}>
-                    Serving Portland Since 2008
+                    {t.servingPortland}
                   </h3>
                   <p className="text-gray-700 text-lg leading-relaxed">
-                    With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.
+                    {t.servingPortlandText}
                   </p>
                 </div>
               </CardContent>
