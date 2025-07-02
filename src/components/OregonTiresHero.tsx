@@ -32,11 +32,11 @@ const OregonTiresHero: React.FC<HeroProps> = ({
       }}
     >
       <div className="container mx-auto px-4 text-center relative z-10">
-        <h1 className="text-5xl font-bold mb-6">{t.heroTitle}</h1>
+        <h1 className="text-5xl font-bold mb-6" style={{ textShadow: '2px 2px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000' }}>{t.heroTitle}</h1>
         
         {/* Updated tagline section */}
         <div className="mb-8">
-          <p className="text-xl max-w-3xl mx-auto">{t.heroSubtitle}</p>
+          <p className="text-xl max-w-3xl mx-auto" style={{ textShadow: '1px 1px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000' }}>{t.heroSubtitle}</p>
         </div>
         
         <div className="flex justify-center gap-4 flex-wrap">
