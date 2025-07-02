@@ -23,15 +23,6 @@ const OregonTiresHero: React.FC<HeroProps> = ({
   return (
     <section className="text-white py-20" style={{ backgroundColor: primaryColor }}>
       <div className="container mx-auto px-4 text-center">
-        {/* Logo Image - Full Width */}
-        <div className="mb-8 -mx-4">
-          <img 
-            src="/lovable-uploads/b5b7fac4-56f8-4e79-bb2e-57fe29b15867.png" 
-            alt="Oregon Tires Auto Care - Spanish & English Speaking" 
-            className="w-full h-auto"
-          />
-        </div>
-        
         <h1 className="text-5xl font-bold mb-6">{t.heroTitle}</h1>
         
         {/* Updated tagline section */}
