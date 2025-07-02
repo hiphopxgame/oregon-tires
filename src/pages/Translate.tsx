@@ -499,6 +499,53 @@ const Translate = () => {
               englishKey={translations.english.readyToHelp} 
               spanishKey={translations.spanish.readyToHelp} 
             />
+
+            <SectionHeader title="Additional Content" />
+            <TranslationRow 
+              labelKey="aboutOregonTires" 
+              englishKey={translations.english.aboutOregonTires} 
+              spanishKey={translations.spanish.aboutOregonTires} 
+            />
+            <TranslationRow 
+              labelKey="careCatchphrase" 
+              englishKey={translations.english.careCatchphrase} 
+              spanishKey={translations.spanish.careCatchphrase} 
+            />
+            <TranslationRow 
+              labelKey="callImmediately" 
+              englishKey={translations.english.callImmediately} 
+              spanishKey={translations.spanish.callImmediately} 
+            />
+            <TranslationRow 
+              labelKey="availableHours" 
+              englishKey={translations.english.availableHours} 
+              spanishKey={translations.spanish.availableHours} 
+            />
+            <TranslationRow 
+              labelKey="ourServicePromise" 
+              englishKey={translations.english.ourServicePromise} 
+              spanishKey={translations.spanish.ourServicePromise} 
+            />
+            <TranslationRow 
+              labelKey="servicePromiseDesc" 
+              englishKey={translations.english.servicePromiseDesc} 
+              spanishKey={translations.spanish.servicePromiseDesc} 
+            />
+            <TranslationRow 
+              labelKey="qualityGuarantee" 
+              englishKey={translations.english.qualityGuarantee} 
+              spanishKey={translations.spanish.qualityGuarantee} 
+            />
+            <TranslationRow 
+              labelKey="fairPricing" 
+              englishKey={translations.english.fairPricing} 
+              spanishKey={translations.spanish.fairPricing} 
+            />
+            <TranslationRow 
+              labelKey="expertServicePromise" 
+              englishKey={translations.english.expertServicePromise} 
+              spanishKey={translations.spanish.expertServicePromise} 
+            />
           </div>
         </div>
       </div>

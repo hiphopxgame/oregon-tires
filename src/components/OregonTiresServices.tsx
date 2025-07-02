@@ -182,8 +182,8 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
 
               <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500 mt-6">
                 <p className="text-red-700 font-semibold text-sm mb-2">{t.needServiceToday}</p>
-                <p className="text-red-600 text-sm">Call us immediately at (503) 367-9714</p>
-                <p className="text-red-600 text-xs mt-1">Available Mon-Sat 7AM-7PM</p>
+                <p className="text-red-600 text-sm">{t.callImmediately}</p>
+                <p className="text-red-600 text-xs mt-1">{t.availableHours}</p>
               </div>
             </CardContent>
           </Card>
@@ -193,23 +193,22 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
         <div className="mt-16 text-center">
           <Card className="max-w-4xl mx-auto border-0" style={{ backgroundColor: `${primaryColor}15` }}>
             <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-4" style={{ color: primaryColor }}>Our Service Promise</h3>
+              <h3 className="text-2xl font-bold mb-4" style={{ color: primaryColor }}>{t.ourServicePromise}</h3>
               <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                Every service comes with our commitment to quality, transparency, and customer satisfaction. 
-                We provide detailed estimates, use only premium parts, and back our work with comprehensive warranties.
+                {t.servicePromiseDesc}
               </p>
               <div className="grid md:grid-cols-3 gap-6 text-center">
                 <div>
                   <div className="text-2xl font-bold mb-2" style={{ color: primaryColor }}>✓</div>
-                  <div className="font-semibold text-gray-800">Quality Guarantee</div>
+                  <div className="font-semibold text-gray-800">{t.qualityGuarantee}</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold mb-2" style={{ color: primaryColor }}>✓</div>
-                  <div className="font-semibold text-gray-800">Fair Pricing</div>
+                  <div className="font-semibold text-gray-800">{t.fairPricing}</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold mb-2" style={{ color: primaryColor }}>✓</div>
-                  <div className="font-semibold text-gray-800">Expert Service</div>
+                  <div className="font-semibold text-gray-800">{t.expertServicePromise}</div>
                 </div>
               </div>
             </CardContent>

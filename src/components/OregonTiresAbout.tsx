@@ -21,10 +21,10 @@ const OregonTiresAbout: React.FC<AboutProps> = ({
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-6" style={{ color: primaryColor }}>
-              About Oregon Tires
+              {t.aboutOregonTires}
             </h2>
             <p className="text-2xl font-semibold mb-8" style={{ color: primaryColor }}>
-              "We take care of your car, you enjoy the road."
+              "{t.careCatchphrase}"
             </p>
           </div>
 

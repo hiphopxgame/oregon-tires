@@ -96,7 +96,16 @@ const translations = {
     alignment: "Alignment",
     alignmentDesc: "Precision wheel alignment to ensure even tire wear and optimal handling.",
     mechanicalInspection: "Mechanical Inspection",
-    mechanicalInspectionDesc: "Comprehensive vehicle inspection and detailed repair estimate."
+    mechanicalInspectionDesc: "Comprehensive vehicle inspection and detailed repair estimate.",
+    callImmediately: "Call us immediately at (503) 367-9714",
+    availableHours: "Available Mon-Sat 7AM-7PM",
+    ourServicePromise: "Our Service Promise",
+    servicePromiseDesc: "Every service comes with our commitment to quality, transparency, and customer satisfaction. We provide detailed estimates, use only premium parts, and back our work with comprehensive warranties.",
+    qualityGuarantee: "Quality Guarantee",
+    fairPricing: "Fair Pricing",
+    expertServicePromise: "Expert Service",
+    aboutOregonTires: "About Oregon Tires",
+    careCatchphrase: "We take care of your car, you enjoy the road."
   },
   spanish: {
     title: "Oregon Tires Auto Care",
@@ -194,7 +203,16 @@ const translations = {
     alignment: "Alineación",
     alignmentDesc: "Alineación de ruedas de precisión para asegurar desgaste uniforme de llantas y manejo óptimo.",
     mechanicalInspection: "Inspección Mecánica",
-    mechanicalInspectionDesc: "Inspección completa del vehículo y estimado detallado de reparación."
+    mechanicalInspectionDesc: "Inspección completa del vehículo y estimado detallado de reparación.",
+    callImmediately: "Llámenos inmediatamente al (503) 367-9714",
+    availableHours: "Disponible Lun-Sáb 7AM-7PM",
+    ourServicePromise: "Nuestra Promesa de Servicio",
+    servicePromiseDesc: "Cada servicio viene con nuestro compromiso de calidad, transparencia y satisfacción del cliente. Proporcionamos estimados detallados, usamos solo partes premium y respaldamos nuestro trabajo con garantías integrales.",
+    qualityGuarantee: "Garantía de Calidad",
+    fairPricing: "Precios Justos",
+    expertServicePromise: "Servicio Experto",
+    aboutOregonTires: "Acerca de Oregon Tires",
+    careCatchphrase: "Nosotros cuidamos tu auto, tú disfruta el camino."
   }
 };
 
