@@ -10,12 +10,13 @@ interface AnalyticsViewProps {
   contactMessages: ContactMessage[];
 }
 
-type DetailView = 'total' | 'confirmed' | 'completed' | 'cancelled' | 'thisweek' | 'allmessages' | 'unreadmessages' | null;
+type DetailView = 'total' | 'new' | 'confirmed' | 'completed' | 'cancelled' | 'thisweek' | 'allmessages' | 'unreadmessages' | null;
 
 export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewProps) => {
   const [detailView, setDetailView] = useState<DetailView>(null);
   
   const totalAppointments = appointments.length;
+  const newAppointments = appointments.filter(apt => apt.status === 'new').length;
   const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmed').length;
   const completedAppointments = appointments.filter(apt => apt.status === 'completed').length;
   const cancelledAppointments = appointments.filter(apt => apt.status === 'cancelled').length;
@@ -31,6 +32,8 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
     switch (type) {
       case 'total':
         return { type: 'appointments', data: appointments };
+      case 'new':
+        return { type: 'appointments', data: appointments.filter(apt => apt.status === 'new') };
       case 'confirmed':
         return { type: 'appointments', data: appointments.filter(apt => apt.status === 'confirmed') };
       case 'completed':
@@ -52,6 +55,8 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
     switch (type) {
       case 'total':
         return 'All Appointments';
+      case 'new':
+        return 'New Appointments';
       case 'confirmed':
         return 'Confirmed Appointments';
       case 'completed':
@@ -245,7 +250,15 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
           </div>
 
           {/* Bottom row: Status-based appointments */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <button
+              onClick={() => setDetailView('new')}
+              className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 hover:bg-yellow-100 transition-colors text-left"
+            >
+              <h3 className="font-semibold text-yellow-800">New</h3>
+              <p className="text-2xl font-bold text-yellow-900">{newAppointments}</p>
+            </button>
+
             <button
               onClick={() => setDetailView('confirmed')}
               className="bg-blue-50 p-4 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors text-left"

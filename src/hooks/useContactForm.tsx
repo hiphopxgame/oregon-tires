@@ -45,7 +45,8 @@ export const useContactForm = (language: string, t: any) => {
           ...formData,
           service: contactForm.service,
           preferred_date: contactForm.preferred_date,
-          preferred_time: contactForm.preferred_time
+          preferred_time: contactForm.preferred_time,
+          status: 'new'
         };
 
         const { error } = await supabase

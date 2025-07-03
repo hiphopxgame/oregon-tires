@@ -3,6 +3,7 @@ import React from 'react';
 import ContactInformation from './contact/ContactInformation';
 import ContactForm from './contact/ContactForm';
 import LocationMap from './contact/LocationMap';
+import WeeklySchedule from './WeeklySchedule';
 
 interface ContactProps {
   language: string;
@@ -38,6 +39,11 @@ const OregonTiresContact: React.FC<ContactProps> = ({
           </h2>
           <p className="text-xl text-gray-600">{t.contactSubtitle}</p>
         </div>
+
+        <WeeklySchedule 
+          translations={translations}
+          primaryColor={primaryColor}
+        />
 
         <div className="grid lg:grid-cols-2 gap-12">
           <ContactInformation 
