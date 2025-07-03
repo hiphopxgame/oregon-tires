@@ -113,14 +113,14 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
                       </SelectContent>
                     </Select>
                     <Select
-                      value={appointment.assigned_employee_id || ""}
-                      onValueChange={(value) => updateAppointmentAssignment(appointment.id, value || null)}
+                      value={appointment.assigned_employee_id || "unassigned"}
+                      onValueChange={(value) => updateAppointmentAssignment(appointment.id, value === "unassigned" ? null : value)}
                     >
                       <SelectTrigger className="w-32">
                         <SelectValue placeholder="Assign" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Unassigned</SelectItem>
+                        <SelectItem value="unassigned">Unassigned</SelectItem>
                         {employees.map((employee) => (
                           <SelectItem key={employee.id} value={employee.id}>
                             {employee.name}
