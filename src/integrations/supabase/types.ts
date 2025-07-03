@@ -661,6 +661,7 @@ export type Database = {
       }
       oregon_tires_appointments: {
         Row: {
+          assigned_employee_id: string | null
           created_at: string
           email: string
           first_name: string
@@ -676,6 +677,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          assigned_employee_id?: string | null
           created_at?: string
           email: string
           first_name: string
@@ -691,6 +693,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          assigned_employee_id?: string | null
           created_at?: string
           email?: string
           first_name?: string
@@ -705,7 +708,15 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "oregon_tires_appointments_assigned_employee_id_fkey"
+            columns: ["assigned_employee_id"]
+            isOneToOne: false
+            referencedRelation: "oregon_tires_employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       oregon_tires_contact_messages: {
         Row: {

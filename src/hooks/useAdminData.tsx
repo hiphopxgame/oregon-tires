@@ -51,6 +51,43 @@ export const useAdminData = () => {
     await fetchData();
   };
 
+  const updateAppointmentAssignment = async (id: string, employeeId: string | null) => {
+    try {
+      console.log('Updating appointment assignment:', { id, employeeId });
+      
+      const { error } = await supabase
+        .from('oregon_tires_appointments')
+        .update({ assigned_employee_id: employeeId })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state immediately for better UX
+      setAppointments(prev => 
+        prev.map(apt => apt.id === id ? { ...apt, assigned_employee_id: employeeId } : apt)
+      );
+
+      toast({
+        title: "Assignment Updated",
+        description: "Employee assignment has been updated.",
+      });
+
+      // Force a fresh data fetch to ensure consistency
+      setTimeout(() => {
+        refetchData();
+      }, 500);
+    } catch (error) {
+      console.error('Error updating appointment assignment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update assignment",
+        variant: "destructive",
+      });
+      // Revert local state on error
+      await refetchData();
+    }
+  };
+
   const updateAppointmentStatus = async (id: string, status: string) => {
     try {
       console.log('Updating appointment status:', { id, status });
@@ -134,6 +171,7 @@ export const useAdminData = () => {
     contactMessages,
     loading,
     updateAppointmentStatus,
+    updateAppointmentAssignment,
     updateMessageStatus,
     refetchData
   };

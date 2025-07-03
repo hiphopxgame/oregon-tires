@@ -8,12 +8,14 @@ interface TimeSlotProps {
   timeSlot: string;
   appointments: Appointment[];
   updateAppointmentStatus: (id: string, status: string) => void;
+  updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
 }
 
 export const TimeSlot = ({
   timeSlot,
   appointments,
-  updateAppointmentStatus
+  updateAppointmentStatus,
+  updateAppointmentAssignment
 }: TimeSlotProps) => {
   const formatTime = (time: string) => {
     const hour = parseInt(time.split(':')[0]);
@@ -46,6 +48,7 @@ export const TimeSlot = ({
               key={appointment.id}
               appointment={appointment}
               updateAppointmentStatus={updateAppointmentStatus}
+              updateAppointmentAssignment={updateAppointmentAssignment}
             />
           ))}
         </div>

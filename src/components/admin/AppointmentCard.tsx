@@ -1,18 +1,22 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Phone } from 'lucide-react';
+import { User, Phone, UserCheck } from 'lucide-react';
 import { Appointment } from '@/types/admin';
+import { useEmployees } from '@/hooks/useEmployees';
 
 interface AppointmentCardProps {
   appointment: Appointment;
   updateAppointmentStatus: (id: string, status: string) => void;
+  updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
 }
 
 export const AppointmentCard = ({
   appointment,
-  updateAppointmentStatus
+  updateAppointmentStatus,
+  updateAppointmentAssignment
 }: AppointmentCardProps) => {
+  const { employees } = useEmployees();
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'confirmed': return 'bg-blue-100 text-blue-800 border-blue-200';
@@ -47,6 +51,14 @@ export const AppointmentCard = ({
               <strong>Message:</strong> {appointment.message}
             </div>
           )}
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+            <UserCheck className="h-3 w-3" />
+            <span><strong>Assigned:</strong> {
+              appointment.assigned_employee_id 
+                ? employees.find(emp => emp.id === appointment.assigned_employee_id)?.name || 'Unknown'
+                : 'Unassigned'
+            }</span>
+          </div>
         </div>
         <div className="flex flex-col gap-2">
           <Badge className={getStatusColor(appointment.status)}>
@@ -63,6 +75,22 @@ export const AppointmentCard = ({
               <SelectItem value="confirmed">Confirmed</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={appointment.assigned_employee_id || ""}
+            onValueChange={(value) => updateAppointmentAssignment(appointment.id, value || null)}
+          >
+            <SelectTrigger className="w-28 h-8 text-xs">
+              <SelectValue placeholder="Assign" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Unassigned</SelectItem>
+              {employees.map((employee) => (
+                <SelectItem key={employee.id} value={employee.id}>
+                  {employee.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

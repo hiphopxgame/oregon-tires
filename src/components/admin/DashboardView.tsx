@@ -9,6 +9,7 @@ interface DashboardViewProps {
   appointmentDates: Date[];
   selectedDateAppointments: Appointment[];
   updateAppointmentStatus: (id: string, status: string) => void;
+  updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   contactMessages: ContactMessage[];
@@ -22,6 +23,7 @@ export const DashboardView = ({
   appointmentDates,
   selectedDateAppointments,
   updateAppointmentStatus,
+  updateAppointmentAssignment,
   activeTab,
   setActiveTab,
   contactMessages,
@@ -46,6 +48,7 @@ export const DashboardView = ({
           updateMessageStatus={updateMessageStatus}
           appointments={appointments}
           updateAppointmentStatus={updateAppointmentStatus}
+          updateAppointmentAssignment={updateAppointmentAssignment}
         />
       </div>
     </div>

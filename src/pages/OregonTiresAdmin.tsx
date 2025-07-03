@@ -18,6 +18,7 @@ const OregonTiresAdmin = () => {
     contactMessages,
     loading,
     updateAppointmentStatus,
+    updateAppointmentAssignment,
     updateMessageStatus,
     refetchData
   } = useAdminData();
@@ -43,6 +44,7 @@ const OregonTiresAdmin = () => {
             setSelectedDate={setSelectedDate}
             appointmentDates={appointmentDates}
             updateAppointmentStatus={updateAppointmentStatus}
+            updateAppointmentAssignment={updateAppointmentAssignment}
             onDataRefresh={refetchData}
           />
         );
@@ -51,6 +53,7 @@ const OregonTiresAdmin = () => {
           <AppointmentsView
             appointments={appointments}
             updateAppointmentStatus={updateAppointmentStatus}
+            updateAppointmentAssignment={updateAppointmentAssignment}
           />
         );
       case 'messages':
@@ -75,6 +78,7 @@ const OregonTiresAdmin = () => {
             setSelectedDate={setSelectedDate}
             appointmentDates={appointmentDates}
             updateAppointmentStatus={updateAppointmentStatus}
+            updateAppointmentAssignment={updateAppointmentAssignment}
             onDataRefresh={refetchData}
           />
         );

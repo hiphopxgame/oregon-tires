@@ -12,6 +12,7 @@ interface AdminTabsProps {
   updateMessageStatus: (id: string, status: string) => void;
   appointments: Appointment[];
   updateAppointmentStatus: (id: string, status: string) => void;
+  updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
 }
 
 export const AdminTabs = ({
@@ -20,7 +21,8 @@ export const AdminTabs = ({
   contactMessages,
   updateMessageStatus,
   appointments,
-  updateAppointmentStatus
+  updateAppointmentStatus,
+  updateAppointmentAssignment
 }: AdminTabsProps) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -41,6 +43,7 @@ export const AdminTabs = ({
         <AppointmentsTab 
           appointments={appointments}
           updateAppointmentStatus={updateAppointmentStatus}
+          updateAppointmentAssignment={updateAppointmentAssignment}
         />
       </TabsContent>
 

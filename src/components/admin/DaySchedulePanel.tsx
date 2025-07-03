@@ -11,13 +11,15 @@ interface DaySchedulePanelProps {
   appointments: Appointment[];
   navigateDate: (direction: 'prev' | 'next') => void;
   updateAppointmentStatus: (id: string, status: string) => void;
+  updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
 }
 
 export const DaySchedulePanel = ({
   selectedDate,
   appointments,
   navigateDate,
-  updateAppointmentStatus
+  updateAppointmentStatus,
+  updateAppointmentAssignment
 }: DaySchedulePanelProps) => {
   // Generate time slots from 7 AM to 7 PM
   const generateTimeSlots = () => {
@@ -94,6 +96,7 @@ export const DaySchedulePanel = ({
                 timeSlot={timeSlot}
                 appointments={slotAppointments}
                 updateAppointmentStatus={updateAppointmentStatus}
+                updateAppointmentAssignment={updateAppointmentAssignment}
               />
             );
           })}

@@ -4,13 +4,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Appointment } from '@/types/admin';
+import { useEmployees } from '@/hooks/useEmployees';
 
 interface AppointmentsTabProps {
   appointments: Appointment[];
   updateAppointmentStatus: (id: string, status: string) => void;
+  updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
 }
 
-export const AppointmentsTab = ({ appointments, updateAppointmentStatus }: AppointmentsTabProps) => {
+export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateAppointmentAssignment }: AppointmentsTabProps) => {
+  const { employees } = useEmployees();
   const getStatusBadge = (status: string) => {
     const normalizedStatus = status.toLowerCase();
     const variants = {
@@ -48,6 +51,7 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus }: Appoi
               <TableHead>Service</TableHead>
               <TableHead>Date & Time</TableHead>
               <TableHead>Contact</TableHead>
+              <TableHead>Assigned Employee</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -83,22 +87,48 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus }: Appoi
                   </div>
                 </TableCell>
                 <TableCell>
+                  <div className="text-sm">
+                    {appointment.assigned_employee_id 
+                      ? employees.find(emp => emp.id === appointment.assigned_employee_id)?.name || 'Unknown'
+                      : 'Unassigned'
+                    }
+                  </div>
+                </TableCell>
+                <TableCell>
                   {getStatusBadge(appointment.status)}
                 </TableCell>
                 <TableCell>
-                  <Select
-                    value={appointment.status}
-                    onValueChange={(value) => updateAppointmentStatus(appointment.id, value)}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="confirmed">Confirmed</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex flex-col gap-2">
+                    <Select
+                      value={appointment.status}
+                      onValueChange={(value) => updateAppointmentStatus(appointment.id, value)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="confirmed">Confirmed</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={appointment.assigned_employee_id || ""}
+                      onValueChange={(value) => updateAppointmentAssignment(appointment.id, value || null)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue placeholder="Assign" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Unassigned</SelectItem>
+                        {employees.map((employee) => (
+                          <SelectItem key={employee.id} value={employee.id}>
+                            {employee.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

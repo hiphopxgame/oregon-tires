@@ -13,6 +13,7 @@ interface ExpandedCalendarViewProps {
   setSelectedDate: (date: Date) => void;
   appointmentDates: Date[];
   updateAppointmentStatus: (id: string, status: string) => void;
+  updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
   onDataRefresh?: () => void;
 }
 
@@ -22,6 +23,7 @@ export const ExpandedCalendarView = ({
   setSelectedDate,
   appointmentDates,
   updateAppointmentStatus,
+  updateAppointmentAssignment,
   onDataRefresh
 }: ExpandedCalendarViewProps) => {
   // Get appointments for selected date
@@ -71,6 +73,7 @@ export const ExpandedCalendarView = ({
             appointments={selectedDateAppointments}
             navigateDate={navigateDate}
             updateAppointmentStatus={updateAppointmentStatus}
+            updateAppointmentAssignment={updateAppointmentAssignment}
           />
           
           {/* Hours Editor */}

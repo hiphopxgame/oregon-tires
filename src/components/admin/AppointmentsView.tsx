@@ -5,9 +5,10 @@ import { Appointment } from '@/types/admin';
 interface AppointmentsViewProps {
   appointments: Appointment[];
   updateAppointmentStatus: (id: string, status: string) => void;
+  updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
 }
 
-export const AppointmentsView = ({ appointments, updateAppointmentStatus }: AppointmentsViewProps) => {
+export const AppointmentsView = ({ appointments, updateAppointmentStatus, updateAppointmentAssignment }: AppointmentsViewProps) => {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm border-2 border-green-700">
@@ -18,7 +19,8 @@ export const AppointmentsView = ({ appointments, updateAppointmentStatus }: Appo
         <div className="p-6">
           <AppointmentsTab 
             appointments={appointments} 
-            updateAppointmentStatus={updateAppointmentStatus} 
+            updateAppointmentStatus={updateAppointmentStatus}
+            updateAppointmentAssignment={updateAppointmentAssignment}
           />
         </div>
       </div>

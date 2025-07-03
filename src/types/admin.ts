@@ -12,6 +12,7 @@ export interface Appointment {
   status: string;
   language: string;
   created_at: string;
+  assigned_employee_id: string | null;
 }
 
 export interface ContactMessage {
