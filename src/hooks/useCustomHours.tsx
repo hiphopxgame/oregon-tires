@@ -149,6 +149,27 @@ export const useCustomHours = () => {
 
   useEffect(() => {
     fetchCustomHours();
+
+    // Set up real-time subscription for custom hours changes
+    const channel = supabase
+      .channel('custom-hours-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'oregon_tires_custom_hours'
+        },
+        (payload) => {
+          console.log('Real-time custom hours change detected:', payload);
+          fetchCustomHours(); // Refetch when changes occur
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return {

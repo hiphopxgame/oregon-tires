@@ -164,6 +164,79 @@ export const useAdminData = () => {
 
   useEffect(() => {
     fetchData();
+
+    // Set up real-time subscriptions for automatic updates
+    const appointmentsChannel = supabase
+      .channel('admin-appointments-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'oregon_tires_appointments'
+        },
+        (payload) => {
+          console.log('Real-time appointment change:', payload);
+          refetchData(); // Refresh data when changes occur
+        }
+      )
+      .subscribe();
+
+    const messagesChannel = supabase
+      .channel('admin-messages-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes
+          schema: 'public',
+          table: 'oregon_tires_contact_messages'
+        },
+        (payload) => {
+          console.log('Real-time message change:', payload);
+          refetchData(); // Refresh data when changes occur
+        }
+      )
+      .subscribe();
+
+    const employeesChannel = supabase
+      .channel('admin-employees-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes
+          schema: 'public',
+          table: 'oregon_tires_employees'
+        },
+        (payload) => {
+          console.log('Real-time employee change:', payload);
+          refetchData(); // Refresh data when employee changes occur
+        }
+      )
+      .subscribe();
+
+    const customHoursChannel = supabase
+      .channel('admin-custom-hours-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes
+          schema: 'public',
+          table: 'oregon_tires_custom_hours'
+        },
+        (payload) => {
+          console.log('Real-time custom hours change:', payload);
+          refetchData(); // Refresh data when custom hours change
+        }
+      )
+      .subscribe();
+
+    // Cleanup function to remove subscriptions
+    return () => {
+      supabase.removeChannel(appointmentsChannel);
+      supabase.removeChannel(messagesChannel);
+      supabase.removeChannel(employeesChannel);
+      supabase.removeChannel(customHoursChannel);
+    };
   }, []);
 
   return {

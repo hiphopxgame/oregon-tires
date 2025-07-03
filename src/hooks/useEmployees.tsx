@@ -40,6 +40,27 @@ export const useEmployees = () => {
 
   useEffect(() => {
     fetchEmployees();
+
+    // Set up real-time subscription for employee changes
+    const channel = supabase
+      .channel('employees-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'oregon_tires_employees'
+        },
+        (payload) => {
+          console.log('Real-time employee change detected:', payload);
+          fetchEmployees(); // Refetch when changes occur
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return {
