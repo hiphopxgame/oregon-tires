@@ -8,6 +8,7 @@ export interface CustomHours {
   is_closed: boolean;
   opening_time: string | null;
   closing_time: string | null;
+  simultaneous_bookings: number;
   created_at: string;
   updated_at: string;
 }
@@ -42,6 +43,7 @@ export const useCustomHours = () => {
     is_closed: boolean;
     opening_time?: string | null;
     closing_time?: string | null;
+    simultaneous_bookings?: number;
   }) => {
     try {
       const { data, error } = await supabase
@@ -51,6 +53,7 @@ export const useCustomHours = () => {
           is_closed: hours.is_closed,
           opening_time: hours.opening_time,
           closing_time: hours.closing_time,
+          simultaneous_bookings: hours.simultaneous_bookings || 2,
         }, {
           onConflict: 'date'
         })
@@ -126,6 +129,7 @@ export const useCustomHours = () => {
         is_closed: true,
         opening_time: null,
         closing_time: null,
+        simultaneous_bookings: 2,
         created_at: '',
         updated_at: ''
       };
@@ -137,6 +141,7 @@ export const useCustomHours = () => {
       is_closed: false,
       opening_time: '07:00',
       closing_time: '19:00',
+      simultaneous_bookings: 2,
       created_at: '',
       updated_at: ''
     };

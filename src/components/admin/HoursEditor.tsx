@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Clock, Save, RotateCcw } from 'lucide-react';
+import { Clock, Save, RotateCcw, Users } from 'lucide-react';
 import { CustomHours, useCustomHours } from '@/hooks/useCustomHours';
 
 interface HoursEditorProps {
@@ -21,6 +21,7 @@ export const HoursEditor = ({ selectedDate }: HoursEditorProps) => {
   const [isClosed, setIsClosed] = useState(currentHours.is_closed);
   const [openingTime, setOpeningTime] = useState(currentHours.opening_time || '07:00');
   const [closingTime, setClosingTime] = useState(currentHours.closing_time || '19:00');
+  const [simultaneousBookings, setSimultaneousBookings] = useState(currentHours.simultaneous_bookings || 2);
 
   const formatDateDisplay = (date: Date) => {
     return date.toLocaleDateString('en-US', { 
@@ -38,6 +39,7 @@ export const HoursEditor = ({ selectedDate }: HoursEditorProps) => {
         is_closed: isClosed,
         opening_time: isClosed ? null : openingTime,
         closing_time: isClosed ? null : closingTime,
+        simultaneous_bookings: simultaneousBookings,
       });
     } catch (error) {
       // Error handled in hook
@@ -62,6 +64,7 @@ export const HoursEditor = ({ selectedDate }: HoursEditorProps) => {
         setOpeningTime('07:00');
         setClosingTime('19:00');
       }
+      setSimultaneousBookings(2);
     } catch (error) {
       // Error handled in hook
     } finally {
@@ -73,7 +76,8 @@ export const HoursEditor = ({ selectedDate }: HoursEditorProps) => {
     return (
       isClosed !== currentHours.is_closed ||
       (!isClosed && openingTime !== (currentHours.opening_time || '07:00')) ||
-      (!isClosed && closingTime !== (currentHours.closing_time || '19:00'))
+      (!isClosed && closingTime !== (currentHours.closing_time || '19:00')) ||
+      simultaneousBookings !== (currentHours.simultaneous_bookings || 2)
     );
   };
 
@@ -100,24 +104,45 @@ export const HoursEditor = ({ selectedDate }: HoursEditorProps) => {
         </div>
 
         {!isClosed && (
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="opening-time">Opening Time</Label>
-              <Input
-                id="opening-time"
-                type="time"
-                value={openingTime}
-                onChange={(e) => setOpeningTime(e.target.value)}
-              />
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="opening-time">Opening Time</Label>
+                <Input
+                  id="opening-time"
+                  type="time"
+                  value={openingTime}
+                  onChange={(e) => setOpeningTime(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="closing-time">Closing Time</Label>
+                <Input
+                  id="closing-time"
+                  type="time"
+                  value={closingTime}
+                  onChange={(e) => setClosingTime(e.target.value)}
+                />
+              </div>
             </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="closing-time">Closing Time</Label>
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-green-700" />
+                <Label htmlFor="simultaneous-bookings">Simultaneous Bookings</Label>
+              </div>
               <Input
-                id="closing-time"
-                type="time"
-                value={closingTime}
-                onChange={(e) => setClosingTime(e.target.value)}
+                id="simultaneous-bookings"
+                type="number"
+                min="1"
+                max="10"
+                value={simultaneousBookings}
+                onChange={(e) => setSimultaneousBookings(parseInt(e.target.value) || 1)}
+                className="w-32"
               />
+              <p className="text-xs text-gray-600">
+                Number of customers that can book the same time slot
+              </p>
             </div>
           </div>
         )}

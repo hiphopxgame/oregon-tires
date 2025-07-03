@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useCustomHours } from '@/hooks/useCustomHours';
 
 interface TimeSlot {
   time: string;
@@ -18,6 +19,7 @@ interface UseScheduleAvailabilityProps {
 export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleAvailabilityProps) => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(true);
+  const { getHoursForDate } = useCustomHours();
 
   const serviceDurations: Record<string, number> = {
     'new-tires': 2,
@@ -72,29 +74,17 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
     try {
       setLoading(true);
       
-      // Check for custom hours for this date
-      const { data: customHours } = await supabase
-        .from('oregon_tires_custom_hours')
-        .select('*')
-        .eq('date', preferredDate)
-        .single();
-
+      // Get hours and simultaneous booking capacity for this date
+      const hours = getHoursForDate(preferredDate);
+      
       let openingHour = 7;
       let closingHour = 19;
-      let isClosed = false;
+      let isClosed = hours.is_closed;
+      let maxSimultaneousBookings = hours.simultaneous_bookings;
 
-      if (customHours) {
-        isClosed = customHours.is_closed;
-        if (!isClosed && customHours.opening_time && customHours.closing_time) {
-          openingHour = parseInt(customHours.opening_time.split(':')[0]);
-          closingHour = parseInt(customHours.closing_time.split(':')[0]);
-        }
-      } else {
-        // Default logic: Sunday closed, Mon-Sat 7AM-7PM
-        const selectedDate = new Date(preferredDate + 'T00:00:00');
-        if (selectedDate.getDay() === 0) {
-          isClosed = true;
-        }
+      if (!isClosed && hours.opening_time && hours.closing_time) {
+        openingHour = parseInt(hours.opening_time.split(':')[0]);
+        closingHour = parseInt(hours.closing_time.split(':')[0]);
       }
 
       if (isClosed) {
@@ -149,7 +139,7 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
               }
             });
 
-            if (slotConflicts >= 2) {
+            if (slotConflicts >= maxSimultaneousBookings) {
               hasConflict = true;
               break;
             }

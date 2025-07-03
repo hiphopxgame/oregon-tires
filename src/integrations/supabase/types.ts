@@ -754,6 +754,7 @@ export type Database = {
           id: string
           is_closed: boolean
           opening_time: string | null
+          simultaneous_bookings: number | null
           updated_at: string
         }
         Insert: {
@@ -763,6 +764,7 @@ export type Database = {
           id?: string
           is_closed?: boolean
           opening_time?: string | null
+          simultaneous_bookings?: number | null
           updated_at?: string
         }
         Update: {
@@ -772,6 +774,37 @@ export type Database = {
           id?: string
           is_closed?: boolean
           opening_time?: string | null
+          simultaneous_bookings?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      oregon_tires_employees: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          phone?: string | null
           updated_at?: string
         }
         Relationships: []
