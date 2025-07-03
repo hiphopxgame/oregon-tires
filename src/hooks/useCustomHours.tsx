@@ -150,9 +150,9 @@ export const useCustomHours = () => {
   useEffect(() => {
     fetchCustomHours();
 
-    // Set up real-time subscription for custom hours changes
+    // Set up real-time subscription for custom hours changes with unique channel name
     const channel = supabase
-      .channel('custom-hours-changes')
+      .channel('hours-editor-changes')
       .on(
         'postgres_changes',
         {
@@ -162,7 +162,7 @@ export const useCustomHours = () => {
         },
         (payload) => {
           console.log('Real-time custom hours change detected:', payload);
-          fetchCustomHours(); // Refetch when changes occur
+          setTimeout(() => fetchCustomHours(), 100); // Small delay to avoid rapid calls
         }
       )
       .subscribe();

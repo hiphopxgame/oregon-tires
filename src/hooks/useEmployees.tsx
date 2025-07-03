@@ -41,9 +41,9 @@ export const useEmployees = () => {
   useEffect(() => {
     fetchEmployees();
 
-    // Set up real-time subscription for employee changes
+    // Set up real-time subscription for employee changes with unique channel name
     const channel = supabase
-      .channel('employees-changes')
+      .channel('employee-manager-changes')
       .on(
         'postgres_changes',
         {
@@ -53,7 +53,7 @@ export const useEmployees = () => {
         },
         (payload) => {
           console.log('Real-time employee change detected:', payload);
-          fetchEmployees(); // Refetch when changes occur
+          setTimeout(() => fetchEmployees(), 100); // Small delay to avoid rapid calls
         }
       )
       .subscribe();
