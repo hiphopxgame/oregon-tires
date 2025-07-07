@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,45 +7,15 @@ import { Switch } from '@/components/ui/switch';
 import { Plus, Edit2, Save, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-interface Employee {
-  id: string;
-  name: string;
-  email: string | null;
-  phone: string | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import { useEmployees, Employee } from '@/hooks/useEmployees';
 
 export const EmployeeManager = () => {
   const { toast } = useToast();
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { employees, loading, refetch } = useEmployees();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingData, setEditingData] = useState<Partial<Employee>>({});
   const [newEmployee, setNewEmployee] = useState({ name: '', email: '', phone: '' });
   const [showAddForm, setShowAddForm] = useState(false);
-
-  const fetchEmployees = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('oregon_tires_employees')
-        .select('*')
-        .order('name');
-
-      if (error) throw error;
-      setEmployees(data || []);
-    } catch (error) {
-      console.error('Error fetching employees:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load employees",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddEmployee = async () => {
     if (!newEmployee.name.trim()) return;
@@ -63,7 +33,6 @@ export const EmployeeManager = () => {
 
       setNewEmployee({ name: '', email: '', phone: '' });
       setShowAddForm(false);
-      fetchEmployees();
       
       toast({
         title: "Success",
@@ -88,10 +57,8 @@ export const EmployeeManager = () => {
 
       if (error) throw error;
 
-      setEmployees(prev => 
-        prev.map(emp => emp.id === id ? { ...emp, ...updates } : emp)
-      );
       setEditingId(null);
+      setEditingData({});
 
       toast({
         title: "Success",
@@ -107,9 +74,19 @@ export const EmployeeManager = () => {
     }
   };
 
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
+  const startEditing = (employee: Employee) => {
+    setEditingId(employee.id);
+    setEditingData({
+      name: employee.name,
+      email: employee.email,
+      phone: employee.phone
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditingData({});
+  };
 
   if (loading) {
     return <div className="text-green-700">Loading employees...</div>;
@@ -193,51 +170,30 @@ export const EmployeeManager = () => {
               {editingId === employee.id ? (
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
                   <Input
-                    value={employee.name}
-                    onChange={(e) => 
-                      setEmployees(prev => 
-                        prev.map(emp => 
-                          emp.id === employee.id ? { ...emp, name: e.target.value } : emp
-                        )
-                      )
-                    }
+                    value={editingData.name || ''}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, name: e.target.value }))}
                   />
                   <Input
-                    value={employee.email || ''}
-                    onChange={(e) => 
-                      setEmployees(prev => 
-                        prev.map(emp => 
-                          emp.id === employee.id ? { ...emp, email: e.target.value } : emp
-                        )
-                      )
-                    }
+                    value={editingData.email || ''}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="Email"
                   />
                   <Input
-                    value={employee.phone || ''}
-                    onChange={(e) => 
-                      setEmployees(prev => 
-                        prev.map(emp => 
-                          emp.id === employee.id ? { ...emp, phone: e.target.value } : emp
-                        )
-                      )
-                    }
+                    value={editingData.phone || ''}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="Phone"
                   />
                   <div className="flex gap-2">
                     <Button 
                       size="sm" 
-                      onClick={() => handleUpdateEmployee(employee.id, employee)}
+                      onClick={() => handleUpdateEmployee(employee.id, editingData)}
                     >
                       <Save className="h-4 w-4" />
                     </Button>
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => {
-                        setEditingId(null);
-                        fetchEmployees(); // Reset changes
-                      }}
+                      onClick={cancelEditing}
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -269,7 +225,7 @@ export const EmployeeManager = () => {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => setEditingId(employee.id)}
+                      onClick={() => startEditing(employee)}
                     >
                       <Edit2 className="h-4 w-4" />
                     </Button>
