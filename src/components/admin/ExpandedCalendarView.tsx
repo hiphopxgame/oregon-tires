@@ -5,7 +5,6 @@ import { Appointment } from '@/types/admin';
 import { CalendarPanel } from './CalendarPanel';
 import { DaySchedulePanel } from './DaySchedulePanel';
 import { HoursEditor } from './HoursEditor';
-import { EmployeeManager } from './EmployeeManager';
 
 interface ExpandedCalendarViewProps {
   appointments: Appointment[];
@@ -78,9 +77,6 @@ export const ExpandedCalendarView = ({
           
           {/* Hours Editor */}
           <HoursEditor selectedDate={selectedDate} />
-          
-          {/* Employee Manager */}
-          <EmployeeManager />
         </div>
       </div>
     </div>

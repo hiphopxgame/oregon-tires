@@ -9,6 +9,7 @@ import { DayView } from '@/components/admin/DayView';
 import { AnalyticsView } from '@/components/admin/AnalyticsView';
 import { AppointmentsView } from '@/components/admin/AppointmentsView';
 import { MessagesView } from '@/components/admin/MessagesView';
+import { EmployeesView } from '@/components/admin/EmployeesView';
 import { ExpandedCalendarView } from '@/components/admin/ExpandedCalendarView';
 
 const OregonTiresAdmin = () => {
@@ -63,6 +64,8 @@ const OregonTiresAdmin = () => {
             updateMessageStatus={updateMessageStatus}
           />
         );
+      case 'employees':
+        return <EmployeesView />;
       case 'analytics':
         return (
           <AnalyticsView
