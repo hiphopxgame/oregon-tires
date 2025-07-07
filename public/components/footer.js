@@ -61,7 +61,7 @@ function createFooter() {
                                 <i data-lucide="external-link" class="h-4 w-4"></i>
                                 React Version
                             </a>
-                            <a href="/oregon-tires-dashboard.html" class="text-white hover:text-yellow-200 flex items-center gap-2 block">
+                            <a href="/admin" class="text-white hover:text-yellow-200 flex items-center gap-2 block">
                                 <i data-lucide="external-link" class="h-4 w-4"></i>
                                 Admin Dashboard
                             </a>

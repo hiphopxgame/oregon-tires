@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -17,7 +17,7 @@ export const useCustomHours = () => {
   const [customHours, setCustomHours] = useState<CustomHours[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchCustomHours = async () => {
+  const fetchCustomHours = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -37,7 +37,7 @@ export const useCustomHours = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   const updateCustomHours = async (date: string, hours: {
     is_closed: boolean;
@@ -151,8 +151,9 @@ export const useCustomHours = () => {
     fetchCustomHours();
 
     // Set up real-time subscription for custom hours changes with unique channel name
+    const channelId = Math.random().toString(36).substr(2, 9);
     const channel = supabase
-      .channel('hours-editor-changes')
+      .channel(`hours-editor-changes-${channelId}`)
       .on(
         'postgres_changes',
         {
@@ -170,7 +171,7 @@ export const useCustomHours = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchCustomHours]);
 
   return {
     customHours,

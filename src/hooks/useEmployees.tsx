@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -16,7 +16,7 @@ export const useEmployees = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('oregon_tires_employees')
@@ -36,14 +36,15 @@ export const useEmployees = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchEmployees();
 
     // Set up real-time subscription for employee changes with unique channel name
+    const channelId = Math.random().toString(36).substr(2, 9);
     const channel = supabase
-      .channel('employee-manager-changes')
+      .channel(`employee-manager-changes-${channelId}`)
       .on(
         'postgres_changes',
         {
@@ -61,7 +62,7 @@ export const useEmployees = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchEmployees]);
 
   return {
     employees,

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Appointment, ContactMessage } from '@/types/admin';
@@ -10,7 +10,7 @@ export const useAdminData = () => {
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       console.log('Fetching admin data...');
       const [appointmentsRes, contactRes] = await Promise.all([
@@ -43,13 +43,13 @@ export const useAdminData = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
-  const refetchData = async () => {
+  const refetchData = useCallback(async () => {
     console.log('Refetching admin data...');
     setLoading(true);
     await fetchData();
-  };
+  }, [fetchData]);
 
   const updateAppointmentAssignment = async (id: string, employeeId: string | null) => {
     try {
@@ -165,9 +165,12 @@ export const useAdminData = () => {
   useEffect(() => {
     fetchData();
 
+    // Create unique channel names to avoid conflicts
+    const channelId = Math.random().toString(36).substr(2, 9);
+    
     // Set up real-time subscriptions for automatic updates with unique channel names
     const appointmentsChannel = supabase
-      .channel('admin-dashboard-appointments')
+      .channel(`admin-dashboard-appointments-${channelId}`)
       .on(
         'postgres_changes',
         {
@@ -184,7 +187,7 @@ export const useAdminData = () => {
       .subscribe();
 
     const messagesChannel = supabase
-      .channel('admin-dashboard-messages')
+      .channel(`admin-dashboard-messages-${channelId}`)
       .on(
         'postgres_changes',
         {
@@ -204,7 +207,7 @@ export const useAdminData = () => {
       supabase.removeChannel(appointmentsChannel);
       supabase.removeChannel(messagesChannel);
     };
-  }, []);
+  }, [fetchData, refetchData]);
 
   return {
     appointments,
