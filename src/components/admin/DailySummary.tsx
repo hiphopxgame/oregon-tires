@@ -11,9 +11,9 @@ export const DailySummary = ({ appointments }: DailySummaryProps) => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
         <div>
           <div className="text-2xl font-bold text-black">
-            {appointments.length}
+            {appointments.filter(apt => apt.status === 'new').length}
           </div>
-          <div className="text-sm text-gray-600">Total Appointments</div>
+          <div className="text-sm text-gray-600">New</div>
         </div>
         <div>
           <div className="text-2xl font-bold text-blue-600">
