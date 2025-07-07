@@ -21,7 +21,6 @@ export const useEmployees = () => {
       const { data, error } = await supabase
         .from('oregon_tires_employees')
         .select('*')
-        .eq('is_active', true)
         .order('name');
 
       if (error) throw error;
