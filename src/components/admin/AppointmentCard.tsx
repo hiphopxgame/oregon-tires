@@ -19,6 +19,7 @@ export const AppointmentCard = ({
   const { employees } = useEmployees();
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
+      case 'new': return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'confirmed': return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'completed': return 'bg-green-100 text-green-800 border-green-200';
       case 'cancelled': return 'bg-red-100 text-red-800 border-red-200';
@@ -72,6 +73,7 @@ export const AppointmentCard = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="new">New</SelectItem>
               <SelectItem value="confirmed">Confirmed</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>

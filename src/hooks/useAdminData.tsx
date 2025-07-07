@@ -92,6 +92,19 @@ export const useAdminData = () => {
     try {
       console.log('Updating appointment status:', { id, status });
       
+      // Validate that employee is assigned when confirming appointment
+      if (status === 'confirmed') {
+        const appointment = appointments.find(apt => apt.id === id);
+        if (!appointment?.assigned_employee_id) {
+          toast({
+            title: "Employee Required",
+            description: "You must assign an employee before confirming an appointment.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+      
       const { error } = await supabase
         .from('oregon_tires_appointments')
         .update({ status })

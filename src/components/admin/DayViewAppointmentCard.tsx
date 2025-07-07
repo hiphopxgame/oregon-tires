@@ -204,6 +204,7 @@ export const DayViewAppointmentCard = ({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="New">New</SelectItem>
             <SelectItem value="Confirmed">Confirmed</SelectItem>
             <SelectItem value="Completed">Completed</SelectItem>
             <SelectItem value="Cancelled">Cancelled</SelectItem>
