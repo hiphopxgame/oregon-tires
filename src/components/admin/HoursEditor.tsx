@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,15 @@ export const HoursEditor = ({ selectedDate }: HoursEditorProps) => {
   const [openingTime, setOpeningTime] = useState(currentHours.opening_time || '07:00');
   const [closingTime, setClosingTime] = useState(currentHours.closing_time || '19:00');
   const [simultaneousBookings, setSimultaneousBookings] = useState(currentHours.simultaneous_bookings || 2);
+
+  // Update form state when selectedDate changes
+  useEffect(() => {
+    const updatedHours = getHoursForDate(dateStr);
+    setIsClosed(updatedHours.is_closed);
+    setOpeningTime(updatedHours.opening_time || '07:00');
+    setClosingTime(updatedHours.closing_time || '19:00');
+    setSimultaneousBookings(updatedHours.simultaneous_bookings || 2);
+  }, [dateStr, getHoursForDate]);
 
   const formatDateDisplay = (date: Date) => {
     return date.toLocaleDateString('en-US', { 
