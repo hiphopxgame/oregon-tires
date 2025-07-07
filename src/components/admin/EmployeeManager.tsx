@@ -8,6 +8,7 @@ import { Plus, Edit2, Save, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmployees, Employee } from '@/hooks/useEmployees';
+import { EmployeeAppointments } from './EmployeeAppointments';
 
 export const EmployeeManager = () => {
   const { toast } = useToast();
@@ -165,10 +166,10 @@ export const EmployeeManager = () => {
           {employees.map((employee) => (
             <div 
               key={employee.id} 
-              className="flex items-center justify-between p-3 border rounded-lg bg-white"
+              className="border rounded-lg bg-white p-3"
             >
               {editingId === employee.id ? (
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
                   <Input
                     value={editingData.name || ''}
                     onChange={(e) => setEditingData(prev => ({ ...prev, name: e.target.value }))}
@@ -201,35 +202,43 @@ export const EmployeeManager = () => {
                 </div>
               ) : (
                 <>
-                  <div className="flex-1">
-                    <div className="font-medium">{employee.name}</div>
-                    <div className="text-sm text-gray-600">
-                      {employee.email && <span>{employee.email}</span>}
-                      {employee.email && employee.phone && <span> • </span>}
-                      {employee.phone && <span>{employee.phone}</span>}
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="font-medium">{employee.name}</div>
+                      <div className="text-sm text-gray-600">
+                        {employee.email && <span>{employee.email}</span>}
+                        {employee.email && employee.phone && <span> • </span>}
+                        {employee.phone && <span>{employee.phone}</span>}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor={`active-${employee.id}`} className="text-sm">
+                          Active
+                        </Label>
+                        <Switch
+                          id={`active-${employee.id}`}
+                          checked={employee.is_active}
+                          onCheckedChange={(checked) => 
+                            handleUpdateEmployee(employee.id, { is_active: checked })
+                          }
+                        />
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => startEditing(employee)}
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor={`active-${employee.id}`} className="text-sm">
-                        Active
-                      </Label>
-                      <Switch
-                        id={`active-${employee.id}`}
-                        checked={employee.is_active}
-                        onCheckedChange={(checked) => 
-                          handleUpdateEmployee(employee.id, { is_active: checked })
-                        }
-                      />
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => startEditing(employee)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  
+                  {/* Employee Appointments Section */}
+                  <EmployeeAppointments 
+                    employeeId={employee.id} 
+                    employeeName={employee.name} 
+                  />
                 </>
               )}
             </div>
