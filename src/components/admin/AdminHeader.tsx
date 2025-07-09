@@ -20,6 +20,7 @@ export const AdminHeader = ({
     { id: 'appointments', label: 'Appointments' },
     { id: 'messages', label: 'Messages' },
     { id: 'employees', label: 'Employees' },
+    { id: 'gallery', label: 'Gallery' },
     { id: 'analytics', label: 'Analytics' }
   ];
 

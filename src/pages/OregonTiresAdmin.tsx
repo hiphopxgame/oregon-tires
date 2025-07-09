@@ -11,6 +11,7 @@ import { AppointmentsView } from '@/components/admin/AppointmentsView';
 import { MessagesView } from '@/components/admin/MessagesView';
 import { EmployeesView } from '@/components/admin/EmployeesView';
 import { ExpandedCalendarView } from '@/components/admin/ExpandedCalendarView';
+import { GalleryManager } from '@/components/admin/GalleryManager';
 
 const OregonTiresAdmin = () => {
   const { language, toggleLanguage } = useLanguage();
@@ -66,6 +67,8 @@ const OregonTiresAdmin = () => {
         );
       case 'employees':
         return <EmployeesView />;
+      case 'gallery':
+        return <GalleryManager />;
       case 'analytics':
         return (
           <AnalyticsView

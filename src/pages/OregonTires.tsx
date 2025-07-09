@@ -7,6 +7,7 @@ import OregonTiresAbout from "@/components/OregonTiresAbout";
 import OregonTiresTestimonials from "@/components/OregonTiresTestimonials";
 import OregonTiresContact from "@/components/OregonTiresContact";
 import OregonTiresFooter from "@/components/OregonTiresFooter";
+import { OregonTiresGallery } from "@/components/OregonTiresGallery";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useDesignTheme } from "@/hooks/useDesignTheme";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -59,6 +60,12 @@ const OregonTires = () => {
       />
 
       <OregonTiresTestimonials
+        translations={t}
+        primaryColor={currentDesign.primaryColor}
+      />
+
+      <OregonTiresGallery
+        language={language}
         translations={t}
         primaryColor={currentDesign.primaryColor}
       />

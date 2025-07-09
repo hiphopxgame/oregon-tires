@@ -118,7 +118,12 @@ const translations = {
     bilingualStaff: "Bilingual staff (English & Spanish)",
     honestPricing: "Honest, transparent pricing", 
     qualityWorkmanship: "Quality workmanship guaranteed",
-    fastReliableService: "Fast and reliable service"
+    fastReliableService: "Fast and reliable service",
+    // Gallery section
+    gallery: {
+      title: "Our Work",
+      subtitle: "Take a look at some of our recent tire and automotive service work."
+    }
   },
   spanish: {
     title: "Oregon Tires Auto Care",
@@ -238,7 +243,12 @@ const translations = {
     bilingualStaff: "Personal bilingüe (inglés y español)",
     honestPricing: "Precios honestos y transparentes",
     qualityWorkmanship: "Trabajo de calidad garantizado",
-    fastReliableService: "Servicio rápido y confiable"
+    fastReliableService: "Servicio rápido y confiable",
+    // Gallery section
+    gallery: {
+      title: "Nuestro Trabajo",
+      subtitle: "Echa un vistazo a algunos de nuestros trabajos recientes de llantas y servicios automotrices."
+    }
   }
 };
 
