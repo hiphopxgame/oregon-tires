@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGalleryImages } from '@/hooks/useGalleryImages';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface OregonTiresGalleryProps {
   language: string;
@@ -9,6 +12,43 @@ interface OregonTiresGalleryProps {
 
 export const OregonTiresGallery = ({ language, translations, primaryColor }: OregonTiresGalleryProps) => {
   const { images, loading } = useGalleryImages(language);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openImageModal = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImageIndex(null);
+  };
+
+  const goToPrevious = () => {
+    if (selectedImageIndex !== null && selectedImageIndex > 0) {
+      setSelectedImageIndex(selectedImageIndex - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (selectedImageIndex !== null && selectedImageIndex < images.length - 1) {
+      setSelectedImageIndex(selectedImageIndex + 1);
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') goToPrevious();
+    if (e.key === 'ArrowRight') goToNext();
+    if (e.key === 'Escape') closeModal();
+  };
+
+  React.useEffect(() => {
+    if (isModalOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isModalOpen, selectedImageIndex]);
 
   if (loading) {
     return (
@@ -39,10 +79,11 @@ export const OregonTiresGallery = ({ language, translations, primaryColor }: Ore
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {images.map((image) => (
+          {images.map((image, index) => (
             <div 
               key={image.id} 
-              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => openImageModal(index)}
             >
               <div className="aspect-w-16 aspect-h-12 relative overflow-hidden">
                 <img 
@@ -64,6 +105,71 @@ export const OregonTiresGallery = ({ language, translations, primaryColor }: Ore
             </div>
           ))}
         </div>
+
+        {/* Image Modal */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-black/90">
+            <DialogClose asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 z-50 text-white hover:bg-white/20"
+                onClick={closeModal}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+            </DialogClose>
+            
+            {selectedImageIndex !== null && images[selectedImageIndex] && (
+              <div className="relative w-full h-full flex items-center justify-center">
+                {/* Navigation buttons */}
+                {selectedImageIndex > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-4 z-50 text-white hover:bg-white/20"
+                    onClick={goToPrevious}
+                  >
+                    <ChevronLeft className="h-8 w-8" />
+                  </Button>
+                )}
+                
+                {selectedImageIndex < images.length - 1 && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-4 z-50 text-white hover:bg-white/20"
+                    onClick={goToNext}
+                  >
+                    <ChevronRight className="h-8 w-8" />
+                  </Button>
+                )}
+
+                {/* Image */}
+                <div className="w-full h-full flex flex-col items-center justify-center p-8">
+                  <img
+                    src={images[selectedImageIndex].image_url}
+                    alt={images[selectedImageIndex].title}
+                    className="max-w-full max-h-[70vh] object-contain"
+                  />
+                  <div className="text-center mt-4 text-white">
+                    <h3 className="text-xl font-semibold mb-2">
+                      {images[selectedImageIndex].title}
+                    </h3>
+                    {images[selectedImageIndex].description && (
+                      <p className="text-gray-300">
+                        {images[selectedImageIndex].description}
+                      </p>
+                    )}
+                    <p className="text-sm text-gray-400 mt-2">
+                      {selectedImageIndex + 1} of {images.length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </section>
   );

@@ -121,7 +121,7 @@ const translations = {
     fastReliableService: "Fast and reliable service",
     // Gallery section
     gallery: {
-      title: "Our Work",
+      title: "Specials",
       subtitle: "Take a look at some of our recent tire and automotive service work."
     }
   },
@@ -246,7 +246,7 @@ const translations = {
     fastReliableService: "Servicio rápido y confiable",
     // Gallery section
     gallery: {
-      title: "Nuestro Trabajo",
+      title: "Especiales",
       subtitle: "Echa un vistazo a algunos de nuestros trabajos recientes de llantas y servicios automotrices."
     }
   }
