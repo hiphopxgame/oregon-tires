@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, User, Calendar, Clock, MessageSquare } from 'lucide-react';
+import { ChevronLeft, User, Calendar, Clock, MessageSquare, Users, Repeat, TrendingUp } from 'lucide-react';
 import { Appointment, ContactMessage } from '@/types/admin';
 
 interface AnalyticsViewProps {
@@ -10,7 +10,7 @@ interface AnalyticsViewProps {
   contactMessages: ContactMessage[];
 }
 
-type DetailView = 'total' | 'new' | 'confirmed' | 'completed' | 'cancelled' | 'thisweek' | 'allmessages' | 'unreadmessages' | null;
+type DetailView = 'total' | 'new' | 'confirmed' | 'completed' | 'cancelled' | 'thisweek' | 'allmessages' | 'unreadmessages' | 'customers' | 'recurring' | null;
 
 export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewProps) => {
   const [detailView, setDetailView] = useState<DetailView>(null);
@@ -27,6 +27,43 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
   const thisWeek = new Date();
   thisWeek.setDate(thisWeek.getDate() - 7);
   const recentAppointments = appointments.filter(apt => new Date(apt.created_at) > thisWeek);
+
+  // Customer analytics
+  const customerMap = new Map<string, {
+    email: string;
+    name: string;
+    appointments: Appointment[];
+    lastService: string;
+    lastDate: string;
+    totalSpent: number;
+  }>();
+
+  appointments.forEach(apt => {
+    const key = apt.email.toLowerCase();
+    const existing = customerMap.get(key);
+    
+    if (existing) {
+      existing.appointments.push(apt);
+      // Update last service if this appointment is more recent
+      if (new Date(apt.created_at) > new Date(existing.lastDate)) {
+        existing.lastService = apt.service;
+        existing.lastDate = apt.created_at;
+      }
+    } else {
+      customerMap.set(key, {
+        email: apt.email,
+        name: `${apt.first_name} ${apt.last_name}`,
+        appointments: [apt],
+        lastService: apt.service,
+        lastDate: apt.created_at,
+        totalSpent: 0 // Could be enhanced with pricing data
+      });
+    }
+  });
+
+  const allCustomers = Array.from(customerMap.values());
+  const recurringCustomers = allCustomers.filter(customer => customer.appointments.length > 1);
+  const totalCustomers = allCustomers.length;
 
   const getDetailedData = (type: DetailView) => {
     switch (type) {
@@ -46,6 +83,10 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
         return { type: 'messages', data: contactMessages };
       case 'unreadmessages':
         return { type: 'messages', data: contactMessages.filter(msg => msg.status === 'new') };
+      case 'customers':
+        return { type: 'customers', data: allCustomers };
+      case 'recurring':
+        return { type: 'customers', data: recurringCustomers };
       default:
         return { type: 'appointments', data: [] };
     }
@@ -69,6 +110,10 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
         return 'All Messages';
       case 'unreadmessages':
         return 'Unread Messages';
+      case 'customers':
+        return 'All Customers';
+      case 'recurring':
+        return 'Recurring Customers';
       default:
         return '';
     }
@@ -112,7 +157,12 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
             </Button>
             <div>
               <h2 className="text-2xl font-bold">{getDetailTitle(detailView)}</h2>
-              <p className="text-green-100">{detailedData.data.length} {detailedData.type === 'appointments' ? 'appointment' : 'message'}{detailedData.data.length !== 1 ? 's' : ''}</p>
+              <p className="text-green-100">
+                {detailedData.data.length} {
+                  detailedData.type === 'appointments' ? 'appointment' : 
+                  detailedData.type === 'customers' ? 'customer' : 'message'
+                }{detailedData.data.length !== 1 ? 's' : ''}
+              </p>
             </div>
           </div>
           <div className="p-6">
@@ -123,7 +173,65 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
               </div>
             ) : (
               <div className="space-y-4">
-                {detailedData.type === 'appointments' ? (
+                {detailedData.type === 'customers' ? (
+                  (detailedData.data as any[]).map((customer) => (
+                    <Card key={customer.email} className="border border-gray-200">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <Users className="h-5 w-5 text-gray-500" />
+                            <div>
+                              <h3 className="font-semibold text-lg text-gray-900">
+                                {customer.name}
+                              </h3>
+                              <p className="text-sm text-gray-600">{customer.email}</p>
+                            </div>
+                          </div>
+                          <div className={`px-3 py-1 rounded-full text-sm font-medium border ${
+                            customer.appointments.length > 1 ? 'bg-purple-100 text-purple-800 border-purple-200' : 'bg-blue-100 text-blue-800 border-blue-200'
+                          }`}>
+                            {customer.appointments.length} appointment{customer.appointments.length !== 1 ? 's' : ''}
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Last Service</p>
+                            <p className="font-medium">{customer.lastService}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Last Visit</p>
+                            <p className="font-medium">{new Date(customer.lastDate).toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide">Total Visits</p>
+                            <p className="font-medium">{customer.appointments.length}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4">
+                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Service History</p>
+                          <div className="space-y-2">
+                            {customer.appointments
+                              .sort((a: Appointment, b: Appointment) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                              .map((apt: Appointment) => (
+                                <div key={apt.id} className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded text-sm">
+                                  <div>
+                                    <span className="font-medium">{apt.service}</span>
+                                    <span className="text-gray-500 ml-2">on {apt.preferred_date}</span>
+                                  </div>
+                                  <div className={`px-2 py-1 rounded text-xs ${getStatusColor(apt.status)}`}>
+                                    {formatStatus(apt.status)}
+                                  </div>
+                                </div>
+                              ))
+                            }
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : detailedData.type === 'appointments' ? (
                   (detailedData.data as Appointment[]).map((appointment) => (
                     <Card key={appointment.id} className="border border-gray-200">
                       <CardContent className="p-4">
@@ -284,6 +392,46 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
             </button>
           </div>
           
+          {/* Customer Analytics Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <button
+              onClick={() => setDetailView('customers')}
+              className="bg-indigo-50 p-4 rounded-lg border border-indigo-200 hover:bg-indigo-100 transition-colors text-left"
+            >
+              <h3 className="font-semibold text-indigo-800 flex items-center gap-2 mb-2">
+                <Users className="h-5 w-5" />
+                All Customers
+              </h3>
+              <p className="text-2xl font-bold text-indigo-900">{totalCustomers}</p>
+              <p className="text-sm text-indigo-600">Unique customers</p>
+            </button>
+
+            <button
+              onClick={() => setDetailView('recurring')}
+              className="bg-purple-50 p-4 rounded-lg border border-purple-200 hover:bg-purple-100 transition-colors text-left"
+            >
+              <h3 className="font-semibold text-purple-800 flex items-center gap-2 mb-2">
+                <Repeat className="h-5 w-5" />
+                Recurring Customers
+              </h3>
+              <p className="text-2xl font-bold text-purple-900">{recurringCustomers.length}</p>
+              <p className="text-sm text-purple-600">{Math.round((recurringCustomers.length / totalCustomers) * 100) || 0}% of all customers</p>
+            </button>
+
+            <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+              <h3 className="font-semibold text-orange-800 flex items-center gap-2 mb-2">
+                <TrendingUp className="h-5 w-5" />
+                Customer Retention
+              </h3>
+              <p className="text-2xl font-bold text-orange-900">
+                {recurringCustomers.length > 0 ? 
+                  Math.round(recurringCustomers.reduce((acc, customer) => acc + customer.appointments.length, 0) / recurringCustomers.length * 10) / 10 : 0
+                }
+              </p>
+              <p className="text-sm text-orange-600">Avg visits per returning customer</p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
