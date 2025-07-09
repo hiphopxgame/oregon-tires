@@ -24,7 +24,8 @@ export const EmployeeAppointments = ({ employeeId, employeeName }: EmployeeAppoi
         .from('oregon_tires_appointments')
         .select('*')
         .eq('assigned_employee_id', employeeId)
-        .order('preferred_date', { ascending: false });
+        .order('preferred_date', { ascending: true })
+        .order('preferred_time', { ascending: true });
 
       if (error) throw error;
       setAppointments(data || []);

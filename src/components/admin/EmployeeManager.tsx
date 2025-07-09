@@ -212,18 +212,6 @@ export const EmployeeManager = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <Label htmlFor={`active-${employee.id}`} className="text-sm">
-                          Active
-                        </Label>
-                        <Switch
-                          id={`active-${employee.id}`}
-                          checked={employee.is_active}
-                          onCheckedChange={(checked) => 
-                            handleUpdateEmployee(employee.id, { is_active: checked })
-                          }
-                        />
-                      </div>
                       <Button 
                         variant="outline" 
                         size="sm"
