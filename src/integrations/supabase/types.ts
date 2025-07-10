@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      customer_vehicles: {
+        Row: {
+          created_at: string
+          customer_email: string
+          customer_name: string
+          id: string
+          license_plate: string | null
+          make: string | null
+          model: string | null
+          updated_at: string
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          id?: string
+          license_plate?: string | null
+          make?: string | null
+          model?: string | null
+          updated_at?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          id?: string
+          license_plate?: string | null
+          make?: string | null
+          model?: string | null
+          updated_at?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       dc_ad_stats: {
         Row: {
           ad_id: string
@@ -687,6 +726,7 @@ export type Database = {
           status: string
           tire_size: string | null
           updated_at: string
+          vehicle_id: string | null
           vin: string | null
         }
         Insert: {
@@ -711,6 +751,7 @@ export type Database = {
           status?: string
           tire_size?: string | null
           updated_at?: string
+          vehicle_id?: string | null
           vin?: string | null
         }
         Update: {
@@ -735,6 +776,7 @@ export type Database = {
           status?: string
           tire_size?: string | null
           updated_at?: string
+          vehicle_id?: string | null
           vin?: string | null
         }
         Relationships: [
@@ -743,6 +785,13 @@ export type Database = {
             columns: ["assigned_employee_id"]
             isOneToOne: false
             referencedRelation: "oregon_tires_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oregon_tires_appointments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "customer_vehicles"
             referencedColumns: ["id"]
           },
         ]

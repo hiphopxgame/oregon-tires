@@ -39,6 +39,42 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
 
     setSubmitting(true);
     try {
+      // First, check if vehicle exists or create new one
+      let vehicleId = null;
+      
+      if (customerInfo.vehicleMake || customerInfo.vehicleModel || customerInfo.vehicleYear || customerInfo.licensePlate || customerInfo.vin) {
+        // Check if vehicle already exists
+        const { data: existingVehicle } = await supabase
+          .from('customer_vehicles')
+          .select('id')
+          .eq('customer_email', customerInfo.email)
+          .eq('license_plate', customerInfo.licensePlate || '')
+          .eq('vin', customerInfo.vin || '')
+          .single();
+
+        if (existingVehicle) {
+          vehicleId = existingVehicle.id;
+        } else {
+          // Create new vehicle record
+          const { data: newVehicle, error: vehicleError } = await supabase
+            .from('customer_vehicles')
+            .insert({
+              customer_email: customerInfo.email,
+              customer_name: `${customerInfo.firstName} ${customerInfo.lastName}`,
+              make: customerInfo.vehicleMake || null,
+              model: customerInfo.vehicleModel || null,
+              year: customerInfo.vehicleYear ? parseInt(customerInfo.vehicleYear) : null,
+              license_plate: customerInfo.licensePlate || null,
+              vin: customerInfo.vin || null
+            })
+            .select('id')
+            .single();
+
+          if (vehicleError) throw vehicleError;
+          vehicleId = newVehicle.id;
+        }
+      }
+
       const { error } = await supabase
         .from('oregon_tires_appointments')
         .insert({
@@ -53,7 +89,13 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           tire_size: customerInfo.tireSize || null,
           license_plate: customerInfo.licensePlate || null,
           vin: customerInfo.vin || null,
-          status: 'pending',
+          customer_address: customerInfo.address || null,
+          customer_city: customerInfo.city || null,
+          customer_state: customerInfo.state || null,
+          customer_zip: customerInfo.zip || null,
+          service_location: (customerInfo.service === 'mobile-service' || customerInfo.service === 'roadside-assistance') ? 'customer-location' : 'shop',
+          vehicle_id: vehicleId,
+          status: 'new',
           language: 'english'
         });
 

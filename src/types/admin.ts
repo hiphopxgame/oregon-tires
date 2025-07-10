@@ -16,6 +16,12 @@ export interface Appointment {
   tire_size?: string | null;
   license_plate?: string | null;
   vin?: string | null;
+  service_location?: string | null;
+  customer_address?: string | null;
+  customer_city?: string | null;
+  customer_state?: string | null;
+  customer_zip?: string | null;
+  vehicle_id?: string | null;
 }
 
 export interface ContactMessage {

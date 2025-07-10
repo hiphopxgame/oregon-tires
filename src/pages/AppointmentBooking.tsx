@@ -21,6 +21,9 @@ export interface CustomerInfo {
   city: string;
   state: string;
   zip: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  vehicleYear: string;
 }
 
 const AppointmentBooking = () => {
@@ -39,7 +42,10 @@ const AppointmentBooking = () => {
     address: '',
     city: '',
     state: '',
-    zip: ''
+    zip: '',
+    vehicleMake: '',
+    vehicleModel: '',
+    vehicleYear: ''
   });
 
   // Scroll to top when component mounts

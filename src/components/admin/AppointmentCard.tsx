@@ -62,6 +62,11 @@ export const AppointmentCard = ({
               <strong>VIN:</strong> {appointment.vin}
             </div>
           )}
+          {appointment.service_location === 'customer-location' && (
+            <div className="text-sm text-gray-600 mb-2">
+              <strong>Service Location:</strong> {appointment.customer_address}, {appointment.customer_city}, {appointment.customer_state} {appointment.customer_zip}
+            </div>
+          )}
           {appointment.message && (
             <div className="text-sm text-gray-600 mb-2">
               <strong>Message:</strong> {appointment.message}

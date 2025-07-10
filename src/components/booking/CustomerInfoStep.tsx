@@ -195,40 +195,90 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
             </div>
           )}
 
-          {/* Vehicle Identification for Non-Tire Services */}
-          {requiresVehicleInfo && (
-            <div className="space-y-4">
-              <p className="text-sm font-medium text-gray-700">
-                Vehicle Identification (Please provide at least one) *
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    License Plate Number
-                  </label>
-                  <input
-                    type="text"
-                    value={customerInfo.licensePlate}
-                    onChange={(e) => onInputChange('licensePlate', e.target.value)}
-                    placeholder="e.g., ABC123"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
-                  />
+          {/* Vehicle Information */}
+          {(requiresVehicleInfo || isTireService) && (
+            <Card className="border-gray-200">
+              <CardHeader>
+                <CardTitle className="text-sm">Vehicle Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Make
+                    </label>
+                    <input
+                      type="text"
+                      value={customerInfo.vehicleMake}
+                      onChange={(e) => onInputChange('vehicleMake', e.target.value)}
+                      placeholder="e.g., Toyota"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Model
+                    </label>
+                    <input
+                      type="text"
+                      value={customerInfo.vehicleModel}
+                      onChange={(e) => onInputChange('vehicleModel', e.target.value)}
+                      placeholder="e.g., Camry"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Year
+                    </label>
+                    <input
+                      type="number"
+                      value={customerInfo.vehicleYear}
+                      onChange={(e) => onInputChange('vehicleYear', e.target.value)}
+                      placeholder="e.g., 2020"
+                      min="1900"
+                      max={new Date().getFullYear() + 1}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    VIN (Vehicle Identification Number)
-                  </label>
-                  <input
-                    type="text"
-                    value={customerInfo.vin}
-                    onChange={(e) => onInputChange('vin', e.target.value)}
-                    placeholder="17-character VIN"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
-                    maxLength={17}
-                  />
-                </div>
-              </div>
-            </div>
+                
+                {requiresVehicleInfo && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">
+                      Vehicle Identification (Please provide at least one) *
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          License Plate Number
+                        </label>
+                        <input
+                          type="text"
+                          value={customerInfo.licensePlate}
+                          onChange={(e) => onInputChange('licensePlate', e.target.value)}
+                          placeholder="e.g., ABC123"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          VIN (Vehicle Identification Number)
+                        </label>
+                        <input
+                          type="text"
+                          value={customerInfo.vin}
+                          onChange={(e) => onInputChange('vin', e.target.value)}
+                          placeholder="17-character VIN"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                          maxLength={17}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
 
           {/* Address Fields for Mobile Service and Roadside Assistance */}
