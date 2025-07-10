@@ -9,6 +9,7 @@ interface DistanceCalculatorProps {
   state: string;
   zip: string;
   serviceType: 'mobile-service' | 'roadside-assistance';
+  onDistanceCalculated?: (distance: number, cost: number) => void;
 }
 
 interface DistanceResult {
@@ -22,7 +23,8 @@ export const DistanceCalculator: React.FC<DistanceCalculatorProps> = ({
   city,
   state,
   zip,
-  serviceType
+  serviceType,
+  onDistanceCalculated
 }) => {
   const [distanceResult, setDistanceResult] = useState<DistanceResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,6 +60,11 @@ export const DistanceCalculator: React.FC<DistanceCalculatorProps> = ({
         duration: mockDuration,
         cost: totalCost
       });
+
+      // Call the callback to update parent component
+      if (onDistanceCalculated) {
+        onDistanceCalculated(mockDistance, totalCost);
+      }
     } catch (err) {
       setError("Unable to calculate distance. Please check your address.");
     } finally {

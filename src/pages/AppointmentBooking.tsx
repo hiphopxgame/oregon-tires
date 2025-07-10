@@ -24,6 +24,8 @@ export interface CustomerInfo {
   vehicleMake: string;
   vehicleModel: string;
   vehicleYear: string;
+  travel_distance_miles: string;
+  travel_cost_estimate: string;
 }
 
 const AppointmentBooking = () => {
@@ -45,7 +47,9 @@ const AppointmentBooking = () => {
     zip: '',
     vehicleMake: '',
     vehicleModel: '',
-    vehicleYear: ''
+    vehicleYear: '',
+    travel_distance_miles: '',
+    travel_cost_estimate: ''
   });
 
   // Scroll to top when component mounts

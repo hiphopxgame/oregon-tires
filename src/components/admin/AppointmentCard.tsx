@@ -65,6 +65,14 @@ export const AppointmentCard = ({
           {appointment.service_location === 'customer-location' && (
             <div className="text-sm text-gray-600 mb-2">
               <strong>Service Location:</strong> {appointment.customer_address}, {appointment.customer_city}, {appointment.customer_state} {appointment.customer_zip}
+              {appointment.travel_distance_miles && (
+                <div className="mt-1">
+                  <strong>Distance:</strong> {appointment.travel_distance_miles} miles
+                  {appointment.travel_cost_estimate && (
+                    <span className="ml-2"><strong>Travel Cost:</strong> ${appointment.travel_cost_estimate}</span>
+                  )}
+                </div>
+              )}
             </div>
           )}
           {appointment.message && (

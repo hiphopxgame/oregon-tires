@@ -725,6 +725,8 @@ export type Database = {
           service_location: string | null
           status: string
           tire_size: string | null
+          travel_cost_estimate: number | null
+          travel_distance_miles: number | null
           updated_at: string
           vehicle_id: string | null
           vin: string | null
@@ -750,6 +752,8 @@ export type Database = {
           service_location?: string | null
           status?: string
           tire_size?: string | null
+          travel_cost_estimate?: number | null
+          travel_distance_miles?: number | null
           updated_at?: string
           vehicle_id?: string | null
           vin?: string | null
@@ -775,6 +779,8 @@ export type Database = {
           service_location?: string | null
           status?: string
           tire_size?: string | null
+          travel_cost_estimate?: number | null
+          travel_distance_miles?: number | null
           updated_at?: string
           vehicle_id?: string | null
           vin?: string | null

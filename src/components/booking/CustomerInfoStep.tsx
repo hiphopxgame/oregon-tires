@@ -353,13 +353,17 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                   </p>
                 </div>
                 
-                {/* Distance Calculator */}
+                 {/* Distance Calculator */}
                 <DistanceCalculator
                   address={customerInfo.address}
                   city={customerInfo.city}
                   state={customerInfo.state}
                   zip={customerInfo.zip}
                   serviceType={isMobileService ? 'mobile-service' : 'roadside-assistance'}
+                  onDistanceCalculated={(distance, cost) => {
+                    onInputChange('travel_distance_miles', distance.toString());
+                    onInputChange('travel_cost_estimate', cost.toString());
+                  }}
                 />
               </CardContent>
             </Card>

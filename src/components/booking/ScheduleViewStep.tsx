@@ -95,6 +95,8 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           customer_zip: customerInfo.zip || null,
           service_location: (customerInfo.service === 'mobile-service' || customerInfo.service === 'roadside-assistance') ? 'customer-location' : 'shop',
           vehicle_id: vehicleId,
+          travel_distance_miles: customerInfo.travel_distance_miles ? parseFloat(customerInfo.travel_distance_miles) : null,
+          travel_cost_estimate: customerInfo.travel_cost_estimate ? parseFloat(customerInfo.travel_cost_estimate) : null,
           status: 'new',
           language: 'english'
         });

@@ -22,6 +22,8 @@ export interface Appointment {
   customer_state?: string | null;
   customer_zip?: string | null;
   vehicle_id?: string | null;
+  travel_distance_miles?: number | null;
+  travel_cost_estimate?: number | null;
 }
 
 export interface ContactMessage {
