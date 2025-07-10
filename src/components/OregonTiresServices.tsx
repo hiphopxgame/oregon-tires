@@ -180,6 +180,22 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                 <p className="text-gray-600 text-sm">{t.mechanicalInspectionDesc}</p>
               </div>
 
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                  {t.homeService}
+                </h4>
+                <p className="text-gray-600 text-sm">{t.homeServiceDesc}</p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                  {t.roadsideAssistance}
+                </h4>
+                <p className="text-gray-600 text-sm">{t.roadsideAssistanceDesc}</p>
+              </div>
+
               <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500 mt-6">
                 <p className="text-red-700 font-semibold text-sm mb-2">{t.needServiceToday}</p>
                 <p className="text-red-600 text-sm">{t.callImmediately}</p>

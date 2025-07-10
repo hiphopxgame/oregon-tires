@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CustomerInfo } from '@/pages/AppointmentBooking';
 import { User, Calendar, MessageSquare, Wrench, MapPin } from 'lucide-react';
+import { DistanceCalculator } from './DistanceCalculator';
 
 interface CustomerInfoStepProps {
   customerInfo: CustomerInfo;
@@ -37,8 +38,9 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
       return;
     }
 
-    if (isMobileService && (!customerInfo.address || !customerInfo.city || !customerInfo.state || !customerInfo.zip)) {
-      alert('Please fill in your complete address for mobile service');
+    if (requiresAddress && (!customerInfo.address || !customerInfo.city || !customerInfo.state || !customerInfo.zip)) {
+      const serviceName = isMobileService ? 'mobile service' : 'roadside assistance';
+      alert(`Please fill in your complete address for ${serviceName}`);
       return;
     }
 
@@ -56,17 +58,20 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
     { value: 'tuneup', label: 'Tuneup' },
     { value: 'alignment', label: 'Alignment' },
     { value: 'mechanical-inspection-and-estimate', label: 'Mechanical Inspection and Estimate' },
-    { value: 'mobile-service', label: 'Mobile Service (At Your Home)' }
+    { value: 'mobile-service', label: 'Mobile Service (At Your Home)' },
+    { value: 'roadside-assistance', label: 'Roadside Assistance' }
   ];
 
   // Tire services that require tire size
   const tireServices = ['new-tires', 'used-tires', 'mount-and-balance-tires', 'tire-repair'];
   
   // Services that require license plate or VIN
-  const requiresVehicleInfo = !tireServices.includes(customerInfo.service) && customerInfo.service !== '' && customerInfo.service !== 'mobile-service';
+  const requiresVehicleInfo = !tireServices.includes(customerInfo.service) && customerInfo.service !== '' && customerInfo.service !== 'mobile-service' && customerInfo.service !== 'roadside-assistance';
 
   const isTireService = tireServices.includes(customerInfo.service);
   const isMobileService = customerInfo.service === 'mobile-service';
+  const isRoadsideService = customerInfo.service === 'roadside-assistance';
+  const requiresAddress = isMobileService || isRoadsideService;
 
   // Get today's date for minimum date selection
   const today = new Date().toISOString().split('T')[0];
@@ -226,13 +231,13 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
             </div>
           )}
 
-          {/* Address Fields for Mobile Service */}
-          {isMobileService && (
-            <Card className="border-2 border-blue-200 bg-blue-50">
+          {/* Address Fields for Mobile Service and Roadside Assistance */}
+          {requiresAddress && (
+            <Card className={`border-2 ${isMobileService ? 'border-blue-200 bg-blue-50' : 'border-orange-200 bg-orange-50'}`}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-800">
+                <CardTitle className={`flex items-center gap-2 ${isMobileService ? 'text-blue-800' : 'text-orange-800'}`}>
                   <MapPin className="h-5 w-5" />
-                  Service Address (Required for Mobile Service)
+                  {isMobileService ? 'Service Address (Required for Mobile Service)' : 'Location Address (Required for Roadside Assistance)'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -290,11 +295,22 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                     />
                   </div>
                 </div>
-                <div className="bg-blue-100 p-3 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    📍 Mobile service available within 25 miles of Portland. Additional travel charges may apply for longer distances.
+                <div className={`${isMobileService ? 'bg-blue-100' : 'bg-orange-100'} p-3 rounded-lg`}>
+                  <p className={`text-sm ${isMobileService ? 'text-blue-800' : 'text-orange-800'}`}>
+                    {isMobileService 
+                      ? '📍 Mobile service available within 25 miles of Portland. Additional travel charges may apply for longer distances.'
+                      : '🚛 Emergency roadside assistance available 24/7. Distance and urgency fees apply.'}
                   </p>
                 </div>
+                
+                {/* Distance Calculator */}
+                <DistanceCalculator
+                  address={customerInfo.address}
+                  city={customerInfo.city}
+                  state={customerInfo.state}
+                  zip={customerInfo.zip}
+                  serviceType={isMobileService ? 'mobile-service' : 'roadside-assistance'}
+                />
               </CardContent>
             </Card>
           )}
