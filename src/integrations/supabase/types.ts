@@ -668,6 +668,10 @@ export type Database = {
         Row: {
           assigned_employee_id: string | null
           created_at: string
+          customer_address: string | null
+          customer_city: string | null
+          customer_state: string | null
+          customer_zip: string | null
           email: string
           first_name: string
           id: string
@@ -679,6 +683,7 @@ export type Database = {
           preferred_date: string
           preferred_time: string
           service: string
+          service_location: string | null
           status: string
           tire_size: string | null
           updated_at: string
@@ -687,6 +692,10 @@ export type Database = {
         Insert: {
           assigned_employee_id?: string | null
           created_at?: string
+          customer_address?: string | null
+          customer_city?: string | null
+          customer_state?: string | null
+          customer_zip?: string | null
           email: string
           first_name: string
           id?: string
@@ -698,6 +707,7 @@ export type Database = {
           preferred_date: string
           preferred_time: string
           service: string
+          service_location?: string | null
           status?: string
           tire_size?: string | null
           updated_at?: string
@@ -706,6 +716,10 @@ export type Database = {
         Update: {
           assigned_employee_id?: string | null
           created_at?: string
+          customer_address?: string | null
+          customer_city?: string | null
+          customer_state?: string | null
+          customer_zip?: string | null
           email?: string
           first_name?: string
           id?: string
@@ -717,6 +731,7 @@ export type Database = {
           preferred_date?: string
           preferred_time?: string
           service?: string
+          service_location?: string | null
           status?: string
           tire_size?: string | null
           updated_at?: string

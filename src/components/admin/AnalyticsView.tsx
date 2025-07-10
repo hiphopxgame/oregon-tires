@@ -330,6 +330,17 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
     );
   }
 
+  // Calculate appointment time frequency
+  const appointmentTimes = appointments.reduce((acc, apt) => {
+    const time = apt.preferred_time;
+    acc[time] = (acc[time] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const timeFrequencyData = Object.entries(appointmentTimes)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([time, count]) => ({ time, count }));
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm border-2 border-green-700">
@@ -355,6 +366,33 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
               <h3 className="font-semibold text-purple-800">This Week</h3>
               <p className="text-2xl font-bold text-purple-900">{recentAppointments.length}</p>
             </button>
+          </div>
+
+          {/* Appointment Time Frequency */}
+          <div className="mb-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Appointment Time Frequency
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {timeFrequencyData.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {timeFrequencyData.map(({ time, count }) => (
+                      <div key={time} className="bg-gray-50 p-3 rounded-lg text-center">
+                        <div className="text-sm font-medium text-gray-600">{time}</div>
+                        <div className="text-lg font-bold text-gray-900">{count}</div>
+                        <div className="text-xs text-gray-500">appointments</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No appointment data available</p>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Bottom row: Status-based appointments */}

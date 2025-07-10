@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CustomerInfo } from '@/pages/AppointmentBooking';
-import { User, Calendar, MessageSquare, Wrench } from 'lucide-react';
+import { User, Calendar, MessageSquare, Wrench, MapPin } from 'lucide-react';
 
 interface CustomerInfoStepProps {
   customerInfo: CustomerInfo;
@@ -37,6 +37,11 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
       return;
     }
 
+    if (isMobileService && (!customerInfo.address || !customerInfo.city || !customerInfo.state || !customerInfo.zip)) {
+      alert('Please fill in your complete address for mobile service');
+      return;
+    }
+
     onNext();
   };
 
@@ -50,16 +55,18 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
     { value: 'full-brake-change', label: 'Full Brake Change' },
     { value: 'tuneup', label: 'Tuneup' },
     { value: 'alignment', label: 'Alignment' },
-    { value: 'mechanical-inspection-and-estimate', label: 'Mechanical Inspection and Estimate' }
+    { value: 'mechanical-inspection-and-estimate', label: 'Mechanical Inspection and Estimate' },
+    { value: 'mobile-service', label: 'Mobile Service (At Your Home)' }
   ];
 
   // Tire services that require tire size
   const tireServices = ['new-tires', 'used-tires', 'mount-and-balance-tires', 'tire-repair'];
   
   // Services that require license plate or VIN
-  const requiresVehicleInfo = !tireServices.includes(customerInfo.service) && customerInfo.service !== '';
+  const requiresVehicleInfo = !tireServices.includes(customerInfo.service) && customerInfo.service !== '' && customerInfo.service !== 'mobile-service';
 
   const isTireService = tireServices.includes(customerInfo.service);
+  const isMobileService = customerInfo.service === 'mobile-service';
 
   // Get today's date for minimum date selection
   const today = new Date().toISOString().split('T')[0];
@@ -217,6 +224,79 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Address Fields for Mobile Service */}
+          {isMobileService && (
+            <Card className="border-2 border-blue-200 bg-blue-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-800">
+                  <MapPin className="h-5 w-5" />
+                  Service Address (Required for Mobile Service)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Street Address *
+                  </label>
+                  <input
+                    type="text"
+                    value={customerInfo.address}
+                    onChange={(e) => onInputChange('address', e.target.value)}
+                    placeholder="e.g., 123 Main Street"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      City *
+                    </label>
+                    <input
+                      type="text"
+                      value={customerInfo.city}
+                      onChange={(e) => onInputChange('city', e.target.value)}
+                      placeholder="e.g., Portland"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      State *
+                    </label>
+                    <input
+                      type="text"
+                      value={customerInfo.state}
+                      onChange={(e) => onInputChange('state', e.target.value)}
+                      placeholder="e.g., Oregon"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      ZIP Code *
+                    </label>
+                    <input
+                      type="text"
+                      value={customerInfo.zip}
+                      onChange={(e) => onInputChange('zip', e.target.value)}
+                      placeholder="e.g., 97201"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="bg-blue-100 p-3 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    📍 Mobile service available within 25 miles of Portland. Additional travel charges may apply for longer distances.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           <div>

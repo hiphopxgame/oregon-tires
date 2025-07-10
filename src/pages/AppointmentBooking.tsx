@@ -17,6 +17,10 @@ export interface CustomerInfo {
   tireSize: string;
   licensePlate: string;
   vin: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
 }
 
 const AppointmentBooking = () => {
@@ -31,7 +35,11 @@ const AppointmentBooking = () => {
     message: '',
     tireSize: '',
     licensePlate: '',
-    vin: ''
+    vin: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: ''
   });
 
   // Scroll to top when component mounts
