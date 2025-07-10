@@ -116,11 +116,13 @@ export const AppointmentCard = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="unassigned">Unassigned</SelectItem>
-              {employees.map((employee) => (
+              {employees && employees.length > 0 ? employees.map((employee) => (
                 <SelectItem key={employee.id} value={employee.id}>
-                  {employee.name}
+                  {employee.name} {!employee.is_active && '(Inactive)'}
                 </SelectItem>
-              ))}
+              )) : (
+                <SelectItem value="loading" disabled>Loading employees...</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
