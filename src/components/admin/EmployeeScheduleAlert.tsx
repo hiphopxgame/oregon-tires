@@ -21,6 +21,11 @@ export const EmployeeScheduleAlert: React.FC<EmployeeScheduleAlertProps> = ({
   employees,
   selectedDate
 }) => {
+  // Add defensive checks for undefined arrays
+  if (!appointments || !employees || !Array.isArray(appointments) || !Array.isArray(employees)) {
+    return null;
+  }
+
   // Get appointments for the selected date
   const dateString = selectedDate.toISOString().split('T')[0];
   const dayAppointments = appointments.filter(apt => apt.preferred_date === dateString);

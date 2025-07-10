@@ -25,6 +25,23 @@ export const EmployeeAppointments: React.FC<EmployeeAppointmentsProps> = ({
   selectedDate,
   updateAppointmentAssignment
 }) => {
+  // Add defensive checks for undefined arrays
+  if (!appointments || !employees || !Array.isArray(appointments) || !Array.isArray(employees)) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Employee Assignments
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-500">Loading assignments...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const dateString = selectedDate.toISOString().split('T')[0];
   const dayAppointments = appointments.filter(apt => apt.preferred_date === dateString);
   const unassignedAppointments = dayAppointments.filter(apt => !apt.assigned_employee_id);
