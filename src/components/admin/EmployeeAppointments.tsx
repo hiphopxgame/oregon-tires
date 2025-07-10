@@ -1,141 +1,140 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronUp, Calendar, Clock, User, Phone, Mail } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { User, Clock, Wrench, CheckCircle } from 'lucide-react';
 import { Appointment } from '@/types/admin';
 
-interface EmployeeAppointmentsProps {
-  employeeId: string;
-  employeeName: string;
+interface Employee {
+  id: string;
+  name: string;
+  is_active: boolean;
 }
 
-export const EmployeeAppointments = ({ employeeId, employeeName }: EmployeeAppointmentsProps) => {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+interface EmployeeAppointmentsProps {
+  appointments: Appointment[];
+  employees: Employee[];
+  selectedDate: Date;
+  updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
+}
 
-  const fetchAppointments = async () => {
-    if (!isExpanded) return;
-    
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('oregon_tires_appointments')
-        .select('*')
-        .eq('assigned_employee_id', employeeId)
-        .order('preferred_date', { ascending: true })
-        .order('preferred_time', { ascending: true });
+export const EmployeeAppointments: React.FC<EmployeeAppointmentsProps> = ({
+  appointments,
+  employees,
+  selectedDate,
+  updateAppointmentAssignment
+}) => {
+  const dateString = selectedDate.toISOString().split('T')[0];
+  const dayAppointments = appointments.filter(apt => apt.preferred_date === dateString);
+  const unassignedAppointments = dayAppointments.filter(apt => !apt.assigned_employee_id);
+  
+  const activeEmployees = employees.filter(emp => emp.is_active);
 
-      if (error) throw error;
-      setAppointments(data || []);
-    } catch (error) {
-      console.error('Error fetching employee appointments:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAppointments();
-  }, [isExpanded, employeeId]);
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'confirmed':
-        return 'default';
-      case 'pending':
-        return 'secondary';
-      case 'completed':
-        return 'outline';
-      case 'cancelled':
-        return 'destructive';
-      default:
-        return 'secondary';
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+  const handleQuickAssign = () => {
+    // Auto-assign unassigned appointments to available employees
+    unassignedAppointments.forEach((apt, index) => {
+      const employeeIndex = index % activeEmployees.length;
+      const employee = activeEmployees[employeeIndex];
+      if (employee) {
+        updateAppointmentAssignment(apt.id, employee.id);
+      }
     });
   };
 
-  return (
-    <div className="mt-3 border-t pt-3">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full justify-between text-sm"
-      >
-        <span className="flex items-center gap-2">
-          <Calendar className="h-4 w-4" />
-          Assigned Appointments
-        </span>
-        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-      </Button>
+  if (dayAppointments.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Employee Assignments
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-500">No appointments scheduled for this date.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
-      {isExpanded && (
-        <div className="mt-3 space-y-2">
-          {loading ? (
-            <div className="text-sm text-gray-500 text-center py-4">Loading appointments...</div>
-          ) : appointments.length === 0 ? (
-            <div className="text-sm text-gray-500 text-center py-4">
-              No appointments assigned to {employeeName}
-            </div>
-          ) : (
-            appointments.map((appointment) => (
-              <div key={appointment.id} className="border rounded-lg p-3 bg-gray-50">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-gray-500" />
-                    <span className="font-medium text-sm">
-                      {appointment.first_name} {appointment.last_name}
-                    </span>
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Employee Assignments ({dayAppointments.length} appointments)
+          </div>
+          {unassignedAppointments.length > 0 && (
+            <Button onClick={handleQuickAssign} size="sm" variant="outline">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Quick Assign All
+            </Button>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {dayAppointments
+          .sort((a, b) => a.preferred_time.localeCompare(b.preferred_time))
+          .map(appointment => (
+            <div
+              key={appointment.id}
+              className={`p-4 border rounded-lg ${
+                !appointment.assigned_employee_id 
+                  ? 'border-orange-200 bg-orange-50' 
+                  : 'border-green-200 bg-green-50'
+              }`}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock className="h-4 w-4 text-gray-500" />
+                    <span className="font-medium">{appointment.preferred_time}</span>
+                    <Badge variant={appointment.assigned_employee_id ? "default" : "destructive"}>
+                      {appointment.assigned_employee_id ? "Assigned" : "Unassigned"}
+                    </Badge>
                   </div>
-                  <Badge variant={getStatusBadgeVariant(appointment.status)}>
-                    {appointment.status}
-                  </Badge>
+                  
+                  <div className="text-sm space-y-1">
+                    <div className="flex items-center gap-2">
+                      <User className="h-3 w-3 text-gray-400" />
+                      <span>{appointment.first_name} {appointment.last_name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Wrench className="h-3 w-3 text-gray-400" />
+                      <span>{appointment.service}</span>
+                    </div>
+                  </div>
                 </div>
                 
-                <div className="space-y-1 text-xs text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-3 w-3" />
-                    <span>{formatDate(appointment.preferred_date)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-3 w-3" />
-                    <span>{appointment.preferred_time}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">Service:</span>
-                    <span>{appointment.service}</span>
-                  </div>
-                  {appointment.phone && (
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-3 w-3" />
-                      <span>{appointment.phone}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-3 w-3" />
-                    <span>{appointment.email}</span>
-                  </div>
-                  {appointment.message && (
-                    <div className="mt-2 p-2 bg-white rounded text-xs">
-                      <strong>Message:</strong> {appointment.message}
-                    </div>
-                  )}
+                <div className="ml-4">
+                  <Select
+                    value={appointment.assigned_employee_id || "unassigned"}
+                    onValueChange={(value) => 
+                      updateAppointmentAssignment(
+                        appointment.id, 
+                        value === "unassigned" ? null : value
+                      )
+                    }
+                  >
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Assign employee" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="unassigned">Unassigned</SelectItem>
+                      {activeEmployees.map(employee => (
+                        <SelectItem key={employee.id} value={employee.id}>
+                          {employee.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-      )}
-    </div>
+            </div>
+          ))}
+      </CardContent>
+    </Card>
   );
 };

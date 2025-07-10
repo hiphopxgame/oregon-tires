@@ -6,6 +6,8 @@ import { Appointment } from '@/types/admin';
 import { DailySummary } from './DailySummary';
 import { TimeSlot } from './TimeSlot';
 import { EmployeeScheduleAlert } from './EmployeeScheduleAlert';
+import { EmployeeAppointments } from './EmployeeAppointments';
+import { useEmployees } from '@/hooks/useEmployees';
 
 interface DaySchedulePanelProps {
   selectedDate: Date;
@@ -15,6 +17,12 @@ interface DaySchedulePanelProps {
   updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
 }
 
+interface Employee {
+  id: string;
+  name: string;
+  is_active: boolean;
+}
+
 export const DaySchedulePanel = ({
   selectedDate,
   appointments,
@@ -22,6 +30,7 @@ export const DaySchedulePanel = ({
   updateAppointmentStatus,
   updateAppointmentAssignment
 }: DaySchedulePanelProps) => {
+  const { employees } = useEmployees();
   // Generate time slots from 7 AM to 7 PM
   const generateTimeSlots = () => {
     const slots = [];
@@ -85,6 +94,17 @@ export const DaySchedulePanel = ({
           <EmployeeScheduleAlert 
             selectedDate={selectedDate}
             appointments={appointments}
+            employees={employees}
+          />
+        </div>
+
+        {/* Employee Assignment Panel */}
+        <div className="mb-4">
+          <EmployeeAppointments
+            appointments={appointments}
+            employees={employees}
+            selectedDate={selectedDate}
+            updateAppointmentAssignment={updateAppointmentAssignment}
           />
         </div>
 

@@ -8,7 +8,7 @@ import { Plus, Edit2, Save, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmployees, Employee } from '@/hooks/useEmployees';
-import { EmployeeAppointments } from './EmployeeAppointments';
+
 
 export const EmployeeManager = () => {
   const { toast } = useToast();
@@ -222,11 +222,7 @@ export const EmployeeManager = () => {
                     </div>
                   </div>
                   
-                  {/* Employee Appointments Section */}
-                  <EmployeeAppointments 
-                    employeeId={employee.id} 
-                    employeeName={employee.name} 
-                  />
+                  {/* Employee information displayed, scheduling handled in DaySchedulePanel */}
                 </>
               )}
             </div>
