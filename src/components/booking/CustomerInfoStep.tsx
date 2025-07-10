@@ -59,7 +59,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
     { value: 'alignment', label: 'Alignment' },
     { value: 'mechanical-inspection-and-estimate', label: 'Mechanical Inspection and Estimate' },
     { value: 'mobile-service', label: 'Mobile Service (At Your Home)' },
-    { value: 'roadside-assistance', label: 'Roadside Assistance' }
+    { value: 'roadside-assistance', label: 'Roadside Assistance (Any Location)' }
   ];
 
   // Tire services that require tire size

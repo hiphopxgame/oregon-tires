@@ -84,7 +84,7 @@ export const AppointmentCard = ({
             <UserCheck className="h-3 w-3" />
             <span><strong>Assigned:</strong> {
               appointment.assigned_employee_id 
-                ? employees.find(emp => emp.id === appointment.assigned_employee_id)?.name || 'Unknown'
+                ? (employees?.find(emp => emp.id === appointment.assigned_employee_id)?.name || 'Loading...')
                 : 'Unassigned'
             }</span>
           </div>

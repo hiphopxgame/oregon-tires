@@ -31,7 +31,7 @@ export const DistanceCalculator: React.FC<DistanceCalculatorProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   // Oregon Tires location
-  const shopAddress = "Portland, OR"; // Replace with actual address
+  const shopAddress = "8536 SE 82nd Ave, Portland, OR 97266";
 
   const calculateDistance = async () => {
     if (!address || !city || !state || !zip) {
