@@ -14,6 +14,9 @@ export interface CustomerInfo {
   service: string;
   preferredDate: string;
   message: string;
+  tireSize: string;
+  licensePlate: string;
+  vin: string;
 }
 
 const AppointmentBooking = () => {
@@ -25,7 +28,10 @@ const AppointmentBooking = () => {
     email: '',
     service: '',
     preferredDate: '',
-    message: ''
+    message: '',
+    tireSize: '',
+    licensePlate: '',
+    vin: ''
   });
 
   // Scroll to top when component mounts

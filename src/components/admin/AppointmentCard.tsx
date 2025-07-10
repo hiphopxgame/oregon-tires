@@ -47,6 +47,21 @@ export const AppointmentCard = ({
           <div className="text-sm text-gray-600 mb-2">
             <strong>Time:</strong> {appointment.preferred_time}
           </div>
+          {appointment.tire_size && (
+            <div className="text-sm text-gray-600 mb-2">
+              <strong>Tire Size:</strong> {appointment.tire_size}
+            </div>
+          )}
+          {appointment.license_plate && (
+            <div className="text-sm text-gray-600 mb-2">
+              <strong>License Plate:</strong> {appointment.license_plate}
+            </div>
+          )}
+          {appointment.vin && (
+            <div className="text-sm text-gray-600 mb-2">
+              <strong>VIN:</strong> {appointment.vin}
+            </div>
+          )}
           {appointment.message && (
             <div className="text-sm text-gray-600 mb-2">
               <strong>Message:</strong> {appointment.message}

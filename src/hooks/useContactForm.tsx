@@ -12,6 +12,9 @@ interface ContactFormData {
   service: string;
   preferred_date: string;
   preferred_time: string;
+  tireSize: string;
+  licensePlate: string;
+  vin: string;
 }
 
 export const useContactForm = (language: string, t: any) => {
@@ -23,7 +26,10 @@ export const useContactForm = (language: string, t: any) => {
     message: '',
     service: '',
     preferred_date: '',
-    preferred_time: ''
+    preferred_time: '',
+    tireSize: '',
+    licensePlate: '',
+    vin: ''
   });
 
   const handleContactSubmit = async (e: React.FormEvent, isScheduleMode: boolean) => {
@@ -46,6 +52,9 @@ export const useContactForm = (language: string, t: any) => {
           service: contactForm.service,
           preferred_date: contactForm.preferred_date,
           preferred_time: contactForm.preferred_time,
+          tire_size: contactForm.tireSize || null,
+          license_plate: contactForm.licensePlate || null,
+          vin: contactForm.vin || null,
           status: 'new'
         };
 
@@ -82,7 +91,10 @@ export const useContactForm = (language: string, t: any) => {
         message: '',
         service: '',
         preferred_date: '',
-        preferred_time: ''
+        preferred_time: '',
+        tireSize: '',
+        licensePlate: '',
+        vin: ''
       });
     } catch (error) {
       console.error("Form submission error:", error);

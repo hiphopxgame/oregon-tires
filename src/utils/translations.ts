@@ -122,7 +122,7 @@ const translations = {
     // Gallery section
     gallery: {
       title: "Specials",
-      subtitle: "Take a look at some of our recent tire and automotive service work."
+      subtitle: "Check out our current deals and special offers on tires and automotive services. Save money while getting the quality service you deserve!"
     }
   },
   spanish: {
@@ -247,7 +247,7 @@ const translations = {
     // Gallery section
     gallery: {
       title: "Especiales",
-      subtitle: "Echa un vistazo a algunos de nuestros trabajos recientes de llantas y servicios automotrices."
+      subtitle: "¡Consulta nuestras ofertas actuales y descuentos especiales en llantas y servicios automotrices. ¡Ahorra dinero mientras obtienes el servicio de calidad que mereces!"
     }
   }
 };

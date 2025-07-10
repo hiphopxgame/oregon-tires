@@ -673,13 +673,16 @@ export type Database = {
           id: string
           language: string
           last_name: string
+          license_plate: string | null
           message: string | null
           phone: string | null
           preferred_date: string
           preferred_time: string
           service: string
           status: string
+          tire_size: string | null
           updated_at: string
+          vin: string | null
         }
         Insert: {
           assigned_employee_id?: string | null
@@ -689,13 +692,16 @@ export type Database = {
           id?: string
           language?: string
           last_name: string
+          license_plate?: string | null
           message?: string | null
           phone?: string | null
           preferred_date: string
           preferred_time: string
           service: string
           status?: string
+          tire_size?: string | null
           updated_at?: string
+          vin?: string | null
         }
         Update: {
           assigned_employee_id?: string | null
@@ -705,13 +711,16 @@ export type Database = {
           id?: string
           language?: string
           last_name?: string
+          license_plate?: string | null
           message?: string | null
           phone?: string | null
           preferred_date?: string
           preferred_time?: string
           service?: string
           status?: string
+          tire_size?: string | null
           updated_at?: string
+          vin?: string | null
         }
         Relationships: [
           {

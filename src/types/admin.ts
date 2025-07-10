@@ -13,6 +13,9 @@ export interface Appointment {
   language: string;
   created_at: string;
   assigned_employee_id: string | null;
+  tire_size?: string | null;
+  license_plate?: string | null;
+  vin?: string | null;
 }
 
 export interface ContactMessage {

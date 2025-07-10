@@ -49,6 +49,10 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           service: customerInfo.service,
           preferred_date: customerInfo.preferredDate,
           preferred_time: selectedTime,
+          message: customerInfo.message || null,
+          tire_size: customerInfo.tireSize || null,
+          license_plate: customerInfo.licensePlate || null,
+          vin: customerInfo.vin || null,
           status: 'pending',
           language: 'english'
         });

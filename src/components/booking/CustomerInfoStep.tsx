@@ -26,6 +26,17 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
       return;
     }
 
+    // Additional validation for service-specific fields
+    if (isTireService && !customerInfo.tireSize) {
+      alert('Please enter your tire size for tire services');
+      return;
+    }
+
+    if (requiresVehicleInfo && !customerInfo.licensePlate && !customerInfo.vin) {
+      alert('Please enter either your License Plate Number or VIN for this service');
+      return;
+    }
+
     onNext();
   };
 
@@ -41,6 +52,14 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
     { value: 'alignment', label: 'Alignment' },
     { value: 'mechanical-inspection-and-estimate', label: 'Mechanical Inspection and Estimate' }
   ];
+
+  // Tire services that require tire size
+  const tireServices = ['new-tires', 'used-tires', 'mount-and-balance-tires', 'tire-repair'];
+  
+  // Services that require license plate or VIN
+  const requiresVehicleInfo = !tireServices.includes(customerInfo.service) && customerInfo.service !== '';
+
+  const isTireService = tireServices.includes(customerInfo.service);
 
   // Get today's date for minimum date selection
   const today = new Date().toISOString().split('T')[0];
@@ -136,6 +155,69 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
               ))}
             </select>
           </div>
+
+          {/* Tire Size Field for Tire Services */}
+          {isTireService && (
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Tire Size *
+              </label>
+              <div className="mb-4">
+                <img 
+                  src="/lovable-uploads/76982728-b5a9-4195-af0f-d91ebb846545.png" 
+                  alt="Tire Size Reference Guide" 
+                  className="w-full max-w-md mx-auto rounded-lg border border-gray-300"
+                />
+                <p className="text-sm text-gray-600 mt-2 text-center">
+                  Use the reference above to find your tire size (e.g., 195/55R16)
+                </p>
+              </div>
+              <input
+                type="text"
+                value={customerInfo.tireSize}
+                onChange={(e) => onInputChange('tireSize', e.target.value)}
+                placeholder="e.g., 195/55R16"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                required
+              />
+            </div>
+          )}
+
+          {/* Vehicle Identification for Non-Tire Services */}
+          {requiresVehicleInfo && (
+            <div className="space-y-4">
+              <p className="text-sm font-medium text-gray-700">
+                Vehicle Identification (Please provide at least one) *
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    License Plate Number
+                  </label>
+                  <input
+                    type="text"
+                    value={customerInfo.licensePlate}
+                    onChange={(e) => onInputChange('licensePlate', e.target.value)}
+                    placeholder="e.g., ABC123"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    VIN (Vehicle Identification Number)
+                  </label>
+                  <input
+                    type="text"
+                    value={customerInfo.vin}
+                    onChange={(e) => onInputChange('vin', e.target.value)}
+                    placeholder="17-character VIN"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
+                    maxLength={17}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium mb-2">
