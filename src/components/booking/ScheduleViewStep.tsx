@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerInfo } from '@/pages/AppointmentBooking';
 import { supabase } from '@/integrations/supabase/client';
+import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { toast } from '@/hooks/use-toast';
 import { Clock, AlertTriangle, CheckCircle, Home, Calendar } from 'lucide-react';
 import { useScheduleAvailability } from '@/hooks/useScheduleAvailability';
@@ -21,6 +22,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
   const [submitting, setSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
   const navigate = useNavigate();
+  const { sendAppointmentEmail } = useEmailNotifications();
 
   const { timeSlots, loading, serviceDuration } = useScheduleAvailability({
     preferredDate: customerInfo.preferredDate,
@@ -75,7 +77,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
         }
       }
 
-      const { error } = await supabase
+      const { data: appointmentData, error } = await supabase
         .from('oregon_tires_appointments')
         .insert({
           first_name: customerInfo.firstName,
@@ -99,15 +101,25 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
           travel_cost_estimate: customerInfo.travel_cost_estimate ? parseFloat(customerInfo.travel_cost_estimate) : null,
           status: 'new',
           language: 'english'
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
+
+      // Send confirmation email to customer
+      try {
+        await sendAppointmentEmail('appointment_created', appointmentData.id);
+      } catch (emailError) {
+        console.error('Failed to send confirmation email:', emailError);
+        // Don't fail the booking if email fails
+      }
 
       setBookingComplete(true);
       
       toast({
         title: "Success!",
-        description: "Your appointment has been scheduled successfully.",
+        description: "Your appointment has been scheduled successfully. Check your email for confirmation.",
         variant: "default",
       });
       

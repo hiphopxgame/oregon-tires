@@ -3,9 +3,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Appointment, ContactMessage } from '@/types/admin';
+import { useEmailNotifications } from './useEmailNotifications';
 
 export const useAdminData = () => {
   const { toast } = useToast();
+  const { sendAppointmentEmail } = useEmailNotifications();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +74,15 @@ export const useAdminData = () => {
         description: "Employee assignment has been updated.",
       });
 
+      // Send email notification to employee when assigned
+      if (employeeId) {
+        try {
+          await sendAppointmentEmail('appointment_assigned', id);
+        } catch (emailError) {
+          console.error('Failed to send assignment email:', emailError);
+        }
+      }
+
       // Force a fresh data fetch to ensure consistency
       setTimeout(() => {
         refetchData();
@@ -121,6 +132,15 @@ export const useAdminData = () => {
         title: "Status Updated",
         description: "Appointment status has been updated.",
       });
+
+      // Send email notification when appointment is completed
+      if (status === 'completed') {
+        try {
+          await sendAppointmentEmail('appointment_completed', id);
+        } catch (emailError) {
+          console.error('Failed to send completion email:', emailError);
+        }
+      }
 
       // Force a fresh data fetch to ensure consistency
       setTimeout(() => {

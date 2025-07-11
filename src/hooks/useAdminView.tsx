@@ -4,7 +4,7 @@ import { Appointment } from '@/types/admin';
 
 export const useAdminView = (appointments: Appointment[]) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [activeTab, setActiveTab] = useState('calendar');
+  const [activeTab, setActiveTab] = useState('overview');
   const [currentView, setCurrentView] = useState('calendar');
 
   const getAppointmentsForDate = (date: Date) => {

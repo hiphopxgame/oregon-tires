@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessagesTab } from './MessagesTab';
 import { AppointmentsTab } from './AppointmentsTab';
 import { CalendarTab } from './CalendarTab';
+import { DashboardOverview } from './DashboardOverview';
 import { ContactMessage, Appointment } from '@/types/admin';
 
 interface AdminTabsProps {
@@ -26,11 +27,16 @@ export const AdminTabs = ({
 }: AdminTabsProps) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-4">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="calendar">Calendar</TabsTrigger>
         <TabsTrigger value="appointments">Appointments</TabsTrigger>
         <TabsTrigger value="messages">Messages</TabsTrigger>
       </TabsList>
+
+      <TabsContent value="overview">
+        <DashboardOverview appointments={appointments} />
+      </TabsContent>
 
       <TabsContent value="calendar">
         <CalendarTab 
