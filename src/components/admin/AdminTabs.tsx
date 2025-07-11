@@ -4,6 +4,7 @@ import { MessagesTab } from './MessagesTab';
 import { AppointmentsTab } from './AppointmentsTab';
 import { CalendarTab } from './CalendarTab';
 import { DashboardOverview } from './DashboardOverview';
+import { EmailLogsView } from './EmailLogsView';
 import { ContactMessage, Appointment } from '@/types/admin';
 
 interface AdminTabsProps {
@@ -27,11 +28,12 @@ export const AdminTabs = ({
 }: AdminTabsProps) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="grid w-full grid-cols-5">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="calendar">Calendar</TabsTrigger>
         <TabsTrigger value="appointments">Appointments</TabsTrigger>
         <TabsTrigger value="messages">Messages</TabsTrigger>
+        <TabsTrigger value="emails">Email Logs</TabsTrigger>
       </TabsList>
 
       <TabsContent value="overview">
@@ -58,6 +60,10 @@ export const AdminTabs = ({
           contactMessages={contactMessages}
           updateMessageStatus={updateMessageStatus}
         />
+      </TabsContent>
+
+      <TabsContent value="emails">
+        <EmailLogsView />
       </TabsContent>
     </Tabs>
   );

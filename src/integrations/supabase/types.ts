@@ -874,6 +874,56 @@ export type Database = {
         }
         Relationships: []
       }
+      oregon_tires_email_logs: {
+        Row: {
+          appointment_id: string | null
+          body: string
+          created_at: string
+          email_type: string
+          id: string
+          recipient_email: string
+          recipient_name: string
+          recipient_type: string
+          resend_message_id: string | null
+          sent_at: string
+          subject: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          body: string
+          created_at?: string
+          email_type: string
+          id?: string
+          recipient_email: string
+          recipient_name: string
+          recipient_type: string
+          resend_message_id?: string | null
+          sent_at?: string
+          subject: string
+        }
+        Update: {
+          appointment_id?: string | null
+          body?: string
+          created_at?: string
+          email_type?: string
+          id?: string
+          recipient_email?: string
+          recipient_name?: string
+          recipient_type?: string
+          resend_message_id?: string | null
+          sent_at?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oregon_tires_email_logs_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "oregon_tires_appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       oregon_tires_employee_schedules: {
         Row: {
           created_at: string
