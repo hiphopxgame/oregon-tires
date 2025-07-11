@@ -12,6 +12,8 @@ import { MessagesView } from '@/components/admin/MessagesView';
 import { EmployeesView } from '@/components/admin/EmployeesView';
 import { ExpandedCalendarView } from '@/components/admin/ExpandedCalendarView';
 import { GalleryManager } from '@/components/admin/GalleryManager';
+import { EmailLogsView } from '@/components/admin/EmailLogsView';
+import { DashboardOverview } from '@/components/admin/DashboardOverview';
 
 const OregonTiresAdmin = () => {
   const { language, toggleLanguage } = useLanguage();
@@ -38,6 +40,8 @@ const OregonTiresAdmin = () => {
 
   const renderCurrentView = () => {
     switch (currentView) {
+      case 'overview':
+        return <DashboardOverview appointments={appointments} />;
       case 'calendar':
         return (
           <ExpandedCalendarView
@@ -65,6 +69,8 @@ const OregonTiresAdmin = () => {
             updateMessageStatus={updateMessageStatus}
           />
         );
+      case 'emails':
+        return <EmailLogsView />;
       case 'employees':
         return <EmployeesView />;
       case 'gallery':
@@ -77,17 +83,7 @@ const OregonTiresAdmin = () => {
           />
         );
       default:
-        return (
-          <ExpandedCalendarView
-            appointments={appointments}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            appointmentDates={appointmentDates}
-            updateAppointmentStatus={updateAppointmentStatus}
-            updateAppointmentAssignment={updateAppointmentAssignment}
-            onDataRefresh={refetchData}
-          />
-        );
+        return <DashboardOverview appointments={appointments} />;
     }
   };
 
