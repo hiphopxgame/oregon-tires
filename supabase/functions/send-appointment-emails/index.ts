@@ -1,12 +1,24 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { Resend } from "npm:resend@2.0.0";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// SMTP configuration
+const smtp = new SMTPClient({
+  connection: {
+    hostname: Deno.env.get('SMTP_HOST')!,
+    port: parseInt(Deno.env.get('SMTP_PORT') || '587'),
+    tls: true,
+    auth: {
+      username: Deno.env.get('SMTP_USER')!,
+      password: Deno.env.get('SMTP_PASS')!,
+    },
+  },
+});
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -69,9 +81,9 @@ const handler = async (req: Request): Promise<Response> => {
         <p>Best regards,<br>The Oregon Tires Team</p>
       `;
       
-      const emailResult = await resend.emails.send({
-        from: "Oregon Tires <appointments@oregontires.com>",
-        to: [appointment.email],
+      await smtp.send({
+        from: Deno.env.get('SMTP_FROM_EMAIL')!,
+        to: appointment.email,
         subject: subject,
         html: emailBody,
       });
@@ -85,7 +97,7 @@ const handler = async (req: Request): Promise<Response> => {
         subject: subject,
         body: emailBody,
         appointment_id: appointmentId,
-        resend_message_id: emailResult.data?.id
+        resend_message_id: null
       });
 
     } else if (type === 'appointment_assigned' && appointment.assigned_employee?.email) {
@@ -126,9 +138,9 @@ const handler = async (req: Request): Promise<Response> => {
         <p>Best regards,<br>Oregon Tires Management</p>
       `;
       
-      const emailResult = await resend.emails.send({
-        from: "Oregon Tires <assignments@oregontires.com>",
-        to: [appointment.assigned_employee.email],
+      await smtp.send({
+        from: Deno.env.get('SMTP_FROM_EMAIL')!,
+        to: appointment.assigned_employee.email,
         subject: subject,
         html: emailBody,
       });
@@ -142,7 +154,7 @@ const handler = async (req: Request): Promise<Response> => {
         subject: subject,
         body: emailBody,
         appointment_id: appointmentId,
-        resend_message_id: emailResult.data?.id
+        resend_message_id: null
       });
 
     } else if (type === 'appointment_completed') {
@@ -170,9 +182,9 @@ const handler = async (req: Request): Promise<Response> => {
         <p>Best regards,<br>The Oregon Tires Team</p>
       `;
       
-      const emailResult = await resend.emails.send({
-        from: "Oregon Tires <service@oregontires.com>",
-        to: [appointment.email],
+      await smtp.send({
+        from: Deno.env.get('SMTP_FROM_EMAIL')!,
+        to: appointment.email,
         subject: subject,
         html: emailBody,
       });
@@ -186,7 +198,7 @@ const handler = async (req: Request): Promise<Response> => {
         subject: subject,
         body: emailBody,
         appointment_id: appointmentId,
-        resend_message_id: emailResult.data?.id
+        resend_message_id: null
       });
     }
 
