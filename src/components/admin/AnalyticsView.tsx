@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, User, Calendar, Clock, MessageSquare, Users, Repeat, TrendingUp } from 'lucide-react';
+import { ChevronLeft, User, Calendar, Clock, MessageSquare, Users, Repeat, TrendingUp, Timer } from 'lucide-react';
 import { Appointment, ContactMessage } from '@/types/admin';
+import { useEmployees } from '@/hooks/useEmployees';
 
 interface AnalyticsViewProps {
   appointments: Appointment[];
@@ -14,12 +15,34 @@ type DetailView = 'total' | 'new' | 'confirmed' | 'completed' | 'cancelled' | 't
 
 export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewProps) => {
   const [detailView, setDetailView] = useState<DetailView>(null);
+  const { employees } = useEmployees();
   
   const totalAppointments = appointments.length;
   const newAppointments = appointments.filter(apt => apt.status === 'new').length;
   const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmed').length;
   const completedAppointments = appointments.filter(apt => apt.status === 'completed').length;
   const cancelledAppointments = appointments.filter(apt => apt.status === 'cancelled').length;
+  
+  // Time tracking analytics
+  const completedWithTime = appointments.filter(apt => apt.status === 'completed' && apt.actual_duration_minutes);
+  const avgAppointmentTime = completedWithTime.length > 0 
+    ? Math.round(completedWithTime.reduce((acc, apt) => acc + (apt.actual_duration_minutes || 0), 0) / completedWithTime.length)
+    : 0;
+  
+  // Employee analytics
+  const employeeStats = employees?.map(employee => {
+    const employeeAppointments = appointments.filter(apt => apt.assigned_employee_id === employee.id);
+    const completedByEmployee = employeeAppointments.filter(apt => apt.status === 'completed' && apt.actual_duration_minutes);
+    const totalTimeWorked = completedByEmployee.reduce((acc, apt) => acc + (apt.actual_duration_minutes || 0), 0);
+    
+    return {
+      ...employee,
+      totalAppointments: employeeAppointments.length,
+      completedAppointments: completedByEmployee.length,
+      totalTimeWorked,
+      avgTimePerAppointment: completedByEmployee.length > 0 ? Math.round(totalTimeWorked / completedByEmployee.length) : 0
+    };
+  }) || [];
   
   const totalMessages = contactMessages.length;
   const unreadMessages = contactMessages.filter(msg => msg.status === 'new').length;
@@ -468,6 +491,76 @@ export const AnalyticsView = ({ appointments, contactMessages }: AnalyticsViewPr
               </p>
               <p className="text-sm text-orange-600">Avg visits per returning customer</p>
             </div>
+          </div>
+
+          {/* Time Tracking Analytics */}
+          <div className="mb-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Timer className="h-5 w-5" />
+                  Time Tracking Analytics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h4 className="font-semibold text-blue-800">Completed with Timer</h4>
+                    <p className="text-2xl font-bold text-blue-900">{completedWithTime.length}</p>
+                    <p className="text-sm text-blue-600">out of {completedAppointments} completed</p>
+                  </div>
+                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h4 className="font-semibold text-green-800">Average Duration</h4>
+                    <p className="text-2xl font-bold text-green-900">{avgAppointmentTime} min</p>
+                    <p className="text-sm text-green-600">per appointment</p>
+                  </div>
+                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <h4 className="font-semibold text-purple-800">Total Time Tracked</h4>
+                    <p className="text-2xl font-bold text-purple-900">
+                      {Math.round(completedWithTime.reduce((acc, apt) => acc + (apt.actual_duration_minutes || 0), 0) / 60 * 10) / 10} hrs
+                    </p>
+                    <p className="text-sm text-purple-600">across all appointments</p>
+                  </div>
+                </div>
+
+                {/* Employee Performance */}
+                {employeeStats.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-4">Employee Performance</h4>
+                    <div className="space-y-3">
+                      {employeeStats
+                        .filter(emp => emp.completedAppointments > 0)
+                        .sort((a, b) => b.completedAppointments - a.completedAppointments)
+                        .map((employee) => (
+                          <div key={employee.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <h5 className="font-medium text-gray-900">{employee.name}</h5>
+                              <div className="text-sm text-gray-600">
+                                {employee.completedAppointments} completed
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <p className="text-gray-500">Total Time</p>
+                                <p className="font-medium">{Math.round(employee.totalTimeWorked / 60 * 10) / 10} hrs</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500">Avg per Appointment</p>
+                                <p className="font-medium">{employee.avgTimePerAppointment} min</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500">Assignments</p>
+                                <p className="font-medium">{employee.totalAppointments} total</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

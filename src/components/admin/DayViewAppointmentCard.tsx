@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Edit2, Save, X } from 'lucide-react';
+import { User, Edit2, Save, X, Play, Square, Clock } from 'lucide-react';
 import { Appointment } from '@/types/admin';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAppointmentTimer } from '@/hooks/useAppointmentTimer';
 
 interface EditingAppointment {
   id: string;
@@ -34,6 +35,21 @@ export const DayViewAppointmentCard = ({
 }: DayViewAppointmentCardProps) => {
   const [editingAppointment, setEditingAppointment] = useState<EditingAppointment | null>(null);
   const { toast } = useToast();
+  
+  const {
+    isRunning,
+    elapsedTime,
+    formattedTime,
+    startTimer,
+    endTimer
+  } = useAppointmentTimer({
+    appointmentId: appointment.id,
+    onAppointmentUpdated
+  });
+
+  // Check if appointment has started or completed times
+  const hasStarted = !!appointment.started_at;
+  const hasCompleted = !!appointment.completed_at;
 
   const updateAppointmentDateTime = async (appointmentId: string, newDate: string, newTime: string) => {
     try {
@@ -193,6 +209,59 @@ export const DayViewAppointmentCard = ({
       {appointment.message && (
         <p className="text-sm text-gray-600 mb-2 italic">"{appointment.message}"</p>
       )}
+
+      {/* Timer Section */}
+      <div className="mb-3 p-3 bg-blue-50 rounded border border-blue-200">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="font-medium text-sm text-blue-700 flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Appointment Timer
+          </h4>
+          {isRunning && (
+            <div className="text-lg font-mono font-bold text-blue-900">
+              {formattedTime}
+            </div>
+          )}
+        </div>
+        
+        <div className="flex gap-2">
+          {!hasStarted && !isRunning && (
+            <Button
+              size="sm"
+              onClick={startTimer}
+              className="h-8 px-3 bg-green-600 hover:bg-green-700 text-white"
+              disabled={appointment.status === 'completed' || appointment.status === 'cancelled'}
+            >
+              <Play className="h-3 w-3 mr-1" />
+              Start
+            </Button>
+          )}
+          
+          {(hasStarted || isRunning) && !hasCompleted && (
+            <Button
+              size="sm"
+              onClick={endTimer}
+              className="h-8 px-3 bg-red-600 hover:bg-red-700 text-white"
+              disabled={!isRunning && !hasStarted}
+            >
+              <Square className="h-3 w-3 mr-1" />
+              End
+            </Button>
+          )}
+          
+          {hasCompleted && appointment.actual_duration_minutes && (
+            <div className="text-sm text-green-700 font-medium">
+              Completed in {appointment.actual_duration_minutes} minutes
+            </div>
+          )}
+        </div>
+        
+        {hasStarted && !hasCompleted && !isRunning && (
+          <div className="text-xs text-blue-600 mt-1">
+            Started at {new Date(appointment.started_at!).toLocaleTimeString()}
+          </div>
+        )}
+      </div>
 
       <div className="flex items-center gap-2">
         <span className="text-xs text-gray-500">Status:</span>

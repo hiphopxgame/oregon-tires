@@ -24,6 +24,9 @@ export interface Appointment {
   vehicle_id?: string | null;
   travel_distance_miles?: number | null;
   travel_cost_estimate?: number | null;
+  started_at?: string | null;
+  completed_at?: string | null;
+  actual_duration_minutes?: number | null;
 }
 
 export interface ContactMessage {
