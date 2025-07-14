@@ -703,6 +703,178 @@ export type Database = {
         }
         Relationships: []
       }
+      hiphopworld_card_collections: {
+        Row: {
+          card_id: string
+          collected_at: string
+          collector_user_id: string
+          id: string
+          individual_balance: number
+        }
+        Insert: {
+          card_id: string
+          collected_at?: string
+          collector_user_id: string
+          id?: string
+          individual_balance?: number
+        }
+        Update: {
+          card_id?: string
+          collected_at?: string
+          collector_user_id?: string
+          id?: string
+          individual_balance?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hiphopworld_card_collections_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "hiphopworld_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hiphopworld_card_collections_collector_user_id_fkey"
+            columns: ["collector_user_id"]
+            isOneToOne: false
+            referencedRelation: "hiphopworld_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      hiphopworld_cards: {
+        Row: {
+          card_type: string
+          content_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          individual_balance: number
+          is_public: boolean
+          title: string
+          total_balance: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          card_type: string
+          content_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          individual_balance?: number
+          is_public?: boolean
+          title: string
+          total_balance?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          card_type?: string
+          content_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          individual_balance?: number
+          is_public?: boolean
+          title?: string
+          total_balance?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hiphopworld_cards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "hiphopworld_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      hiphopworld_communities: {
+        Row: {
+          community_id: number
+          created_at: string
+          id: string
+          land_id: number
+          owner_user_id: string | null
+          price: number
+          purchased_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          community_id: number
+          created_at?: string
+          id?: string
+          land_id: number
+          owner_user_id?: string | null
+          price: number
+          purchased_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          community_id?: number
+          created_at?: string
+          id?: string
+          land_id?: number
+          owner_user_id?: string | null
+          price?: number
+          purchased_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hiphopworld_communities_owner_user_id_fkey"
+            columns: ["owner_user_id"]
+            isOneToOne: false
+            referencedRelation: "hiphopworld_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      hiphopworld_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          communities_owned: number
+          created_at: string
+          display_name: string | null
+          hip_hop_cards_owned: number
+          hip_hop_cash_balance: number
+          id: string
+          updated_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          communities_owned?: number
+          created_at?: string
+          display_name?: string | null
+          hip_hop_cards_owned?: number
+          hip_hop_cash_balance?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          communities_owned?: number
+          created_at?: string
+          display_name?: string | null
+          hip_hop_cards_owned?: number
+          hip_hop_cash_balance?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       oregon_tires_appointments: {
         Row: {
           assigned_employee_id: string | null

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -5,14 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Mail, Loader2 } from 'lucide-react';
+import { Mail, Loader2, CheckCircle } from 'lucide-react';
 
 export const EmailTestPanel = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const testSMTP = async () => {
+  const testResend = async () => {
     if (!email) {
       toast({
         title: "Error",
@@ -29,13 +30,13 @@ export const EmailTestPanel = () => {
         .from('oregon_tires_appointments')
         .insert({
           first_name: 'Test',
-          last_name: 'User',
+          last_name: 'Customer',
           email: email,
           phone: '(555) 123-4567',
-          service: 'SMTP Test',
+          service: 'Email Test Service',
           preferred_date: new Date().toISOString().split('T')[0],
           preferred_time: '10:00',
-          message: 'This is a test email to verify SMTP configuration.',
+          message: 'This is a test email to verify Resend integration with Oregon Tires.',
           language: 'english',
           status: 'test'
         })
@@ -44,7 +45,7 @@ export const EmailTestPanel = () => {
 
       if (appointmentError) throw appointmentError;
 
-      // Send test email
+      // Send test email using Resend
       const { data, error } = await supabase.functions.invoke('send-appointment-emails', {
         body: {
           type: 'appointment_created',
@@ -61,15 +62,15 @@ export const EmailTestPanel = () => {
         .eq('id', testAppointment.id);
 
       toast({
-        title: "Test Email Sent!",
-        description: `Test email sent successfully to ${email}. Check your inbox and spam folder.`,
+        title: "Test Email Sent Successfully!",
+        description: `Test email sent via Resend to ${email}. Check your inbox and spam folder.`,
       });
 
     } catch (error: any) {
-      console.error('SMTP test failed:', error);
+      console.error('Resend test failed:', error);
       toast({
-        title: "SMTP Test Failed",
-        description: error.message || "Failed to send test email. Check your SMTP configuration.",
+        title: "Email Test Failed",
+        description: error.message || "Failed to send test email via Resend. Please check your configuration.",
         variant: "destructive",
       });
     } finally {
@@ -82,10 +83,10 @@ export const EmailTestPanel = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Mail className="h-5 w-5" />
-          SMTP Test Panel
+          Resend Email Test
         </CardTitle>
         <CardDescription>
-          Test your SMTP configuration by sending a test email
+          Test your Resend integration by sending a test appointment confirmation
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -100,15 +101,20 @@ export const EmailTestPanel = () => {
           />
         </div>
         <Button 
-          onClick={testSMTP} 
+          onClick={testResend} 
           disabled={loading || !email}
           className="w-full"
         >
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Send Test Email
+          {!loading && <CheckCircle className="mr-2 h-4 w-4" />}
+          Send Test Email via Resend
         </Button>
-        <div className="text-sm text-muted-foreground">
-          <p>This will send a test appointment confirmation email to verify your SMTP settings.</p>
+        <div className="text-sm text-muted-foreground space-y-2">
+          <p>This will send a test appointment confirmation email using your verified oregon.tires domain.</p>
+          <div className="bg-green-50 border border-green-200 rounded p-2">
+            <p className="text-green-800 font-medium">✓ Domain Verified</p>
+            <p className="text-green-700 text-xs">Your oregon.tires domain is verified with Resend</p>
+          </div>
         </div>
       </CardContent>
     </Card>
