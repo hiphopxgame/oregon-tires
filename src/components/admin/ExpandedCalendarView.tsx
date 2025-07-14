@@ -73,6 +73,7 @@ export const ExpandedCalendarView = ({
             navigateDate={navigateDate}
             updateAppointmentStatus={updateAppointmentStatus}
             updateAppointmentAssignment={updateAppointmentAssignment}
+            onAppointmentUpdated={onDataRefresh}
           />
           
           {/* Hours Editor */}

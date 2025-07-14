@@ -1,22 +1,41 @@
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Phone, UserCheck } from 'lucide-react';
+import { User, Phone, UserCheck, Play, Square, Clock } from 'lucide-react';
 import { Appointment } from '@/types/admin';
 import { useEmployees } from '@/hooks/useEmployees';
+import { useAppointmentTimer } from '@/hooks/useAppointmentTimer';
 
 interface AppointmentCardProps {
   appointment: Appointment;
   updateAppointmentStatus: (id: string, status: string) => void;
   updateAppointmentAssignment: (id: string, employeeId: string | null) => void;
+  onAppointmentUpdated?: () => void;
 }
 
 export const AppointmentCard = ({
   appointment,
   updateAppointmentStatus,
-  updateAppointmentAssignment
+  updateAppointmentAssignment,
+  onAppointmentUpdated
 }: AppointmentCardProps) => {
   const { employees } = useEmployees();
+  
+  const {
+    isRunning,
+    elapsedTime,
+    formattedTime,
+    startTimer,
+    endTimer
+  } = useAppointmentTimer({
+    appointmentId: appointment.id,
+    onAppointmentUpdated
+  });
+
+  // Check if appointment has started or completed times
+  const hasStarted = !!appointment.started_at;
+  const hasCompleted = !!appointment.completed_at;
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'new': return 'bg-blue-100 text-blue-800 border-blue-200';
@@ -93,6 +112,60 @@ export const AppointmentCard = ({
           <Badge className={getStatusColor(appointment.status)}>
             {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
           </Badge>
+          
+          {/* Timer Section */}
+          <div className="mb-2 p-2 bg-blue-50 rounded border border-blue-200">
+            <div className="flex items-center justify-between mb-1">
+              <h4 className="font-medium text-xs text-blue-700 flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                Timer
+              </h4>
+              {isRunning && (
+                <div className="text-sm font-mono font-bold text-blue-900">
+                  {formattedTime}
+                </div>
+              )}
+            </div>
+            
+            <div className="flex gap-1">
+              {!hasStarted && !isRunning && (
+                <Button
+                  size="sm"
+                  onClick={startTimer}
+                  className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
+                  disabled={appointment.status === 'completed' || appointment.status === 'cancelled'}
+                >
+                  <Play className="h-2 w-2 mr-1" />
+                  Start
+                </Button>
+              )}
+              
+              {(hasStarted || isRunning) && !hasCompleted && (
+                <Button
+                  size="sm"
+                  onClick={endTimer}
+                  className="h-6 px-2 text-xs bg-red-600 hover:bg-red-700 text-white"
+                  disabled={!isRunning && !hasStarted}
+                >
+                  <Square className="h-2 w-2 mr-1" />
+                  End
+                </Button>
+              )}
+              
+              {hasCompleted && appointment.actual_duration_minutes && (
+                <div className="text-xs text-green-700 font-medium">
+                  {appointment.actual_duration_minutes}min
+                </div>
+              )}
+            </div>
+            
+            {hasStarted && !hasCompleted && !isRunning && (
+              <div className="text-xs text-blue-600 mt-1">
+                Started: {new Date(appointment.started_at!).toLocaleTimeString()}
+              </div>
+            )}
+          </div>
+          
           <Select
             value={appointment.status}
             onValueChange={(value) => updateAppointmentStatus(appointment.id, value)}
