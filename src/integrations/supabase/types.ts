@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      bitcoin_crypto_data: {
+        Row: {
+          cmc_id: number
+          created_at: string
+          id: string
+          last_updated: string
+          logo_url: string | null
+          market_cap: number
+          name: string
+          percent_change_1h: number | null
+          percent_change_24h: number | null
+          percent_change_30d: number | null
+          percent_change_7d: number | null
+          price: number
+          rank: number
+          slug: string
+          symbol: string
+          updated_at: string
+          volume_24h: number
+        }
+        Insert: {
+          cmc_id: number
+          created_at?: string
+          id?: string
+          last_updated: string
+          logo_url?: string | null
+          market_cap: number
+          name: string
+          percent_change_1h?: number | null
+          percent_change_24h?: number | null
+          percent_change_30d?: number | null
+          percent_change_7d?: number | null
+          price: number
+          rank: number
+          slug: string
+          symbol: string
+          updated_at?: string
+          volume_24h: number
+        }
+        Update: {
+          cmc_id?: number
+          created_at?: string
+          id?: string
+          last_updated?: string
+          logo_url?: string | null
+          market_cap?: number
+          name?: string
+          percent_change_1h?: number | null
+          percent_change_24h?: number | null
+          percent_change_30d?: number | null
+          percent_change_7d?: number | null
+          price?: number
+          rank?: number
+          slug?: string
+          symbol?: string
+          updated_at?: string
+          volume_24h?: number
+        }
+        Relationships: []
+      }
       bitcoin_payments: {
         Row: {
           btc_amount: number
@@ -1515,29 +1575,50 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          display_name: string | null
           email: string
+          facebook_url: string | null
           full_name: string | null
           id: string
+          instagram_url: string | null
+          is_email_public: boolean | null
+          twitter_url: string | null
           updated_at: string
           username: string | null
+          website_url: string | null
+          youtube_url: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          display_name?: string | null
           email: string
+          facebook_url?: string | null
           full_name?: string | null
           id: string
+          instagram_url?: string | null
+          is_email_public?: boolean | null
+          twitter_url?: string | null
           updated_at?: string
           username?: string | null
+          website_url?: string | null
+          youtube_url?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          display_name?: string | null
           email?: string
+          facebook_url?: string | null
           full_name?: string | null
           id?: string
+          instagram_url?: string | null
+          is_email_public?: boolean | null
+          twitter_url?: string | null
           updated_at?: string
           username?: string | null
+          website_url?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
@@ -1626,6 +1707,7 @@ export type Database = {
           image_url: string | null
           instagram_url: string | null
           is_active: boolean
+          is_featured: boolean
           organizer_name: string | null
           organizer_url: string | null
           price_display: string | null
@@ -1635,6 +1717,7 @@ export type Database = {
           tags: string[] | null
           ticket_url: string | null
           title: string
+          twitter_url: string | null
           updated_at: string
           venue_address: string | null
           venue_city: string | null
@@ -1642,6 +1725,7 @@ export type Database = {
           venue_state: string | null
           venue_zip: string | null
           website_url: string | null
+          youtube_url: string | null
         }
         Insert: {
           api_source: string
@@ -1655,6 +1739,7 @@ export type Database = {
           image_url?: string | null
           instagram_url?: string | null
           is_active?: boolean
+          is_featured?: boolean
           organizer_name?: string | null
           organizer_url?: string | null
           price_display?: string | null
@@ -1664,6 +1749,7 @@ export type Database = {
           tags?: string[] | null
           ticket_url?: string | null
           title: string
+          twitter_url?: string | null
           updated_at?: string
           venue_address?: string | null
           venue_city?: string | null
@@ -1671,6 +1757,7 @@ export type Database = {
           venue_state?: string | null
           venue_zip?: string | null
           website_url?: string | null
+          youtube_url?: string | null
         }
         Update: {
           api_source?: string
@@ -1684,6 +1771,7 @@ export type Database = {
           image_url?: string | null
           instagram_url?: string | null
           is_active?: boolean
+          is_featured?: boolean
           organizer_name?: string | null
           organizer_url?: string | null
           price_display?: string | null
@@ -1693,6 +1781,7 @@ export type Database = {
           tags?: string[] | null
           ticket_url?: string | null
           title?: string
+          twitter_url?: string | null
           updated_at?: string
           venue_address?: string | null
           venue_city?: string | null
@@ -1700,6 +1789,7 @@ export type Database = {
           venue_state?: string | null
           venue_zip?: string | null
           website_url?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
@@ -1717,9 +1807,11 @@ export type Database = {
           name: string
           phone: string | null
           state: string | null
+          twitter_url: string | null
           updated_at: string
           venue_type: string | null
           website: string | null
+          youtube_url: string | null
           zip_code: string | null
         }
         Insert: {
@@ -1735,9 +1827,11 @@ export type Database = {
           name: string
           phone?: string | null
           state?: string | null
+          twitter_url?: string | null
           updated_at?: string
           venue_type?: string | null
           website?: string | null
+          youtube_url?: string | null
           zip_code?: string | null
         }
         Update: {
@@ -1753,9 +1847,11 @@ export type Database = {
           name?: string
           phone?: string | null
           state?: string | null
+          twitter_url?: string | null
           updated_at?: string
           venue_type?: string | null
           website?: string | null
+          youtube_url?: string | null
           zip_code?: string | null
         }
         Relationships: []
@@ -1834,6 +1930,7 @@ export type Database = {
           id: string
           image_url: string | null
           instagram_url: string | null
+          is_featured: boolean
           is_recurring: boolean | null
           organizer_email: string | null
           organizer_name: string | null
@@ -1849,6 +1946,7 @@ export type Database = {
           status: string | null
           ticket_url: string | null
           title: string
+          twitter_url: string | null
           updated_at: string
           venue_address: string | null
           venue_city: string | null
@@ -1856,6 +1954,7 @@ export type Database = {
           venue_state: string | null
           venue_zip: string | null
           website_url: string | null
+          youtube_url: string | null
         }
         Insert: {
           category: string
@@ -1867,6 +1966,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           instagram_url?: string | null
+          is_featured?: boolean
           is_recurring?: boolean | null
           organizer_email?: string | null
           organizer_name?: string | null
@@ -1882,6 +1982,7 @@ export type Database = {
           status?: string | null
           ticket_url?: string | null
           title: string
+          twitter_url?: string | null
           updated_at?: string
           venue_address?: string | null
           venue_city?: string | null
@@ -1889,6 +1990,7 @@ export type Database = {
           venue_state?: string | null
           venue_zip?: string | null
           website_url?: string | null
+          youtube_url?: string | null
         }
         Update: {
           category?: string
@@ -1900,6 +2002,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           instagram_url?: string | null
+          is_featured?: boolean
           is_recurring?: boolean | null
           organizer_email?: string | null
           organizer_name?: string | null
@@ -1915,6 +2018,7 @@ export type Database = {
           status?: string | null
           ticket_url?: string | null
           title?: string
+          twitter_url?: string | null
           updated_at?: string
           venue_address?: string | null
           venue_city?: string | null
@@ -1922,6 +2026,7 @@ export type Database = {
           venue_state?: string | null
           venue_zip?: string | null
           website_url?: string | null
+          youtube_url?: string | null
         }
         Relationships: [
           {
@@ -1964,19 +2069,23 @@ export type Database = {
           approved_by: string | null
           city: string | null
           created_at: string
+          facebook_url: string | null
           google_photos: string[] | null
           google_place_id: string | null
           google_rating: number | null
           google_review_count: number | null
           id: string
+          instagram_url: string | null
           latitude: number | null
           longitude: number | null
           name: string
           phone: string | null
           state: string | null
           status: string | null
+          twitter_url: string | null
           updated_at: string
           website: string | null
+          youtube_url: string | null
           zip_code: string | null
         }
         Insert: {
@@ -1985,19 +2094,23 @@ export type Database = {
           approved_by?: string | null
           city?: string | null
           created_at?: string
+          facebook_url?: string | null
           google_photos?: string[] | null
           google_place_id?: string | null
           google_rating?: number | null
           google_review_count?: number | null
           id?: string
+          instagram_url?: string | null
           latitude?: number | null
           longitude?: number | null
           name: string
           phone?: string | null
           state?: string | null
           status?: string | null
+          twitter_url?: string | null
           updated_at?: string
           website?: string | null
+          youtube_url?: string | null
           zip_code?: string | null
         }
         Update: {
@@ -2006,19 +2119,23 @@ export type Database = {
           approved_by?: string | null
           city?: string | null
           created_at?: string
+          facebook_url?: string | null
           google_photos?: string[] | null
           google_place_id?: string | null
           google_rating?: number | null
           google_review_count?: number | null
           id?: string
+          instagram_url?: string | null
           latitude?: number | null
           longitude?: number | null
           name?: string
           phone?: string | null
           state?: string | null
           status?: string | null
+          twitter_url?: string | null
           updated_at?: string
           website?: string | null
+          youtube_url?: string | null
           zip_code?: string | null
         }
         Relationships: []

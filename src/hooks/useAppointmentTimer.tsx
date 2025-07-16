@@ -11,7 +11,37 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
   const [isRunning, setIsRunning] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [appointment, setAppointment] = useState<any>(null);
   const { toast } = useToast();
+
+  // Load appointment data to check existing timer state
+  useEffect(() => {
+    const loadAppointment = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('oregon_tires_appointments')
+          .select('*')
+          .eq('id', appointmentId)
+          .single();
+
+        if (error) throw error;
+        
+        setAppointment(data);
+        
+        // If appointment has started_at but not completed_at, it's currently running
+        if (data.started_at && !data.completed_at) {
+          const startedAt = new Date(data.started_at);
+          setStartTime(startedAt);
+          setIsRunning(true);
+          setElapsedTime(Math.floor((Date.now() - startedAt.getTime()) / 1000));
+        }
+      } catch (error) {
+        console.error('Error loading appointment:', error);
+      }
+    };
+
+    loadAppointment();
+  }, [appointmentId]);
 
   // Update elapsed time every second when timer is running
   useEffect(() => {
@@ -34,7 +64,7 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
         .from('oregon_tires_appointments')
         .update({
           started_at: now.toISOString(),
-          status: 'confirmed'
+          status: 'active'
         })
         .eq('id', appointmentId);
 
@@ -46,7 +76,7 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
 
       toast({
         title: "Timer Started",
-        description: "Appointment timer has been started and status updated to Confirmed.",
+        description: "Appointment timer has been started and status updated to Active.",
       });
 
       if (onAppointmentUpdated) {

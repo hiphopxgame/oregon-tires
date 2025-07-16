@@ -57,21 +57,31 @@ export const useAdminData = () => {
     try {
       console.log('Updating appointment assignment:', { id, employeeId });
       
+      // When assigning employee, also update status to confirmed
+      const updateData: any = { assigned_employee_id: employeeId };
+      if (employeeId) {
+        updateData.status = 'confirmed';
+      }
+      
       const { error } = await supabase
         .from('oregon_tires_appointments')
-        .update({ assigned_employee_id: employeeId })
+        .update(updateData)
         .eq('id', id);
 
       if (error) throw error;
 
       // Update local state immediately for better UX
       setAppointments(prev => 
-        prev.map(apt => apt.id === id ? { ...apt, assigned_employee_id: employeeId } : apt)
+        prev.map(apt => apt.id === id ? { 
+          ...apt, 
+          assigned_employee_id: employeeId,
+          status: employeeId ? 'confirmed' : apt.status 
+        } : apt)
       );
 
       toast({
         title: "Assignment Updated",
-        description: "Employee assignment has been updated.",
+        description: employeeId ? "Employee assigned and status updated to Confirmed." : "Employee assignment removed.",
       });
 
       // Send email notification to employee when assigned

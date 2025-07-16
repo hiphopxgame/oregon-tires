@@ -166,6 +166,25 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                 </option>
               ))}
             </select>
+            
+            {/* New Tires Pricing Notice */}
+            {customerInfo.service === 'new-tires' && (
+              <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">💰</span>
+                  <div>
+                    <p className="font-medium text-yellow-800">New Tires - Call for Pricing</p>
+                    <p className="text-sm text-yellow-700">
+                      Tire prices vary based on size, brand, and availability. Please call us at{' '}
+                      <a href="tel:503-555-0123" className="font-medium underline hover:text-yellow-800">
+                        (503) 555-0123
+                      </a>{' '}
+                      for current pricing and availability.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Tire Size Field for Tire Services */}
