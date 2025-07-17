@@ -35,14 +35,7 @@ const OregonTiresHero: React.FC<HeroProps> = ({
       <div className="absolute inset-0 bg-black/50"></div>
       
       <div className="container mx-auto px-4 text-center relative z-10">
-        <h1 className="text-5xl font-bold mb-6 drop-shadow-2xl">{t.heroTitle}</h1>
-        
-        {/* Enhanced tagline section with background */}
-        <div className="mb-8 flex justify-center">
-          <div className="bg-black/70 backdrop-blur-sm rounded-lg px-8 py-4 max-w-4xl">
-            <p className="text-xl font-medium text-white drop-shadow-lg">{t.heroSubtitle}</p>
-          </div>
-        </div>
+        <h1 className="text-5xl font-bold mb-8 drop-shadow-2xl">{t.heroTitle}</h1>
         
         <div className="flex justify-center gap-4 flex-wrap">
           <Button
