@@ -172,35 +172,45 @@ const handler = async (req: Request): Promise<Response> => {
 
     } else if (type === 'appointment_completed') {
       // Send completion notification to customer
+      const durationText = appointment.actual_duration_minutes 
+        ? `${appointment.actual_duration_minutes} minutes`
+        : 'N/A';
+        
       const subject = "Service Completed - Oregon Tires";
       const emailBody = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #007030;">Service Completed</h2>
+          <h2 style="color: #007030;">✅ Your Service is Complete!</h2>
           <p>Dear ${appointment.first_name} ${appointment.last_name},</p>
-          <p>Your service appointment has been completed!</p>
+          <p>Great news! Your tire service appointment has been completed successfully.</p>
           
           <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745;">
-            <h3 style="color: #155724; margin-top: 0;">Service Details:</h3>
-            <ul style="line-height: 1.6;">
+            <h3 style="color: #155724; margin-top: 0;">📋 Service Summary:</h3>
+            <ul style="line-height: 1.8;">
               <li><strong>Service:</strong> ${appointment.service}</li>
               <li><strong>Date:</strong> ${appointment.preferred_date}</li>
               <li><strong>Technician:</strong> ${appointment.assigned_employee?.name || 'Oregon Tires Team'}</li>
+              <li><strong>Service Duration:</strong> ${durationText}</li>
               ${appointment.tire_size ? `<li><strong>Tire Size:</strong> ${appointment.tire_size}</li>` : ''}
               ${appointment.license_plate ? `<li><strong>Vehicle:</strong> ${appointment.license_plate}</li>` : ''}
             </ul>
           </div>
           
-          <p>Thank you for choosing Oregon Tires! We hope you're satisfied with our service.</p>
-          <p>If you have any questions or feedback, please don't hesitate to contact us.</p>
+          <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
+            <p style="margin: 0; color: #856404;"><strong>Thank you for being an Oregon Tires customer!</strong></p>
+          </div>
           
-          <p>We look forward to serving you again in the future!</p>
+          <p>We appreciate your business and trust in our professional tire services. Your satisfaction is our priority, and we're glad we could take care of your vehicle today.</p>
           
-          <p>Best regards,<br><strong>The Oregon Tires Team</strong></p>
+          <p><strong>We'd love to see you again!</strong> Whether you need tire rotation, balancing, repairs, or new tires, Oregon Tires is here to keep you safely on the road.</p>
+          
+          <p>If you have any questions about the service performed or need assistance in the future, please don't hesitate to contact us.</p>
+          
+          <p>Safe travels!<br><strong>The Oregon Tires Team</strong></p>
           
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
           <p style="font-size: 12px; color: #666;">
-            Oregon Tires - Professional Tire Services<br>
-            Visit us at: <a href="https://oregon.tires" style="color: #007030;">oregon.tires</a>
+            Oregon Tires - Professional Tire Installation, Repair & Automotive Services<br>
+            We speak Spanish and English! | Visit us at: <a href="https://oregon.tires" style="color: #007030;">oregon.tires</a>
           </p>
         </div>
       `;

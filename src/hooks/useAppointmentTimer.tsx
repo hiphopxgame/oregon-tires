@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 
 interface UseAppointmentTimerProps {
   appointmentId: string;
@@ -13,6 +14,7 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
   const [elapsedTime, setElapsedTime] = useState(0);
   const [appointment, setAppointment] = useState<any>(null);
   const { toast } = useToast();
+  const { sendAppointmentEmail } = useEmailNotifications();
 
   // Load appointment data to check existing timer state
   useEffect(() => {
@@ -121,6 +123,14 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
       setIsRunning(false);
       setStartTime(null);
       setElapsedTime(0);
+
+      // Send completion email to customer
+      try {
+        await sendAppointmentEmail('appointment_completed', appointmentId);
+      } catch (emailError) {
+        console.error('Error sending completion email:', emailError);
+        // Don't show error to user as the main operation succeeded
+      }
 
       toast({
         title: "Timer Stopped",
