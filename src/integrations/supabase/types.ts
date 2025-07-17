@@ -1025,6 +1025,7 @@ export type Database = {
       oregon_tires_appointments: {
         Row: {
           actual_duration_minutes: number | null
+          actual_duration_seconds: number | null
           assigned_employee_id: string | null
           completed_at: string | null
           created_at: string
@@ -1055,6 +1056,7 @@ export type Database = {
         }
         Insert: {
           actual_duration_minutes?: number | null
+          actual_duration_seconds?: number | null
           assigned_employee_id?: string | null
           completed_at?: string | null
           created_at?: string
@@ -1085,6 +1087,7 @@ export type Database = {
         }
         Update: {
           actual_duration_minutes?: number | null
+          actual_duration_seconds?: number | null
           assigned_employee_id?: string | null
           completed_at?: string | null
           created_at?: string

@@ -116,13 +116,15 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
   const endTimer = async () => {
     try {
       const completedAt = new Date();
-      const durationMinutes = startTime ? Math.floor((completedAt.getTime() - startTime.getTime()) / (1000 * 60)) : 0;
+      const totalSeconds = startTime ? Math.floor((completedAt.getTime() - startTime.getTime()) / 1000) : 0;
+      const durationMinutes = Math.floor(totalSeconds / 60);
 
       const { error } = await supabase
         .from('oregon_tires_appointments')
         .update({
           completed_at: completedAt.toISOString(),
           actual_duration_minutes: durationMinutes,
+          actual_duration_seconds: totalSeconds,
           status: 'completed'
         })
         .eq('id', appointmentId);
@@ -143,7 +145,7 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
 
       toast({
         title: "Timer Stopped",
-        description: `Appointment completed in ${durationMinutes} minutes. Status updated to Completed.`,
+        description: `Appointment completed in ${formatTime(totalSeconds)}. Status updated to Completed.`,
       });
 
       if (onAppointmentUpdated) {
