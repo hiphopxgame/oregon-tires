@@ -57,6 +57,16 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
   }, [isRunning, startTime]);
 
   const startTimer = async () => {
+    // Check if appointment is confirmed before allowing timer start
+    if (!appointment || appointment.status !== 'confirmed') {
+      toast({
+        title: "Cannot Start Timer",
+        description: "Appointment must be confirmed before starting the timer",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const now = new Date();
       
