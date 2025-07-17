@@ -31,25 +31,30 @@ const OregonTiresHero: React.FC<HeroProps> = ({
         backgroundRepeat: 'no-repeat'
       }}
     >
+      {/* Dark overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/50"></div>
+      
       <div className="container mx-auto px-4 text-center relative z-10">
-        <h1 className="text-5xl font-bold mb-6" style={{ textShadow: '2px 2px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000' }}>{t.heroTitle}</h1>
+        <h1 className="text-5xl font-bold mb-6 drop-shadow-2xl">{t.heroTitle}</h1>
         
-        {/* Updated tagline section */}
-        <div className="mb-8">
-          <p className="text-xl max-w-3xl mx-auto" style={{ textShadow: '1px 1px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000' }}>{t.heroSubtitle}</p>
+        {/* Enhanced tagline section with background */}
+        <div className="mb-8 flex justify-center">
+          <div className="bg-black/70 backdrop-blur-sm rounded-lg px-8 py-4 max-w-4xl">
+            <p className="text-xl font-medium text-white drop-shadow-lg">{t.heroSubtitle}</p>
+          </div>
         </div>
         
         <div className="flex justify-center gap-4 flex-wrap">
           <Button
             onClick={openContactForm}
-            className="text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors"
+            className="text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors shadow-lg"
             style={{ backgroundColor: secondaryColor }}
           >
             {t.contact}
           </Button>
           <Link to="/book-appointment">
             <Button 
-              className="bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+              className="bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
               style={{ color: primaryColor }}
             >
               {t.scheduleService}
