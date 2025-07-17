@@ -60,10 +60,10 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
 
   const startTimer = async () => {
     // Check if appointment is confirmed before allowing timer start
-    if (!appointment || appointment.status !== 'confirmed') {
+    if (!appointment || (appointment.status !== 'confirmed' && appointment.status !== 'new' && appointment.status !== 'pending')) {
       toast({
         title: "Cannot Start Timer",
-        description: "Appointment must be confirmed before starting the timer",
+        description: "Appointment must be in a valid status before starting the timer",
         variant: "destructive",
       });
       return;
@@ -76,7 +76,7 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
         .from('oregon_tires_appointments')
         .update({
           started_at: now.toISOString(),
-          status: 'active'
+          status: 'confirmed'
         })
         .eq('id', appointmentId);
 
@@ -88,7 +88,7 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
 
       toast({
         title: "Timer Started",
-        description: "Appointment timer has been started and status updated to Active.",
+        description: "Appointment timer has been started and status updated to Confirmed.",
       });
 
       if (onAppointmentUpdated) {
