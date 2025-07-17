@@ -59,11 +59,20 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
   }, [isRunning, startTime]);
 
   const startTimer = async () => {
-    // Check if appointment is confirmed before allowing timer start
-    if (!appointment || (appointment.status !== 'confirmed' && appointment.status !== 'new' && appointment.status !== 'pending')) {
+    // Check if appointment is confirmed and has employee assigned before allowing timer start
+    if (!appointment || appointment.status !== 'confirmed') {
       toast({
         title: "Cannot Start Timer",
-        description: "Appointment must be in a valid status before starting the timer",
+        description: "Appointment must be Confirmed before starting the timer",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!appointment.assigned_employee_id) {
+      toast({
+        title: "Cannot Start Timer",
+        description: "An employee must be assigned before starting the timer",
         variant: "destructive",
       });
       return;
