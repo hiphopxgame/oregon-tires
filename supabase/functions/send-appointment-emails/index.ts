@@ -29,7 +29,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { type, appointmentId, employeeEmail }: EmailRequest = await req.json();
 
-    // Fetch appointment details
+    // Fetch appointment details with formatted service name
     const { data: appointment, error: appointmentError } = await supabase
       .from('oregon_tires_appointments')
       .select(`
@@ -42,6 +42,13 @@ const handler = async (req: Request): Promise<Response> => {
     if (appointmentError || !appointment) {
       throw new Error('Appointment not found');
     }
+
+    // Format the service name
+    const { data: formattedServiceData } = await supabase
+      .rpc('format_service_name', { service_slug: appointment.service });
+    
+    const formattedServiceName = formattedServiceData || appointment.service;
+
 
     console.log('Processing email for appointment:', appointment.id, 'Type:', type);
 
@@ -59,7 +66,7 @@ const handler = async (req: Request): Promise<Response> => {
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #007030; margin-top: 0;">Appointment Details:</h3>
             <ul style="line-height: 1.6;">
-              <li><strong>Service:</strong> ${appointment.service}</li>
+              <li><strong>Service:</strong> ${formattedServiceName}</li>
               <li><strong>Date:</strong> ${appointment.preferred_date}</li>
               <li><strong>Time:</strong> ${appointment.preferred_time}</li>
               <li><strong>Location:</strong> ${appointment.service_location === 'mobile' ? 'Mobile Service' : 'Our Shop'}</li>
@@ -121,7 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
             
             <h3 style="color: #007030;">Appointment Details:</h3>
             <ul style="line-height: 1.6;">
-              <li><strong>Service:</strong> ${appointment.service}</li>
+              <li><strong>Service:</strong> ${formattedServiceName}</li>
               <li><strong>Date:</strong> ${appointment.preferred_date}</li>
               <li><strong>Time:</strong> ${appointment.preferred_time}</li>
               <li><strong>Location:</strong> ${appointment.service_location === 'mobile' ? 'Mobile Service' : 'Our Shop'}</li>
@@ -186,7 +193,7 @@ const handler = async (req: Request): Promise<Response> => {
           <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745;">
             <h3 style="color: #155724; margin-top: 0;">📋 Service Summary:</h3>
             <ul style="line-height: 1.8;">
-              <li><strong>Service:</strong> ${appointment.service}</li>
+              <li><strong>Service:</strong> ${formattedServiceName}</li>
               <li><strong>Date:</strong> ${appointment.preferred_date}</li>
               <li><strong>Technician:</strong> ${appointment.assigned_employee?.name || 'Oregon Tires Team'}</li>
               <li><strong>Service Duration:</strong> ${durationText}</li>

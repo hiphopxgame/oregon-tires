@@ -15,7 +15,7 @@ export const EmployeeManager = () => {
   const { employees, loading, refetch } = useEmployees();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<Partial<Employee>>({});
-  const [newEmployee, setNewEmployee] = useState({ name: '', email: '', phone: '' });
+  const [newEmployee, setNewEmployee] = useState({ name: '', email: '', phone: '', role: 'Worker' });
   const [showAddForm, setShowAddForm] = useState(false);
 
   const handleAddEmployee = async () => {
@@ -27,12 +27,13 @@ export const EmployeeManager = () => {
         .insert([{
           name: newEmployee.name,
           email: newEmployee.email || null,
-          phone: newEmployee.phone || null
+          phone: newEmployee.phone || null,
+          role: newEmployee.role
         }]);
 
       if (error) throw error;
 
-      setNewEmployee({ name: '', email: '', phone: '' });
+      setNewEmployee({ name: '', email: '', phone: '', role: 'Worker' });
       setShowAddForm(false);
       
       toast({
@@ -80,7 +81,8 @@ export const EmployeeManager = () => {
     setEditingData({
       name: employee.name,
       email: employee.email,
-      phone: employee.phone
+      phone: employee.phone,
+      role: employee.role
     });
   };
 
@@ -112,7 +114,7 @@ export const EmployeeManager = () => {
         {showAddForm && (
           <div className="mb-6 p-4 border rounded-lg bg-gray-50">
             <h4 className="font-medium mb-3">Add New Employee</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <div>
                 <Label htmlFor="name">Name *</Label>
                 <Input
@@ -141,6 +143,18 @@ export const EmployeeManager = () => {
                   placeholder="(555) 123-4567"
                 />
               </div>
+              <div>
+                <Label htmlFor="role">Role</Label>
+                <select
+                  id="role"
+                  className="w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:outline-none"
+                  value={newEmployee.role}
+                  onChange={(e) => setNewEmployee(prev => ({ ...prev, role: e.target.value }))}
+                >
+                  <option value="Worker">Worker</option>
+                  <option value="Manager">Manager</option>
+                </select>
+              </div>
             </div>
             <div className="flex gap-2 mt-3">
               <Button onClick={handleAddEmployee} size="sm">
@@ -152,7 +166,7 @@ export const EmployeeManager = () => {
                 size="sm"
                 onClick={() => {
                   setShowAddForm(false);
-                  setNewEmployee({ name: '', email: '', phone: '' });
+                  setNewEmployee({ name: '', email: '', phone: '', role: 'Worker' });
                 }}
               >
                 <X className="h-4 w-4 mr-1" />
@@ -169,7 +183,7 @@ export const EmployeeManager = () => {
               className="border rounded-lg bg-white p-3"
             >
               {editingId === employee.id ? (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
                   <Input
                     value={editingData.name || ''}
                     onChange={(e) => setEditingData(prev => ({ ...prev, name: e.target.value }))}
@@ -184,6 +198,14 @@ export const EmployeeManager = () => {
                     onChange={(e) => setEditingData(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="Phone"
                   />
+                  <select
+                    className="w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:outline-none"
+                    value={editingData.role || 'Worker'}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, role: e.target.value }))}
+                  >
+                    <option value="Worker">Worker</option>
+                    <option value="Manager">Manager</option>
+                  </select>
                   <div className="flex gap-2">
                     <Button 
                       size="sm" 
@@ -204,7 +226,16 @@ export const EmployeeManager = () => {
                 <>
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <div className="font-medium">{employee.name}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{employee.name}</span>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          employee.role === 'Manager' 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {employee.role}
+                        </span>
+                      </div>
                       <div className="text-sm text-gray-600">
                         {employee.email && <span>{employee.email}</span>}
                         {employee.email && employee.phone && <span> • </span>}

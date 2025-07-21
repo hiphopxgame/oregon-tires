@@ -1304,6 +1304,7 @@ export type Database = {
           is_active: boolean
           name: string
           phone: string | null
+          role: string | null
           updated_at: string
         }
         Insert: {
@@ -1313,6 +1314,7 @@ export type Database = {
           is_active?: boolean
           name: string
           phone?: string | null
+          role?: string | null
           updated_at?: string
         }
         Update: {
@@ -1322,6 +1324,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           phone?: string | null
+          role?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1932,6 +1935,7 @@ export type Database = {
           facebook_url: string | null
           id: string
           image_url: string | null
+          image_urls: string[] | null
           instagram_url: string | null
           is_featured: boolean
           is_recurring: boolean | null
@@ -1968,6 +1972,7 @@ export type Database = {
           facebook_url?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           instagram_url?: string | null
           is_featured?: boolean
           is_recurring?: boolean | null
@@ -2004,6 +2009,7 @@ export type Database = {
           facebook_url?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           instagram_url?: string | null
           is_featured?: boolean
           is_recurring?: boolean | null
@@ -2068,6 +2074,7 @@ export type Database = {
       venues: {
         Row: {
           address: string | null
+          ages: string | null
           approved_at: string | null
           approved_by: string | null
           city: string | null
@@ -2078,6 +2085,7 @@ export type Database = {
           google_rating: number | null
           google_review_count: number | null
           id: string
+          image_urls: string[] | null
           instagram_url: string | null
           latitude: number | null
           longitude: number | null
@@ -2093,6 +2101,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          ages?: string | null
           approved_at?: string | null
           approved_by?: string | null
           city?: string | null
@@ -2103,6 +2112,7 @@ export type Database = {
           google_rating?: number | null
           google_review_count?: number | null
           id?: string
+          image_urls?: string[] | null
           instagram_url?: string | null
           latitude?: number | null
           longitude?: number | null
@@ -2118,6 +2128,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          ages?: string | null
           approved_at?: string | null
           approved_by?: string | null
           city?: string | null
@@ -2128,6 +2139,7 @@ export type Database = {
           google_rating?: number | null
           google_review_count?: number | null
           id?: string
+          image_urls?: string[] | null
           instagram_url?: string | null
           latitude?: number | null
           longitude?: number | null
@@ -2151,6 +2163,10 @@ export type Database = {
       create_admin_user: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      format_service_name: {
+        Args: { service_slug: string }
+        Returns: string
       }
       handle_community_purchase: {
         Args: { p_user_id: string; p_cash_amount: number }
