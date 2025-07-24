@@ -30,12 +30,17 @@ export const AdminHeader = ({
     <header style={{ backgroundColor: '#007030' }} className="text-white shadow-lg">
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-4">
-          <div>
-            <Link to="/" className="hover:opacity-80">
-              <h1 className="text-3xl font-bold">Oregon Tires Admin</h1>
-              <p className="text-white/80">Management Dashboard</p>
-            </Link>
-          </div>
+          <Link to="/" className="hover:opacity-80 transition-opacity flex items-center gap-3">
+            <img 
+              src="/lovable-uploads/1290fb5e-e45c-4fc3-b523-e71d756ec1ef.png" 
+              alt="Oregon Tires Auto Care" 
+              className="h-12 w-auto"
+            />
+            <div>
+              <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+              <p className="text-white/80 text-sm">Management Dashboard</p>
+            </div>
+          </Link>
           <button 
             onClick={toggleLanguage} 
             className="text-white hover:text-yellow-200"

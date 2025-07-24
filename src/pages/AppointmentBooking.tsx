@@ -80,12 +80,13 @@ const AppointmentBooking = () => {
       <header className="bg-[#007030] text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <div>
-              <Link to="/" className="hover:opacity-80">
-                <h1 className="text-2xl font-bold">{t.title}</h1>
-                <p className="text-white/80">{t.booking.professionalServices}</p>
-              </Link>
-            </div>
+            <Link to="/" className="hover:opacity-80 transition-opacity">
+              <img 
+                src="/lovable-uploads/1290fb5e-e45c-4fc3-b523-e71d756ec1ef.png" 
+                alt="Oregon Tires Auto Care - Spanish & English Speaking" 
+                className="h-12 w-auto"
+              />
+            </Link>
             <div className="flex items-center gap-4">
               {/* Language Toggle */}
               <Button
