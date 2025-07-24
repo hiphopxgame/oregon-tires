@@ -5,6 +5,7 @@ import { CustomerInfo } from '@/pages/AppointmentBooking';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { toast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Clock, AlertTriangle, CheckCircle, Home, Calendar } from 'lucide-react';
 import { useScheduleAvailability } from '@/hooks/useScheduleAvailability';
 import { BookingSummary } from './BookingSummary';
@@ -18,6 +19,7 @@ interface ScheduleViewStepProps {
 }
 
 export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo }) => {
+  const { t } = useLanguage();
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
@@ -32,8 +34,8 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
   const handleBookAppointment = async () => {
     if (!selectedTime) {
       toast({
-        title: "Error",
-        description: "Please select a time slot",
+        title: t.booking.errorTitle,
+        description: t.booking.errorSelectTime,
         variant: "destructive",
       });
       return;
@@ -118,16 +120,16 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
       setBookingComplete(true);
       
       toast({
-        title: "Success!",
-        description: "Your appointment has been scheduled successfully. Check your email for confirmation.",
+        title: t.booking.successTitle,
+        description: t.booking.successDesc,
         variant: "default",
       });
       
     } catch (error) {
       console.error('Error booking appointment:', error);
       toast({
-        title: "Error",
-        description: "Failed to book appointment. Please try again.",
+        title: t.booking.errorTitle,
+        description: t.booking.errorDesc,
         variant: "destructive",
       });
     } finally {
@@ -141,7 +143,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <p className="text-gray-600">Loading schedule...</p>
+        <p className="text-gray-600">{t.booking.loadingSchedule}</p>
       </div>
     );
   }
@@ -150,8 +152,8 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
     return (
       <div className="text-center py-8">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-red-600 mb-2">Closed on Sundays</h3>
-        <p className="text-gray-600">We are closed on Sundays. Please select a different date.</p>
+        <h3 className="text-xl font-semibold text-red-600 mb-2">{t.booking.closedSundays}</h3>
+        <p className="text-gray-600">{t.booking.closedSundaysDesc}</p>
       </div>
     );
   }
@@ -160,23 +162,23 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
     return (
       <div className="text-center py-12">
         <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-6" />
-        <h2 className="text-3xl font-bold text-green-600 mb-4">Appointment Confirmed!</h2>
+        <h2 className="text-3xl font-bold text-green-600 mb-4">{t.booking.appointmentConfirmed}</h2>
         <p className="text-lg text-gray-600 mb-2">
-          Thank you, {customerInfo.firstName}! Your appointment has been successfully scheduled.
+          {t.booking.thankYou}, {customerInfo.firstName}! {t.booking.appointmentScheduled}
         </p>
         <p className="text-gray-600 mb-6">
-          We'll contact you soon to confirm the details.
+          {t.booking.contactSoon}
         </p>
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto mb-8">
-          <h3 className="font-semibold text-green-800 mb-2">Appointment Details:</h3>
+          <h3 className="font-semibold text-green-800 mb-2">{t.booking.appointmentDetails}:</h3>
           <p className="text-sm text-green-700">
-            <strong>Service:</strong> {customerInfo.service.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+            <strong>{t.booking.service}:</strong> {customerInfo.service.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
           </p>
           <p className="text-sm text-green-700">
-            <strong>Date:</strong> {selectedDate.toLocaleDateString()}
+            <strong>{t.booking.date}:</strong> {selectedDate.toLocaleDateString()}
           </p>
           <p className="text-sm text-green-700">
-            <strong>Time:</strong> {timeSlots.find(slot => slot.time === selectedTime)?.display}
+            <strong>{t.booking.time}:</strong> {timeSlots.find(slot => slot.time === selectedTime)?.display}
           </p>
         </div>
         
@@ -186,7 +188,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
             className="bg-[#007030] hover:bg-[#005a26] text-white flex items-center gap-2"
           >
             <Home className="h-4 w-4" />
-            Go to Home
+            {t.booking.goToHome}
           </Button>
           <Button 
             onClick={() => window.location.reload()}
@@ -194,7 +196,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
             className="border-[#007030] text-[#007030] hover:bg-[#007030] hover:text-white flex items-center gap-2"
           >
             <Calendar className="h-4 w-4" />
-            Book Another Appointment
+            {t.booking.bookAnother}
           </Button>
         </div>
       </div>
@@ -217,7 +219,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            Available Time Slots for {selectedDate.toDateString()}
+            {t.booking.availableSlots} {selectedDate.toDateString()}
           </CardTitle>
         </CardHeader>
         <CardContent>

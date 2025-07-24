@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface TimeSlot {
   time: string;
@@ -16,6 +17,7 @@ interface TimeSlotGridProps {
 }
 
 export const TimeSlotGrid: React.FC<TimeSlotGridProps> = ({ timeSlots, selectedTime, onTimeSelect }) => {
+  const { t } = useLanguage();
   const availableSlots = timeSlots.filter(slot => slot.status === 'available');
   const unavailableSlots = timeSlots.filter(slot => slot.status === 'unavailable');
 
@@ -70,18 +72,18 @@ export const TimeSlotGrid: React.FC<TimeSlotGridProps> = ({ timeSlots, selectedT
       <div className="flex flex-wrap gap-4 mb-6 text-sm">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
-          <span>Available ({availableSlots.length})</span>
+          <span>{t.booking.available} ({availableSlots.length})</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
-          <span>Unavailable ({unavailableSlots.length})</span>
+          <span>{t.booking.unavailable} ({unavailableSlots.length})</span>
         </div>
       </div>
 
       {/* Available times */}
       {renderSlotGroup(
         availableSlots,
-        'Available Times',
+        t.booking.availableTimes,
         'bg-green-100 border-green-300 text-green-800',
         'bg-green-600 text-white border-green-600'
       )}
@@ -89,7 +91,7 @@ export const TimeSlotGrid: React.FC<TimeSlotGridProps> = ({ timeSlots, selectedT
       {/* Unavailable times */}
       {renderSlotGroup(
         unavailableSlots,
-        'Unavailable Times',
+        t.booking.unavailableTimes,
         'bg-red-100 border-red-300 text-red-800',
         '',
         false

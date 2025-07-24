@@ -405,7 +405,7 @@ const translations = {
       availableTimes: "Horarios Disponibles",
       unavailableTimes: "Horarios No Disponibles",
       available: "Disponible",
-      unavailable: "No Disponible"
+      unavailable: "No disponible"
     }
   }
 };
