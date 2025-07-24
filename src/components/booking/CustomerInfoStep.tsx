@@ -41,7 +41,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
     }
 
     if (requiresAddress && (!customerInfo.address || !customerInfo.city || !customerInfo.state || !customerInfo.zip)) {
-      const serviceName = isMobileService ? 'mobile service' : 'roadside assistance';
+      const serviceName = isMobileService ? t.booking.mobileServiceText : t.booking.roadsideAssistanceText;
       alert(`${t.booking.validationAddress} ${serviceName}`);
       return;
     }
@@ -209,7 +209,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                 type="text"
                 value={customerInfo.tireSize}
                 onChange={(e) => onInputChange('tireSize', e.target.value)}
-                placeholder="e.g., 195/55R16"
+                placeholder={t.booking.tireSizePlaceholder}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
                 required
               />
@@ -232,7 +232,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                       type="text"
                       value={customerInfo.vehicleMake}
                       onChange={(e) => onInputChange('vehicleMake', e.target.value)}
-                      placeholder="e.g., Toyota"
+                      placeholder={t.booking.makePlaceholder}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
                     />
                   </div>
@@ -244,7 +244,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                       type="text"
                       value={customerInfo.vehicleModel}
                       onChange={(e) => onInputChange('vehicleModel', e.target.value)}
-                      placeholder="e.g., Camry"
+                      placeholder={t.booking.modelPlaceholder}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
                     />
                   </div>
@@ -256,7 +256,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                       type="number"
                       value={customerInfo.vehicleYear}
                       onChange={(e) => onInputChange('vehicleYear', e.target.value)}
-                      placeholder="e.g., 2020"
+                      placeholder={t.booking.yearPlaceholder}
                       min="1900"
                       max={new Date().getFullYear() + 1}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
@@ -278,7 +278,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                           type="text"
                           value={customerInfo.licensePlate}
                           onChange={(e) => onInputChange('licensePlate', e.target.value)}
-                          placeholder="e.g., ABC123"
+                          placeholder={t.booking.licensePlatePlaceholder}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
                         />
                       </div>
@@ -290,7 +290,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                           type="text"
                           value={customerInfo.vin}
                           onChange={(e) => onInputChange('vin', e.target.value)}
-                          placeholder="17-character VIN"
+                          placeholder={t.booking.vinPlaceholder}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
                           maxLength={17}
                         />
@@ -320,7 +320,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                     type="text"
                     value={customerInfo.address}
                     onChange={(e) => onInputChange('address', e.target.value)}
-                    placeholder="e.g., 123 Main Street"
+                    placeholder={t.booking.addressPlaceholder}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
                     required
                   />
@@ -334,7 +334,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                       type="text"
                       value={customerInfo.city}
                       onChange={(e) => onInputChange('city', e.target.value)}
-                      placeholder="e.g., Portland"
+                      placeholder={t.booking.cityPlaceholder}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
                       required
                     />
@@ -347,7 +347,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                       type="text"
                       value={customerInfo.state}
                       onChange={(e) => onInputChange('state', e.target.value)}
-                      placeholder="e.g., Oregon"
+                      placeholder={t.booking.statePlaceholder}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
                       required
                     />
@@ -360,7 +360,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                       type="text"
                       value={customerInfo.zip}
                       onChange={(e) => onInputChange('zip', e.target.value)}
-                      placeholder="e.g., 97201"
+                      placeholder={t.booking.zipPlaceholder}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
                       required
                     />
