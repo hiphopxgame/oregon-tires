@@ -605,6 +605,28 @@ const Translate = () => {
               englishKey={translations.english.fastReliableService} 
               spanishKey={translations.spanish.fastReliableService} 
             />
+
+            <SectionHeader title="Booking Page Elements" />
+            <div className="grid gap-2 text-sm">
+              {Object.entries(translations.english.booking).map(([key, value]) => (
+                <TranslationRow 
+                  key={key}
+                  labelKey={`booking.${key}`} 
+                  englishKey={value} 
+                  spanishKey={translations.spanish.booking[key as keyof typeof translations.spanish.booking]} 
+                />
+              ))}
+            </div>
+            
+            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="font-medium text-yellow-800 mb-2">Recent Updates:</p>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                <li>• Added missing form field translations</li>
+                <li>• Fixed placeholder text for vehicle information</li>
+                <li>• Added waiting room message translation</li>
+                <li>• Updated "Next: Review Schedule" button text</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

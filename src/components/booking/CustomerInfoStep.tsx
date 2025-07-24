@@ -423,7 +423,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
               onChange={(e) => onInputChange('message', e.target.value)}
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
-              placeholder="Please describe any specific concerns or additional information about your vehicle..."
+              placeholder={t.booking.vehiclePlaceholder}
             />
           </div>
         </CardContent>
@@ -433,7 +433,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
       <Card className="border-2 border-[#007030] bg-green-50">
         <CardContent className="p-4">
           <p className="text-[#007030] font-medium text-center">
-            While receiving your high quality auto service, please enjoy the comfort of our waiting room with free coffee, energy drinks, and more!
+            {t.booking.waitingRoomMessage}
           </p>
         </CardContent>
       </Card>
