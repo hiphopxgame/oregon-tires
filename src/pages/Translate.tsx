@@ -618,6 +618,32 @@ const Translate = () => {
               ))}
             </div>
             
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="font-medium text-blue-800 mb-2">📝 Personal Information Form Fields:</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="font-medium text-blue-700 mb-2">English:</p>
+                  <ul className="space-y-1 text-blue-600">
+                    <li>• Personal Information</li>
+                    <li>• First Name *</li>
+                    <li>• Last Name *</li>
+                    <li>• Phone Number *</li>
+                    <li>• Email Address</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-medium text-blue-700 mb-2">Spanish:</p>
+                  <ul className="space-y-1 text-blue-600">
+                    <li>• Información personal</li>
+                    <li>• Nombre *</li>
+                    <li>• Apellidos *</li>
+                    <li>• Número de teléfono *</li>
+                    <li>• Correo electrónico</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
             <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
               <p className="font-medium text-green-800 mb-2">✅ COMPLETE TRANSLATION STATUS:</p>
               <ul className="text-sm text-green-700 space-y-1">
@@ -630,8 +656,8 @@ const Translate = () => {
                 <li>• ✅ <strong>Complete Spanish support:</strong> /book-appointment fully bilingual</li>
               </ul>
               <div className="mt-3 p-3 bg-green-100 rounded border border-green-300">
-                <p className="text-green-800 font-medium">✅ All hardcoded English text has been replaced with translations!</p>
-                <p className="text-green-700 text-sm mt-1">Toggle between English/Spanish to test complete functionality.</p>
+                <p className="text-green-800 font-medium">✅ Personal Information translations updated to exact specifications!</p>
+                <p className="text-green-700 text-sm mt-1">Updated: "Last Name" → "Apellidos", "Phone Number" → "Número de teléfono", etc.</p>
               </div>
             </div>
           </div>
