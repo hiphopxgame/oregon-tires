@@ -655,8 +655,19 @@ const Translate = () => {
                 <li>• ✅ <strong>All service dropdown options:</strong> New Tires, Oil Change, Brake Service, etc.</li>
                 <li>• ✅ <strong>Complete Spanish support:</strong> /book-appointment fully bilingual</li>
               </ul>
+              <div className="mt-3 p-3 bg-blue-100 rounded border border-blue-300">
+                <p className="text-blue-800 font-medium">🎯 NEW: Separate Language-Specific Booking Pages!</p>
+                <ul className="text-blue-700 text-sm mt-2 space-y-1">
+                  <li>• 🇺🇸 <strong>English Form:</strong> /book-appointment (defaults to English)</li>
+                  <li>• 🇪🇸 <strong>Spanish Form:</strong> /programar-servicio (defaults to Spanish)</li>
+                  <li>• 🔄 <strong>Smart Routing:</strong> "Schedule Service" → English, "Programar Servicio" → Spanish</li>
+                  <li>• 📱 <strong>Language Toggle:</strong> Still available on both pages</li>
+                  <li>• ✅ <strong>Complete Bilingual Experience:</strong> Forms auto-set to appropriate language</li>
+                </ul>
+              </div>
+              
               <div className="mt-3 p-3 bg-green-100 rounded border border-green-300">
-                <p className="text-green-800 font-medium">✅ /book-appointment page fully updated with complete 2-language support!</p>
+                <p className="text-green-800 font-medium">✅ Complete 2-Language Support Implemented!</p>
                 <ul className="text-green-700 text-sm mt-2 space-y-1">
                   <li>• ✅ Navigation bar with language toggle and logo</li>
                   <li>• ✅ All form fields and labels translated</li>
@@ -664,7 +675,7 @@ const Translate = () => {
                   <li>• ✅ Validation messages and error handling bilingual</li>
                   <li>• ✅ Success confirmation page in both languages</li>
                   <li>• ✅ Date formatting and time display localized</li>
-                  <li>• ✅ Complete English ↔ Spanish functionality</li>
+                  <li>• ✅ Separate dedicated Spanish and English forms</li>
                 </ul>
               </div>
             </div>

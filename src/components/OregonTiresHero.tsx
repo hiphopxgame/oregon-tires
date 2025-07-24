@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 interface HeroProps {
   translations: any;
+  language: string;
   primaryColor: string;
   secondaryColor: string;
   openContactForm: () => void;
@@ -13,6 +14,7 @@ interface HeroProps {
 
 const OregonTiresHero: React.FC<HeroProps> = ({
   translations,
+  language,
   primaryColor,
   secondaryColor,
   openContactForm,
@@ -45,7 +47,7 @@ const OregonTiresHero: React.FC<HeroProps> = ({
           >
             {t.contact}
           </Button>
-          <Link to="/book-appointment">
+          <Link to={language === 'english' ? "/book-appointment" : "/programar-servicio"}>
             <Button 
               className="bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
               style={{ color: primaryColor }}

@@ -126,7 +126,7 @@ const OregonTiresHeader: React.FC<HeaderProps> = ({
               >
                 {t.contact}
               </button>
-              <Link to="/book-appointment">
+              <Link to={language === 'english' ? "/book-appointment" : "/programar-servicio"}>
                 <Button
                   className="bg-yellow-400 text-black hover:bg-yellow-500 px-6 py-2 rounded-lg font-semibold"
                 >

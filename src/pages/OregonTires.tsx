@@ -40,6 +40,7 @@ const OregonTires = () => {
       <div id="home" className="scroll-mt-24">
         <OregonTiresHero
           translations={t}
+          language={language}
           primaryColor={currentDesign.primaryColor}
           secondaryColor={currentDesign.secondaryColor}
           openContactForm={openContactForm}

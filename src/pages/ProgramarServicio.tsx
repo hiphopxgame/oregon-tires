@@ -1,11 +1,10 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, User, Calendar, Globe, Home } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { CustomerInfoStep } from '@/components/booking/CustomerInfoStep';
 import { ScheduleViewStep } from '@/components/booking/ScheduleViewStep';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Home, Phone, User, Calendar, Globe } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useLanguage } from '@/hooks/useLanguage';
 
 export interface CustomerInfo {
   firstName: string;
@@ -16,28 +15,21 @@ export interface CustomerInfo {
   preferredDate: string;
   message: string;
   tireSize: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  vehicleYear: string;
   licensePlate: string;
   vin: string;
   address: string;
   city: string;
   state: string;
   zip: string;
-  vehicleMake: string;
-  vehicleModel: string;
-  vehicleYear: string;
   travel_distance_miles: string;
   travel_cost_estimate: string;
 }
 
-const AppointmentBooking = () => {
-  const { t, language, toggleLanguage } = useLanguage();
-  // Force English language for this page
-  React.useEffect(() => {
-    if (language === 'spanish') {
-      toggleLanguage();
-    }
-  }, [language, toggleLanguage]);
-
+const ProgramarServicio = () => {
+  const { language, t, toggleLanguage } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     firstName: '',
@@ -48,23 +40,25 @@ const AppointmentBooking = () => {
     preferredDate: '',
     message: '',
     tireSize: '',
+    vehicleMake: '',
+    vehicleModel: '',
+    vehicleYear: '',
     licensePlate: '',
     vin: '',
     address: '',
     city: '',
     state: '',
     zip: '',
-    vehicleMake: '',
-    vehicleModel: '',
-    vehicleYear: '',
     travel_distance_miles: '',
     travel_cost_estimate: ''
   });
 
-  // Scroll to top when component mounts
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  // Force Spanish language for this page
+  React.useEffect(() => {
+    if (language === 'english') {
+      toggleLanguage();
+    }
+  }, [language, toggleLanguage]);
 
   const handleInputChange = (field: keyof CustomerInfo, value: string) => {
     setCustomerInfo(prev => ({
@@ -151,16 +145,16 @@ const AppointmentBooking = () => {
                     <Calendar className="h-4 w-4" />
                   </div>
                   <span>{t.booking.scheduleReview}</span>
-        </div>
-      </div>
-    </div>
+                </div>
+              </div>
+            </div>
 
             {/* Step content */}
             {currentStep === 1 && (
               <CustomerInfoStep 
-                customerInfo={customerInfo} 
+                customerInfo={customerInfo}
                 onInputChange={handleInputChange}
-                onNext={handleNext} 
+                onNext={handleNext}
               />
             )}
             
@@ -174,4 +168,4 @@ const AppointmentBooking = () => {
   );
 };
 
-export default AppointmentBooking;
+export default ProgramarServicio;
