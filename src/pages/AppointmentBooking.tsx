@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { CustomerInfoStep } from '@/components/booking/CustomerInfoStep';
 import { ScheduleViewStep } from '@/components/booking/ScheduleViewStep';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Home, Phone, User, Calendar } from 'lucide-react';
+import { ArrowLeft, Home, Phone, User, Calendar, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -30,7 +30,7 @@ export interface CustomerInfo {
 }
 
 const AppointmentBooking = () => {
-  const { t } = useLanguage();
+  const { t, language, toggleLanguage } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     firstName: '',
@@ -86,13 +86,25 @@ const AppointmentBooking = () => {
                 <p className="text-white/80">{t.booking.professionalServices}</p>
               </Link>
             </div>
-            <Link 
-              to="/" 
-              className="text-white hover:text-yellow-200 flex items-center gap-2"
-            >
-              <Home className="h-4 w-4" />
-              {t.booking.backToHome}
-            </Link>
+            <div className="flex items-center gap-4">
+              {/* Language Toggle */}
+              <Button
+                variant="ghost"
+                onClick={toggleLanguage}
+                className="text-white hover:text-yellow-200 hover:bg-white/10 flex items-center gap-2"
+              >
+                <Globe className="h-4 w-4" />
+                {language === 'english' ? 'Español' : 'English'}
+              </Button>
+              {/* Home Link */}
+              <Link 
+                to="/" 
+                className="text-white hover:text-yellow-200 flex items-center gap-2"
+              >
+                <Home className="h-4 w-4" />
+                {t.booking.backToHome}
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -131,9 +143,9 @@ const AppointmentBooking = () => {
                     <Calendar className="h-4 w-4" />
                   </div>
                   <span>{t.booking.scheduleReview}</span>
-                </div>
-              </div>
-            </div>
+        </div>
+      </div>
+    </div>
 
             {/* Step content */}
             {currentStep === 1 && (
