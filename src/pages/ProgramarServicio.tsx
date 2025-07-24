@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, User, Calendar, Globe, Home } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -30,6 +30,7 @@ export interface CustomerInfo {
 
 const ProgramarServicio = () => {
   const { language, t, toggleLanguage } = useLanguage();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     firstName: '',
@@ -92,11 +93,11 @@ const ProgramarServicio = () => {
               {/* Language Toggle */}
               <Button
                 variant="ghost"
-                onClick={toggleLanguage}
+                onClick={() => navigate('/book-appointment')}
                 className="text-white hover:text-yellow-200 hover:bg-white/10 flex items-center gap-2"
               >
                 <Globe className="h-4 w-4" />
-                {language === 'english' ? 'Español' : 'English'}
+                English
               </Button>
               {/* Home Link */}
               <Link 

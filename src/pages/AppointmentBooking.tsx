@@ -4,7 +4,7 @@ import { CustomerInfoStep } from '@/components/booking/CustomerInfoStep';
 import { ScheduleViewStep } from '@/components/booking/ScheduleViewStep';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Home, Phone, User, Calendar, Globe } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export interface CustomerInfo {
@@ -31,6 +31,7 @@ export interface CustomerInfo {
 
 const AppointmentBooking = () => {
   const { t, language, toggleLanguage } = useLanguage();
+  const navigate = useNavigate();
   // Force English language for this page
   React.useEffect(() => {
     if (language === 'spanish') {
@@ -98,11 +99,11 @@ const AppointmentBooking = () => {
               {/* Language Toggle */}
               <Button
                 variant="ghost"
-                onClick={toggleLanguage}
+                onClick={() => navigate('/programar-servicio')}
                 className="text-white hover:text-yellow-200 hover:bg-white/10 flex items-center gap-2"
               >
                 <Globe className="h-4 w-4" />
-                {language === 'english' ? 'Español' : 'English'}
+                Español
               </Button>
               {/* Home Link */}
               <Link 
