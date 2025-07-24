@@ -5,7 +5,6 @@ import { CustomerInfo } from '@/pages/AppointmentBooking';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { toast } from '@/hooks/use-toast';
-import { useLanguage } from '@/hooks/useLanguage';
 import { Clock, AlertTriangle, CheckCircle, Home, Calendar } from 'lucide-react';
 import { useScheduleAvailability } from '@/hooks/useScheduleAvailability';
 import { BookingSummary } from './BookingSummary';
@@ -16,10 +15,10 @@ import { Button } from '@/components/ui/button';
 
 interface ScheduleViewStepProps {
   customerInfo: CustomerInfo;
+  t: any; // Accept translations from parent
 }
 
-export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo }) => {
-  const { t } = useLanguage();
+export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo, t }) => {
   
   // Get the proper translated service name
   const getServiceDisplayName = (serviceValue: string) => {

@@ -5,20 +5,19 @@ import { Button } from '@/components/ui/button';
 import { CustomerInfo } from '@/pages/AppointmentBooking';
 import { User, Calendar, MessageSquare, Wrench, MapPin } from 'lucide-react';
 import { DistanceCalculator } from './DistanceCalculator';
-import { useLanguage } from '@/hooks/useLanguage';
-
 interface CustomerInfoStepProps {
   customerInfo: CustomerInfo;
   onInputChange: (field: keyof CustomerInfo, value: string) => void;
   onNext: () => void;
+  t: any; // Accept translations from parent
 }
 
 export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
   customerInfo,
   onInputChange,
-  onNext
+  onNext,
+  t
 }) => {
-  const { t } = useLanguage();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     

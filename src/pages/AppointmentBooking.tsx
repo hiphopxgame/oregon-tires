@@ -158,14 +158,15 @@ const AppointmentBooking = () => {
             {/* Step content */}
             {currentStep === 1 && (
               <CustomerInfoStep 
-                customerInfo={customerInfo} 
+                customerInfo={customerInfo}
                 onInputChange={handleInputChange}
-                onNext={handleNext} 
+                onNext={handleNext}
+                t={t}
               />
             )}
             
             {currentStep === 2 && (
-              <ScheduleViewStep customerInfo={customerInfo} />
+              <ScheduleViewStep customerInfo={customerInfo} t={t} />
             )}
           </div>
         </div>

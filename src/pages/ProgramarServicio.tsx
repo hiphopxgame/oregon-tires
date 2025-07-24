@@ -155,11 +155,12 @@ const ProgramarServicio = () => {
                 customerInfo={customerInfo}
                 onInputChange={handleInputChange}
                 onNext={handleNext}
+                t={t}
               />
             )}
             
             {currentStep === 2 && (
-              <ScheduleViewStep customerInfo={customerInfo} />
+              <ScheduleViewStep customerInfo={customerInfo} t={t} />
             )}
           </div>
         </div>
