@@ -5,6 +5,7 @@ import { ScheduleViewStep } from '@/components/booking/ScheduleViewStep';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Home, Phone, User, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export interface CustomerInfo {
   firstName: string;
@@ -29,6 +30,7 @@ export interface CustomerInfo {
 }
 
 const AppointmentBooking = () => {
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     firstName: '',
@@ -80,8 +82,8 @@ const AppointmentBooking = () => {
           <div className="flex justify-between items-center">
             <div>
               <Link to="/" className="hover:opacity-80">
-                <h1 className="text-2xl font-bold">Oregon Tires Auto Care</h1>
-                <p className="text-white/80">Professional Tire & Auto Services</p>
+                <h1 className="text-2xl font-bold">{t.title}</h1>
+                <p className="text-white/80">{t.booking.professionalServices}</p>
               </Link>
             </div>
             <Link 
@@ -89,7 +91,7 @@ const AppointmentBooking = () => {
               className="text-white hover:text-yellow-200 flex items-center gap-2"
             >
               <Home className="h-4 w-4" />
-              Back to Home
+              {t.booking.backToHome}
             </Link>
           </div>
         </div>
@@ -107,7 +109,7 @@ const AppointmentBooking = () => {
                   </Button>
                 )}
                 <h1 className="text-3xl font-bold text-[#007030]">
-                  Book Your Appointment
+                  {t.booking.pageTitle}
                 </h1>
               </div>
               
@@ -119,7 +121,7 @@ const AppointmentBooking = () => {
                   }`}>
                     <User className="h-4 w-4" />
                   </div>
-                  <span>Customer Info</span>
+                  <span>{t.booking.customerInfo}</span>
                 </div>
                 <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-[#007030]' : 'bg-gray-200'}`}></div>
                 <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-[#007030]' : 'text-gray-400'}`}>
@@ -128,7 +130,7 @@ const AppointmentBooking = () => {
                   }`}>
                     <Calendar className="h-4 w-4" />
                   </div>
-                  <span>Schedule Review</span>
+                  <span>{t.booking.scheduleReview}</span>
                 </div>
               </div>
             </div>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CustomerInfo } from '@/pages/AppointmentBooking';
 import { User, Calendar, MessageSquare, Wrench, MapPin } from 'lucide-react';
 import { DistanceCalculator } from './DistanceCalculator';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface CustomerInfoStepProps {
   customerInfo: CustomerInfo;
@@ -17,30 +18,31 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
   onInputChange,
   onNext
 }) => {
+  const { t } = useLanguage();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
     if (!customerInfo.firstName || !customerInfo.lastName || !customerInfo.phone || 
         !customerInfo.service || !customerInfo.preferredDate) {
-      alert('Please fill in all required fields');
+      alert(t.booking.validationRequired);
       return;
     }
 
     // Additional validation for service-specific fields
     if (isTireService && !customerInfo.tireSize) {
-      alert('Please enter your tire size for tire services');
+      alert(t.booking.validationTireSize);
       return;
     }
 
     if (requiresVehicleInfo && !customerInfo.licensePlate && !customerInfo.vin) {
-      alert('Please enter either your License Plate Number or VIN for this service');
+      alert(t.booking.validationVehicleId);
       return;
     }
 
     if (requiresAddress && (!customerInfo.address || !customerInfo.city || !customerInfo.state || !customerInfo.zip)) {
       const serviceName = isMobileService ? 'mobile service' : 'roadside assistance';
-      alert(`Please fill in your complete address for ${serviceName}`);
+      alert(`${t.booking.validationAddress} ${serviceName}`);
       return;
     }
 
@@ -82,14 +84,14 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            Personal Information
+            {t.booking.personalInfo}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">
-                First Name *
+                {t.booking.firstName} *
               </label>
               <input
                 type="text"
@@ -101,7 +103,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">
-                Last Name *
+                {t.booking.lastName} *
               </label>
               <input
                 type="text"
@@ -116,7 +118,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">
-                Phone Number *
+                {t.booking.phoneNumber} *
               </label>
               <input
                 type="tel"
@@ -128,7 +130,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">
-                Email Address
+                {t.booking.emailAddress}
               </label>
               <input
                 type="email"
@@ -145,13 +147,13 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wrench className="h-5 w-5" />
-            Service Information
+            {t.booking.serviceInfo}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">
-              Service Needed *
+              {t.booking.serviceNeeded} *
             </label>
             <select
               value={customerInfo.service}
@@ -159,7 +161,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#007030]"
               required
             >
-              <option value="">Select a service</option>
+              <option value="">{t.booking.selectService}</option>
               {services.map((service) => (
                 <option key={service.value} value={service.value}>
                   {service.label}
@@ -173,13 +175,13 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">💰</span>
                   <div>
-                    <p className="font-medium text-yellow-800">New Tires - Call for Pricing</p>
+                    <p className="font-medium text-yellow-800">{t.booking.newTiresPricing}</p>
                     <p className="text-sm text-yellow-700">
-                      Tire prices vary based on size, brand, and availability. Please call us at{' '}
+                      {t.booking.newTiresPricingDesc}{' '}
                       <a href="tel:503-555-0123" className="font-medium underline hover:text-yellow-800">
                         (503) 555-0123
                       </a>{' '}
-                      for current pricing and availability.
+                      {t.booking.newTiresPricingDesc2}
                     </p>
                   </div>
                 </div>
@@ -191,7 +193,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           {isTireService && (
             <div>
               <label className="block text-sm font-medium mb-2">
-                Tire Size *
+                {t.booking.tireSize} *
               </label>
               <div className="mb-4">
                 <img 
@@ -200,7 +202,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                   className="w-full max-w-md mx-auto rounded-lg border border-gray-300"
                 />
                 <p className="text-sm text-gray-600 mt-2 text-center">
-                  Use the reference above to find your tire size (e.g., 195/55R16)
+                  {t.booking.tireSizeRef}
                 </p>
               </div>
               <input
@@ -218,13 +220,13 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           {(requiresVehicleInfo || isTireService) && (
             <Card className="border-gray-200">
               <CardHeader>
-                <CardTitle className="text-sm">Vehicle Information</CardTitle>
+                <CardTitle className="text-sm">{t.booking.vehicleInfo}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Make
+                      {t.booking.make}
                     </label>
                     <input
                       type="text"
@@ -236,7 +238,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Model
+                      {t.booking.model}
                     </label>
                     <input
                       type="text"
@@ -248,7 +250,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Year
+                      {t.booking.year}
                     </label>
                     <input
                       type="number"
@@ -265,12 +267,12 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                 {requiresVehicleInfo && (
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-2">
-                      Vehicle Identification (Please provide at least one) *
+                      {t.booking.vehicleIdentification} *
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-2">
-                          License Plate Number
+                          {t.booking.licensePlate}
                         </label>
                         <input
                           type="text"
@@ -282,7 +284,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-2">
-                          VIN (Vehicle Identification Number)
+                          {t.booking.vin}
                         </label>
                         <input
                           type="text"
@@ -306,13 +308,13 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
               <CardHeader>
                 <CardTitle className={`flex items-center gap-2 ${isMobileService ? 'text-blue-800' : 'text-orange-800'}`}>
                   <MapPin className="h-5 w-5" />
-                  {isMobileService ? 'Service Address (Required for Mobile Service)' : 'Location Address (Required for Roadside Assistance)'}
+                  {isMobileService ? t.booking.serviceAddress : t.booking.locationAddress}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Street Address *
+                    {t.booking.streetAddress} *
                   </label>
                   <input
                     type="text"
@@ -326,7 +328,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      City *
+                      {t.booking.city} *
                     </label>
                     <input
                       type="text"
@@ -339,7 +341,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      State *
+                      {t.booking.state} *
                     </label>
                     <input
                       type="text"
@@ -352,7 +354,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      ZIP Code *
+                      {t.booking.zipCode} *
                     </label>
                     <input
                       type="text"
@@ -367,8 +369,8 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                 <div className={`${isMobileService ? 'bg-blue-100' : 'bg-orange-100'} p-3 rounded-lg`}>
                   <p className={`text-sm ${isMobileService ? 'text-blue-800' : 'text-orange-800'}`}>
                     {isMobileService 
-                      ? '📍 Mobile service available within 25 miles of Portland. Additional travel charges may apply for longer distances.'
-                      : '🚛 Emergency roadside assistance available 24/7. Distance and urgency fees apply.'}
+                      ? t.booking.mobileServiceNote
+                      : t.booking.roadsideNote}
                   </p>
                 </div>
                 
@@ -390,7 +392,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Preferred Date *
+              {t.booking.preferredDate} *
             </label>
             <input
               type="date"
@@ -408,13 +410,13 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />
-            Additional Information
+            {t.booking.additionalInfo}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div>
             <label className="block text-sm font-medium mb-2">
-              Message (Optional)
+              {t.booking.additionalMessage}
             </label>
             <textarea
               value={customerInfo.message}
@@ -441,7 +443,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           type="submit"
           className="bg-[#007030] hover:bg-[#005a26] text-white px-8 py-3"
         >
-          Continue to Schedule
+          {t.booking.nextButton}
         </Button>
       </div>
     </form>
