@@ -177,8 +177,8 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
                     <p className="font-medium text-yellow-800">{t.booking.newTiresPricing}</p>
                     <p className="text-sm text-yellow-700">
                       {t.booking.newTiresPricingDesc}{' '}
-                      <a href="tel:503-555-0123" className="font-medium underline hover:text-yellow-800">
-                        (503) 555-0123
+                      <a href="tel:503-367-9714" className="font-medium underline hover:text-yellow-800">
+                        (503) 367-9714
                       </a>{' '}
                       {t.booking.newTiresPricingDesc2}
                     </p>

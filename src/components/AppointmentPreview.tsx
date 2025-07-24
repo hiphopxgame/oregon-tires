@@ -196,7 +196,7 @@ const AppointmentPreview: React.FC<AppointmentPreviewProps> = ({ onBookAppointme
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-green-600" />
-              <span>(503) 555-0123</span>
+              <span>(503) 367-9714</span>
             </div>
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-green-600" />
