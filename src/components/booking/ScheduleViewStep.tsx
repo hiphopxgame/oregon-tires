@@ -20,6 +20,26 @@ interface ScheduleViewStepProps {
 
 export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo }) => {
   const { t } = useLanguage();
+  
+  // Get the proper translated service name
+  const getServiceDisplayName = (serviceValue: string) => {
+    const serviceMap: { [key: string]: string } = {
+      'new-tires': t.booking.newTires,
+      'used-tires': t.booking.usedTires,
+      'mount-and-balance-tires': t.booking.mountAndBalanceTires,
+      'tire-repair': t.booking.tireRepair,
+      'oil-change': t.booking.oilChange,
+      'front-or-back-brake-change': t.booking.frontOrBackBrakeChange,
+      'full-brake-change': t.booking.fullBrakeChange,
+      'tuneup': t.booking.tuneup,
+      'alignment': t.booking.alignment,
+      'mechanical-inspection-and-estimate': t.booking.mechanicalInspectionAndEstimate,
+      'mobile-service': t.booking.mobileService,
+      'roadside-assistance': t.booking.roadsideAssistance
+    };
+    return serviceMap[serviceValue] || serviceValue.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
+  
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
@@ -172,7 +192,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto mb-8">
           <h3 className="font-semibold text-green-800 mb-2">{t.booking.appointmentDetails}:</h3>
           <p className="text-sm text-green-700">
-            <strong>{t.booking.service}:</strong> {customerInfo.service.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+            <strong>{t.booking.service}:</strong> {getServiceDisplayName(customerInfo.service)}
           </p>
           <p className="text-sm text-green-700">
             <strong>{t.booking.date}:</strong> {selectedDate.toLocaleDateString()}

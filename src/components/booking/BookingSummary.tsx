@@ -12,6 +12,26 @@ interface BookingSummaryProps {
 
 export const BookingSummary: React.FC<BookingSummaryProps> = ({ customerInfo, serviceDuration }) => {
   const { t } = useLanguage();
+  
+  // Get the proper translated service name
+  const getServiceDisplayName = (serviceValue: string) => {
+    const serviceMap: { [key: string]: string } = {
+      'new-tires': t.booking.newTires,
+      'used-tires': t.booking.usedTires,
+      'mount-and-balance-tires': t.booking.mountAndBalanceTires,
+      'tire-repair': t.booking.tireRepair,
+      'oil-change': t.booking.oilChange,
+      'front-or-back-brake-change': t.booking.frontOrBackBrakeChange,
+      'full-brake-change': t.booking.fullBrakeChange,
+      'tuneup': t.booking.tuneup,
+      'alignment': t.booking.alignment,
+      'mechanical-inspection-and-estimate': t.booking.mechanicalInspectionAndEstimate,
+      'mobile-service': t.booking.mobileService,
+      'roadside-assistance': t.booking.roadsideAssistance
+    };
+    return serviceMap[serviceValue] || serviceValue.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
+  
   const selectedDate = new Date(customerInfo.preferredDate + 'T00:00:00');
 
   return (
@@ -30,7 +50,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({ customerInfo, se
             <p><strong>{t.booking.phone}:</strong> {customerInfo.phone}</p>
           </div>
           <div>
-            <p><strong>{t.booking.service}:</strong> {customerInfo.service.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+            <p><strong>{t.booking.service}:</strong> {getServiceDisplayName(customerInfo.service)}</p>
             <p><strong>{t.booking.date}:</strong> {selectedDate.toLocaleDateString()}</p>
             <p><strong>{t.booking.duration}:</strong> {serviceDuration} {t.booking.hours}</p>
           </div>
