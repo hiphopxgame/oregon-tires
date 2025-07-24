@@ -618,13 +618,14 @@ const Translate = () => {
               ))}
             </div>
             
-            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="font-medium text-yellow-800 mb-2">Recent Updates:</p>
-              <ul className="text-sm text-yellow-700 space-y-1">
-                <li>• Added missing form field translations</li>
-                <li>• Fixed placeholder text for vehicle information</li>
-                <li>• Added waiting room message translation</li>
-                <li>• Updated "Next: Review Schedule" button text</li>
+            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="font-medium text-green-800 mb-2">Latest Updates:</p>
+              <ul className="text-sm text-green-700 space-y-1">
+                <li>• ✅ Personal Information section fully translated</li>
+                <li>• ✅ Service Information section with all service options translated</li>
+                <li>• ✅ Additional Information section fully translated</li>
+                <li>• ✅ All form fields and labels now support both languages</li>
+                <li>• ✅ Service dropdown options translated (New Tires, Oil Change, etc.)</li>
               </ul>
             </div>
           </div>

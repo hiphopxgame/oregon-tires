@@ -50,18 +50,18 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
   };
 
   const services = [
-    { value: 'new-tires', label: 'New Tires' },
-    { value: 'used-tires', label: 'Used Tires' },
-    { value: 'mount-and-balance-tires', label: 'Mount and Balance Tires' },
-    { value: 'tire-repair', label: 'Tire Repair' },
-    { value: 'oil-change', label: 'Oil Change' },
-    { value: 'front-or-back-brake-change', label: 'Front or Back Brake Change' },
-    { value: 'full-brake-change', label: 'Full Brake Change' },
-    { value: 'tuneup', label: 'Tuneup' },
-    { value: 'alignment', label: 'Alignment' },
-    { value: 'mechanical-inspection-and-estimate', label: 'Mechanical Inspection and Estimate' },
-    { value: 'mobile-service', label: 'Mobile Service (At Your Home)' },
-    { value: 'roadside-assistance', label: 'Roadside Assistance (Any Location)' }
+    { value: 'new-tires', label: t.booking.newTires },
+    { value: 'used-tires', label: t.booking.usedTires },
+    { value: 'mount-and-balance-tires', label: t.booking.mountAndBalanceTires },
+    { value: 'tire-repair', label: t.booking.tireRepair },
+    { value: 'oil-change', label: t.booking.oilChange },
+    { value: 'front-or-back-brake-change', label: t.booking.frontOrBackBrakeChange },
+    { value: 'full-brake-change', label: t.booking.fullBrakeChange },
+    { value: 'tuneup', label: t.booking.tuneup },
+    { value: 'alignment', label: t.booking.alignment },
+    { value: 'mechanical-inspection-and-estimate', label: t.booking.mechanicalInspectionAndEstimate },
+    { value: 'mobile-service', label: t.booking.mobileService },
+    { value: 'roadside-assistance', label: t.booking.roadsideAssistance }
   ];
 
   // Tire services that require tire size
