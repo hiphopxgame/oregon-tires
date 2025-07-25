@@ -259,6 +259,7 @@ const translations = {
       // Dashboard Overview
       totalAppointments: "Total Appointments",
       thisWeek: "This week",
+      next14Days: "Next 14 days",
       pending: "Pending",
       awaitingConfirmation: "Awaiting confirmation",
       confirmed: "Confirmed",
@@ -273,6 +274,7 @@ const translations = {
       hours: "hours",
       moreAppointments: "more appointments",
       noAppointmentsThisWeek: "No appointments this week",
+      noAppointmentsNext14Days: "No appointments in the next 14 days",
       noActiveEmployees: "No active employees found",
       more: "more",
       // Appointments View
@@ -699,6 +701,7 @@ const translations = {
       // Dashboard Overview
       totalAppointments: "Total de Citas",
       thisWeek: "Esta semana",
+      next14Days: "Próximos 14 días",
       pending: "Pendientes",
       awaitingConfirmation: "Esperando confirmación",
       confirmed: "Confirmadas",
@@ -713,6 +716,7 @@ const translations = {
       hours: "horas",
       moreAppointments: "más citas",
       noAppointmentsThisWeek: "Sin citas esta semana",
+      noAppointmentsNext14Days: "Sin citas en los próximos 14 días",
       noActiveEmployees: "No se encontraron empleados activos",
       more: "más",
       // Appointments View

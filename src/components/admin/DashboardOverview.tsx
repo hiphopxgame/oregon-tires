@@ -1,10 +1,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, User, MapPin } from 'lucide-react';
+import { Calendar, Clock, User, MapPin, CalendarX } from 'lucide-react';
 import { Appointment } from '@/types/admin';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useLanguage } from '@/hooks/useLanguage';
+import { format, addDays, startOfDay, isAfter, isBefore } from 'date-fns';
 
 interface DashboardOverviewProps {
   appointments: Appointment[];
@@ -14,36 +15,37 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
   const { employees } = useEmployees();
   const { t } = useLanguage();
 
-  // Get current week's dates
-  const today = new Date();
-  const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 6); // End of week (Saturday)
+  // Get the next 14 days starting from today
+  const today = startOfDay(new Date());
+  const next14Days = Array.from({ length: 14 }, (_, i) => addDays(today, i));
 
-  // Filter appointments for current week
-  const weekAppointments = appointments.filter(apt => {
-    const aptDate = new Date(apt.preferred_date);
-    return aptDate >= weekStart && aptDate <= weekEnd;
+  // Filter appointments for the next 14 days
+  const upcomingAppointments = appointments.filter(apt => {
+    const aptDate = new Date(apt.preferred_date + 'T00:00:00');
+    const endOfFourteenthDay = addDays(today, 14);
+    return isAfter(aptDate, addDays(today, -1)) && isBefore(aptDate, endOfFourteenthDay);
   });
 
-  // Group appointments by day
-  const appointmentsByDay = weekAppointments.reduce((acc, apt) => {
-    const day = new Date(apt.preferred_date).toLocaleDateString('en-US', { weekday: 'long' });
-    if (!acc[day]) acc[day] = [];
-    acc[day].push(apt);
-    return acc;
-  }, {} as Record<string, Appointment[]>);
+  // Group appointments by date
+  const appointmentsByDate = next14Days.map(date => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const dayAppointments = upcomingAppointments.filter(apt => apt.preferred_date === dateStr);
+    return {
+      date,
+      dateStr,
+      appointments: dayAppointments
+    };
+  });
 
   // Calculate statistics
-  const totalAppointments = weekAppointments.length;
-  const pendingAppointments = weekAppointments.filter(apt => apt.status === 'new').length;
-  const confirmedAppointments = weekAppointments.filter(apt => apt.status === 'confirmed').length;
-  const completedAppointments = weekAppointments.filter(apt => apt.status === 'completed').length;
+  const totalAppointments = upcomingAppointments.length;
+  const pendingAppointments = upcomingAppointments.filter(apt => apt.status === 'new').length;
+  const confirmedAppointments = upcomingAppointments.filter(apt => apt.status === 'confirmed').length;
+  const completedAppointments = upcomingAppointments.filter(apt => apt.status === 'completed').length;
 
-  // Generate employee schedule for the week
+  // Generate employee schedule for the next 14 days
   const employeeSchedule = employees.filter(emp => emp.is_active).map(employee => {
-    const employeeAppointments = weekAppointments.filter(apt => apt.assigned_employee_id === employee.id);
+    const employeeAppointments = upcomingAppointments.filter(apt => apt.assigned_employee_id === employee.id);
     return {
       employee,
       appointments: employeeAppointments,
@@ -73,7 +75,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalAppointments}</div>
-            <p className="text-xs text-muted-foreground">{t.admin.thisWeek}</p>
+            <p className="text-xs text-muted-foreground">{t.admin.next14Days}</p>
           </CardContent>
         </Card>
 
@@ -119,37 +121,50 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
             <CardTitle>{t.admin.thisWeeksAppointments}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => {
-                const dayAppointments = appointmentsByDay[day] || [];
-                return (
-                  <div key={day} className="border-l-4 border-primary pl-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium">{day}</h4>
-                      <Badge variant="outline">{dayAppointments.length} {t.admin.appointmentsCount}</Badge>
-                    </div>
-                    {dayAppointments.length > 0 ? (
-                      <div className="space-y-2">
-                        {dayAppointments.slice(0, 3).map(apt => (
-                          <div key={apt.id} className="text-sm flex items-center justify-between bg-muted/50 p-2 rounded">
-                            <div>
-                              <span className="font-medium">{apt.preferred_time}</span> - {apt.first_name} {apt.last_name}
-                            </div>
-                            <Badge className={getStatusColor(apt.status)} variant="secondary">
-                              {apt.status}
-                            </Badge>
-                          </div>
-                        ))}
-                        {dayAppointments.length > 3 && (
-                          <p className="text-xs text-muted-foreground">+{dayAppointments.length - 3} {t.admin.more}</p>
-                        )}
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {appointmentsByDate.map(({ date, appointments: dayAppointments }) => (
+                <div key={date.toISOString()} className="border-l-4 border-primary pl-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium">{format(date, 'EEEE, MMMM d, yyyy')}</h4>
+                    {dayAppointments.length === 0 ? (
+                      <div className="flex items-center gap-2">
+                        <CalendarX className="h-4 w-4 text-orange-600" />
+                        <Badge variant="outline" className="border-orange-600 text-orange-600">
+                          {t.admin.noAppointments}
+                        </Badge>
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">{t.admin.noAppointments}</p>
+                      <Badge variant="outline">{dayAppointments.length} {t.admin.appointmentsCount}</Badge>
                     )}
                   </div>
-                );
-              })}
+                  {dayAppointments.length > 0 ? (
+                    <div className="space-y-2">
+                      {dayAppointments.slice(0, 3).map(apt => (
+                        <a 
+                          key={apt.id} 
+                          href={`#appointment-${apt.id}`}
+                          className="text-sm flex items-center justify-between bg-muted/50 p-2 rounded hover:bg-muted/70 transition-colors cursor-pointer"
+                        >
+                          <div>
+                            <span className="font-medium">{apt.preferred_time}</span> - {apt.first_name} {apt.last_name}
+                          </div>
+                          <Badge className={getStatusColor(apt.status)} variant="secondary">
+                            {t.admin.status[apt.status] || apt.status}
+                          </Badge>
+                        </a>
+                      ))}
+                      {dayAppointments.length > 3 && (
+                        <p className="text-xs text-muted-foreground">+{dayAppointments.length - 3} {t.admin.more}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      <CalendarX className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-muted-foreground">{t.admin.dayAvailableForBooking}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -177,18 +192,22 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
                   {appointments.length > 0 ? (
                     <div className="space-y-2">
                       {appointments.slice(0, 2).map(apt => (
-                        <div key={apt.id} className="text-sm flex items-center gap-2 bg-muted/30 p-2 rounded">
+                        <a 
+                          key={apt.id} 
+                          href={`#appointment-${apt.id}`}
+                          className="text-sm flex items-center gap-2 bg-muted/30 p-2 rounded hover:bg-muted/50 transition-colors cursor-pointer"
+                        >
                           <Calendar className="h-3 w-3" />
-                          <span>{new Date(apt.preferred_date).toLocaleDateString()} {apt.preferred_time}</span>
+                          <span>{format(new Date(apt.preferred_date), 'MMM d')} {apt.preferred_time}</span>
                           {apt.service_location === 'mobile' && <MapPin className="h-3 w-3" />}
-                        </div>
+                        </a>
                       ))}
                       {appointments.length > 2 && (
                         <p className="text-xs text-muted-foreground pl-5">+{appointments.length - 2} {t.admin.moreAppointments}</p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">{t.admin.noAppointmentsThisWeek}</p>
+                    <p className="text-sm text-muted-foreground">{t.admin.noAppointmentsNext14Days}</p>
                   )}
                 </div>
               ))}
