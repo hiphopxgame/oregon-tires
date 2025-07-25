@@ -274,11 +274,25 @@ export const EmployeeManager = () => {
                   </div>
                   
                   {/* Schedule conflict alert */}
-                  {employeeWithSchedule && <EmployeeScheduleAlert employee={employeeWithSchedule} />}
+                  {employeeWithSchedule && (
+                    <EmployeeScheduleAlert 
+                      employee={employeeWithSchedule} 
+                      onAppointmentClick={(employeeId, date) => {
+                        setExpandedSchedule(employeeId);
+                        // Scroll to the schedule section after a brief delay
+                        setTimeout(() => {
+                          const element = document.getElementById(`schedule-${employeeId}`);
+                          element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }, 100);
+                      }}
+                    />
+                  )}
                   
                   {/* Employee schedule management */}
                   {expandedSchedule === employee.id && employeeWithSchedule && (
-                    <EmployeeCalendarSchedule employee={employeeWithSchedule} />
+                    <div id={`schedule-${employee.id}`}>
+                      <EmployeeCalendarSchedule employee={employeeWithSchedule} />
+                    </div>
                   )}
                 </>
               )}

@@ -7,9 +7,10 @@ import { useEmployeeSchedules, EmployeeWithSchedule } from '@/hooks/useEmployeeS
 
 interface EmployeeScheduleAlertProps {
   employee: EmployeeWithSchedule;
+  onAppointmentClick?: (employeeId: string, date: string) => void;
 }
 
-export const EmployeeScheduleAlert = ({ employee }: EmployeeScheduleAlertProps) => {
+export const EmployeeScheduleAlert = ({ employee, onAppointmentClick }: EmployeeScheduleAlertProps) => {
   const { appointments } = useAdminData();
   const { isEmployeeScheduled } = useEmployeeSchedules();
 
@@ -53,14 +54,17 @@ export const EmployeeScheduleAlert = ({ employee }: EmployeeScheduleAlertProps) 
         </div>
         
         <div className="mt-2 space-y-1">
-          {uniqueDates.map(dateStr => {
-            const date = new Date(dateStr);
+          {conflictingAppointments.map(appointment => {
+            const date = new Date(appointment.preferred_date);
             const dayName = dayNames[date.getDay()];
-            const appointmentsForDate = conflictingAppointments.filter(apt => apt.preferred_date === dateStr);
             
             return (
-              <div key={dateStr} className="text-sm text-orange-700">
-                • {dayName}, {date.toLocaleDateString()} - {appointmentsForDate.map(apt => apt.preferred_time).join(', ')}
+              <div 
+                key={appointment.id} 
+                className="text-sm text-orange-700 cursor-pointer hover:bg-orange-100 p-1 rounded transition-colors"
+                onClick={() => onAppointmentClick?.(employee.id, appointment.preferred_date)}
+              >
+                • {dayName}, {date.toLocaleDateString()} at {appointment.preferred_time} - {appointment.first_name} {appointment.last_name}
               </div>
             );
           })}
