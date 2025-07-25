@@ -4,21 +4,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Edit2, Save, X } from 'lucide-react';
+import { Plus, Edit2, Save, X, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmployees, Employee } from '@/hooks/useEmployees';
+import { useEmployeeSchedules } from '@/hooks/useEmployeeSchedules';
 import { useLanguage } from '@/hooks/useLanguage';
+import { EmployeeScheduleManager } from './EmployeeScheduleManager';
+import { EmployeeScheduleAlert } from './EmployeeScheduleAlert';
 
 
 export const EmployeeManager = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const { employees, loading, refetch } = useEmployees();
+  const { employeesWithSchedules, loading: schedulesLoading } = useEmployeeSchedules();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<Partial<Employee>>({});
   const [newEmployee, setNewEmployee] = useState({ name: '', email: '', phone: '', role: 'Worker' });
   const [showAddForm, setShowAddForm] = useState(false);
+  const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
 
   const handleAddEmployee = async () => {
     if (!newEmployee.name.trim()) return;
@@ -93,7 +98,7 @@ export const EmployeeManager = () => {
     setEditingData({});
   };
 
-  if (loading) {
+  if (loading || schedulesLoading) {
     return <div className="text-green-700">{t.admin.loadingEmployees}</div>;
   }
 
@@ -179,12 +184,15 @@ export const EmployeeManager = () => {
         )}
 
         <div className="space-y-3">
-          {employees.map((employee) => (
-            <div 
-              key={employee.id} 
-              className="border rounded-lg bg-white p-3"
-            >
-              {editingId === employee.id ? (
+          {employees.map((employee) => {
+            const employeeWithSchedule = employeesWithSchedules.find(emp => emp.id === employee.id);
+            
+            return (
+              <div 
+                key={employee.id} 
+                className="border rounded-lg bg-white p-3"
+              >
+                {editingId === employee.id ? (
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
                   <Input
                     value={editingData.name || ''}
@@ -248,6 +256,16 @@ export const EmployeeManager = () => {
                       <Button 
                         variant="outline" 
                         size="sm"
+                        onClick={() => setExpandedSchedule(
+                          expandedSchedule === employee.id ? null : employee.id
+                        )}
+                      >
+                        <Calendar className="h-4 w-4 mr-1" />
+                        Schedule
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
                         onClick={() => startEditing(employee)}
                       >
                         <Edit2 className="h-4 w-4" />
@@ -255,11 +273,18 @@ export const EmployeeManager = () => {
                     </div>
                   </div>
                   
-                  {/* Employee information displayed, scheduling handled in DaySchedulePanel */}
+                  {/* Schedule conflict alert */}
+                  {employeeWithSchedule && <EmployeeScheduleAlert employee={employeeWithSchedule} />}
+                  
+                  {/* Employee schedule management */}
+                  {expandedSchedule === employee.id && employeeWithSchedule && (
+                    <EmployeeScheduleManager employee={employeeWithSchedule} />
+                  )}
                 </>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {employees.length === 0 && (
