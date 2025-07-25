@@ -371,7 +371,61 @@ const translations = {
       wednesday: "Wednesday",
       thursday: "Thursday",
       friday: "Friday",
-      saturday: "Saturday"
+      saturday: "Saturday",
+      
+      // Calendar & Scheduling
+      appointmentCalendar: "Appointment Calendar",
+      selectDate: "Select Date",
+      chooseDateToView: "Choose a date to view appointments",
+      appointmentsScheduled: "appointments scheduled",
+      noAppointmentsDate: "No appointments scheduled for this date",
+      dayView: "Day View",
+      weeklyView: "Weekly View", 
+      monthlyView: "Monthly View",
+      
+      // Day View & Scheduling
+      dailySchedule: "Daily Schedule",
+      servicesDurations: "Service Durations",
+      tireServices: "Tire Services",
+      brakeServices: "Brake Services",
+      otherServices: "Other Services",
+      businessHoursNote: "Business hours: 7 AM - 7 PM",
+      dailySummary: "Daily Summary",
+      fullTimeSlots: "Full Time Slots",
+      overbookedSlots: "Overbooked Slots",
+      availableSlots: "Available Slots",
+      schedulingConflicts: "Scheduling Conflicts",
+      detailedConflicts: "Detailed Scheduling Conflicts",
+      timeSlot: "Time Slot",
+      conflictType: "Conflict Type",
+      
+      // Common Status
+      inProgress: "In Progress",
+      
+      // Time & Date
+      morning: "Morning",
+      afternoon: "Afternoon",
+      evening: "Evening",
+      today: "Today",
+      tomorrow: "Tomorrow",
+      yesterday: "Yesterday",
+      
+      // Common Actions
+      loading: "Loading...",
+      search: "Search",
+      filter: "Filter",
+      sort: "Sort",
+      export: "Export",
+      print: "Print",
+      close: "Close",
+      open: "Open",
+      select: "Select",
+      clear: "Clear",
+      apply: "Apply",
+      reset: "Reset",
+      edit: "Edit",
+      update: "Update",
+      delete: "Delete"
     }
   },
   spanish: {
@@ -745,7 +799,61 @@ const translations = {
       wednesday: "Miércoles",
       thursday: "Jueves",
       friday: "Viernes",
-      saturday: "Sábado"
+      saturday: "Sábado",
+      
+      // Calendar & Scheduling
+      appointmentCalendar: "Calendario de Citas",
+      selectDate: "Seleccionar Fecha",
+      chooseDateToView: "Elige una fecha para ver las citas",
+      appointmentsScheduled: "citas programadas",
+      noAppointmentsDate: "No hay citas programadas para esta fecha",
+      dayView: "Vista Diaria",
+      weeklyView: "Vista Semanal",
+      monthlyView: "Vista Mensual",
+      
+      // Day View & Scheduling
+      dailySchedule: "Horario Diario",
+      servicesDurations: "Duraciones de Servicios",
+      tireServices: "Servicios de Llantas",
+      brakeServices: "Servicios de Frenos",
+      otherServices: "Otros Servicios",
+      businessHoursNote: "Horario comercial: 7 AM - 7 PM",
+      dailySummary: "Resumen Diario",
+      fullTimeSlots: "Horarios Completos",
+      overbookedSlots: "Horarios Sobrecargados",
+      availableSlots: "Horarios Disponibles",
+      schedulingConflicts: "Conflictos de Programación",
+      detailedConflicts: "Conflictos Detallados de Programación",
+      timeSlot: "Horario",
+      conflictType: "Tipo de Conflicto",
+      
+      // Common Status
+      inProgress: "En Progreso",
+      
+      // Time & Date
+      morning: "Mañana",
+      afternoon: "Tarde",
+      evening: "Noche",
+      today: "Hoy",
+      tomorrow: "Mañana",
+      yesterday: "Ayer",
+      
+      // Common Actions
+      loading: "Cargando...",
+      search: "Buscar",
+      filter: "Filtrar",
+      sort: "Ordenar",
+      export: "Exportar",
+      print: "Imprimir",
+      close: "Cerrar",
+      open: "Abrir",
+      select: "Seleccionar",
+      clear: "Limpiar",
+      apply: "Aplicar",
+      reset: "Restablecer",
+      edit: "Editar",
+      update: "Actualizar",
+      delete: "Eliminar"
     }
   }
 };

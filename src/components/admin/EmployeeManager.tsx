@@ -8,9 +8,11 @@ import { Plus, Edit2, Save, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmployees, Employee } from '@/hooks/useEmployees';
+import { useLanguage } from '@/hooks/useLanguage';
 
 
 export const EmployeeManager = () => {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const { employees, loading, refetch } = useEmployees();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -37,14 +39,14 @@ export const EmployeeManager = () => {
       setShowAddForm(false);
       
       toast({
-        title: "Success",
-        description: "Employee added successfully",
+        title: t.admin.success,
+        description: t.admin.employeeAddedSuccess,
       });
     } catch (error) {
       console.error('Error adding employee:', error);
       toast({
-        title: "Error",
-        description: "Failed to add employee",
+        title: t.admin.error,
+        description: t.admin.failedToAddEmployee,
         variant: "destructive",
       });
     }
@@ -63,14 +65,14 @@ export const EmployeeManager = () => {
       setEditingData({});
 
       toast({
-        title: "Success",
-        description: "Employee updated successfully",
+        title: t.admin.success,
+        description: t.admin.employeeUpdatedSuccess,
       });
     } catch (error) {
       console.error('Error updating employee:', error);
       toast({
-        title: "Error",
-        description: "Failed to update employee",
+        title: t.admin.error,
+        description: t.admin.failedToUpdateEmployee,
         variant: "destructive",
       });
     }
@@ -92,31 +94,31 @@ export const EmployeeManager = () => {
   };
 
   if (loading) {
-    return <div className="text-green-700">Loading employees...</div>;
+    return <div className="text-green-700">{t.admin.loadingEmployees}</div>;
   }
 
   return (
     <Card className="border-2 border-green-700">
       <CardHeader className="bg-green-700 text-white">
         <div className="flex items-center justify-between">
-          <CardTitle>Employee Management</CardTitle>
+          <CardTitle>{t.admin.employeeManagement}</CardTitle>
           <Button 
             variant="secondary" 
             size="sm"
             onClick={() => setShowAddForm(!showAddForm)}
           >
             <Plus className="h-4 w-4 mr-1" />
-            Add Employee
+            {t.admin.addEmployee}
           </Button>
         </div>
       </CardHeader>
       <CardContent className="p-4">
         {showAddForm && (
           <div className="mb-6 p-4 border rounded-lg bg-gray-50">
-            <h4 className="font-medium mb-3">Add New Employee</h4>
+            <h4 className="font-medium mb-3">{t.admin.addNewEmployee}</h4>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <div>
-                <Label htmlFor="name">Name *</Label>
+                <Label htmlFor="name">{t.admin.name} *</Label>
                 <Input
                   id="name"
                   value={newEmployee.name}
@@ -262,7 +264,7 @@ export const EmployeeManager = () => {
 
         {employees.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            No employees found. Add your first employee above.
+            {t.admin.noEmployeesFound}
           </div>
         )}
       </CardContent>

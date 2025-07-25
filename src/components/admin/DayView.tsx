@@ -4,6 +4,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, Clock } from 'lucide-react';
 import { Appointment } from '@/types/admin';
 import { DayViewTimeSlot } from './DayViewTimeSlot';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface DayViewProps {
   appointments: Appointment[];
@@ -26,6 +27,7 @@ interface ConflictDetail {
 }
 
 export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, onDataRefresh }: DayViewProps) => {
+  const { t } = useLanguage();
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [overlapWarnings, setOverlapWarnings] = useState<string[]>([]);
   const [detailedConflicts, setDetailedConflicts] = useState<ConflictDetail[]>([]);
@@ -213,7 +215,7 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, o
         <Alert variant="destructive" className="border-red-200 bg-red-50">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            <div className="font-semibold mb-3">Detailed Scheduling Conflicts:</div>
+            <div className="font-semibold mb-3">{t.admin.detailedConflicts}:</div>
             {detailedConflicts.map((conflict, index) => (
               <div key={index} className="mb-4 p-3 bg-white rounded border border-red-200">
                 <div className="font-medium text-red-800 mb-2">
@@ -243,7 +245,7 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, o
         <Alert variant="destructive" className="border-red-200 bg-red-50">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            <div className="font-semibold mb-2">Scheduling Conflicts Detected:</div>
+            <div className="font-semibold mb-2">{t.admin.schedulingConflicts} Detected:</div>
             <ul className="list-disc list-inside space-y-1">
               {overlapWarnings.map((warning, index) => (
                 <li key={index} className="text-sm">{warning}</li>
@@ -256,13 +258,13 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, o
       {/* Service Duration Legend */}
       <Card className="border-2 border-blue-200 bg-blue-50">
         <CardContent className="p-4">
-          <h3 className="font-semibold mb-2">Service Durations:</h3>
+          <h3 className="font-semibold mb-2">{t.admin.servicesDurations}:</h3>
           <div className="grid grid-cols-3 gap-4 text-sm">
-            <div><strong>Tire Services:</strong> 1.5 hours</div>
-            <div><strong>Brake Services:</strong> 2.5 hours</div>
-            <div><strong>Other Services:</strong> 3.5 hours</div>
+            <div><strong>{t.admin.tireServices}:</strong> 1.5 {t.admin.hours}</div>
+            <div><strong>{t.admin.brakeServices}:</strong> 2.5 {t.admin.hours}</div>
+            <div><strong>{t.admin.otherServices}:</strong> 3.5 {t.admin.hours}</div>
           </div>
-          <p className="text-xs text-gray-600 mt-2">Business hours: 7 AM - 7 PM</p>
+          <p className="text-xs text-gray-600 mt-2">{t.admin.businessHoursNote}</p>
         </CardContent>
       </Card>
 
@@ -286,7 +288,7 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, o
       {/* Summary */}
       <Card className="border-2 border-green-700">
         <CardHeader className="bg-green-700 text-white">
-          <CardTitle>Daily Summary</CardTitle>
+          <CardTitle>{t.admin.dailySummary}</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -294,25 +296,25 @@ export const DayView = ({ appointments, selectedDate, updateAppointmentStatus, o
               <div className="text-2xl font-bold text-green-600">
                 {timeSlots.reduce((sum, slot) => sum + slot.appointments.length, 0)}
               </div>
-              <div className="text-sm text-gray-600">Total Appointments</div>
+              <div className="text-sm text-gray-600">{t.admin.totalAppointments}</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-yellow-600">
                 {timeSlots.filter(slot => slot.appointments.length === 2).length}
               </div>
-              <div className="text-sm text-gray-600">Full Time Slots</div>
+              <div className="text-sm text-gray-600">{t.admin.fullTimeSlots}</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-red-600">
                 {timeSlots.filter(slot => slot.hasOverlap).length}
               </div>
-              <div className="text-sm text-gray-600">Overbooked Slots</div>
+              <div className="text-sm text-gray-600">{t.admin.overbookedSlots}</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-gray-600">
                 {timeSlots.filter(slot => slot.appointments.length === 0).length}
               </div>
-              <div className="text-sm text-gray-600">Available Slots</div>
+              <div className="text-sm text-gray-600">{t.admin.availableSlots}</div>
             </div>
           </div>
         </CardContent>

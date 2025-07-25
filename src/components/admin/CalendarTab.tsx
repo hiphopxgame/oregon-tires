@@ -5,6 +5,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Appointment } from '@/types/admin';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface CalendarTabProps {
   appointments: Appointment[];
@@ -12,20 +13,33 @@ interface CalendarTabProps {
 }
 
 export const CalendarTab = ({ appointments, updateAppointmentStatus }: CalendarTabProps) => {
+  const { t } = useLanguage();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const getStatusBadge = (status: string) => {
     const normalizedStatus = status.toLowerCase();
+    const statusMap = {
+      confirmed: t.admin.confirmed,
+      completed: t.admin.completed,
+      cancelled: t.admin.cancelled,
+      new: t.admin.new,
+      pending: t.admin.pending
+    };
+    
     const variants = {
       confirmed: { variant: 'default' as const, className: 'bg-blue-500 text-white' },
       completed: { variant: 'default' as const, className: 'bg-green-500 text-white' },
-      cancelled: { variant: 'destructive' as const, className: 'bg-red-500 text-white' }
+      cancelled: { variant: 'destructive' as const, className: 'bg-red-500 text-white' },
+      new: { variant: 'default' as const, className: 'bg-yellow-500 text-white' },
+      pending: { variant: 'default' as const, className: 'bg-blue-500 text-white' }
     };
 
     const variant = variants[normalizedStatus as keyof typeof variants] || variants.confirmed;
+    const statusText = statusMap[normalizedStatus as keyof typeof statusMap] || status;
+    
     return (
       <Badge variant={variant.variant} className={variant.className}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {statusText}
       </Badge>
     );
   };
@@ -64,9 +78,9 @@ export const CalendarTab = ({ appointments, updateAppointmentStatus }: CalendarT
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Select Date</CardTitle>
+          <CardTitle>{t.admin.selectDate}</CardTitle>
           <CardDescription>
-            Choose a date to view appointments
+            {t.admin.chooseDateToView}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -88,10 +102,10 @@ export const CalendarTab = ({ appointments, updateAppointmentStatus }: CalendarT
       <Card>
         <CardHeader>
           <CardTitle>
-            Appointments for {selectedDate.toLocaleDateString()}
+            {t.admin.appointments} for {selectedDate.toLocaleDateString()}
           </CardTitle>
           <CardDescription>
-            {dayAppointments.length} appointments scheduled
+            {dayAppointments.length} {t.admin.appointmentsScheduled}
           </CardDescription>
         </CardHeader>
         <CardContent className="max-h-96 overflow-y-auto">
@@ -136,9 +150,9 @@ export const CalendarTab = ({ appointments, updateAppointmentStatus }: CalendarT
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="confirmed">Confirmed</SelectItem>
-                                <SelectItem value="completed">Completed</SelectItem>
-                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                                <SelectItem value="confirmed">{t.admin.confirmed}</SelectItem>
+                                <SelectItem value="completed">{t.admin.completed}</SelectItem>
+                                <SelectItem value="cancelled">{t.admin.cancelled}</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -148,7 +162,7 @@ export const CalendarTab = ({ appointments, updateAppointmentStatus }: CalendarT
                   </div>
                 ) : (
                   <div className="text-sm text-gray-400 italic">
-                    No appointments
+                    {t.admin.noAppointments}
                   </div>
                 )}
               </div>
@@ -157,7 +171,7 @@ export const CalendarTab = ({ appointments, updateAppointmentStatus }: CalendarT
           
           {dayAppointments.length === 0 && (
             <div className="text-center py-8 text-gray-500">
-              No appointments scheduled for this date
+              {t.admin.noAppointmentsDate}
             </div>
           )}
         </CardContent>

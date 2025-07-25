@@ -3,6 +3,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Appointment } from '@/types/admin';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface AdminCalendarProps {
   selectedDate: Date;
@@ -19,13 +20,15 @@ export const AdminCalendar = ({
   selectedDateAppointments,
   updateAppointmentStatus
 }: AdminCalendarProps) => {
+  const { t } = useLanguage();
+  
   const getStatusBadge = (status: string) => {
     const normalizedStatus = status.toLowerCase();
     const variants = {
-      confirmed: { className: 'bg-blue-500 text-white', text: 'Confirmed' },
-      pending: { className: 'bg-blue-500 text-white', text: 'Confirmed' }, // Treat pending as confirmed
-      completed: { className: 'bg-green-500 text-white', text: 'Completed' },
-      cancelled: { className: 'bg-red-500 text-white', text: 'Cancelled' }
+      confirmed: { className: 'bg-blue-500 text-white', text: t.admin.confirmed },
+      pending: { className: 'bg-blue-500 text-white', text: t.admin.confirmed }, // Treat pending as confirmed
+      completed: { className: 'bg-green-500 text-white', text: t.admin.completed },
+      cancelled: { className: 'bg-red-500 text-white', text: t.admin.cancelled }
     } as const;
 
     const variant = variants[normalizedStatus as keyof typeof variants] || variants.confirmed;
@@ -50,7 +53,7 @@ export const AdminCalendar = ({
     <div className="lg:col-span-1">
       <Card className="border-2" style={{ borderColor: '#007030' }}>
         <CardHeader style={{ backgroundColor: '#007030' }} className="text-white">
-          <CardTitle>Appointment Calendar</CardTitle>
+          <CardTitle>{t.admin.appointmentCalendar}</CardTitle>
           <CardDescription className="text-white/80">
             {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </CardDescription>
@@ -71,30 +74,30 @@ export const AdminCalendar = ({
           
           <div className="mt-4 p-4 bg-gray-50 rounded-lg">
             <h3 className="font-semibold text-[#007030] mb-2">
-              Appointments for {selectedDate.toLocaleDateString()}
+              {t.admin.appointments} for {selectedDate.toLocaleDateString()}
             </h3>
             <div className="text-2xl font-bold text-[#007030] mb-3">
-              {selectedDateAppointments.length} appointments
+              {selectedDateAppointments.length} {t.admin.appointmentsCount}
             </div>
             
             {/* Status Statistics */}
             <div className="grid grid-cols-3 gap-2 mb-4 text-center">
               <div className="bg-blue-50 p-2 rounded">
-                <div className="text-sm font-medium text-blue-800">Confirmed</div>
+                <div className="text-sm font-medium text-blue-800">{t.admin.confirmed}</div>
                 <div className="text-lg font-bold text-blue-600">{statusCounts.confirmed}</div>
               </div>
               <div className="bg-green-50 p-2 rounded">
-                <div className="text-sm font-medium text-green-800">Completed</div>
+                <div className="text-sm font-medium text-green-800">{t.admin.completed}</div>
                 <div className="text-lg font-bold text-green-600">{statusCounts.completed}</div>
               </div>
               <div className="bg-red-50 p-2 rounded">
-                <div className="text-sm font-medium text-red-800">Cancelled</div>
+                <div className="text-sm font-medium text-red-800">{t.admin.cancelled}</div>
                 <div className="text-lg font-bold text-red-600">{statusCounts.cancelled}</div>
               </div>
             </div>
 
             {selectedDateAppointments.length === 0 ? (
-              <p className="text-gray-500 text-sm">No appointments scheduled for this date</p>
+              <p className="text-gray-500 text-sm">{t.admin.noAppointmentsDate}</p>
             ) : (
               <div className="space-y-2">
                 {selectedDateAppointments.map((apt) => (
@@ -111,9 +114,9 @@ export const AdminCalendar = ({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="confirmed">Confirmed</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                          <SelectItem value="confirmed">{t.admin.confirmed}</SelectItem>
+                          <SelectItem value="completed">{t.admin.completed}</SelectItem>
+                          <SelectItem value="cancelled">{t.admin.cancelled}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
