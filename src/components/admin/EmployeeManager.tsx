@@ -279,8 +279,9 @@ export const EmployeeManager = () => {
                     <EmployeeScheduleAlert 
                       employee={employeeWithSchedule} 
                       onAppointmentClick={(employeeId, date) => {
+                        console.log('Appointment clicked:', { employeeId, date });
                         setExpandedSchedule(employeeId);
-                        // Navigate to the correct date in the calendar
+                        // Set the schedule date to navigate to the correct week
                         setScheduleDate(date);
                         // Scroll to the schedule section after a brief delay
                         setTimeout(() => {
@@ -295,6 +296,7 @@ export const EmployeeManager = () => {
                   {expandedSchedule === employee.id && employeeWithSchedule && (
                     <div id={`schedule-${employee.id}`}>
                       <EmployeeCalendarSchedule 
+                        key={`${employee.id}-${scheduleDate}`} // Force re-render when date changes
                         employee={employeeWithSchedule} 
                         initialDate={scheduleDate}
                       />

@@ -28,6 +28,13 @@ export const EmployeeCalendarSchedule = ({ employee, initialDate }: EmployeeCale
   });
   const [editingSchedule, setEditingSchedule] = useState<EditingSchedule | null>(null);
 
+  // Update currentDate when initialDate changes
+  React.useEffect(() => {
+    if (initialDate) {
+      setCurrentDate(new Date(initialDate + 'T00:00:00'));
+    }
+  }, [initialDate]);
+
   // Get the week range
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 }); // Sunday
   const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 }); // Saturday
