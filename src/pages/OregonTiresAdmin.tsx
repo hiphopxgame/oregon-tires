@@ -16,7 +16,7 @@ import { EmailLogsView } from '@/components/admin/EmailLogsView';
 import { DashboardOverview } from '@/components/admin/DashboardOverview';
 
 const OregonTiresAdmin = () => {
-  const { language, toggleLanguage } = useLanguage();
+  const { language, toggleLanguage, t } = useLanguage();
   const {
     appointments,
     contactMessages,
@@ -90,7 +90,7 @@ const OregonTiresAdmin = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-[#007030]">Loading admin dashboard...</p>
+        <p className="text-[#007030]">{t.admin.loadingDashboard}</p>
       </div>
     );
   }
@@ -102,6 +102,7 @@ const OregonTiresAdmin = () => {
         toggleLanguage={toggleLanguage}
         currentView={currentView}
         setCurrentView={setCurrentView}
+        t={t}
       />
 
       <div className="container mx-auto px-4 py-8">

@@ -7,23 +7,25 @@ interface AdminHeaderProps {
   toggleLanguage: () => void;
   currentView: string;
   setCurrentView: (view: string) => void;
+  t: any;
 }
 
 export const AdminHeader = ({ 
   language, 
   toggleLanguage, 
   currentView, 
-  setCurrentView 
+  setCurrentView,
+  t 
 }: AdminHeaderProps) => {
   const navItems = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'calendar', label: 'Calendar' },
-    { id: 'appointments', label: 'Appointments' },
-    { id: 'messages', label: 'Messages' },
-    { id: 'emails', label: 'Email Logs' },
-    { id: 'employees', label: 'Employees' },
-    { id: 'gallery', label: 'Gallery' },
-    { id: 'analytics', label: 'Analytics' }
+    { id: 'overview', label: t.admin.overview },
+    { id: 'calendar', label: t.admin.calendar },
+    { id: 'appointments', label: t.admin.appointments },
+    { id: 'messages', label: t.admin.messages },
+    { id: 'emails', label: t.admin.emailLogs },
+    { id: 'employees', label: t.admin.employees },
+    { id: 'gallery', label: t.admin.gallery },
+    { id: 'analytics', label: t.admin.analytics }
   ];
 
   return (
@@ -37,8 +39,8 @@ export const AdminHeader = ({
               className="h-12 w-auto"
             />
             <div>
-              <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-              <p className="text-white/80 text-sm">Management Dashboard</p>
+              <h1 className="text-2xl font-bold">{t.admin.dashboard}</h1>
+              <p className="text-white/80 text-sm">{t.admin.managementDashboard}</p>
             </div>
           </Link>
           <button 

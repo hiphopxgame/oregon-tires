@@ -231,6 +231,19 @@ const translations = {
       unavailableTimes: "Unavailable Times",
       available: "Available",
       unavailable: "Unavailable"
+    },
+    admin: {
+      dashboard: "Admin Dashboard",
+      managementDashboard: "Management Dashboard",
+      overview: "Overview",
+      calendar: "Calendar",
+      appointments: "Appointments",
+      messages: "Messages",
+      emailLogs: "Email Logs",
+      employees: "Employees",
+      gallery: "Gallery",
+      analytics: "Analytics",
+      loadingDashboard: "Loading admin dashboard..."
     }
   },
   spanish: {
@@ -464,6 +477,19 @@ const translations = {
       unavailableTimes: "Horarios No Disponibles",
       available: "Disponible",
       unavailable: "No disponible"
+    },
+    admin: {
+      dashboard: "Panel de Administración",
+      managementDashboard: "Panel de Gestión",
+      overview: "Resumen",
+      calendar: "Calendario",
+      appointments: "Citas",
+      messages: "Mensajes",
+      emailLogs: "Registros de Email",
+      employees: "Empleados",
+      gallery: "Galería",
+      analytics: "Analytics",
+      loadingDashboard: "Cargando panel de administración..."
     }
   }
 };
