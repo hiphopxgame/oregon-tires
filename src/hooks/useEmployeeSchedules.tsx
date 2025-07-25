@@ -5,7 +5,7 @@ import { toast } from '@/hooks/use-toast';
 export interface EmployeeSchedule {
   id: string;
   employee_id: string;
-  day_of_week: number; // 0 = Sunday, 6 = Saturday
+  schedule_date: string; // ISO date string
   start_time: string;
   end_time: string;
   is_active: boolean;
@@ -37,12 +37,16 @@ export const useEmployeeSchedules = () => {
 
       if (employeesError) throw employeesError;
 
-      // Fetch all schedules
+      // Fetch all schedules (future and recent only)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
       const { data: schedules, error: schedulesError } = await supabase
         .from('oregon_tires_employee_schedules')
         .select('*')
         .eq('is_active', true)
-        .order('day_of_week');
+        .gte('schedule_date', thirtyDaysAgo.toISOString().split('T')[0])
+        .order('schedule_date');
 
       if (schedulesError) throw schedulesError;
 
@@ -67,7 +71,7 @@ export const useEmployeeSchedules = () => {
 
   const saveEmployeeSchedule = useCallback(async (
     employeeId: string, 
-    dayOfWeek: number, 
+    scheduleDate: string, 
     startTime: string, 
     endTime: string
   ) => {
@@ -76,12 +80,12 @@ export const useEmployeeSchedules = () => {
         .from('oregon_tires_employee_schedules')
         .upsert({
           employee_id: employeeId,
-          day_of_week: dayOfWeek,
+          schedule_date: scheduleDate,
           start_time: startTime,
           end_time: endTime,
           is_active: true
         }, {
-          onConflict: 'employee_id,day_of_week'
+          onConflict: 'employee_id,schedule_date'
         });
 
       if (error) throw error;
@@ -102,13 +106,13 @@ export const useEmployeeSchedules = () => {
     }
   }, [fetchEmployeesWithSchedules]);
 
-  const deleteEmployeeSchedule = useCallback(async (employeeId: string, dayOfWeek: number) => {
+  const deleteEmployeeSchedule = useCallback(async (employeeId: string, scheduleDate: string) => {
     try {
       const { error } = await supabase
         .from('oregon_tires_employee_schedules')
         .delete()
         .eq('employee_id', employeeId)
-        .eq('day_of_week', dayOfWeek);
+        .eq('schedule_date', scheduleDate);
 
       if (error) throw error;
 
@@ -132,9 +136,9 @@ export const useEmployeeSchedules = () => {
     const employee = employeesWithSchedules.find(emp => emp.id === employeeId);
     if (!employee) return false;
 
-    const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
+    const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD format
     return employee.schedules.some(schedule => 
-      schedule.day_of_week === dayOfWeek && schedule.is_active
+      schedule.schedule_date === dateStr && schedule.is_active
     );
   }, [employeesWithSchedules]);
 
@@ -142,9 +146,9 @@ export const useEmployeeSchedules = () => {
     const employee = employeesWithSchedules.find(emp => emp.id === employeeId);
     if (!employee) return null;
 
-    const dayOfWeek = date.getDay();
+    const dateStr = date.toISOString().split('T')[0];
     return employee.schedules.find(schedule => 
-      schedule.day_of_week === dayOfWeek && schedule.is_active
+      schedule.schedule_date === dateStr && schedule.is_active
     ) || null;
   }, [employeesWithSchedules]);
 

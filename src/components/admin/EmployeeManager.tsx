@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEmployees, Employee } from '@/hooks/useEmployees';
 import { useEmployeeSchedules } from '@/hooks/useEmployeeSchedules';
 import { useLanguage } from '@/hooks/useLanguage';
-import { EmployeeScheduleManager } from './EmployeeScheduleManager';
+import { EmployeeCalendarSchedule } from './EmployeeCalendarSchedule';
 import { EmployeeScheduleAlert } from './EmployeeScheduleAlert';
 
 
@@ -278,7 +278,7 @@ export const EmployeeManager = () => {
                   
                   {/* Employee schedule management */}
                   {expandedSchedule === employee.id && employeeWithSchedule && (
-                    <EmployeeScheduleManager employee={employeeWithSchedule} />
+                    <EmployeeCalendarSchedule employee={employeeWithSchedule} />
                   )}
                 </>
               )}

@@ -1348,31 +1348,31 @@ export type Database = {
       oregon_tires_employee_schedules: {
         Row: {
           created_at: string
-          day_of_week: number
           employee_id: string
           end_time: string
           id: string
           is_active: boolean
+          schedule_date: string
           start_time: string
           updated_at: string
         }
         Insert: {
           created_at?: string
-          day_of_week: number
           employee_id: string
           end_time: string
           id?: string
           is_active?: boolean
+          schedule_date: string
           start_time: string
           updated_at?: string
         }
         Update: {
           created_at?: string
-          day_of_week?: number
           employee_id?: string
           end_time?: string
           id?: string
           is_active?: boolean
+          schedule_date?: string
           start_time?: string
           updated_at?: string
         }

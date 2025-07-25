@@ -13,11 +13,17 @@ export const EmployeeScheduleAlert = ({ employee }: EmployeeScheduleAlertProps) 
   const { appointments } = useAdminData();
   const { isEmployeeScheduled } = useEmployeeSchedules();
 
-  // Find appointments assigned to this employee where they're not scheduled
+  // Find future appointments assigned to this employee where they're not scheduled
   const conflictingAppointments = appointments.filter(appointment => {
     if (appointment.assigned_employee_id !== employee.id) return false;
     
     const appointmentDate = new Date(appointment.preferred_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Only include future appointments
+    if (appointmentDate < today) return false;
+    
     return !isEmployeeScheduled(employee.id, appointmentDate);
   });
 

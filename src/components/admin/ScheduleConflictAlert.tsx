@@ -16,6 +16,12 @@ export const ScheduleConflictAlert = ({ appointment, employeeName }: ScheduleCon
   if (!appointment.assigned_employee_id) return null;
 
   const appointmentDate = new Date(appointment.preferred_date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Only show conflicts for future appointments
+  if (appointmentDate < today) return null;
+  
   const isScheduled = isEmployeeScheduled(appointment.assigned_employee_id, appointmentDate);
   
   if (isScheduled) return null;
