@@ -9,6 +9,7 @@ import { format, addDays, startOfWeek, endOfWeek, isSameDay } from 'date-fns';
 
 interface EmployeeCalendarScheduleProps {
   employee: EmployeeWithSchedule;
+  initialDate?: string | null;
 }
 
 interface EditingSchedule {
@@ -17,9 +18,14 @@ interface EditingSchedule {
   endTime: string;
 }
 
-export const EmployeeCalendarSchedule = ({ employee }: EmployeeCalendarScheduleProps) => {
+export const EmployeeCalendarSchedule = ({ employee, initialDate }: EmployeeCalendarScheduleProps) => {
   const { saveEmployeeSchedule, deleteEmployeeSchedule } = useEmployeeSchedules();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(() => {
+    if (initialDate) {
+      return new Date(initialDate + 'T00:00:00');
+    }
+    return new Date();
+  });
   const [editingSchedule, setEditingSchedule] = useState<EditingSchedule | null>(null);
 
   // Get the week range
@@ -88,28 +94,37 @@ export const EmployeeCalendarSchedule = ({ employee }: EmployeeCalendarScheduleP
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            {employee.name} - Weekly Schedule
-          </CardTitle>
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              {employee.name} - Weekly Schedule
+            </CardTitle>
+          </div>
+          <div className="flex items-center justify-center gap-3">
             <Button 
               variant="outline" 
-              size="sm" 
+              size="default" 
               onClick={() => navigateWeek('prev')}
+              className="px-4"
             >
-              ← Previous
+              ← Previous Week
             </Button>
-            <span className="font-medium">
-              {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
-            </span>
+            <div className="text-center">
+              <div className="text-lg font-semibold">
+                {format(weekStart, 'MMMM yyyy')}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d')}
+              </div>
+            </div>
             <Button 
               variant="outline" 
-              size="sm" 
+              size="default" 
               onClick={() => navigateWeek('next')}
+              className="px-4"
             >
-              Next →
+              Next Week →
             </Button>
           </div>
         </div>
@@ -202,15 +217,18 @@ export const EmployeeCalendarSchedule = ({ employee }: EmployeeCalendarScheduleP
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center">
+                  <div className="text-center space-y-2">
+                    <div className="text-xs text-muted-foreground">
+                      Not scheduled
+                    </div>
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="default"
                       onClick={() => handleAddSchedule(day)}
-                      className="w-full h-7 text-xs"
+                      className="w-full h-8 text-xs bg-primary hover:bg-primary/90"
                     >
                       <Plus className="h-3 w-3 mr-1" />
-                      Add Schedule
+                      Add
                     </Button>
                   </div>
                 )}

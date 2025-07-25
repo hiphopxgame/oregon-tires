@@ -24,6 +24,7 @@ export const EmployeeManager = () => {
   const [newEmployee, setNewEmployee] = useState({ name: '', email: '', phone: '', role: 'Worker' });
   const [showAddForm, setShowAddForm] = useState(false);
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
+  const [scheduleDate, setScheduleDate] = useState<string | null>(null);
 
   const handleAddEmployee = async () => {
     if (!newEmployee.name.trim()) return;
@@ -279,6 +280,8 @@ export const EmployeeManager = () => {
                       employee={employeeWithSchedule} 
                       onAppointmentClick={(employeeId, date) => {
                         setExpandedSchedule(employeeId);
+                        // Navigate to the correct date in the calendar
+                        setScheduleDate(date);
                         // Scroll to the schedule section after a brief delay
                         setTimeout(() => {
                           const element = document.getElementById(`schedule-${employeeId}`);
@@ -291,7 +294,10 @@ export const EmployeeManager = () => {
                   {/* Employee schedule management */}
                   {expandedSchedule === employee.id && employeeWithSchedule && (
                     <div id={`schedule-${employee.id}`}>
-                      <EmployeeCalendarSchedule employee={employeeWithSchedule} />
+                      <EmployeeCalendarSchedule 
+                        employee={employeeWithSchedule} 
+                        initialDate={scheduleDate}
+                      />
                     </div>
                   )}
                 </>
