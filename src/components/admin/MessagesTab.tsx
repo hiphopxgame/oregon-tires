@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ContactMessage } from '@/types/admin';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface MessagesTabProps {
   contactMessages: ContactMessage[];
@@ -10,24 +11,26 @@ interface MessagesTabProps {
 }
 
 export const MessagesTab = ({ contactMessages, updateMessageStatus }: MessagesTabProps) => {
+  const { t } = useLanguage();
+  
   return (
     <Card className="border-2" style={{ borderColor: '#007030' }}>
       <CardHeader style={{ backgroundColor: '#007030' }} className="text-white">
-        <CardTitle>Contact Messages</CardTitle>
+        <CardTitle>{t.admin.contactMessages}</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         {contactMessages.length === 0 ? (
-          <p className="text-gray-500 p-6">No messages found.</p>
+          <p className="text-gray-500 p-6">{t.admin.noMessagesFound}</p>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow style={{ backgroundColor: '#FEE11A' }}>
-                  <TableHead className="text-black font-semibold">Customer</TableHead>
-                  <TableHead className="text-black font-semibold">Contact</TableHead>
-                  <TableHead className="text-black font-semibold">Message</TableHead>
-                  <TableHead className="text-black font-semibold">Date</TableHead>
-                  <TableHead className="text-black font-semibold">Status</TableHead>
+                  <TableHead className="text-black font-semibold">{t.admin.customer}</TableHead>
+                  <TableHead className="text-black font-semibold">{t.admin.contact}</TableHead>
+                  <TableHead className="text-black font-semibold">{t.admin.message}</TableHead>
+                  <TableHead className="text-black font-semibold">{t.admin.date}</TableHead>
+                  <TableHead className="text-black font-semibold">{t.admin.status}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -65,9 +68,9 @@ export const MessagesTab = ({ contactMessages, updateMessageStatus }: MessagesTa
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="new">New</SelectItem>
-                          <SelectItem value="priority">Priority</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="new">{t.admin.new}</SelectItem>
+                          <SelectItem value="priority">{t.admin.priority}</SelectItem>
+                          <SelectItem value="completed">{t.admin.completed}</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>

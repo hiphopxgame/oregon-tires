@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, User, MapPin } from 'lucide-react';
 import { Appointment } from '@/types/admin';
 import { useEmployees } from '@/hooks/useEmployees';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface DashboardOverviewProps {
   appointments: Appointment[];
@@ -11,6 +12,7 @@ interface DashboardOverviewProps {
 
 export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointments }) => {
   const { employees } = useEmployees();
+  const { t } = useLanguage();
 
   // Get current week's dates
   const today = new Date();
@@ -66,45 +68,45 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Appointments</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.admin.totalAppointments}</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalAppointments}</div>
-            <p className="text-xs text-muted-foreground">This week</p>
+            <p className="text-xs text-muted-foreground">{t.admin.thisWeek}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.admin.pending}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{pendingAppointments}</div>
-            <p className="text-xs text-muted-foreground">Awaiting confirmation</p>
+            <p className="text-xs text-muted-foreground">{t.admin.awaitingConfirmation}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Confirmed</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.admin.confirmed}</CardTitle>
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{confirmedAppointments}</div>
-            <p className="text-xs text-muted-foreground">Ready to go</p>
+            <p className="text-xs text-muted-foreground">{t.admin.readyToGo}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.admin.completed}</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-600">{completedAppointments}</div>
-            <p className="text-xs text-muted-foreground">Finished</p>
+            <p className="text-xs text-muted-foreground">{t.admin.finished}</p>
           </CardContent>
         </Card>
       </div>
@@ -114,7 +116,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
         {/* Daily Appointments */}
         <Card>
           <CardHeader>
-            <CardTitle>This Week's Appointments</CardTitle>
+            <CardTitle>{t.admin.thisWeeksAppointments}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -124,7 +126,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
                   <div key={day} className="border-l-4 border-primary pl-4">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium">{day}</h4>
-                      <Badge variant="outline">{dayAppointments.length} appointments</Badge>
+                      <Badge variant="outline">{dayAppointments.length} {t.admin.appointmentsCount}</Badge>
                     </div>
                     {dayAppointments.length > 0 ? (
                       <div className="space-y-2">
@@ -139,11 +141,11 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
                           </div>
                         ))}
                         {dayAppointments.length > 3 && (
-                          <p className="text-xs text-muted-foreground">+{dayAppointments.length - 3} more</p>
+                          <p className="text-xs text-muted-foreground">+{dayAppointments.length - 3} {t.admin.more}</p>
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">No appointments</p>
+                      <p className="text-sm text-muted-foreground">{t.admin.noAppointments}</p>
                     )}
                   </div>
                 );
@@ -155,7 +157,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
         {/* Employee Schedule */}
         <Card>
           <CardHeader>
-            <CardTitle>Employee Schedule</CardTitle>
+            <CardTitle>{t.admin.employeeSchedule}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -167,8 +169,8 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
                       <p className="text-sm text-muted-foreground">{employee.email}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">{appointments.length} appointments</p>
-                      <p className="text-xs text-muted-foreground">~{totalHours} hours</p>
+                      <p className="text-sm font-medium">{appointments.length} {t.admin.appointmentsCount}</p>
+                      <p className="text-xs text-muted-foreground">~{totalHours} {t.admin.hours}</p>
                     </div>
                   </div>
                   
@@ -182,17 +184,17 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
                         </div>
                       ))}
                       {appointments.length > 2 && (
-                        <p className="text-xs text-muted-foreground pl-5">+{appointments.length - 2} more appointments</p>
+                        <p className="text-xs text-muted-foreground pl-5">+{appointments.length - 2} {t.admin.moreAppointments}</p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No appointments this week</p>
+                    <p className="text-sm text-muted-foreground">{t.admin.noAppointmentsThisWeek}</p>
                   )}
                 </div>
               ))}
               
               {employeeSchedule.length === 0 && (
-                <p className="text-muted-foreground text-center py-4">No active employees found</p>
+                <p className="text-muted-foreground text-center py-4">{t.admin.noActiveEmployees}</p>
               )}
             </div>
           </CardContent>

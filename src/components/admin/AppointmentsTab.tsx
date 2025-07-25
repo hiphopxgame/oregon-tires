@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Appointment } from '@/types/admin';
 import { useEmployees } from '@/hooks/useEmployees';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface AppointmentsTabProps {
   appointments: Appointment[];
@@ -14,6 +15,7 @@ interface AppointmentsTabProps {
 
 export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateAppointmentAssignment }: AppointmentsTabProps) => {
   const { employees } = useEmployees();
+  const { t } = useLanguage();
   const getStatusBadge = (status: string) => {
     const normalizedStatus = status.toLowerCase();
     const variants = {
@@ -39,22 +41,22 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
   return (
     <Card>
       <CardHeader>
-        <CardTitle>All Appointments</CardTitle>
+        <CardTitle>{t.admin.allAppointments}</CardTitle>
         <CardDescription>
-          {appointments.length} appointments total (sorted by newest first)
+          {appointments.length} {t.admin.appointmentsCount} total (sorted by newest first)
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Customer</TableHead>
-              <TableHead>Service</TableHead>
-              <TableHead>Date & Time</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Assigned Employee</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>{t.admin.customer}</TableHead>
+              <TableHead>{t.admin.service}</TableHead>
+              <TableHead>{t.admin.dateTime}</TableHead>
+              <TableHead>{t.admin.contact}</TableHead>
+              <TableHead>{t.admin.assignedEmployee}</TableHead>
+              <TableHead>{t.admin.status}</TableHead>
+              <TableHead>{t.admin.actions}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -66,7 +68,7 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
                       {appointment.first_name} {appointment.last_name}
                     </div>
                     <div className="text-sm text-gray-500">
-                      Created: {new Date(appointment.created_at).toLocaleDateString()}
+                      {t.admin.created}: {new Date(appointment.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </TableCell>
@@ -96,7 +98,7 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
                   <div className="text-sm">
                     {appointment.assigned_employee_id 
                       ? employees.find(emp => emp.id === appointment.assigned_employee_id)?.name || 'Unknown'
-                      : 'Unassigned'
+                      : t.admin.unassigned
                     }
                   </div>
                 </TableCell>
@@ -113,10 +115,10 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="confirmed">Confirmed</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                        <SelectItem value="new">{t.admin.new}</SelectItem>
+                        <SelectItem value="confirmed">{t.admin.confirmed}</SelectItem>
+                        <SelectItem value="completed">{t.admin.completed}</SelectItem>
+                        <SelectItem value="cancelled">{t.admin.cancelled}</SelectItem>
                       </SelectContent>
                     </Select>
                     <Select
@@ -127,7 +129,7 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
                         <SelectValue placeholder="Assign" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                        <SelectItem value="unassigned">{t.admin.unassigned}</SelectItem>
                         {employees.map((employee) => (
                           <SelectItem key={employee.id} value={employee.id}>
                             {employee.name}
@@ -144,7 +146,7 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
         
         {appointments.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            No appointments found
+            {t.admin.noAppointmentsFound}
           </div>
         )}
       </CardContent>
