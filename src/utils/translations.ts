@@ -246,7 +246,7 @@ const translations = {
       analytics: "Analytics",
       loadingDashboard: "Loading admin dashboard...",
       // Upcoming Appointments
-      next3DaysOverview: "Next 3 days overview with appointment details",
+      next6DaysOverview: "Next 6 days overview with appointment details",
       noAppointments: "No Appointments",
       nothingScheduled: "Nothing scheduled for this day",
       dayAvailableForBooking: "This day is available for new bookings",
@@ -686,7 +686,7 @@ const translations = {
       analytics: "Analytics",
       loadingDashboard: "Cargando panel de administración...",
       // Upcoming Appointments
-      next3DaysOverview: "Resumen de los próximos 3 días con detalles de citas",
+      next6DaysOverview: "Resumen de los próximos 6 días con detalles de citas",
       noAppointments: "Sin Citas",
       nothingScheduled: "Nada programado para este día",
       dayAvailableForBooking: "Este día está disponible para nuevas reservas",

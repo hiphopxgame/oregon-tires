@@ -12,23 +12,26 @@ interface UpcomingAppointmentsViewProps {
 export const UpcomingAppointmentsView = ({ appointments }: UpcomingAppointmentsViewProps) => {
   const { t } = useLanguage();
 
-  // Get the next 3 days starting from today
+  // Get the next 6 days starting from today
   const today = startOfDay(new Date());
-  const next3Days = [
+  const next6Days = [
     today,
     addDays(today, 1),
-    addDays(today, 2)
+    addDays(today, 2),
+    addDays(today, 3),
+    addDays(today, 4),
+    addDays(today, 5)
   ];
 
-  // Filter appointments for the next 3 days
+  // Filter appointments for the next 6 days
   const upcomingAppointments = appointments.filter(apt => {
     const aptDate = new Date(apt.preferred_date + 'T00:00:00');
-    const endOfThirdDay = addDays(today, 3);
-    return isAfter(aptDate, addDays(today, -1)) && isBefore(aptDate, endOfThirdDay);
+    const endOfSixthDay = addDays(today, 6);
+    return isAfter(aptDate, addDays(today, -1)) && isBefore(aptDate, endOfSixthDay);
   });
 
   // Group appointments by date
-  const appointmentsByDate = next3Days.map(date => {
+  const appointmentsByDate = next6Days.map(date => {
     const dateStr = format(date, 'yyyy-MM-dd');
     const dayAppointments = upcomingAppointments.filter(apt => apt.preferred_date === dateStr);
     return {
@@ -59,7 +62,7 @@ export const UpcomingAppointmentsView = ({ appointments }: UpcomingAppointmentsV
       <div className="bg-white rounded-lg shadow-sm border-2 border-green-700">
         <div className="bg-green-700 text-white px-6 py-4">
           <h2 className="text-2xl font-bold">{t.admin.upcomingAppointments}</h2>
-          <p className="text-green-100">{t.admin.next3DaysOverview}</p>
+          <p className="text-green-100">{t.admin.next6DaysOverview}</p>
         </div>
         
         <div className="p-6">
@@ -96,7 +99,11 @@ export const UpcomingAppointmentsView = ({ appointments }: UpcomingAppointmentsV
                   ) : (
                     <div className="space-y-4">
                       {dayAppointments.map((appointment) => (
-                        <div key={appointment.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <a 
+                          key={appointment.id} 
+                          href={`#appointment-${appointment.id}`}
+                          className="block border rounded-lg p-4 hover:bg-gray-50 hover:shadow-md transition-all duration-200"
+                        >
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center gap-3">
                               <div className="flex items-center gap-1 text-sm text-gray-600">
@@ -152,7 +159,7 @@ export const UpcomingAppointmentsView = ({ appointments }: UpcomingAppointmentsV
                               <strong>{t.admin.customerMessage}:</strong> {appointment.message}
                             </div>
                           )}
-                        </div>
+                        </a>
                       ))}
                     </div>
                   )}
