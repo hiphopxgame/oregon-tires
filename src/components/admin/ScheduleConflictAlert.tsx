@@ -11,7 +11,7 @@ interface ScheduleConflictAlertProps {
 }
 
 export const ScheduleConflictAlert = ({ appointment, employeeName }: ScheduleConflictAlertProps) => {
-  const { isEmployeeScheduled, getEmployeeScheduleForDate } = useEmployeeSchedules();
+  const { isEmployeeScheduled, getEmployeeScheduleForDate, employeesWithSchedules } = useEmployeeSchedules();
 
   if (!appointment.assigned_employee_id) return null;
 
@@ -23,6 +23,19 @@ export const ScheduleConflictAlert = ({ appointment, employeeName }: ScheduleCon
   if (appointmentDate < today) return null;
   
   const isScheduled = isEmployeeScheduled(appointment.assigned_employee_id, appointmentDate);
+  
+  // Debug logging
+  const employee = employeesWithSchedules.find(emp => emp.id === appointment.assigned_employee_id);
+  const dateStr = appointmentDate.toISOString().split('T')[0];
+  console.log('ScheduleConflictAlert Debug:', {
+    employeeId: appointment.assigned_employee_id,
+    employeeName,
+    appointmentDate: dateStr,
+    employee: employee ? { id: employee.id, name: employee.name, schedulesCount: employee.schedules.length } : null,
+    schedules: employee?.schedules || [],
+    isScheduled,
+    lookingForDate: dateStr
+  });
   
   if (isScheduled) return null;
 
