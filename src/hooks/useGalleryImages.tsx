@@ -22,7 +22,7 @@ export const useGalleryImages = (language?: string) => {
   const fetchImages = async () => {
     try {
       let query = supabase
-        .from('oregon_tires_gallery_images')
+        .from('oretir_gallery_images')
         .select('*')
         .eq('is_active', true)
         .order('display_order', { ascending: true })
@@ -79,7 +79,7 @@ export const useGalleryImages = (language?: string) => {
   const addImage = async (imageData: Omit<GalleryImage, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const { error } = await supabase
-        .from('oregon_tires_gallery_images')
+        .from('oretir_gallery_images')
         .insert([imageData]);
 
       if (error) throw error;
@@ -103,7 +103,7 @@ export const useGalleryImages = (language?: string) => {
   const updateImage = async (id: string, updates: Partial<GalleryImage>) => {
     try {
       const { error } = await supabase
-        .from('oregon_tires_gallery_images')
+        .from('oretir_gallery_images')
         .update(updates)
         .eq('id', id);
 
@@ -129,7 +129,7 @@ export const useGalleryImages = (language?: string) => {
     try {
       // Delete from database
       const { error: dbError } = await supabase
-        .from('oregon_tires_gallery_images')
+        .from('oretir_gallery_images')
         .delete()
         .eq('id', id);
 

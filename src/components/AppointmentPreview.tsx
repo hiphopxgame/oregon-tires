@@ -45,7 +45,7 @@ const AppointmentPreview: React.FC<AppointmentPreviewProps> = ({ onBookAppointme
     queryFn: async () => {
       const dateStr = selectedDate.toISOString().split('T')[0];
       const { data, error } = await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .select('*')
         .eq('preferred_date', dateStr)
         .neq('status', 'cancelled');

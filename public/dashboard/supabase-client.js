@@ -12,7 +12,7 @@ export async function fetchDataFromSupabase() {
     try {
         // Fetch appointments
         const { data: appointmentsData, error: appointmentsError } = await supabaseClient
-            .from('oregon_tires_appointments')
+            .from('oretir_appointments')
             .select('*')
             .order('created_at', { ascending: false });
 
@@ -23,7 +23,7 @@ export async function fetchDataFromSupabase() {
 
         // Fetch contact messages
         const { data: messagesData, error: messagesError } = await supabaseClient
-            .from('oregon_tires_contact_messages')
+            .from('oretir_contact_messages')
             .select('*')
             .order('created_at', { ascending: false });
 
@@ -48,7 +48,7 @@ export async function updateAppointmentStatus(id, newStatus) {
         console.log('Updating appointment status:', { id, status: newStatus.toLowerCase() });
         
         const { error } = await supabaseClient
-            .from('oregon_tires_appointments')
+            .from('oretir_appointments')
             .update({ status: newStatus.toLowerCase() })
             .eq('id', id);
 
@@ -70,7 +70,7 @@ export async function updateMessageStatus(id, newStatus) {
         console.log('Updating message status:', { id, status: newStatus.toLowerCase() });
         
         const { error } = await supabaseClient
-            .from('oregon_tires_contact_messages')
+            .from('oretir_contact_messages')
             .update({ status: newStatus.toLowerCase() })
             .eq('id', id);
 

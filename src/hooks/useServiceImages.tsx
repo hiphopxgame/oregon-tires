@@ -24,7 +24,7 @@ export const useServiceImages = () => {
   const fetchCurrentImages = async () => {
     try {
       const { data, error } = await supabase
-        .from('oregon_tires_service_images')
+        .from('oretir_service_images')
         .select('*')
         .eq('is_current', true)
         .order('service_key');
@@ -44,7 +44,7 @@ export const useServiceImages = () => {
   const fetchImageHistory = async (serviceKey: string) => {
     try {
       const { data, error } = await supabase
-        .from('oregon_tires_service_images')
+        .from('oretir_service_images')
         .select('*')
         .eq('service_key', serviceKey)
         .order('created_at', { ascending: false });
@@ -90,7 +90,7 @@ export const useServiceImages = () => {
 
       // Insert new image record
       const { data, error } = await supabase
-        .from('oregon_tires_service_images')
+        .from('oretir_service_images')
         .insert({
           service_key: serviceKey,
           title: currentImage?.title || serviceKey,
@@ -134,7 +134,7 @@ export const useServiceImages = () => {
       // Start a transaction to update current status
       // First, set all images for this service to not current
       const { error: updateError } = await supabase
-        .from('oregon_tires_service_images')
+        .from('oretir_service_images')
         .update({ is_current: false })
         .eq('service_key', serviceKey);
 
@@ -142,7 +142,7 @@ export const useServiceImages = () => {
 
       // Then set the selected image as current
       const { error: setCurrentError } = await supabase
-        .from('oregon_tires_service_images')
+        .from('oretir_service_images')
         .update({ is_current: true })
         .eq('id', imageId);
 
@@ -171,7 +171,7 @@ export const useServiceImages = () => {
   const updateImageSettings = async (imageId: string, position_x: number, position_y: number, scale: number) => {
     try {
       const { error } = await supabase
-        .from('oregon_tires_service_images')
+        .from('oretir_service_images')
         .update({ position_x, position_y, scale })
         .eq('id', imageId);
 

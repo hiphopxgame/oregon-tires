@@ -21,7 +21,7 @@ async function handleFormSubmit(event) {
     try {
         console.log('Submitting contact message');
         const { error } = await window.supabaseClient
-            .from('oregon_tires_contact_messages')
+            .from('oretir_contact_messages')
             .insert(data);
 
         if (error) throw error;

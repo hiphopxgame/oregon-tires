@@ -31,10 +31,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Fetch appointment details with formatted service name
     const { data: appointment, error: appointmentError } = await supabase
-      .from('oregon_tires_appointments')
+      .from('oretir_appointments')
       .select(`
         *,
-        assigned_employee:oregon_tires_employees(name, email)
+        assigned_employee:oretir_employees(name, email)
       `)
       .eq('id', appointmentId)
       .single();
@@ -98,7 +98,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
 
       // Log the email
-      await supabase.from('oregon_tires_email_logs').insert({
+      await supabase.from('oretir_email_logs').insert({
         email_type: type,
         recipient_email: appointment.email,
         recipient_name: `${appointment.first_name} ${appointment.last_name}`,
@@ -166,7 +166,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
 
       // Log the email
-      await supabase.from('oregon_tires_email_logs').insert({
+      await supabase.from('oretir_email_logs').insert({
         email_type: type,
         recipient_email: appointment.assigned_employee.email,
         recipient_name: appointment.assigned_employee.name,
@@ -230,7 +230,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
 
       // Log the email
-      await supabase.from('oregon_tires_email_logs').insert({
+      await supabase.from('oretir_email_logs').insert({
         email_type: type,
         recipient_email: appointment.email,
         recipient_name: `${appointment.first_name} ${appointment.last_name}`,

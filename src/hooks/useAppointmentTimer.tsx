@@ -21,7 +21,7 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
     const loadAppointment = async () => {
       try {
         const { data, error } = await supabase
-          .from('oregon_tires_appointments')
+          .from('oretir_appointments')
           .select('*')
           .eq('id', appointmentId)
           .single();
@@ -82,7 +82,7 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
       const now = new Date();
       
       const { error } = await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .update({
           started_at: now.toISOString(),
           status: 'confirmed'
@@ -120,7 +120,7 @@ export const useAppointmentTimer = ({ appointmentId, onAppointmentUpdated }: Use
       const durationMinutes = Math.floor(totalSeconds / 60);
 
       const { error } = await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .update({
           completed_at: completedAt.toISOString(),
           actual_duration_minutes: durationMinutes,

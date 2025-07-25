@@ -54,7 +54,7 @@ export const DayViewAppointmentCard = ({
   const updateAppointmentDateTime = async (appointmentId: string, newDate: string, newTime: string) => {
     try {
       const { error } = await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .update({
           preferred_date: newDate,
           preferred_time: newTime

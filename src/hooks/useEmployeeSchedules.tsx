@@ -31,7 +31,7 @@ export const useEmployeeSchedules = () => {
     try {
       // Fetch employees
       const { data: employees, error: employeesError } = await supabase
-        .from('oregon_tires_employees')
+        .from('oretir_employees')
         .select('*')
         .order('name');
 
@@ -42,7 +42,7 @@ export const useEmployeeSchedules = () => {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
       const { data: schedules, error: schedulesError } = await supabase
-        .from('oregon_tires_employee_schedules')
+        .from('oretir_employee_schedules')
         .select('*')
         .eq('is_active', true)
         .gte('schedule_date', thirtyDaysAgo.toISOString().split('T')[0])
@@ -77,7 +77,7 @@ export const useEmployeeSchedules = () => {
   ) => {
     try {
       const { error } = await supabase
-        .from('oregon_tires_employee_schedules')
+        .from('oretir_employee_schedules')
         .upsert({
           employee_id: employeeId,
           schedule_date: scheduleDate,
@@ -109,7 +109,7 @@ export const useEmployeeSchedules = () => {
   const deleteEmployeeSchedule = useCallback(async (employeeId: string, scheduleDate: string) => {
     try {
       const { error } = await supabase
-        .from('oregon_tires_employee_schedules')
+        .from('oretir_employee_schedules')
         .delete()
         .eq('employee_id', employeeId)
         .eq('schedule_date', scheduleDate);
@@ -164,7 +164,7 @@ export const useEmployeeSchedules = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'oregon_tires_employee_schedules'
+          table: 'oretir_employee_schedules'
         },
         () => {
           setTimeout(() => fetchEmployeesWithSchedules(), 100);

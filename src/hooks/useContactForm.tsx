@@ -59,7 +59,7 @@ export const useContactForm = (language: string, t: any) => {
         };
 
         const { error } = await supabase
-          .from('oregon_tires_appointments')
+          .from('oretir_appointments')
           .insert(appointmentData);
 
         if (error) throw error;
@@ -71,7 +71,7 @@ export const useContactForm = (language: string, t: any) => {
         });
       } else {
         const { error } = await supabase
-          .from('oregon_tires_contact_messages')
+          .from('oretir_contact_messages')
           .insert(formData);
 
         if (error) throw error;

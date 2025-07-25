@@ -130,7 +130,7 @@ async function handleContactFormSubmit(event) {
 
     try {
         const { error } = await window.supabaseClient
-            .from('oregon_tires_contact_messages')
+            .from('oretir_contact_messages')
             .insert(data);
 
         if (error) throw error;

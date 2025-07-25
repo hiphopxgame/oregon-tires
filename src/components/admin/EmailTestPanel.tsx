@@ -27,7 +27,7 @@ export const EmailTestPanel = () => {
     try {
       // Create a test appointment to send an email
       const { data: testAppointment, error: appointmentError } = await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .insert({
           first_name: 'Test',
           last_name: 'Customer',
@@ -57,7 +57,7 @@ export const EmailTestPanel = () => {
 
       // Clean up test appointment
       await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .delete()
         .eq('id', testAppointment.id);
 

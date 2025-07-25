@@ -36,7 +36,7 @@ async function checkAppointmentConflicts(date, time, service) {
         
         // Fetch appointments for the selected date
         const { data: appointments, error } = await window.supabaseClient
-            .from('oregon_tires_appointments')
+            .from('oretir_appointments')
             .select('*')
             .eq('preferred_date', date)
             .neq('status', 'cancelled');

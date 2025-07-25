@@ -31,7 +31,7 @@ export const EmployeeManager = () => {
 
     try {
       const { error } = await supabase
-        .from('oregon_tires_employees')
+        .from('oretir_employees')
         .insert([{
           name: newEmployee.name,
           email: newEmployee.email || null,
@@ -61,7 +61,7 @@ export const EmployeeManager = () => {
   const handleUpdateEmployee = async (id: string, updates: Partial<Employee>) => {
     try {
       const { error } = await supabase
-        .from('oregon_tires_employees')
+        .from('oretir_employees')
         .update(updates)
         .eq('id', id);
 

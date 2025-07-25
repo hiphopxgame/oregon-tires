@@ -20,7 +20,7 @@ export const useEmployees = () => {
   const fetchEmployees = useCallback(async () => {
     try {
       const { data, error } = await supabase
-        .from('oregon_tires_employees')
+        .from('oretir_employees')
         .select('*')
         .order('name');
 
@@ -50,7 +50,7 @@ export const useEmployees = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'oregon_tires_employees'
+          table: 'oretir_employees'
         },
         (payload) => {
           console.log('Real-time employee change detected:', payload);

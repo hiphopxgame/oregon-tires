@@ -99,7 +99,7 @@ export const ScheduleViewStep: React.FC<ScheduleViewStepProps> = ({ customerInfo
       }
 
       const { data: appointmentData, error } = await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .insert({
           first_name: customerInfo.firstName,
           last_name: customerInfo.lastName,

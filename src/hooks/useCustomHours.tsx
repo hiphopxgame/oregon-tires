@@ -21,7 +21,7 @@ export const useCustomHours = () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('oregon_tires_custom_hours')
+        .from('oretir_custom_hours')
         .select('*')
         .order('date', { ascending: true });
 
@@ -47,7 +47,7 @@ export const useCustomHours = () => {
   }) => {
     try {
       const { data, error } = await supabase
-        .from('oregon_tires_custom_hours')
+        .from('oretir_custom_hours')
         .upsert({
           date,
           is_closed: hours.is_closed,
@@ -92,7 +92,7 @@ export const useCustomHours = () => {
   const deleteCustomHours = async (date: string) => {
     try {
       const { error } = await supabase
-        .from('oregon_tires_custom_hours')
+        .from('oretir_custom_hours')
         .delete()
         .eq('date', date);
 
@@ -159,7 +159,7 @@ export const useCustomHours = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'oregon_tires_custom_hours'
+          table: 'oretir_custom_hours'
         },
         (payload) => {
           console.log('Real-time custom hours change detected:', payload);

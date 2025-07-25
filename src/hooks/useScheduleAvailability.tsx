@@ -94,7 +94,7 @@ export const useScheduleAvailability = ({ preferredDate, service }: UseScheduleA
       }
 
       const { data: appointments, error } = await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .select('*')
         .eq('preferred_date', preferredDate)
         .neq('status', 'cancelled');

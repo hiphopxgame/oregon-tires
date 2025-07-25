@@ -32,7 +32,7 @@ export const EmailLogsView = () => {
   const fetchEmailLogs = async () => {
     try {
       const { data, error } = await supabase
-        .from('oregon_tires_email_logs')
+        .from('oretir_email_logs')
         .select('*')
         .order('sent_at', { ascending: false })
         .limit(50);
