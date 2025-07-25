@@ -1211,7 +1211,7 @@ export type Database = {
             foreignKeyName: "oregon_tires_appointments_assigned_employee_id_fkey"
             columns: ["assigned_employee_id"]
             isOneToOne: false
-            referencedRelation: "oregon_tires_employees"
+            referencedRelation: "oretir_employees"
             referencedColumns: ["id"]
           },
           {
@@ -1258,238 +1258,6 @@ export type Database = {
           message?: string
           phone?: string | null
           status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      oregon_tires_custom_hours: {
-        Row: {
-          closing_time: string | null
-          created_at: string
-          date: string
-          id: string
-          is_closed: boolean
-          opening_time: string | null
-          simultaneous_bookings: number | null
-          updated_at: string
-        }
-        Insert: {
-          closing_time?: string | null
-          created_at?: string
-          date: string
-          id?: string
-          is_closed?: boolean
-          opening_time?: string | null
-          simultaneous_bookings?: number | null
-          updated_at?: string
-        }
-        Update: {
-          closing_time?: string | null
-          created_at?: string
-          date?: string
-          id?: string
-          is_closed?: boolean
-          opening_time?: string | null
-          simultaneous_bookings?: number | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      oregon_tires_email_logs: {
-        Row: {
-          appointment_id: string | null
-          body: string
-          created_at: string
-          email_type: string
-          id: string
-          recipient_email: string
-          recipient_name: string
-          recipient_type: string
-          resend_message_id: string | null
-          sent_at: string
-          subject: string
-        }
-        Insert: {
-          appointment_id?: string | null
-          body: string
-          created_at?: string
-          email_type: string
-          id?: string
-          recipient_email: string
-          recipient_name: string
-          recipient_type: string
-          resend_message_id?: string | null
-          sent_at?: string
-          subject: string
-        }
-        Update: {
-          appointment_id?: string | null
-          body?: string
-          created_at?: string
-          email_type?: string
-          id?: string
-          recipient_email?: string
-          recipient_name?: string
-          recipient_type?: string
-          resend_message_id?: string | null
-          sent_at?: string
-          subject?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "oregon_tires_email_logs_appointment_id_fkey"
-            columns: ["appointment_id"]
-            isOneToOne: false
-            referencedRelation: "oregon_tires_appointments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      oregon_tires_employee_schedules: {
-        Row: {
-          created_at: string
-          employee_id: string
-          end_time: string
-          id: string
-          is_active: boolean
-          schedule_date: string
-          start_time: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          employee_id: string
-          end_time: string
-          id?: string
-          is_active?: boolean
-          schedule_date: string
-          start_time: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          employee_id?: string
-          end_time?: string
-          id?: string
-          is_active?: boolean
-          schedule_date?: string
-          start_time?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "oregon_tires_employee_schedules_employee_id_fkey"
-            columns: ["employee_id"]
-            isOneToOne: false
-            referencedRelation: "oregon_tires_employees"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      oregon_tires_employees: {
-        Row: {
-          created_at: string
-          email: string | null
-          id: string
-          is_active: boolean
-          name: string
-          phone: string | null
-          role: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          email?: string | null
-          id?: string
-          is_active?: boolean
-          name: string
-          phone?: string | null
-          role?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          email?: string | null
-          id?: string
-          is_active?: boolean
-          name?: string
-          phone?: string | null
-          role?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      oregon_tires_gallery_images: {
-        Row: {
-          created_at: string
-          description: string | null
-          display_order: number | null
-          id: string
-          image_url: string
-          is_active: boolean
-          language: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          display_order?: number | null
-          id?: string
-          image_url: string
-          is_active?: boolean
-          language?: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          display_order?: number | null
-          id?: string
-          image_url?: string
-          is_active?: boolean
-          language?: string
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      oregon_tires_service_images: {
-        Row: {
-          created_at: string
-          id: string
-          image_url: string
-          is_current: boolean
-          position_x: number
-          position_y: number
-          scale: number
-          service_key: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          image_url: string
-          is_current?: boolean
-          position_x?: number
-          position_y?: number
-          scale?: number
-          service_key: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          image_url?: string
-          is_current?: boolean
-          position_x?: number
-          position_y?: number
-          scale?: number
-          service_key?: string
-          title?: string
           updated_at?: string
         }
         Relationships: []
@@ -1619,6 +1387,199 @@ export type Database = {
         }
         Relationships: []
       }
+      oretir_custom_hours: {
+        Row: {
+          closing_time: string | null
+          created_at: string
+          date: string
+          id: string
+          is_closed: boolean
+          opening_time: string | null
+          simultaneous_bookings: number | null
+          updated_at: string
+        }
+        Insert: {
+          closing_time?: string | null
+          created_at?: string
+          date: string
+          id?: string
+          is_closed?: boolean
+          opening_time?: string | null
+          simultaneous_bookings?: number | null
+          updated_at?: string
+        }
+        Update: {
+          closing_time?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          is_closed?: boolean
+          opening_time?: string | null
+          simultaneous_bookings?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      oretir_email_logs: {
+        Row: {
+          appointment_id: string | null
+          body: string
+          created_at: string
+          email_type: string
+          id: string
+          recipient_email: string
+          recipient_name: string
+          recipient_type: string
+          resend_message_id: string | null
+          sent_at: string
+          subject: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          body: string
+          created_at?: string
+          email_type: string
+          id?: string
+          recipient_email: string
+          recipient_name: string
+          recipient_type: string
+          resend_message_id?: string | null
+          sent_at?: string
+          subject: string
+        }
+        Update: {
+          appointment_id?: string | null
+          body?: string
+          created_at?: string
+          email_type?: string
+          id?: string
+          recipient_email?: string
+          recipient_name?: string
+          recipient_type?: string
+          resend_message_id?: string | null
+          sent_at?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oregon_tires_email_logs_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "oregon_tires_appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oretir_employee_schedules: {
+        Row: {
+          created_at: string
+          employee_id: string
+          end_time: string
+          id: string
+          is_active: boolean
+          schedule_date: string
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          end_time: string
+          id?: string
+          is_active?: boolean
+          schedule_date: string
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          end_time?: string
+          id?: string
+          is_active?: boolean
+          schedule_date?: string
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oregon_tires_employee_schedules_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "oretir_employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oretir_employees: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          phone: string | null
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          phone?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          phone?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      oretir_gallery_images: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          image_url: string
+          is_active: boolean
+          language: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_active?: boolean
+          language?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          language?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       oretir_profiles: {
         Row: {
           created_at: string
@@ -1636,6 +1597,45 @@ export type Database = {
           created_at?: string
           id?: string
           is_admin?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      oretir_service_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_current: boolean
+          position_x: number
+          position_y: number
+          scale: number
+          service_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_current?: boolean
+          position_x?: number
+          position_y?: number
+          scale?: number
+          service_key: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_current?: boolean
+          position_x?: number
+          position_y?: number
+          scale?: number
+          service_key?: string
+          title?: string
           updated_at?: string
         }
         Relationships: []
@@ -1703,6 +1703,159 @@ export type Database = {
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      pdxbus_businesses: {
+        Row: {
+          address: string | null
+          business_hours: Json | null
+          business_name: string
+          category: string
+          city: string
+          created_at: string
+          description: string | null
+          email: string | null
+          facebook_url: string | null
+          id: string
+          image_urls: string[] | null
+          instagram_url: string | null
+          is_approved: boolean
+          is_featured: boolean
+          linkedin_url: string | null
+          logo_url: string | null
+          owner_id: string
+          phone: string | null
+          state: string
+          twitter_url: string | null
+          updated_at: string
+          website_url: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_hours?: Json | null
+          business_name: string
+          category: string
+          city?: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          facebook_url?: string | null
+          id?: string
+          image_urls?: string[] | null
+          instagram_url?: string | null
+          is_approved?: boolean
+          is_featured?: boolean
+          linkedin_url?: string | null
+          logo_url?: string | null
+          owner_id: string
+          phone?: string | null
+          state?: string
+          twitter_url?: string | null
+          updated_at?: string
+          website_url?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_hours?: Json | null
+          business_name?: string
+          category?: string
+          city?: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          facebook_url?: string | null
+          id?: string
+          image_urls?: string[] | null
+          instagram_url?: string | null
+          is_approved?: boolean
+          is_featured?: boolean
+          linkedin_url?: string | null
+          logo_url?: string | null
+          owner_id?: string
+          phone?: string | null
+          state?: string
+          twitter_url?: string | null
+          updated_at?: string
+          website_url?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      pdxbus_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      pdxbus_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          company_name: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_approved: boolean
+          linkedin_url: string | null
+          phone: string | null
+          position: string | null
+          updated_at: string
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          company_name?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          is_approved?: boolean
+          linkedin_url?: string | null
+          phone?: string | null
+          position?: string | null
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          company_name?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_approved?: boolean
+          linkedin_url?: string | null
+          phone?: string | null
+          position?: string | null
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -1844,171 +1997,6 @@ export type Database = {
         }
         Relationships: []
       }
-      poreve_events: {
-        Row: {
-          api_source: string
-          category: string
-          created_at: string
-          description: string | null
-          end_date: string | null
-          external_id: string
-          facebook_url: string | null
-          id: string
-          image_url: string | null
-          instagram_url: string | null
-          is_active: boolean
-          is_featured: boolean
-          organizer_name: string | null
-          organizer_url: string | null
-          price_display: string | null
-          price_max: number | null
-          price_min: number | null
-          start_date: string
-          tags: string[] | null
-          ticket_url: string | null
-          title: string
-          twitter_url: string | null
-          updated_at: string
-          venue_address: string | null
-          venue_city: string | null
-          venue_name: string
-          venue_state: string | null
-          venue_zip: string | null
-          website_url: string | null
-          youtube_url: string | null
-        }
-        Insert: {
-          api_source: string
-          category: string
-          created_at?: string
-          description?: string | null
-          end_date?: string | null
-          external_id: string
-          facebook_url?: string | null
-          id?: string
-          image_url?: string | null
-          instagram_url?: string | null
-          is_active?: boolean
-          is_featured?: boolean
-          organizer_name?: string | null
-          organizer_url?: string | null
-          price_display?: string | null
-          price_max?: number | null
-          price_min?: number | null
-          start_date: string
-          tags?: string[] | null
-          ticket_url?: string | null
-          title: string
-          twitter_url?: string | null
-          updated_at?: string
-          venue_address?: string | null
-          venue_city?: string | null
-          venue_name: string
-          venue_state?: string | null
-          venue_zip?: string | null
-          website_url?: string | null
-          youtube_url?: string | null
-        }
-        Update: {
-          api_source?: string
-          category?: string
-          created_at?: string
-          description?: string | null
-          end_date?: string | null
-          external_id?: string
-          facebook_url?: string | null
-          id?: string
-          image_url?: string | null
-          instagram_url?: string | null
-          is_active?: boolean
-          is_featured?: boolean
-          organizer_name?: string | null
-          organizer_url?: string | null
-          price_display?: string | null
-          price_max?: number | null
-          price_min?: number | null
-          start_date?: string
-          tags?: string[] | null
-          ticket_url?: string | null
-          title?: string
-          twitter_url?: string | null
-          updated_at?: string
-          venue_address?: string | null
-          venue_city?: string | null
-          venue_name?: string
-          venue_state?: string | null
-          venue_zip?: string | null
-          website_url?: string | null
-          youtube_url?: string | null
-        }
-        Relationships: []
-      }
-      poreve_venues: {
-        Row: {
-          address: string | null
-          capacity: number | null
-          city: string | null
-          created_at: string
-          created_by: string | null
-          facebook_url: string | null
-          id: string
-          instagram_url: string | null
-          latitude: number | null
-          longitude: number | null
-          name: string
-          phone: string | null
-          state: string | null
-          twitter_url: string | null
-          updated_at: string
-          venue_type: string | null
-          website: string | null
-          youtube_url: string | null
-          zip_code: string | null
-        }
-        Insert: {
-          address?: string | null
-          capacity?: number | null
-          city?: string | null
-          created_at?: string
-          created_by?: string | null
-          facebook_url?: string | null
-          id?: string
-          instagram_url?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          name: string
-          phone?: string | null
-          state?: string | null
-          twitter_url?: string | null
-          updated_at?: string
-          venue_type?: string | null
-          website?: string | null
-          youtube_url?: string | null
-          zip_code?: string | null
-        }
-        Update: {
-          address?: string | null
-          capacity?: number | null
-          city?: string | null
-          created_at?: string
-          created_by?: string | null
-          facebook_url?: string | null
-          id?: string
-          instagram_url?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          name?: string
-          phone?: string | null
-          state?: string | null
-          twitter_url?: string | null
-          updated_at?: string
-          venue_type?: string | null
-          website?: string | null
-          youtube_url?: string | null
-          zip_code?: string | null
-        }
-        Relationships: []
-      }
       pormar_consultation_requests: {
         Row: {
           additional_guests: number | null
@@ -2080,11 +2068,13 @@ export type Database = {
       }
       user_events: {
         Row: {
+          api_source: string | null
           category: string
           created_at: string
           created_by: string | null
           description: string | null
           end_time: string | null
+          external_id: string | null
           facebook_url: string | null
           id: string
           image_url: string | null
@@ -2112,11 +2102,13 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
+          api_source?: string | null
           category: string
           created_at?: string
           created_by?: string | null
           description?: string | null
           end_time?: string | null
+          external_id?: string | null
           facebook_url?: string | null
           id?: string
           image_url?: string | null
@@ -2144,11 +2136,13 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
+          api_source?: string | null
           category?: string
           created_at?: string
           created_by?: string | null
           description?: string | null
           end_time?: string | null
+          external_id?: string | null
           facebook_url?: string | null
           id?: string
           image_url?: string | null
@@ -2213,6 +2207,7 @@ export type Database = {
         Row: {
           address: string | null
           ages: string | null
+          api_source: string | null
           approved_at: string | null
           approved_by: string | null
           city: string | null
@@ -2240,6 +2235,7 @@ export type Database = {
         Insert: {
           address?: string | null
           ages?: string | null
+          api_source?: string | null
           approved_at?: string | null
           approved_by?: string | null
           city?: string | null
@@ -2267,6 +2263,7 @@ export type Database = {
         Update: {
           address?: string | null
           ages?: string | null
+          api_source?: string | null
           approved_at?: string | null
           approved_by?: string | null
           city?: string | null
@@ -2322,6 +2319,10 @@ export type Database = {
         Returns: boolean
       }
       is_hiphop_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_pdxbus_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
