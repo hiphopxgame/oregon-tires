@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -6,6 +7,7 @@ import { User, Phone, UserCheck, Play, Square, Clock } from 'lucide-react';
 import { Appointment } from '@/types/admin';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useAppointmentTimer } from '@/hooks/useAppointmentTimer';
+import { ScheduleConflictAlert } from './ScheduleConflictAlert';
 
 interface AppointmentCardProps {
   appointment: Appointment;
@@ -47,7 +49,14 @@ export const AppointmentCard = ({
   };
 
   return (
-    <div className="p-3 bg-white rounded border border-green-200 shadow-sm">
+    <div className="space-y-3">
+      {/* Schedule conflict alert */}
+      <ScheduleConflictAlert 
+        appointment={appointment} 
+        employeeName={employees.find(emp => emp.id === appointment.assigned_employee_id)?.name}
+      />
+      
+      <div className="p-3 bg-white rounded border border-green-200 shadow-sm">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -199,6 +208,7 @@ export const AppointmentCard = ({
             </SelectContent>
           </Select>
         </div>
+      </div>
       </div>
     </div>
   );

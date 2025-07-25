@@ -1,118 +1,65 @@
 import React from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Users, Calendar } from 'lucide-react';
-import { Appointment } from '@/types/admin';
-
-interface Employee {
-  id: string;
-  name: string;
-  is_active: boolean;
-}
+import { AlertTriangle, Calendar, Users } from 'lucide-react';
+import { useAdminData } from '@/hooks/useAdminData';
+import { useEmployeeSchedules, EmployeeWithSchedule } from '@/hooks/useEmployeeSchedules';
 
 interface EmployeeScheduleAlertProps {
-  appointments: Appointment[];
-  employees: Employee[];
-  selectedDate: Date;
+  employee: EmployeeWithSchedule;
 }
 
-export const EmployeeScheduleAlert: React.FC<EmployeeScheduleAlertProps> = ({
-  appointments,
-  employees,
-  selectedDate
-}) => {
-  // Add defensive checks for undefined arrays
-  if (!appointments || !employees || !Array.isArray(appointments) || !Array.isArray(employees)) {
-    return null;
-  }
+export const EmployeeScheduleAlert = ({ employee }: EmployeeScheduleAlertProps) => {
+  const { appointments } = useAdminData();
+  const { isEmployeeScheduled } = useEmployeeSchedules();
 
-  // Get appointments for the selected date
-  const dateString = selectedDate.toISOString().split('T')[0];
-  const dayAppointments = appointments.filter(apt => apt.preferred_date === dateString);
-  
-  // Group appointments by time to find simultaneous bookings
-  const timeSlots: { [key: string]: Appointment[] } = {};
-  dayAppointments.forEach(apt => {
-    if (!timeSlots[apt.preferred_time]) {
-      timeSlots[apt.preferred_time] = [];
-    }
-    timeSlots[apt.preferred_time].push(apt);
+  // Find appointments assigned to this employee where they're not scheduled
+  const conflictingAppointments = appointments.filter(appointment => {
+    if (appointment.assigned_employee_id !== employee.id) return false;
+    
+    const appointmentDate = new Date(appointment.preferred_date);
+    return !isEmployeeScheduled(employee.id, appointmentDate);
   });
 
-  // Find time slots with multiple appointments
-  const simultaneousBookings = Object.entries(timeSlots)
-    .filter(([_, apts]) => apts.length > 1)
-    .map(([time, apts]) => ({ time, count: apts.length, appointments: apts }));
+  if (conflictingAppointments.length === 0) return null;
 
-  // Find unassigned appointments
-  const unassignedAppointments = dayAppointments.filter(apt => !apt.assigned_employee_id);
-
-  // Get scheduled employees for this date (mock data for now - would need real schedule data)
-  const scheduledEmployees = employees.filter(emp => emp.is_active);
-
-  if (simultaneousBookings.length === 0 && unassignedAppointments.length === 0) {
-    return null;
-  }
+  const uniqueDates = [...new Set(conflictingAppointments.map(apt => apt.preferred_date))];
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   return (
-    <div className="space-y-4">
-      {/* Staffing Alerts */}
-      {simultaneousBookings.map(({ time, count, appointments }) => {
-        const assignedEmployees = new Set(
-          appointments
-            .filter(apt => apt.assigned_employee_id)
-            .map(apt => apt.assigned_employee_id)
-        );
+    <Alert className="border-orange-200 bg-orange-50 mt-3">
+      <AlertTriangle className="h-4 w-4 text-orange-600" />
+      <AlertDescription>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-orange-800">
+              <strong>{employee.name}</strong> has {conflictingAppointments.length} appointment{conflictingAppointments.length > 1 ? 's' : ''} 
+              on unscheduled day{uniqueDates.length > 1 ? 's' : ''}
+            </span>
+            <Badge variant="outline" className="text-orange-700 border-orange-300">
+              Schedule Needed
+            </Badge>
+          </div>
+          <div className="flex items-center gap-1 text-sm text-orange-700">
+            <Calendar className="h-3 w-3" />
+            <span>{uniqueDates.length} day{uniqueDates.length > 1 ? 's' : ''}</span>
+          </div>
+        </div>
         
-        const needsMoreStaff = assignedEmployees.size < count;
-        
-        return needsMoreStaff ? (
-          <Alert key={time} className="border-orange-200 bg-orange-50">
-            <AlertTriangle className="h-4 w-4 text-orange-600" />
-            <AlertTitle className="text-orange-800">
-              Staffing Alert for {time}
-            </AlertTitle>
-            <AlertDescription className="text-orange-700">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="h-4 w-4" />
-                <span>
-                  {count} simultaneous appointments but only {assignedEmployees.size} employee(s) assigned
-                </span>
+        <div className="mt-2 space-y-1">
+          {uniqueDates.map(dateStr => {
+            const date = new Date(dateStr);
+            const dayName = dayNames[date.getDay()];
+            const appointmentsForDate = conflictingAppointments.filter(apt => apt.preferred_date === dateStr);
+            
+            return (
+              <div key={dateStr} className="text-sm text-orange-700">
+                • {dayName}, {date.toLocaleDateString()} - {appointmentsForDate.length} appointment{appointmentsForDate.length > 1 ? 's' : ''}
               </div>
-              <div className="flex flex-wrap gap-2">
-                {appointments.map(apt => (
-                  <Badge key={apt.id} variant="outline" className="text-orange-800 border-orange-300">
-                    {apt.first_name} {apt.last_name} - {apt.service}
-                  </Badge>
-                ))}
-              </div>
-            </AlertDescription>
-          </Alert>
-        ) : null;
-      })}
-
-      {/* Unassigned Appointments Alert */}
-      {unassignedAppointments.length > 0 && (
-        <Alert className="border-blue-200 bg-blue-50">
-          <Calendar className="h-4 w-4 text-blue-600" />
-          <AlertTitle className="text-blue-800">
-            Unassigned Appointments ({unassignedAppointments.length})
-          </AlertTitle>
-          <AlertDescription className="text-blue-700">
-            <p className="mb-2">The following appointments need employee assignment:</p>
-            <div className="flex flex-wrap gap-2">
-              {unassignedAppointments.map(apt => (
-                <Badge key={apt.id} variant="outline" className="text-blue-800 border-blue-300">
-                  {apt.preferred_time} - {apt.first_name} {apt.last_name}
-                </Badge>
-              ))}
-            </div>
-            <p className="mt-2 text-sm">
-              Available employees: {scheduledEmployees.map(emp => emp.name).join(', ')}
-            </p>
-          </AlertDescription>
-        </Alert>
-      )}
-    </div>
+            );
+          })}
+        </div>
+      </AlertDescription>
+    </Alert>
   );
 };

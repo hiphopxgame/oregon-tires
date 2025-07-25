@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { Appointment } from '@/types/admin';
 import { DailySummary } from './DailySummary';
 import { TimeSlot } from './TimeSlot';
-import { EmployeeScheduleAlert } from './EmployeeScheduleAlert';
+
 import { EmployeeAppointments } from './EmployeeAppointments';
 import { useEmployees } from '@/hooks/useEmployees';
 
@@ -91,14 +91,6 @@ export const DaySchedulePanel = ({
       <CardContent className="p-4">
         <DailySummary appointments={appointments} />
 
-        {/* Employee Schedule Alert */}
-        <div className="mb-4">
-          <EmployeeScheduleAlert 
-            selectedDate={selectedDate}
-            appointments={appointments}
-            employees={employees}
-          />
-        </div>
 
         {/* Employee Assignment Panel */}
         <div className="mb-4">
