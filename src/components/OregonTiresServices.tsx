@@ -4,13 +4,13 @@ import { CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Import background images
-import expertServiceImg from '@/assets/expert-service.jpg';
-import quickServiceImg from '@/assets/quick-service.jpg';
-import qualityPartsImg from '@/assets/quality-parts.jpg';
-import bilingualServiceImg from '@/assets/bilingual-service.jpg';
-import tireServicesImg from '@/assets/tire-services.jpg';
-import autoMaintenanceImg from '@/assets/auto-maintenance.jpg';
-import specializedServicesImg from '@/assets/specialized-services.jpg';
+import expertTechniciansImg from '@/assets/expert-technicians.jpg';
+import fastCarsImg from '@/assets/fast-cars.jpg';
+import qualityCarPartsImg from '@/assets/quality-car-parts.jpg';
+import bilingualSupportImg from '@/assets/bilingual-support.jpg';
+import tireShopImg from '@/assets/tire-shop.jpg';
+import autoRepairImg from '@/assets/auto-repair.jpg';
+import specializedToolsImg from '@/assets/specialized-tools.jpg';
 
 interface ServicesProps {
   translations: any;
@@ -37,10 +37,10 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
 
         {/* Key Features */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-64">
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-72">
             <div 
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${expertServiceImg})` }}
+              style={{ backgroundImage: `url(${expertTechniciansImg})` }}
             >
               <div className="absolute inset-0 bg-black/40"></div>
             </div>
@@ -52,10 +52,10 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
             </div>
           </Card>
 
-          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-64">
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-72">
             <div 
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${quickServiceImg})` }}
+              style={{ backgroundImage: `url(${fastCarsImg})` }}
             >
               <div className="absolute inset-0 bg-black/40"></div>
             </div>
@@ -67,10 +67,10 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
             </div>
           </Card>
 
-          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-64">
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-72">
             <div 
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${qualityPartsImg})` }}
+              style={{ backgroundImage: `url(${qualityCarPartsImg})` }}
             >
               <div className="absolute inset-0 bg-black/40"></div>
             </div>
@@ -82,10 +82,10 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
             </div>
           </Card>
 
-          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-64">
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-72">
             <div 
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${bilingualServiceImg})` }}
+              style={{ backgroundImage: `url(${bilingualSupportImg})` }}
             >
               <div className="absolute inset-0 bg-black/40"></div>
             </div>
@@ -99,25 +99,25 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
         </div>
 
         {/* Detailed Services */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Tire Services */}
-          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-96">
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 min-h-[500px]">
             <div 
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${tireServicesImg})` }}
+              style={{ backgroundImage: `url(${tireShopImg})` }}
             >
               <div className="absolute inset-0 bg-black/50"></div>
             </div>
             <div className="relative z-10 h-full flex flex-col">
               <div className="bg-white/95 backdrop-blur-sm m-4 rounded-lg p-4">
-                <CardTitle className="text-xl flex items-center gap-2 mb-4" style={{ color: primaryColor }}>
+                <CardTitle className="text-xl flex items-center gap-2 mb-2" style={{ color: primaryColor }}>
                   {t.tireServices}
                 </CardTitle>
               </div>
               <div className="flex-1 p-4">
-                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 space-y-4">
+                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 space-y-3">
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                       {t.newOrUsedTires}
                     </h4>
@@ -125,7 +125,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   </div>
                   
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                       {t.mountAndBalance}
                     </h4>
@@ -133,7 +133,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                       {t.tireRepairService}
                     </h4>
@@ -145,23 +145,23 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
           </Card>
 
           {/* Auto Maintenance */}
-          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-96">
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 min-h-[500px]">
             <div 
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${autoMaintenanceImg})` }}
+              style={{ backgroundImage: `url(${autoRepairImg})` }}
             >
               <div className="absolute inset-0 bg-black/50"></div>
             </div>
             <div className="relative z-10 h-full flex flex-col">
               <div className="bg-white/95 backdrop-blur-sm m-4 rounded-lg p-4">
-                <CardTitle className="text-xl flex items-center gap-2 mb-4" style={{ color: primaryColor }}>
+                <CardTitle className="text-xl flex items-center gap-2 mb-2" style={{ color: primaryColor }}>
                   {t.autoMaintenance}
                 </CardTitle>
               </div>
               <div className="flex-1 p-4">
-                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 space-y-4">
+                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 space-y-3">
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                       {t.oilChangeService}
                     </h4>
@@ -169,7 +169,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                       {t.brakeServices}
                     </h4>
@@ -177,7 +177,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                       {t.tuneup}
                     </h4>
@@ -189,23 +189,23 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
           </Card>
 
           {/* Specialized Services */}
-          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-96">
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 min-h-[500px]">
             <div 
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${specializedServicesImg})` }}
+              style={{ backgroundImage: `url(${specializedToolsImg})` }}
             >
               <div className="absolute inset-0 bg-black/50"></div>
             </div>
             <div className="relative z-10 h-full flex flex-col">
               <div className="bg-white/95 backdrop-blur-sm m-4 rounded-lg p-4">
-                <CardTitle className="text-xl flex items-center gap-2 mb-4" style={{ color: primaryColor }}>
+                <CardTitle className="text-xl flex items-center gap-2 mb-2" style={{ color: primaryColor }}>
                   {t.specializedServices}
                 </CardTitle>
               </div>
               <div className="flex-1 p-4">
-                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 space-y-4 max-h-72 overflow-y-auto">
+                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 space-y-3">
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                       {t.alignment}
                     </h4>
@@ -213,7 +213,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                       {t.mechanicalInspection}
                     </h4>
@@ -221,7 +221,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                       {t.homeService}
                     </h4>
@@ -229,15 +229,15 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
                       {t.roadsideAssistance}
                     </h4>
                     <p className="text-gray-600 text-sm">{t.roadsideAssistanceDesc}</p>
                   </div>
 
-                  <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500 mt-6">
-                    <p className="text-red-700 font-semibold text-sm mb-2">{t.needServiceToday}</p>
+                  <div className="p-3 bg-red-50 rounded-lg border-l-4 border-red-500 mt-4">
+                    <p className="text-red-700 font-semibold text-sm mb-1">{t.needServiceToday}</p>
                     <p className="text-red-600 text-sm">{t.callImmediately}</p>
                     <p className="text-red-600 text-xs mt-1">{t.availableHours}</p>
                   </div>
