@@ -60,7 +60,7 @@ export const EmployeeScheduleAlert = ({ employee }: EmployeeScheduleAlertProps) 
             
             return (
               <div key={dateStr} className="text-sm text-orange-700">
-                • {dayName}, {date.toLocaleDateString()} - {appointmentsForDate.length} appointment{appointmentsForDate.length > 1 ? 's' : ''}
+                • {dayName}, {date.toLocaleDateString()} - {appointmentsForDate.map(apt => apt.preferred_time).join(', ')}
               </div>
             );
           })}

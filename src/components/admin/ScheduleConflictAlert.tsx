@@ -43,8 +43,8 @@ export const ScheduleConflictAlert = ({ appointment, employeeName }: ScheduleCon
           </Badge>
         </div>
         <div className="flex items-center gap-1 text-sm text-orange-700">
-          <Calendar className="h-3 w-3" />
-          <span>Needs scheduling</span>
+          <Clock className="h-3 w-3" />
+          <span>Appointment at {appointment.preferred_time}</span>
         </div>
       </AlertDescription>
     </Alert>
