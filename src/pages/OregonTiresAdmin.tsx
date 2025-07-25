@@ -14,6 +14,7 @@ import { ExpandedCalendarView } from '@/components/admin/ExpandedCalendarView';
 import { GalleryManager } from '@/components/admin/GalleryManager';
 import { EmailLogsView } from '@/components/admin/EmailLogsView';
 import { DashboardOverview } from '@/components/admin/DashboardOverview';
+import { UpcomingAppointmentsView } from '@/components/admin/UpcomingAppointmentsView';
 
 const OregonTiresAdmin = () => {
   const { language, toggleLanguage, t } = useLanguage();
@@ -54,6 +55,8 @@ const OregonTiresAdmin = () => {
             onDataRefresh={refetchData}
           />
         );
+      case 'upcoming':
+        return <UpcomingAppointmentsView appointments={appointments} />;
       case 'appointments':
         return (
           <AppointmentsView

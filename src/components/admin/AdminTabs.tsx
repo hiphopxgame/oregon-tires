@@ -6,6 +6,7 @@ import { CalendarTab } from './CalendarTab';
 import { DashboardOverview } from './DashboardOverview';
 import { EmailLogsView } from './EmailLogsView';
 import { EmailTestPanel } from './EmailTestPanel';
+import { UpcomingAppointmentsView } from './UpcomingAppointmentsView';
 import { ContactMessage, Appointment } from '@/types/admin';
 
 interface AdminTabsProps {
@@ -29,9 +30,10 @@ export const AdminTabs = ({
 }: AdminTabsProps) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
-      <TabsList className="grid w-full grid-cols-6">
+      <TabsList className="grid w-full grid-cols-7">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="calendar">Calendar</TabsTrigger>
+        <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
         <TabsTrigger value="appointments">Appointments</TabsTrigger>
         <TabsTrigger value="messages">Messages</TabsTrigger>
         <TabsTrigger value="emails">Email Logs</TabsTrigger>
@@ -47,6 +49,10 @@ export const AdminTabs = ({
           appointments={appointments}
           updateAppointmentStatus={updateAppointmentStatus}
         />
+      </TabsContent>
+
+      <TabsContent value="upcoming">
+        <UpcomingAppointmentsView appointments={appointments} />
       </TabsContent>
 
       <TabsContent value="appointments">
