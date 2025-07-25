@@ -79,6 +79,11 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
                     <div className="text-sm text-gray-500">
                       {appointment.preferred_time}
                     </div>
+                    {appointment.status === 'completed' && appointment.actual_duration_minutes && (
+                      <div className="text-sm text-green-700 font-medium mt-1">
+                        Completed in {appointment.actual_duration_minutes}min
+                      </div>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell>
