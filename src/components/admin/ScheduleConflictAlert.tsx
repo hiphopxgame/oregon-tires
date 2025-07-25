@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Calendar, Clock } from 'lucide-react';
 import { useEmployeeSchedules } from '@/hooks/useEmployeeSchedules';
 import { Appointment } from '@/types/admin';
+import { format } from 'date-fns';
 
 interface ScheduleConflictAlertProps {
   appointment: Appointment;
@@ -15,7 +16,7 @@ export const ScheduleConflictAlert = ({ appointment, employeeName }: ScheduleCon
 
   if (!appointment.assigned_employee_id) return null;
 
-  const appointmentDate = new Date(appointment.preferred_date);
+  const appointmentDate = new Date(appointment.preferred_date + 'T00:00:00');
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   

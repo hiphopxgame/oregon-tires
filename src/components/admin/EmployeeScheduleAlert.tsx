@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Calendar, Users } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import { useEmployeeSchedules, EmployeeWithSchedule } from '@/hooks/useEmployeeSchedules';
+import { format } from 'date-fns';
 
 interface EmployeeScheduleAlertProps {
   employee: EmployeeWithSchedule;
@@ -18,7 +19,7 @@ export const EmployeeScheduleAlert = ({ employee, onAppointmentClick }: Employee
   const conflictingAppointments = appointments.filter(appointment => {
     if (appointment.assigned_employee_id !== employee.id) return false;
     
-    const appointmentDate = new Date(appointment.preferred_date);
+    const appointmentDate = new Date(appointment.preferred_date + 'T00:00:00');
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -55,7 +56,7 @@ export const EmployeeScheduleAlert = ({ employee, onAppointmentClick }: Employee
         
         <div className="mt-2 space-y-1">
           {conflictingAppointments.map(appointment => {
-            const date = new Date(appointment.preferred_date);
+            const date = new Date(appointment.preferred_date + 'T00:00:00');
             const dayName = dayNames[date.getDay()];
             
             return (
@@ -64,7 +65,7 @@ export const EmployeeScheduleAlert = ({ employee, onAppointmentClick }: Employee
                 className="text-sm text-orange-700 cursor-pointer hover:bg-orange-100 p-1 rounded transition-colors"
                 onClick={() => onAppointmentClick?.(employee.id, appointment.preferred_date)}
               >
-                • {dayName}, {date.toLocaleDateString()} at {appointment.preferred_time} - {appointment.first_name} {appointment.last_name}
+                • {dayName}, {format(date, 'M/d/yyyy')} at {appointment.preferred_time} - {appointment.first_name} {appointment.last_name}
               </div>
             );
           })}
