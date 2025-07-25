@@ -1,7 +1,16 @@
 
 import React from 'react';
-import { Wrench, Clock, Shield, Users, Car, Settings, Zap, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// Import background images
+import expertServiceImg from '@/assets/expert-service.jpg';
+import quickServiceImg from '@/assets/quick-service.jpg';
+import qualityPartsImg from '@/assets/quality-parts.jpg';
+import bilingualServiceImg from '@/assets/bilingual-service.jpg';
+import tireServicesImg from '@/assets/tire-services.jpg';
+import autoMaintenanceImg from '@/assets/auto-maintenance.jpg';
+import specializedServicesImg from '@/assets/specialized-services.jpg';
 
 interface ServicesProps {
   translations: any;
@@ -28,180 +37,213 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
 
         {/* Key Features */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          <Card className="text-center hover:shadow-lg transition-shadow border-0">
-            <CardHeader className="pb-4">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Wrench className="h-8 w-8" style={{ color: primaryColor }} />
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-64">
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${expertServiceImg})` }}
+            >
+              <div className="absolute inset-0 bg-black/40"></div>
+            </div>
+            <div className="relative z-10 h-full flex flex-col justify-end p-6">
+              <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4">
+                <CardTitle className="text-lg mb-2" style={{ color: primaryColor }}>{t.expertService}</CardTitle>
+                <p className="text-gray-700 text-sm">{t.expertServiceDesc}</p>
               </div>
-              <CardTitle className="text-lg" style={{ color: primaryColor }}>{t.expertService}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 text-sm">{t.expertServiceDesc}</p>
-            </CardContent>
+            </div>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-shadow border-0">
-            <CardHeader className="pb-4">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="h-8 w-8" style={{ color: primaryColor }} />
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-64">
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${quickServiceImg})` }}
+            >
+              <div className="absolute inset-0 bg-black/40"></div>
+            </div>
+            <div className="relative z-10 h-full flex flex-col justify-end p-6">
+              <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4">
+                <CardTitle className="text-lg mb-2" style={{ color: primaryColor }}>{t.quickService}</CardTitle>
+                <p className="text-gray-700 text-sm">{t.quickServiceDesc}</p>
               </div>
-              <CardTitle className="text-lg" style={{ color: primaryColor }}>{t.quickService}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 text-sm">{t.quickServiceDesc}</p>
-            </CardContent>
+            </div>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-shadow border-0">
-            <CardHeader className="pb-4">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8" style={{ color: primaryColor }} />
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-64">
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${qualityPartsImg})` }}
+            >
+              <div className="absolute inset-0 bg-black/40"></div>
+            </div>
+            <div className="relative z-10 h-full flex flex-col justify-end p-6">
+              <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4">
+                <CardTitle className="text-lg mb-2" style={{ color: primaryColor }}>{t.qualityParts}</CardTitle>
+                <p className="text-gray-700 text-sm">{t.qualityPartsDesc}</p>
               </div>
-              <CardTitle className="text-lg" style={{ color: primaryColor }}>{t.qualityParts}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 text-sm">{t.qualityPartsDesc}</p>
-            </CardContent>
+            </div>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-shadow border-0">
-            <CardHeader className="pb-4">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8" style={{ color: primaryColor }} />
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-64">
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${bilingualServiceImg})` }}
+            >
+              <div className="absolute inset-0 bg-black/40"></div>
+            </div>
+            <div className="relative z-10 h-full flex flex-col justify-end p-6">
+              <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4">
+                <CardTitle className="text-lg mb-2" style={{ color: primaryColor }}>{t.bilingualService}</CardTitle>
+                <p className="text-gray-700 text-sm">{t.bilingualServiceDesc}</p>
               </div>
-              <CardTitle className="text-lg" style={{ color: primaryColor }}>{t.bilingualService}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 text-sm">{t.bilingualServiceDesc}</p>
-            </CardContent>
+            </div>
           </Card>
         </div>
 
         {/* Detailed Services */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Tire Services */}
-          <Card className="hover:shadow-lg transition-shadow border-0">
-            <CardHeader>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                  <Car className="h-6 w-6" style={{ color: primaryColor }} />
-                </div>
-                <CardTitle className="text-xl" style={{ color: primaryColor }}>{t.tireServices}</CardTitle>
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-96">
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${tireServicesImg})` }}
+            >
+              <div className="absolute inset-0 bg-black/50"></div>
+            </div>
+            <div className="relative z-10 h-full flex flex-col">
+              <div className="bg-white/95 backdrop-blur-sm m-4 rounded-lg p-4">
+                <CardTitle className="text-xl flex items-center gap-2 mb-4" style={{ color: primaryColor }}>
+                  {t.tireServices}
+                </CardTitle>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.newOrUsedTires}
-                </h4>
-                <p className="text-gray-600 text-sm">{t.newOrUsedTiresDesc}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.mountAndBalance}
-                </h4>
-                <p className="text-gray-600 text-sm">{t.mountAndBalanceDesc}</p>
-              </div>
+              <div className="flex-1 p-4">
+                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                      {t.newOrUsedTires}
+                    </h4>
+                    <p className="text-gray-600 text-sm">{t.newOrUsedTiresDesc}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                      {t.mountAndBalance}
+                    </h4>
+                    <p className="text-gray-600 text-sm">{t.mountAndBalanceDesc}</p>
+                  </div>
 
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.tireRepairService}
-                </h4>
-                <p className="text-gray-600 text-sm">{t.tireRepairServiceDesc}</p>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                      {t.tireRepairService}
+                    </h4>
+                    <p className="text-gray-600 text-sm">{t.tireRepairServiceDesc}</p>
+                  </div>
+                </div>
               </div>
-            </CardContent>
+            </div>
           </Card>
 
           {/* Auto Maintenance */}
-          <Card className="hover:shadow-lg transition-shadow border-0">
-            <CardHeader>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                  <Settings className="h-6 w-6" style={{ color: primaryColor }} />
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-96">
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${autoMaintenanceImg})` }}
+            >
+              <div className="absolute inset-0 bg-black/50"></div>
+            </div>
+            <div className="relative z-10 h-full flex flex-col">
+              <div className="bg-white/95 backdrop-blur-sm m-4 rounded-lg p-4">
+                <CardTitle className="text-xl flex items-center gap-2 mb-4" style={{ color: primaryColor }}>
+                  {t.autoMaintenance}
+                </CardTitle>
+              </div>
+              <div className="flex-1 p-4">
+                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                      {t.oilChangeService}
+                    </h4>
+                    <p className="text-gray-600 text-sm">{t.oilChangeServiceDesc}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                      {t.brakeServices}
+                    </h4>
+                    <p className="text-gray-600 text-sm">{t.brakeServicesDesc}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                      {t.tuneup}
+                    </h4>
+                    <p className="text-gray-600 text-sm">{t.tuneupDesc}</p>
+                  </div>
                 </div>
-                <CardTitle className="text-xl" style={{ color: primaryColor }}>{t.autoMaintenance}</CardTitle>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.oilChangeService}
-                </h4>
-                <p className="text-gray-600 text-sm">{t.oilChangeServiceDesc}</p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.brakeServices}
-                </h4>
-                <p className="text-gray-600 text-sm">{t.brakeServicesDesc}</p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.tuneup}
-                </h4>
-                <p className="text-gray-600 text-sm">{t.tuneupDesc}</p>
-              </div>
-            </CardContent>
+            </div>
           </Card>
 
           {/* Specialized Services */}
-          <Card className="hover:shadow-lg transition-shadow border-0">
-            <CardHeader>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                  <Zap className="h-6 w-6" style={{ color: primaryColor }} />
+          <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-96">
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${specializedServicesImg})` }}
+            >
+              <div className="absolute inset-0 bg-black/50"></div>
+            </div>
+            <div className="relative z-10 h-full flex flex-col">
+              <div className="bg-white/95 backdrop-blur-sm m-4 rounded-lg p-4">
+                <CardTitle className="text-xl flex items-center gap-2 mb-4" style={{ color: primaryColor }}>
+                  {t.specializedServices}
+                </CardTitle>
+              </div>
+              <div className="flex-1 p-4">
+                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 space-y-4 max-h-72 overflow-y-auto">
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                      {t.alignment}
+                    </h4>
+                    <p className="text-gray-600 text-sm">{t.alignmentDesc}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                      {t.mechanicalInspection}
+                    </h4>
+                    <p className="text-gray-600 text-sm">{t.mechanicalInspectionDesc}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                      {t.homeService}
+                    </h4>
+                    <p className="text-gray-600 text-sm">{t.homeServiceDesc}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
+                      {t.roadsideAssistance}
+                    </h4>
+                    <p className="text-gray-600 text-sm">{t.roadsideAssistanceDesc}</p>
+                  </div>
+
+                  <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500 mt-6">
+                    <p className="text-red-700 font-semibold text-sm mb-2">{t.needServiceToday}</p>
+                    <p className="text-red-600 text-sm">{t.callImmediately}</p>
+                    <p className="text-red-600 text-xs mt-1">{t.availableHours}</p>
+                  </div>
                 </div>
-                <CardTitle className="text-xl" style={{ color: primaryColor }}>{t.specializedServices}</CardTitle>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.alignment}
-                </h4>
-                <p className="text-gray-600 text-sm">{t.alignmentDesc}</p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.mechanicalInspection}
-                </h4>
-                <p className="text-gray-600 text-sm">{t.mechanicalInspectionDesc}</p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.homeService}
-                </h4>
-                <p className="text-gray-600 text-sm">{t.homeServiceDesc}</p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" style={{ color: primaryColor }} />
-                  {t.roadsideAssistance}
-                </h4>
-                <p className="text-gray-600 text-sm">{t.roadsideAssistanceDesc}</p>
-              </div>
-
-              <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500 mt-6">
-                <p className="text-red-700 font-semibold text-sm mb-2">{t.needServiceToday}</p>
-                <p className="text-red-600 text-sm">{t.callImmediately}</p>
-                <p className="text-red-600 text-xs mt-1">{t.availableHours}</p>
-              </div>
-            </CardContent>
+            </div>
           </Card>
         </div>
 
