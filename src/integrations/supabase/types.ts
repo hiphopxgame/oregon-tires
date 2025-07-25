@@ -1455,6 +1455,45 @@ export type Database = {
         }
         Relationships: []
       }
+      oregon_tires_service_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_current: boolean
+          position_x: number
+          position_y: number
+          scale: number
+          service_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_current?: boolean
+          position_x?: number
+          position_y?: number
+          scale?: number
+          service_key: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_current?: boolean
+          position_x?: number
+          position_y?: number
+          scale?: number
+          service_key?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       oretir_admin_notifications: {
         Row: {
           appointment_id: string | null
