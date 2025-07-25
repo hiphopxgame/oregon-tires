@@ -15,6 +15,7 @@ import { GalleryManager } from '@/components/admin/GalleryManager';
 import { EmailLogsView } from '@/components/admin/EmailLogsView';
 import { DashboardOverview } from '@/components/admin/DashboardOverview';
 import { UpcomingAppointmentsView } from '@/components/admin/UpcomingAppointmentsView';
+import ServiceImagesManager from '@/components/admin/ServiceImagesManager';
 
 const OregonTiresAdmin = () => {
   const { language, toggleLanguage, t } = useLanguage();
@@ -78,6 +79,8 @@ const OregonTiresAdmin = () => {
         return <EmployeesView />;
       case 'gallery':
         return <GalleryManager />;
+      case 'images':
+        return <ServiceImagesManager />;
       case 'analytics':
         return (
           <AnalyticsView

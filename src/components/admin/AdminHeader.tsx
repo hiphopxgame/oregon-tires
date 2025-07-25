@@ -25,6 +25,7 @@ export const AdminHeader = ({
     { id: 'emails', label: t.admin.emailLogs },
     { id: 'employees', label: t.admin.employees },
     { id: 'gallery', label: t.admin.gallery },
+    { id: 'images', label: 'Service Images' },
     { id: 'analytics', label: t.admin.analytics }
   ];
 
