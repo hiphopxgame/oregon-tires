@@ -12,14 +12,22 @@ export const useAdminAuth = () => {
 
   const checkAdminStatus = async (userId: string) => {
     try {
+      console.log('Checking admin status for user:', userId);
       const { data, error } = await supabase
         .from('oretir_profiles')
         .select('is_admin')
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
-      return data?.is_admin || false;
+      if (error) {
+        console.error('Error in admin status query:', error);
+        throw error;
+      }
+      
+      console.log('Admin status data:', data);
+      const isAdmin = data?.is_admin || false;
+      console.log('Is admin:', isAdmin);
+      return isAdmin;
     } catch (error) {
       console.error('Error checking admin status:', error);
       return false;
@@ -74,13 +82,16 @@ export const useAdminAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log('User session found, checking admin status...');
           // Defer admin status check to avoid deadlock
           setTimeout(() => {
             checkAdminStatus(session.user.id).then(adminStatus => {
+              console.log('Admin status result:', adminStatus);
               setIsAdmin(adminStatus);
               setLoading(false); // Set loading false after admin check
               
               if (!adminStatus && event === 'SIGNED_IN') {
+                console.log('User is not admin, signing out...');
                 supabase.auth.signOut().then(() => {
                   toast({
                     title: "Access Denied",
@@ -89,9 +100,13 @@ export const useAdminAuth = () => {
                   });
                 });
               }
+            }).catch(error => {
+              console.error('Error in admin status check:', error);
+              setLoading(false);
             });
           }, 0);
         } else {
+          console.log('No user session found');
           setIsAdmin(false);
           setLoading(false); // Set loading false for no session
         }
@@ -100,19 +115,26 @@ export const useAdminAuth = () => {
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
         checkAdminStatus(session.user.id).then(adminStatus => {
+          console.log('Initial admin status:', adminStatus);
           setIsAdmin(adminStatus);
           
           if (!adminStatus) {
+            console.log('Initial check: User is not admin, signing out...');
             supabase.auth.signOut();
           }
           setLoading(false);
+        }).catch(error => {
+          console.error('Error in initial admin check:', error);
+          setLoading(false);
         });
       } else {
+        console.log('No initial session found');
         setLoading(false);
       }
     });
