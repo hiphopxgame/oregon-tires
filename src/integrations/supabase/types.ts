@@ -1649,18 +1649,21 @@ export type Database = {
           created_at: string
           id: string
           is_admin: boolean
+          project_id: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           id: string
           is_admin?: boolean
+          project_id?: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
           is_admin?: boolean
+          project_id?: string
           updated_at?: string
         }
         Relationships: []
@@ -2398,7 +2401,12 @@ export type Database = {
         Args:
           | { user_email: string }
           | { user_email: string; admin_status?: boolean }
-        Returns: undefined
+          | {
+              user_email: string
+              admin_status?: boolean
+              target_project_id?: string
+            }
+        Returns: boolean
       }
       setup_admin_user: {
         Args: Record<PropertyKey, never>

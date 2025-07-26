@@ -15,34 +15,42 @@ export const useAdminAuth = () => {
       console.log('Checking admin status for user:', userId);
       const { data, error } = await supabase
         .from('oretir_profiles')
-        .select('is_admin')
+        .select('is_admin, project_id')
         .eq('id', userId)
+        .eq('project_id', 'oregon-tires') // Only check oregon-tires project users
         .single();
 
       if (error) {
         console.error('Error in admin status query:', error);
-        // If profile doesn't exist, create one
+        // If profile doesn't exist, create one for oregon-tires project
         if (error.code === 'PGRST116') {
-          console.log('Profile not found, creating one...');
+          console.log('Profile not found, creating one for oregon-tires project...');
           const { data: insertData, error: insertError } = await supabase
             .from('oretir_profiles')
-            .insert({ id: userId, is_admin: false })
-            .select('is_admin')
+            .insert({ id: userId, is_admin: false, project_id: 'oregon-tires' })
+            .select('is_admin, project_id')
             .single();
           
           if (insertError) {
             console.error('Error creating profile:', insertError);
             return false;
           }
-          console.log('Profile created:', insertData);
+          console.log('Profile created for oregon-tires:', insertData);
           return insertData?.is_admin || false;
         }
         throw error;
       }
       
       console.log('Admin status data:', data);
+      
+      // Verify user belongs to oregon-tires project
+      if (data?.project_id !== 'oregon-tires') {
+        console.log('User does not belong to oregon-tires project:', data?.project_id);
+        return false;
+      }
+      
       const isAdmin = data?.is_admin || false;
-      console.log('Is admin:', isAdmin);
+      console.log('Is admin for oregon-tires:', isAdmin);
       return isAdmin;
     } catch (error) {
       console.error('Error checking admin status:', error);
