@@ -2,15 +2,7 @@
 import React from 'react';
 import { CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-// Import background images
-import expertTechniciansImg from '@/assets/expert-technicians.jpg';
-import fastCarsImg from '@/assets/fast-cars.jpg';
-import qualityCarPartsImg from '@/assets/quality-car-parts.jpg';
-import bilingualSupportImg from '@/assets/bilingual-support.jpg';
-import tireShopImg from '@/assets/tire-shop.jpg';
-import autoRepairImg from '@/assets/auto-repair.jpg';
-import specializedToolsImg from '@/assets/specialized-tools.jpg';
+import { useServiceImagesForFrontend } from '@/hooks/useServiceImagesForFrontend';
 
 interface ServicesProps {
   translations: any;
@@ -24,6 +16,7 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
   secondaryColor
 }) => {
   const t = translations;
+  const { getImageUrl, getImageStyle } = useServiceImagesForFrontend();
 
   return (
     <section id="services" className="py-16 bg-gray-50 scroll-mt-24">
@@ -39,8 +32,11 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-72">
             <div 
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${expertTechniciansImg})` }}
+              className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+              style={{ 
+                backgroundImage: `url(${getImageUrl('expert-technicians')})`,
+                ...getImageStyle('expert-technicians')
+              }}
             >
               <div className="absolute inset-0 bg-black/40"></div>
             </div>
@@ -54,8 +50,11 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
 
           <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-72">
             <div 
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${fastCarsImg})` }}
+              className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+              style={{ 
+                backgroundImage: `url(${getImageUrl('fast-cars')})`,
+                ...getImageStyle('fast-cars')
+              }}
             >
               <div className="absolute inset-0 bg-black/40"></div>
             </div>
@@ -69,8 +68,11 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
 
           <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-72">
             <div 
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${qualityCarPartsImg})` }}
+              className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+              style={{ 
+                backgroundImage: `url(${getImageUrl('quality-car-parts')})`,
+                ...getImageStyle('quality-car-parts')
+              }}
             >
               <div className="absolute inset-0 bg-black/40"></div>
             </div>
@@ -84,8 +86,11 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
 
           <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 h-72">
             <div 
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${bilingualSupportImg})` }}
+              className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+              style={{ 
+                backgroundImage: `url(${getImageUrl('bilingual-support')})`,
+                ...getImageStyle('bilingual-support')
+              }}
             >
               <div className="absolute inset-0 bg-black/40"></div>
             </div>
@@ -103,8 +108,11 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
           {/* Tire Services */}
           <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 min-h-[500px]">
             <div 
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${tireShopImg})` }}
+              className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+              style={{ 
+                backgroundImage: `url(${getImageUrl('tire-shop')})`,
+                ...getImageStyle('tire-shop')
+              }}
             >
               <div className="absolute inset-0 bg-black/50"></div>
             </div>
@@ -147,8 +155,11 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
           {/* Auto Maintenance */}
           <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 min-h-[500px]">
             <div 
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${autoRepairImg})` }}
+              className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+              style={{ 
+                backgroundImage: `url(${getImageUrl('auto-repair')})`,
+                ...getImageStyle('auto-repair')
+              }}
             >
               <div className="absolute inset-0 bg-black/50"></div>
             </div>
@@ -191,8 +202,11 @@ const OregonTiresServices: React.FC<ServicesProps> = ({
           {/* Specialized Services */}
           <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-0 min-h-[500px]">
             <div 
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${specializedToolsImg})` }}
+              className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+              style={{ 
+                backgroundImage: `url(${getImageUrl('specialized-tools')})`,
+                ...getImageStyle('specialized-tools')
+              }}
             >
               <div className="absolute inset-0 bg-black/50"></div>
             </div>
