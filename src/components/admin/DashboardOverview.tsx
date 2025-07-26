@@ -118,10 +118,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointmen
         {/* Daily Appointments */}
         <Card>
           <CardHeader>
-            <CardTitle>{t.admin.thisWeeksAppointments}</CardTitle>
+            <CardTitle>Upcoming Appointments</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+            <div className="space-y-4">
               {appointmentsByDate.map(({ date, appointments: dayAppointments }) => (
                 <div key={date.toISOString()} className="border-l-4 border-primary pl-4">
                   <div className="flex items-center justify-between mb-2">
