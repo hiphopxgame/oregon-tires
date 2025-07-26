@@ -2,6 +2,7 @@
 import { useLanguage } from '@/hooks/useLanguage';
 import { useAdminData } from '@/hooks/useAdminData';
 import { useAdminView } from '@/hooks/useAdminView';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminFooter } from '@/components/admin/AdminFooter';
 import { AdminCalendar } from '@/components/admin/AdminCalendar';
@@ -19,6 +20,7 @@ import ServiceImagesManager from '@/components/admin/ServiceImagesManager';
 
 const OregonTiresAdmin = () => {
   const { language, toggleLanguage, t } = useLanguage();
+  const { signOut } = useAdminAuth();
   const {
     appointments,
     contactMessages,
@@ -109,6 +111,7 @@ const OregonTiresAdmin = () => {
         currentView={currentView}
         setCurrentView={setCurrentView}
         t={t}
+        onSignOut={signOut}
       />
 
       <div className="container mx-auto px-4 py-8">

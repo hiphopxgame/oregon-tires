@@ -41,4 +41,4 @@ double_confirm_changes = true
 enable_confirmations = false
 
 [functions.send-appointment-emails]
-verify_jwt = false
+verify_jwt = true

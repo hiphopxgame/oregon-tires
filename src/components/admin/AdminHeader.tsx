@@ -1,6 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 
 interface AdminHeaderProps {
   language: string;
@@ -8,6 +9,7 @@ interface AdminHeaderProps {
   currentView: string;
   setCurrentView: (view: string) => void;
   t: any;
+  onSignOut: () => Promise<void>;
 }
 
 export const AdminHeader = ({ 
@@ -15,7 +17,8 @@ export const AdminHeader = ({
   toggleLanguage, 
   currentView, 
   setCurrentView,
-  t 
+  t,
+  onSignOut
 }: AdminHeaderProps) => {
   const navItems = [
     { id: 'overview', label: t.admin.overview },
@@ -44,12 +47,23 @@ export const AdminHeader = ({
               <p className="text-white/80 text-sm">{t.admin.managementDashboard}</p>
             </div>
           </Link>
-          <button 
-            onClick={toggleLanguage} 
-            className="text-white hover:text-yellow-200"
-          >
-            English | Español
-          </button>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={toggleLanguage} 
+              className="text-white hover:text-yellow-200"
+            >
+              English | Español
+            </button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onSignOut}
+              className="text-white hover:bg-red-600 hover:text-white flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
+          </div>
         </div>
         
         <nav className="flex flex-wrap gap-2">

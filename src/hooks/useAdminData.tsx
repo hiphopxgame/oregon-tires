@@ -17,11 +17,11 @@ export const useAdminData = () => {
       console.log('Fetching admin data...');
       const [appointmentsRes, contactRes] = await Promise.all([
         supabase
-          .from('oregon_tires_appointments')
+          .from('oretir_appointments')
           .select('*')
           .order('created_at', { ascending: false }),
         supabase
-          .from('oregon_tires_contact_messages')
+          .from('oretir_contact_messages')
           .select('*')
           .order('created_at', { ascending: false })
       ]);
@@ -64,7 +64,7 @@ export const useAdminData = () => {
       }
       
       const { error } = await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .update(updateData)
         .eq('id', id);
 
@@ -127,7 +127,7 @@ export const useAdminData = () => {
       }
       
       const { error } = await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .update({ status })
         .eq('id', id);
 
@@ -173,7 +173,7 @@ export const useAdminData = () => {
       console.log('Updating message status:', { id, status });
       
       const { error } = await supabase
-        .from('oregon_tires_contact_messages')
+        .from('oretir_contact_messages')
         .update({ status })
         .eq('id', id);
 
@@ -219,7 +219,7 @@ export const useAdminData = () => {
         {
           event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
           schema: 'public',
-          table: 'oregon_tires_appointments'
+          table: 'oretir_appointments'
         },
         (payload) => {
           console.log('Real-time appointment change:', payload);
@@ -245,7 +245,7 @@ export const useAdminData = () => {
         {
           event: '*', // Listen to all changes
           schema: 'public',
-          table: 'oregon_tires_contact_messages'
+          table: 'oretir_contact_messages'
         },
         (payload) => {
           console.log('Real-time message change:', payload);
