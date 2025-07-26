@@ -218,20 +218,30 @@ const ServiceImagesManager = () => {
         {homePageImages.map((serviceImage) => (
           <Card key={serviceImage.service_key} className="overflow-hidden">
             <CardHeader className="pb-4">
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-center">
                 <CardTitle className="text-lg">{serviceImage.title}</CardTitle>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenHistory(serviceImage.service_key)}
-                      className="flex items-center gap-2"
-                    >
-                      <History className="h-4 w-4" />
-                      History
-                    </Button>
-                  </DialogTrigger>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => resetSettings(serviceImage.service_key)}
+                    className="flex items-center gap-1"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    Reset
+                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenHistory(serviceImage.service_key)}
+                        className="flex items-center gap-1"
+                      >
+                        <History className="h-3 w-3" />
+                        History
+                      </Button>
+                    </DialogTrigger>
                   <DialogContent className="max-w-4xl max-h-[80vh]">
                     <DialogHeader>
                       <DialogTitle>Image History - {serviceImage.title}</DialogTitle>
@@ -295,6 +305,7 @@ const ServiceImagesManager = () => {
                     </ScrollArea>
                   </DialogContent>
                 </Dialog>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -435,30 +446,8 @@ const ServiceImagesManager = () => {
                 <span className="text-sm text-gray-500">{serviceImage.scale}x</span>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => resetSettings(serviceImage.service_key)}
-                  className="flex-1 flex items-center gap-2"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  Reset
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleOpenHistory(serviceImage.service_key)}
-                  className="flex-1 flex items-center gap-2"
-                >
-                  <History className="h-4 w-4" />
-                  History
-                </Button>
-              </div>
-
               {/* Image Info */}
-              <div className="text-xs text-gray-500 pt-2 border-t">
+              <div className="text-xs text-gray-500 pt-4 border-t">
                 <p>Last updated: {new Date(serviceImage.updated_at).toLocaleDateString()}</p>
               </div>
             </CardContent>
