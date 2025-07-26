@@ -223,6 +223,15 @@ export const useAdminData = () => {
         },
         (payload) => {
           console.log('Real-time appointment change:', payload);
+          
+          // Show notification for new appointments
+          if (payload.eventType === 'INSERT') {
+            toast({
+              title: "New Appointment Scheduled",
+              description: `A new appointment has been booked by ${payload.new?.first_name} ${payload.new?.last_name}`,
+            });
+          }
+          
           // Use a small delay to avoid rapid successive calls
           setTimeout(() => refetchData(), 100);
         }
