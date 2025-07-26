@@ -116,13 +116,14 @@
   .calendar-day-has-appointment::after {
     content: '';
     position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 8px;
-    height: 8px;
+    top: 1px;
+    right: 1px;
+    width: 12px;
+    height: 12px;
     background-color: hsl(var(--appointment-indicator));
     border-radius: 50%;
-    border: 1px solid hsl(var(--background));
+    border: 2px solid hsl(var(--background));
     z-index: 10;
+    box-shadow: 0 0 4px hsla(var(--appointment-indicator) / 0.5);
   }
 }
