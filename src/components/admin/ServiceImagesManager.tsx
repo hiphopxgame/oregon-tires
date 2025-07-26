@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, Save, RotateCcw, History, Check, Clock, Image as ImageIcon } from 'lucide-react';
+import { Upload, Save, RotateCcw, History, Check, Clock, Image as ImageIcon, Trash2, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useServiceImages } from '@/hooks/useServiceImages';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
@@ -19,13 +20,13 @@ import { Badge } from "@/components/ui/badge";
 
 // Define the service keys that match the home page services
 const homePageServices = [
-  { key: 'expert-technicians', title: 'Expert Technicians' },
-  { key: 'fast-cars', title: 'Quick Service' },
-  { key: 'quality-car-parts', title: 'Quality Parts' },
-  { key: 'bilingual-support', title: 'Bilingual Support' },
-  { key: 'tire-shop', title: 'Tire Services' },
-  { key: 'auto-repair', title: 'Auto Maintenance' },
-  { key: 'specialized-tools', title: 'Specialized Services' }
+  { key: 'expert-technicians', title: 'Expert Technicians', assetName: 'expert-technicians' },
+  { key: 'fast-cars', title: 'Quick Service', assetName: 'fast-cars' },
+  { key: 'quality-car-parts', title: 'Quality Parts', assetName: 'quality-car-parts' },
+  { key: 'bilingual-support', title: 'Bilingual Support', assetName: 'bilingual-support' },
+  { key: 'tire-shop', title: 'Tire Services', assetName: 'tire-shop' },
+  { key: 'auto-repair', title: 'Auto Maintenance', assetName: 'auto-repair' },
+  { key: 'specialized-tools', title: 'Specialized Services', assetName: 'specialized-tools' }
 ];
 
 const ServiceImagesManager = () => {
@@ -36,7 +37,8 @@ const ServiceImagesManager = () => {
     fetchImageHistory,
     uploadServiceImage,
     setCurrentImage,
-    updateImageSettings
+    updateImageSettings,
+    refetch: fetchCurrentImages
   } = useServiceImages();
 
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
@@ -63,11 +65,48 @@ const ServiceImagesManager = () => {
     try {
       await setCurrentImage(imageId, serviceKey);
       toast({
-        title: "Image restored",
-        description: "The selected image has been restored as the current image.",
+        title: "Image updated",
+        description: "The image is now live on the website!",
       });
     } catch (error) {
       // Error is handled in the hook
+    }
+  };
+
+  const deleteImage = async (imageId: string, imageUrl: string) => {
+    try {
+      // Delete from storage
+      const pathMatch = imageUrl.match(/service-images\/(.+)$/);
+      if (pathMatch) {
+        const { error: storageError } = await supabase.storage
+          .from('gallery-images')
+          .remove([`service-images/${pathMatch[1]}`]);
+        
+        if (storageError) throw storageError;
+      }
+
+      // Delete from database
+      const { error } = await supabase
+        .from('oretir_service_images')
+        .delete()
+        .eq('id', imageId);
+
+      if (error) throw error;
+
+      // Refresh data
+      await fetchCurrentImages();
+      
+      toast({
+        title: "Image deleted",
+        description: "The image has been permanently deleted.",
+      });
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast({
+        title: "Delete failed",
+        description: "Failed to delete the image.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -108,7 +147,7 @@ const ServiceImagesManager = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Service Images Manager</h2>
-          <p className="text-gray-600 mt-1">Manage images for the services section with history tracking</p>
+          <p className="text-gray-600 mt-1">Manage the 7 live service images displayed on the home page</p>
         </div>
       </div>
 
@@ -182,17 +221,29 @@ const ServiceImagesManager = () => {
                                 {new Date(historyImage.created_at).toLocaleDateString()} at{' '}
                                 {new Date(historyImage.created_at).toLocaleTimeString()}
                               </p>
-                              {!historyImage.is_current && (
+                              <div className="flex gap-1">
+                                {!historyImage.is_current && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex-1"
+                                    onClick={() => handleRestoreImage(historyImage.id, serviceImage.service_key)}
+                                  >
+                                    <Eye className="h-3 w-3 mr-1" />
+                                    Set Live
+                                  </Button>
+                                )}
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="w-full"
-                                  onClick={() => handleRestoreImage(historyImage.id, serviceImage.service_key)}
+                                  className={historyImage.is_current ? "w-full" : "flex-1"}
+                                  onClick={() => deleteImage(historyImage.id, historyImage.image_url)}
+                                  disabled={historyImage.is_current}
                                 >
-                                  <RotateCcw className="h-3 w-3 mr-1" />
-                                  Restore
+                                  <Trash2 className="h-3 w-3 mr-1" />
+                                  Delete
                                 </Button>
-                              )}
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -220,10 +271,12 @@ const ServiceImagesManager = () => {
                     <p className="text-gray-600 text-sm">Sample description text</p>
                   </div>
                 </div>
-                <Badge className="absolute top-2 right-2 bg-green-500">
-                  <Clock className="h-3 w-3 mr-1" />
-                  Live
-                </Badge>
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <Badge className="bg-green-500">
+                    <Clock className="h-3 w-3 mr-1" />
+                    Live
+                  </Badge>
+                </div>
               </div>
 
               {/* Upload New Image */}
@@ -299,16 +352,27 @@ const ServiceImagesManager = () => {
                 <span className="text-sm text-gray-500">{serviceImage.scale}x</span>
               </div>
 
-              {/* Reset Button */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => resetSettings(serviceImage.service_key)}
-                className="w-full flex items-center gap-2"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Reset Position & Scale
-              </Button>
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => resetSettings(serviceImage.service_key)}
+                  className="flex-1 flex items-center gap-2"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Reset
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleOpenHistory(serviceImage.service_key)}
+                  className="flex-1 flex items-center gap-2"
+                >
+                  <History className="h-4 w-4" />
+                  Manage
+                </Button>
+              </div>
 
               {/* Image Info */}
               <div className="text-xs text-gray-500 pt-2 border-t">
