@@ -42,6 +42,8 @@ const ServiceImagesManager = () => {
   } = useServiceImages();
 
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File }>({});
+  const [uploading, setUploading] = useState<{ [key: string]: boolean }>({});
   const { toast } = useToast();
 
   // Filter to only show services that are on the home page
@@ -49,11 +51,46 @@ const ServiceImagesManager = () => {
     homePageServices.some(service => service.key === img.service_key)
   );
 
-  const handleFileUpload = async (serviceKey: string, file: File) => {
+  const handleFileSelect = (serviceKey: string, file: File | null) => {
+    if (file) {
+      setSelectedFiles(prev => ({ ...prev, [serviceKey]: file }));
+    } else {
+      setSelectedFiles(prev => {
+        const newFiles = { ...prev };
+        delete newFiles[serviceKey];
+        return newFiles;
+      });
+    }
+  };
+
+  const handleUploadImage = async (serviceKey: string) => {
+    const file = selectedFiles[serviceKey];
+    if (!file) return;
+
     try {
+      setUploading(prev => ({ ...prev, [serviceKey]: true }));
       await uploadServiceImage(serviceKey, file);
+      
+      // Clear the selected file after successful upload
+      setSelectedFiles(prev => {
+        const newFiles = { ...prev };
+        delete newFiles[serviceKey];
+        return newFiles;
+      });
+      
+      // Reset the file input
+      if (fileInputRefs.current[serviceKey]) {
+        fileInputRefs.current[serviceKey]!.value = '';
+      }
+      
+      toast({
+        title: "Upload successful!",
+        description: "Your image has been uploaded. Use 'Set as Current' to make it live.",
+      });
     } catch (error) {
       // Error is handled in the hook
+    } finally {
+      setUploading(prev => ({ ...prev, [serviceKey]: false }));
     }
   };
 
@@ -280,29 +317,68 @@ const ServiceImagesManager = () => {
               </div>
 
               {/* Upload New Image */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor={`file-${serviceImage.service_key}`}>Upload New Image</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id={`file-${serviceImage.service_key}`}
-                    type="file"
-                    accept="image/*"
-                    ref={(el) => fileInputRefs.current[serviceImage.service_key] = el}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleFileUpload(serviceImage.service_key, file);
-                      }
-                    }}
-                    className="flex-1"
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => fileInputRefs.current[serviceImage.service_key]?.click()}
-                  >
-                    <Upload className="h-4 w-4" />
-                  </Button>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      id={`file-${serviceImage.service_key}`}
+                      type="file"
+                      accept="image/*"
+                      ref={(el) => fileInputRefs.current[serviceImage.service_key] = el}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        handleFileSelect(serviceImage.service_key, file);
+                      }}
+                      className="flex-1"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => fileInputRefs.current[serviceImage.service_key]?.click()}
+                    >
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  {selectedFiles[serviceImage.service_key] && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <ImageIcon className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-800">
+                            {selectedFiles[serviceImage.service_key].name}
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleFileSelect(serviceImage.service_key, null)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleUploadImage(serviceImage.service_key)}
+                            disabled={uploading[serviceImage.service_key]}
+                          >
+                            {uploading[serviceImage.service_key] ? (
+                              <>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1" />
+                                Uploading...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="h-3 w-3 mr-1" />
+                                Upload Image
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -400,29 +476,68 @@ const ServiceImagesManager = () => {
                 </div>
 
                 {/* Upload New Image */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor={`file-${service.key}`}>Upload Image</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id={`file-${service.key}`}
-                      type="file"
-                      accept="image/*"
-                      ref={(el) => fileInputRefs.current[service.key] = el}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          handleFileUpload(service.key, file);
-                        }
-                      }}
-                      className="flex-1"
-                    />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => fileInputRefs.current[service.key]?.click()}
-                    >
-                      <Upload className="h-4 w-4" />
-                    </Button>
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Input
+                        id={`file-${service.key}`}
+                        type="file"
+                        accept="image/*"
+                        ref={(el) => fileInputRefs.current[service.key] = el}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          handleFileSelect(service.key, file);
+                        }}
+                        className="flex-1"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => fileInputRefs.current[service.key]?.click()}
+                      >
+                        <Upload className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    
+                    {selectedFiles[service.key] && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <ImageIcon className="h-4 w-4 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-800">
+                              {selectedFiles[service.key].name}
+                            </span>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleFileSelect(service.key, null)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleUploadImage(service.key)}
+                              disabled={uploading[service.key]}
+                            >
+                              {uploading[service.key] ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1" />
+                                  Uploading...
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="h-3 w-3 mr-1" />
+                                  Upload Image
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
