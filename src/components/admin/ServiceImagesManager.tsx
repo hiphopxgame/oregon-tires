@@ -17,6 +17,17 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 
+// Define the service keys that match the home page services
+const homePageServices = [
+  { key: 'expert-technicians', title: 'Expert Technicians' },
+  { key: 'fast-cars', title: 'Quick Service' },
+  { key: 'quality-car-parts', title: 'Quality Parts' },
+  { key: 'bilingual-support', title: 'Bilingual Support' },
+  { key: 'tire-shop', title: 'Tire Services' },
+  { key: 'auto-repair', title: 'Auto Maintenance' },
+  { key: 'specialized-tools', title: 'Specialized Services' }
+];
+
 const ServiceImagesManager = () => {
   const {
     currentImages,
@@ -30,6 +41,11 @@ const ServiceImagesManager = () => {
 
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const { toast } = useToast();
+
+  // Filter to only show services that are on the home page
+  const homePageImages = currentImages.filter(img => 
+    homePageServices.some(service => service.key === img.service_key)
+  );
 
   const handleFileUpload = async (serviceKey: string, file: File) => {
     try {
@@ -96,8 +112,27 @@ const ServiceImagesManager = () => {
         </div>
       </div>
 
+      {homePageImages.length === 0 && !loading && (
+        <div className="col-span-full bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+          <ImageIcon className="h-12 w-12 text-blue-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-blue-800 mb-2">No Service Images Found</h3>
+          <p className="text-blue-600 mb-4">
+            The service images from the home page are not yet in the database. 
+            You need to upload images for each service to start managing them.
+          </p>
+          <div className="text-left max-w-md mx-auto">
+            <p className="text-sm text-blue-700 font-medium mb-2">Expected services:</p>
+            <ul className="text-sm text-blue-600 space-y-1">
+              {homePageServices.map(service => (
+                <li key={service.key}>• {service.title}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {currentImages.map((serviceImage) => (
+        {homePageImages.map((serviceImage) => (
           <Card key={serviceImage.service_key} className="overflow-hidden">
             <CardHeader className="pb-4">
               <div className="flex justify-between items-start">
@@ -282,6 +317,54 @@ const ServiceImagesManager = () => {
             </CardContent>
           </Card>
         ))}
+        
+        {/* Upload sections for missing services */}
+        {homePageServices
+          .filter(service => !currentImages.some(img => img.service_key === service.key))
+          .map(service => (
+            <Card key={service.key} className="overflow-hidden border-dashed border-2 border-gray-300">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg text-gray-600">{service.title}</CardTitle>
+                <p className="text-sm text-gray-500">No image uploaded yet</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="relative h-48 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                  <div className="text-center">
+                    <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                    <p className="text-gray-500">Upload an image to get started</p>
+                  </div>
+                </div>
+
+                {/* Upload New Image */}
+                <div className="space-y-2">
+                  <Label htmlFor={`file-${service.key}`}>Upload Image</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id={`file-${service.key}`}
+                      type="file"
+                      accept="image/*"
+                      ref={(el) => fileInputRefs.current[service.key] = el}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleFileUpload(service.key, file);
+                        }
+                      }}
+                      className="flex-1"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => fileInputRefs.current[service.key]?.click()}
+                    >
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        }
       </div>
     </div>
   );
