@@ -10,35 +10,54 @@ export const useAdminAuth = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
 
-  const checkAdminStatus = async (userId: string) => {
+  const checkAdminStatus = async (userId: string, userEmail?: string) => {
     try {
-      console.log('Checking admin status for user:', userId);
+      console.log('Checking admin status for user:', userId, userEmail);
+      
+      // First check if this is the super admin account by email
+      if (userEmail === 'tyronenorris@gmail.com') {
+        console.log('Super admin detected:', userEmail);
+        return true;
+      }
+
+      // For non-super admin users, check project-specific admin status
       const { data, error } = await supabase
         .from('oretir_profiles')
         .select('is_admin, project_id')
         .eq('id', userId)
-        .eq('project_id', 'oregon-tires') // Only check oregon-tires project users
-        .single();
+        .eq('project_id', 'oregon-tires')
+        .maybeSingle(); // Use maybeSingle to avoid errors when no data
 
       if (error) {
         console.error('Error in admin status query:', error);
         // If profile doesn't exist, create one for oregon-tires project
-        if (error.code === 'PGRST116') {
-          console.log('Profile not found, creating one for oregon-tires project...');
-          const { data: insertData, error: insertError } = await supabase
-            .from('oretir_profiles')
-            .insert({ id: userId, is_admin: false, project_id: 'oregon-tires' })
-            .select('is_admin, project_id')
-            .single();
-          
-          if (insertError) {
-            console.error('Error creating profile:', insertError);
-            return false;
-          }
-          console.log('Profile created for oregon-tires:', insertData);
-          return insertData?.is_admin || false;
+        const { data: insertData, error: insertError } = await supabase
+          .from('oretir_profiles')
+          .insert({ id: userId, is_admin: false, project_id: 'oregon-tires' })
+          .select('is_admin, project_id')
+          .single();
+        
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          return false;
         }
-        throw error;
+        console.log('Profile created for oregon-tires:', insertData);
+        return insertData?.is_admin || false;
+      }
+      
+      if (!data) {
+        console.log('No profile found, creating one...');
+        const { data: insertData, error: insertError } = await supabase
+          .from('oretir_profiles')
+          .insert({ id: userId, is_admin: false, project_id: 'oregon-tires' })
+          .select('is_admin, project_id')
+          .single();
+        
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          return false;
+        }
+        return insertData?.is_admin || false;
       }
       
       console.log('Admin status data:', data);
@@ -68,7 +87,7 @@ export const useAdminAuth = () => {
       if (error) throw error;
 
       if (data.user) {
-        const adminStatus = await checkAdminStatus(data.user.id);
+        const adminStatus = await checkAdminStatus(data.user.id, data.user.email);
         if (!adminStatus) {
           await supabase.auth.signOut();
           throw new Error('Access denied. Admin privileges required.');
@@ -109,7 +128,7 @@ export const useAdminAuth = () => {
           console.log('User session found, checking admin status...');
           // Defer admin status check to avoid deadlock
           setTimeout(() => {
-            checkAdminStatus(session.user.id).then(adminStatus => {
+            checkAdminStatus(session.user.id, session.user.email).then(adminStatus => {
               console.log('Admin status result:', adminStatus);
               setIsAdmin(adminStatus);
               setLoading(false); // Set loading false after admin check
@@ -144,7 +163,7 @@ export const useAdminAuth = () => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        checkAdminStatus(session.user.id).then(adminStatus => {
+        checkAdminStatus(session.user.id, session.user.email).then(adminStatus => {
           console.log('Initial admin status:', adminStatus);
           setIsAdmin(adminStatus);
           

@@ -2397,6 +2397,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_super_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       set_admin_by_email: {
         Args:
           | { user_email: string }
