@@ -2395,7 +2395,9 @@ export type Database = {
         Returns: boolean
       }
       set_admin_by_email: {
-        Args: { user_email: string }
+        Args:
+          | { user_email: string }
+          | { user_email: string; admin_status?: boolean }
         Returns: undefined
       }
       setup_admin_user: {

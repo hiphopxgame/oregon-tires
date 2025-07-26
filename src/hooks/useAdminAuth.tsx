@@ -21,6 +21,22 @@ export const useAdminAuth = () => {
 
       if (error) {
         console.error('Error in admin status query:', error);
+        // If profile doesn't exist, create one
+        if (error.code === 'PGRST116') {
+          console.log('Profile not found, creating one...');
+          const { data: insertData, error: insertError } = await supabase
+            .from('oretir_profiles')
+            .insert({ id: userId, is_admin: false })
+            .select('is_admin')
+            .single();
+          
+          if (insertError) {
+            console.error('Error creating profile:', insertError);
+            return false;
+          }
+          console.log('Profile created:', insertData);
+          return insertData?.is_admin || false;
+        }
         throw error;
       }
       
