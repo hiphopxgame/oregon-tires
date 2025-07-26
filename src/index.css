@@ -51,6 +51,9 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Custom appointment indicator color */
+    --appointment-indicator: 60 93% 56%;
   }
 
   .dark {
@@ -89,6 +92,8 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --appointment-indicator: 60 93% 56%;
   }
 }
 
@@ -99,5 +104,25 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Calendar appointment indicators */
+@layer components {
+  .calendar-day-has-appointment {
+    position: relative;
+  }
+  
+  .calendar-day-has-appointment::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    background-color: hsl(var(--appointment-indicator));
+    border-radius: 50%;
+    border: 1px solid hsl(var(--background));
+    z-index: 10;
   }
 }

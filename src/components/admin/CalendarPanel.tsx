@@ -33,21 +33,16 @@ export const CalendarPanel = ({
           modifiers={{
             hasAppointment: appointmentDates
           }}
-          modifiersStyles={{
-            hasAppointment: { 
-              backgroundColor: '#FEE11A', 
-              color: '#000', 
-              fontWeight: 'bold',
-              borderRadius: '50%'
-            }
+          modifiersClassNames={{
+            hasAppointment: "calendar-day-has-appointment"
           }}
         />
         
         {/* Legend */}
-        <div className="mt-4 p-3 bg-gray-50 rounded">
-          <h4 className="font-medium text-sm mb-2">Legend</h4>
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-4 h-4 bg-yellow-300 rounded-full"></div>
+        <div className="mt-4 p-3 bg-muted rounded">
+          <h4 className="font-medium text-sm mb-2 text-muted-foreground">Legend</h4>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="w-3 h-3 bg-appointment-indicator rounded-full border border-background"></div>
             <span>Has Appointments</span>
           </div>
         </div>
