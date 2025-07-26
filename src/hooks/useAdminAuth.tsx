@@ -78,6 +78,7 @@ export const useAdminAuth = () => {
           setTimeout(() => {
             checkAdminStatus(session.user.id).then(adminStatus => {
               setIsAdmin(adminStatus);
+              setLoading(false); // Set loading false after admin check
               
               if (!adminStatus && event === 'SIGNED_IN') {
                 supabase.auth.signOut().then(() => {
@@ -92,9 +93,8 @@ export const useAdminAuth = () => {
           }, 0);
         } else {
           setIsAdmin(false);
+          setLoading(false); // Set loading false for no session
         }
-        
-        setLoading(false);
       }
     );
 
