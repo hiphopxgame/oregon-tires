@@ -92,8 +92,8 @@ export const CalendarTab = ({ appointments, updateAppointmentStatus }: CalendarT
             modifiers={{
               hasAppointment: appointmentDates
             }}
-            modifiersStyles={{
-              hasAppointment: { backgroundColor: '#FEE11A', color: '#000', fontWeight: 'bold' }
+            modifiersClassNames={{
+              hasAppointment: "calendar-day-has-appointment"
             }}
           />
         </CardContent>
