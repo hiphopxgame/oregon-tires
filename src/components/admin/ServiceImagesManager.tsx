@@ -69,7 +69,14 @@ const ServiceImagesManager = () => {
 
     try {
       setUploading(prev => ({ ...prev, [serviceKey]: true }));
-      await uploadServiceImage(serviceKey, file);
+      
+      // Upload the image
+      const uploadedImage = await uploadServiceImage(serviceKey, file);
+      
+      // Automatically set the uploaded image as current (live)
+      if (uploadedImage) {
+        await setCurrentImage(uploadedImage.id, serviceKey);
+      }
       
       // Clear the selected file after successful upload
       setSelectedFiles(prev => {
@@ -84,8 +91,8 @@ const ServiceImagesManager = () => {
       }
       
       toast({
-        title: "Upload successful!",
-        description: "Your image has been uploaded. Use 'Set as Current' to make it live.",
+        title: "Image is now live!",
+        description: "Your new image has been uploaded and is immediately visible on the website.",
       });
     } catch (error) {
       // Error is handled in the hook
@@ -446,7 +453,7 @@ const ServiceImagesManager = () => {
                   className="flex-1 flex items-center gap-2"
                 >
                   <History className="h-4 w-4" />
-                  Manage
+                  History
                 </Button>
               </div>
 
