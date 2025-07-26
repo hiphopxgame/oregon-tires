@@ -70,9 +70,19 @@ export const useContactForm = (language: string, t: any) => {
           variant: "default",
         });
       } else {
+        const contactData = {
+          first_name: contactForm.firstName,
+          last_name: contactForm.lastName,
+          phone: contactForm.phone,
+          email: contactForm.email,
+          message: contactForm.message,
+          language: language,
+          status: 'new'
+        };
+
         const { error } = await supabase
           .from('oretir_contact_messages')
-          .insert(formData);
+          .insert(contactData);
 
         if (error) throw error;
         

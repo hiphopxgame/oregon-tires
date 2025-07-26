@@ -1290,70 +1290,98 @@ export type Database = {
           title?: string
           type?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "oretir_admin_notifications_appointment_id_fkey"
-            columns: ["appointment_id"]
-            isOneToOne: false
-            referencedRelation: "oretir_appointments"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       oretir_appointments: {
         Row: {
-          appointment_date: string
-          approved_at: string | null
-          approved_by: string | null
+          actual_duration_minutes: number | null
+          actual_duration_seconds: number | null
+          assigned_employee_id: string | null
+          completed_at: string | null
           created_at: string
-          customer_email: string
-          customer_name: string
-          customer_phone: string | null
-          duration_minutes: number
-          end_time: string
+          customer_address: string | null
+          customer_city: string | null
+          customer_state: string | null
+          customer_zip: string | null
+          email: string
+          first_name: string
           id: string
+          language: string
+          last_name: string
+          license_plate: string | null
           message: string | null
-          service_type: string
-          start_time: string
-          station_number: number
+          phone: string | null
+          preferred_date: string
+          preferred_time: string
+          service: string
+          service_location: string | null
+          started_at: string | null
           status: string
-          updated_at: string
+          tire_size: string | null
+          travel_cost_estimate: number | null
+          travel_distance_miles: number | null
+          vehicle_id: string | null
+          vin: string | null
         }
         Insert: {
-          appointment_date: string
-          approved_at?: string | null
-          approved_by?: string | null
+          actual_duration_minutes?: number | null
+          actual_duration_seconds?: number | null
+          assigned_employee_id?: string | null
+          completed_at?: string | null
           created_at?: string
-          customer_email: string
-          customer_name: string
-          customer_phone?: string | null
-          duration_minutes: number
-          end_time: string
+          customer_address?: string | null
+          customer_city?: string | null
+          customer_state?: string | null
+          customer_zip?: string | null
+          email: string
+          first_name: string
           id?: string
+          language?: string
+          last_name: string
+          license_plate?: string | null
           message?: string | null
-          service_type: string
-          start_time: string
-          station_number: number
+          phone?: string | null
+          preferred_date: string
+          preferred_time: string
+          service: string
+          service_location?: string | null
+          started_at?: string | null
           status?: string
-          updated_at?: string
+          tire_size?: string | null
+          travel_cost_estimate?: number | null
+          travel_distance_miles?: number | null
+          vehicle_id?: string | null
+          vin?: string | null
         }
         Update: {
-          appointment_date?: string
-          approved_at?: string | null
-          approved_by?: string | null
+          actual_duration_minutes?: number | null
+          actual_duration_seconds?: number | null
+          assigned_employee_id?: string | null
+          completed_at?: string | null
           created_at?: string
-          customer_email?: string
-          customer_name?: string
-          customer_phone?: string | null
-          duration_minutes?: number
-          end_time?: string
+          customer_address?: string | null
+          customer_city?: string | null
+          customer_state?: string | null
+          customer_zip?: string | null
+          email?: string
+          first_name?: string
           id?: string
+          language?: string
+          last_name?: string
+          license_plate?: string | null
           message?: string | null
-          service_type?: string
-          start_time?: string
-          station_number?: number
+          phone?: string | null
+          preferred_date?: string
+          preferred_time?: string
+          service?: string
+          service_location?: string | null
+          started_at?: string | null
           status?: string
-          updated_at?: string
+          tire_size?: string | null
+          travel_cost_estimate?: number | null
+          travel_distance_miles?: number | null
+          vehicle_id?: string | null
+          vin?: string | null
         }
         Relationships: []
       }
@@ -1361,29 +1389,35 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          first_name: string
           id: string
+          language: string
+          last_name: string
           message: string
-          name: string
           phone: string | null
-          subject: string | null
+          status: string
         }
         Insert: {
           created_at?: string
           email: string
+          first_name: string
           id?: string
+          language?: string
+          last_name: string
           message: string
-          name: string
           phone?: string | null
-          subject?: string | null
+          status?: string
         }
         Update: {
           created_at?: string
           email?: string
+          first_name?: string
           id?: string
+          language?: string
+          last_name?: string
           message?: string
-          name?: string
           phone?: string | null
-          subject?: string | null
+          status?: string
         }
         Relationships: []
       }
