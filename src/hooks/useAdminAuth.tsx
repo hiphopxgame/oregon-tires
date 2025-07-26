@@ -69,24 +69,27 @@ export const useAdminAuth = () => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Check admin status when user signs in
-          const adminStatus = await checkAdminStatus(session.user.id);
-          setIsAdmin(adminStatus);
-          
-          if (!adminStatus && event === 'SIGNED_IN') {
-            // If user is not admin, sign them out
-            await supabase.auth.signOut();
-            toast({
-              title: "Access Denied",
-              description: "Admin privileges required",
-              variant: "destructive",
+          // Defer admin status check to avoid deadlock
+          setTimeout(() => {
+            checkAdminStatus(session.user.id).then(adminStatus => {
+              setIsAdmin(adminStatus);
+              
+              if (!adminStatus && event === 'SIGNED_IN') {
+                supabase.auth.signOut().then(() => {
+                  toast({
+                    title: "Access Denied",
+                    description: "Admin privileges required",
+                    variant: "destructive",
+                  });
+                });
+              }
             });
-          }
+          }, 0);
         } else {
           setIsAdmin(false);
         }
@@ -96,20 +99,22 @@ export const useAdminAuth = () => {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        const adminStatus = await checkAdminStatus(session.user.id);
-        setIsAdmin(adminStatus);
-        
-        if (!adminStatus) {
-          await supabase.auth.signOut();
-        }
+        checkAdminStatus(session.user.id).then(adminStatus => {
+          setIsAdmin(adminStatus);
+          
+          if (!adminStatus) {
+            supabase.auth.signOut();
+          }
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
