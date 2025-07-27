@@ -125,9 +125,24 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
     setCurrentPage(1); // Reset to first page
   };
 
-  const handleMonthChange = (month: Date | undefined) => {
-    setSelectedMonth(month);
+  const handleMonthChange = (date: Date | undefined) => {
+    // If a date is selected, extract just the month/year for filtering
+    if (date) {
+      const monthYear = new Date(date.getFullYear(), date.getMonth(), 1);
+      setSelectedMonth(monthYear);
+    } else {
+      setSelectedMonth(undefined);
+    }
     setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const handleSort = (column: typeof sortBy) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('desc');
+    }
   };
 
   return (
@@ -176,31 +191,6 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
               </Select>
             </div>
 
-            {/* Sort By */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Sort by:</label>
-              <Select value={sortBy} onValueChange={(value: typeof sortBy) => setSortBy(value)}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="created">Created</SelectItem>
-                  <SelectItem value="date">Date</SelectItem>
-                  <SelectItem value="customer">Customer</SelectItem>
-                  <SelectItem value="service">Service</SelectItem>
-                  <SelectItem value="status">Status</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                className="p-2"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-                <span className="ml-1 text-xs">{sortOrder.toUpperCase()}</span>
-              </Button>
-            </div>
 
             {/* Month filter */}
             <div className="flex items-center gap-2">
@@ -256,12 +246,56 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t.admin.customer}</TableHead>
-              <TableHead>{t.admin.service}</TableHead>
-              <TableHead>{t.admin.dateTime}</TableHead>
+              <TableHead>
+                <Button 
+                  variant="ghost" 
+                  className="h-auto p-0 font-semibold hover:bg-transparent"
+                  onClick={() => handleSort('customer')}
+                >
+                  {t.admin.customer}
+                  {sortBy === 'customer' && (
+                    <ArrowUpDown className={cn("ml-2 h-4 w-4", sortOrder === 'desc' && "rotate-180")} />
+                  )}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button 
+                  variant="ghost" 
+                  className="h-auto p-0 font-semibold hover:bg-transparent"
+                  onClick={() => handleSort('service')}
+                >
+                  {t.admin.service}
+                  {sortBy === 'service' && (
+                    <ArrowUpDown className={cn("ml-2 h-4 w-4", sortOrder === 'desc' && "rotate-180")} />
+                  )}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button 
+                  variant="ghost" 
+                  className="h-auto p-0 font-semibold hover:bg-transparent"
+                  onClick={() => handleSort('date')}
+                >
+                  {t.admin.dateTime}
+                  {sortBy === 'date' && (
+                    <ArrowUpDown className={cn("ml-2 h-4 w-4", sortOrder === 'desc' && "rotate-180")} />
+                  )}
+                </Button>
+              </TableHead>
               <TableHead>{t.admin.contact}</TableHead>
               <TableHead>{t.admin.assignedEmployee}</TableHead>
-              <TableHead>{t.admin.status}</TableHead>
+              <TableHead>
+                <Button 
+                  variant="ghost" 
+                  className="h-auto p-0 font-semibold hover:bg-transparent"
+                  onClick={() => handleSort('status')}
+                >
+                  {t.admin.status}
+                  {sortBy === 'status' && (
+                    <ArrowUpDown className={cn("ml-2 h-4 w-4", sortOrder === 'desc' && "rotate-180")} />
+                  )}
+                </Button>
+              </TableHead>
               <TableHead>{t.admin.actions}</TableHead>
             </TableRow>
           </TableHeader>
