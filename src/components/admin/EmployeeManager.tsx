@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Edit2, Save, X, Calendar, Shield, ShieldOff, Power, PowerOff, CalendarDays, Clock } from 'lucide-react';
+import { Plus, Edit2, Save, X, Calendar, Shield, ShieldOff, Power, PowerOff, CalendarDays, Clock, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmployees, Employee } from '@/hooks/useEmployees';
@@ -15,6 +15,7 @@ import { useEmployeeAppointments } from '@/hooks/useEmployeeAppointments';
 import { useLanguage } from '@/hooks/useLanguage';
 import { EmployeeCalendarSchedule } from './EmployeeCalendarSchedule';
 import { EmployeeScheduleAlert } from './EmployeeScheduleAlert';
+import { EmployeeEditDialog } from './EmployeeEditDialog';
 
 
 export const EmployeeManager = () => {
@@ -29,6 +30,8 @@ export const EmployeeManager = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
   const [scheduleDate, setScheduleDate] = useState<string | null>(null);
+  const [editDialogEmployee, setEditDialogEmployee] = useState<Employee | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   // Separate active and inactive employees
   const activeEmployees = employees.filter(emp => emp.is_active);
@@ -149,6 +152,15 @@ export const EmployeeManager = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleOpenEditDialog = (employee: Employee) => {
+    setEditDialogEmployee(employee);
+    setShowEditDialog(true);
+  };
+
+  const handleEmployeeUpdated = () => {
+    refetch();
   };
 
   const startEditing = (employee: Employee) => {
@@ -314,9 +326,11 @@ export const EmployeeManager = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => startEditing(employee)}
+                  onClick={() => handleOpenEditDialog(employee)}
+                  className="text-gray-600 hover:text-gray-700"
                 >
-                  <Edit2 className="h-4 w-4" />
+                  <Settings className="h-4 w-4 mr-1" />
+                  Manage
                 </Button>
               </div>
             </div>
@@ -479,6 +493,14 @@ export const EmployeeManager = () => {
           </div>
         )}
       </CardContent>
+
+      {/* Employee Edit Dialog */}
+      <EmployeeEditDialog
+        employee={editDialogEmployee}
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        onEmployeeUpdated={handleEmployeeUpdated}
+      />
     </Card>
   );
 };
