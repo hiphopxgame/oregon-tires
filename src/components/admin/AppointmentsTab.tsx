@@ -221,6 +221,12 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
                      captionLayout="dropdown-buttons"
                      fromYear={2020}
                      toYear={2030}
+                     hideHead
+                     fixedWeeks
+                     showOutsideDays={false}
+                     components={{
+                       Day: () => null
+                     }}
                    />
                  </PopoverContent>
               </Popover>
