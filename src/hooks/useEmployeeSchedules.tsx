@@ -155,7 +155,7 @@ export const useEmployeeSchedules = () => {
   useEffect(() => {
     fetchEmployeesWithSchedules();
 
-    // Set up real-time subscription
+    // Set up real-time subscription for both employees and schedules
     const channelId = Math.random().toString(36).substr(2, 9);
     const channel = supabase
       .channel(`employee-schedules-${channelId}`)
@@ -165,6 +165,17 @@ export const useEmployeeSchedules = () => {
           event: '*',
           schema: 'public',
           table: 'oretir_employee_schedules'
+        },
+        () => {
+          setTimeout(() => fetchEmployeesWithSchedules(), 100);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'oretir_employees'
         },
         () => {
           setTimeout(() => fetchEmployeesWithSchedules(), 100);
