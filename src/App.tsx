@@ -11,6 +11,7 @@ import AppointmentBooking from "./pages/AppointmentBooking";
 import ProgramarServicio from "./pages/ProgramarServicio";
 import Translate from "./pages/Translate";
 import NotFound from "./pages/NotFound";
+import { EmployeeProfile } from "./pages/EmployeeProfile";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,11 @@ const App = () => (
           <Route path="/admin" element={
             <ProtectedAdminRoute>
               <OregonTiresAdmin />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/employee/profile" element={
+            <ProtectedAdminRoute>
+              <EmployeeProfile />
             </ProtectedAdminRoute>
           } />
           <Route path="/book-appointment" element={<AppointmentBooking />} />

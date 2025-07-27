@@ -14,8 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_accounts: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean | null
+          project_id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          is_active?: boolean | null
+          project_id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean | null
+          project_id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
+          admin_comments: string | null
           appointment_date: string
           appointment_time: string
           client_id: string
@@ -30,6 +64,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          admin_comments?: string | null
           appointment_date: string
           appointment_time: string
           client_id: string
@@ -44,6 +79,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          admin_comments?: string | null
           appointment_date?: string
           appointment_time?: string
           client_id?: string
@@ -251,6 +287,7 @@ export type Database = {
           allergies: string | null
           city: string | null
           created_at: string
+          email: string | null
           first_name: string
           hair_type: string | null
           id: string
@@ -268,6 +305,7 @@ export type Database = {
           allergies?: string | null
           city?: string | null
           created_at?: string
+          email?: string | null
           first_name: string
           hair_type?: string | null
           id?: string
@@ -285,6 +323,7 @@ export type Database = {
           allergies?: string | null
           city?: string | null
           created_at?: string
+          email?: string | null
           first_name?: string
           hair_type?: string | null
           id?: string
@@ -2784,6 +2823,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      create_employee_auth_account: {
+        Args: { employee_email: string; temporary_password?: string }
+        Returns: string
+      }
       format_service_name: {
         Args: { service_slug: string }
         Returns: string
@@ -2808,6 +2851,10 @@ export type Database = {
         Returns: boolean
       }
       is_hiphop_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_iwitty_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }

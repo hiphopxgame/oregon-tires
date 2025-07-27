@@ -7,7 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Save, Mail, Key, Shield, AlertTriangle, User } from 'lucide-react';
+import { Save, Mail, Key, Shield, AlertTriangle, User, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Employee } from '@/hooks/useEmployees';
@@ -135,6 +135,39 @@ export const EmployeeEditDialog = ({ employee, open, onOpenChange, onEmployeeUpd
     }
   };
 
+  const handleCreateAccount = async () => {
+    if (!formData.email || !formData.name) return;
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-employee-account', {
+        body: {
+          email: formData.email,
+          employeeName: formData.name
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Account Created",
+        description: `Account created for ${formData.name}. They will receive login details via email.`,
+      });
+
+      // Refresh the auth account status
+      checkAuthAccountExists(formData.email);
+    } catch (error) {
+      console.error('Error creating account:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create employee account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleMakeAdmin = async () => {
     if (!formData.email) return;
 
@@ -154,7 +187,7 @@ export const EmployeeEditDialog = ({ employee, open, onOpenChange, onEmployeeUpd
       console.error('Error granting admin access:', error);
       toast({
         title: "Error",
-        description: "Employee needs to create an account first. Ask them to sign up on the login page.",
+        description: "Failed to grant admin access. Make sure the employee has an account first.",
         variant: "destructive",
       });
     } finally {
@@ -296,16 +329,28 @@ export const EmployeeEditDialog = ({ employee, open, onOpenChange, onEmployeeUpd
                 )}
 
                 {!hasAuthAccount && (
-                  <div className="p-3 border border-orange-200 bg-orange-50 rounded-lg">
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-orange-800">No Account Found</p>
-                        <p className="text-sm text-orange-700">
-                          Ask the employee to sign up at the login page using email: {formData.email}
-                        </p>
+                  <div className="space-y-3">
+                    <div className="p-3 border border-orange-200 bg-orange-50 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-orange-800">No Account Found</p>
+                          <p className="text-sm text-orange-700">
+                            Create an account for this employee to enable dashboard access.
+                          </p>
+                        </div>
                       </div>
                     </div>
+                    
+                    <Button
+                      variant="default"
+                      onClick={handleCreateAccount}
+                      disabled={isLoading || !formData.email}
+                      className="w-full bg-green-600 hover:bg-green-700"
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Create Account & Send Login Details
+                    </Button>
                   </div>
                 )}
               </CardContent>

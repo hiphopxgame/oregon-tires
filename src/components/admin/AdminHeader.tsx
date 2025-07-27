@@ -56,8 +56,15 @@ export const AdminHeader = ({
                 <User className="h-4 w-4" />
                 <div className="text-sm">
                   <div className="font-medium">{user.email}</div>
-                  {user.email === 'tyronenorris@gmail.com' && (
+                  {user.email === 'tyronenorris@gmail.com' ? (
                     <div className="text-xs text-yellow-200">Super Admin</div>
+                  ) : (
+                    <Link 
+                      to="/employee/profile" 
+                      className="text-xs text-blue-200 hover:text-blue-100 underline"
+                    >
+                      Edit Profile
+                    </Link>
                   )}
                 </div>
               </div>
