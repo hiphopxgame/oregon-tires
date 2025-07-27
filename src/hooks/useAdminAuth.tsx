@@ -103,17 +103,26 @@ export const useAdminAuth = () => {
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      
+      // Clear local state regardless of error (session might already be invalid)
       setUser(null);
       setSession(null);
       setIsAdmin(false);
-    } catch (error) {
+      
+      // Only show error if it's not a session_not_found error
+      if (error && error.message !== "Session from session_id claim in JWT does not exist") {
+        throw error;
+      }
+    } catch (error: any) {
       console.error('Error signing out:', error);
-      toast({
-        title: "Error",
-        description: "Failed to sign out",
-        variant: "destructive",
-      });
+      // Only show toast for actual errors, not session already invalid
+      if (error.message !== "Session from session_id claim in JWT does not exist") {
+        toast({
+          title: "Error",
+          description: "Failed to sign out",
+          variant: "destructive",
+        });
+      }
     }
   };
 
