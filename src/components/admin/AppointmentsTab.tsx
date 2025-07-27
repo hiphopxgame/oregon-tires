@@ -1,10 +1,11 @@
 
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Search, ArrowUpDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -29,6 +30,9 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedMonth, setSelectedMonth] = useState<Date | undefined>();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'date' | 'customer' | 'service' | 'status' | 'created'>('created');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   const getStatusBadge = (status: string) => {
     const normalizedStatus = status.toLowerCase();
@@ -47,26 +51,61 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
     );
   };
 
-  // Filter by month if selected
-  const filteredAppointments = selectedMonth 
-    ? appointments.filter(appointment => {
-        const appointmentDate = new Date(appointment.preferred_date + 'T00:00:00');
-        return appointmentDate.getMonth() === selectedMonth.getMonth() && 
-               appointmentDate.getFullYear() === selectedMonth.getFullYear();
-      })
-    : appointments;
+  // Apply all filters
+  const filteredAppointments = appointments.filter(appointment => {
+    // Month filter
+    if (selectedMonth) {
+      const appointmentDate = new Date(appointment.preferred_date + 'T00:00:00');
+      if (appointmentDate.getMonth() !== selectedMonth.getMonth() || 
+          appointmentDate.getFullYear() !== selectedMonth.getFullYear()) {
+        return false;
+      }
+    }
+    
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const searchFields = [
+        `${appointment.first_name} ${appointment.last_name}`,
+        appointment.email,
+        appointment.phone || '',
+        appointment.service,
+        appointment.status,
+        employees.find(emp => emp.id === appointment.assigned_employee_id)?.name || ''
+      ];
+      
+      if (!searchFields.some(field => field.toLowerCase().includes(query))) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
 
-  // Sort appointments: unassigned first, then by creation date within each group
+  // Sort appointments
   const sortedAppointments = [...filteredAppointments].sort((a, b) => {
-    // First priority: unassigned appointments come first
-    const aUnassigned = !a.assigned_employee_id;
-    const bUnassigned = !b.assigned_employee_id;
+    let comparison = 0;
     
-    if (aUnassigned && !bUnassigned) return -1;
-    if (!aUnassigned && bUnassigned) return 1;
+    switch (sortBy) {
+      case 'customer':
+        comparison = `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
+        break;
+      case 'service':
+        comparison = a.service.localeCompare(b.service);
+        break;
+      case 'status':
+        comparison = a.status.localeCompare(b.status);
+        break;
+      case 'date':
+        comparison = new Date(a.preferred_date).getTime() - new Date(b.preferred_date).getTime();
+        break;
+      case 'created':
+      default:
+        comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        break;
+    }
     
-    // Second priority: within each group, sort by creation date (newest first)
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    return sortOrder === 'asc' ? comparison : -comparison;
   });
 
   // Pagination calculations
@@ -103,55 +142,113 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
       </CardHeader>
       <CardContent>
         {/* Filter Controls */}
-        <div className="flex flex-wrap gap-4 mb-6">
-          {/* Items per page selector */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium">Show:</label>
-            <Select value={itemsPerPage === -1 ? "all" : itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-              <SelectTrigger className="w-24">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-                <SelectItem value="all">All</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="space-y-4 mb-6">
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by customer name, email, service, or status..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-10"
+            />
           </div>
+          
+          {/* Filter Row */}
+          <div className="flex flex-wrap gap-4">
+            {/* Items per page selector */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Show:</label>
+              <Select value={itemsPerPage === -1 ? "all" : itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                <SelectTrigger className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Month filter */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium">Month:</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-[200px] justify-start text-left font-normal",
-                    !selectedMonth && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedMonth ? format(selectedMonth, "MMMM yyyy") : "All months"}
+            {/* Sort By */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Sort by:</label>
+              <Select value={sortBy} onValueChange={(value: typeof sortBy) => setSortBy(value)}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="created">Created</SelectItem>
+                  <SelectItem value="date">Date</SelectItem>
+                  <SelectItem value="customer">Customer</SelectItem>
+                  <SelectItem value="service">Service</SelectItem>
+                  <SelectItem value="status">Status</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                className="p-2"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+                <span className="ml-1 text-xs">{sortOrder.toUpperCase()}</span>
+              </Button>
+            </div>
+
+            {/* Month filter */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Month:</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[200px] justify-start text-left font-normal",
+                      !selectedMonth && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedMonth ? format(selectedMonth, "MMMM yyyy") : "All months"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedMonth}
+                    onSelect={handleMonthChange}
+                    className={cn("p-3 pointer-events-auto")}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              
+              {/* Clear month filter button */}
+              {selectedMonth && (
+                <Button variant="outline" size="sm" onClick={() => handleMonthChange(undefined)}>
+                  Clear
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={selectedMonth}
-                  onSelect={handleMonthChange}
-                  className={cn("p-3 pointer-events-auto")}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            
-            {/* Clear month filter button */}
-            {selectedMonth && (
-              <Button variant="outline" size="sm" onClick={() => handleMonthChange(undefined)}>
-                Clear
+              )}
+            </div>
+
+            {/* Clear all filters */}
+            {(searchQuery || selectedMonth) && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedMonth(undefined);
+                  setCurrentPage(1);
+                }}
+              >
+                Clear All
               </Button>
             )}
           </div>
