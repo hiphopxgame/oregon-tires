@@ -19,7 +19,7 @@ interface EditingSchedule {
 }
 
 export const EmployeeCalendarSchedule = ({ employee, initialDate }: EmployeeCalendarScheduleProps) => {
-  const { saveEmployeeSchedule, deleteEmployeeSchedule } = useEmployeeSchedules();
+  const { saveEmployeeSchedule, deleteEmployeeSchedule, refetch } = useEmployeeSchedules();
   const [currentDate, setCurrentDate] = useState(() => {
     if (initialDate) {
       return new Date(initialDate + 'T00:00:00');
@@ -27,6 +27,7 @@ export const EmployeeCalendarSchedule = ({ employee, initialDate }: EmployeeCale
     return new Date();
   });
   const [editingSchedule, setEditingSchedule] = useState<EditingSchedule | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Update currentDate when initialDate changes
   React.useEffect(() => {
@@ -71,21 +72,43 @@ export const EmployeeCalendarSchedule = ({ employee, initialDate }: EmployeeCale
   };
 
   const handleSaveSchedule = async () => {
-    if (!editingSchedule) return;
+    if (!editingSchedule || isUpdating) return;
 
-    await saveEmployeeSchedule(
-      employee.id,
-      editingSchedule.date,
-      editingSchedule.startTime,
-      editingSchedule.endTime
-    );
-    
-    setEditingSchedule(null);
+    setIsUpdating(true);
+    try {
+      await saveEmployeeSchedule(
+        employee.id,
+        editingSchedule.date,
+        editingSchedule.startTime,
+        editingSchedule.endTime
+      );
+      
+      setEditingSchedule(null);
+      
+      // Force a refresh after save
+      setTimeout(() => {
+        refetch();
+      }, 500);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleDeleteSchedule = async (date: Date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    await deleteEmployeeSchedule(employee.id, dateStr);
+    if (isUpdating) return;
+    
+    setIsUpdating(true);
+    try {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      await deleteEmployeeSchedule(employee.id, dateStr);
+      
+      // Force a refresh after delete
+      setTimeout(() => {
+        refetch();
+      }, 500);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const navigateWeek = (direction: 'prev' | 'next') => {
@@ -181,6 +204,7 @@ export const EmployeeCalendarSchedule = ({ employee, initialDate }: EmployeeCale
                       <Button
                         size="sm"
                         onClick={handleSaveSchedule}
+                        disabled={isUpdating}
                         className="flex-1 h-7 text-xs"
                       >
                         <Save className="h-3 w-3" />
@@ -189,6 +213,7 @@ export const EmployeeCalendarSchedule = ({ employee, initialDate }: EmployeeCale
                         size="sm"
                         variant="outline"
                         onClick={() => setEditingSchedule(null)}
+                        disabled={isUpdating}
                         className="h-7 px-2"
                       >
                         <X className="h-3 w-3" />
@@ -209,6 +234,7 @@ export const EmployeeCalendarSchedule = ({ employee, initialDate }: EmployeeCale
                         size="sm"
                         variant="outline"
                         onClick={() => handleEditSchedule(day)}
+                        disabled={isUpdating}
                         className="flex-1 h-7 text-xs"
                       >
                         <Edit3 className="h-3 w-3" />
@@ -217,6 +243,7 @@ export const EmployeeCalendarSchedule = ({ employee, initialDate }: EmployeeCale
                         size="sm"
                         variant="outline"
                         onClick={() => handleDeleteSchedule(day)}
+                        disabled={isUpdating}
                         className="h-7 px-2 text-red-600 hover:text-red-700"
                       >
                         <Trash2 className="h-3 w-3" />

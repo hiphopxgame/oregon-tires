@@ -119,8 +119,8 @@ export const EmployeeManager = () => {
     } catch (error) {
       console.error('Error granting admin access:', error);
       toast({
-        title: "Error",
-        description: "Failed to grant admin access. Make sure the employee has an account with this email.",
+        title: "Error", 
+        description: `${employee.name} (${employee.email}) needs to create an account first. Ask them to sign up on the login page, then try again.`,
         variant: "destructive",
       });
     }
