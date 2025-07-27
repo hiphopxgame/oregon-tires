@@ -8,6 +8,7 @@ import { Appointment } from '@/types/admin';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useAppointmentTimer } from '@/hooks/useAppointmentTimer';
 import { ScheduleConflictAlert } from './ScheduleConflictAlert';
+import { AppointmentNotesEditor } from './AppointmentNotesEditor';
 
 interface AppointmentCardProps {
   appointment: Appointment;
@@ -209,6 +210,12 @@ export const AppointmentCard = ({
           </Select>
         </div>
       </div>
+
+      {/* Admin Notes Section */}
+      <AppointmentNotesEditor 
+        appointment={appointment} 
+        onNotesUpdate={onAppointmentUpdated}
+      />
       </div>
     </div>
   );

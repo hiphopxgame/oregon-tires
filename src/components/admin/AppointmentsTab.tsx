@@ -197,26 +197,32 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
               <label className="text-sm font-medium">Month:</label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-[200px] justify-start text-left font-normal",
-                      !selectedMonth && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedMonth ? format(selectedMonth, "MMMM yyyy") : "All months"}
-                  </Button>
+                   <Button
+                     variant="outline"
+                     className={cn(
+                       "w-[200px] justify-start text-left font-normal",
+                       !selectedMonth && "text-muted-foreground"
+                     )}
+                   >
+                     <CalendarIcon className="mr-2 h-4 w-4" />
+                     {selectedMonth ? format(selectedMonth, "MMMM yyyy") : "All months"}
+                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedMonth}
-                    onSelect={handleMonthChange}
-                    className={cn("p-3 pointer-events-auto")}
-                    initialFocus
-                  />
-                </PopoverContent>
+                 <PopoverContent className="w-auto p-0" align="start">
+                   <Calendar
+                     mode="single"
+                     selected={selectedMonth}
+                     onSelect={handleMonthChange}
+                     className={cn("p-3 pointer-events-auto")}
+                     initialFocus
+                     formatters={{
+                       formatCaption: (date) => format(date, "MMMM yyyy")
+                     }}
+                     captionLayout="dropdown-buttons"
+                     fromYear={2020}
+                     toYear={2030}
+                   />
+                 </PopoverContent>
               </Popover>
               
               {/* Clear month filter button */}

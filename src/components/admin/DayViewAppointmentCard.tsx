@@ -7,6 +7,7 @@ import { Appointment } from '@/types/admin';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAppointmentTimer } from '@/hooks/useAppointmentTimer';
+import { AppointmentNotesEditor } from './AppointmentNotesEditor';
 
 interface EditingAppointment {
   id: string;
@@ -280,6 +281,12 @@ export const DayViewAppointmentCard = ({
           </SelectContent>
         </Select>
       </div>
+
+      {/* Admin Notes Section */}
+      <AppointmentNotesEditor 
+        appointment={appointment} 
+        onNotesUpdate={onAppointmentUpdated}
+      />
     </div>
   );
 };

@@ -27,6 +27,7 @@ export interface Appointment {
   started_at?: string | null;
   completed_at?: string | null;
   actual_duration_minutes?: number | null;
+  admin_notes?: string | null;
 }
 
 export interface ContactMessage {
