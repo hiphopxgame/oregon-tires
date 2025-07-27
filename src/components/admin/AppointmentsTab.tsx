@@ -195,48 +195,30 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
             {/* Month filter */}
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Month:</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                   <Button
-                     variant="outline"
-                     className={cn(
-                       "w-[200px] justify-start text-left font-normal",
-                       !selectedMonth && "text-muted-foreground"
-                     )}
-                   >
-                     <CalendarIcon className="mr-2 h-4 w-4" />
-                     {selectedMonth ? format(selectedMonth, "MMMM yyyy") : "All months"}
-                   </Button>
-                </PopoverTrigger>
-                 <PopoverContent className="w-auto p-0" align="start">
-                   <Calendar
-                     mode="single"
-                     selected={selectedMonth}
-                     onSelect={handleMonthChange}
-                     className={cn("p-3 pointer-events-auto")}
-                     initialFocus
-                     formatters={{
-                       formatCaption: (date) => format(date, "MMMM yyyy")
-                     }}
-                     captionLayout="dropdown-buttons"
-                     fromYear={2020}
-                     toYear={2030}
-                     hideHead
-                     fixedWeeks
-                     showOutsideDays={false}
-                     components={{
-                       Day: () => null
-                     }}
-                   />
-                 </PopoverContent>
-              </Popover>
-              
-              {/* Clear month filter button */}
-              {selectedMonth && (
-                <Button variant="outline" size="sm" onClick={() => handleMonthChange(undefined)}>
-                  Clear
-                </Button>
-              )}
+              <Select value={selectedMonth ? format(selectedMonth, "yyyy-MM") : ""} onValueChange={(value) => {
+                if (value) {
+                  const [year, month] = value.split('-');
+                  handleMonthChange(new Date(parseInt(year), parseInt(month) - 1, 1));
+                } else {
+                  handleMonthChange(undefined);
+                }
+              }}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="All months" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All months</SelectItem>
+                  {Array.from({ length: 24 }, (_, i) => {
+                    const date = new Date(2024 - Math.floor(i / 12), 11 - (i % 12), 1);
+                    const value = format(date, "yyyy-MM");
+                    return (
+                      <SelectItem key={value} value={value}>
+                        {format(date, "MMMM yyyy")}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Clear all filters */}
