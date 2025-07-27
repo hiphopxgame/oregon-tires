@@ -1,8 +1,10 @@
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Appointment } from '@/types/admin';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -16,6 +18,11 @@ interface AppointmentsTabProps {
 export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateAppointmentAssignment }: AppointmentsTabProps) => {
   const { employees } = useEmployees();
   const { t } = useLanguage();
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
   const getStatusBadge = (status: string) => {
     const normalizedStatus = status.toLowerCase();
     const variants = {
@@ -46,12 +53,22 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
+  // Pagination calculations
+  const totalPages = Math.ceil(sortedAppointments.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentAppointments = sortedAppointments.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>{t.admin.allAppointments}</CardTitle>
         <CardDescription>
-          {appointments.length} {t.admin.appointmentsCount} total (sorted by newest first)
+          {appointments.length} {t.admin.appointmentsCount} total - Showing {currentAppointments.length} on page {currentPage} of {totalPages}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -68,7 +85,7 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedAppointments.map((appointment) => (
+            {currentAppointments.map((appointment) => (
               <TableRow key={appointment.id}>
                 <TableCell>
                   <div>
@@ -155,6 +172,41 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
         {appointments.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             {t.admin.noAppointmentsFound}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => handlePageChange(page)}
+                      isActive={currentPage === page}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </CardContent>
