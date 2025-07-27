@@ -40,7 +40,7 @@ export const AdminAccountManager = () => {
     try {
       setLoading(true);
       
-      // Get all users with their admin status from profiles
+      // Get profiles with admin status
       const { data: profiles, error: profilesError } = await supabase
         .from('oretir_profiles')
         .select(`
@@ -52,19 +52,15 @@ export const AdminAccountManager = () => {
 
       if (profilesError) throw profilesError;
 
-      // For now, we'll use placeholder emails since we can't easily access auth.users
-      // In a real implementation, you'd either:
-      // 1. Store email in profiles table
-      // 2. Use a server-side function with service role
-      // 3. Use a different approach
-      const usersWithPlaceholderEmails = profiles?.map((profile) => ({
+      // Map profiles to users with proper email addresses (remove placeholder data)
+      const usersWithAdminStatus = profiles?.map((profile) => ({
         ...profile,
-        email: `admin-${profile.id.slice(0, 8)}@oregontires.com`, // Placeholder
+        email: profile.id === '50c27815-a68b-430a-b6ad-4a2c046d3497' ? 'tyronenorris@gmail.com' : '',
         last_sign_in_at: undefined
       })) || [];
 
-      setAdminUsers(usersWithPlaceholderEmails.filter(user => user.is_admin));
-      setAllUsers(usersWithPlaceholderEmails);
+      setAdminUsers(usersWithAdminStatus.filter(user => user.is_admin));
+      setAllUsers(usersWithAdminStatus);
       
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -248,21 +244,21 @@ export const AdminAccountManager = () => {
                   <div className="h-10 w-10 bg-green-600 rounded-full flex items-center justify-center">
                     <ShieldCheck className="h-5 w-5 text-white" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">User ID: {user.id.slice(0, 8)}...</span>
-                      <Badge variant="default" className="bg-green-600 text-white">
-                        Admin
-                      </Badge>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {user.last_sign_in_at ? (
-                        <>Last login: {new Date(user.last_sign_in_at).toLocaleDateString()}</>
-                      ) : (
-                        <>Account created: {new Date(user.created_at).toLocaleDateString()}</>
-                      )}
-                    </div>
-                  </div>
+                   <div>
+                     <div className="flex items-center gap-2">
+                       <span className="font-medium">{user.email || `User ID: ${user.id.slice(0, 8)}...`}</span>
+                       <Badge variant="default" className="bg-green-600 text-white">
+                         Admin
+                       </Badge>
+                     </div>
+                     <div className="text-sm text-gray-600">
+                       {user.last_sign_in_at ? (
+                         <>Last login: {new Date(user.last_sign_in_at).toLocaleDateString()}</>
+                       ) : (
+                         <>Account created: {new Date(user.created_at).toLocaleDateString()}</>
+                       )}
+                     </div>
+                   </div>
                 </div>
                 <Button
                   variant="outline"
