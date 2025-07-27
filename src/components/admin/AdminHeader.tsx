@@ -1,7 +1,8 @@
 
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 interface AdminHeaderProps {
   language: string;
@@ -20,6 +21,8 @@ export const AdminHeader = ({
   t,
   onSignOut
 }: AdminHeaderProps) => {
+  const { user } = useAdminAuth();
+  
   const navItems = [
     { id: 'overview', label: t.admin.overview },
     { id: 'calendar', label: t.admin.calendar },
@@ -48,6 +51,17 @@ export const AdminHeader = ({
             </div>
           </Link>
           <div className="flex items-center gap-4">
+            {user && (
+              <div className="flex items-center gap-2 text-white/90 bg-white/10 px-3 py-2 rounded-lg">
+                <User className="h-4 w-4" />
+                <div className="text-sm">
+                  <div className="font-medium">{user.email}</div>
+                  {user.email === 'tyronenorris@gmail.com' && (
+                    <div className="text-xs text-yellow-200">Super Admin</div>
+                  )}
+                </div>
+              </div>
+            )}
             <button 
               onClick={toggleLanguage} 
               className="text-white hover:text-yellow-200"
