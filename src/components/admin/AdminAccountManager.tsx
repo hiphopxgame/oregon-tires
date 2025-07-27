@@ -174,8 +174,6 @@ export const AdminAccountManager = () => {
     );
   }
 
-  const regularUsers = allUsers.filter(user => !user.is_admin);
-
   return (
     <div className="space-y-6">
       {/* Admin Users */}
@@ -283,55 +281,6 @@ export const AdminAccountManager = () => {
           )}
         </CardContent>
       </Card>
-
-      {/* Regular Users - Potential Admins */}
-      {regularUsers.length > 0 && (
-        <Card className="border-2 border-gray-300">
-          <CardHeader className="bg-gray-100">
-            <CardTitle className="flex items-center gap-2 text-gray-700">
-              <User className="h-5 w-5" />
-              Regular Users (Can be promoted to Admin)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="space-y-3">
-              {regularUsers.slice(0, 5).map((user) => (
-                <div 
-                  key={user.id} 
-                  className="border rounded-lg bg-gray-50 p-3 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 bg-gray-400 rounded-full flex items-center justify-center">
-                      <User className="h-4 w-4 text-white" />
-                    </div>
-                    <div>
-                      <span className="font-medium">User ID: {user.id.slice(0, 8)}...</span>
-                      <div className="text-sm text-gray-600">
-                        Joined: {new Date(user.created_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => grantAdminAccess(user.id)}
-                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                  >
-                    <Shield className="h-4 w-4 mr-1" />
-                    Make Admin
-                  </Button>
-                </div>
-              ))}
-            </div>
-            
-            {regularUsers.length > 5 && (
-              <p className="text-sm text-gray-500 mt-3 text-center">
-                Showing first 5 users. Total: {regularUsers.length} regular users
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
       {/* Help Section */}
       <Alert>

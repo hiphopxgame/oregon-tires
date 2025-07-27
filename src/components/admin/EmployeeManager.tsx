@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Edit2, Save, X, Calendar } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Edit2, Save, X, Calendar, Shield, ShieldOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmployees, Employee } from '@/hooks/useEmployees';
@@ -21,7 +22,7 @@ export const EmployeeManager = () => {
   const { employeesWithSchedules, loading: schedulesLoading } = useEmployeeSchedules();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<Partial<Employee>>({});
-  const [newEmployee, setNewEmployee] = useState({ name: '', email: '', phone: '', role: 'Worker' });
+  const [newEmployee, setNewEmployee] = useState({ name: '', email: '', phone: '', role: 'Employee' });
   const [showAddForm, setShowAddForm] = useState(false);
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
   const [scheduleDate, setScheduleDate] = useState<string | null>(null);
@@ -41,7 +42,7 @@ export const EmployeeManager = () => {
 
       if (error) throw error;
 
-      setNewEmployee({ name: '', email: '', phone: '', role: 'Worker' });
+      setNewEmployee({ name: '', email: '', phone: '', role: 'Employee' });
       setShowAddForm(false);
       
       toast({
@@ -79,6 +80,37 @@ export const EmployeeManager = () => {
       toast({
         title: t.admin.error,
         description: t.admin.failedToUpdateEmployee,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMakeAdmin = async (employee: Employee) => {
+    if (!employee.email) {
+      toast({
+        title: t.admin.error,
+        description: "Employee must have an email address to become an admin",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.rpc('set_admin_by_email', {
+        user_email: employee.email
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `${employee.name} has been granted admin access`,
+      });
+    } catch (error) {
+      console.error('Error granting admin access:', error);
+      toast({
+        title: "Error",
+        description: "Failed to grant admin access. Make sure the employee has an account with this email.",
         variant: "destructive",
       });
     }
@@ -158,10 +190,10 @@ export const EmployeeManager = () => {
                   className="w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:outline-none"
                   value={newEmployee.role}
                   onChange={(e) => setNewEmployee(prev => ({ ...prev, role: e.target.value }))}
-                >
-                  <option value="Worker">Worker</option>
-                  <option value="Manager">Manager</option>
-                </select>
+                  >
+                    <option value="Employee">Employee</option>
+                    <option value="Manager">Manager</option>
+                  </select>
               </div>
             </div>
             <div className="flex gap-2 mt-3">
@@ -174,7 +206,7 @@ export const EmployeeManager = () => {
                 size="sm"
                 onClick={() => {
                   setShowAddForm(false);
-                  setNewEmployee({ name: '', email: '', phone: '', role: 'Worker' });
+                  setNewEmployee({ name: '', email: '', phone: '', role: 'Employee' });
                 }}
               >
                 <X className="h-4 w-4 mr-1" />
@@ -211,10 +243,10 @@ export const EmployeeManager = () => {
                   />
                   <select
                     className="w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:outline-none"
-                    value={editingData.role || 'Worker'}
+                    value={editingData.role || 'Employee'}
                     onChange={(e) => setEditingData(prev => ({ ...prev, role: e.target.value }))}
                   >
-                    <option value="Worker">Worker</option>
+                    <option value="Employee">Employee</option>
                     <option value="Manager">Manager</option>
                   </select>
                   <div className="flex gap-2">
@@ -254,6 +286,17 @@ export const EmployeeManager = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
+                      {employee.email && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleMakeAdmin(employee)}
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        >
+                          <Shield className="h-4 w-4 mr-1" />
+                          Make Admin
+                        </Button>
+                      )}
                       <Button 
                         variant="outline" 
                         size="sm"
