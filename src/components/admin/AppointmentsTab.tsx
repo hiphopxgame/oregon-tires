@@ -33,10 +33,18 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
     );
   };
 
-  // Sort appointments by creation date, newest first
-  const sortedAppointments = [...appointments].sort((a, b) => 
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+  // Sort appointments: unassigned first, then by creation date within each group
+  const sortedAppointments = [...appointments].sort((a, b) => {
+    // First priority: unassigned appointments come first
+    const aUnassigned = !a.assigned_employee_id;
+    const bUnassigned = !b.assigned_employee_id;
+    
+    if (aUnassigned && !bUnassigned) return -1;
+    if (!aUnassigned && bUnassigned) return 1;
+    
+    // Second priority: within each group, sort by creation date (newest first)
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
 
   return (
     <Card>
