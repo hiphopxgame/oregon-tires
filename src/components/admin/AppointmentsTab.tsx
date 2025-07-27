@@ -1,13 +1,19 @@
 
 import { useState } from 'react';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Appointment } from '@/types/admin';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useLanguage } from '@/hooks/useLanguage';
+import { cn } from '@/lib/utils';
 
 interface AppointmentsTabProps {
   appointments: Appointment[];
@@ -19,9 +25,10 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
   const { employees } = useEmployees();
   const { t } = useLanguage();
   
-  // Pagination state
+  // Pagination and filtering state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [selectedMonth, setSelectedMonth] = useState<Date | undefined>();
   
   const getStatusBadge = (status: string) => {
     const normalizedStatus = status.toLowerCase();
@@ -40,8 +47,17 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
     );
   };
 
+  // Filter by month if selected
+  const filteredAppointments = selectedMonth 
+    ? appointments.filter(appointment => {
+        const appointmentDate = new Date(appointment.preferred_date + 'T00:00:00');
+        return appointmentDate.getMonth() === selectedMonth.getMonth() && 
+               appointmentDate.getFullYear() === selectedMonth.getFullYear();
+      })
+    : appointments;
+
   // Sort appointments: unassigned first, then by creation date within each group
-  const sortedAppointments = [...appointments].sort((a, b) => {
+  const sortedAppointments = [...filteredAppointments].sort((a, b) => {
     // First priority: unassigned appointments come first
     const aUnassigned = !a.assigned_employee_id;
     const bUnassigned = !b.assigned_employee_id;
@@ -54,13 +70,25 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
   });
 
   // Pagination calculations
-  const totalPages = Math.ceil(sortedAppointments.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  const showAllItems = itemsPerPage === -1;
+  const totalPages = showAllItems ? 1 : Math.ceil(sortedAppointments.length / itemsPerPage);
+  const startIndex = showAllItems ? 0 : (currentPage - 1) * itemsPerPage;
+  const endIndex = showAllItems ? sortedAppointments.length : startIndex + itemsPerPage;
   const currentAppointments = sortedAppointments.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (value: string) => {
+    const newItemsPerPage = value === "all" ? -1 : parseInt(value);
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page
+  };
+
+  const handleMonthChange = (month: Date | undefined) => {
+    setSelectedMonth(month);
+    setCurrentPage(1); // Reset to first page when filtering
   };
 
   return (
@@ -68,10 +96,66 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
       <CardHeader>
         <CardTitle>{t.admin.allAppointments}</CardTitle>
         <CardDescription>
-          {appointments.length} {t.admin.appointmentsCount} total - Showing {currentAppointments.length} on page {currentPage} of {totalPages}
+          {filteredAppointments.length} {selectedMonth ? 'filtered' : 'total'} appointments
+          {selectedMonth && ` for ${format(selectedMonth, 'MMMM yyyy')}`}
+          {showAllItems ? '' : ` - Showing ${currentAppointments.length} on page ${currentPage} of ${totalPages}`}
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {/* Filter Controls */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          {/* Items per page selector */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Show:</label>
+            <Select value={itemsPerPage === -1 ? "all" : itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+              <SelectTrigger className="w-24">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Month filter */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Month:</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-[200px] justify-start text-left font-normal",
+                    !selectedMonth && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedMonth ? format(selectedMonth, "MMMM yyyy") : "All months"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedMonth}
+                  onSelect={handleMonthChange}
+                  className={cn("p-3 pointer-events-auto")}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            
+            {/* Clear month filter button */}
+            {selectedMonth && (
+              <Button variant="outline" size="sm" onClick={() => handleMonthChange(undefined)}>
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
