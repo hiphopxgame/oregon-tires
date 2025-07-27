@@ -5,11 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit2, Save, X, Calendar, Shield, ShieldOff } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Plus, Edit2, Save, X, Calendar, Shield, ShieldOff, Power, PowerOff, CalendarDays, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmployees, Employee } from '@/hooks/useEmployees';
 import { useEmployeeSchedules } from '@/hooks/useEmployeeSchedules';
+import { useEmployeeAppointments } from '@/hooks/useEmployeeAppointments';
 import { useLanguage } from '@/hooks/useLanguage';
 import { EmployeeCalendarSchedule } from './EmployeeCalendarSchedule';
 import { EmployeeScheduleAlert } from './EmployeeScheduleAlert';
@@ -20,12 +22,17 @@ export const EmployeeManager = () => {
   const { toast } = useToast();
   const { employees, loading, refetch } = useEmployees();
   const { employeesWithSchedules, loading: schedulesLoading } = useEmployeeSchedules();
+  const { getEmployeeAppointmentSummary, loading: appointmentsLoading } = useEmployeeAppointments();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<Partial<Employee>>({});
   const [newEmployee, setNewEmployee] = useState({ name: '', email: '', phone: '', role: 'Employee' });
   const [showAddForm, setShowAddForm] = useState(false);
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null);
   const [scheduleDate, setScheduleDate] = useState<string | null>(null);
+
+  // Separate active and inactive employees
+  const activeEmployees = employees.filter(emp => emp.is_active);
+  const inactiveEmployees = employees.filter(emp => !emp.is_active);
 
   const handleAddEmployee = async () => {
     if (!newEmployee.name.trim()) return;
@@ -119,6 +126,31 @@ export const EmployeeManager = () => {
     }
   };
 
+  const handleToggleEmployeeStatus = async (employee: Employee) => {
+    try {
+      const { error } = await supabase
+        .from('oretir_employees')
+        .update({ is_active: !employee.is_active })
+        .eq('id', employee.id);
+
+      if (error) throw error;
+
+      refetch();
+
+      toast({
+        title: "Success",
+        description: `${employee.name} has been ${!employee.is_active ? 'activated' : 'deactivated'}`,
+      });
+    } catch (error) {
+      console.error('Error updating employee status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update employee status",
+        variant: "destructive",
+      });
+    }
+  };
+
   const startEditing = (employee: Employee) => {
     setEditingId(employee.id);
     setEditingData({
@@ -134,9 +166,192 @@ export const EmployeeManager = () => {
     setEditingData({});
   };
 
-  if (loading || schedulesLoading) {
+  if (loading || schedulesLoading || appointmentsLoading) {
     return <div className="text-green-700">{t.admin.loadingEmployees}</div>;
   }
+
+  const renderEmployeeCard = (employee: Employee, isActive: boolean) => {
+    const employeeWithSchedule = employeesWithSchedules.find(emp => emp.id === employee.id);
+    const appointmentSummary = getEmployeeAppointmentSummary(employee.id);
+    
+    return (
+      <div 
+        key={employee.id} 
+        className={`border rounded-lg p-3 ${isActive ? 'bg-white' : 'bg-gray-50'}`}
+      >
+        {editingId === employee.id ? (
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
+            <Input
+              value={editingData.name || ''}
+              onChange={(e) => setEditingData(prev => ({ ...prev, name: e.target.value }))}
+            />
+            <Input
+              value={editingData.email || ''}
+              onChange={(e) => setEditingData(prev => ({ ...prev, email: e.target.value }))}
+              placeholder="Email"
+            />
+            <Input
+              value={editingData.phone || ''}
+              onChange={(e) => setEditingData(prev => ({ ...prev, phone: e.target.value }))}
+              placeholder="Phone"
+            />
+            <select
+              className="w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:outline-none"
+              value={editingData.role || 'Employee'}
+              onChange={(e) => setEditingData(prev => ({ ...prev, role: e.target.value }))}
+            >
+              <option value="Employee">Employee</option>
+              <option value="Manager">Manager</option>
+            </select>
+            <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                onClick={() => handleUpdateEmployee(employee.id, editingData)}
+              >
+                <Save className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={cancelEditing}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{employee.name}</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    employee.role === 'Manager' 
+                      ? 'bg-blue-100 text-blue-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {employee.role}
+                  </span>
+                  {!isActive && (
+                    <Badge variant="secondary" className="text-xs">
+                      Inactive
+                    </Badge>
+                  )}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {employee.email && <span>{employee.email}</span>}
+                  {employee.email && employee.phone && <span> • </span>}
+                  {employee.phone && <span>{employee.phone}</span>}
+                </div>
+                
+                {/* Appointment Summary */}
+                {isActive && appointmentSummary && (
+                  <div className="mt-2 p-2 bg-blue-50 rounded text-sm">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-1">
+                        <CalendarDays className="h-4 w-4 text-blue-600" />
+                        <span className="text-blue-800 font-medium">
+                          {appointmentSummary.upcoming_count} upcoming
+                        </span>
+                      </div>
+                      {appointmentSummary.next_appointment_date && (
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4 text-blue-600" />
+                          <span className="text-blue-700">
+                            Next: {new Date(appointmentSummary.next_appointment_date).toLocaleDateString()}
+                            {appointmentSummary.next_appointment_service && 
+                              ` (${appointmentSummary.next_appointment_service})`
+                            }
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <Button 
+                  variant={isActive ? "outline" : "default"}
+                  size="sm"
+                  onClick={() => handleToggleEmployeeStatus(employee)}
+                  className={isActive ? "text-red-600 hover:text-red-700" : "text-green-600 hover:text-green-700"}
+                >
+                  {isActive ? (
+                    <>
+                      <PowerOff className="h-4 w-4 mr-1" />
+                      Deactivate
+                    </>
+                  ) : (
+                    <>
+                      <Power className="h-4 w-4 mr-1" />
+                      Activate
+                    </>
+                  )}
+                </Button>
+                {isActive && employee.email && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleMakeAdmin(employee)}
+                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                  >
+                    <Shield className="h-4 w-4 mr-1" />
+                    Make Admin
+                  </Button>
+                )}
+                {isActive && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setExpandedSchedule(
+                      expandedSchedule === employee.id ? null : employee.id
+                    )}
+                  >
+                    <Calendar className="h-4 w-4 mr-1" />
+                    Schedule
+                  </Button>
+                )}
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => startEditing(employee)}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            {/* Schedule conflict alert */}
+            {isActive && employeeWithSchedule && (
+              <EmployeeScheduleAlert 
+                employee={employeeWithSchedule} 
+                onAppointmentClick={(employeeId, date) => {
+                  console.log('Appointment clicked:', { employeeId, date });
+                  setExpandedSchedule(employeeId);
+                  setScheduleDate(date);
+                  setTimeout(() => {
+                    const element = document.getElementById(`schedule-${employeeId}`);
+                    element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                  }, 100);
+                }}
+              />
+            )}
+            
+            {/* Employee schedule management */}
+            {isActive && expandedSchedule === employee.id && employeeWithSchedule && (
+              <div id={`schedule-${employee.id}`}>
+                <EmployeeCalendarSchedule 
+                  key={`${employee.id}-${scheduleDate}`}
+                  employee={employeeWithSchedule} 
+                  initialDate={scheduleDate}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
 
   return (
     <Card className="border-2 border-green-700">
@@ -219,141 +434,44 @@ export const EmployeeManager = () => {
           </div>
         )}
 
-        <div className="space-y-3">
-          {employees.map((employee) => {
-            const employeeWithSchedule = employeesWithSchedules.find(emp => emp.id === employee.id);
-            
-            return (
-              <div 
-                key={employee.id} 
-                className="border rounded-lg bg-white p-3"
-              >
-                {editingId === employee.id ? (
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
-                  <Input
-                    value={editingData.name || ''}
-                    onChange={(e) => setEditingData(prev => ({ ...prev, name: e.target.value }))}
-                  />
-                  <Input
-                    value={editingData.email || ''}
-                    onChange={(e) => setEditingData(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="Email"
-                  />
-                  <Input
-                    value={editingData.phone || ''}
-                    onChange={(e) => setEditingData(prev => ({ ...prev, phone: e.target.value }))}
-                    placeholder="Phone"
-                  />
-                  <select
-                    className="w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:outline-none"
-                    value={editingData.role || 'Employee'}
-                    onChange={(e) => setEditingData(prev => ({ ...prev, role: e.target.value }))}
-                  >
-                    <option value="Employee">Employee</option>
-                    <option value="Manager">Manager</option>
-                  </select>
-                  <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleUpdateEmployee(employee.id, editingData)}
-                    >
-                      <Save className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={cancelEditing}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{employee.name}</span>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          employee.role === 'Manager' 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {employee.role}
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {employee.email && <span>{employee.email}</span>}
-                        {employee.email && employee.phone && <span> • </span>}
-                        {employee.phone && <span>{employee.phone}</span>}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {employee.email && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleMakeAdmin(employee)}
-                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                        >
-                          <Shield className="h-4 w-4 mr-1" />
-                          Make Admin
-                        </Button>
-                      )}
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setExpandedSchedule(
-                          expandedSchedule === employee.id ? null : employee.id
-                        )}
-                      >
-                        <Calendar className="h-4 w-4 mr-1" />
-                        Schedule
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => startEditing(employee)}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  {/* Schedule conflict alert */}
-                  {employeeWithSchedule && (
-                    <EmployeeScheduleAlert 
-                      employee={employeeWithSchedule} 
-                      onAppointmentClick={(employeeId, date) => {
-                        console.log('Appointment clicked:', { employeeId, date });
-                        setExpandedSchedule(employeeId);
-                        // Set the schedule date to navigate to the correct week
-                        setScheduleDate(date);
-                        // Scroll to the schedule section after a brief delay
-                        setTimeout(() => {
-                          const element = document.getElementById(`schedule-${employeeId}`);
-                          element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        }, 100);
-                      }}
-                    />
-                  )}
-                  
-                  {/* Employee schedule management */}
-                  {expandedSchedule === employee.id && employeeWithSchedule && (
-                    <div id={`schedule-${employee.id}`}>
-                      <EmployeeCalendarSchedule 
-                        key={`${employee.id}-${scheduleDate}`} // Force re-render when date changes
-                        employee={employeeWithSchedule} 
-                        initialDate={scheduleDate}
-                      />
-                    </div>
-                  )}
-                </>
-              )}
+        {/* Active Employees Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-green-700">Active Team Members</h3>
+            <Badge variant="outline" className="text-green-700">
+              {activeEmployees.length}
+            </Badge>
+          </div>
+          
+          <div className="space-y-3">
+            {activeEmployees.map((employee) => renderEmployeeCard(employee, true))}
+          </div>
+          
+          {activeEmployees.length === 0 && (
+            <div className="text-center py-4 text-gray-500 border rounded-lg bg-gray-50">
+              No active employees found
             </div>
-            );
-          })}
+          )}
         </div>
+
+        {/* Inactive Employees Section */}
+        {inactiveEmployees.length > 0 && (
+          <>
+            <Separator className="my-6" />
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-gray-600">Past Employees</h3>
+                <Badge variant="secondary">
+                  {inactiveEmployees.length}
+                </Badge>
+              </div>
+              
+              <div className="space-y-3">
+                {inactiveEmployees.map((employee) => renderEmployeeCard(employee, false))}
+              </div>
+            </div>
+          </>
+        )}
 
         {employees.length === 0 && (
           <div className="text-center py-8 text-gray-500">
