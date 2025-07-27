@@ -71,6 +71,9 @@ export const EmployeeManager = () => {
       setEditingId(null);
       setEditingData({});
 
+      // Manually refresh both hooks to ensure immediate update
+      refetch();
+
       toast({
         title: t.admin.success,
         description: t.admin.employeeUpdatedSuccess,
