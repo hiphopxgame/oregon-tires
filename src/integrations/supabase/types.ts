@@ -2831,6 +2831,18 @@ export type Database = {
         Args: { service_slug: string }
         Returns: string
       }
+      get_admin_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          email: string
+          name: string
+          is_admin: boolean
+          created_at: string
+          updated_at: string
+          last_sign_in_at: string
+        }[]
+      }
       handle_community_purchase: {
         Args: { p_user_id: string; p_cash_amount: number }
         Returns: undefined

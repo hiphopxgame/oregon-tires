@@ -22,8 +22,10 @@ import { useLanguage } from '@/hooks/useLanguage';
 interface AdminUser {
   id: string;
   email: string;
+  name: string;
   is_admin: boolean;
   created_at: string;
+  updated_at: string;
   last_sign_in_at?: string;
 }
 
@@ -40,44 +42,13 @@ export const AdminAccountManager = () => {
     try {
       setLoading(true);
       
-      // Get admin profiles with their email addresses from auth.users
-      const { data: profiles, error: profilesError } = await supabase
-        .from('oretir_profiles')
-        .select(`
-          id,
-          is_admin,
-          created_at,
-          updated_at
-        `)
-        .eq('is_admin', true);
+      // Use the database function to get admin users with email and name
+      const { data: adminUsers, error } = await supabase.rpc('get_admin_users');
 
-      if (profilesError) throw profilesError;
+      if (error) throw error;
 
-      // For each admin profile, we need to get the email from a secure source
-      // Since we can't directly join with auth.users, we'll create a more robust approach
-      const adminUsersWithEmails = await Promise.all(
-        profiles?.map(async (profile) => {
-          // For now, we'll need to rely on the super admin check or implement a better email fetching strategy
-          let email = '';
-          
-          // Check if this is the super admin
-          if (profile.id === '50c27815-a68b-430a-b6ad-4a2c046d3497') {
-            email = 'tyronenorris@gmail.com';
-          } else {
-            // For other admins, we'll show a placeholder that indicates they need to be contacted differently
-            email = 'Admin User (Contact via dashboard)';
-          }
-          
-          return {
-            ...profile,
-            email,
-            last_sign_in_at: undefined
-          };
-        }) || []
-      );
-
-      setAdminUsers(adminUsersWithEmails);
-      setAllUsers(adminUsersWithEmails);
+      setAdminUsers(adminUsers || []);
+      setAllUsers(adminUsers || []);
       
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -290,14 +261,15 @@ export const AdminAccountManager = () => {
                   <div className="h-10 w-10 bg-green-600 rounded-full flex items-center justify-center">
                     <ShieldCheck className="h-5 w-5 text-white" />
                   </div>
-                   <div>
-                     <div className="flex items-center gap-2">
-                       <span className="font-medium">{user.email || `User ID: ${user.id.slice(0, 8)}...`}</span>
-                       <Badge variant="default" className="bg-green-600 text-white">
-                         Admin
-                       </Badge>
-                     </div>
-                     <div className="text-sm text-gray-600">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{user.name}</span>
+                        <Badge variant="default" className="bg-green-600 text-white">
+                          Admin
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-gray-600">{user.email}</div>
+                      <div className="text-sm text-gray-600">
                        {user.last_sign_in_at ? (
                          <>Last login: {new Date(user.last_sign_in_at).toLocaleDateString()}</>
                        ) : (
