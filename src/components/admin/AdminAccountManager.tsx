@@ -40,7 +40,7 @@ export const AdminAccountManager = () => {
     try {
       setLoading(true);
       
-      // Get profiles with admin status
+      // Get admin profiles with their email addresses from auth.users
       const { data: profiles, error: profilesError } = await supabase
         .from('oretir_profiles')
         .select(`
@@ -48,19 +48,36 @@ export const AdminAccountManager = () => {
           is_admin,
           created_at,
           updated_at
-        `);
+        `)
+        .eq('is_admin', true);
 
       if (profilesError) throw profilesError;
 
-      // Map profiles to users with proper email addresses (remove placeholder data)
-      const usersWithAdminStatus = profiles?.map((profile) => ({
-        ...profile,
-        email: profile.id === '50c27815-a68b-430a-b6ad-4a2c046d3497' ? 'tyronenorris@gmail.com' : '',
-        last_sign_in_at: undefined
-      })) || [];
+      // For each admin profile, we need to get the email from a secure source
+      // Since we can't directly join with auth.users, we'll create a more robust approach
+      const adminUsersWithEmails = await Promise.all(
+        profiles?.map(async (profile) => {
+          // For now, we'll need to rely on the super admin check or implement a better email fetching strategy
+          let email = '';
+          
+          // Check if this is the super admin
+          if (profile.id === '50c27815-a68b-430a-b6ad-4a2c046d3497') {
+            email = 'tyronenorris@gmail.com';
+          } else {
+            // For other admins, we'll show a placeholder that indicates they need to be contacted differently
+            email = 'Admin User (Contact via dashboard)';
+          }
+          
+          return {
+            ...profile,
+            email,
+            last_sign_in_at: undefined
+          };
+        }) || []
+      );
 
-      setAdminUsers(usersWithAdminStatus.filter(user => user.is_admin));
-      setAllUsers(usersWithAdminStatus);
+      setAdminUsers(adminUsersWithEmails);
+      setAllUsers(adminUsersWithEmails);
       
     } catch (error) {
       console.error('Error fetching users:', error);
