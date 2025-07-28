@@ -55,7 +55,8 @@ export const EmployeeEditDialog = ({ employee, open, onOpenChange, onEmployeeUpd
       // We can't directly query auth.users, so we'll try the RPC call to see if it works
       const { error } = await supabase.rpc('set_admin_by_email', {
         user_email: email,
-        admin_status: false // Just checking, not actually changing
+        admin_status: false, // Just checking, not actually changing
+        target_project_id: 'oregon-tires'
       });
       
       // If no error, user exists
@@ -176,7 +177,8 @@ export const EmployeeEditDialog = ({ employee, open, onOpenChange, onEmployeeUpd
       // First try to grant admin access to existing user
       const { error } = await supabase.rpc('set_admin_by_email', {
         user_email: formData.email,
-        admin_status: true
+        admin_status: true,
+        target_project_id: 'oregon-tires'
       });
 
       if (error) {
@@ -194,7 +196,8 @@ export const EmployeeEditDialog = ({ employee, open, onOpenChange, onEmployeeUpd
           // Now grant admin access to the newly created user
           const { error: adminError } = await supabase.rpc('set_admin_by_email', {
             user_email: formData.email,
-            admin_status: true
+            admin_status: true,
+            target_project_id: 'oregon-tires'
           });
 
           if (adminError) throw adminError;
