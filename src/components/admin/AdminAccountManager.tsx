@@ -132,26 +132,53 @@ export const AdminAccountManager = () => {
     if (!newAdminEmail.trim()) return;
 
     try {
-      // Since we can't easily search by email, we'll use the set_admin_by_email function
+      // First try to grant admin access to existing user
       const { data, error } = await supabase.rpc('set_admin_by_email', {
         user_email: newAdminEmail.trim()
       });
 
-      if (error) throw error;
+      if (error) {
+        // If user doesn't exist, create the account first
+        if (error.message.includes('not found')) {
+          const { data: createData, error: createError } = await supabase.functions.invoke('create-employee-account', {
+            body: {
+              email: newAdminEmail.trim(),
+              employeeName: newAdminEmail.split('@')[0] // Use email prefix as name
+            }
+          });
+
+          if (createError) throw createError;
+
+          // Now grant admin access to the newly created user
+          const { error: adminError } = await supabase.rpc('set_admin_by_email', {
+            user_email: newAdminEmail.trim()
+          });
+
+          if (adminError) throw adminError;
+
+          toast({
+            title: "Account Created & Admin Access Granted",
+            description: "New admin account created successfully. Login details sent via email.",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "Success",
+          description: "Admin access granted successfully",
+        });
+      }
 
       await fetchUsers();
       setNewAdminEmail('');
       setShowAddForm(false);
       
-      toast({
-        title: "Success",
-        description: "Admin access granted successfully",
-      });
     } catch (error) {
       console.error('Error adding admin:', error);
       toast({
-        title: "User Not Found",
-        description: "No user found with this email address or failed to grant access",
+        title: "Error",
+        description: "Failed to create account or grant admin access. Please try again.",
         variant: "destructive",
       });
     }
@@ -197,25 +224,25 @@ export const AdminAccountManager = () => {
         <CardContent className="p-4">
           {showAddForm && (
             <div className="mb-6 p-4 border rounded-lg bg-blue-50">
-              <h4 className="font-medium mb-3">Grant Admin Access</h4>
+              <h4 className="font-medium mb-3">Create Admin Account</h4>
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <Label htmlFor="admin-email">User Email *</Label>
+                  <Label htmlFor="admin-email">Email Address *</Label>
                   <Input
                     id="admin-email"
                     type="email"
                     value={newAdminEmail}
                     onChange={(e) => setNewAdminEmail(e.target.value)}
-                    placeholder="Enter exact email address"
+                    placeholder="admin@company.com"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Must match the email used during account registration
+                    Will create account if user doesn't exist, then grant admin access
                   </p>
                 </div>
                 <div className="flex items-end gap-2">
                   <Button onClick={addAdminByEmail} size="sm">
                     <Shield className="h-4 w-4 mr-1" />
-                    Grant Access
+                    Create & Grant Admin
                   </Button>
                   <Button 
                     variant="outline" 
