@@ -173,21 +173,51 @@ export const EmployeeEditDialog = ({ employee, open, onOpenChange, onEmployeeUpd
 
     setIsLoading(true);
     try {
+      // First try to grant admin access to existing user
       const { error } = await supabase.rpc('set_admin_by_email', {
         user_email: formData.email
       });
 
-      if (error) throw error;
+      if (error) {
+        // If user doesn't exist, create the account first
+        if (error.message.includes('not found')) {
+          const { data: createData, error: createError } = await supabase.functions.invoke('create-employee-account', {
+            body: {
+              email: formData.email,
+              employeeName: formData.name
+            }
+          });
 
-      toast({
-        title: "Success",
-        description: `${formData.name} has been granted admin access`,
-      });
+          if (createError) throw createError;
+
+          // Now grant admin access to the newly created user
+          const { error: adminError } = await supabase.rpc('set_admin_by_email', {
+            user_email: formData.email
+          });
+
+          if (adminError) throw adminError;
+
+          toast({
+            title: "Account Created & Admin Access Granted",
+            description: `${formData.name} has been given admin access. Login details sent via email.`,
+          });
+
+          // Refresh the auth account status
+          checkAuthAccountExists(formData.email);
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "Success",
+          description: `${formData.name} has been granted admin access`,
+        });
+      }
     } catch (error) {
       console.error('Error granting admin access:', error);
       toast({
         title: "Error",
-        description: "Failed to grant admin access. Make sure the employee has an account first.",
+        description: "Failed to create account or grant admin access. Please try again.",
         variant: "destructive",
       });
     } finally {
