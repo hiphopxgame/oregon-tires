@@ -175,7 +175,8 @@ export const EmployeeEditDialog = ({ employee, open, onOpenChange, onEmployeeUpd
     try {
       // First try to grant admin access to existing user
       const { error } = await supabase.rpc('set_admin_by_email', {
-        user_email: formData.email
+        user_email: formData.email,
+        admin_status: true
       });
 
       if (error) {
@@ -192,7 +193,8 @@ export const EmployeeEditDialog = ({ employee, open, onOpenChange, onEmployeeUpd
 
           // Now grant admin access to the newly created user
           const { error: adminError } = await supabase.rpc('set_admin_by_email', {
-            user_email: formData.email
+            user_email: formData.email,
+            admin_status: true
           });
 
           if (adminError) throw adminError;

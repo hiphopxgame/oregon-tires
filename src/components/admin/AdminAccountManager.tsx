@@ -134,7 +134,8 @@ export const AdminAccountManager = () => {
     try {
       // First try to grant admin access to existing user
       const { data, error } = await supabase.rpc('set_admin_by_email', {
-        user_email: newAdminEmail.trim()
+        user_email: newAdminEmail.trim(),
+        admin_status: true
       });
 
       if (error) {
@@ -151,7 +152,8 @@ export const AdminAccountManager = () => {
 
           // Now grant admin access to the newly created user
           const { error: adminError } = await supabase.rpc('set_admin_by_email', {
-            user_email: newAdminEmail.trim()
+            user_email: newAdminEmail.trim(),
+            admin_status: true
           });
 
           if (adminError) throw adminError;
