@@ -195,11 +195,11 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
             {/* Month filter */}
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Month:</label>
-              <Select value={selectedMonth ? format(selectedMonth, "yyyy-MM") : ""} onValueChange={(value) => {
-                if (value) {
-                  const [year, month] = value.split('-');
-                  handleMonthChange(new Date(parseInt(year), parseInt(month) - 1, 1));
+              <Select value={selectedMonth ? format(selectedMonth, "yyyy-MM") : "all"} onValueChange={(value) => {
+                if (value === "all") {
+                  handleMonthChange(undefined);
                 } else {
+                  const [year, month] = value.split('-');
                   handleMonthChange(undefined);
                 }
               }}>
@@ -207,7 +207,7 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
                   <SelectValue placeholder="All months" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All months</SelectItem>
+                  <SelectItem value="all">All months</SelectItem>
                   {Array.from({ length: 24 }, (_, i) => {
                     const date = new Date(2024 - Math.floor(i / 12), 11 - (i % 12), 1);
                     const value = format(date, "yyyy-MM");
