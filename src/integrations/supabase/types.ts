@@ -3330,6 +3330,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      user_hosts_game: {
+        Args: { game_id: string; user_id: string }
+        Returns: boolean
+      }
+      user_participates_in_game: {
+        Args: { game_id: string; user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "member" | "artist"
