@@ -63,9 +63,10 @@ export const useServiceImagesForFrontend = () => {
   useEffect(() => {
     fetchServiceImages();
 
-    // Subscribe to real-time updates
+    // Subscribe to real-time updates with unique channel name
+    const channelId = Math.random().toString(36).substr(2, 9);
     const channel = supabase
-      .channel('service-images-changes')
+      .channel(`service-images-changes-${channelId}`)
       .on(
         'postgres_changes',
         {
