@@ -200,7 +200,7 @@ export const AppointmentsTab = ({ appointments, updateAppointmentStatus, updateA
                   handleMonthChange(undefined);
                 } else {
                   const [year, month] = value.split('-');
-                  handleMonthChange(undefined);
+                  handleMonthChange(new Date(parseInt(year), parseInt(month) - 1, 1));
                 }
               }}>
                 <SelectTrigger className="w-[200px]">
