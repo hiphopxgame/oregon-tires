@@ -723,6 +723,111 @@ export type Database = {
         }
         Relationships: []
       }
+      donations: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string | null
+          donor_name: string | null
+          email: string | null
+          id: string
+          message: string | null
+          status: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string | null
+          donor_name?: string | null
+          email?: string | null
+          id?: string
+          message?: string | null
+          status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string | null
+          donor_name?: string | null
+          email?: string | null
+          id?: string
+          message?: string | null
+          status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      featured_artists: {
+        Row: {
+          apple_music_url: string | null
+          bandcamp_url: string | null
+          bio: string | null
+          created_at: string
+          created_by: string | null
+          display_order: number | null
+          facebook_url: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          soundcloud_url: string | null
+          spotify_url: string | null
+          tiktok_url: string | null
+          twitter_url: string | null
+          updated_at: string
+          website_url: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          apple_music_url?: string | null
+          bandcamp_url?: string | null
+          bio?: string | null
+          created_at?: string
+          created_by?: string | null
+          display_order?: number | null
+          facebook_url?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          soundcloud_url?: string | null
+          spotify_url?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+          website_url?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          apple_music_url?: string | null
+          bandcamp_url?: string | null
+          bio?: string | null
+          created_at?: string
+          created_by?: string | null
+          display_order?: number | null
+          facebook_url?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          soundcloud_url?: string | null
+          spotify_url?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+          website_url?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       hair_styles: {
         Row: {
           base_price: number | null
@@ -1313,6 +1418,260 @@ export type Database = {
         }
         Relationships: []
       }
+      iwitty_admin_accounts: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      iwitty_appointments: {
+        Row: {
+          admin_comments: string | null
+          appointment_date: string
+          appointment_time: string
+          client_id: string
+          confirmation_sent: boolean | null
+          created_at: string
+          estimated_duration: number | null
+          id: string
+          price_quote: number | null
+          special_requests: string | null
+          status: string
+          style_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_comments?: string | null
+          appointment_date: string
+          appointment_time: string
+          client_id: string
+          confirmation_sent?: boolean | null
+          created_at?: string
+          estimated_duration?: number | null
+          id?: string
+          price_quote?: number | null
+          special_requests?: string | null
+          status?: string
+          style_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_comments?: string | null
+          appointment_date?: string
+          appointment_time?: string
+          client_id?: string
+          confirmation_sent?: boolean | null
+          created_at?: string
+          estimated_duration?: number | null
+          id?: string
+          price_quote?: number | null
+          special_requests?: string | null
+          status?: string
+          style_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_iwitty_appointments_client_profile"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "iwitty_profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "iwitty_appointments_style_id_fkey"
+            columns: ["style_id"]
+            isOneToOne: false
+            referencedRelation: "iwitty_hair_styles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iwitty_hair_styles: {
+        Row: {
+          base_price: number | null
+          created_at: string
+          description: string | null
+          duration_hours: number | null
+          id: string
+          name: string
+        }
+        Insert: {
+          base_price?: number | null
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          id?: string
+          name: string
+        }
+        Update: {
+          base_price?: number | null
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      iwitty_portfolio_images: {
+        Row: {
+          client_name: string | null
+          completion_date: string | null
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          image_url: string
+          is_featured: boolean | null
+          style_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          client_name?: string | null
+          completion_date?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_featured?: boolean | null
+          style_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          client_name?: string | null
+          completion_date?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_featured?: boolean | null
+          style_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iwitty_portfolio_images_style_id_fkey"
+            columns: ["style_id"]
+            isOneToOne: false
+            referencedRelation: "iwitty_hair_styles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iwitty_profiles: {
+        Row: {
+          address: string | null
+          allergies: string | null
+          city: string | null
+          created_at: string
+          email: string | null
+          first_name: string
+          hair_type: string | null
+          id: string
+          last_name: string
+          phone: string | null
+          preferred_contact: string | null
+          state: string | null
+          updated_at: string
+          user_id: string
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          allergies?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          first_name: string
+          hair_type?: string | null
+          id?: string
+          last_name: string
+          phone?: string | null
+          preferred_contact?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id: string
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          allergies?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string
+          hair_type?: string | null
+          id?: string
+          last_name?: string
+          phone?: string | null
+          preferred_contact?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id?: string
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      multichain_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       music_videos: {
         Row: {
           approved_at: string | null
@@ -1362,10 +1721,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "music_videos_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "public_por_eve_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "music_videos_artist_id_fkey"
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "por_eve_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "music_videos_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "public_por_eve_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2169,6 +2542,7 @@ export type Database = {
           id: string
           instagram_url: string | null
           is_email_public: boolean | null
+          project_id: string
           soundcloud_url: string | null
           spotify_url: string | null
           state: string | null
@@ -2190,6 +2564,7 @@ export type Database = {
           id: string
           instagram_url?: string | null
           is_email_public?: boolean | null
+          project_id?: string
           soundcloud_url?: string | null
           spotify_url?: string | null
           state?: string | null
@@ -2211,6 +2586,7 @@ export type Database = {
           id?: string
           instagram_url?: string | null
           is_email_public?: boolean | null
+          project_id?: string
           soundcloud_url?: string | null
           spotify_url?: string | null
           state?: string | null
@@ -2697,6 +3073,13 @@ export type Database = {
             referencedRelation: "por_eve_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_user_events_created_by"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "public_por_eve_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -2812,7 +3195,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_por_eve_profiles: {
+        Row: {
+          avatar_url: string | null
+          bandcamp_url: string | null
+          city: string | null
+          display_name: string | null
+          facebook_url: string | null
+          id: string | null
+          instagram_url: string | null
+          soundcloud_url: string | null
+          spotify_url: string | null
+          state: string | null
+          twitter_url: string | null
+          username: string | null
+          website_url: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bandcamp_url?: string | null
+          city?: string | null
+          display_name?: string | null
+          facebook_url?: string | null
+          id?: string | null
+          instagram_url?: string | null
+          soundcloud_url?: string | null
+          spotify_url?: string | null
+          state?: string | null
+          twitter_url?: string | null
+          username?: string | null
+          website_url?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bandcamp_url?: string | null
+          city?: string | null
+          display_name?: string | null
+          facebook_url?: string | null
+          id?: string | null
+          instagram_url?: string | null
+          soundcloud_url?: string | null
+          spotify_url?: string | null
+          state?: string | null
+          twitter_url?: string | null
+          username?: string | null
+          website_url?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       approve_import_batch: {
