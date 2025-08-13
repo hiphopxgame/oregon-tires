@@ -19,6 +19,7 @@ import autoRepairImg from '@/assets/auto-repair.jpg';
 import specializedToolsImg from '@/assets/specialized-tools.jpg';
 
 const fallbackImages = {
+  'hero-background': '/lovable-uploads/afc0de17-b407-4b29-b6a2-6f44d5dcad0d.png',
   'expert-technicians': expertTechniciansImg,
   'fast-cars': fastCarsImg,
   'quality-car-parts': qualityCarPartsImg,

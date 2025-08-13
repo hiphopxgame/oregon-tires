@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useServiceImagesForFrontend } from "@/hooks/useServiceImagesForFrontend";
 
 interface HeroProps {
   translations: any;
@@ -21,16 +22,21 @@ const OregonTiresHero: React.FC<HeroProps> = ({
   openScheduleForm
 }) => {
   const t = translations;
+  const { getImageUrl, getImageStyle } = useServiceImagesForFrontend();
+
+  const heroBackgroundUrl = getImageUrl('hero-background');
+  const heroImageStyle = getImageStyle('hero-background');
 
   return (
     <section 
       className="text-white py-20 relative"
       style={{ 
         backgroundColor: primaryColor,
-        backgroundImage: `url('/lovable-uploads/afc0de17-b407-4b29-b6a2-6f44d5dcad0d.png')`,
+        backgroundImage: `url('${heroBackgroundUrl}')`,
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundPosition: heroImageStyle.backgroundPosition,
+        backgroundRepeat: 'no-repeat',
+        transform: heroImageStyle.transform
       }}
     >
       {/* Dark overlay for better text readability */}

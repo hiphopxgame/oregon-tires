@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 
 // Define the service keys that match the home page services
 const homePageServices = [
+  { key: 'hero-background', title: 'Hero Background Image', assetName: 'hero-background' },
   { key: 'expert-technicians', title: 'Expert Technicians', assetName: 'expert-technicians' },
   { key: 'fast-cars', title: 'Quick Service', assetName: 'fast-cars' },
   { key: 'quality-car-parts', title: 'Quality Parts', assetName: 'quality-car-parts' },
@@ -191,7 +192,7 @@ const ServiceImagesManager = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Service Images Manager</h2>
-          <p className="text-gray-600 mt-1">Manage the 7 live service images displayed on the home page</p>
+          <p className="text-gray-600 mt-1">Manage the hero background and 7 service images displayed on the home page</p>
         </div>
       </div>
 
@@ -311,21 +312,44 @@ const ServiceImagesManager = () => {
             <CardContent className="space-y-4">
               {/* Current Image Preview */}
               <div className="relative h-48 bg-gray-100 rounded-lg overflow-hidden">
-                <div 
-                  className="absolute inset-0 bg-cover transition-all duration-300"
-                  style={{ 
-                    backgroundImage: `url(${serviceImage.image_url})`,
-                    backgroundPosition: `${serviceImage.position_x}% ${serviceImage.position_y}%`,
-                    transform: `scale(${serviceImage.scale})`,
-                  }}
-                />
-                <div className="absolute inset-0 bg-black/30" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <div className="bg-white/95 backdrop-blur-sm rounded-lg p-3">
-                    <h4 className="font-semibold text-gray-800">{serviceImage.title}</h4>
-                    <p className="text-gray-600 text-sm">Sample description text</p>
+                {serviceImage.service_key === 'hero-background' ? (
+                  // Hero background preview
+                  <div 
+                    className="absolute inset-0 bg-cover transition-all duration-300"
+                    style={{ 
+                      backgroundImage: `url(${serviceImage.image_url})`,
+                      backgroundPosition: `${serviceImage.position_x}% ${serviceImage.position_y}%`,
+                      transform: `scale(${serviceImage.scale})`,
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-black/50" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center text-white">
+                        <h3 className="text-2xl font-bold mb-2">Oregon Tires</h3>
+                        <p className="text-lg">Preview of hero section</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  // Service card preview
+                  <>
+                    <div 
+                      className="absolute inset-0 bg-cover transition-all duration-300"
+                      style={{ 
+                        backgroundImage: `url(${serviceImage.image_url})`,
+                        backgroundPosition: `${serviceImage.position_x}% ${serviceImage.position_y}%`,
+                        transform: `scale(${serviceImage.scale})`,
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/30" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <div className="bg-white/95 backdrop-blur-sm rounded-lg p-3">
+                        <h4 className="font-semibold text-gray-800">{serviceImage.title}</h4>
+                        <p className="text-gray-600 text-sm">Sample description text</p>
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div className="absolute top-2 right-2 flex gap-2">
                   <Badge className="bg-green-500">
                     <Clock className="h-3 w-3 mr-1" />
