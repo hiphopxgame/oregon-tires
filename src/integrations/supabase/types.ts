@@ -7,13 +7,58 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
+      _members: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          is_public: boolean | null
+          social_accounts: Json | null
+          updated_at: string
+          user_id: string
+          username: string
+          verified: boolean | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          is_public?: boolean | null
+          social_accounts?: Json | null
+          updated_at?: string
+          user_id: string
+          username: string
+          verified?: boolean | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          is_public?: boolean | null
+          social_accounts?: Json | null
+          updated_at?: string
+          user_id?: string
+          username?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       admin_accounts: {
         Row: {
           created_at: string | null
@@ -1642,6 +1687,77 @@ export type Database = {
         }
         Relationships: []
       }
+      member_social_accounts: {
+        Row: {
+          connected_at: string
+          id: string
+          member_id: string
+          provider: string
+          provider_email: string | null
+          provider_id: string
+          provider_username: string | null
+        }
+        Insert: {
+          connected_at?: string
+          id?: string
+          member_id: string
+          provider: string
+          provider_email?: string | null
+          provider_id: string
+          provider_username?: string | null
+        }
+        Update: {
+          connected_at?: string
+          id?: string
+          member_id?: string
+          provider?: string
+          provider_email?: string | null
+          provider_id?: string
+          provider_username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_social_accounts_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      members: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
       multichain_profiles: {
         Row: {
           avatar_url: string | null
@@ -3267,23 +3383,23 @@ export type Database = {
       get_admin_users: {
         Args: Record<PropertyKey, never>
         Returns: {
-          id: string
-          email: string
-          name: string
-          is_admin: boolean
           created_at: string
-          updated_at: string
+          email: string
+          id: string
+          is_admin: boolean
           last_sign_in_at: string
+          name: string
+          updated_at: string
         }[]
       }
       handle_community_purchase: {
-        Args: { p_user_id: string; p_cash_amount: number }
+        Args: { p_cash_amount: number; p_user_id: string }
         Returns: undefined
       }
       has_role: {
         Args: {
-          _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
         }
         Returns: boolean
       }
@@ -3313,13 +3429,13 @@ export type Database = {
       }
       set_admin_by_email: {
         Args:
-          | { user_email: string }
-          | { user_email: string; admin_status?: boolean }
           | {
-              user_email: string
               admin_status?: boolean
               target_project_id?: string
+              user_email: string
             }
+          | { admin_status?: boolean; user_email: string }
+          | { user_email: string }
         Returns: boolean
       }
       setup_admin_user: {
