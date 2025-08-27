@@ -18,7 +18,7 @@ export const useEmployeeAppointments = () => {
       const today = new Date().toISOString().split('T')[0];
       
       const { data: appointments, error } = await supabase
-        .from('oregon_tires_appointments')
+        .from('oretir_appointments')
         .select('assigned_employee_id, preferred_date, service, status')
         .not('assigned_employee_id', 'is', null)
         .gte('preferred_date', today)
@@ -76,7 +76,7 @@ export const useEmployeeAppointments = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'oregon_tires_appointments'
+          table: 'oretir_appointments'
         },
         () => {
           setTimeout(() => fetchEmployeeAppointments(), 100);

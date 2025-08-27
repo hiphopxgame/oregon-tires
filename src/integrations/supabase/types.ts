@@ -1925,24 +1925,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "music_videos_approved_by_fkey"
-            columns: ["approved_by"]
-            isOneToOne: false
-            referencedRelation: "public_por_eve_profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "music_videos_artist_id_fkey"
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "por_eve_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "music_videos_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "public_por_eve_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2156,6 +2142,7 @@ export type Database = {
           tire_size: string | null
           travel_cost_estimate: number | null
           travel_distance_miles: number | null
+          updated_at: string
           vehicle_id: string | null
           vin: string | null
         }
@@ -2187,6 +2174,7 @@ export type Database = {
           tire_size?: string | null
           travel_cost_estimate?: number | null
           travel_distance_miles?: number | null
+          updated_at?: string
           vehicle_id?: string | null
           vin?: string | null
         }
@@ -2218,6 +2206,7 @@ export type Database = {
           tire_size?: string | null
           travel_cost_estimate?: number | null
           travel_distance_miles?: number | null
+          updated_at?: string
           vehicle_id?: string | null
           vin?: string | null
         }
@@ -3277,13 +3266,6 @@ export type Database = {
             referencedRelation: "por_eve_profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "fk_user_events_created_by"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "public_por_eve_profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       user_roles: {
@@ -3399,57 +3381,7 @@ export type Database = {
       }
     }
     Views: {
-      public_por_eve_profiles: {
-        Row: {
-          avatar_url: string | null
-          bandcamp_url: string | null
-          city: string | null
-          display_name: string | null
-          facebook_url: string | null
-          id: string | null
-          instagram_url: string | null
-          soundcloud_url: string | null
-          spotify_url: string | null
-          state: string | null
-          twitter_url: string | null
-          username: string | null
-          website_url: string | null
-          youtube_url: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bandcamp_url?: string | null
-          city?: string | null
-          display_name?: string | null
-          facebook_url?: string | null
-          id?: string | null
-          instagram_url?: string | null
-          soundcloud_url?: string | null
-          spotify_url?: string | null
-          state?: string | null
-          twitter_url?: string | null
-          username?: string | null
-          website_url?: string | null
-          youtube_url?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bandcamp_url?: string | null
-          city?: string | null
-          display_name?: string | null
-          facebook_url?: string | null
-          id?: string | null
-          instagram_url?: string | null
-          soundcloud_url?: string | null
-          spotify_url?: string | null
-          state?: string | null
-          twitter_url?: string | null
-          username?: string | null
-          website_url?: string | null
-          youtube_url?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       approve_import_batch: {
