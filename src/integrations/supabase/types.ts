@@ -1933,117 +1933,6 @@ export type Database = {
           },
         ]
       }
-      oregon_tires_appointments: {
-        Row: {
-          actual_duration_minutes: number | null
-          actual_duration_seconds: number | null
-          assigned_employee_id: string | null
-          completed_at: string | null
-          created_at: string
-          customer_address: string | null
-          customer_city: string | null
-          customer_state: string | null
-          customer_zip: string | null
-          email: string
-          first_name: string
-          id: string
-          language: string
-          last_name: string
-          license_plate: string | null
-          message: string | null
-          phone: string | null
-          preferred_date: string
-          preferred_time: string
-          service: string
-          service_location: string | null
-          started_at: string | null
-          status: string
-          tire_size: string | null
-          travel_cost_estimate: number | null
-          travel_distance_miles: number | null
-          updated_at: string
-          vehicle_id: string | null
-          vin: string | null
-        }
-        Insert: {
-          actual_duration_minutes?: number | null
-          actual_duration_seconds?: number | null
-          assigned_employee_id?: string | null
-          completed_at?: string | null
-          created_at?: string
-          customer_address?: string | null
-          customer_city?: string | null
-          customer_state?: string | null
-          customer_zip?: string | null
-          email: string
-          first_name: string
-          id?: string
-          language?: string
-          last_name: string
-          license_plate?: string | null
-          message?: string | null
-          phone?: string | null
-          preferred_date: string
-          preferred_time: string
-          service: string
-          service_location?: string | null
-          started_at?: string | null
-          status?: string
-          tire_size?: string | null
-          travel_cost_estimate?: number | null
-          travel_distance_miles?: number | null
-          updated_at?: string
-          vehicle_id?: string | null
-          vin?: string | null
-        }
-        Update: {
-          actual_duration_minutes?: number | null
-          actual_duration_seconds?: number | null
-          assigned_employee_id?: string | null
-          completed_at?: string | null
-          created_at?: string
-          customer_address?: string | null
-          customer_city?: string | null
-          customer_state?: string | null
-          customer_zip?: string | null
-          email?: string
-          first_name?: string
-          id?: string
-          language?: string
-          last_name?: string
-          license_plate?: string | null
-          message?: string | null
-          phone?: string | null
-          preferred_date?: string
-          preferred_time?: string
-          service?: string
-          service_location?: string | null
-          started_at?: string | null
-          status?: string
-          tire_size?: string | null
-          travel_cost_estimate?: number | null
-          travel_distance_miles?: number | null
-          updated_at?: string
-          vehicle_id?: string | null
-          vin?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "oregon_tires_appointments_assigned_employee_id_fkey"
-            columns: ["assigned_employee_id"]
-            isOneToOne: false
-            referencedRelation: "oretir_employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "oregon_tires_appointments_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "customer_vehicles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       oregon_tires_contact_messages: {
         Row: {
           created_at: string
@@ -2321,15 +2210,7 @@ export type Database = {
           sent_at?: string
           subject?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "oregon_tires_email_logs_appointment_id_fkey"
-            columns: ["appointment_id"]
-            isOneToOne: false
-            referencedRelation: "oregon_tires_appointments"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       oretir_employee_schedules: {
         Row: {
