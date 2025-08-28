@@ -271,6 +271,7 @@ export type Database = {
           facebook_url: string | null
           id: string
           instagram_url: string | null
+          is_email_public: boolean | null
           is_featured: boolean | null
           is_public: boolean | null
           name: string
@@ -294,6 +295,7 @@ export type Database = {
           facebook_url?: string | null
           id?: string
           instagram_url?: string | null
+          is_email_public?: boolean | null
           is_featured?: boolean | null
           is_public?: boolean | null
           name: string
@@ -317,6 +319,7 @@ export type Database = {
           facebook_url?: string | null
           id?: string
           instagram_url?: string | null
+          is_email_public?: boolean | null
           is_featured?: boolean | null
           is_public?: boolean | null
           name?: string
