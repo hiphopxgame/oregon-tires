@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 
 const NotFound = () => {
@@ -29,12 +29,12 @@ const NotFound = () => {
           Sorry, the page you're looking for doesn't exist or has been moved.
         </p>
         
-        <a 
-          href="/" 
+        <Link 
+          to="/" 
           className="inline-block bg-[#007030] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#005a24] transition-colors"
         >
           Return to Home
-        </a>
+        </Link>
       </div>
     </div>
   );

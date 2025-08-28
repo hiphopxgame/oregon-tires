@@ -39,7 +39,7 @@ export const EmployeeProfile = () => {
         .from('oretir_employees')
         .select('*')
         .eq('email', user?.email)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 

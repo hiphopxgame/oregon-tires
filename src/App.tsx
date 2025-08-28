@@ -24,6 +24,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<OregonTires />} />
+          <Route path="/oregon-tires" element={<OregonTires />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={
             <ProtectedAdminRoute>
