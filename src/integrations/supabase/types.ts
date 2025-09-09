@@ -227,6 +227,9 @@ export type Database = {
           id: string
           image_url: string
           is_featured: boolean | null
+          position_x: number | null
+          position_y: number | null
+          scale: number | null
           updated_at: string
         }
         Insert: {
@@ -237,6 +240,9 @@ export type Database = {
           id?: string
           image_url: string
           is_featured?: boolean | null
+          position_x?: number | null
+          position_y?: number | null
+          scale?: number | null
           updated_at?: string
         }
         Update: {
@@ -247,6 +253,9 @@ export type Database = {
           id?: string
           image_url?: string
           is_featured?: boolean | null
+          position_x?: number | null
+          position_y?: number | null
+          scale?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -271,6 +280,7 @@ export type Database = {
           facebook_url: string | null
           id: string
           instagram_url: string | null
+          is_archived: boolean | null
           is_email_public: boolean | null
           is_featured: boolean | null
           is_public: boolean | null
@@ -295,6 +305,7 @@ export type Database = {
           facebook_url?: string | null
           id?: string
           instagram_url?: string | null
+          is_archived?: boolean | null
           is_email_public?: boolean | null
           is_featured?: boolean | null
           is_public?: boolean | null
@@ -319,6 +330,7 @@ export type Database = {
           facebook_url?: string | null
           id?: string
           instagram_url?: string | null
+          is_archived?: boolean | null
           is_email_public?: boolean | null
           is_featured?: boolean | null
           is_public?: boolean | null
@@ -546,6 +558,281 @@ export type Database = {
           updated_at?: string
           user_id?: string
           zip_code?: string | null
+        }
+        Relationships: []
+      }
+      cbake_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          inquiry_type: string
+          message: string
+          name: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          inquiry_type: string
+          message: string
+          name: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          inquiry_type?: string
+          message?: string
+          name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cbake_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "cbake_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      cbake_newsletter_subscriptions: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cbake_orders: {
+        Row: {
+          created_at: string
+          delivery: string
+          dough_type: string
+          email: string
+          estimated_total: number | null
+          filling: string
+          id: string
+          name: string
+          order_type: string
+          phone: string | null
+          product_id: string | null
+          product_name: string | null
+          quantity: number
+          special_instructions: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          delivery: string
+          dough_type: string
+          email: string
+          estimated_total?: number | null
+          filling: string
+          id?: string
+          name: string
+          order_type: string
+          phone?: string | null
+          product_id?: string | null
+          product_name?: string | null
+          quantity?: number
+          special_instructions?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          delivery?: string
+          dough_type?: string
+          email?: string
+          estimated_total?: number | null
+          filling?: string
+          id?: string
+          name?: string
+          order_type?: string
+          phone?: string | null
+          product_id?: string | null
+          product_name?: string | null
+          quantity?: number
+          special_instructions?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cbake_orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "cbake_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cbake_orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "cbake_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      cbake_products: {
+        Row: {
+          base_price: number | null
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          image_url: string | null
+          ingredients: string | null
+          is_active: boolean
+          name: string
+          origin: string | null
+          product_type: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          base_price?: number | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          ingredients?: string | null
+          is_active?: boolean
+          name: string
+          origin?: string | null
+          product_type: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          base_price?: number | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          ingredients?: string | null
+          is_active?: boolean
+          name?: string
+          origin?: string | null
+          product_type?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cbake_profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          is_admin: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          is_admin?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          is_admin?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      cbake_quotes: {
+        Row: {
+          admin_notes: string | null
+          business_name: string | null
+          catering_services: Json | null
+          created_at: string
+          email: string
+          event_date: string | null
+          event_type: string | null
+          guest_count: number | null
+          id: string
+          name: string
+          phone: string | null
+          quoted_amount: number | null
+          special_requirements: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          business_name?: string | null
+          catering_services?: Json | null
+          created_at?: string
+          email: string
+          event_date?: string | null
+          event_type?: string | null
+          guest_count?: number | null
+          id?: string
+          name: string
+          phone?: string | null
+          quoted_amount?: number | null
+          special_requirements?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          business_name?: string | null
+          catering_services?: Json | null
+          created_at?: string
+          email?: string
+          event_date?: string | null
+          event_type?: string | null
+          guest_count?: number | null
+          id?: string
+          name?: string
+          phone?: string | null
+          quoted_amount?: number | null
+          special_requirements?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -3308,6 +3595,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_cbake_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }

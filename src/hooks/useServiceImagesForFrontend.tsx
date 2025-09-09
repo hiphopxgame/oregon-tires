@@ -9,24 +9,16 @@ interface ServiceImage {
   scale: number;
 }
 
-// Import fallback images from existing assets
-import expertTechniciansImg from '@/assets/expert-technicians.jpg';
-import fastCarsImg from '@/assets/fast-cars.jpg';
-import qualityCarPartsImg from '@/assets/quality-parts.jpg';
-import bilingualSupportImg from '@/assets/bilingual-service.jpg';
-import tireShopImg from '@/assets/tire-services.jpg';
-import autoRepairImg from '@/assets/auto-maintenance.jpg';
-import specializedToolsImg from '@/assets/specialized-services.jpg';
-
-const fallbackImages = {
+// Fallback images served from public folder to avoid build-time imports
+const fallbackImages: Record<string, string> = {
   'hero-background': '/lovable-uploads/afc0de17-b407-4b29-b6a2-6f44d5dcad0d.png',
-  'expert-technicians': expertTechniciansImg,
-  'fast-cars': fastCarsImg,
-  'quality-car-parts': qualityCarPartsImg,
-  'bilingual-support': bilingualSupportImg,
-  'tire-shop': tireShopImg,
-  'auto-repair': autoRepairImg,
-  'specialized-tools': specializedToolsImg,
+  'expert-technicians': '/images/expert-technicians.jpg',
+  'fast-cars': '/images/fast-cars.jpg',
+  'quality-car-parts': '/images/quality-parts.jpg',
+  'bilingual-support': '/images/bilingual-service.jpg',
+  'tire-shop': '/images/tire-services.jpg',
+  'auto-repair': '/images/auto-maintenance.jpg',
+  'specialized-tools': '/images/specialized-services.jpg',
 };
 
 export const useServiceImagesForFrontend = () => {
