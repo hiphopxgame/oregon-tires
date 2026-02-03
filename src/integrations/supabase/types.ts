@@ -14,6 +14,160 @@ export type Database = {
   }
   public: {
     Tables: {
+      _hhid_account: {
+        Row: {
+          accessToken: string | null
+          accessTokenExpiresAt: string | null
+          accountId: string
+          createdAt: string
+          id: string
+          idToken: string | null
+          password: string | null
+          providerId: string
+          refreshToken: string | null
+          refreshTokenExpiresAt: string | null
+          scope: string | null
+          updatedAt: string
+          userId: string
+        }
+        Insert: {
+          accessToken?: string | null
+          accessTokenExpiresAt?: string | null
+          accountId: string
+          createdAt?: string
+          id: string
+          idToken?: string | null
+          password?: string | null
+          providerId: string
+          refreshToken?: string | null
+          refreshTokenExpiresAt?: string | null
+          scope?: string | null
+          updatedAt?: string
+          userId: string
+        }
+        Update: {
+          accessToken?: string | null
+          accessTokenExpiresAt?: string | null
+          accountId?: string
+          createdAt?: string
+          id?: string
+          idToken?: string | null
+          password?: string | null
+          providerId?: string
+          refreshToken?: string | null
+          refreshTokenExpiresAt?: string | null
+          scope?: string | null
+          updatedAt?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "_hhid_account_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "_hhid_user"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      _hhid_session: {
+        Row: {
+          createdAt: string
+          expiresAt: string
+          id: string
+          ipAddress: string | null
+          token: string
+          updatedAt: string
+          userAgent: string | null
+          userId: string
+        }
+        Insert: {
+          createdAt?: string
+          expiresAt: string
+          id: string
+          ipAddress?: string | null
+          token: string
+          updatedAt?: string
+          userAgent?: string | null
+          userId: string
+        }
+        Update: {
+          createdAt?: string
+          expiresAt?: string
+          id?: string
+          ipAddress?: string | null
+          token?: string
+          updatedAt?: string
+          userAgent?: string | null
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "_hhid_session_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "_hhid_user"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      _hhid_user: {
+        Row: {
+          createdAt: string
+          email: string
+          emailVerified: boolean
+          id: string
+          image: string | null
+          name: string
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          email: string
+          emailVerified?: boolean
+          id: string
+          image?: string | null
+          name: string
+          updatedAt?: string
+        }
+        Update: {
+          createdAt?: string
+          email?: string
+          emailVerified?: boolean
+          id?: string
+          image?: string | null
+          name?: string
+          updatedAt?: string
+        }
+        Relationships: []
+      }
+      _hhid_verification: {
+        Row: {
+          createdAt: string
+          expiresAt: string
+          id: string
+          identifier: string
+          updatedAt: string
+          value: string
+        }
+        Insert: {
+          createdAt?: string
+          expiresAt: string
+          id: string
+          identifier: string
+          updatedAt?: string
+          value: string
+        }
+        Update: {
+          createdAt?: string
+          expiresAt?: string
+          id?: string
+          identifier?: string
+          updatedAt?: string
+          value?: string
+        }
+        Relationships: []
+      }
       _members: {
         Row: {
           avatar_url: string | null
@@ -292,6 +446,7 @@ export type Database = {
           is_featured: boolean | null
           is_public: boolean | null
           name: string
+          slug: string
           soundcloud_url: string | null
           spotify_url: string | null
           tiktok_url: string | null
@@ -317,6 +472,7 @@ export type Database = {
           is_featured?: boolean | null
           is_public?: boolean | null
           name: string
+          slug: string
           soundcloud_url?: string | null
           spotify_url?: string | null
           tiktok_url?: string | null
@@ -342,6 +498,7 @@ export type Database = {
           is_featured?: boolean | null
           is_public?: boolean | null
           name?: string
+          slug?: string
           soundcloud_url?: string | null
           spotify_url?: string | null
           tiktok_url?: string | null
@@ -575,6 +732,48 @@ export type Database = {
         }
         Relationships: []
       }
+      cbake_cart_items: {
+        Row: {
+          created_at: string
+          dough_type: string | null
+          filling: string | null
+          id: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          special_instructions: string | null
+          unit_price: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          dough_type?: string | null
+          filling?: string | null
+          id?: string
+          product_id?: string | null
+          product_name: string
+          quantity?: number
+          special_instructions?: string | null
+          unit_price: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          dough_type?: string | null
+          filling?: string | null
+          id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          special_instructions?: string | null
+          unit_price?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       cbake_messages: {
         Row: {
           created_at: string
@@ -645,13 +844,17 @@ export type Database = {
       }
       cbake_orders: {
         Row: {
+          business_location: string | null
+          company_name: string | null
           created_at: string
           delivery: string
           dough_type: string
           email: string
           estimated_total: number | null
           filling: string
+          first_name: string
           id: string
+          last_name: string | null
           name: string
           order_type: string
           phone: string | null
@@ -664,13 +867,17 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          business_location?: string | null
+          company_name?: string | null
           created_at?: string
           delivery: string
           dough_type: string
           email: string
           estimated_total?: number | null
           filling: string
+          first_name: string
           id?: string
+          last_name?: string | null
           name: string
           order_type: string
           phone?: string | null
@@ -683,13 +890,17 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          business_location?: string | null
+          company_name?: string | null
           created_at?: string
           delivery?: string
           dough_type?: string
           email?: string
           estimated_total?: number | null
           filling?: string
+          first_name?: string
           id?: string
+          last_name?: string | null
           name?: string
           order_type?: string
           phone?: string | null
@@ -850,6 +1061,44 @@ export type Database = {
         }
         Relationships: []
       }
+      consultation_access_log: {
+        Row: {
+          access_type: string
+          accessed_at: string | null
+          accessed_by: string | null
+          consultation_id: string | null
+          id: string
+          ip_address: unknown
+          user_agent: string | null
+        }
+        Insert: {
+          access_type: string
+          accessed_at?: string | null
+          accessed_by?: string | null
+          consultation_id?: string | null
+          id?: string
+          ip_address?: unknown
+          user_agent?: string | null
+        }
+        Update: {
+          access_type?: string
+          accessed_at?: string | null
+          accessed_by?: string | null
+          consultation_id?: string | null
+          id?: string
+          ip_address?: unknown
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_access_log_consultation_id_fkey"
+            columns: ["consultation_id"]
+            isOneToOne: false
+            referencedRelation: "pormar_consultation_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_messages: {
         Row: {
           company: string | null
@@ -934,7 +1183,7 @@ export type Database = {
           created_at: string
           event_type: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           user_id: string | null
         }
@@ -943,7 +1192,7 @@ export type Database = {
           created_at?: string
           event_type: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -952,7 +1201,7 @@ export type Database = {
           created_at?: string
           event_type?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -3790,24 +4039,20 @@ export type Database = {
       }
     }
     Functions: {
-      approve_import_batch: {
-        Args: { batch_id: string }
-        Returns: undefined
+      approve_import_batch: { Args: { batch_id: string }; Returns: undefined }
+      can_access_consultation: {
+        Args: { consultation_id: string }
+        Returns: boolean
       }
-      create_admin_user: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      create_admin_user: { Args: never; Returns: undefined }
       create_employee_auth_account: {
         Args: { employee_email: string; temporary_password?: string }
         Returns: string
       }
-      format_service_name: {
-        Args: { service_slug: string }
-        Returns: string
-      }
+      format_service_name: { Args: { service_slug: string }; Returns: string }
+      generate_slug: { Args: { input_text: string }; Returns: string }
       get_admin_users: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           email: string
@@ -3829,53 +4074,29 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_cbake_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_current_user_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_hiphop_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_iwitty_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_pdxbus_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_super_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      set_admin_by_email: {
-        Args:
-          | {
+      is_admin: { Args: never; Returns: boolean }
+      is_cbake_admin: { Args: never; Returns: boolean }
+      is_current_user_admin: { Args: never; Returns: boolean }
+      is_hiphop_admin: { Args: never; Returns: boolean }
+      is_iwitty_admin: { Args: never; Returns: boolean }
+      is_pdxbus_admin: { Args: never; Returns: boolean }
+      is_super_admin: { Args: never; Returns: boolean }
+      set_admin_by_email:
+        | { Args: { user_email: string }; Returns: undefined }
+        | {
+            Args: { admin_status?: boolean; user_email: string }
+            Returns: boolean
+          }
+        | {
+            Args: {
               admin_status?: boolean
               target_project_id?: string
               user_email: string
             }
-          | { admin_status?: boolean; user_email: string }
-          | { user_email: string }
-        Returns: boolean
-      }
-      setup_admin_user: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      upgrade_to_artist: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+            Returns: boolean
+          }
+      setup_admin_user: { Args: never; Returns: undefined }
+      upgrade_to_artist: { Args: never; Returns: undefined }
       user_hosts_game: {
         Args: { game_id: string; user_id: string }
         Returns: boolean
