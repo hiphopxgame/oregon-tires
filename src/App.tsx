@@ -13,6 +13,7 @@ import Translate from "./pages/Translate";
 import NotFound from "./pages/NotFound";
 import { EmployeeProfile } from "./pages/EmployeeProfile";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import DatabaseDownload from "./pages/DatabaseDownload";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/book-appointment" element={<AppointmentBooking />} />
           <Route path="/programar-servicio" element={<ProgramarServicio />} />
           <Route path="/translate" element={<Translate />} />
+          <Route path="/database" element={<DatabaseDownload />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
