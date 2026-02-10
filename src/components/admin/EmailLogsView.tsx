@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Mail, Eye, Calendar, Clock, User } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { format } from 'date-fns';
 
 interface EmailLog {
@@ -151,7 +152,7 @@ export const EmailLogsView = () => {
                           <strong>Email Content:</strong>
                           <ScrollArea className="h-96 mt-2 border rounded p-4">
                             <div 
-                              dangerouslySetInnerHTML={{ __html: log.body }}
+                              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(log.body) }}
                               className="prose prose-sm max-w-none"
                             />
                           </ScrollArea>

@@ -5,7 +5,7 @@ import { Resend } from "npm:resend@2.0.0";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 interface CreateAccountRequest {
@@ -15,15 +15,47 @@ interface CreateAccountRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Authenticate the caller
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized", success: false }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const callerClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await callerClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized", success: false }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Verify the caller is an admin
+    const { data: isAdmin, error: adminError } = await callerClient.rpc("is_admin");
+    if (adminError || !isAdmin) {
+      return new Response(
+        JSON.stringify({ error: "Admin privileges required", success: false }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const { email, employeeName, temporaryPassword = "TempPass123!" }: CreateAccountRequest = await req.json();
 
-    // Create Supabase admin client
+    // Create Supabase admin client for user creation
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -35,7 +67,6 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    // Create the user account
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: email,
       password: temporaryPassword,
@@ -52,7 +83,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('User created successfully:', authData.user.id);
 
-    // Initialize Resend for sending welcome email
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     
     if (resend) {
@@ -94,7 +124,6 @@ const handler = async (req: Request): Promise<Response> => {
         console.log("Welcome email sent successfully:", emailResponse);
       } catch (emailError) {
         console.error("Error sending welcome email:", emailError);
-        // Don't fail the whole process if email fails
       }
     }
 
