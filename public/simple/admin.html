@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oregon Tires Admin Dashboard</title>
+  <meta name="robots" content="noindex, nofollow">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#0D3618',
+            accent: '#FFFE03',
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    .tab-active { background-color: #0D3618; color: white; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-confirmed { background: #d1fae5; color: #065f46; }
+    .status-completed { background: #dbeafe; color: #1e40af; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    .status-new { background: #e0e7ff; color: #3730a3; }
+    .status-read { background: #f3f4f6; color: #374151; }
+    .status-replied { background: #d1fae5; color: #065f46; }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-overlay { background: rgba(0,0,0,0.5); }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="min-h-screen flex items-center justify-center bg-brand">
+    <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+      <div class="text-center mb-6">
+        <img src="/lovable-uploads/1290fb5e-e45c-4fc3-b523-e71d756ec1ef.png" alt="Oregon Tires" class="h-16 mx-auto mb-4">
+        <h1 class="text-2xl font-bold text-brand">Admin Dashboard</h1>
+        <p class="text-gray-500 mt-1">Sign in to manage your business</p>
+      </div>
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" id="login-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input type="password" id="login-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        </div>
+        <button type="submit" id="login-btn" class="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:opacity-90 transition">Sign In</button>
+        <div id="login-error" class="text-red-600 text-sm text-center hidden"></div>
+      </form>
+      <div class="mt-4 text-center">
+        <a href="/simple/" class="text-brand text-sm hover:underline">← Back to website</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div id="admin-dashboard" class="hidden">
+    <!-- Header -->
+    <header class="bg-brand text-white shadow-lg">
+      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <img src="/lovable-uploads/1290fb5e-e45c-4fc3-b523-e71d756ec1ef.png" alt="Oregon Tires" class="h-10">
+          <div>
+            <h1 class="text-lg font-bold">Admin Dashboard</h1>
+            <p class="text-xs text-green-200" id="admin-email"></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="/simple/" class="text-sm hover:text-yellow-200">View Site</a>
+          <button onclick="signOut()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition">Sign Out</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-white shadow-sm border-b">
+      <div class="container mx-auto px-4">
+        <div class="flex gap-1 overflow-x-auto py-2" id="nav-tabs">
+          <button onclick="switchTab('overview')" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition">📊 Overview</button>
+          <button onclick="switchTab('appointments')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition hover:bg-gray-100">📅 Appointments</button>
+          <button onclick="switchTab('messages')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition hover:bg-gray-100">💬 Messages</button>
+          <button onclick="switchTab('employees')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition hover:bg-gray-100">👥 Employees</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="container mx-auto px-4 py-6">
+      <!-- OVERVIEW TAB -->
+      <div id="tab-overview" class="tab-content fade-in">
+        <h2 class="text-2xl font-bold text-brand mb-6">Dashboard Overview</h2>
+        <div class="grid md:grid-cols-4 gap-4 mb-8">
+          <div class="bg-white rounded-xl shadow p-6">
+            <div class="text-3xl mb-2">📅</div>
+            <div class="text-sm text-gray-500">Total Appointments</div>
+            <div class="text-3xl font-bold text-brand" id="stat-total">0</div>
+          </div>
+          <div class="bg-white rounded-xl shadow p-6">
+            <div class="text-3xl mb-2">⏳</div>
+            <div class="text-sm text-gray-500">Pending</div>
+            <div class="text-3xl font-bold text-yellow-600" id="stat-pending">0</div>
+          </div>
+          <div class="bg-white rounded-xl shadow p-6">
+            <div class="text-3xl mb-2">✅</div>
+            <div class="text-sm text-gray-500">Confirmed</div>
+            <div class="text-3xl font-bold text-green-600" id="stat-confirmed">0</div>
+          </div>
+          <div class="bg-white rounded-xl shadow p-6">
+            <div class="text-3xl mb-2">💬</div>
+            <div class="text-sm text-gray-500">New Messages</div>
+            <div class="text-3xl font-bold text-blue-600" id="stat-messages">0</div>
+          </div>
+        </div>
+
+        <!-- Recent Appointments -->
+        <div class="bg-white rounded-xl shadow p-6 mb-6">
+          <h3 class="text-lg font-bold text-brand mb-4">Recent Appointments</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead><tr class="border-b text-left text-gray-500">
+                <th class="pb-2 pr-4">Customer</th>
+                <th class="pb-2 pr-4">Service</th>
+                <th class="pb-2 pr-4">Date</th>
+                <th class="pb-2 pr-4">Time</th>
+                <th class="pb-2">Status</th>
+              </tr></thead>
+              <tbody id="recent-appointments"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Messages -->
+        <div class="bg-white rounded-xl shadow p-6">
+          <h3 class="text-lg font-bold text-brand mb-4">Recent Messages</h3>
+          <div id="recent-messages" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- APPOINTMENTS TAB -->
+      <div id="tab-appointments" class="tab-content hidden fade-in">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-brand">Appointments</h2>
+          <div class="flex gap-2">
+            <select id="appt-filter" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button onclick="loadAppointments()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead><tr class="bg-gray-50 border-b text-left text-gray-500">
+                <th class="p-3">Customer</th>
+                <th class="p-3">Contact</th>
+                <th class="p-3">Service</th>
+                <th class="p-3">Date & Time</th>
+                <th class="p-3">Status</th>
+                <th class="p-3">Notes</th>
+                <th class="p-3">Actions</th>
+              </tr></thead>
+              <tbody id="appointments-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MESSAGES TAB -->
+      <div id="tab-messages" class="tab-content hidden fade-in">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-brand">Contact Messages</h2>
+          <button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
+        </div>
+        <div class="space-y-4" id="messages-list"></div>
+      </div>
+
+      <!-- EMPLOYEES TAB -->
+      <div id="tab-employees" class="tab-content hidden fade-in">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-brand">Employees</h2>
+          <button onclick="loadEmployees()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
+        </div>
+        <div class="bg-white rounded-xl shadow overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead><tr class="bg-gray-50 border-b text-left text-gray-500">
+                <th class="p-3">Name</th>
+                <th class="p-3">Role</th>
+                <th class="p-3">Phone</th>
+                <th class="p-3">Email</th>
+                <th class="p-3">Status</th>
+              </tr></thead>
+              <tbody id="employees-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes Modal -->
+  <div id="notes-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+      <h3 class="text-lg font-bold text-brand mb-4">Admin Notes</h3>
+      <textarea id="notes-text" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 mb-4" placeholder="Add notes about this appointment..."></textarea>
+      <div class="flex gap-2 justify-end">
+        <button onclick="closeNotesModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+        <button onclick="saveNotes()" class="px-4 py-2 bg-brand text-white rounded-lg hover:opacity-90">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed bottom-4 right-4 z-50 bg-brand text-white px-6 py-3 rounded-lg shadow-lg"></div>
+
+<script>
+// ===== SUPABASE =====
+const sb = supabase.createClient(
+  'https://vtknmauyvmuaryttnenx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0a25tYXV5dm11YXJ5dHRuZW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1MDE1MDgsImV4cCI6MjA2NTA3NzUwOH0._bOyuxj1nRBw3U7Q3qCsDubBNg_EM-VLhQB0y5p9okY'
+);
+
+let appointments = [];
+let messages = [];
+let employees = [];
+let currentNotesId = null;
+
+// ===== TOAST =====
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = `fixed bottom-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg ${isError ? 'bg-red-600' : 'bg-brand'} text-white`;
+  toast.classList.remove('hidden');
+  setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+// ===== AUTH =====
+async function checkAdminStatus(userId, email) {
+  if (email === 'tyronenorris@gmail.com') return true;
+  const { data, error } = await sb.from('oretir_profiles')
+    .select('is_admin, project_id')
+    .eq('id', userId)
+    .eq('project_id', 'oregon-tires')
+    .maybeSingle();
+  if (error || !data) return false;
+  return data.is_admin === true && data.project_id === 'oregon-tires';
+}
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const errorEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+  errorEl.classList.add('hidden');
+
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    
+    const isAdmin = await checkAdminStatus(data.user.id, data.user.email);
+    if (!isAdmin) {
+      await sb.auth.signOut();
+      throw new Error('Access denied. Admin privileges required.');
+    }
+    
+    showDashboard(data.user);
+  } catch (err) {
+    errorEl.textContent = err.message;
+    errorEl.classList.remove('hidden');
+  } finally {
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+  }
+});
+
+async function signOut() {
+  await sb.auth.signOut();
+  document.getElementById('admin-dashboard').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  showToast('Signed out successfully');
+}
+
+// Check existing session on load
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    const isAdmin = await checkAdminStatus(session.user.id, session.user.email);
+    if (isAdmin) {
+      showDashboard(session.user);
+    }
+  }
+})();
+
+function showDashboard(user) {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('admin-dashboard').classList.remove('hidden');
+  document.getElementById('admin-email').textContent = user.email;
+  loadAllData();
+}
+
+// ===== DATA LOADING =====
+async function loadAllData() {
+  await Promise.all([loadAppointments(), loadMessages(), loadEmployees()]);
+  updateStats();
+}
+
+async function loadAppointments() {
+  const { data, error } = await sb.from('oretir_appointments')
+    .select('*')
+    .order('preferred_date', { ascending: false })
+    .limit(200);
+  if (error) { showToast('Error loading appointments', true); return; }
+  appointments = data || [];
+  renderAppointments();
+  renderRecentAppointments();
+  updateStats();
+}
+
+async function loadMessages() {
+  const { data, error } = await sb.from('oregon_tires_contact_messages')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  
+  if (error) {
+    // Fallback to contact_messages table
+    const { data: d2, error: e2 } = await sb.from('contact_messages')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (e2) { showToast('Error loading messages', true); return; }
+    messages = d2 || [];
+  } else {
+    messages = data || [];
+  }
+  renderMessages();
+  renderRecentMessages();
+  updateStats();
+}
+
+async function loadEmployees() {
+  const { data, error } = await sb.from('oregon_tires_employees')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { 
+    document.getElementById('employees-table').innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No employees table found or empty</td></tr>';
+    employees = [];
+    return; 
+  }
+  employees = data || [];
+  renderEmployees();
+}
+
+// ===== STATS =====
+function updateStats() {
+  document.getElementById('stat-total').textContent = appointments.length;
+  document.getElementById('stat-pending').textContent = appointments.filter(a => a.status === 'pending').length;
+  document.getElementById('stat-confirmed').textContent = appointments.filter(a => a.status === 'confirmed').length;
+  const newMsgs = messages.filter(m => m.status === 'new' || m.status === 'unread').length;
+  document.getElementById('stat-messages').textContent = newMsgs;
+}
+
+// ===== RENDERING =====
+function statusBadge(status) {
+  const cls = `status-${status || 'pending'}`;
+  return `<span class="px-2 py-1 rounded-full text-xs font-medium ${cls}">${(status || 'pending').charAt(0).toUpperCase() + (status || 'pending').slice(1)}</span>`;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatTime(timeStr) {
+  if (!timeStr) return '—';
+  const [h, m] = timeStr.split(':');
+  const hour = parseInt(h);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const h12 = hour % 12 || 12;
+  return `${h12}:${m} ${ampm}`;
+}
+
+function renderRecentAppointments() {
+  const tbody = document.getElementById('recent-appointments');
+  const recent = appointments.slice(0, 5);
+  if (!recent.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-gray-500">No appointments yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = recent.map(a => `
+    <tr class="border-b hover:bg-gray-50">
+      <td class="py-3 pr-4 font-medium">${a.first_name} ${a.last_name}</td>
+      <td class="py-3 pr-4">${a.service || '—'}</td>
+      <td class="py-3 pr-4">${formatDate(a.preferred_date)}</td>
+      <td class="py-3 pr-4">${formatTime(a.preferred_time)}</td>
+      <td class="py-3">${statusBadge(a.status)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderAppointments() {
+  const filter = document.getElementById('appt-filter').value;
+  const filtered = filter === 'all' ? appointments : appointments.filter(a => a.status === filter);
+  const tbody = document.getElementById('appointments-table');
+  
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-gray-500">No appointments found</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(a => `
+    <tr class="border-b hover:bg-gray-50">
+      <td class="p-3 font-medium">${a.first_name} ${a.last_name}</td>
+      <td class="p-3">
+        <div class="text-sm">${a.email || '—'}</div>
+        <div class="text-xs text-gray-500">${a.phone || '—'}</div>
+      </td>
+      <td class="p-3">${a.service || '—'}</td>
+      <td class="p-3">
+        <div class="text-sm">${formatDate(a.preferred_date)}</div>
+        <div class="text-xs text-gray-500">${formatTime(a.preferred_time)}</div>
+      </td>
+      <td class="p-3">${statusBadge(a.status)}</td>
+      <td class="p-3">
+        <div class="text-xs text-gray-600 max-w-[150px] truncate" title="${(a.admin_notes || a.message || '').replace(/"/g, '&quot;')}">${a.admin_notes || a.message || '—'}</div>
+      </td>
+      <td class="p-3">
+        <div class="flex gap-1 flex-wrap">
+          <select onchange="updateAppointmentStatus('${a.id}', this.value)" class="border rounded px-2 py-1 text-xs">
+            <option value="pending" ${a.status === 'pending' ? 'selected' : ''}>Pending</option>
+            <option value="confirmed" ${a.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+            <option value="completed" ${a.status === 'completed' ? 'selected' : ''}>Completed</option>
+            <option value="cancelled" ${a.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+          </select>
+          <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100" title="Edit notes">📝</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderRecentMessages() {
+  const container = document.getElementById('recent-messages');
+  const recent = messages.slice(0, 3);
+  if (!recent.length) {
+    container.innerHTML = '<p class="text-gray-500 text-sm">No messages yet</p>';
+    return;
+  }
+  container.innerHTML = recent.map(m => `
+    <div class="border rounded-lg p-4 hover:bg-gray-50">
+      <div class="flex justify-between items-start mb-2">
+        <div>
+          <span class="font-medium">${m.name || m.first_name + ' ' + (m.last_name || '')}</span>
+          <span class="text-gray-400 text-xs ml-2">${new Date(m.created_at).toLocaleDateString()}</span>
+        </div>
+        ${statusBadge(m.status)}
+      </div>
+      <p class="text-sm text-gray-600 line-clamp-2">${m.message}</p>
+    </div>
+  `).join('');
+}
+
+function renderMessages() {
+  const container = document.getElementById('messages-list');
+  if (!messages.length) {
+    container.innerHTML = '<div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">No messages found</div>';
+    return;
+  }
+  container.innerHTML = messages.map(m => `
+    <div class="bg-white rounded-xl shadow p-6">
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <h4 class="font-bold text-brand">${m.name || (m.first_name || '') + ' ' + (m.last_name || '')}</h4>
+          <p class="text-sm text-gray-500">${m.email} ${m.phone ? '• ' + m.phone : ''}</p>
+          <p class="text-xs text-gray-400">${new Date(m.created_at).toLocaleString()}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          ${statusBadge(m.status)}
+          <select onchange="updateMessageStatus('${m.id}', this.value, '${m.name ? 'contact_messages' : 'oregon_tires_contact_messages'}')" class="border rounded px-2 py-1 text-xs">
+            <option value="new" ${m.status === 'new' ? 'selected' : ''}>New</option>
+            <option value="read" ${m.status === 'read' ? 'selected' : ''}>Read</option>
+            <option value="replied" ${m.status === 'replied' ? 'selected' : ''}>Replied</option>
+          </select>
+        </div>
+      </div>
+      <p class="text-gray-700">${m.message}</p>
+    </div>
+  `).join('');
+}
+
+function renderEmployees() {
+  const tbody = document.getElementById('employees-table');
+  if (!employees.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-gray-500">No employees found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = employees.map(e => `
+    <tr class="border-b hover:bg-gray-50">
+      <td class="p-3 font-medium">${e.name || e.full_name || '—'}</td>
+      <td class="p-3">${e.role || e.position || '—'}</td>
+      <td class="p-3">${e.phone || '—'}</td>
+      <td class="p-3">${e.email || '—'}</td>
+      <td class="p-3">${e.is_active !== false ? '<span class="text-green-600 font-medium">Active</span>' : '<span class="text-gray-400">Inactive</span>'}</td>
+    </tr>
+  `).join('');
+}
+
+// ===== ACTIONS =====
+async function updateAppointmentStatus(id, status) {
+  const { error } = await sb.from('oretir_appointments').update({ status }).eq('id', id);
+  if (error) { showToast('Error updating status', true); return; }
+  showToast(`Appointment ${status}`);
+  const appt = appointments.find(a => a.id === id);
+  if (appt) appt.status = status;
+  renderAppointments();
+  renderRecentAppointments();
+  updateStats();
+}
+
+async function updateMessageStatus(id, status, table) {
+  const { error } = await sb.from(table).update({ status }).eq('id', id);
+  if (error) { 
+    // Try the other table
+    const otherTable = table === 'contact_messages' ? 'oregon_tires_contact_messages' : 'contact_messages';
+    const { error: e2 } = await sb.from(otherTable).update({ status }).eq('id', id);
+    if (e2) { showToast('Error updating message status', true); return; }
+  }
+  showToast(`Message marked as ${status}`);
+  const msg = messages.find(m => m.id === id);
+  if (msg) msg.status = status;
+  renderMessages();
+  renderRecentMessages();
+  updateStats();
+}
+
+function openNotesModal(id) {
+  currentNotesId = id;
+  const appt = appointments.find(a => a.id === id);
+  document.getElementById('notes-text').value = appt?.admin_notes || '';
+  document.getElementById('notes-modal').classList.remove('hidden');
+}
+
+function closeNotesModal() {
+  document.getElementById('notes-modal').classList.add('hidden');
+  currentNotesId = null;
+}
+
+async function saveNotes() {
+  if (!currentNotesId) return;
+  const notes = document.getElementById('notes-text').value;
+  const { error } = await sb.from('oretir_appointments').update({ admin_notes: notes }).eq('id', currentNotesId);
+  if (error) { showToast('Error saving notes', true); return; }
+  showToast('Notes saved');
+  const appt = appointments.find(a => a.id === currentNotesId);
+  if (appt) appt.admin_notes = notes;
+  renderAppointments();
+  closeNotesModal();
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el => {
+    el.classList.remove('tab-active');
+    el.classList.add('hover:bg-gray-100');
+  });
+  document.getElementById('tab-' + tab).classList.remove('hidden');
+  const btns = document.querySelectorAll('.tab-btn');
+  const tabs = ['overview', 'appointments', 'messages', 'employees'];
+  const idx = tabs.indexOf(tab);
+  if (idx >= 0 && btns[idx]) {
+    btns[idx].classList.add('tab-active');
+    btns[idx].classList.remove('hover:bg-gray-100');
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('notes-modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('notes-modal')) closeNotesModal();
+});
+</script>
+</body>
+</html>

@@ -1,14 +1,21 @@
 import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const SimpleSite: React.FC = () => {
+  const location = useLocation();
+
   useEffect(() => {
-    // Redirect to the static HTML file
-    window.location.href = '/simple/index.html';
-  }, []);
+    // Check if accessing admin path
+    if (location.pathname === '/simple/admin') {
+      window.location.href = '/simple/admin.html';
+    } else {
+      window.location.href = '/simple/index.html';
+    }
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <p>Redirecting to simplified site...</p>
+      <p>Redirecting...</p>
     </div>
   );
 };
