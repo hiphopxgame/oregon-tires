@@ -32,15 +32,28 @@ const handler = async (req: Request): Promise<Response> => {
     // Fetch appointment details with formatted service name
     const { data: appointment, error: appointmentError } = await supabase
       .from('oretir_appointments')
-      .select(`
-        *,
-        assigned_employee:oretir_employees(name, email)
-      `)
+      .select('*')
       .eq('id', appointmentId)
-      .single();
+      .maybeSingle();
 
-    if (appointmentError || !appointment) {
-      throw new Error('Appointment not found');
+    if (appointmentError) {
+      console.error('Error fetching appointment:', appointmentError);
+      throw new Error('Appointment query failed: ' + appointmentError.message);
+    }
+
+    if (!appointment) {
+      throw new Error('Appointment not found for id: ' + appointmentId);
+    }
+
+    // Fetch assigned employee separately if needed
+    let assignedEmployee: { name: string; email: string } | null = null;
+    if (appointment.assigned_employee_id) {
+      const { data: empData } = await supabase
+        .from('oretir_employees')
+        .select('name, email')
+        .eq('id', appointment.assigned_employee_id)
+        .maybeSingle();
+      assignedEmployee = empData;
     }
 
     // Format the service name
@@ -109,13 +122,13 @@ const handler = async (req: Request): Promise<Response> => {
         resend_message_id: emailResponse.data?.id || null
       });
 
-    } else if (type === 'appointment_assigned' && appointment.assigned_employee?.email) {
+    } else if (type === 'appointment_assigned' && assignedEmployee?.email) {
       // Send assignment notification to employee
       const subject = "New Appointment Assignment - Oregon Tires";
       const emailBody = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #007030;">New Appointment Assignment</h2>
-          <p>Hello ${appointment.assigned_employee.name},</p>
+          <p>Hello ${assignedEmployee.name},</p>
           <p>You have been assigned to a new appointment:</p>
           
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -160,7 +173,7 @@ const handler = async (req: Request): Promise<Response> => {
       
       emailResponse = await resend.emails.send({
         from: 'Oregon Tires <assignments@oregon.tires>',
-        to: [appointment.assigned_employee.email],
+        to: [assignedEmployee.email],
         subject: subject,
         html: emailBody,
       });
@@ -168,8 +181,8 @@ const handler = async (req: Request): Promise<Response> => {
       // Log the email
       await supabase.from('oretir_email_logs').insert({
         email_type: type,
-        recipient_email: appointment.assigned_employee.email,
-        recipient_name: appointment.assigned_employee.name,
+        recipient_email: assignedEmployee.email,
+        recipient_name: assignedEmployee.name,
         recipient_type: 'employee',
         subject: subject,
         body: emailBody,
@@ -195,7 +208,7 @@ const handler = async (req: Request): Promise<Response> => {
             <ul style="line-height: 1.8;">
               <li><strong>Service:</strong> ${formattedServiceName}</li>
               <li><strong>Date:</strong> ${appointment.preferred_date}</li>
-              <li><strong>Technician:</strong> ${appointment.assigned_employee?.name || 'Oregon Tires Team'}</li>
+              <li><strong>Technician:</strong> ${assignedEmployee?.name || 'Oregon Tires Team'}</li>
               <li><strong>Service Duration:</strong> ${durationText}</li>
               ${appointment.tire_size ? `<li><strong>Tire Size:</strong> ${appointment.tire_size}</li>` : ''}
               ${appointment.license_plate ? `<li><strong>Vehicle:</strong> ${appointment.license_plate}</li>` : ''}
