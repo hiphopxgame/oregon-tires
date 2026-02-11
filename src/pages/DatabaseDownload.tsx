@@ -277,7 +277,6 @@ const IMAGE_FILES = [
   'public/favicon.ico',
   'public/placeholder.svg',
   'public/robots.txt',
-  'public/.htaccess',
   'public/_redirects',
   'public/images/auto-maintenance.jpg',
   'public/images/bilingual-service.jpg',
@@ -591,6 +590,23 @@ const DatabaseDownload = () => {
       zip.file('README.md', README_CONTENT);
       zip.file('index.html', INDEX_HTML_CONTENT);
       zip.file('vite.config.ts', VITE_CONFIG_CONTENT);
+      zip.file('public/.htaccess', `Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css application/xml application/xhtml+xml application/rss+xml application/javascript application/x-javascript
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+</IfModule>`);
 
       // Fetch all source text files
       let fetched = 0;
