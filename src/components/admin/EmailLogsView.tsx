@@ -91,7 +91,7 @@ export const EmailLogsView = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Email Logs</h2>
+        <h2 className="text-2xl font-bold">Changes</h2>
         <Button onClick={fetchEmailLogs} variant="outline" size="sm">
           Refresh
         </Button>

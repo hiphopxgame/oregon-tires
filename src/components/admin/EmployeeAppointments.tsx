@@ -140,7 +140,7 @@ export const EmployeeAppointments: React.FC<EmployeeAppointmentsProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="unassigned">Unassigned</SelectItem>
-                      {activeEmployees.map(employee => (
+                      {employees.filter(e => e.is_active).map(employee => (
                         <SelectItem key={employee.id} value={employee.id}>
                           {employee.name}
                         </SelectItem>

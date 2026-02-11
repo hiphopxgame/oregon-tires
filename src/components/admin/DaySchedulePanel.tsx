@@ -102,11 +102,6 @@ export const DaySchedulePanel = ({
           />
         </div>
 
-        {/* Debug info - remove this later */}
-        <div className="mb-4 p-2 bg-blue-50 rounded text-xs">
-          <p>Selected Date: {selectedDate.toISOString().split('T')[0]}</p>
-          <p>Appointments for this date: {appointments.length}</p>
-        </div>
 
         {/* Time Slots */}
         <div className="space-y-2">
