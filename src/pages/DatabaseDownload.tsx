@@ -86,8 +86,7 @@ const MIGRATION_FILES = [
 
 // Source files needed to build & deploy the React app for / and /admin
 const SOURCE_FILES = [
-  // Config (index.html is hardcoded separately to avoid Vite-transformed version)
-  'vite.config.ts',
+  // Config (index.html and vite.config.ts are hardcoded separately)
   'tailwind.config.ts',
   'postcss.config.js',
   'tsconfig.json',
@@ -346,6 +345,26 @@ const INDEX_HTML_CONTENT = `<!DOCTYPE html>
   </body>
 </html>`;
 
+// Hardcoded vite.config.ts without lovable-tagger dependency
+const VITE_CONFIG_CONTENT = `import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
+
+export default defineConfig(({ mode }) => ({
+  server: {
+    host: "::",
+    port: 8080,
+  },
+  plugins: [
+    react(),
+  ].filter(Boolean),
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+}));`;
+
 const PACKAGE_JSON_CONTENT = `{
   "name": "oregon-tires",
   "private": true,
@@ -571,6 +590,7 @@ const DatabaseDownload = () => {
       zip.file('package.json', PACKAGE_JSON_CONTENT);
       zip.file('README.md', README_CONTENT);
       zip.file('index.html', INDEX_HTML_CONTENT);
+      zip.file('vite.config.ts', VITE_CONFIG_CONTENT);
 
       // Fetch all source text files
       let fetched = 0;
