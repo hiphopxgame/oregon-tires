@@ -266,9 +266,7 @@ const SOURCE_FILES = [
   'src/types/admin.ts',
   'src/utils/translations.ts',
 
-  // Edge functions
-  'supabase/functions/create-employee-account/index.ts',
-  'supabase/functions/send-appointment-emails/index.ts',
+  // Note: Edge functions are hardcoded into the ZIP to avoid Vite import resolution issues
   'supabase/config.toml',
 ];
 
@@ -562,10 +560,23 @@ const DatabaseDownload = () => {
     }
   };
 
-  const fetchTextFile = async (path: string): Promise<string | null> => {
+  const fetchTextFile = async (path: string, raw = false): Promise<string | null> => {
     try {
-      const res = await fetch(`/${path}`);
-      if (res.ok) return await res.text();
+      const suffix = raw ? '?raw' : '';
+      const res = await fetch(`/${path}${suffix}`);
+      if (res.ok) {
+        const text = await res.text();
+        // ?raw returns an ES module with default export, extract the content
+        if (raw && text.startsWith('export default')) {
+          try {
+            // The raw response is: export default "...escaped content..."
+            return JSON.parse(text.replace(/^export default /, '').replace(/;?\s*$/, ''));
+          } catch {
+            return text;
+          }
+        }
+        return text;
+      }
     } catch { /* skip */ }
     return null;
   };
@@ -607,6 +618,17 @@ RewriteRule . /index.html [L]
     ExpiresByType image/png "access plus 1 year"
     ExpiresByType image/jpeg "access plus 1 year"
 </IfModule>`);
+
+      // Edge functions use Deno imports that Vite can't resolve - fetch as raw
+      for (const efPath of [
+        'supabase/functions/send-appointment-emails/index.ts',
+        'supabase/functions/create-employee-account/index.ts',
+      ]) {
+        const content = await fetchTextFile(efPath, true);
+        if (content) {
+          zip.file(efPath, content);
+        }
+      }
 
       // Fetch all source text files
       let fetched = 0;
