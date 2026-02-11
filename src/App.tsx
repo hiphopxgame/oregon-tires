@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import { EmployeeProfile } from "./pages/EmployeeProfile";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import DatabaseDownload from "./pages/DatabaseDownload";
+import SimpleSite from "./pages/SimpleSite";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/programar-servicio" element={<ProgramarServicio />} />
           <Route path="/translate" element={<Translate />} />
           <Route path="/database" element={<DatabaseDownload />} />
+          <Route path="/simple" element={<SimpleSite />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
