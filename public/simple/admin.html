@@ -13,6 +13,7 @@
           colors: {
             brand: '#0D3618',
             accent: '#FFFE03',
+            'brand-light': '#007030',
           }
         }
       }
@@ -20,210 +21,289 @@
   </script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    .tab-active { background-color: #0D3618; color: white; }
-    .status-pending { background: #fef3c7; color: #92400e; }
+    .tab-active { background-color: white; color: #007030; }
+    .status-new, .status-pending { background: #dbeafe; color: #1e40af; }
     .status-confirmed { background: #d1fae5; color: #065f46; }
-    .status-completed { background: #dbeafe; color: #1e40af; }
+    .status-completed { background: #f3f4f6; color: #374151; }
     .status-cancelled { background: #fee2e2; color: #991b1b; }
-    .status-new { background: #e0e7ff; color: #3730a3; }
-    .status-read { background: #f3f4f6; color: #374151; }
-    .status-replied { background: #d1fae5; color: #065f46; }
+    .status-priority { background: #fef3c7; color: #92400e; }
+    .status-read, .status-replied { background: #e0e7ff; color: #3730a3; }
     .fade-in { animation: fadeIn 0.3s ease-in; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .modal-overlay { background: rgba(0,0,0,0.5); }
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-  <!-- LOGIN SCREEN -->
-  <div id="login-screen" class="min-h-screen flex items-center justify-center bg-brand">
-    <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
-      <div class="text-center mb-6">
-        <img src="/lovable-uploads/1290fb5e-e45c-4fc3-b523-e71d756ec1ef.png" alt="Oregon Tires" class="h-16 mx-auto mb-4">
-        <h1 class="text-2xl font-bold text-brand">Admin Dashboard</h1>
-        <p class="text-gray-500 mt-1">Sign in to manage your business</p>
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="min-h-screen flex items-center justify-center bg-brand">
+  <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+    <div class="text-center mb-6">
+      <img src="/lovable-uploads/1290fb5e-e45c-4fc3-b523-e71d756ec1ef.png" alt="Oregon Tires" class="h-16 mx-auto mb-4">
+      <h1 class="text-2xl font-bold text-brand">Admin Dashboard</h1>
+      <p class="text-gray-500 mt-1">Sign in to manage your business</p>
+    </div>
+    <form id="login-form" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input type="email" id="login-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
       </div>
-      <form id="login-form" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input type="email" id="login-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-          <input type="password" id="login-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
-        </div>
-        <button type="submit" id="login-btn" class="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:opacity-90 transition">Sign In</button>
-        <div id="login-error" class="text-red-600 text-sm text-center hidden"></div>
-      </form>
-      <div class="mt-4 text-center">
-        <a href="/simple/" class="text-brand text-sm hover:underline">← Back to website</a>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <input type="password" id="login-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
       </div>
+      <button type="submit" id="login-btn" class="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:opacity-90 transition">Sign In</button>
+      <div id="login-error" class="text-red-600 text-sm text-center hidden"></div>
+    </form>
+    <div class="mt-4 text-center">
+      <a href="/simple/" class="text-brand text-sm hover:underline">← Back to website</a>
     </div>
   </div>
+</div>
 
-  <!-- ADMIN DASHBOARD -->
-  <div id="admin-dashboard" class="hidden">
-    <!-- Header -->
-    <header class="bg-brand text-white shadow-lg">
-      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+<!-- ADMIN DASHBOARD -->
+<div id="admin-dashboard" class="hidden">
+  <!-- Header -->
+  <header class="bg-brand-light text-white shadow-lg">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex justify-between items-center mb-4">
         <div class="flex items-center gap-3">
-          <img src="/lovable-uploads/1290fb5e-e45c-4fc3-b523-e71d756ec1ef.png" alt="Oregon Tires" class="h-10">
+          <a href="/simple/"><img src="/lovable-uploads/1290fb5e-e45c-4fc3-b523-e71d756ec1ef.png" alt="Oregon Tires" class="h-12"></a>
           <div>
-            <h1 class="text-lg font-bold">Admin Dashboard</h1>
-            <p class="text-xs text-green-200" id="admin-email"></p>
+            <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+            <p class="text-white/80 text-sm">Oregon Tires Management</p>
           </div>
         </div>
         <div class="flex items-center gap-3">
-          <a href="/simple/" class="text-sm hover:text-yellow-200">View Site</a>
+          <div class="bg-white/10 px-3 py-2 rounded-lg text-sm">
+            <div class="font-medium" id="admin-email"></div>
+            <div class="text-xs text-yellow-200" id="admin-role"></div>
+          </div>
+          <a href="/simple/" class="text-sm hover:text-yellow-200 hidden md:inline">View Site</a>
           <button onclick="signOut()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition">Sign Out</button>
         </div>
       </div>
-    </header>
+      <!-- Navigation -->
+      <nav class="flex flex-wrap gap-1" id="nav-tabs">
+        <button onclick="switchTab('overview')" data-tab="overview" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition">📊 Overview</button>
+        <button onclick="switchTab('calendar')" data-tab="calendar" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📅 Calendar</button>
+        <button onclick="switchTab('appointments')" data-tab="appointments" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🗓 Appointments</button>
+        <button onclick="switchTab('messages')" data-tab="messages" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">💬 Messages</button>
+        <button onclick="switchTab('emails')" data-tab="emails" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📧 Email Logs</button>
+        <button onclick="switchTab('employees')" data-tab="employees" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👥 Employees</button>
+        <button onclick="switchTab('gallery')" data-tab="gallery" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 Gallery</button>
+        <button onclick="switchTab('images')" data-tab="images" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🎨 Service Images</button>
+        <button onclick="switchTab('analytics')" data-tab="analytics" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📈 Analytics</button>
+      </nav>
+    </div>
+  </header>
 
-    <!-- Navigation Tabs -->
-    <div class="bg-white shadow-sm border-b">
-      <div class="container mx-auto px-4">
-        <div class="flex gap-1 overflow-x-auto py-2" id="nav-tabs">
-          <button onclick="switchTab('overview')" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition">📊 Overview</button>
-          <button onclick="switchTab('appointments')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition hover:bg-gray-100">📅 Appointments</button>
-          <button onclick="switchTab('messages')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition hover:bg-gray-100">💬 Messages</button>
-          <button onclick="switchTab('employees')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition hover:bg-gray-100">👥 Employees</button>
+  <div class="container mx-auto px-4 py-6">
+
+    <!-- OVERVIEW TAB -->
+    <div id="tab-overview" class="tab-content fade-in">
+      <h2 class="text-2xl font-bold text-brand mb-6">Dashboard Overview</h2>
+      <div class="grid md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-xl shadow p-6"><div class="text-sm text-gray-500">Total Appointments</div><div class="text-3xl font-bold text-brand" id="stat-total">0</div><p class="text-xs text-gray-400">Next 14 days</p></div>
+        <div class="bg-white rounded-xl shadow p-6"><div class="text-sm text-gray-500">Pending</div><div class="text-3xl font-bold text-blue-600" id="stat-pending">0</div><p class="text-xs text-gray-400">Awaiting confirmation</p></div>
+        <div class="bg-white rounded-xl shadow p-6"><div class="text-sm text-gray-500">Confirmed</div><div class="text-3xl font-bold text-green-600" id="stat-confirmed">0</div><p class="text-xs text-gray-400">Ready to go</p></div>
+        <div class="bg-white rounded-xl shadow p-6"><div class="text-sm text-gray-500">Completed</div><div class="text-3xl font-bold text-gray-600" id="stat-completed">0</div><p class="text-xs text-gray-400">Finished</p></div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow p-6"><h3 class="text-lg font-bold text-brand mb-4">Upcoming Appointments (14 Days)</h3><div id="overview-upcoming" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div></div>
+        <div class="bg-white rounded-xl shadow p-6"><h3 class="text-lg font-bold text-brand mb-4">Employee Schedule</h3><div id="overview-employees" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div></div>
+      </div>
+    </div>
+
+    <!-- CALENDAR TAB -->
+    <div id="tab-calendar" class="tab-content hidden fade-in">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl mb-0"><h2 class="text-2xl font-bold">📅 Calendar Management</h2></div>
+      <div class="grid lg:grid-cols-3 gap-6 mt-6">
+        <div class="bg-white rounded-xl shadow p-4">
+          <div class="flex justify-between items-center mb-4">
+            <button onclick="calNavMonth(-1)" class="px-3 py-1 border rounded hover:bg-gray-100">◀</button>
+            <h3 class="font-bold text-brand" id="cal-month-label"></h3>
+            <button onclick="calNavMonth(1)" class="px-3 py-1 border rounded hover:bg-gray-100">▶</button>
+          </div>
+          <div id="cal-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+        </div>
+        <div class="lg:col-span-2 space-y-4">
+          <div class="bg-white rounded-xl shadow p-6">
+            <div class="flex justify-between items-center mb-4">
+              <button onclick="calNavDay(-1)" class="px-3 py-1 border rounded hover:bg-gray-100">◀ Prev</button>
+              <h3 class="text-xl font-bold text-brand" id="cal-day-label"></h3>
+              <button onclick="calNavDay(1)" class="px-3 py-1 border rounded hover:bg-gray-100">Next ▶</button>
+            </div>
+            <div id="cal-day-appointments" class="space-y-3"></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Content Area -->
-    <div class="container mx-auto px-4 py-6">
-      <!-- OVERVIEW TAB -->
-      <div id="tab-overview" class="tab-content fade-in">
-        <h2 class="text-2xl font-bold text-brand mb-6">Dashboard Overview</h2>
-        <div class="grid md:grid-cols-4 gap-4 mb-8">
-          <div class="bg-white rounded-xl shadow p-6">
-            <div class="text-3xl mb-2">📅</div>
-            <div class="text-sm text-gray-500">Total Appointments</div>
-            <div class="text-3xl font-bold text-brand" id="stat-total">0</div>
-          </div>
-          <div class="bg-white rounded-xl shadow p-6">
-            <div class="text-3xl mb-2">⏳</div>
-            <div class="text-sm text-gray-500">Pending</div>
-            <div class="text-3xl font-bold text-yellow-600" id="stat-pending">0</div>
-          </div>
-          <div class="bg-white rounded-xl shadow p-6">
-            <div class="text-3xl mb-2">✅</div>
-            <div class="text-sm text-gray-500">Confirmed</div>
-            <div class="text-3xl font-bold text-green-600" id="stat-confirmed">0</div>
-          </div>
-          <div class="bg-white rounded-xl shadow p-6">
-            <div class="text-3xl mb-2">💬</div>
-            <div class="text-sm text-gray-500">New Messages</div>
-            <div class="text-3xl font-bold text-blue-600" id="stat-messages">0</div>
-          </div>
+    <!-- APPOINTMENTS TAB -->
+    <div id="tab-appointments" class="tab-content hidden fade-in">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl"><h2 class="text-2xl font-bold">All Appointments</h2><p class="text-green-100">Manage all appointments</p></div>
+      <div class="bg-white rounded-b-xl shadow p-6">
+        <div class="flex flex-wrap gap-3 mb-4">
+          <input type="text" id="appt-search" placeholder="Search by name, email, service..." onkeyup="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]">
+          <select id="appt-filter" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
+            <option value="all">All Status</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+          </select>
+          <select id="appt-month" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
+            <option value="all">All Months</option>
+          </select>
+          <select id="appt-per-page" onchange="apptPage=1;renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
+            <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="all">All</option>
+          </select>
+          <button onclick="loadAppointments()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
         </div>
-
-        <!-- Recent Appointments -->
-        <div class="bg-white rounded-xl shadow p-6 mb-6">
-          <h3 class="text-lg font-bold text-brand mb-4">Recent Appointments</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead><tr class="border-b text-left text-gray-500">
-                <th class="pb-2 pr-4">Customer</th>
-                <th class="pb-2 pr-4">Service</th>
-                <th class="pb-2 pr-4">Date</th>
-                <th class="pb-2 pr-4">Time</th>
-                <th class="pb-2">Status</th>
-              </tr></thead>
-              <tbody id="recent-appointments"></tbody>
-            </table>
-          </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="bg-yellow-100 border-b text-left">
+              <th class="p-3 cursor-pointer" onclick="sortAppts('customer')">Customer ↕</th>
+              <th class="p-3 cursor-pointer" onclick="sortAppts('service')">Service ↕</th>
+              <th class="p-3 cursor-pointer" onclick="sortAppts('date')">Date & Time ↕</th>
+              <th class="p-3">Contact</th>
+              <th class="p-3">Employee</th>
+              <th class="p-3 cursor-pointer" onclick="sortAppts('status')">Status ↕</th>
+              <th class="p-3">Actions</th>
+            </tr></thead>
+            <tbody id="appointments-table"></tbody>
+          </table>
         </div>
+        <div id="appt-pagination" class="flex justify-center gap-2 mt-4"></div>
+      </div>
+    </div>
 
-        <!-- Recent Messages -->
-        <div class="bg-white rounded-xl shadow p-6">
-          <h3 class="text-lg font-bold text-brand mb-4">Recent Messages</h3>
-          <div id="recent-messages" class="space-y-3"></div>
+    <!-- MESSAGES TAB -->
+    <div id="tab-messages" class="tab-content hidden fade-in">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl"><h2 class="text-2xl font-bold">Contact Messages</h2><p class="text-green-100">Manage all messages</p></div>
+      <div class="bg-white rounded-b-xl shadow p-6">
+        <div class="flex justify-end mb-4"><button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="bg-yellow-100 border-b text-left">
+              <th class="p-3">Customer</th><th class="p-3">Contact</th><th class="p-3">Message</th><th class="p-3">Date</th><th class="p-3">Status</th>
+            </tr></thead>
+            <tbody id="messages-table"></tbody>
+          </table>
         </div>
       </div>
+    </div>
 
-      <!-- APPOINTMENTS TAB -->
-      <div id="tab-appointments" class="tab-content hidden fade-in">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-brand">Appointments</h2>
-          <div class="flex gap-2">
-            <select id="appt-filter" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-            <button onclick="loadAppointments()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
+    <!-- EMAIL LOGS TAB -->
+    <div id="tab-emails" class="tab-content hidden fade-in">
+      <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-brand">Email Logs</h2><button onclick="loadEmailLogs()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
+      <div id="email-logs-list" class="space-y-3"></div>
+    </div>
+
+    <!-- EMPLOYEES TAB -->
+    <div id="tab-employees" class="tab-content hidden fade-in">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div><h2 class="text-2xl font-bold">👥 Employee & Admin Management</h2><p class="text-green-100">Manage team members and dashboard admin accounts</p></div>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6">
+        <!-- Sub-tabs -->
+        <div class="flex gap-2 mb-6 border-b pb-3">
+          <button onclick="switchEmployeeSubTab('team')" id="emp-sub-team" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">👷 Service Team</button>
+          <button onclick="switchEmployeeSubTab('admins')" id="emp-sub-admins" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">🛡 Dashboard Admins</button>
+        </div>
+        <!-- Add Employee Form -->
+        <div id="add-employee-form" class="hidden mb-6 p-4 border rounded-lg bg-gray-50">
+          <h4 class="font-medium mb-3">Add New Employee</h4>
+          <div class="grid md:grid-cols-4 gap-3">
+            <div><label class="text-sm font-medium">Name *</label><input id="new-emp-name" class="w-full p-2 border rounded mt-1" placeholder="Employee name"></div>
+            <div><label class="text-sm font-medium">Email</label><input id="new-emp-email" type="email" class="w-full p-2 border rounded mt-1" placeholder="email@example.com"></div>
+            <div><label class="text-sm font-medium">Phone</label><input id="new-emp-phone" class="w-full p-2 border rounded mt-1" placeholder="(555) 123-4567"></div>
+            <div><label class="text-sm font-medium">Role</label><select id="new-emp-role" class="w-full p-2 border rounded mt-1"><option value="Employee">Employee</option><option value="Manager">Manager</option></select></div>
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button onclick="addEmployee()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">💾 Save</button>
+            <button onclick="toggleAddEmployeeForm()" class="border px-4 py-2 rounded-lg text-sm">Cancel</button>
           </div>
         </div>
-        <div class="bg-white rounded-xl shadow overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead><tr class="bg-gray-50 border-b text-left text-gray-500">
-                <th class="p-3">Customer</th>
-                <th class="p-3">Contact</th>
-                <th class="p-3">Service</th>
-                <th class="p-3">Date & Time</th>
-                <th class="p-3">Status</th>
-                <th class="p-3">Notes</th>
-                <th class="p-3">Actions</th>
-              </tr></thead>
-              <tbody id="appointments-table"></tbody>
-            </table>
+        <!-- Add Admin Form -->
+        <div id="add-admin-form" class="hidden mb-6 p-4 border rounded-lg bg-blue-50">
+          <h4 class="font-medium mb-3">Create Admin Account</h4>
+          <div class="flex gap-3 items-end">
+            <div class="flex-1"><label class="text-sm font-medium">Email Address *</label><input id="new-admin-email" type="email" class="w-full p-2 border rounded mt-1" placeholder="admin@company.com"><p class="text-xs text-gray-500 mt-1">Will create account if user doesn't exist, then grant admin access</p></div>
+            <button onclick="addAdmin()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm h-10">🛡 Create & Grant Admin</button>
+            <button onclick="toggleAddAdminForm()" class="border px-4 py-2 rounded-lg text-sm h-10">Cancel</button>
           </div>
         </div>
+        <div id="employees-content"></div>
       </div>
+    </div>
 
-      <!-- MESSAGES TAB -->
-      <div id="tab-messages" class="tab-content hidden fade-in">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-brand">Contact Messages</h2>
-          <button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
-        </div>
-        <div class="space-y-4" id="messages-list"></div>
+    <!-- GALLERY TAB -->
+    <div id="tab-gallery" class="tab-content hidden fade-in">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <h2 class="text-2xl font-bold">Gallery Management</h2>
+        <button onclick="toggleAddGalleryForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ Add Image</button>
       </div>
-
-      <!-- EMPLOYEES TAB -->
-      <div id="tab-employees" class="tab-content hidden fade-in">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-brand">Employees</h2>
-          <button onclick="loadEmployees()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
-        </div>
-        <div class="bg-white rounded-xl shadow overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead><tr class="bg-gray-50 border-b text-left text-gray-500">
-                <th class="p-3">Name</th>
-                <th class="p-3">Role</th>
-                <th class="p-3">Phone</th>
-                <th class="p-3">Email</th>
-                <th class="p-3">Status</th>
-              </tr></thead>
-              <tbody id="employees-table"></tbody>
-            </table>
+      <div class="bg-white rounded-b-xl shadow p-6">
+        <div id="add-gallery-form" class="hidden mb-6 p-4 border rounded-lg bg-gray-50">
+          <h4 class="font-medium mb-3">Add New Image</h4>
+          <div class="space-y-3">
+            <div><label class="text-sm font-medium">Image File *</label><input type="file" id="gallery-file" accept="image/*" class="w-full p-2 border rounded mt-1"></div>
+            <div class="grid md:grid-cols-2 gap-3">
+              <div><label class="text-sm font-medium">Title *</label><input id="gallery-title" class="w-full p-2 border rounded mt-1" placeholder="Image title"></div>
+              <div><label class="text-sm font-medium">Language</label><select id="gallery-lang" class="w-full p-2 border rounded mt-1"><option value="english">English</option><option value="spanish">Spanish</option></select></div>
+            </div>
+            <div><label class="text-sm font-medium">Description</label><textarea id="gallery-desc" rows="2" class="w-full p-2 border rounded mt-1" placeholder="Image description"></textarea></div>
+            <div class="flex gap-2">
+              <button onclick="uploadGalleryImage()" id="gallery-upload-btn" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">💾 Upload & Save</button>
+              <button onclick="toggleAddGalleryForm()" class="border px-4 py-2 rounded-lg text-sm">Cancel</button>
+            </div>
           </div>
         </div>
+        <div id="gallery-grid" class="space-y-3"></div>
       </div>
+    </div>
+
+    <!-- SERVICE IMAGES TAB -->
+    <div id="tab-images" class="tab-content hidden fade-in">
+      <div class="flex justify-between items-center mb-4"><div><h2 class="text-2xl font-bold text-brand">Service Images Manager</h2><p class="text-gray-600 mt-1">Manage the hero background and 7 service images displayed on the home page</p></div></div>
+      <div id="service-images-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- ANALYTICS TAB -->
+    <div id="tab-analytics" class="tab-content hidden fade-in">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6"><h2 class="text-2xl font-bold">Analytics Dashboard</h2><p class="text-green-100">Overview of your business metrics</p></div>
+      <div id="analytics-content"></div>
+    </div>
+
+  </div><!-- end container -->
+</div>
+
+<!-- Notes Modal -->
+<div id="notes-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+    <h3 class="text-lg font-bold text-brand mb-4">Admin Notes</h3>
+    <textarea id="notes-text" rows="4" class="w-full p-3 border rounded-lg mb-4" placeholder="Add notes..."></textarea>
+    <div class="flex gap-2 justify-end">
+      <button onclick="closeModal('notes-modal')" class="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+      <button onclick="saveNotes()" class="px-4 py-2 bg-brand text-white rounded-lg hover:opacity-90">Save</button>
     </div>
   </div>
+</div>
 
-  <!-- Notes Modal -->
-  <div id="notes-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
-    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
-      <h3 class="text-lg font-bold text-brand mb-4">Admin Notes</h3>
-      <textarea id="notes-text" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 mb-4" placeholder="Add notes about this appointment..."></textarea>
-      <div class="flex gap-2 justify-end">
-        <button onclick="closeNotesModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
-        <button onclick="saveNotes()" class="px-4 py-2 bg-brand text-white rounded-lg hover:opacity-90">Save</button>
-      </div>
+<!-- Email Detail Modal -->
+<div id="email-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-bold text-brand" id="email-modal-subject"></h3>
+      <button onclick="closeModal('email-modal')" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
     </div>
+    <div id="email-modal-meta" class="grid grid-cols-2 gap-4 text-sm mb-4 border-b pb-4"></div>
+    <div id="email-modal-body" class="prose prose-sm max-w-none"></div>
   </div>
+</div>
 
-  <!-- Toast -->
-  <div id="toast" class="hidden fixed bottom-4 right-4 z-50 bg-brand text-white px-6 py-3 rounded-lg shadow-lg"></div>
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-4 right-4 z-50 bg-brand text-white px-6 py-3 rounded-lg shadow-lg transition-all"></div>
 
 <script>
 // ===== SUPABASE =====
@@ -232,369 +312,676 @@ const sb = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0a25tYXV5dm11YXJ5dHRuZW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1MDE1MDgsImV4cCI6MjA2NTA3NzUwOH0._bOyuxj1nRBw3U7Q3qCsDubBNg_EM-VLhQB0y5p9okY'
 );
 
-let appointments = [];
-let messages = [];
-let employees = [];
-let currentNotesId = null;
+// ===== STATE =====
+let appointments = [], messages = [], employees = [], emailLogs = [], galleryImages = [], serviceImages = [];
+let currentNotesId = null, apptPage = 1, apptSortBy = 'created', apptSortOrder = 'desc';
+let calDate = new Date(), calSelectedDate = new Date();
+let employeeSubTab = 'team', adminUsers = [];
 
-// ===== TOAST =====
-function showToast(msg, isError = false) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.className = `fixed bottom-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg ${isError ? 'bg-red-600' : 'bg-brand'} text-white`;
-  toast.classList.remove('hidden');
-  setTimeout(() => toast.classList.add('hidden'), 3000);
+// ===== UTILS =====
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `fixed bottom-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${isError ? 'bg-red-600' : 'bg-brand'}`;
+  setTimeout(() => t.classList.add('hidden'), 3000);
 }
+function statusBadge(s) { return `<span class="px-2 py-1 rounded-full text-xs font-medium status-${s||'new'}">${(s||'new').charAt(0).toUpperCase()+(s||'new').slice(1)}</span>`; }
+function fmtDate(d) { if(!d) return '—'; return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function fmtTime(t) { if(!t) return '—'; const [h,m]=t.split(':'); const hr=parseInt(h); return `${hr%12||12}:${m} ${hr>=12?'PM':'AM'}`; }
+function fmtDateTime(d) { return new Date(d).toLocaleString(); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function esc(s) { if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
 // ===== AUTH =====
-async function checkAdminStatus(userId, email) {
+async function checkAdminStatus(uid, email) {
   if (email === 'tyronenorris@gmail.com') return true;
-  const { data, error } = await sb.from('oretir_profiles')
-    .select('is_admin, project_id')
-    .eq('id', userId)
-    .eq('project_id', 'oregon-tires')
-    .maybeSingle();
-  if (error || !data) return false;
-  return data.is_admin === true && data.project_id === 'oregon-tires';
+  const { data } = await sb.from('oretir_profiles').select('is_admin, project_id').eq('id', uid).eq('project_id', 'oregon-tires').maybeSingle();
+  return data?.is_admin === true;
 }
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
-  const errorEl = document.getElementById('login-error');
-  const btn = document.getElementById('login-btn');
-  
-  btn.textContent = 'Signing in...';
-  btn.disabled = true;
-  errorEl.classList.add('hidden');
-
+  const email = document.getElementById('login-email').value, password = document.getElementById('login-password').value;
+  const errorEl = document.getElementById('login-error'), btn = document.getElementById('login-btn');
+  btn.textContent = 'Signing in...'; btn.disabled = true; errorEl.classList.add('hidden');
   try {
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    
-    const isAdmin = await checkAdminStatus(data.user.id, data.user.email);
-    if (!isAdmin) {
-      await sb.auth.signOut();
-      throw new Error('Access denied. Admin privileges required.');
-    }
-    
+    if (!await checkAdminStatus(data.user.id, data.user.email)) { await sb.auth.signOut(); throw new Error('Access denied. Admin privileges required.'); }
     showDashboard(data.user);
-  } catch (err) {
-    errorEl.textContent = err.message;
-    errorEl.classList.remove('hidden');
-  } finally {
-    btn.textContent = 'Sign In';
-    btn.disabled = false;
-  }
+  } catch (err) { errorEl.textContent = err.message; errorEl.classList.remove('hidden'); }
+  finally { btn.textContent = 'Sign In'; btn.disabled = false; }
 });
 
-async function signOut() {
-  await sb.auth.signOut();
-  document.getElementById('admin-dashboard').classList.add('hidden');
-  document.getElementById('login-screen').classList.remove('hidden');
-  showToast('Signed out successfully');
-}
+async function signOut() { await sb.auth.signOut(); document.getElementById('admin-dashboard').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); }
 
-// Check existing session on load
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    const isAdmin = await checkAdminStatus(session.user.id, session.user.email);
-    if (isAdmin) {
-      showDashboard(session.user);
-    }
-  }
+  if (session?.user && await checkAdminStatus(session.user.id, session.user.email)) showDashboard(session.user);
 })();
 
 function showDashboard(user) {
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('admin-dashboard').classList.remove('hidden');
   document.getElementById('admin-email').textContent = user.email;
+  document.getElementById('admin-role').textContent = user.email === 'tyronenorris@gmail.com' ? 'Super Admin' : 'Admin';
   loadAllData();
+  setupRealtime();
+  populateMonthFilter();
 }
 
-// ===== DATA LOADING =====
-async function loadAllData() {
-  await Promise.all([loadAppointments(), loadMessages(), loadEmployees()]);
-  updateStats();
-}
+// ===== DATA =====
+async function loadAllData() { await Promise.all([loadAppointments(), loadMessages(), loadEmployees(), loadEmailLogs(), loadGalleryImages(), loadServiceImages(), loadAdminUsers()]); }
 
 async function loadAppointments() {
-  const { data, error } = await sb.from('oretir_appointments')
-    .select('*')
-    .order('preferred_date', { ascending: false })
-    .limit(200);
-  if (error) { showToast('Error loading appointments', true); return; }
+  const { data } = await sb.from('oretir_appointments').select('*').order('created_at', { ascending: false });
   appointments = data || [];
-  renderAppointments();
-  renderRecentAppointments();
-  updateStats();
+  renderOverview(); renderAppointments(); renderCalendar();
 }
-
 async function loadMessages() {
-  const { data, error } = await sb.from('oregon_tires_contact_messages')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100);
-  
-  if (error) {
-    // Fallback to contact_messages table
-    const { data: d2, error: e2 } = await sb.from('contact_messages')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100);
-    if (e2) { showToast('Error loading messages', true); return; }
-    messages = d2 || [];
-  } else {
-    messages = data || [];
-  }
-  renderMessages();
-  renderRecentMessages();
-  updateStats();
+  const { data } = await sb.from('oretir_contact_messages').select('*').order('created_at', { ascending: false });
+  messages = data || [];
+  renderMessages(); renderOverview();
 }
-
 async function loadEmployees() {
-  const { data, error } = await sb.from('oregon_tires_employees')
-    .select('*')
-    .order('created_at', { ascending: false });
-  if (error) { 
-    document.getElementById('employees-table').innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No employees table found or empty</td></tr>';
-    employees = [];
-    return; 
-  }
+  const { data } = await sb.from('oretir_employees').select('*').order('created_at', { ascending: false });
   employees = data || [];
-  renderEmployees();
+  renderEmployees(); renderOverview();
+}
+async function loadEmailLogs() {
+  const { data } = await sb.from('oretir_email_logs').select('*').order('sent_at', { ascending: false }).limit(50);
+  emailLogs = data || [];
+  renderEmailLogs();
+}
+async function loadGalleryImages() {
+  const { data } = await sb.from('oretir_gallery_images').select('*').order('display_order', { ascending: true });
+  galleryImages = data || [];
+  renderGallery();
+}
+async function loadServiceImages() {
+  const { data } = await sb.from('oretir_service_images').select('*').eq('is_current', true).order('service_key');
+  serviceImages = data || [];
+  renderServiceImages();
+}
+async function loadAdminUsers() {
+  const { data } = await sb.rpc('get_admin_users');
+  adminUsers = data || [];
+  if (employeeSubTab === 'admins') renderEmployees();
 }
 
-// ===== STATS =====
-function updateStats() {
-  document.getElementById('stat-total').textContent = appointments.length;
-  document.getElementById('stat-pending').textContent = appointments.filter(a => a.status === 'pending').length;
-  document.getElementById('stat-confirmed').textContent = appointments.filter(a => a.status === 'confirmed').length;
-  const newMsgs = messages.filter(m => m.status === 'new' || m.status === 'unread').length;
-  document.getElementById('stat-messages').textContent = newMsgs;
+function setupRealtime() {
+  const ch = Math.random().toString(36).substr(2,9);
+  sb.channel('admin-rt-'+ch)
+    .on('postgres_changes',{event:'*',schema:'public',table:'oretir_appointments'},(p)=>{
+      if(p.eventType==='INSERT') showToast(`New appointment from ${p.new?.first_name} ${p.new?.last_name}`);
+      loadAppointments();
+    })
+    .on('postgres_changes',{event:'*',schema:'public',table:'oretir_contact_messages'},()=>loadMessages())
+    .subscribe();
 }
 
-// ===== RENDERING =====
-function statusBadge(status) {
-  const cls = `status-${status || 'pending'}`;
-  return `<span class="px-2 py-1 rounded-full text-xs font-medium ${cls}">${(status || 'pending').charAt(0).toUpperCase() + (status || 'pending').slice(1)}</span>`;
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return '—';
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
-function formatTime(timeStr) {
-  if (!timeStr) return '—';
-  const [h, m] = timeStr.split(':');
-  const hour = parseInt(h);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const h12 = hour % 12 || 12;
-  return `${h12}:${m} ${ampm}`;
-}
-
-function renderRecentAppointments() {
-  const tbody = document.getElementById('recent-appointments');
-  const recent = appointments.slice(0, 5);
-  if (!recent.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-gray-500">No appointments yet</td></tr>';
-    return;
+// ===== MONTH FILTER =====
+function populateMonthFilter() {
+  const sel = document.getElementById('appt-month');
+  for (let i = 0; i < 24; i++) {
+    const d = new Date(); d.setMonth(d.getMonth() - i);
+    const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    sel.innerHTML += `<option value="${val}">${d.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</option>`;
   }
-  tbody.innerHTML = recent.map(a => `
-    <tr class="border-b hover:bg-gray-50">
-      <td class="py-3 pr-4 font-medium">${a.first_name} ${a.last_name}</td>
-      <td class="py-3 pr-4">${a.service || '—'}</td>
-      <td class="py-3 pr-4">${formatDate(a.preferred_date)}</td>
-      <td class="py-3 pr-4">${formatTime(a.preferred_time)}</td>
-      <td class="py-3">${statusBadge(a.status)}</td>
-    </tr>
-  `).join('');
 }
+
+// ===== OVERVIEW =====
+function renderOverview() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const in14 = new Date(today); in14.setDate(in14.getDate()+14);
+  const upcoming = appointments.filter(a => { const d = new Date(a.preferred_date+'T00:00:00'); return d >= today && d < in14; });
+  
+  document.getElementById('stat-total').textContent = upcoming.length;
+  document.getElementById('stat-pending').textContent = upcoming.filter(a=>a.status==='new').length;
+  document.getElementById('stat-confirmed').textContent = upcoming.filter(a=>a.status==='confirmed').length;
+  document.getElementById('stat-completed').textContent = upcoming.filter(a=>a.status==='completed').length;
+
+  // Upcoming by date
+  const container = document.getElementById('overview-upcoming');
+  const byDate = {};
+  for (let i=0; i<14; i++) { const d = new Date(today); d.setDate(d.getDate()+i); byDate[d.toISOString().split('T')[0]] = []; }
+  upcoming.forEach(a => { if(byDate[a.preferred_date]) byDate[a.preferred_date].push(a); });
+  
+  container.innerHTML = Object.entries(byDate).map(([date, apts]) => {
+    const d = new Date(date+'T00:00:00');
+    const dayLabel = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    return `<div class="border-l-4 border-brand-light pl-4">
+      <div class="flex justify-between items-center mb-1">
+        <h4 class="font-medium text-sm">${dayLabel}</h4>
+        ${apts.length ? `<span class="text-xs bg-gray-100 px-2 py-1 rounded">${apts.length} appt${apts.length>1?'s':''}</span>` : '<span class="text-xs text-orange-600">No appointments</span>'}
+      </div>
+      ${apts.length ? apts.slice(0,3).map(a => `<div class="text-sm flex justify-between bg-gray-50 p-2 rounded mb-1">
+        <span><strong>${fmtTime(a.preferred_time)}</strong> - ${esc(a.first_name)} ${esc(a.last_name)}</span>${statusBadge(a.status)}
+      </div>`).join('') + (apts.length>3 ? `<p class="text-xs text-gray-400">+${apts.length-3} more</p>` : '') : '<div class="text-sm text-gray-400 py-2 text-center">Available for booking</div>'}
+    </div>`;
+  }).join('');
+
+  // Employee schedule
+  const empContainer = document.getElementById('overview-employees');
+  const activeEmps = employees.filter(e=>e.is_active);
+  empContainer.innerHTML = activeEmps.length ? activeEmps.map(emp => {
+    const empApts = upcoming.filter(a=>a.assigned_employee_id===emp.id);
+    return `<div class="border rounded-lg p-4">
+      <div class="flex justify-between items-center mb-2"><div><h4 class="font-medium">${esc(emp.name)}</h4><p class="text-sm text-gray-500">${esc(emp.email||'')}</p></div>
+      <div class="text-right"><p class="text-sm font-medium">${empApts.length} appointments</p><p class="text-xs text-gray-500">~${(empApts.length*1.5).toFixed(1)} hours</p></div></div>
+      ${empApts.length ? empApts.slice(0,2).map(a=>`<div class="text-sm flex items-center gap-2 bg-gray-50 p-2 rounded mb-1">📅 ${fmtDate(a.preferred_date)} ${fmtTime(a.preferred_time)}</div>`).join('') + (empApts.length>2?`<p class="text-xs text-gray-400">+${empApts.length-2} more</p>`:'') : '<p class="text-sm text-gray-400">No appointments in next 14 days</p>'}
+    </div>`;
+  }).join('') : '<p class="text-gray-500 text-center py-4">No active employees</p>';
+}
+
+// ===== CALENDAR =====
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  document.getElementById('cal-month-label').textContent = calDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  
+  const firstDay = new Date(y,m,1).getDay(), daysInMonth = new Date(y,m+1,0).getDate();
+  let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="font-bold text-xs text-gray-500 py-1">${d}</div>`).join('');
+  for(let i=0;i<firstDay;i++) html += '<div></div>';
+  for(let d=1;d<=daysInMonth;d++) {
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const count = appointments.filter(a=>a.preferred_date===dateStr).length;
+    const isSelected = calSelectedDate.toISOString().split('T')[0] === dateStr;
+    const isToday = new Date().toISOString().split('T')[0] === dateStr;
+    html += `<div onclick="selectCalDay('${dateStr}')" class="p-1 text-center cursor-pointer rounded-lg hover:bg-gray-100 ${isSelected?'bg-brand text-white hover:bg-brand':''} ${isToday&&!isSelected?'border-2 border-brand':''}">
+      <div class="text-sm">${d}</div>
+      ${count?`<div class="text-xs ${isSelected?'text-white/80':'text-brand'} font-medium">${count}</div>`:''}
+    </div>`;
+  }
+  grid.innerHTML = html;
+  renderCalDay();
+}
+function selectCalDay(dateStr) { calSelectedDate = new Date(dateStr+'T00:00:00'); renderCalendar(); }
+function calNavMonth(dir) { calDate.setMonth(calDate.getMonth()+dir); renderCalendar(); }
+function calNavDay(dir) { calSelectedDate.setDate(calSelectedDate.getDate()+dir); calDate = new Date(calSelectedDate); renderCalendar(); }
+function renderCalDay() {
+  const dateStr = calSelectedDate.toISOString().split('T')[0];
+  document.getElementById('cal-day-label').textContent = calSelectedDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const dayApts = appointments.filter(a=>a.preferred_date===dateStr).sort((a,b)=>(a.preferred_time||'').localeCompare(b.preferred_time||''));
+  const container = document.getElementById('cal-day-appointments');
+  container.innerHTML = dayApts.length ? dayApts.map(a => `
+    <div class="border rounded-lg p-4 hover:bg-gray-50">
+      <div class="flex justify-between items-start mb-2">
+        <div><h4 class="font-medium">${esc(a.first_name)} ${esc(a.last_name)}</h4><p class="text-sm text-gray-500">${esc(a.service)} • ${fmtTime(a.preferred_time)}</p>
+        <p class="text-sm text-gray-500">${esc(a.email)} ${a.phone?'• '+esc(a.phone):''}</p></div>
+        <div class="flex items-center gap-2">${statusBadge(a.status)}
+          <select onchange="updateApptStatus('${a.id}',this.value)" class="border rounded px-2 py-1 text-xs">
+            <option value="new" ${a.status==='new'?'selected':''}>New</option><option value="confirmed" ${a.status==='confirmed'?'selected':''}>Confirmed</option>
+            <option value="completed" ${a.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${a.status==='cancelled'?'selected':''}>Cancelled</option>
+          </select>
+        </div>
+      </div>
+      ${a.assigned_employee_id ? `<p class="text-xs text-blue-600">Assigned: ${esc(employees.find(e=>e.id===a.assigned_employee_id)?.name||'Unknown')}</p>` : ''}
+      ${a.admin_notes ? `<p class="text-xs text-gray-500 mt-1">📝 ${esc(a.admin_notes)}</p>` : ''}
+      ${a.message ? `<p class="text-xs text-gray-500 mt-1 italic">"${esc(a.message)}"</p>` : ''}
+    </div>
+  `).join('') : '<div class="text-center py-8 text-gray-500">No appointments for this day</div>';
+}
+
+// ===== APPOINTMENTS =====
+function sortAppts(col) { if(apptSortBy===col) apptSortOrder=apptSortOrder==='asc'?'desc':'asc'; else { apptSortBy=col; apptSortOrder='desc'; } renderAppointments(); }
 
 function renderAppointments() {
   const filter = document.getElementById('appt-filter').value;
-  const filtered = filter === 'all' ? appointments : appointments.filter(a => a.status === filter);
+  const search = document.getElementById('appt-search').value.toLowerCase();
+  const month = document.getElementById('appt-month').value;
+  const perPage = document.getElementById('appt-per-page').value;
+
+  let filtered = appointments.filter(a => {
+    if (filter !== 'all' && a.status !== filter) return false;
+    if (month !== 'all') { const [y,m] = month.split('-'); const ad = new Date(a.preferred_date+'T00:00:00'); if(ad.getFullYear()!==parseInt(y)||ad.getMonth()+1!==parseInt(m)) return false; }
+    if (search) { const s = `${a.first_name} ${a.last_name} ${a.email} ${a.phone||''} ${a.service} ${a.status}`.toLowerCase(); if(!s.includes(search)) return false; }
+    return true;
+  });
+
+  filtered.sort((a,b) => {
+    let cmp = 0;
+    if(apptSortBy==='customer') cmp=`${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
+    else if(apptSortBy==='service') cmp=a.service.localeCompare(b.service);
+    else if(apptSortBy==='status') cmp=a.status.localeCompare(b.status);
+    else if(apptSortBy==='date') cmp=new Date(a.preferred_date).getTime()-new Date(b.preferred_date).getTime();
+    else cmp=new Date(a.created_at).getTime()-new Date(b.created_at).getTime();
+    return apptSortOrder==='asc'?cmp:-cmp;
+  });
+
+  const showAll = perPage === 'all';
+  const pp = showAll ? filtered.length : parseInt(perPage);
+  const totalPages = showAll ? 1 : Math.ceil(filtered.length / pp);
+  if(apptPage > totalPages) apptPage = totalPages || 1;
+  const start = (apptPage-1)*pp, end = start+pp;
+  const page = filtered.slice(start, end);
+
   const tbody = document.getElementById('appointments-table');
-  
-  if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-gray-500">No appointments found</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(a => `
+  tbody.innerHTML = page.length ? page.map(a => `
     <tr class="border-b hover:bg-gray-50">
-      <td class="p-3 font-medium">${a.first_name} ${a.last_name}</td>
-      <td class="p-3">
-        <div class="text-sm">${a.email || '—'}</div>
-        <div class="text-xs text-gray-500">${a.phone || '—'}</div>
-      </td>
-      <td class="p-3">${a.service || '—'}</td>
-      <td class="p-3">
-        <div class="text-sm">${formatDate(a.preferred_date)}</div>
-        <div class="text-xs text-gray-500">${formatTime(a.preferred_time)}</div>
-      </td>
+      <td class="p-3"><div class="font-medium">${esc(a.first_name)} ${esc(a.last_name)}</div><div class="text-xs text-gray-500">Created: ${new Date(a.created_at).toLocaleDateString()}</div></td>
+      <td class="p-3">${esc(a.service)}</td>
+      <td class="p-3"><div class="font-medium">${fmtDate(a.preferred_date)}</div><div class="text-xs text-gray-500">${fmtTime(a.preferred_time)}</div>
+        ${a.status==='completed'&&a.actual_duration_minutes?`<div class="text-xs text-green-700 font-medium mt-1">Completed in ${a.actual_duration_minutes}min</div>`:''}</td>
+      <td class="p-3"><div class="text-sm">${esc(a.email)}</div>${a.phone?`<div class="text-xs text-gray-500">${esc(a.phone)}</div>`:''}</td>
+      <td class="p-3 text-sm">${a.assigned_employee_id ? esc(employees.find(e=>e.id===a.assigned_employee_id)?.name||'Unknown') : '<span class="text-gray-400">Unassigned</span>'}</td>
       <td class="p-3">${statusBadge(a.status)}</td>
-      <td class="p-3">
-        <div class="text-xs text-gray-600 max-w-[150px] truncate" title="${(a.admin_notes || a.message || '').replace(/"/g, '&quot;')}">${a.admin_notes || a.message || '—'}</div>
-      </td>
-      <td class="p-3">
-        <div class="flex gap-1 flex-wrap">
-          <select onchange="updateAppointmentStatus('${a.id}', this.value)" class="border rounded px-2 py-1 text-xs">
-            <option value="pending" ${a.status === 'pending' ? 'selected' : ''}>Pending</option>
-            <option value="confirmed" ${a.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-            <option value="completed" ${a.status === 'completed' ? 'selected' : ''}>Completed</option>
-            <option value="cancelled" ${a.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-          </select>
-          <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100" title="Edit notes">📝</button>
-        </div>
-      </td>
+      <td class="p-3"><div class="flex flex-col gap-1">
+        <select onchange="updateApptStatus('${a.id}',this.value)" class="border rounded px-2 py-1 text-xs">
+          <option value="new" ${a.status==='new'?'selected':''}>New</option><option value="confirmed" ${a.status==='confirmed'?'selected':''}>Confirmed</option>
+          <option value="completed" ${a.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${a.status==='cancelled'?'selected':''}>Cancelled</option>
+        </select>
+        <select onchange="updateApptAssignment('${a.id}',this.value)" class="border rounded px-2 py-1 text-xs">
+          <option value="">Unassigned</option>${employees.filter(e=>e.is_active).map(e=>`<option value="${e.id}" ${a.assigned_employee_id===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}
+        </select>
+        <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100">📝 Notes</button>
+      </div></td>
     </tr>
-  `).join('');
+  `).join('') : '<tr><td colspan="7" class="p-6 text-center text-gray-500">No appointments found</td></tr>';
+
+  // Pagination
+  const pagDiv = document.getElementById('appt-pagination');
+  if(totalPages > 1) {
+    pagDiv.innerHTML = `<button onclick="apptPage=Math.max(1,apptPage-1);renderAppointments()" class="px-3 py-1 border rounded ${apptPage===1?'opacity-50':'hover:bg-gray-100'}" ${apptPage===1?'disabled':''}>← Prev</button>` +
+      Array.from({length:totalPages},(_,i)=>`<button onclick="apptPage=${i+1};renderAppointments()" class="px-3 py-1 border rounded ${apptPage===i+1?'bg-brand text-white':'hover:bg-gray-100'}">${i+1}</button>`).join('') +
+      `<button onclick="apptPage=Math.min(${totalPages},apptPage+1);renderAppointments()" class="px-3 py-1 border rounded ${apptPage===totalPages?'opacity-50':'hover:bg-gray-100'}" ${apptPage===totalPages?'disabled':''}>Next →</button>`;
+  } else pagDiv.innerHTML = '';
 }
 
-function renderRecentMessages() {
-  const container = document.getElementById('recent-messages');
-  const recent = messages.slice(0, 3);
-  if (!recent.length) {
-    container.innerHTML = '<p class="text-gray-500 text-sm">No messages yet</p>';
-    return;
-  }
-  container.innerHTML = recent.map(m => `
-    <div class="border rounded-lg p-4 hover:bg-gray-50">
-      <div class="flex justify-between items-start mb-2">
-        <div>
-          <span class="font-medium">${m.name || m.first_name + ' ' + (m.last_name || '')}</span>
-          <span class="text-gray-400 text-xs ml-2">${new Date(m.created_at).toLocaleDateString()}</span>
-        </div>
-        ${statusBadge(m.status)}
-      </div>
-      <p class="text-sm text-gray-600 line-clamp-2">${m.message}</p>
-    </div>
-  `).join('');
-}
-
+// ===== MESSAGES =====
 function renderMessages() {
-  const container = document.getElementById('messages-list');
-  if (!messages.length) {
-    container.innerHTML = '<div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">No messages found</div>';
-    return;
-  }
-  container.innerHTML = messages.map(m => `
-    <div class="bg-white rounded-xl shadow p-6">
-      <div class="flex justify-between items-start mb-3">
-        <div>
-          <h4 class="font-bold text-brand">${m.name || (m.first_name || '') + ' ' + (m.last_name || '')}</h4>
-          <p class="text-sm text-gray-500">${m.email} ${m.phone ? '• ' + m.phone : ''}</p>
-          <p class="text-xs text-gray-400">${new Date(m.created_at).toLocaleString()}</p>
-        </div>
-        <div class="flex items-center gap-2">
-          ${statusBadge(m.status)}
-          <select onchange="updateMessageStatus('${m.id}', this.value, '${m.name ? 'contact_messages' : 'oregon_tires_contact_messages'}')" class="border rounded px-2 py-1 text-xs">
-            <option value="new" ${m.status === 'new' ? 'selected' : ''}>New</option>
-            <option value="read" ${m.status === 'read' ? 'selected' : ''}>Read</option>
-            <option value="replied" ${m.status === 'replied' ? 'selected' : ''}>Replied</option>
-          </select>
-        </div>
-      </div>
-      <p class="text-gray-700">${m.message}</p>
-    </div>
-  `).join('');
+  const tbody = document.getElementById('messages-table');
+  tbody.innerHTML = messages.length ? messages.map(m => `
+    <tr class="border-b hover:bg-gray-50">
+      <td class="p-3 font-medium text-brand-light">${esc(m.first_name)} ${esc(m.last_name)}</td>
+      <td class="p-3 text-sm"><div>${esc(m.email)}</div>${m.phone?`<div class="text-xs text-gray-500">${esc(m.phone)}</div>`:''}</td>
+      <td class="p-3 text-sm max-w-[300px] truncate">${esc(m.message)}</td>
+      <td class="p-3 text-sm">${new Date(m.created_at).toLocaleDateString()}</td>
+      <td class="p-3"><select onchange="updateMsgStatus('${m.id}',this.value)" class="border rounded px-2 py-1 text-xs">
+        <option value="new" ${m.status==='new'?'selected':''}>New</option><option value="priority" ${m.status==='priority'?'selected':''}>Priority</option><option value="completed" ${m.status==='completed'?'selected':''}>Completed</option>
+      </select></td>
+    </tr>
+  `).join('') : '<tr><td colspan="5" class="p-6 text-center text-gray-500">No messages found</td></tr>';
 }
+
+// ===== EMAIL LOGS =====
+function renderEmailLogs() {
+  const container = document.getElementById('email-logs-list');
+  if(!emailLogs.length) { container.innerHTML = '<div class="bg-white rounded-xl shadow p-8 text-center text-gray-500">📧 No emails have been sent yet.</div>'; return; }
+  container.innerHTML = emailLogs.map(log => {
+    const typeColors = {appointment_created:'bg-blue-100 text-blue-800',appointment_assigned:'bg-yellow-100 text-yellow-800',appointment_completed:'bg-green-100 text-green-800'};
+    const typeLabels = {appointment_created:'Confirmation',appointment_assigned:'Assignment',appointment_completed:'Completion'};
+    return `<div class="bg-white rounded-xl shadow p-4 hover:shadow-md transition">
+      <div class="flex justify-between items-start">
+        <div class="space-y-1">
+          <div class="flex gap-2"><span class="px-2 py-1 rounded-full text-xs font-medium ${typeColors[log.email_type]||'bg-gray-100 text-gray-800'}">${typeLabels[log.email_type]||log.email_type}</span>
+          <span class="px-2 py-1 rounded-full text-xs font-medium border">${log.recipient_type}</span></div>
+          <h4 class="font-medium">${esc(log.subject)}</h4>
+        </div>
+        <button onclick="viewEmail('${log.id}')" class="border rounded px-3 py-1 text-sm hover:bg-gray-50">👁 View</button>
+      </div>
+      <div class="flex justify-between items-center text-sm text-gray-500 mt-2">
+        <div>👤 ${esc(log.recipient_name)} • 📧 ${esc(log.recipient_email)}</div>
+        <div>📅 ${new Date(log.sent_at).toLocaleDateString()} 🕐 ${new Date(log.sent_at).toLocaleTimeString()}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function viewEmail(id) {
+  const log = emailLogs.find(l=>l.id===id); if(!log) return;
+  document.getElementById('email-modal-subject').textContent = log.subject;
+  document.getElementById('email-modal-meta').innerHTML = `
+    <div><strong>To:</strong> ${esc(log.recipient_name)} (${esc(log.recipient_email)})</div>
+    <div><strong>Type:</strong> ${log.email_type}</div>
+    <div><strong>Sent:</strong> ${fmtDateTime(log.sent_at)}</div>
+    <div><strong>Message ID:</strong> ${esc(log.resend_message_id||'N/A')}</div>`;
+  document.getElementById('email-modal-body').innerHTML = log.body; // HTML email content
+  document.getElementById('email-modal').classList.remove('hidden');
+}
+
+// ===== EMPLOYEES =====
+function switchEmployeeSubTab(tab) {
+  employeeSubTab = tab;
+  document.getElementById('emp-sub-team').className = `px-4 py-2 rounded-lg text-sm font-medium ${tab==='team'?'bg-brand text-white':'border hover:bg-gray-50'}`;
+  document.getElementById('emp-sub-admins').className = `px-4 py-2 rounded-lg text-sm font-medium ${tab==='admins'?'bg-blue-600 text-white':'border hover:bg-gray-50'}`;
+  renderEmployees();
+}
+function toggleAddEmployeeForm() { document.getElementById('add-employee-form').classList.toggle('hidden'); }
+function toggleAddAdminForm() { document.getElementById('add-admin-form').classList.toggle('hidden'); }
 
 function renderEmployees() {
-  const tbody = document.getElementById('employees-table');
-  if (!employees.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-gray-500">No employees found</td></tr>';
-    return;
+  const container = document.getElementById('employees-content');
+  if(employeeSubTab === 'team') {
+    const active = employees.filter(e=>e.is_active), inactive = employees.filter(e=>!e.is_active);
+    container.innerHTML = `
+      <div class="flex justify-end mb-4"><button onclick="toggleAddEmployeeForm()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">+ Add Employee</button></div>
+      <h3 class="font-bold text-brand mb-3">Active Employees (${active.length})</h3>
+      <div class="space-y-3 mb-6">${active.length ? active.map(renderEmployeeCard).join('') : '<p class="text-gray-500">No active employees</p>'}</div>
+      ${inactive.length ? `<h3 class="font-bold text-gray-500 mb-3">Inactive Employees (${inactive.length})</h3><div class="space-y-3">${inactive.map(e=>renderEmployeeCard(e,true)).join('')}</div>` : ''}
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="flex justify-end mb-4"><button onclick="toggleAddAdminForm()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">+ Add Admin</button></div>
+      <div class="space-y-3">${adminUsers.length ? adminUsers.map(u => `
+        <div class="border rounded-lg bg-green-50 p-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">🛡</div>
+            <div><div class="flex items-center gap-2"><span class="font-medium">${esc(u.name)}</span><span class="bg-green-600 text-white px-2 py-0.5 rounded-full text-xs">Admin</span></div>
+            <div class="text-sm text-gray-600">${esc(u.email)}</div>
+            <div class="text-sm text-gray-500">${u.last_sign_in_at ? 'Last login: '+new Date(u.last_sign_in_at).toLocaleDateString() : 'Created: '+new Date(u.created_at).toLocaleDateString()}</div></div>
+          </div>
+          <button onclick="revokeAdmin('${u.id}')" class="text-red-600 border border-red-200 px-3 py-1 rounded-lg text-sm hover:bg-red-50">🗑 Revoke Access</button>
+        </div>
+      `).join('') : '<p class="text-gray-500 text-center py-4">No admin accounts found</p>'}</div>
+      <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+        <strong>Admin Account Management:</strong><br>
+        • Admin users can access the dashboard at /simple/admin<br>
+        • Only users with admin privileges can view and manage data<br>
+        • Revoked admins will lose access immediately
+      </div>
+    `;
   }
-  tbody.innerHTML = employees.map(e => `
-    <tr class="border-b hover:bg-gray-50">
-      <td class="p-3 font-medium">${e.name || e.full_name || '—'}</td>
-      <td class="p-3">${e.role || e.position || '—'}</td>
-      <td class="p-3">${e.phone || '—'}</td>
-      <td class="p-3">${e.email || '—'}</td>
-      <td class="p-3">${e.is_active !== false ? '<span class="text-green-600 font-medium">Active</span>' : '<span class="text-gray-400">Inactive</span>'}</td>
-    </tr>
+}
+
+function renderEmployeeCard(emp, inactive) {
+  const upcoming = appointments.filter(a => a.assigned_employee_id===emp.id && new Date(a.preferred_date+'T00:00:00') >= new Date(new Date().toISOString().split('T')[0]+'T00:00:00'));
+  return `<div class="border rounded-lg p-4 ${inactive?'bg-gray-50':'bg-white'}">
+    <div class="flex items-center justify-between">
+      <div class="flex-1">
+        <div class="flex items-center gap-2">
+          <span class="font-medium">${esc(emp.name)}</span>
+          <span class="text-xs px-2 py-1 rounded-full ${emp.role==='Manager'?'bg-blue-100 text-blue-800':'bg-gray-100 text-gray-800'}">${emp.role||'Employee'}</span>
+          ${inactive?'<span class="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600">Inactive</span>':''}
+        </div>
+        <div class="text-sm text-gray-600">${emp.email?esc(emp.email):''}${emp.email&&emp.phone?' • ':''}${emp.phone?esc(emp.phone):''}</div>
+        ${!inactive && upcoming.length ? `<div class="mt-2 p-2 bg-blue-50 rounded text-sm">📅 <span class="text-blue-800 font-medium">${upcoming.length} upcoming</span>
+          ${upcoming[0]?` • Next: ${fmtDate(upcoming[0].preferred_date)}`:''}</div>` : ''}
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleEmployeeStatus('${emp.id}',${!emp.is_active})" class="border rounded px-3 py-1 text-xs ${inactive?'text-green-600 hover:bg-green-50':'text-red-600 hover:bg-red-50'}">${inactive?'⚡ Activate':'⏻ Deactivate'}</button>
+        ${!inactive&&emp.email?`<button onclick="makeAdmin('${esc(emp.email)}','${esc(emp.name)}')" class="border rounded px-3 py-1 text-xs text-blue-600 hover:bg-blue-50">🛡 Make Admin</button>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ===== GALLERY =====
+function toggleAddGalleryForm() { document.getElementById('add-gallery-form').classList.toggle('hidden'); }
+
+function renderGallery() {
+  const container = document.getElementById('gallery-grid');
+  container.innerHTML = galleryImages.length ? galleryImages.map(img => `
+    <div class="border rounded-lg bg-white p-3 flex items-start gap-4">
+      <img src="${esc(img.image_url)}" alt="${esc(img.title)}" class="w-20 h-20 object-cover rounded">
+      <div class="flex-1">
+        <div class="flex justify-between items-start">
+          <div><h4 class="font-medium">${esc(img.title)}</h4><p class="text-sm text-gray-600 capitalize">${img.language||'english'} • Order: ${img.display_order||0} • ${img.is_active!==false?'Active':'Inactive'}</p>
+          ${img.description?`<p class="text-sm text-gray-500 mt-1">${esc(img.description)}</p>`:''}</div>
+          <button onclick="deleteGalleryImage('${img.id}','${esc(img.image_url)}')" class="text-red-600 border border-red-200 px-2 py-1 rounded text-xs hover:bg-red-50">🗑</button>
+        </div>
+      </div>
+    </div>
+  `).join('') : '<div class="text-center py-8 text-gray-500">No gallery images found. Add your first image above.</div>';
+}
+
+async function uploadGalleryImage() {
+  const file = document.getElementById('gallery-file').files[0];
+  const title = document.getElementById('gallery-title').value;
+  if(!file||!title) { showToast('Please select a file and enter a title', true); return; }
+  const btn = document.getElementById('gallery-upload-btn'); btn.textContent = 'Uploading...'; btn.disabled = true;
+  try {
+    const ext = file.name.split('.').pop();
+    const path = `gallery/${Date.now()}.${ext}`;
+    const { error: upErr } = await sb.storage.from('gallery-images').upload(path, file);
+    if(upErr) throw upErr;
+    const { data: { publicUrl } } = sb.storage.from('gallery-images').getPublicUrl(path);
+    const { error } = await sb.from('oretir_gallery_images').insert([{
+      title, image_url: publicUrl, description: document.getElementById('gallery-desc').value,
+      language: document.getElementById('gallery-lang').value, is_active: true
+    }]);
+    if(error) throw error;
+    showToast('Image uploaded!'); toggleAddGalleryForm(); loadGalleryImages();
+    document.getElementById('gallery-file').value=''; document.getElementById('gallery-title').value=''; document.getElementById('gallery-desc').value='';
+  } catch(e) { showToast('Upload failed: '+e.message, true); }
+  finally { btn.textContent='💾 Upload & Save'; btn.disabled=false; }
+}
+
+async function deleteGalleryImage(id, url) {
+  if(!confirm('Delete this image permanently?')) return;
+  try {
+    const pathMatch = url.match(/gallery-images\/(.+)$/);
+    if(pathMatch) await sb.storage.from('gallery-images').remove([pathMatch[1]]);
+    await sb.from('oretir_gallery_images').delete().eq('id', id);
+    showToast('Image deleted'); loadGalleryImages();
+  } catch(e) { showToast('Delete failed', true); }
+}
+
+// ===== SERVICE IMAGES =====
+function renderServiceImages() {
+  const services = [
+    {key:'hero-background',title:'Hero Background Image'},{key:'expert-technicians',title:'Expert Technicians'},
+    {key:'fast-cars',title:'Quick Service'},{key:'quality-car-parts',title:'Quality Parts'},
+    {key:'bilingual-support',title:'Bilingual Support'},{key:'tire-shop',title:'Tire Services'},
+    {key:'auto-repair',title:'Auto Maintenance'},{key:'specialized-tools',title:'Specialized Services'}
+  ];
+  const container = document.getElementById('service-images-grid');
+  const matched = services.map(s => ({ ...s, img: serviceImages.find(i=>i.service_key===s.key) }));
+  container.innerHTML = matched.map(s => `
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+      <div class="p-4"><h3 class="font-bold text-brand">${s.title}</h3></div>
+      <div class="relative h-48 bg-gray-100">
+        ${s.img ? `<div class="absolute inset-0 bg-cover" style="background-image:url(${s.img.image_url});background-position:${s.img.position_x||50}% ${s.img.position_y||50}%"></div>
+          <div class="absolute inset-0 bg-black/30"></div>
+          <div class="absolute top-2 right-2"><span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs">🕐 Live</span></div>` 
+          : '<div class="flex items-center justify-center h-full text-gray-400">No image uploaded</div>'}
+      </div>
+      <div class="p-4">
+        <label class="text-sm font-medium">Upload New Image</label>
+        <div class="flex gap-2 mt-1">
+          <input type="file" accept="image/*" id="svc-file-${s.key}" class="flex-1 text-sm border rounded p-1">
+          <button onclick="uploadServiceImage('${s.key}')" class="bg-brand text-white px-3 py-1 rounded text-sm">⬆ Upload</button>
+        </div>
+      </div>
+    </div>
   `).join('');
+}
+
+async function uploadServiceImage(key) {
+  const input = document.getElementById('svc-file-'+key);
+  const file = input?.files?.[0]; if(!file) { showToast('Select a file first', true); return; }
+  try {
+    const ext = file.name.split('.').pop();
+    const path = `service-images/${key}-${Date.now()}.${ext}`;
+    const { error: upErr } = await sb.storage.from('gallery-images').upload(path, file);
+    if(upErr) throw upErr;
+    const { data: { publicUrl } } = sb.storage.from('gallery-images').getPublicUrl(path);
+    // Mark old as not current
+    await sb.from('oretir_service_images').update({is_current:false}).eq('service_key',key);
+    // Insert new
+    const svcTitles = {'hero-background':'Hero Background','expert-technicians':'Expert Technicians','fast-cars':'Quick Service','quality-car-parts':'Quality Parts','bilingual-support':'Bilingual Support','tire-shop':'Tire Services','auto-repair':'Auto Maintenance','specialized-tools':'Specialized Services'};
+    await sb.from('oretir_service_images').insert([{service_key:key,title:svcTitles[key]||key,image_url:publicUrl,is_current:true}]);
+    showToast('Image is now live!'); input.value=''; loadServiceImages();
+  } catch(e) { showToast('Upload failed: '+e.message, true); }
+}
+
+// ===== ANALYTICS =====
+function renderAnalytics() {
+  const total = appointments.length;
+  const newA = appointments.filter(a=>a.status==='new').length;
+  const confirmed = appointments.filter(a=>a.status==='confirmed').length;
+  const completed = appointments.filter(a=>a.status==='completed').length;
+  const cancelled = appointments.filter(a=>a.status==='cancelled').length;
+  const thisWeek = new Date(); thisWeek.setDate(thisWeek.getDate()-7);
+  const recent = appointments.filter(a=>new Date(a.created_at)>thisWeek).length;
+  const totalMsgs = messages.length;
+  const unreadMsgs = messages.filter(m=>m.status==='new').length;
+
+  // Customers
+  const custMap = {};
+  appointments.forEach(a => {
+    const k = a.email.toLowerCase();
+    if(!custMap[k]) custMap[k] = {name:`${a.first_name} ${a.last_name}`,email:a.email,count:0,services:[]};
+    custMap[k].count++; custMap[k].services.push(a.service);
+  });
+  const totalCustomers = Object.keys(custMap).length;
+  const recurring = Object.values(custMap).filter(c=>c.count>1).length;
+
+  // Avg time
+  const withTime = appointments.filter(a=>a.status==='completed'&&a.actual_duration_minutes);
+  const avgTime = withTime.length ? Math.round(withTime.reduce((s,a)=>s+(a.actual_duration_minutes||0),0)/withTime.length) : 0;
+
+  // Employee stats
+  const empStats = employees.filter(e=>e.is_active).map(e => {
+    const eApts = appointments.filter(a=>a.assigned_employee_id===e.id);
+    const eDone = eApts.filter(a=>a.status==='completed'&&a.actual_duration_minutes);
+    const totalTime = eDone.reduce((s,a)=>s+(a.actual_duration_minutes||0),0);
+    return { name: e.name, total: eApts.length, completed: eDone.length, totalTime, avgTime: eDone.length ? Math.round(totalTime/eDone.length) : 0 };
+  });
+
+  // Time frequency
+  const timeCounts = {};
+  appointments.forEach(a => { timeCounts[a.preferred_time] = (timeCounts[a.preferred_time]||0)+1; });
+  const topTimes = Object.entries(timeCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+
+  document.getElementById('analytics-content').innerHTML = `
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+      <div class="bg-gray-50 p-4 rounded-lg border hover:bg-gray-100 cursor-pointer"><h3 class="font-semibold">Total Appointments</h3><p class="text-3xl font-bold text-brand">${total}</p></div>
+      <div class="bg-gray-50 p-4 rounded-lg border hover:bg-gray-100 cursor-pointer"><h3 class="font-semibold">This Week</h3><p class="text-3xl font-bold text-brand">${recent}</p></div>
+    </div>
+    <div class="grid md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-blue-50 p-4 rounded-lg border"><h3 class="text-sm text-blue-800">New</h3><p class="text-2xl font-bold text-blue-600">${newA}</p></div>
+      <div class="bg-green-50 p-4 rounded-lg border"><h3 class="text-sm text-green-800">Confirmed</h3><p class="text-2xl font-bold text-green-600">${confirmed}</p></div>
+      <div class="bg-gray-50 p-4 rounded-lg border"><h3 class="text-sm text-gray-800">Completed</h3><p class="text-2xl font-bold text-gray-600">${completed}</p></div>
+      <div class="bg-red-50 p-4 rounded-lg border"><h3 class="text-sm text-red-800">Cancelled</h3><p class="text-2xl font-bold text-red-600">${cancelled}</p></div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-lg font-bold text-brand mb-4">📬 Messages</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-gray-50 p-4 rounded-lg"><p class="text-sm text-gray-600">Total</p><p class="text-2xl font-bold">${totalMsgs}</p></div>
+          <div class="bg-gray-50 p-4 rounded-lg"><p class="text-sm text-gray-600">Unread</p><p class="text-2xl font-bold text-blue-600">${unreadMsgs}</p></div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-lg font-bold text-brand mb-4">👥 Customers</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-gray-50 p-4 rounded-lg"><p class="text-sm text-gray-600">Total</p><p class="text-2xl font-bold">${totalCustomers}</p></div>
+          <div class="bg-purple-50 p-4 rounded-lg"><p class="text-sm text-gray-600">Recurring</p><p class="text-2xl font-bold text-purple-600">${recurring}</p></div>
+        </div>
+      </div>
+    </div>
+    ${avgTime ? `<div class="bg-white rounded-xl shadow p-6 mb-6"><h3 class="text-lg font-bold text-brand mb-4">⏱ Time Tracking</h3>
+      <p>Average appointment time: <strong>${avgTime} minutes</strong> (from ${withTime.length} completed)</p></div>` : ''}
+    ${empStats.length ? `<div class="bg-white rounded-xl shadow p-6 mb-6"><h3 class="text-lg font-bold text-brand mb-4">👷 Employee Performance</h3>
+      <table class="w-full text-sm"><thead><tr class="border-b"><th class="text-left p-2">Employee</th><th class="p-2">Total</th><th class="p-2">Completed</th><th class="p-2">Total Time</th><th class="p-2">Avg Time</th></tr></thead>
+      <tbody>${empStats.map(e=>`<tr class="border-b"><td class="p-2 font-medium">${esc(e.name)}</td><td class="p-2 text-center">${e.total}</td><td class="p-2 text-center">${e.completed}</td><td class="p-2 text-center">${e.totalTime}min</td><td class="p-2 text-center">${e.avgTime}min</td></tr>`).join('')}</tbody></table></div>` : ''}
+    ${topTimes.length ? `<div class="bg-white rounded-xl shadow p-6"><h3 class="text-lg font-bold text-brand mb-4">🕐 Popular Appointment Times</h3>
+      <div class="space-y-2">${topTimes.map(([time,count])=>{
+        const pct = Math.round(count/total*100);
+        return `<div class="flex items-center gap-3"><span class="w-20 text-sm font-medium">${fmtTime(time)}</span><div class="flex-1 bg-gray-200 rounded-full h-4"><div class="bg-brand rounded-full h-4" style="width:${pct}%"></div></div><span class="text-sm text-gray-600">${count}</span></div>`;
+      }).join('')}</div></div>` : ''}
+  `;
 }
 
 // ===== ACTIONS =====
-async function updateAppointmentStatus(id, status) {
+async function updateApptStatus(id, status) {
+  if(status==='confirmed') { const a=appointments.find(x=>x.id===id); if(!a?.assigned_employee_id) { showToast('Assign an employee before confirming',true); loadAppointments(); return; } }
   const { error } = await sb.from('oretir_appointments').update({ status }).eq('id', id);
-  if (error) { showToast('Error updating status', true); return; }
-  showToast(`Appointment ${status}`);
-  const appt = appointments.find(a => a.id === id);
-  if (appt) appt.status = status;
-  renderAppointments();
-  renderRecentAppointments();
-  updateStats();
+  if(error) { showToast('Error: '+error.message, true); return; }
+  showToast(`Status → ${status}`);
+  // Send email on completion
+  if(status==='completed') { try { await sb.functions.invoke('send-appointment-emails',{body:{type:'appointment_completed',appointmentId:id}}); } catch(e){} }
+  loadAppointments();
 }
 
-async function updateMessageStatus(id, status, table) {
-  const { error } = await sb.from(table).update({ status }).eq('id', id);
-  if (error) { 
-    // Try the other table
-    const otherTable = table === 'contact_messages' ? 'oregon_tires_contact_messages' : 'contact_messages';
-    const { error: e2 } = await sb.from(otherTable).update({ status }).eq('id', id);
-    if (e2) { showToast('Error updating message status', true); return; }
-  }
-  showToast(`Message marked as ${status}`);
-  const msg = messages.find(m => m.id === id);
-  if (msg) msg.status = status;
-  renderMessages();
-  renderRecentMessages();
-  updateStats();
+async function updateApptAssignment(id, empId) {
+  const update = { assigned_employee_id: empId || null };
+  if(empId) update.status = 'confirmed';
+  const { error } = await sb.from('oretir_appointments').update(update).eq('id', id);
+  if(error) { showToast('Error: '+error.message, true); return; }
+  showToast(empId ? 'Employee assigned & confirmed' : 'Assignment removed');
+  if(empId) { try { await sb.functions.invoke('send-appointment-emails',{body:{type:'appointment_assigned',appointmentId:id}}); } catch(e){} }
+  loadAppointments();
+}
+
+async function updateMsgStatus(id, status) {
+  const { error } = await sb.from('oretir_contact_messages').update({ status }).eq('id', id);
+  if(error) { showToast('Error', true); return; }
+  showToast(`Message → ${status}`); loadMessages();
 }
 
 function openNotesModal(id) {
   currentNotesId = id;
-  const appt = appointments.find(a => a.id === id);
-  document.getElementById('notes-text').value = appt?.admin_notes || '';
+  const a = appointments.find(x=>x.id===id);
+  document.getElementById('notes-text').value = a?.admin_notes || '';
   document.getElementById('notes-modal').classList.remove('hidden');
 }
-
-function closeNotesModal() {
-  document.getElementById('notes-modal').classList.add('hidden');
-  currentNotesId = null;
+async function saveNotes() {
+  if(!currentNotesId) return;
+  const notes = document.getElementById('notes-text').value;
+  await sb.from('oretir_appointments').update({ admin_notes: notes }).eq('id', currentNotesId);
+  showToast('Notes saved'); closeModal('notes-modal'); loadAppointments();
 }
 
-async function saveNotes() {
-  if (!currentNotesId) return;
-  const notes = document.getElementById('notes-text').value;
-  const { error } = await sb.from('oretir_appointments').update({ admin_notes: notes }).eq('id', currentNotesId);
-  if (error) { showToast('Error saving notes', true); return; }
-  showToast('Notes saved');
-  const appt = appointments.find(a => a.id === currentNotesId);
-  if (appt) appt.admin_notes = notes;
-  renderAppointments();
-  closeNotesModal();
+async function addEmployee() {
+  const name = document.getElementById('new-emp-name').value;
+  if(!name) { showToast('Name is required', true); return; }
+  const { error } = await sb.from('oretir_employees').insert([{
+    name, email: document.getElementById('new-emp-email').value||null,
+    phone: document.getElementById('new-emp-phone').value||null,
+    role: document.getElementById('new-emp-role').value
+  }]);
+  if(error) { showToast('Error: '+error.message, true); return; }
+  showToast('Employee added!'); toggleAddEmployeeForm();
+  document.getElementById('new-emp-name').value=''; document.getElementById('new-emp-email').value='';
+  document.getElementById('new-emp-phone').value=''; loadEmployees();
+}
+
+async function toggleEmployeeStatus(id, newStatus) {
+  await sb.from('oretir_employees').update({ is_active: newStatus }).eq('id', id);
+  showToast(`Employee ${newStatus?'activated':'deactivated'}`); loadEmployees();
+}
+
+async function makeAdmin(email, name) {
+  try {
+    const { error } = await sb.rpc('set_admin_by_email', { user_email: email, admin_status: true, target_project_id: 'oregon-tires' });
+    if(error) {
+      if(error.message.includes('not found')) {
+        await sb.functions.invoke('create-employee-account', { body: { email, employeeName: name } });
+        await sb.rpc('set_admin_by_email', { user_email: email, admin_status: true, target_project_id: 'oregon-tires' });
+        showToast('Account created & admin access granted');
+      } else throw error;
+    } else showToast('Admin access granted');
+    loadAdminUsers();
+  } catch(e) { showToast('Failed: '+e.message, true); }
+}
+
+async function addAdmin() {
+  const email = document.getElementById('new-admin-email').value;
+  if(!email) return;
+  await makeAdmin(email, email.split('@')[0]);
+  document.getElementById('new-admin-email').value=''; toggleAddAdminForm();
+}
+
+async function revokeAdmin(userId) {
+  if(!confirm('Revoke admin access?')) return;
+  await sb.from('oretir_profiles').update({ is_admin: false }).eq('id', userId);
+  showToast('Admin access revoked'); loadAdminUsers();
 }
 
 // ===== TAB SWITCHING =====
 function switchTab(tab) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-  document.querySelectorAll('.tab-btn').forEach(el => {
-    el.classList.remove('tab-active');
-    el.classList.add('hover:bg-gray-100');
-  });
+  document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('tab-active'); el.classList.add('text-white','hover:bg-green-600'); });
   document.getElementById('tab-' + tab).classList.remove('hidden');
-  const btns = document.querySelectorAll('.tab-btn');
-  const tabs = ['overview', 'appointments', 'messages', 'employees'];
-  const idx = tabs.indexOf(tab);
-  if (idx >= 0 && btns[idx]) {
-    btns[idx].classList.add('tab-active');
-    btns[idx].classList.remove('hover:bg-gray-100');
-  }
+  const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+  if(btn) { btn.classList.add('tab-active'); btn.classList.remove('text-white','hover:bg-green-600'); }
+  if(tab==='analytics') renderAnalytics();
+  if(tab==='calendar') renderCalendar();
 }
 
-// Close modal on overlay click
-document.getElementById('notes-modal').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('notes-modal')) closeNotesModal();
-});
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', (e) => { if(e.target===m) m.classList.add('hidden'); }));
 </script>
 </body>
 </html>
