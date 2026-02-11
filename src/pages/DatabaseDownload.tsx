@@ -1,8 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Database, FileText, ArrowLeft } from 'lucide-react';
+import { Download, Database, FileText, ArrowLeft, Package, FolderArchive } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import JSZip from 'jszip';
 
 const MIGRATION_FILES = [
   "20250613064349-4388eb16-b9ef-474d-81c2-a7aae0caaa6a.sql",
@@ -80,20 +81,375 @@ const MIGRATION_FILES = [
   "20250912052951_9079d402-139f-46d0-919a-e0c532a8e913.sql",
   "20250912053024_ad545f96-6a7f-4748-a286-7a0e26e5e976.sql",
   "20260210201918_efbae300-0626-48d1-bb7e-ba7d56730082.sql",
+  "20260210202939_91cfa57c-4b77-4982-a4bc-928d9bd0611f.sql",
 ];
 
-const DatabaseDownload = () => {
-  const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState('');
+// Source files needed to build & deploy the React app for / and /admin
+const SOURCE_FILES = [
+  // Config
+  'index.html',
+  'vite.config.ts',
+  'tailwind.config.ts',
+  'postcss.config.js',
+  'tsconfig.json',
+  'tsconfig.app.json',
+  'tsconfig.node.json',
+  'components.json',
+  'eslint.config.js',
+  '.env',
 
-  const downloadAllFiles = async () => {
-    setLoading(true);
-    setProgress('Fetching schema file...');
+  // Entry
+  'src/main.tsx',
+  'src/App.tsx',
+  'src/App.css',
+  'src/index.css',
+  'src/vite-env.d.ts',
+  'src/lib/utils.ts',
+
+  // Pages
+  'src/pages/Index.tsx',
+  'src/pages/OregonTires.tsx',
+  'src/pages/OregonTiresAdmin.tsx',
+  'src/pages/AdminLogin.tsx',
+  'src/pages/AppointmentBooking.tsx',
+  'src/pages/ProgramarServicio.tsx',
+  'src/pages/Translate.tsx',
+  'src/pages/EmployeeProfile.tsx',
+  'src/pages/NotFound.tsx',
+
+  // Oregon Tires components
+  'src/components/OregonTiresHeader.tsx',
+  'src/components/OregonTiresHero.tsx',
+  'src/components/OregonTiresServices.tsx',
+  'src/components/OregonTiresAbout.tsx',
+  'src/components/OregonTiresTestimonials.tsx',
+  'src/components/OregonTiresContact.tsx',
+  'src/components/OregonTiresFooter.tsx',
+  'src/components/OregonTiresGallery.tsx',
+  'src/components/WeeklySchedule.tsx',
+  'src/components/AppointmentPreview.tsx',
+  'src/components/ProtectedAdminRoute.tsx',
+
+  // Admin components
+  'src/components/admin/AdminHeader.tsx',
+  'src/components/admin/AdminFooter.tsx',
+  'src/components/admin/AdminTabs.tsx',
+  'src/components/admin/AdminCalendar.tsx',
+  'src/components/admin/AdminAccountManager.tsx',
+  'src/components/admin/AnalyticsView.tsx',
+  'src/components/admin/AppointmentCard.tsx',
+  'src/components/admin/AppointmentNotesEditor.tsx',
+  'src/components/admin/AppointmentsTab.tsx',
+  'src/components/admin/AppointmentsView.tsx',
+  'src/components/admin/CalendarPanel.tsx',
+  'src/components/admin/CalendarTab.tsx',
+  'src/components/admin/DailySummary.tsx',
+  'src/components/admin/DashboardOverview.tsx',
+  'src/components/admin/DashboardView.tsx',
+  'src/components/admin/DaySchedulePanel.tsx',
+  'src/components/admin/DayView.tsx',
+  'src/components/admin/DayViewAppointmentCard.tsx',
+  'src/components/admin/DayViewTimeSlot.tsx',
+  'src/components/admin/EmailLogsView.tsx',
+  'src/components/admin/EmailTestPanel.tsx',
+  'src/components/admin/EmployeeAppointments.tsx',
+  'src/components/admin/EmployeeCalendarSchedule.tsx',
+  'src/components/admin/EmployeeEditDialog.tsx',
+  'src/components/admin/EmployeeManager.tsx',
+  'src/components/admin/EmployeeScheduleAlert.tsx',
+  'src/components/admin/EmployeesView.tsx',
+  'src/components/admin/ExpandedCalendarView.tsx',
+  'src/components/admin/GalleryManager.tsx',
+  'src/components/admin/HoursEditor.tsx',
+  'src/components/admin/MessagesTab.tsx',
+  'src/components/admin/MessagesView.tsx',
+  'src/components/admin/ScheduleConflictAlert.tsx',
+  'src/components/admin/ServiceImagesManager.tsx',
+  'src/components/admin/TimeSlot.tsx',
+  'src/components/admin/UpcomingAppointmentsView.tsx',
+
+  // Admin hours sub-components
+  'src/components/admin/hours/ClosedToggle.tsx',
+  'src/components/admin/hours/HoursActions.tsx',
+  'src/components/admin/hours/HoursInfo.tsx',
+  'src/components/admin/hours/SimultaneousBookingsEditor.tsx',
+  'src/components/admin/hours/TimeRangeEditor.tsx',
+  'src/components/admin/hours/useHoursEditor.tsx',
+
+  // Booking components
+  'src/components/booking/BookingConfirmation.tsx',
+  'src/components/booking/BookingSummary.tsx',
+  'src/components/booking/CustomerInfoStep.tsx',
+  'src/components/booking/DistanceCalculator.tsx',
+  'src/components/booking/ScheduleViewStep.tsx',
+  'src/components/booking/TimeSlotGrid.tsx',
+
+  // Contact components
+  'src/components/contact/ContactForm.tsx',
+  'src/components/contact/ContactInformation.tsx',
+  'src/components/contact/LocationMap.tsx',
+
+  // UI components (shadcn)
+  'src/components/ui/accordion.tsx',
+  'src/components/ui/alert-dialog.tsx',
+  'src/components/ui/alert.tsx',
+  'src/components/ui/aspect-ratio.tsx',
+  'src/components/ui/avatar.tsx',
+  'src/components/ui/badge.tsx',
+  'src/components/ui/breadcrumb.tsx',
+  'src/components/ui/button.tsx',
+  'src/components/ui/calendar.tsx',
+  'src/components/ui/carousel.tsx',
+  'src/components/ui/chart.tsx',
+  'src/components/ui/checkbox.tsx',
+  'src/components/ui/collapsible.tsx',
+  'src/components/ui/command.tsx',
+  'src/components/ui/context-menu.tsx',
+  'src/components/ui/dialog.tsx',
+  'src/components/ui/drawer.tsx',
+  'src/components/ui/dropdown-menu.tsx',
+  'src/components/ui/form.tsx',
+  'src/components/ui/hover-card.tsx',
+  'src/components/ui/input-otp.tsx',
+  'src/components/ui/input.tsx',
+  'src/components/ui/label.tsx',
+  'src/components/ui/menubar.tsx',
+  'src/components/ui/navigation-menu.tsx',
+  'src/components/ui/pagination.tsx',
+  'src/components/ui/popover.tsx',
+  'src/components/ui/progress.tsx',
+  'src/components/ui/radio-group.tsx',
+  'src/components/ui/resizable.tsx',
+  'src/components/ui/scroll-area.tsx',
+  'src/components/ui/select.tsx',
+  'src/components/ui/separator.tsx',
+  'src/components/ui/sheet.tsx',
+  'src/components/ui/sidebar.tsx',
+  'src/components/ui/skeleton.tsx',
+  'src/components/ui/slider.tsx',
+  'src/components/ui/sonner.tsx',
+  'src/components/ui/switch.tsx',
+  'src/components/ui/table.tsx',
+  'src/components/ui/tabs.tsx',
+  'src/components/ui/textarea.tsx',
+  'src/components/ui/toast.tsx',
+  'src/components/ui/toaster.tsx',
+  'src/components/ui/toggle-group.tsx',
+  'src/components/ui/toggle.tsx',
+  'src/components/ui/tooltip.tsx',
+  'src/components/ui/use-toast.ts',
+
+  // Hooks
+  'src/hooks/use-mobile.tsx',
+  'src/hooks/use-toast.ts',
+  'src/hooks/useAdminAuth.tsx',
+  'src/hooks/useAdminData.tsx',
+  'src/hooks/useAdminView.tsx',
+  'src/hooks/useAppointmentTimer.tsx',
+  'src/hooks/useContactForm.tsx',
+  'src/hooks/useCustomHours.tsx',
+  'src/hooks/useDesignTheme.tsx',
+  'src/hooks/useEmailNotifications.tsx',
+  'src/hooks/useEmployeeAppointments.tsx',
+  'src/hooks/useEmployeeSchedules.tsx',
+  'src/hooks/useEmployees.tsx',
+  'src/hooks/useGalleryImages.tsx',
+  'src/hooks/useLanguage.tsx',
+  'src/hooks/useNavigation.tsx',
+  'src/hooks/useScheduleAvailability.tsx',
+  'src/hooks/useServiceImages.tsx',
+  'src/hooks/useServiceImagesForFrontend.tsx',
+
+  // Integrations
+  'src/integrations/supabase/client.ts',
+  'src/integrations/supabase/types.ts',
+
+  // Types & Utils
+  'src/types/admin.ts',
+  'src/utils/translations.ts',
+
+  // Edge functions
+  'supabase/functions/create-employee-account/index.ts',
+  'supabase/functions/send-appointment-emails/index.ts',
+  'supabase/config.toml',
+];
+
+// Binary/image assets to include (fetched as arraybuffer)
+const IMAGE_FILES = [
+  'public/favicon.ico',
+  'public/placeholder.svg',
+  'public/robots.txt',
+  'public/.htaccess',
+  'public/_redirects',
+  'public/images/auto-maintenance.jpg',
+  'public/images/bilingual-service.jpg',
+  'public/images/expert-technicians.jpg',
+  'public/images/fast-cars.jpg',
+  'public/images/quality-parts.jpg',
+  'public/images/specialized-services.jpg',
+  'public/images/tire-services.jpg',
+];
+
+const SRC_IMAGE_FILES = [
+  'src/assets/auto-repair.jpg',
+  'src/assets/bilingual-support.jpg',
+  'src/assets/expert-service.jpg',
+  'src/assets/quality-car-parts.jpg',
+  'src/assets/quick-service.jpg',
+  'src/assets/specialized-tools.jpg',
+  'src/assets/tire-shop.jpg',
+];
+
+const PACKAGE_JSON_CONTENT = `{
+  "name": "oregon-tires",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "@radix-ui/react-accordion": "^1.2.0",
+    "@radix-ui/react-alert-dialog": "^1.1.1",
+    "@radix-ui/react-aspect-ratio": "^1.1.0",
+    "@radix-ui/react-avatar": "^1.1.0",
+    "@radix-ui/react-checkbox": "^1.1.1",
+    "@radix-ui/react-collapsible": "^1.1.0",
+    "@radix-ui/react-context-menu": "^2.2.1",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-hover-card": "^1.1.1",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-menubar": "^1.1.1",
+    "@radix-ui/react-navigation-menu": "^1.2.0",
+    "@radix-ui/react-popover": "^1.1.1",
+    "@radix-ui/react-progress": "^1.1.0",
+    "@radix-ui/react-radio-group": "^1.2.0",
+    "@radix-ui/react-scroll-area": "^1.1.0",
+    "@radix-ui/react-select": "^2.1.1",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slider": "^1.2.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-switch": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.1",
+    "@radix-ui/react-toggle": "^1.1.0",
+    "@radix-ui/react-toggle-group": "^1.1.0",
+    "@radix-ui/react-tooltip": "^1.1.4",
+    "@supabase/supabase-js": "^2.50.0",
+    "@tanstack/react-query": "^5.56.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
+    "date-fns": "^3.6.0",
+    "dompurify": "^3.3.1",
+    "embla-carousel-react": "^8.3.0",
+    "input-otp": "^1.2.4",
+    "lucide-react": "^0.462.0",
+    "next-themes": "^0.3.0",
+    "react": "^18.3.1",
+    "react-day-picker": "^8.10.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.0",
+    "react-resizable-panels": "^2.1.3",
+    "react-router-dom": "^6.26.2",
+    "recharts": "^2.12.7",
+    "sonner": "^1.5.0",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7",
+    "vaul": "^0.9.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/dompurify": "^3.0.5",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0"
+  }
+}`;
+
+const README_CONTENT = `# Oregon Tires - Web Application
+
+## Setup & Deployment
+
+### Prerequisites
+- Node.js 18+ and npm
+
+### Install
+\`\`\`bash
+npm install
+\`\`\`
+
+### Environment
+The \`.env\` file is pre-configured with your Supabase credentials.  
+If you need to change them, edit \`.env\`:
+\`\`\`
+VITE_SUPABASE_URL=https://vtknmauyvmuaryttnenx.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
+VITE_SUPABASE_PROJECT_ID=vtknmauyvmuaryttnenx
+\`\`\`
+
+### Build for Production
+\`\`\`bash
+npm run build
+\`\`\`
+This creates a \`dist/\` folder. Upload its contents to your web server.
+
+### SPA Routing
+For client-side routing to work, configure your web server to serve \`index.html\` for all routes.
+
+**Apache (.htaccess)** — included in dist automatically:
+\`\`\`
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
+\`\`\`
+
+**Nginx:**
+\`\`\`
+location / {
+  try_files $uri $uri/ /index.html;
+}
+\`\`\`
+
+### Routes
+- \`/\` — Public Oregon Tires website
+- \`/admin/login\` — Admin login
+- \`/admin\` — Admin dashboard (requires authentication)
+- \`/book-appointment\` — Appointment booking
+- \`/programar-servicio\` — Spanish appointment booking
+
+### Edge Functions
+The \`supabase/functions/\` directory contains Supabase Edge Functions.
+Deploy them via the Supabase CLI:
+\`\`\`bash
+supabase functions deploy send-appointment-emails
+supabase functions deploy create-employee-account
+\`\`\`
+`;
+
+const DatabaseDownload = () => {
+  const [sqlLoading, setSqlLoading] = useState(false);
+  const [sqlProgress, setSqlProgress] = useState('');
+  const [zipLoading, setZipLoading] = useState(false);
+  const [zipProgress, setZipProgress] = useState('');
+
+  const downloadSqlBundle = async () => {
+    setSqlLoading(true);
+    setSqlProgress('Fetching schema file...');
 
     try {
       let bundledContent = '';
 
-      // Fetch the main schema file
       const schemaRes = await fetch('/database-schema.sql');
       if (schemaRes.ok) {
         const schemaText = await schemaRes.text();
@@ -104,16 +460,13 @@ const DatabaseDownload = () => {
         bundledContent += `\n\n`;
       }
 
-      // Fetch each migration file
       for (let i = 0; i < MIGRATION_FILES.length; i++) {
         const file = MIGRATION_FILES[i];
-        setProgress(`Fetching migration ${i + 1} of ${MIGRATION_FILES.length}...`);
-
+        setSqlProgress(`Fetching migration ${i + 1} of ${MIGRATION_FILES.length}...`);
         try {
           const res = await fetch(`/supabase/migrations/${file}`);
           if (res.ok) {
             const text = await res.text();
-            // Skip empty or near-empty migrations
             if (text.trim().length > 1) {
               bundledContent += `-- ========================================================\n`;
               bundledContent += `-- MIGRATION: ${file}\n`;
@@ -123,11 +476,10 @@ const DatabaseDownload = () => {
             }
           }
         } catch {
-          // Skip files that can't be fetched from public
+          // skip
         }
       }
 
-      // Trigger download
       const blob = new Blob([bundledContent], { type: 'text/sql' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -137,13 +489,109 @@ const DatabaseDownload = () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-
-      setProgress('Download complete!');
+      setSqlProgress('Download complete!');
     } catch (error) {
       console.error('Download error:', error);
-      setProgress('Error during download. Check console.');
+      setSqlProgress('Error during download. Check console.');
     } finally {
-      setLoading(false);
+      setSqlLoading(false);
+    }
+  };
+
+  const fetchTextFile = async (path: string): Promise<string | null> => {
+    try {
+      const res = await fetch(`/${path}`);
+      if (res.ok) return await res.text();
+    } catch { /* skip */ }
+    return null;
+  };
+
+  const fetchBinaryFile = async (path: string): Promise<ArrayBuffer | null> => {
+    try {
+      const res = await fetch(`/${path}`);
+      if (res.ok) return await res.arrayBuffer();
+    } catch { /* skip */ }
+    return null;
+  };
+
+  const downloadAppZip = async () => {
+    setZipLoading(true);
+    setZipProgress('Initializing...');
+
+    try {
+      const zip = new JSZip();
+
+      // Add package.json and README
+      zip.file('package.json', PACKAGE_JSON_CONTENT);
+      zip.file('README.md', README_CONTENT);
+
+      // Fetch all source text files
+      let fetched = 0;
+      const total = SOURCE_FILES.length + IMAGE_FILES.length + SRC_IMAGE_FILES.length + MIGRATION_FILES.length;
+
+      for (const filePath of SOURCE_FILES) {
+        fetched++;
+        setZipProgress(`Fetching source files... (${fetched}/${total})`);
+        const content = await fetchTextFile(filePath);
+        if (content) {
+          zip.file(filePath, content);
+        }
+      }
+
+      // Fetch public assets as binary
+      for (const filePath of IMAGE_FILES) {
+        fetched++;
+        setZipProgress(`Fetching assets... (${fetched}/${total})`);
+        const data = await fetchBinaryFile(filePath);
+        if (data) {
+          zip.file(filePath, data);
+        }
+      }
+
+      // Fetch src/assets as binary
+      for (const filePath of SRC_IMAGE_FILES) {
+        fetched++;
+        setZipProgress(`Fetching src assets... (${fetched}/${total})`);
+        const data = await fetchBinaryFile(filePath);
+        if (data) {
+          zip.file(filePath, data);
+        }
+      }
+
+      // Fetch database schema
+      setZipProgress('Fetching database schema...');
+      const schema = await fetchTextFile('database-schema.sql');
+      if (schema) {
+        zip.file('public/database-schema.sql', schema);
+      }
+
+      // Fetch migration files
+      for (let i = 0; i < MIGRATION_FILES.length; i++) {
+        fetched++;
+        setZipProgress(`Fetching migrations... (${fetched}/${total})`);
+        const content = await fetchTextFile(`supabase/migrations/${MIGRATION_FILES[i]}`);
+        if (content && content.trim().length > 1) {
+          zip.file(`supabase/migrations/${MIGRATION_FILES[i]}`, content);
+        }
+      }
+
+      // Generate and download
+      setZipProgress('Generating zip file...');
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'oregon-tires-app.zip';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setZipProgress('Download complete!');
+    } catch (error) {
+      console.error('Zip error:', error);
+      setZipProgress('Error creating zip. Check console.');
+    } finally {
+      setZipLoading(false);
     }
   };
 
@@ -158,20 +606,49 @@ const DatabaseDownload = () => {
             <div className="flex items-center gap-3">
               <Database className="h-8 w-8" />
               <div>
-                <h1 className="text-2xl font-bold">Database Files</h1>
-                <p className="text-white/80 text-sm">Download all database schema and migration files</p>
+                <h1 className="text-2xl font-bold">Project Downloads</h1>
+                <p className="text-white/80 text-sm">Download database files & deployable app source</p>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-3xl">
-        <Card className="mb-8">
+      <main className="container mx-auto px-4 py-8 max-w-3xl space-y-8">
+        {/* App Source Zip */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FolderArchive className="h-5 w-5" />
+              Download Full App Source (.zip)
+            </CardTitle>
+            <CardDescription>
+              Complete React source code for <code>/</code> and <code>/admin</code> routes with all components, hooks, styles, assets, database migrations, edge functions, and a README with build &amp; deploy instructions. Run <code>npm install &amp;&amp; npm run build</code> then upload <code>dist/</code> to your server.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={downloadAppZip}
+              disabled={zipLoading}
+              size="lg"
+              className="w-full"
+              style={{ backgroundColor: '#007030' }}
+            >
+              <Package className="h-5 w-5 mr-2" />
+              {zipLoading ? zipProgress : 'Download App Source (.zip)'}
+            </Button>
+            {zipProgress && !zipLoading && (
+              <p className="text-sm text-muted-foreground mt-2 text-center">{zipProgress}</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Database SQL Bundle */}
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Download className="h-5 w-5" />
-              Download All Database Files
+              Download Database Bundle (.sql)
             </CardTitle>
             <CardDescription>
               Bundles the complete schema and all {MIGRATION_FILES.length} migration files into a single .sql file.
@@ -179,35 +656,43 @@ const DatabaseDownload = () => {
           </CardHeader>
           <CardContent>
             <Button
-              onClick={downloadAllFiles}
-              disabled={loading}
+              onClick={downloadSqlBundle}
+              disabled={sqlLoading}
               size="lg"
               className="w-full"
               style={{ backgroundColor: '#007030' }}
             >
-              {loading ? progress : 'Download Database Bundle (.sql)'}
+              {sqlLoading ? sqlProgress : 'Download Database Bundle (.sql)'}
             </Button>
-            {progress && !loading && (
-              <p className="text-sm text-muted-foreground mt-2 text-center">{progress}</p>
+            {sqlProgress && !sqlLoading && (
+              <p className="text-sm text-muted-foreground mt-2 text-center">{sqlProgress}</p>
             )}
           </CardContent>
         </Card>
 
+        {/* File list */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Included Files</CardTitle>
-            <CardDescription>1 schema file + {MIGRATION_FILES.length} migrations</CardDescription>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Included in App Zip
+            </CardTitle>
+            <CardDescription>
+              {SOURCE_FILES.length} source files + {IMAGE_FILES.length + SRC_IMAGE_FILES.length} assets + {MIGRATION_FILES.length} migrations
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-1 max-h-96 overflow-y-auto">
-              <div className="flex items-center gap-2 p-2 rounded bg-green-50 text-green-800 font-medium text-sm">
-                <FileText className="h-4 w-4 shrink-0" />
-                database-schema.sql
-              </div>
-              {MIGRATION_FILES.map((file) => (
-                <div key={file} className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 text-sm text-muted-foreground">
-                  <FileText className="h-4 w-4 shrink-0" />
+            <div className="space-y-1 max-h-96 overflow-y-auto text-sm">
+              <div className="p-2 rounded bg-green-50 text-green-800 font-medium">📦 package.json</div>
+              <div className="p-2 rounded bg-green-50 text-green-800 font-medium">📖 README.md</div>
+              {SOURCE_FILES.map((file) => (
+                <div key={file} className="p-2 rounded hover:bg-gray-100 text-muted-foreground">
                   {file}
+                </div>
+              ))}
+              {[...IMAGE_FILES, ...SRC_IMAGE_FILES].map((file) => (
+                <div key={file} className="p-2 rounded hover:bg-gray-100 text-muted-foreground">
+                  🖼️ {file}
                 </div>
               ))}
             </div>
