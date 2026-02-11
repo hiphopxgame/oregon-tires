@@ -192,11 +192,11 @@
 
     <!-- MESSAGES TAB (with Email Logs sub-tab) -->
     <div id="tab-messages" class="tab-content hidden fade-in">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl"><h2 class="text-2xl font-bold">Messages & Changes</h2><p class="text-green-100">Manage all messages and change history</p></div>
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl"><h2 class="text-2xl font-bold">Messages & Website Changes</h2><p class="text-green-100">Manage all messages and website change history</p></div>
       <div class="bg-white rounded-b-xl shadow p-6">
         <div class="flex gap-2 mb-6 border-b pb-3">
           <button onclick="switchMessagesSubTab('contacts')" id="msg-sub-contacts" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">💬 Contact Messages</button>
-          <button onclick="switchMessagesSubTab('emaillogs')" id="msg-sub-emaillogs" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📝 Changes</button>
+          <button onclick="switchMessagesSubTab('emaillogs')" id="msg-sub-emaillogs" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📝 Website Changes</button>
         </div>
         <div id="msg-subtab-contacts">
           <div class="flex justify-end mb-4"><button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
@@ -210,7 +210,7 @@
           </div>
         </div>
         <div id="msg-subtab-emaillogs" class="hidden">
-          <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-brand">Changes</h2><button onclick="loadEmailLogs()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
+          <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-brand">Website Changes</h2><button onclick="loadEmailLogs()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
           <div id="email-logs-list" class="space-y-3"></div>
         </div>
       </div>
@@ -320,6 +320,25 @@
     </div>
     <div id="email-modal-meta" class="grid grid-cols-2 gap-4 text-sm mb-4 border-b pb-4"></div>
     <div id="email-modal-body" class="prose prose-sm max-w-none"></div>
+  </div>
+</div>
+
+<!-- Message Detail Modal -->
+<div id="message-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-bold text-brand">Message Details</h3>
+      <button onclick="closeModal('message-modal')" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+    </div>
+    <div id="message-modal-meta" class="space-y-2 text-sm border-b pb-4 mb-4"></div>
+    <div class="bg-gray-50 rounded-lg p-4">
+      <h4 class="font-medium text-sm text-gray-600 mb-2">Message:</h4>
+      <p id="message-modal-body" class="text-gray-800 whitespace-pre-wrap"></p>
+    </div>
+    <div class="mt-4 flex justify-between items-center">
+      <div id="message-modal-status"></div>
+      <button onclick="closeModal('message-modal')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">Close</button>
+    </div>
   </div>
 </div>
 
@@ -658,11 +677,17 @@ function renderMessages() {
     <tr class="border-b hover:bg-gray-50">
       <td class="p-3 font-medium text-brand-light">${esc(m.first_name)} ${esc(m.last_name)}</td>
       <td class="p-3 text-sm"><div>${esc(m.email)}</div>${m.phone?`<div class="text-xs text-gray-500">${esc(m.phone)}</div>`:''}</td>
-      <td class="p-3 text-sm max-w-[300px] truncate">${esc(m.message)}</td>
+      <td class="p-3 text-sm max-w-[400px]">
+        <div class="line-clamp-2">${esc(m.message)}</div>
+        ${m.message && m.message.length > 80 ? `<button onclick="openMessageModal('${m.id}')" class="text-brand-light text-xs font-medium hover:underline mt-1">Read full message →</button>` : ''}
+      </td>
       <td class="p-3 text-sm">${new Date(m.created_at).toLocaleDateString()}</td>
-      <td class="p-3"><select onchange="updateMsgStatus('${m.id}',this.value)" class="border rounded px-2 py-1 text-xs">
-        <option value="new" ${m.status==='new'?'selected':''}>New</option><option value="priority" ${m.status==='priority'?'selected':''}>Priority</option><option value="completed" ${m.status==='completed'?'selected':''}>Completed</option>
-      </select></td>
+      <td class="p-3">
+        <select onchange="updateMsgStatus('${m.id}',this.value)" class="border rounded px-2 py-1 text-xs">
+          <option value="new" ${m.status==='new'?'selected':''}>New</option><option value="priority" ${m.status==='priority'?'selected':''}>Priority</option><option value="completed" ${m.status==='completed'?'selected':''}>Completed</option>
+        </select>
+        <button onclick="openMessageModal('${m.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100 mt-1 block w-full">👁 View</button>
+      </td>
     </tr>
   `).join('') : '<tr><td colspan="5" class="p-6 text-center text-gray-500">No messages found</td></tr>';
 }
@@ -700,6 +725,25 @@ function viewEmail(id) {
     <div><strong>Message ID:</strong> ${esc(log.resend_message_id||'N/A')}</div>`;
   document.getElementById('email-modal-body').innerHTML = log.body; // HTML email content
   document.getElementById('email-modal').classList.remove('hidden');
+}
+
+function openMessageModal(id) {
+  const m = messages.find(msg => msg.id === id); if(!m) return;
+  document.getElementById('message-modal-meta').innerHTML = `
+    <div class="grid grid-cols-2 gap-4">
+      <div><strong>Name:</strong> ${esc(m.first_name)} ${esc(m.last_name)}</div>
+      <div><strong>Email:</strong> ${esc(m.email)}</div>
+      ${m.phone ? `<div><strong>Phone:</strong> ${esc(m.phone)}</div>` : ''}
+      <div><strong>Date:</strong> ${new Date(m.created_at).toLocaleString()}</div>
+    </div>`;
+  document.getElementById('message-modal-body').textContent = m.message;
+  document.getElementById('message-modal-status').innerHTML = `
+    <select onchange="updateMsgStatus('${m.id}',this.value)" class="border rounded px-3 py-2 text-sm">
+      <option value="new" ${m.status==='new'?'selected':''}>New</option>
+      <option value="priority" ${m.status==='priority'?'selected':''}>Priority</option>
+      <option value="completed" ${m.status==='completed'?'selected':''}>Completed</option>
+    </select>`;
+  document.getElementById('message-modal').classList.remove('hidden');
 }
 
 // ===== EMPLOYEES =====

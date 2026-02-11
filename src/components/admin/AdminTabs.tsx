@@ -38,7 +38,7 @@ export const AdminTabs = ({
         <TabsTrigger value="appointments">Appointments</TabsTrigger>
         <TabsTrigger value="messages">Messages</TabsTrigger>
         <TabsTrigger value="images">Service Images</TabsTrigger>
-        <TabsTrigger value="emails">Changes</TabsTrigger>
+        <TabsTrigger value="emails">Website Changes</TabsTrigger>
         <TabsTrigger value="test">Email Test</TabsTrigger>
       </TabsList>
 
