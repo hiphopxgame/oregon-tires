@@ -77,9 +77,9 @@
           </div>
         </div>
         <div class="flex items-center gap-3">
-          <div class="bg-white/10 px-3 py-2 rounded-lg text-sm">
+          <div class="bg-white/10 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-white/20 transition" onclick="openAccountSettings()">
             <div class="font-medium" id="admin-email"></div>
-            <div class="text-xs text-yellow-200" id="admin-role"></div>
+            <div class="text-xs text-yellow-200" id="admin-role">⚙️ Account Settings</div>
           </div>
           <a href="/simple/" class="text-sm hover:text-yellow-200 hidden md:inline">View Site</a>
           <button onclick="signOut()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition">Sign Out</button>
@@ -337,6 +337,44 @@
   </div>
 </div>
 
+<!-- Account Settings Modal -->
+<div id="account-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4 max-h-[80vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-lg font-bold text-brand">⚙️ Account Settings</h3>
+      <button onclick="closeModal('account-modal')" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+    </div>
+    <!-- Update Name -->
+    <div class="space-y-4">
+      <div class="border rounded-lg p-4">
+        <h4 class="font-medium mb-3">Update Display Name</h4>
+        <div class="flex gap-3">
+          <input id="settings-name" class="flex-1 p-2 border rounded" placeholder="Your name">
+          <button onclick="updateAccountName()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">Save</button>
+        </div>
+      </div>
+      <!-- Update Email -->
+      <div class="border rounded-lg p-4">
+        <h4 class="font-medium mb-3">Update Email</h4>
+        <div class="flex gap-3">
+          <input id="settings-email" type="email" class="flex-1 p-2 border rounded" placeholder="New email">
+          <button onclick="updateAccountEmail()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">Save</button>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">A confirmation email will be sent to both old and new addresses.</p>
+      </div>
+      <!-- Update Password -->
+      <div class="border rounded-lg p-4">
+        <h4 class="font-medium mb-3">Update Password</h4>
+        <div class="space-y-2">
+          <input id="settings-password" type="password" class="w-full p-2 border rounded" placeholder="New password (min 6 chars)">
+          <input id="settings-password-confirm" type="password" class="w-full p-2 border rounded" placeholder="Confirm new password">
+          <button onclick="updateAccountPassword()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm w-full">Update Password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast" class="hidden fixed bottom-4 right-4 z-50 bg-brand text-white px-6 py-3 rounded-lg shadow-lg transition-all"></div>
 
@@ -351,7 +389,7 @@ const sb = supabase.createClient(
 let appointments = [], messages = [], employees = [], emailLogs = [], galleryImages = [], serviceImages = [];
 let currentNotesId = null, apptPage = 1, apptSortBy = 'created', apptSortOrder = 'desc';
 let calDate = new Date(), calSelectedDate = new Date();
-let employeeSubTab = 'team', adminUsers = [];
+let adminUsers = [], currentUser = null;
 
 // ===== UTILS =====
 function showToast(msg, isError) {
@@ -396,10 +434,14 @@ async function signOut() { await sb.auth.signOut(); document.getElementById('adm
 })();
 
 function showDashboard(user) {
+  currentUser = user;
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('admin-dashboard').classList.remove('hidden');
   document.getElementById('admin-email').textContent = user.email;
   document.getElementById('admin-role').textContent = user.email === 'tyronenorris@gmail.com' ? 'Super Admin' : 'Admin';
+  // Pre-fill account settings
+  document.getElementById('settings-name').value = user.user_metadata?.full_name || '';
+  document.getElementById('settings-email').value = user.email || '';
   loadAllData();
   setupRealtime();
   populateMonthFilter();
@@ -1037,14 +1079,24 @@ async function saveNotes() {
 
 async function addEmployee() {
   const name = document.getElementById('new-emp-name').value;
+  const email = document.getElementById('new-emp-email').value || null;
   if(!name) { showToast('Name is required', true); return; }
   const { error } = await sb.from('oretir_employees').insert([{
-    name, email: document.getElementById('new-emp-email').value||null,
+    name, email,
     phone: document.getElementById('new-emp-phone').value||null,
     role: document.getElementById('new-emp-role').value
   }]);
   if(error) { showToast('Error: '+error.message, true); return; }
-  showToast('Employee added!'); toggleAddEmployeeForm();
+  // Create auth account so employee can log in (if email provided)
+  if(email) {
+    try {
+      await sb.functions.invoke('create-employee-account', { body: { email, employeeName: name } });
+      showToast('Employee added & login credentials sent via email!');
+    } catch(e) { showToast('Employee added but could not send login email: ' + e.message, true); }
+  } else {
+    showToast('Employee added!');
+  }
+  toggleAddEmployeeForm();
   document.getElementById('new-emp-name').value=''; document.getElementById('new-emp-email').value='';
   document.getElementById('new-emp-phone').value=''; loadEmployees();
 }
@@ -1159,6 +1211,47 @@ function switchGallerySubTab(sub) {
   document.getElementById('gal-sub-serviceimgs').className = sub === 'serviceimgs' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white' : 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
   document.getElementById('gallery-add-btn').classList.toggle('hidden', sub !== 'gallery');
   if(sub === 'serviceimgs') loadServiceImages();
+}
+
+// ===== ACCOUNT SETTINGS =====
+function openAccountSettings() {
+  if(currentUser) {
+    document.getElementById('settings-name').value = currentUser.user_metadata?.full_name || '';
+    document.getElementById('settings-email').value = currentUser.email || '';
+  }
+  document.getElementById('settings-password').value = '';
+  document.getElementById('settings-password-confirm').value = '';
+  document.getElementById('account-modal').classList.remove('hidden');
+}
+
+async function updateAccountName() {
+  const name = document.getElementById('settings-name').value.trim();
+  if(!name) { showToast('Name is required', true); return; }
+  const { error } = await sb.auth.updateUser({ data: { full_name: name } });
+  if(error) { showToast('Error: ' + error.message, true); return; }
+  document.getElementById('admin-email').textContent = name;
+  currentUser.user_metadata = { ...currentUser.user_metadata, full_name: name };
+  showToast('Name updated successfully');
+}
+
+async function updateAccountEmail() {
+  const email = document.getElementById('settings-email').value.trim();
+  if(!email) { showToast('Email is required', true); return; }
+  const { error } = await sb.auth.updateUser({ email });
+  if(error) { showToast('Error: ' + error.message, true); return; }
+  showToast('Confirmation email sent to both old and new addresses');
+}
+
+async function updateAccountPassword() {
+  const pw = document.getElementById('settings-password').value;
+  const pwConfirm = document.getElementById('settings-password-confirm').value;
+  if(!pw || pw.length < 6) { showToast('Password must be at least 6 characters', true); return; }
+  if(pw !== pwConfirm) { showToast('Passwords do not match', true); return; }
+  const { error } = await sb.auth.updateUser({ password: pw });
+  if(error) { showToast('Error: ' + error.message, true); return; }
+  document.getElementById('settings-password').value = '';
+  document.getElementById('settings-password-confirm').value = '';
+  showToast('Password updated successfully');
 }
 
 // Close modals on overlay click
