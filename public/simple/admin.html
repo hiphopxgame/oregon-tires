@@ -88,8 +88,8 @@
       <!-- Navigation -->
       <nav class="flex flex-wrap gap-1" id="nav-tabs">
         <button onclick="switchTab('overview')" data-tab="overview" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition">📊 Overview</button>
-        <button onclick="switchTab('appointments')" data-tab="appointments" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🗓 Appointments</button>
         <button onclick="switchTab('calendar')" data-tab="calendar" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📅 Calendar</button>
+        <button onclick="switchTab('appointments')" data-tab="appointments" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🗓 Appointments</button>
         <button onclick="switchTab('messages')" data-tab="messages" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">💬 Messages</button>
         <button onclick="switchTab('employees')" data-tab="employees" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👥 Employees</button>
         <button onclick="switchTab('gallery')" data-tab="gallery" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 Gallery</button>
@@ -177,11 +177,11 @@
 
     <!-- MESSAGES TAB (with Email Logs sub-tab) -->
     <div id="tab-messages" class="tab-content hidden fade-in">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl"><h2 class="text-2xl font-bold">Messages & Email Logs</h2><p class="text-green-100">Manage all messages and email history</p></div>
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl"><h2 class="text-2xl font-bold">Messages & Changes</h2><p class="text-green-100">Manage all messages and change history</p></div>
       <div class="bg-white rounded-b-xl shadow p-6">
         <div class="flex gap-2 mb-6 border-b pb-3">
           <button onclick="switchMessagesSubTab('contacts')" id="msg-sub-contacts" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">💬 Contact Messages</button>
-          <button onclick="switchMessagesSubTab('emaillogs')" id="msg-sub-emaillogs" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📧 Email Logs</button>
+          <button onclick="switchMessagesSubTab('emaillogs')" id="msg-sub-emaillogs" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📝 Changes</button>
         </div>
         <div id="msg-subtab-contacts">
           <div class="flex justify-end mb-4"><button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
@@ -195,7 +195,7 @@
           </div>
         </div>
         <div id="msg-subtab-emaillogs" class="hidden">
-          <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-brand">Email Logs</h2><button onclick="loadEmailLogs()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
+          <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-brand">Changes</h2><button onclick="loadEmailLogs()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
           <div id="email-logs-list" class="space-y-3"></div>
         </div>
       </div>
@@ -455,15 +455,16 @@ function renderOverview() {
   
   container.innerHTML = Object.entries(byDate).map(([date, apts]) => {
     const d = new Date(date+'T00:00:00');
-    const dayLabel = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-    return `<div class="border-l-4 border-brand-light pl-4">
+    const dayLabel = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const isToday = date === new Date().toISOString().split('T')[0];
+    return `<div class="border-l-4 ${apts.length ? 'border-green-600 bg-green-50' : 'border-gray-300'} pl-4 py-2 rounded-r-lg ${isToday ? 'ring-2 ring-yellow-400 bg-yellow-50' : ''}">
       <div class="flex justify-between items-center mb-1">
-        <h4 class="font-medium text-sm">${dayLabel}</h4>
-        ${apts.length ? `<span class="text-xs bg-gray-100 px-2 py-1 rounded">${apts.length} appt${apts.length>1?'s':''}</span>` : '<span class="text-xs text-orange-600">No appointments</span>'}
+        <h4 class="font-semibold text-sm ${isToday ? 'text-yellow-800' : ''}">${isToday ? '⭐ Today — ' : ''}${dayLabel}</h4>
+        ${apts.length ? `<span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-bold">${apts.length} appt${apts.length>1?'s':''}</span>` : '<span class="text-xs text-gray-400 italic">Open</span>'}
       </div>
-      ${apts.length ? apts.slice(0,3).map(a => `<div class="text-sm flex justify-between bg-gray-50 p-2 rounded mb-1">
-        <span><strong>${fmtTime(a.preferred_time)}</strong> - ${esc(a.first_name)} ${esc(a.last_name)}</span>${statusBadge(a.status)}
-      </div>`).join('') + (apts.length>3 ? `<p class="text-xs text-gray-400">+${apts.length-3} more</p>` : '') : '<div class="text-sm text-gray-400 py-2 text-center">Available for booking</div>'}
+      ${apts.length ? apts.slice(0,3).map(a => `<div class="text-sm flex justify-between items-center bg-white p-2 rounded mb-1 border">
+        <span><strong>${fmtTime(a.preferred_time)}</strong> — ${esc(a.first_name)} ${esc(a.last_name)} <span class="text-gray-500 text-xs">(${esc(a.service)})</span></span>${statusBadge(a.status)}
+      </div>`).join('') + (apts.length>3 ? `<p class="text-xs text-gray-400">+${apts.length-3} more</p>` : '') : ''}
     </div>`;
   }).join('');
 
@@ -494,9 +495,14 @@ function renderCalendar() {
     const count = appointments.filter(a=>a.preferred_date===dateStr).length;
     const isSelected = calSelectedDate.toISOString().split('T')[0] === dateStr;
     const isToday = new Date().toISOString().split('T')[0] === dateStr;
-    html += `<div onclick="selectCalDay('${dateStr}')" class="p-1 text-center cursor-pointer rounded-lg hover:bg-gray-100 ${isSelected?'bg-brand text-white hover:bg-brand':''} ${isToday&&!isSelected?'border-2 border-brand':''}">
+    const hasAppts = count > 0;
+    let cellClasses = 'p-1 text-center cursor-pointer rounded-lg hover:bg-gray-100 relative';
+    if(isSelected) cellClasses += ' bg-brand text-white hover:bg-brand';
+    else if(hasAppts) cellClasses += ' bg-green-100 border-2 border-green-500 font-bold';
+    if(isToday && !isSelected) cellClasses += ' ring-2 ring-yellow-400';
+    html += `<div onclick="selectCalDay('${dateStr}')" class="${cellClasses}">
       <div class="text-sm">${d}</div>
-      ${count?`<div class="text-xs ${isSelected?'text-white/80':'text-brand'} font-medium">${count}</div>`:''}
+      ${count ? `<div class="text-xs ${isSelected?'text-white/80':'text-green-700'} font-bold">${count} appt${count>1?'s':''}</div>` : ''}
     </div>`;
   }
   grid.innerHTML = html;
@@ -691,21 +697,36 @@ function renderEmployees() {
 
 function renderEmployeeCard(emp, inactive) {
   const upcoming = appointments.filter(a => a.assigned_employee_id===emp.id && new Date(a.preferred_date+'T00:00:00') >= new Date(new Date().toISOString().split('T')[0]+'T00:00:00'));
-  return `<div class="border rounded-lg p-4 ${inactive?'bg-gray-50':'bg-white'}">
-    <div class="flex items-center justify-between">
-      <div class="flex-1">
-        <div class="flex items-center gap-2">
-          <span class="font-medium">${esc(emp.name)}</span>
-          <span class="text-xs px-2 py-1 rounded-full ${emp.role==='Manager'?'bg-blue-100 text-blue-800':'bg-gray-100 text-gray-800'}">${emp.role||'Employee'}</span>
-          ${inactive?'<span class="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600">Inactive</span>':''}
+  return `<div class="border rounded-lg p-4 ${inactive?'bg-gray-50':'bg-white'}" id="emp-card-${emp.id}">
+    <div id="emp-view-${emp.id}">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <span class="font-medium">${esc(emp.name)}</span>
+            <span class="text-xs px-2 py-1 rounded-full ${emp.role==='Manager'?'bg-blue-100 text-blue-800':'bg-gray-100 text-gray-800'}">${emp.role||'Employee'}</span>
+            ${inactive?'<span class="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600">Inactive</span>':''}
+          </div>
+          <div class="text-sm text-gray-600">${emp.email?esc(emp.email):''}${emp.email&&emp.phone?' • ':''}${emp.phone?esc(emp.phone):''}</div>
+          ${!inactive && upcoming.length ? `<div class="mt-2 p-2 bg-blue-50 rounded text-sm">📅 <span class="text-blue-800 font-medium">${upcoming.length} upcoming</span>
+            ${upcoming[0]?` • Next: ${fmtDate(upcoming[0].preferred_date)}`:''}</div>` : ''}
         </div>
-        <div class="text-sm text-gray-600">${emp.email?esc(emp.email):''}${emp.email&&emp.phone?' • ':''}${emp.phone?esc(emp.phone):''}</div>
-        ${!inactive && upcoming.length ? `<div class="mt-2 p-2 bg-blue-50 rounded text-sm">📅 <span class="text-blue-800 font-medium">${upcoming.length} upcoming</span>
-          ${upcoming[0]?` • Next: ${fmtDate(upcoming[0].preferred_date)}`:''}</div>` : ''}
+        <div class="flex items-center gap-2">
+          <button onclick="startEditEmployee('${emp.id}')" class="border rounded px-3 py-1 text-xs text-gray-600 hover:bg-gray-100">✏️ Edit</button>
+          <button onclick="toggleEmployeeStatus('${emp.id}',${!emp.is_active})" class="border rounded px-3 py-1 text-xs ${inactive?'text-green-600 hover:bg-green-50':'text-red-600 hover:bg-red-50'}">${inactive?'⚡ Activate':'⏻ Deactivate'}</button>
+          ${!inactive&&emp.email?`<button onclick="makeAdmin('${esc(emp.email)}','${esc(emp.name)}')" class="border rounded px-3 py-1 text-xs text-blue-600 hover:bg-blue-50">🛡 Make Admin</button>`:''}
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="toggleEmployeeStatus('${emp.id}',${!emp.is_active})" class="border rounded px-3 py-1 text-xs ${inactive?'text-green-600 hover:bg-green-50':'text-red-600 hover:bg-red-50'}">${inactive?'⚡ Activate':'⏻ Deactivate'}</button>
-        ${!inactive&&emp.email?`<button onclick="makeAdmin('${esc(emp.email)}','${esc(emp.name)}')" class="border rounded px-3 py-1 text-xs text-blue-600 hover:bg-blue-50">🛡 Make Admin</button>`:''}
+    </div>
+    <div id="emp-edit-${emp.id}" class="hidden">
+      <div class="grid md:grid-cols-4 gap-3 items-end">
+        <div><label class="text-xs font-medium">Name *</label><input id="edit-emp-name-${emp.id}" value="${esc(emp.name)}" class="w-full p-2 border rounded mt-1 text-sm"></div>
+        <div><label class="text-xs font-medium">Email</label><input id="edit-emp-email-${emp.id}" value="${esc(emp.email||'')}" class="w-full p-2 border rounded mt-1 text-sm"></div>
+        <div><label class="text-xs font-medium">Phone</label><input id="edit-emp-phone-${emp.id}" value="${esc(emp.phone||'')}" class="w-full p-2 border rounded mt-1 text-sm"></div>
+        <div><label class="text-xs font-medium">Role</label><select id="edit-emp-role-${emp.id}" class="w-full p-2 border rounded mt-1 text-sm"><option value="Employee" ${emp.role==='Employee'?'selected':''}>Employee</option><option value="Manager" ${emp.role==='Manager'?'selected':''}>Manager</option></select></div>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button onclick="saveEditEmployee('${emp.id}')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">💾 Save</button>
+        <button onclick="cancelEditEmployee('${emp.id}')" class="border px-4 py-2 rounded-lg text-sm">Cancel</button>
       </div>
     </div>
   </div>`;
@@ -946,6 +967,26 @@ async function addEmployee() {
 async function toggleEmployeeStatus(id, newStatus) {
   await sb.from('oretir_employees').update({ is_active: newStatus }).eq('id', id);
   showToast(`Employee ${newStatus?'activated':'deactivated'}`); loadEmployees();
+}
+
+function startEditEmployee(id) {
+  document.getElementById('emp-view-'+id).classList.add('hidden');
+  document.getElementById('emp-edit-'+id).classList.remove('hidden');
+}
+function cancelEditEmployee(id) {
+  document.getElementById('emp-edit-'+id).classList.add('hidden');
+  document.getElementById('emp-view-'+id).classList.remove('hidden');
+}
+async function saveEditEmployee(id) {
+  const name = document.getElementById('edit-emp-name-'+id).value;
+  if(!name) { showToast('Name is required', true); return; }
+  const { error } = await sb.from('oretir_employees').update({
+    name, email: document.getElementById('edit-emp-email-'+id).value || null,
+    phone: document.getElementById('edit-emp-phone-'+id).value || null,
+    role: document.getElementById('edit-emp-role-'+id).value
+  }).eq('id', id);
+  if(error) { showToast('Error: '+error.message, true); return; }
+  showToast('Employee updated!'); loadEmployees();
 }
 
 async function makeAdmin(email, name) {

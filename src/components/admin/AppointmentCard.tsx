@@ -199,9 +199,9 @@ export const AppointmentCard = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="unassigned">Unassigned</SelectItem>
-              {employees && employees.length > 0 ? employees.map((employee) => (
+              {employees && employees.length > 0 ? employees.filter(e => e.is_active).map((employee) => (
                 <SelectItem key={employee.id} value={employee.id}>
-                  {employee.name} {!employee.is_active && '(Inactive)'}
+                  {employee.name}
                 </SelectItem>
               )) : (
                 <SelectItem value="loading" disabled>Loading employees...</SelectItem>
