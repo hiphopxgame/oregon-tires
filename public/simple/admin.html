@@ -88,13 +88,11 @@
       <!-- Navigation -->
       <nav class="flex flex-wrap gap-1" id="nav-tabs">
         <button onclick="switchTab('overview')" data-tab="overview" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition">📊 Overview</button>
-        <button onclick="switchTab('calendar')" data-tab="calendar" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📅 Calendar</button>
         <button onclick="switchTab('appointments')" data-tab="appointments" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🗓 Appointments</button>
+        <button onclick="switchTab('calendar')" data-tab="calendar" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📅 Calendar</button>
         <button onclick="switchTab('messages')" data-tab="messages" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">💬 Messages</button>
-        <button onclick="switchTab('emails')" data-tab="emails" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📧 Email Logs</button>
         <button onclick="switchTab('employees')" data-tab="employees" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👥 Employees</button>
         <button onclick="switchTab('gallery')" data-tab="gallery" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 Gallery</button>
-        <button onclick="switchTab('images')" data-tab="images" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🎨 Service Images</button>
         <button onclick="switchTab('analytics')" data-tab="analytics" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📈 Analytics</button>
       </nav>
     </div>
@@ -177,26 +175,30 @@
       </div>
     </div>
 
-    <!-- MESSAGES TAB -->
+    <!-- MESSAGES TAB (with Email Logs sub-tab) -->
     <div id="tab-messages" class="tab-content hidden fade-in">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl"><h2 class="text-2xl font-bold">Contact Messages</h2><p class="text-green-100">Manage all messages</p></div>
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl"><h2 class="text-2xl font-bold">Messages & Email Logs</h2><p class="text-green-100">Manage all messages and email history</p></div>
       <div class="bg-white rounded-b-xl shadow p-6">
-        <div class="flex justify-end mb-4"><button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead><tr class="bg-yellow-100 border-b text-left">
-              <th class="p-3">Customer</th><th class="p-3">Contact</th><th class="p-3">Message</th><th class="p-3">Date</th><th class="p-3">Status</th>
-            </tr></thead>
-            <tbody id="messages-table"></tbody>
-          </table>
+        <div class="flex gap-2 mb-6 border-b pb-3">
+          <button onclick="switchMessagesSubTab('contacts')" id="msg-sub-contacts" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">💬 Contact Messages</button>
+          <button onclick="switchMessagesSubTab('emaillogs')" id="msg-sub-emaillogs" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📧 Email Logs</button>
+        </div>
+        <div id="msg-subtab-contacts">
+          <div class="flex justify-end mb-4"><button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead><tr class="bg-yellow-100 border-b text-left">
+                <th class="p-3">Customer</th><th class="p-3">Contact</th><th class="p-3">Message</th><th class="p-3">Date</th><th class="p-3">Status</th>
+              </tr></thead>
+              <tbody id="messages-table"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="msg-subtab-emaillogs" class="hidden">
+          <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-brand">Email Logs</h2><button onclick="loadEmailLogs()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
+          <div id="email-logs-list" class="space-y-3"></div>
         </div>
       </div>
-    </div>
-
-    <!-- EMAIL LOGS TAB -->
-    <div id="tab-emails" class="tab-content hidden fade-in">
-      <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-brand">Email Logs</h2><button onclick="loadEmailLogs()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
-      <div id="email-logs-list" class="space-y-3"></div>
     </div>
 
     <!-- EMPLOYEES TAB -->
@@ -237,36 +239,40 @@
       </div>
     </div>
 
-    <!-- GALLERY TAB -->
+    <!-- GALLERY TAB (with Service Images sub-tab) -->
     <div id="tab-gallery" class="tab-content hidden fade-in">
       <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
-        <h2 class="text-2xl font-bold">Gallery Management</h2>
-        <button onclick="toggleAddGalleryForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ Add Image</button>
+        <h2 class="text-2xl font-bold">Gallery & Service Images</h2>
+        <button onclick="toggleAddGalleryForm()" id="gallery-add-btn" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ Add Image</button>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6">
-        <div id="add-gallery-form" class="hidden mb-6 p-4 border rounded-lg bg-gray-50">
-          <h4 class="font-medium mb-3">Add New Image</h4>
-          <div class="space-y-3">
-            <div><label class="text-sm font-medium">Image File *</label><input type="file" id="gallery-file" accept="image/*" class="w-full p-2 border rounded mt-1"></div>
-            <div class="grid md:grid-cols-2 gap-3">
-              <div><label class="text-sm font-medium">Title *</label><input id="gallery-title" class="w-full p-2 border rounded mt-1" placeholder="Image title"></div>
-              <div><label class="text-sm font-medium">Language</label><select id="gallery-lang" class="w-full p-2 border rounded mt-1"><option value="english">English</option><option value="spanish">Spanish</option></select></div>
-            </div>
-            <div><label class="text-sm font-medium">Description</label><textarea id="gallery-desc" rows="2" class="w-full p-2 border rounded mt-1" placeholder="Image description"></textarea></div>
-            <div class="flex gap-2">
-              <button onclick="uploadGalleryImage()" id="gallery-upload-btn" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">💾 Upload & Save</button>
-              <button onclick="toggleAddGalleryForm()" class="border px-4 py-2 rounded-lg text-sm">Cancel</button>
+        <div class="flex gap-2 mb-6 border-b pb-3">
+          <button onclick="switchGallerySubTab('gallery')" id="gal-sub-gallery" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">🖼 Gallery</button>
+          <button onclick="switchGallerySubTab('serviceimgs')" id="gal-sub-serviceimgs" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">🎨 Service Images</button>
+        </div>
+        <div id="gal-subtab-gallery">
+          <div id="add-gallery-form" class="hidden mb-6 p-4 border rounded-lg bg-gray-50">
+            <h4 class="font-medium mb-3">Add New Image</h4>
+            <div class="space-y-3">
+              <div><label class="text-sm font-medium">Image File *</label><input type="file" id="gallery-file" accept="image/*" class="w-full p-2 border rounded mt-1"></div>
+              <div class="grid md:grid-cols-2 gap-3">
+                <div><label class="text-sm font-medium">Title *</label><input id="gallery-title" class="w-full p-2 border rounded mt-1" placeholder="Image title"></div>
+                <div><label class="text-sm font-medium">Language</label><select id="gallery-lang" class="w-full p-2 border rounded mt-1"><option value="english">English</option><option value="spanish">Spanish</option></select></div>
+              </div>
+              <div><label class="text-sm font-medium">Description</label><textarea id="gallery-desc" rows="2" class="w-full p-2 border rounded mt-1" placeholder="Image description"></textarea></div>
+              <div class="flex gap-2">
+                <button onclick="uploadGalleryImage()" id="gallery-upload-btn" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">💾 Upload & Save</button>
+                <button onclick="toggleAddGalleryForm()" class="border px-4 py-2 rounded-lg text-sm">Cancel</button>
+              </div>
             </div>
           </div>
+          <div id="gallery-grid" class="space-y-3"></div>
         </div>
-        <div id="gallery-grid" class="space-y-3"></div>
+        <div id="gal-subtab-serviceimgs" class="hidden">
+          <div class="flex justify-between items-center mb-4"><div><h2 class="text-2xl font-bold text-brand">Service Images Manager</h2><p class="text-gray-600 mt-1">Manage the hero background and 7 service images displayed on the home page</p></div></div>
+          <div id="service-images-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
       </div>
-    </div>
-
-    <!-- SERVICE IMAGES TAB -->
-    <div id="tab-images" class="tab-content hidden fade-in">
-      <div class="flex justify-between items-center mb-4"><div><h2 class="text-2xl font-bold text-brand">Service Images Manager</h2><p class="text-gray-600 mt-1">Manage the hero background and 7 service images displayed on the home page</p></div></div>
-      <div id="service-images-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </div>
 
     <!-- ANALYTICS TAB -->
@@ -978,6 +984,25 @@ function switchTab(tab) {
   if(btn) { btn.classList.add('tab-active'); btn.classList.remove('text-white','hover:bg-green-600'); }
   if(tab==='analytics') renderAnalytics();
   if(tab==='calendar') renderCalendar();
+}
+
+// Sub-tab switching for Messages
+function switchMessagesSubTab(sub) {
+  document.getElementById('msg-subtab-contacts').classList.toggle('hidden', sub !== 'contacts');
+  document.getElementById('msg-subtab-emaillogs').classList.toggle('hidden', sub !== 'emaillogs');
+  document.getElementById('msg-sub-contacts').className = sub === 'contacts' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white' : 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
+  document.getElementById('msg-sub-emaillogs').className = sub === 'emaillogs' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white' : 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
+  if(sub === 'emaillogs') loadEmailLogs();
+}
+
+// Sub-tab switching for Gallery
+function switchGallerySubTab(sub) {
+  document.getElementById('gal-subtab-gallery').classList.toggle('hidden', sub !== 'gallery');
+  document.getElementById('gal-subtab-serviceimgs').classList.toggle('hidden', sub !== 'serviceimgs');
+  document.getElementById('gal-sub-gallery').className = sub === 'gallery' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white' : 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
+  document.getElementById('gal-sub-serviceimgs').className = sub === 'serviceimgs' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white' : 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
+  document.getElementById('gallery-add-btn').classList.toggle('hidden', sub !== 'gallery');
+  if(sub === 'serviceimgs') loadServiceImages();
 }
 
 // Close modals on overlay click
