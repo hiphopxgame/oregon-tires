@@ -86,8 +86,7 @@ const MIGRATION_FILES = [
 
 // Source files needed to build & deploy the React app for / and /admin
 const SOURCE_FILES = [
-  // Config
-  'index.html',
+  // Config (index.html is hardcoded separately to avoid Vite-transformed version)
   'vite.config.ts',
   'tailwind.config.ts',
   'postcss.config.js',
@@ -299,6 +298,53 @@ const SRC_IMAGE_FILES = [
   'src/assets/specialized-tools.jpg',
   'src/assets/tire-shop.jpg',
 ];
+
+// Hardcoded source index.html to avoid fetching the Vite-transformed version
+const INDEX_HTML_CONTENT = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Oregon Tires Auto Care - Professional Tire & Auto Services in Portland</title>
+    <meta name="description" content="Oregon Tires Auto Care - Professional tire sales, installation, brake services, and auto care in Portland, Oregon. Bilingual service in English and Spanish. Call (503) 367-9714" />
+    <meta name="author" content="Oregon Tires Auto Care" />
+    <meta name="keywords" content="tires, auto care, brake service, oil change, Portland Oregon, bilingual service, Spanish English speaking" />
+    <link rel="icon" href="/lovable-uploads/b0182aa8-dde3-4175-8f09-21b6122f47f4.png" type="image/png">
+    <meta property="og:title" content="Oregon Tires" />
+    <meta property="og:description" content="Oregon Tires is serving Portland with honest, reliable automotive services since 2008." />
+    <meta property="og:image" content="https://oregon.tires/assets/logo.jpg" />
+    <meta property="og:url" content="https://oregon.tires/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="Oregon Tires" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Oregon Tires Auto Care" />
+    <meta name="twitter:description" content="Professional tire and auto services in Portland, Oregon" />
+    <meta name="twitter:image" content="/lovable-uploads/b0182aa8-dde3-4175-8f09-21b6122f47f4.png" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "AutomotiveBusiness",
+      "name": "Oregon Tires Auto Care",
+      "description": "Professional tire sales, installation, brake services, and auto care in Portland, Oregon",
+      "telephone": "(503) 367-9714",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Portland",
+        "addressRegion": "Oregon",
+        "addressCountry": "US"
+      },
+      "openingHours": ["Mo-Fr 08:00-18:00", "Sa 08:00-16:00"],
+      "priceRange": "$$",
+      "image": "/lovable-uploads/b0182aa8-dde3-4175-8f09-21b6122f47f4.png"
+    }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>`;
 
 const PACKAGE_JSON_CONTENT = `{
   "name": "oregon-tires",
@@ -521,9 +567,10 @@ const DatabaseDownload = () => {
     try {
       const zip = new JSZip();
 
-      // Add package.json and README
+      // Add package.json, README, and source index.html
       zip.file('package.json', PACKAGE_JSON_CONTENT);
       zip.file('README.md', README_CONTENT);
+      zip.file('index.html', INDEX_HTML_CONTENT);
 
       // Fetch all source text files
       let fetched = 0;
