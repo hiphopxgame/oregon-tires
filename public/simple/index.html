@@ -427,16 +427,18 @@ document.getElementById('contact-form').addEventListener('submit', async functio
   e.preventDefault();
   const form = e.target;
   const data = {
-    name: form.firstName.value + ' ' + form.lastName.value,
+    first_name: form.firstName.value,
+    last_name: form.lastName.value,
     email: form.email.value,
     phone: form.phone.value,
     message: form.message.value,
-    status: 'new'
+    status: 'new',
+    language: currentLang === 'en' ? 'english' : 'spanish'
   };
 
   const statusEl = document.getElementById('form-status');
   try {
-    const { error } = await sb.from('contact_messages').insert([data]);
+    const { error } = await sb.from('oretir_contact_messages').insert([data]);
     if (error) throw error;
     statusEl.textContent = currentLang === 'en' ? '✅ Message sent successfully!' : '✅ ¡Mensaje enviado exitosamente!';
     statusEl.className = 'mt-3 text-center text-green-600 font-semibold';
