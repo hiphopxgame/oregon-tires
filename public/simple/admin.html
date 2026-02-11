@@ -88,8 +88,7 @@
       <!-- Navigation -->
       <nav class="flex flex-wrap gap-1" id="nav-tabs">
         <button onclick="switchTab('overview')" data-tab="overview" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition">📊 Overview</button>
-        <button onclick="switchTab('calendar')" data-tab="calendar" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📅 Calendar</button>
-        <button onclick="switchTab('appointments')" data-tab="appointments" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🗓 Appointments</button>
+        <button onclick="switchTab('appointments')" data-tab="appointments" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📅 Appointments</button>
         <button onclick="switchTab('messages')" data-tab="messages" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">💬 Messages</button>
         <button onclick="switchTab('employees')" data-tab="employees" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👥 Employees</button>
         <button onclick="switchTab('gallery')" data-tab="gallery" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 Gallery</button>
@@ -115,63 +114,79 @@
       </div>
     </div>
 
-    <!-- CALENDAR TAB -->
-    <div id="tab-calendar" class="tab-content hidden fade-in">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl mb-0"><h2 class="text-2xl font-bold">📅 Calendar Management</h2></div>
-      <div class="grid lg:grid-cols-3 gap-6 mt-6">
-        <div class="bg-white rounded-xl shadow p-4">
-          <div class="flex justify-between items-center mb-4">
-            <button onclick="calNavMonth(-1)" class="px-3 py-1 border rounded hover:bg-gray-100">◀</button>
-            <h3 class="font-bold text-brand" id="cal-month-label"></h3>
-            <button onclick="calNavMonth(1)" class="px-3 py-1 border rounded hover:bg-gray-100">▶</button>
-          </div>
-          <div id="cal-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
-        </div>
-        <div class="lg:col-span-2 space-y-4">
-          <div class="bg-white rounded-xl shadow p-6">
-            <div class="flex justify-between items-center mb-4">
-              <button onclick="calNavDay(-1)" class="px-3 py-1 border rounded hover:bg-gray-100">◀ Prev</button>
-              <h3 class="text-xl font-bold text-brand" id="cal-day-label"></h3>
-              <button onclick="calNavDay(1)" class="px-3 py-1 border rounded hover:bg-gray-100">Next ▶</button>
-            </div>
-            <div id="cal-day-appointments" class="space-y-3"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- APPOINTMENTS TAB -->
+    <!-- APPOINTMENTS TAB (combined calendar + list) -->
     <div id="tab-appointments" class="tab-content hidden fade-in">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl"><h2 class="text-2xl font-bold">All Appointments</h2><p class="text-green-100">Manage all appointments</p></div>
-      <div class="bg-white rounded-b-xl shadow p-6">
-        <div class="flex flex-wrap gap-3 mb-4">
-          <input type="text" id="appt-search" placeholder="Search by name, email, service..." onkeyup="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]">
-          <select id="appt-filter" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
-            <option value="all">All Status</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
-          </select>
-          <select id="appt-month" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
-            <option value="all">All Months</option>
-          </select>
-          <select id="appt-per-page" onchange="apptPage=1;renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
-            <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="all">All</option>
-          </select>
-          <button onclick="loadAppointments()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div><h2 class="text-2xl font-bold">📅 Appointments</h2><p class="text-green-100">Calendar view with employee assignment</p></div>
+        <button onclick="loadAppointments()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30">↻ Refresh</button>
+      </div>
+      <div class="bg-white rounded-b-xl shadow">
+        <!-- Sub-tabs: Calendar vs List view -->
+        <div class="flex gap-2 p-4 border-b">
+          <button onclick="switchApptView('calendar')" id="appt-view-calendar" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">📅 Calendar View</button>
+          <button onclick="switchApptView('list')" id="appt-view-list" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📋 List View</button>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead><tr class="bg-yellow-100 border-b text-left">
-              <th class="p-3 cursor-pointer" onclick="sortAppts('customer')">Customer ↕</th>
-              <th class="p-3 cursor-pointer" onclick="sortAppts('service')">Service ↕</th>
-              <th class="p-3 cursor-pointer" onclick="sortAppts('date')">Date & Time ↕</th>
-              <th class="p-3">Contact</th>
-              <th class="p-3">Employee</th>
-              <th class="p-3 cursor-pointer" onclick="sortAppts('status')">Status ↕</th>
-              <th class="p-3">Actions</th>
-            </tr></thead>
-            <tbody id="appointments-table"></tbody>
-          </table>
+
+        <!-- Calendar View -->
+        <div id="appt-subtab-calendar" class="p-6">
+          <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Mini Calendar -->
+            <div class="bg-gray-50 rounded-xl p-4 border">
+              <div class="flex justify-between items-center mb-4">
+                <button onclick="calNavMonth(-1)" class="px-3 py-1 border rounded hover:bg-gray-100 bg-white">◀</button>
+                <h3 class="font-bold text-brand" id="cal-month-label"></h3>
+                <button onclick="calNavMonth(1)" class="px-3 py-1 border rounded hover:bg-gray-100 bg-white">▶</button>
+              </div>
+              <div id="cal-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+              <!-- Legend -->
+              <div class="mt-4 pt-3 border-t text-xs text-gray-500 space-y-1">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-green-100 border-2 border-green-500"></div> Has appointments</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded ring-2 ring-yellow-400"></div> Today</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-brand"></div> Selected</div>
+              </div>
+            </div>
+            <!-- Day Detail with Assignment -->
+            <div class="lg:col-span-2">
+              <div class="flex justify-between items-center mb-4">
+                <button onclick="calNavDay(-1)" class="px-3 py-1 border rounded hover:bg-gray-100">◀ Prev Day</button>
+                <h3 class="text-xl font-bold text-brand" id="cal-day-label"></h3>
+                <button onclick="calNavDay(1)" class="px-3 py-1 border rounded hover:bg-gray-100">Next Day ▶</button>
+              </div>
+              <div id="cal-day-appointments" class="space-y-3"></div>
+            </div>
+          </div>
         </div>
-        <div id="appt-pagination" class="flex justify-center gap-2 mt-4"></div>
+
+        <!-- List View -->
+        <div id="appt-subtab-list" class="hidden p-6">
+          <div class="flex flex-wrap gap-3 mb-4">
+            <input type="text" id="appt-search" placeholder="Search by name, email, service..." onkeyup="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]">
+            <select id="appt-filter" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
+              <option value="all">All Status</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+            </select>
+            <select id="appt-month" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
+              <option value="all">All Months</option>
+            </select>
+            <select id="appt-per-page" onchange="apptPage=1;renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
+              <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="all">All</option>
+            </select>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead><tr class="bg-yellow-100 border-b text-left">
+                <th class="p-3 cursor-pointer" onclick="sortAppts('customer')">Customer ↕</th>
+                <th class="p-3 cursor-pointer" onclick="sortAppts('service')">Service ↕</th>
+                <th class="p-3 cursor-pointer" onclick="sortAppts('date')">Date & Time ↕</th>
+                <th class="p-3">Contact</th>
+                <th class="p-3">Employee</th>
+                <th class="p-3 cursor-pointer" onclick="sortAppts('status')">Status ↕</th>
+                <th class="p-3">Actions</th>
+              </tr></thead>
+              <tbody id="appointments-table"></tbody>
+            </table>
+          </div>
+          <div id="appt-pagination" class="flex justify-center gap-2 mt-4"></div>
+        </div>
       </div>
     </div>
 
@@ -516,23 +531,59 @@ function renderCalDay() {
   document.getElementById('cal-day-label').textContent = calSelectedDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   const dayApts = appointments.filter(a=>a.preferred_date===dateStr).sort((a,b)=>(a.preferred_time||'').localeCompare(b.preferred_time||''));
   const container = document.getElementById('cal-day-appointments');
-  container.innerHTML = dayApts.length ? dayApts.map(a => `
-    <div class="border rounded-lg p-4 hover:bg-gray-50">
-      <div class="flex justify-between items-start mb-2">
-        <div><h4 class="font-medium">${esc(a.first_name)} ${esc(a.last_name)}</h4><p class="text-sm text-gray-500">${esc(a.service)} • ${fmtTime(a.preferred_time)}</p>
-        <p class="text-sm text-gray-500">${esc(a.email)} ${a.phone?'• '+esc(a.phone):''}</p></div>
-        <div class="flex items-center gap-2">${statusBadge(a.status)}
-          <select onchange="updateApptStatus('${a.id}',this.value)" class="border rounded px-2 py-1 text-xs">
-            <option value="new" ${a.status==='new'?'selected':''}>New</option><option value="confirmed" ${a.status==='confirmed'?'selected':''}>Confirmed</option>
-            <option value="completed" ${a.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${a.status==='cancelled'?'selected':''}>Cancelled</option>
-          </select>
+  const activeEmps = employees.filter(e=>e.is_active);
+
+  if (!dayApts.length) {
+    container.innerHTML = '<div class="text-center py-12 text-gray-500"><div class="text-4xl mb-3">📅</div><p class="text-lg font-medium">No appointments</p><p class="text-sm">This day is open for bookings</p></div>';
+    return;
+  }
+
+  // Unassigned count
+  const unassigned = dayApts.filter(a=>!a.assigned_employee_id).length;
+  let headerHtml = '';
+  if (unassigned > 0) {
+    headerHtml = `<div class="bg-orange-50 border border-orange-300 rounded-lg p-3 mb-4 flex justify-between items-center">
+      <span class="text-orange-800 font-medium">⚠️ ${unassigned} unassigned appointment${unassigned>1?'s':''}</span>
+      <button onclick="quickAssignDay('${dateStr}')" class="bg-orange-600 text-white px-3 py-1 rounded text-sm hover:bg-orange-700">⚡ Quick Assign All</button>
+    </div>`;
+  }
+
+  container.innerHTML = headerHtml + dayApts.map(a => `
+    <div class="border rounded-lg p-4 hover:shadow-md transition ${!a.assigned_employee_id ? 'border-orange-300 bg-orange-50/50' : 'hover:bg-gray-50'}">
+      <div class="flex justify-between items-start gap-4">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-lg font-bold text-brand">${fmtTime(a.preferred_time)}</span>
+            ${statusBadge(a.status)}
+          </div>
+          <h4 class="font-medium">${esc(a.first_name)} ${esc(a.last_name)}</h4>
+          <p class="text-sm text-gray-600">${esc(a.service)}</p>
+          <p class="text-sm text-gray-500">${esc(a.email)} ${a.phone?'• '+esc(a.phone):''}</p>
+          ${a.message ? `<p class="text-xs text-gray-500 mt-1 italic border-l-2 border-gray-300 pl-2">"${esc(a.message)}"</p>` : ''}
+          ${a.admin_notes ? `<p class="text-xs text-blue-600 mt-1">📝 ${esc(a.admin_notes)}</p>` : ''}
+        </div>
+        <div class="flex flex-col gap-2 min-w-[180px]">
+          <div>
+            <label class="text-xs font-medium text-gray-500">Employee</label>
+            <select onchange="updateApptAssignment('${a.id}',this.value)" class="w-full border rounded px-2 py-1.5 text-sm ${!a.assigned_employee_id ? 'border-orange-400 bg-orange-50' : 'border-green-400 bg-green-50'}">
+              <option value="">— Unassigned —</option>
+              ${activeEmps.map(e=>`<option value="${e.id}" ${a.assigned_employee_id===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-500">Status</label>
+            <select onchange="updateApptStatus('${a.id}',this.value)" class="w-full border rounded px-2 py-1.5 text-sm">
+              <option value="new" ${a.status==='new'?'selected':''}>New</option>
+              <option value="confirmed" ${a.status==='confirmed'?'selected':''}>Confirmed</option>
+              <option value="completed" ${a.status==='completed'?'selected':''}>Completed</option>
+              <option value="cancelled" ${a.status==='cancelled'?'selected':''}>Cancelled</option>
+            </select>
+          </div>
+          <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100 text-center">📝 Notes</button>
         </div>
       </div>
-      ${a.assigned_employee_id ? `<p class="text-xs text-blue-600">Assigned: ${esc(employees.find(e=>e.id===a.assigned_employee_id)?.name||'Unknown')}</p>` : ''}
-      ${a.admin_notes ? `<p class="text-xs text-gray-500 mt-1">📝 ${esc(a.admin_notes)}</p>` : ''}
-      ${a.message ? `<p class="text-xs text-gray-500 mt-1 italic">"${esc(a.message)}"</p>` : ''}
     </div>
-  `).join('') : '<div class="text-center py-8 text-gray-500">No appointments for this day</div>';
+  `).join('');
 }
 
 // ===== APPOINTMENTS =====
@@ -1024,7 +1075,28 @@ function switchTab(tab) {
   const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
   if(btn) { btn.classList.add('tab-active'); btn.classList.remove('text-white','hover:bg-green-600'); }
   if(tab==='analytics') renderAnalytics();
-  if(tab==='calendar') renderCalendar();
+  if(tab==='appointments') renderCalendar();
+}
+
+// Sub-tab switching for Appointments (Calendar vs List)
+function switchApptView(view) {
+  document.getElementById('appt-subtab-calendar').classList.toggle('hidden', view !== 'calendar');
+  document.getElementById('appt-subtab-list').classList.toggle('hidden', view !== 'list');
+  document.getElementById('appt-view-calendar').className = view === 'calendar' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white' : 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
+  document.getElementById('appt-view-list').className = view === 'list' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white' : 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
+  if(view === 'calendar') renderCalendar();
+  if(view === 'list') renderAppointments();
+}
+
+// Quick assign all unassigned appointments for a day
+function quickAssignDay(dateStr) {
+  const dayApts = appointments.filter(a => a.preferred_date === dateStr && !a.assigned_employee_id);
+  const activeEmps = employees.filter(e => e.is_active);
+  if(!activeEmps.length) { showToast('No active employees to assign', true); return; }
+  dayApts.forEach((apt, i) => {
+    const emp = activeEmps[i % activeEmps.length];
+    updateApptAssignment(apt.id, emp.id);
+  });
 }
 
 // Sub-tab switching for Messages
