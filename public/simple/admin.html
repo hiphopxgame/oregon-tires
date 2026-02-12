@@ -346,6 +346,16 @@
     </div>
     <!-- Update Name -->
     <div class="space-y-4">
+      <!-- Notification Email -->
+      <div class="border rounded-lg p-4 bg-yellow-50 border-yellow-200">
+        <h4 class="font-medium mb-1">📧 Admin Notification Email</h4>
+        <p class="text-xs text-gray-500 mb-3">All appointment confirmations, employee account emails, and assignment notifications will be CC'd to this address.</p>
+        <div class="flex gap-3">
+          <input id="settings-notification-email" type="email" class="flex-1 p-2 border rounded" placeholder="admin@example.com">
+          <button onclick="updateNotificationEmail()" class="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm">Save</button>
+        </div>
+      </div>
+      <!-- Update Name -->
       <div class="border rounded-lg p-4">
         <h4 class="font-medium mb-3">Update Display Name</h4>
         <div class="flex gap-3">
@@ -1221,7 +1231,23 @@ function openAccountSettings() {
   }
   document.getElementById('settings-password').value = '';
   document.getElementById('settings-password-confirm').value = '';
+  // Load notification email setting
+  sb.from('oretir_settings').select('setting_value').eq('setting_key', 'admin_email').maybeSingle().then(({ data }) => {
+    document.getElementById('settings-notification-email').value = data?.setting_value || 'tyronenorris@gmail.com';
+  });
   document.getElementById('account-modal').classList.remove('hidden');
+}
+
+async function updateNotificationEmail() {
+  const email = document.getElementById('settings-notification-email').value.trim();
+  if(!email) { showToast('Email is required', true); return; }
+  const { error } = await sb.from('oretir_settings').update({ setting_value: email }).eq('setting_key', 'admin_email');
+  if(error) {
+    // Try insert if row doesn't exist
+    const { error: insertErr } = await sb.from('oretir_settings').insert({ setting_key: 'admin_email', setting_value: email });
+    if(insertErr) { showToast('Error: ' + insertErr.message, true); return; }
+  }
+  showToast('Notification email updated to ' + email);
 }
 
 async function updateAccountName() {

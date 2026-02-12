@@ -130,13 +130,21 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('User ready:', userId);
 
+    // Fetch admin notification email from settings
+    let adminNotificationEmail = 'tyronenorris@gmail.com';
+    try {
+      const { data: settingData } = await supabaseAdmin.from('oretir_settings').select('setting_value').eq('setting_key', 'admin_email').maybeSingle();
+      if (settingData?.setting_value) adminNotificationEmail = settingData.setting_value;
+    } catch (e) { console.error('Could not fetch admin email setting:', e); }
+
     // Send welcome email with credentials
     try {
       const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
       
       const emailResponse = await resend.emails.send({
-        from: "Oregon Tires Auto Care <onboarding@resend.dev>",
+        from: "Oregon Tires Auto Care <staff@oregon.tires>",
         to: [email],
+        cc: [adminNotificationEmail],
         subject: "Welcome to Oregon Tires - Your Account Details",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
