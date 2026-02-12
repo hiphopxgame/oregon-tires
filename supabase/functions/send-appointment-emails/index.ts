@@ -104,7 +104,7 @@ const handler = async (req: Request): Promise<Response> => {
       `;
       
       emailResponse = await resend.emails.send({
-        from: 'Oregon Tires <onboarding@resend.dev>',
+        from: 'Oregon Tires <appointments@oregon.tires>',
         to: [appointment.email],
         subject: subject,
         html: emailBody,
@@ -172,7 +172,7 @@ const handler = async (req: Request): Promise<Response> => {
       `;
       
       emailResponse = await resend.emails.send({
-        from: 'Oregon Tires <onboarding@resend.dev>',
+        from: 'Oregon Tires <assignments@oregon.tires>',
         to: [assignedEmployee.email],
         subject: subject,
         html: emailBody,
@@ -236,7 +236,7 @@ const handler = async (req: Request): Promise<Response> => {
       `;
       
       emailResponse = await resend.emails.send({
-        from: 'Oregon Tires <onboarding@resend.dev>',
+        from: 'Oregon Tires <service@oregon.tires>',
         to: [appointment.email],
         subject: subject,
         html: emailBody,
