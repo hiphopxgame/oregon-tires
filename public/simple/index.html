@@ -131,33 +131,54 @@
       </div>
 
       <!-- Feature cards with dynamic images -->
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="service-feature-cards">
         <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-expert-technicians" class="h-32 bg-gray-200 bg-cover bg-center"></div>
+          <div id="svc-img-expert-technicians" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand mb-2" data-t="expertService">Expert Technicians</h3>
             <p class="text-gray-600 text-sm" data-t="expertServiceDesc">Our certified mechanics have years of experience with all vehicle makes and models.</p>
           </div>
         </div>
         <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-fast-cars" class="h-32 bg-gray-200 bg-cover bg-center"></div>
+          <div id="svc-img-fast-cars" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand mb-2" data-t="quickService">Fast Service</h3>
             <p class="text-gray-600 text-sm" data-t="quickServiceDesc">Most services completed while you wait. We value your time and get you back on the road quickly.</p>
           </div>
         </div>
         <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-quality-car-parts" class="h-32 bg-gray-200 bg-cover bg-center"></div>
+          <div id="svc-img-quality-car-parts" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand mb-2" data-t="qualityParts">Quality Parts</h3>
             <p class="text-gray-600 text-sm" data-t="qualityPartsDesc">We use only premium parts and materials to ensure lasting repairs and optimal performance.</p>
           </div>
         </div>
         <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-bilingual-support" class="h-32 bg-gray-200 bg-cover bg-center"></div>
+          <div id="svc-img-bilingual-support" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand mb-2" data-t="bilingualService">Bilingual Support</h3>
             <p class="text-gray-600 text-sm" data-t="bilingualServiceDesc">Fluent in both English and Spanish to serve our diverse Portland community.</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div id="svc-img-tire-shop" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden"></div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-brand mb-2" data-t="tireServices">Tire Services</h3>
+            <p class="text-gray-600 text-sm" data-t="tireServicesDesc">New and used tires, mount and balance, repair — everything your tires need.</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div id="svc-img-auto-repair" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden"></div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-brand mb-2" data-t="autoMaintenance">Auto Maintenance</h3>
+            <p class="text-gray-600 text-sm" data-t="autoMaintenanceDesc">Oil changes, brake services, tuneups and more to keep your vehicle running smoothly.</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div id="svc-img-specialized-tools" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden"></div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-brand mb-2" data-t="specializedServices">Specialized Services</h3>
+            <p class="text-gray-600 text-sm" data-t="specializedServicesDesc">Alignment, mechanical inspection, mobile service, and roadside assistance.</p>
           </div>
         </div>
       </div>
@@ -473,16 +494,18 @@ async function loadServiceImagesForSite() {
       heroEl.style.backgroundPosition = heroPos;
     }
 
-    // Feature card images
-    ['expert-technicians','fast-cars','quality-car-parts','bilingual-support'].forEach(key => {
+    // Feature card images — all 7 service keys
+    ['expert-technicians','fast-cars','quality-car-parts','bilingual-support','tire-shop','auto-repair','specialized-tools'].forEach(key => {
       const el = document.getElementById('svc-img-'+key);
       if (!el) return;
       const img = imgMap[key];
       const url = img?.image_url || fallbackImages[key];
       const pos = img ? `${img.position_x||50}% ${img.position_y||50}%` : 'center';
+      const scale = img?.scale || 1;
       if (url) {
         el.style.backgroundImage = `url('${url}')`;
         el.style.backgroundPosition = pos;
+        if (scale !== 1) el.style.backgroundSize = `${scale * 100}%`;
       }
     });
   } catch (e) {
@@ -490,7 +513,7 @@ async function loadServiceImagesForSite() {
     // Apply fallbacks
     const heroEl = document.getElementById('home');
     if (fallbackImages['hero-background']) heroEl.style.backgroundImage = `url('${fallbackImages['hero-background']}')`;
-    ['expert-technicians','fast-cars','quality-car-parts','bilingual-support'].forEach(key => {
+    ['expert-technicians','fast-cars','quality-car-parts','bilingual-support','tire-shop','auto-repair','specialized-tools'].forEach(key => {
       const el = document.getElementById('svc-img-'+key);
       if (el && fallbackImages[key]) el.style.backgroundImage = `url('${fallbackImages[key]}')`;
     });
@@ -564,7 +587,9 @@ const t = {
     quickService: 'Fast Service', quickServiceDesc: 'Most services completed while you wait. We value your time and get you back on the road quickly.',
     qualityParts: 'Quality Parts', qualityPartsDesc: 'We use only premium parts and materials to ensure lasting repairs and optimal performance.',
     bilingualService: 'Bilingual Support', bilingualServiceDesc: 'Fluent in both English and Spanish to serve our diverse Portland community.',
-    tireServices: 'Tire Services', autoMaintenance: 'Auto Maintenance', specializedServices: 'Specialized Services',
+    tireServices: 'Tire Services', tireServicesDesc: 'New and used tires, mount and balance, repair — everything your tires need.',
+    autoMaintenance: 'Auto Maintenance', autoMaintenanceDesc: 'Oil changes, brake services, tuneups and more to keep your vehicle running smoothly.',
+    specializedServices: 'Specialized Services', specializedServicesDesc: 'Alignment, mechanical inspection, mobile service, and roadside assistance.',
     newOrUsedTires: 'New or Used Tires', mountAndBalance: 'Mount and Balance Tires', tireRepairService: 'Tire Repair',
     oilChangeService: 'Oil Change', brakeServices: 'Brake Services', tuneup: 'Tuneup',
     alignment: 'Alignment', mechanicalInspection: 'Mechanical Inspection', homeService: 'Mobile Service (At Your Home)',
@@ -598,7 +623,9 @@ const t = {
     quickService: 'Servicio Rápido', quickServiceDesc: 'La mayoría de servicios se completan mientras esperas. Valoramos tu tiempo.',
     qualityParts: 'Partes de Calidad', qualityPartsDesc: 'Usamos solo partes y materiales premium para garantizar reparaciones duraderas.',
     bilingualService: 'Soporte Bilingüe', bilingualServiceDesc: 'Fluidos en inglés y español para servir a nuestra diversa comunidad de Portland.',
-    tireServices: 'Servicios de Llantas', autoMaintenance: 'Mantenimiento Automotriz', specializedServices: 'Servicios Especializados',
+    tireServices: 'Servicios de Llantas', tireServicesDesc: 'Llantas nuevas y usadas, montaje, balanceado y reparación — todo lo que tus llantas necesitan.',
+    autoMaintenance: 'Mantenimiento Automotriz', autoMaintenanceDesc: 'Cambios de aceite, frenos, afinaciones y más para mantener tu vehículo en óptimas condiciones.',
+    specializedServices: 'Servicios Especializados', specializedServicesDesc: 'Alineación, inspección mecánica, servicio móvil y asistencia en carretera.',
     newOrUsedTires: 'Llantas Nuevas o Usadas', mountAndBalance: 'Montaje y Balanceado', tireRepairService: 'Reparación de Llantas',
     oilChangeService: 'Cambio de Aceite', brakeServices: 'Servicios de Frenos', tuneup: 'Afinación',
     alignment: 'Alineación', mechanicalInspection: 'Inspección Mecánica', homeService: 'Servicio Móvil (En Su Casa)',
