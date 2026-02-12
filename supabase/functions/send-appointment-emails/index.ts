@@ -63,7 +63,14 @@ const handler = async (req: Request): Promise<Response> => {
     const formattedServiceName = formattedServiceData || appointment.service;
 
 
-    console.log('Processing email for appointment:', appointment.id, 'Type:', type);
+    // Fetch admin notification email from settings
+    let adminNotificationEmail = 'tyronenorris@gmail.com';
+    try {
+      const { data: settingData } = await supabase.from('oretir_settings').select('setting_value').eq('setting_key', 'admin_email').maybeSingle();
+      if (settingData?.setting_value) adminNotificationEmail = settingData.setting_value;
+    } catch (e) { console.error('Could not fetch admin email setting:', e); }
+
+    console.log('Processing email for appointment:', appointment.id, 'Type:', type, 'Admin CC:', adminNotificationEmail);
 
     let emailResponse;
 
@@ -106,6 +113,7 @@ const handler = async (req: Request): Promise<Response> => {
       emailResponse = await resend.emails.send({
         from: 'Oregon Tires <appointments@oregon.tires>',
         to: [appointment.email],
+        cc: adminNotificationEmail !== appointment.email ? [adminNotificationEmail] : [],
         subject: subject,
         html: emailBody,
       });
@@ -174,6 +182,7 @@ const handler = async (req: Request): Promise<Response> => {
       emailResponse = await resend.emails.send({
         from: 'Oregon Tires <assignments@oregon.tires>',
         to: [assignedEmployee.email],
+        cc: adminNotificationEmail !== assignedEmployee.email ? [adminNotificationEmail] : [],
         subject: subject,
         html: emailBody,
       });
@@ -238,6 +247,7 @@ const handler = async (req: Request): Promise<Response> => {
       emailResponse = await resend.emails.send({
         from: 'Oregon Tires <service@oregon.tires>',
         to: [appointment.email],
+        cc: adminNotificationEmail !== appointment.email ? [adminNotificationEmail] : [],
         subject: subject,
         html: emailBody,
       });
