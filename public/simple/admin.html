@@ -932,14 +932,29 @@ function renderServiceImages() {
   const matched = services.map(s => ({ ...s, img: serviceImages.find(i=>i.service_key===s.key) }));
   container.innerHTML = matched.map(s => `
     <div class="bg-white rounded-xl shadow overflow-hidden">
-      <div class="p-4"><h3 class="font-bold text-brand">${s.title}</h3></div>
-      <div class="relative h-48 bg-gray-100">
-        ${s.img ? `<div class="absolute inset-0 bg-cover" style="background-image:url(${s.img.image_url});background-position:${s.img.position_x||50}% ${s.img.position_y||50}%"></div>
+      <div class="p-4"><h3 class="font-bold text-brand">${s.title}</h3><p class="text-xs text-gray-500">${s.key}</p></div>
+      <div class="relative h-48 bg-gray-100 overflow-hidden">
+        ${s.img ? `<div class="absolute inset-0 bg-cover" style="background-image:url(${s.img.image_url});background-position:${s.img.position_x||50}% ${s.img.position_y||50}%;background-size:${(s.img.scale||1)*100}%"></div>
           <div class="absolute inset-0 bg-black/30"></div>
           <div class="absolute top-2 right-2"><span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs">🕐 Live</span></div>` 
           : '<div class="flex items-center justify-center h-full text-gray-400">No image uploaded</div>'}
       </div>
-      <div class="p-4">
+      ${s.img ? `<div class="p-4 border-t bg-gray-50 space-y-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Horizontal Position: <span id="pos-x-val-${s.key}">${s.img.position_x||50}%</span></label>
+          <input type="range" min="0" max="100" value="${s.img.position_x||50}" id="pos-x-${s.key}" oninput="document.getElementById('pos-x-val-${s.key}').textContent=this.value+'%';previewPosition('${s.key}')" class="w-full h-2 accent-green-700">
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Vertical Position: <span id="pos-y-val-${s.key}">${s.img.position_y||50}%</span></label>
+          <input type="range" min="0" max="100" value="${s.img.position_y||50}" id="pos-y-${s.key}" oninput="document.getElementById('pos-y-val-${s.key}').textContent=this.value+'%';previewPosition('${s.key}')" class="w-full h-2 accent-green-700">
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Zoom: <span id="scale-val-${s.key}">${((s.img.scale||1)*100).toFixed(0)}%</span></label>
+          <input type="range" min="100" max="300" value="${((s.img.scale||1)*100).toFixed(0)}" id="scale-${s.key}" oninput="document.getElementById('scale-val-${s.key}').textContent=this.value+'%';previewPosition('${s.key}')" class="w-full h-2 accent-green-700">
+        </div>
+        <button onclick="saveImagePosition('${s.key}','${s.img.id}')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm w-full">💾 Save Position & Crop</button>
+      </div>` : ''}
+      <div class="p-4 border-t">
         <label class="text-sm font-medium">Upload New Image</label>
         <div class="flex gap-2 mt-1">
           <input type="file" accept="image/*" id="svc-file-${s.key}" class="flex-1 text-sm border rounded p-1">
@@ -948,6 +963,30 @@ function renderServiceImages() {
       </div>
     </div>
   `).join('');
+}
+
+function previewPosition(key) {
+  const card = document.querySelector(`#service-images-grid [style*="${key}"]`)?.closest('.relative');
+  if (!card) return;
+  const bg = card.querySelector('[style*="background-image"]');
+  if (!bg) return;
+  const x = document.getElementById('pos-x-'+key)?.value || 50;
+  const y = document.getElementById('pos-y-'+key)?.value || 50;
+  const s = document.getElementById('scale-'+key)?.value || 100;
+  bg.style.backgroundPosition = `${x}% ${y}%`;
+  bg.style.backgroundSize = `${s}%`;
+}
+
+async function saveImagePosition(key, imageId) {
+  const x = parseInt(document.getElementById('pos-x-'+key)?.value || 50);
+  const y = parseInt(document.getElementById('pos-y-'+key)?.value || 50);
+  const s = parseInt(document.getElementById('scale-'+key)?.value || 100) / 100;
+  try {
+    const { error } = await sb.from('oretir_service_images').update({ position_x: x, position_y: y, scale: s }).eq('id', imageId);
+    if (error) throw error;
+    showToast('Position saved & live on website!');
+    loadServiceImages();
+  } catch(e) { showToast('Save failed: '+e.message, true); }
 }
 
 async function uploadServiceImage(key) {
