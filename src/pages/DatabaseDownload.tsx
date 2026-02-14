@@ -152,11 +152,18 @@ const DatabaseDownload = () => {
     try {
       const zip = new JSZip();
 
-      // Fetch the simplified HTML file
+      // Fetch the simplified HTML files
       const htmlRes = await fetch('/simple/index.html');
       if (htmlRes.ok) {
         const htmlContent = await htmlRes.text();
         zip.file('index.html', htmlContent);
+      }
+
+      setZipProgress('Fetching admin panel...');
+      const adminRes = await fetch('/simple/admin.html');
+      if (adminRes.ok) {
+        const adminContent = await adminRes.text();
+        zip.file('admin.html', adminContent);
       }
 
       // Add a simple README
