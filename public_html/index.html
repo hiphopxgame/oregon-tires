@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oregon Tires Auto Care - Professional Tire & Auto Services in Portland</title>
+  <meta name="description" content="Oregon Tires Auto Care - Professional tire sales, installation, brake services, and auto care in Portland, Oregon. Bilingual service in English and Spanish. Call (503) 367-9714">
+  <meta name="author" content="Oregon Tires Auto Care">
+  <meta name="keywords" content="tires, auto care, brake service, oil change, Portland Oregon, bilingual service, Spanish English speaking">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/og-image.jpg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#15803d">
+
+  <!-- SEO Meta Tags -->
+  <link rel="canonical" href="https://oregon.tires/">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Oregon Tires Auto Care">
+  <meta property="og:description" content="Oregon Tires is serving Portland with honest, reliable automotive services since 2008.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:url" content="https://oregon.tires/">
+  <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:alt" content="Oregon Tires Auto Care - Spanish & English Speaking">
+  <meta property="og:site_name" content="Oregon Tires Auto Care">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Oregon Tires Auto Care - Your Trusted Auto Care in Portland">
+  <meta name="twitter:description" content="Professional tire installation, repair, and complete automotive services in Portland, OR. Bilingual service - English and Spanish.">
+  <meta name="twitter:image" content="https://oregon.tires/assets/og-image.jpg">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AutomotiveBusiness",
+    "name": "Oregon Tires Auto Care",
+    "description": "Professional tire sales, installation, brake services, and auto care in Portland, Oregon",
+    "url": "https://oregon.tires",
+    "image": "https://oregon.tires/assets/og-image.jpg",
+    "telephone": "(503) 367-9714",
+    "email": "oregontirespdx@gmail.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "8536 SE 82nd Ave",
+      "addressLocality": "Portland",
+      "addressRegion": "OR",
+      "postalCode": "97266",
+      "addressCountry": "US"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 45.46123,
+      "longitude": -122.57895
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "150",
+      "bestRating": "5"
+    },
+    "openingHours": ["Mo-Sa 07:00-19:00"],
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+        "opens": "07:00",
+        "closes": "19:00"
+      }
+    ],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Auto Care Services",
+      "itemListElement": [
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Tire Installation"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Tire Repair"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Oil Change"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Brake Service"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Wheel Alignment"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Engine Diagnostics"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Suspension Repair"}}
+      ]
+    },
+    "priceRange": "$$",
+    "currenciesAccepted": "USD",
+    "paymentAccepted": "Cash, Credit Card",
+    "knowsLanguage": ["en", "es"]
+  }
+  </script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: '#0D3618',
+            accent: '#FFFE03',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Supabase CDN -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .star { color: #facc15; }
+    .fade-in { animation: fadeIn 0.6s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+
+  <!-- Google Analytics 4 — replace G-CHYMTNB6LH with your real Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CHYMTNB6LH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-CHYMTNB6LH');
+  </script>
+
+  <!-- Basic error tracking via GA4 -->
+  <script>
+    window.addEventListener('error', function(e) {
+      if (typeof gtag === 'function') gtag('event', 'exception', {
+        description: e.message + ' at ' + (e.filename || 'unknown') + ':' + (e.lineno || 0),
+        fatal: false
+      });
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      if (typeof gtag === 'function') gtag('event', 'exception', {
+        description: 'Unhandled promise rejection: ' + (e.reason?.message || e.reason || 'unknown'),
+        fatal: false
+      });
+    });
+  </script>
+</head>
+<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
+
+  <!-- Top Bar -->
+  <div class="bg-brand text-white text-sm py-2">
+    <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
+      <div class="flex flex-wrap items-center gap-4">
+        <span>📞 <a href="tel:5033679714" class="hover:text-yellow-300">(503) 367-9714</a></span>
+        <span>✉️ <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></span>
+        <span class="hidden md:inline">📍 8536 SE 82nd Ave, Portland, OR 97266</span>
+        <span class="hidden lg:inline" id="top-hours">🕐 Mon-Sat 7AM-7PM</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="https://www.instagram.com/oregontires" target="_blank" class="hover:text-yellow-300">Instagram</a>
+        <a href="https://www.facebook.com/61571913202998/" target="_blank" class="hover:text-yellow-300">Facebook</a>
+        <button id="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode" class="text-sm text-white hover:text-yellow-300 transition-colors">🌙</button>
+        <button onclick="toggleLanguage()" class="hover:text-yellow-300 font-medium" id="lang-toggle" aria-label="Switch language">🌐 ES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-white shadow-md sticky top-0 z-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="#home">
+        <img src="assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" loading="eager" fetchpriority="high">
+      </a>
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="#home" class="text-brand font-medium hover:opacity-70" data-t="home">Home</a>
+        <a href="#services" class="text-brand font-medium hover:opacity-70" data-t="services">Services</a>
+        <a href="#about" class="text-brand font-medium hover:opacity-70" data-t="about">About</a>
+        <a href="#reviews" class="text-brand font-medium hover:opacity-70" data-t="testimonials">Reviews</a>
+        <a href="#gallery" class="text-brand font-medium hover:opacity-70" data-t="gallery">Gallery</a>
+        <a href="#contact" class="text-brand font-medium hover:opacity-70" data-t="contact">Contact</a>
+        <a href="/book-appointment" class="bg-yellow-400 text-black px-5 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition" data-t="scheduleService">Schedule Service</a>
+      </nav>
+      <!-- Mobile menu button -->
+      <button onclick="toggleMobileMenu()" class="md:hidden text-brand text-2xl" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t px-4 pb-4 dark:bg-gray-800 dark:border-gray-700">
+      <a href="#home" class="block py-2 text-brand" data-t="home">Home</a>
+      <a href="#services" class="block py-2 text-brand" data-t="services">Services</a>
+      <a href="#about" class="block py-2 text-brand" data-t="about">About</a>
+      <a href="#reviews" class="block py-2 text-brand" data-t="testimonials">Reviews</a>
+      <a href="#gallery" class="block py-2 text-brand" data-t="gallery">Gallery</a>
+      <a href="#contact" class="block py-2 text-brand" data-t="contact">Contact</a>
+      <a href="/book-appointment" class="block py-2 text-brand font-semibold" data-t="scheduleService">Schedule Service</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <main id="main-content">
+  <section id="home" class="bg-brand text-white py-20 scroll-mt-24 relative bg-cover bg-center" style="background-color: #0D3618; background-image: url('assets/hero-bg.png');">
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div class="container mx-auto px-4 text-center relative z-10">
+      <h1 class="text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg" data-t="heroTitle">Your Trusted Auto Care Experts in Portland</h1>
+      <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90" data-t="heroSubtitle">Professional tire installation, repair, and complete automotive services. We speak Spanish and English!</p>
+      <div class="flex justify-center gap-4 flex-wrap">
+        <a href="#contact" class="bg-yellow-400 text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition" data-t="contact">Contact Us</a>
+        <a href="/book-appointment" class="bg-white text-brand px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition" data-t="scheduleService">Schedule Service</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="services" class="py-16 bg-gray-50 scroll-mt-24 dark:bg-gray-800">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold text-brand mb-4" data-t="services">Services</h2>
+        <p class="text-xl text-gray-600" data-t="servicesSubtitle">Comprehensive automotive services you can trust</p>
+      </div>
+
+      <!-- Feature cards with dynamic images -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="service-feature-cards">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div id="svc-img-expert-technicians" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/expert-technicians.jpg');"></div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-brand mb-2" data-t="expertService">Expert Technicians</h3>
+            <p class="text-gray-600 text-sm" data-t="expertServiceDesc">Our certified mechanics have years of experience with all vehicle makes and models.</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div id="svc-img-fast-cars" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/fast-cars.jpg');"></div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-brand mb-2" data-t="quickService">Fast Service</h3>
+            <p class="text-gray-600 text-sm" data-t="quickServiceDesc">Most services completed while you wait. We value your time and get you back on the road quickly.</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div id="svc-img-quality-car-parts" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/quality-parts.jpg');"></div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-brand mb-2" data-t="qualityParts">Quality Parts</h3>
+            <p class="text-gray-600 text-sm" data-t="qualityPartsDesc">We use only premium parts and materials to ensure lasting repairs and optimal performance.</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div id="svc-img-bilingual-support" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/bilingual-service.jpg');"></div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-brand mb-2" data-t="bilingualService">Bilingual Support</h3>
+            <p class="text-gray-600 text-sm" data-t="bilingualServiceDesc">Fluent in both English and Spanish to serve our diverse Portland community.</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div id="svc-img-tire-shop" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/tire-services.jpg');"></div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-brand mb-2" data-t="tireServices">Tire Services</h3>
+            <p class="text-gray-600 text-sm" data-t="tireServicesDesc">New and used tires, mount and balance, repair — everything your tires need.</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div id="svc-img-auto-repair" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/auto-maintenance.jpg');"></div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-brand mb-2" data-t="autoMaintenance">Auto Maintenance</h3>
+            <p class="text-gray-600 text-sm" data-t="autoMaintenanceDesc">Oil changes, brake services, tuneups and more to keep your vehicle running smoothly.</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div id="svc-img-specialized-tools" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/specialized-services.jpg');"></div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-brand mb-2" data-t="specializedServices">Specialized Services</h3>
+            <p class="text-gray-600 text-sm" data-t="specializedServicesDesc">Alignment, mechanical inspection, mobile service, and roadside assistance.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service categories -->
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold text-brand mb-4" data-t="tireServices">Tire Services</h3>
+          <ul class="space-y-2 text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-brand">✓</span> <span data-t="newOrUsedTires">New or Used Tires</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand">✓</span> <span data-t="mountAndBalance">Mount and Balance Tires</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand">✓</span> <span data-t="tireRepairService">Tire Repair</span></li>
+          </ul>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold text-brand mb-4" data-t="autoMaintenance">Auto Maintenance</h3>
+          <ul class="space-y-2 text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-brand">✓</span> <span data-t="oilChangeService">Oil Change</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand">✓</span> <span data-t="brakeServices">Brake Services</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand">✓</span> <span data-t="tuneup">Tuneup</span></li>
+          </ul>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold text-brand mb-4" data-t="specializedServices">Specialized Services</h3>
+          <ul class="space-y-2 text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-brand">✓</span> <span data-t="alignment">Alignment</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand">✓</span> <span data-t="mechanicalInspection">Mechanical Inspection</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand">✓</span> <span data-t="homeService">Mobile Service (At Your Home)</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand">✓</span> <span data-t="roadsideAssistance">Roadside Assistance (Any Location)</span></li>
+          </ul>
+          <div class="mt-4 bg-red-50 border-l-4 border-red-500 p-3 rounded">
+            <p class="text-red-700 font-semibold text-sm" data-t="needServiceToday">Need Emergency Service Today?</p>
+            <p class="text-red-600 text-sm" data-t="callImmediately">Call us immediately at (503) 367-9714</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service Promise -->
+      <div class="mt-12 max-w-4xl mx-auto bg-brand/5 rounded-xl p-8 text-center">
+        <h3 class="text-2xl font-bold text-brand mb-4" data-t="ourServicePromise">Our Service Promise</h3>
+        <p class="text-gray-700 text-lg mb-6" data-t="servicePromiseDesc">Every service comes with our commitment to quality, transparency, and customer satisfaction.</p>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div><span class="text-2xl font-bold text-brand">✓</span><div class="font-semibold mt-1" data-t="qualityGuarantee">Quality Guarantee</div></div>
+          <div><span class="text-2xl font-bold text-brand">✓</span><div class="font-semibold mt-1" data-t="fairPricing">Fair Pricing</div></div>
+          <div><span class="text-2xl font-bold text-brand">✓</span><div class="font-semibold mt-1" data-t="expertServicePromise">Expert Service</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="py-16 bg-white scroll-mt-24 dark:bg-gray-900">
+    <div class="container mx-auto px-4 max-w-5xl">
+      <div class="text-center mb-10">
+        <h2 class="text-4xl font-bold text-brand mb-4" data-t="aboutOregonTires">About Oregon Tires</h2>
+        <p class="text-2xl font-semibold text-brand italic">"<span data-t="careCatchphrase">We take care of your car, you enjoy the road.</span>"</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mb-10">
+        <div class="bg-brand/5 rounded-xl p-8">
+          <h3 class="text-2xl font-bold text-brand mb-3" data-t="vision">Vision</h3>
+          <p class="text-gray-700" data-t="visionText">To be the most trusted tire shop in Portland, Oregon.</p>
+        </div>
+        <div class="bg-brand/5 rounded-xl p-8">
+          <h3 class="text-2xl font-bold text-brand mb-3" data-t="mission">Mission</h3>
+          <p class="text-gray-700" data-t="missionText">At Oregon Tires, we are dedicated to offering high-quality new and used tires, reliable mechanical services, and personalized attention.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-gray-50 rounded-xl p-8">
+          <h3 class="text-2xl font-bold text-brand mb-4" data-t="whyChooseUs">Why Choose Us</h3>
+          <ul class="space-y-2 text-gray-700">
+            <li>• <span data-t="bilingualStaff">Bilingual staff (English & Spanish)</span></li>
+            <li>• <span data-t="honestPricing">Honest, transparent pricing</span></li>
+            <li>• <span data-t="qualityWorkmanship">Quality workmanship guaranteed</span></li>
+            <li>• <span data-t="fastReliableService">Fast and reliable service</span></li>
+          </ul>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-8">
+          <h3 class="text-2xl font-bold text-brand mb-4" data-t="servingPortland">Serving Portland Since 2008</h3>
+          <p class="text-gray-700" data-t="servingPortlandText">With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews -->
+  <section id="reviews" class="py-16 bg-gray-50 scroll-mt-24 dark:bg-gray-800">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-10">
+        <h2 class="text-4xl font-bold text-brand mb-4" data-t="customerReviews">What Our Customers Say</h2>
+        <p class="text-xl text-gray-600" data-t="customerReviewsSubtitle">Real reviews from satisfied customers in Portland</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6 mb-10" id="reviews-grid">
+        <!-- Populated by JS -->
+      </div>
+      <div class="text-center">
+        <div class="inline-block bg-white p-8 rounded-xl shadow-lg">
+          <div class="text-5xl font-bold text-brand mb-2">4.8</div>
+          <div class="text-gray-600 mb-3" data-t="outOfStars">out of 5 stars</div>
+          <div class="flex justify-center mb-3">
+            <span class="star text-2xl">★★★★★</span>
+          </div>
+          <div class="text-gray-600 mb-4" data-t="basedOnReviews">Based on 150+ Google Reviews</div>
+          <a href="https://www.google.com/search?q=Oregon+Tires+Reviews" target="_blank" class="inline-block border-2 border-brand text-brand px-6 py-2 rounded-lg font-medium hover:bg-brand/5 transition" data-t="viewAllReviews">View All Reviews on Google</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section id="gallery" class="py-16 bg-white scroll-mt-24 dark:bg-gray-900">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-10">
+        <h2 class="text-4xl font-bold text-brand mb-4" data-t="gallery">Gallery</h2>
+        <p class="text-xl text-gray-600" data-t="gallerySubtitle">See our work and facilities</p>
+      </div>
+      <div id="gallery-section-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="sr-only" data-t="loadingGallery" aria-live="polite">Loading gallery...</div>
+        <div class="animate-pulse bg-gray-200 rounded-xl h-64"></div>
+        <div class="animate-pulse bg-gray-200 rounded-xl h-64"></div>
+        <div class="animate-pulse bg-gray-200 rounded-xl h-64"></div>
+        <div class="animate-pulse bg-gray-200 rounded-xl h-64"></div>
+        <div class="animate-pulse bg-gray-200 rounded-xl h-64"></div>
+        <div class="animate-pulse bg-gray-200 rounded-xl h-64"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="py-16 bg-white scroll-mt-24 dark:bg-gray-900">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-10">
+        <h2 class="text-4xl font-bold text-brand mb-4" data-t="contact">Contact</h2>
+        <p class="text-xl text-gray-600" data-t="contactSubtitle">Get in touch with us for all your automotive needs</p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
+        <!-- Contact Info -->
+        <div>
+          <h3 class="text-2xl font-bold text-brand mb-6" data-t="contactInfo">Contact Information</h3>
+          <div class="space-y-5">
+            <div class="flex items-center gap-4">
+              <div class="bg-green-100 p-3 rounded-full"><span class="text-xl">📞</span></div>
+              <div>
+                <h4 class="font-semibold" data-t="phone">Phone</h4>
+                <p class="text-gray-600"><a href="tel:5033679714">(503) 367-9714</a></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="bg-green-100 p-3 rounded-full"><span class="text-xl">📍</span></div>
+              <div>
+                <h4 class="font-semibold" data-t="address">Address</h4>
+                <p class="text-gray-600" data-t="physicalAddress">8536 SE 82nd Ave, Portland, OR 97266</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="bg-green-100 p-3 rounded-full"><span class="text-xl">🕐</span></div>
+              <div>
+                <h4 class="font-semibold" data-t="businessHours">Business Hours</h4>
+                <p class="text-gray-600" data-t="monSat">Mon-Sat 7AM-7PM</p>
+                <p class="text-gray-600" data-t="sunday">Sunday: Closed</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="bg-gray-50 rounded-xl p-6 dark:bg-gray-800">
+          <h3 class="text-xl font-bold text-brand mb-4" data-t="contact">Contact</h3>
+          <form id="contact-form" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" data-t="firstName">First Name</label>
+                <input type="text" name="firstName" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" data-t="lastName">Last Name</label>
+                <input type="text" name="lastName" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" data-t="phone">Phone</label>
+              <input type="tel" name="phone" required placeholder="(503) 123-4567" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" data-t="email">Email</label>
+              <input type="email" name="email" required placeholder="your@email.com" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" data-t="message">Message</label>
+              <textarea name="message" rows="4" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"></textarea>
+            </div>
+            <button type="submit" id="contact-submit" class="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed" data-t="sendMessage">Send Message</button>
+          </form>
+          <div id="form-status" class="mt-3 text-center hidden"></div>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div class="mt-12 text-center">
+        <h3 class="text-2xl font-bold text-brand mb-4" data-t="visitLocation">Visit Our Location</h3>
+        <p class="text-gray-600 mb-4" data-t="physicalAddress">8536 SE 82nd Ave, Portland, OR 97266</p>
+        <div class="bg-gray-200 h-96 rounded-xl overflow-hidden">
+          <div id="map-placeholder" class="bg-gray-100 rounded-xl h-full flex items-center justify-center text-gray-500 cursor-pointer" data-t="clickToLoadMap">Click to load map</div>
+          <iframe
+            id="map-frame"
+            data-src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.8567891234567!2d-122.57895!3d45.46123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5495a0b91234567%3A0x1234567890abcdef!2s8536%20SE%2082nd%20Ave%2C%20Portland%2C%20OR%2097266!5e0!3m2!1sen!2sus!4v1234567890123"
+            width="100%" height="100%" style="border:0;" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+            class="rounded-xl hidden"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-brand text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4" data-t="contactInfo">Contact Information</h3>
+          <div class="space-y-2 text-gray-200">
+            <p>📞 <a href="tel:5033679714" class="hover:text-yellow-300">(503) 367-9714</a></p>
+            <p>✉️ <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></p>
+            <p>📍 8536 SE 82nd Ave, Portland, OR 97266</p>
+            <p>🕐 <span data-t="monSat">Mon-Sat 7AM-7PM</span></p>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4" data-t="services">Services</h3>
+          <ul class="space-y-1 text-gray-200">
+            <li data-t="tireInstallation">Tire Installation</li>
+            <li data-t="tireRepair">Tire Repair</li>
+            <li data-t="wheelAlignment">Wheel Alignment</li>
+            <li data-t="brakeService">Brake Service</li>
+            <li data-t="oilChange">Oil Change</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4" data-t="followUs">Follow Us</h3>
+          <div class="space-y-2">
+            <a href="https://www.facebook.com/61571913202998/" target="_blank" class="block text-gray-200 hover:text-yellow-300">Facebook</a>
+            <a href="https://www.instagram.com/oregontires" target="_blank" class="block text-gray-200 hover:text-yellow-300">Instagram</a>
+          </div>
+          <div class="mt-4">
+            <button onclick="toggleLanguage()" class="text-gray-200 hover:text-yellow-300" id="footer-lang-toggle" aria-label="Switch language" data-t="langToggleFooter">English | Español</button>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-green-700 mt-8 pt-8 text-center text-gray-300">
+        <p>&copy; <span data-t="copyright">2025 Oregon Tires Auto Care. All rights reserved.</span></p>
+        <p class="mt-3 text-xs text-gray-500"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-yellow-200 hover:text-yellow-100 transition-colors">1vsM.com</a></p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+// ===== SUPABASE =====
+const sb = supabase.createClient(
+  'https://vtknmauyvmuaryttnenx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0a25tYXV5dm11YXJ5dHRuZW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1MDE1MDgsImV4cCI6MjA2NTA3NzUwOH0._bOyuxj1nRBw3U7Q3qCsDubBNg_EM-VLhQB0y5p9okY'
+);
+
+// ===== HTML ESCAPE HELPER =====
+function esc(s) { if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// ===== TRANSLATIONS =====
+let currentLang = 'en';
+const t = {
+  en: {
+    home: 'Home', services: 'Services', about: 'About', testimonials: 'Reviews', contact: 'Contact',
+    scheduleService: 'Schedule Service', heroTitle: 'Your Trusted Auto Care Experts in Portland',
+    heroSubtitle: 'Professional tire installation, repair, and complete automotive services. We speak Spanish and English!',
+    servicesSubtitle: 'Comprehensive automotive services you can trust',
+    expertService: 'Expert Technicians', expertServiceDesc: 'Our certified mechanics have years of experience with all vehicle makes and models.',
+    quickService: 'Fast Service', quickServiceDesc: 'Most services completed while you wait. We value your time and get you back on the road quickly.',
+    qualityParts: 'Quality Parts', qualityPartsDesc: 'We use only premium parts and materials to ensure lasting repairs and optimal performance.',
+    bilingualService: 'Bilingual Support', bilingualServiceDesc: 'Fluent in both English and Spanish to serve our diverse Portland community.',
+    tireServices: 'Tire Services', tireServicesDesc: 'New and used tires, mount and balance, repair — everything your tires need.',
+    autoMaintenance: 'Auto Maintenance', autoMaintenanceDesc: 'Oil changes, brake services, tuneups and more to keep your vehicle running smoothly.',
+    specializedServices: 'Specialized Services', specializedServicesDesc: 'Alignment, mechanical inspection, mobile service, and roadside assistance.',
+    newOrUsedTires: 'New or Used Tires', mountAndBalance: 'Mount and Balance Tires', tireRepairService: 'Tire Repair',
+    oilChangeService: 'Oil Change', brakeServices: 'Brake Services', tuneup: 'Tuneup',
+    alignment: 'Alignment', mechanicalInspection: 'Mechanical Inspection', homeService: 'Mobile Service (At Your Home)',
+    roadsideAssistance: 'Roadside Assistance (Any Location)',
+    needServiceToday: 'Need Emergency Service Today?', callImmediately: 'Call us immediately at (503) 367-9714',
+    ourServicePromise: 'Our Service Promise',
+    servicePromiseDesc: 'Every service comes with our commitment to quality, transparency, and customer satisfaction.',
+    qualityGuarantee: 'Quality Guarantee', fairPricing: 'Fair Pricing', expertServicePromise: 'Expert Service',
+    aboutOregonTires: 'About Oregon Tires', careCatchphrase: 'We take care of your car, you enjoy the road.',
+    vision: 'Vision', visionText: 'To be the most trusted tire shop in Portland, Oregon. We aim to be recognized for our quality, honesty, and prompt service.',
+    mission: 'Mission', missionText: 'At Oregon Tires, we are dedicated to offering high-quality new and used tires, reliable mechanical services, and personalized attention.',
+    whyChooseUs: 'Why Choose Us', servingPortland: 'Serving Portland Since 2008',
+    servingPortlandText: 'With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.',
+    bilingualStaff: 'Bilingual staff (English & Spanish)', honestPricing: 'Honest, transparent pricing',
+    qualityWorkmanship: 'Quality workmanship guaranteed', fastReliableService: 'Fast and reliable service',
+    customerReviews: 'What Our Customers Say', customerReviewsSubtitle: 'Real reviews from satisfied customers in Portland',
+    contactInfo: 'Contact Information', contactSubtitle: 'Get in touch with us for all your automotive needs',
+    phone: 'Phone', businessHours: 'Business Hours', monSat: 'Mon-Sat 7AM-7PM', sunday: 'Sunday: Closed',
+    firstName: 'First Name', lastName: 'Last Name', email: 'Email', message: 'Message',
+    sendMessage: 'Send Message', visitLocation: 'Visit Our Location',
+    tireInstallation: 'Tire Installation', tireRepair: 'Tire Repair', wheelAlignment: 'Wheel Alignment',
+    brakeService: 'Brake Service', oilChange: 'Oil Change',
+    gallery: 'Gallery', gallerySubtitle: 'See our work and facilities',
+    outOfStars: 'out of 5 stars',
+    basedOnReviews: 'Based on 150+ Google Reviews',
+    viewAllReviews: 'View All Reviews on Google',
+    loadingGallery: 'Loading gallery...',
+    address: 'Address',
+    physicalAddress: '8536 SE 82nd Ave, Portland, OR 97266',
+    followUs: 'Follow Us',
+    copyright: '2025 Oregon Tires Auto Care. All rights reserved.',
+    poweredBy: 'Powered by',
+    noGalleryImages: 'No gallery images yet.',
+    galleryLoadError: 'Could not load gallery.',
+    messageSent: 'Message sent successfully!',
+    messageError: 'Error sending message. Please try again.',
+    verified: 'Verified',
+    langToggleFooter: 'English | Español',
+    sending: 'Sending...',
+    clickToLoadMap: 'Click to load map',
+    pleaseWait: 'Please wait 30 seconds before sending another message.',
+    galleryImage: 'Gallery image',
+    nameTooLong: 'Name must be 100 characters or less.',
+    messageTooShort: 'Message must be at least 10 characters.',
+    messageTooLong: 'Message must be 2000 characters or less.',
+    weekAgo: '1 week ago', weeksAgo: 'weeks ago', monthAgo: '1 month ago', monthsAgo: 'months ago',
+    phonePlaceholder: '(503) 123-4567', emailPlaceholder: 'your@email.com'
+  },
+  es: {
+    home: 'Inicio', services: 'Servicios', about: 'Acerca de', testimonials: 'Reseñas', contact: 'Contacto',
+    scheduleService: 'Programar Servicio', heroTitle: 'Sus Expertos de Confianza en Cuidado Automotriz en Portland',
+    heroSubtitle: 'Instalación profesional de llantas, reparación y servicios automotrices completos. ¡Hablamos español e inglés!',
+    servicesSubtitle: 'Servicios automotrices integrales en los que puedes confiar',
+    expertService: 'Técnicos Expertos', expertServiceDesc: 'Nuestros mecánicos certificados tienen años de experiencia con todas las marcas y modelos.',
+    quickService: 'Servicio Rápido', quickServiceDesc: 'La mayoría de servicios se completan mientras esperas. Valoramos tu tiempo.',
+    qualityParts: 'Partes de Calidad', qualityPartsDesc: 'Usamos solo partes y materiales premium para garantizar reparaciones duraderas.',
+    bilingualService: 'Soporte Bilingüe', bilingualServiceDesc: 'Fluidos en inglés y español para servir a nuestra diversa comunidad de Portland.',
+    tireServices: 'Servicios de Llantas', tireServicesDesc: 'Llantas nuevas y usadas, montaje, balanceado y reparación — todo lo que tus llantas necesitan.',
+    autoMaintenance: 'Mantenimiento Automotriz', autoMaintenanceDesc: 'Cambios de aceite, frenos, afinaciones y más para mantener tu vehículo en óptimas condiciones.',
+    specializedServices: 'Servicios Especializados', specializedServicesDesc: 'Alineación, inspección mecánica, servicio móvil y asistencia en carretera.',
+    newOrUsedTires: 'Llantas Nuevas o Usadas', mountAndBalance: 'Montaje y Balanceado', tireRepairService: 'Reparación de Llantas',
+    oilChangeService: 'Cambio de Aceite', brakeServices: 'Servicios de Frenos', tuneup: 'Afinación',
+    alignment: 'Alineación', mechanicalInspection: 'Inspección Mecánica', homeService: 'Servicio Móvil (En Su Casa)',
+    roadsideAssistance: 'Asistencia en Carretera (Cualquier Ubicación)',
+    needServiceToday: '¿Necesitas Servicio de Emergencia Hoy?', callImmediately: 'Llámenos inmediatamente al (503) 367-9714',
+    ourServicePromise: 'Nuestra Promesa de Servicio',
+    servicePromiseDesc: 'Cada servicio viene con nuestro compromiso de calidad, transparencia y satisfacción del cliente.',
+    qualityGuarantee: 'Garantía de Calidad', fairPricing: 'Precios Justos', expertServicePromise: 'Servicio Experto',
+    aboutOregonTires: 'Acerca de Oregon Tires', careCatchphrase: 'Nosotros cuidamos tu auto, tú disfruta el camino.',
+    vision: 'Visión', visionText: 'Ser la tienda de llantas más confiable en Portland, Oregon.',
+    mission: 'Misión', missionText: 'En Oregon Tires, nos dedicamos a ofrecer llantas nuevas y usadas de alta calidad, servicios mecánicos confiables y atención personalizada.',
+    whyChooseUs: 'Por Qué Elegirnos', servingPortland: 'Sirviendo a Portland Desde 2008',
+    servingPortlandText: 'Con más de 15 años de experiencia sirviendo a la comunidad de Portland, hemos construido nuestra reputación en servicio honesto y trabajo de calidad.',
+    bilingualStaff: 'Personal bilingüe (inglés y español)', honestPricing: 'Precios honestos y transparentes',
+    qualityWorkmanship: 'Trabajo de calidad garantizado', fastReliableService: 'Servicio rápido y confiable',
+    customerReviews: 'Lo Que Dicen Nuestros Clientes', customerReviewsSubtitle: 'Reseñas reales de clientes satisfechos en Portland',
+    contactInfo: 'Información de Contacto', contactSubtitle: 'Ponte en contacto con nosotros para todas tus necesidades automotrices',
+    phone: 'Teléfono', businessHours: 'Horarios de Atención', monSat: 'Lun-Sáb 7AM-7PM', sunday: 'Domingo: Cerrado',
+    firstName: 'Nombre', lastName: 'Apellido', email: 'Correo Electrónico', message: 'Mensaje',
+    sendMessage: 'Enviar Mensaje', visitLocation: 'Visita Nuestra Ubicación',
+    tireInstallation: 'Instalación de Llantas', tireRepair: 'Reparación de Llantas', wheelAlignment: 'Alineación de Ruedas',
+    brakeService: 'Servicio de Frenos', oilChange: 'Cambio de Aceite',
+    gallery: 'Galería', gallerySubtitle: 'Vea nuestro trabajo e instalaciones',
+    outOfStars: 'de 5 estrellas',
+    basedOnReviews: 'Basado en más de 150 reseñas de Google',
+    viewAllReviews: 'Ver todas las reseñas en Google',
+    loadingGallery: 'Cargando galería...',
+    address: 'Dirección',
+    physicalAddress: '8536 SE 82nd Ave, Portland, OR 97266',
+    followUs: 'Síguenos',
+    copyright: '2025 Oregon Tires Auto Care. Todos los derechos reservados.',
+    poweredBy: 'Desarrollado por',
+    noGalleryImages: 'Aún no hay imágenes en la galería.',
+    galleryLoadError: 'No se pudo cargar la galería.',
+    messageSent: 'Mensaje enviado con éxito!',
+    messageError: 'Error al enviar mensaje. Por favor intente de nuevo.',
+    verified: 'Verificado',
+    langToggleFooter: 'English | Español',
+    sending: 'Enviando...',
+    clickToLoadMap: 'Clic para cargar el mapa',
+    pleaseWait: 'Por favor espera 30 segundos antes de enviar otro mensaje.',
+    galleryImage: 'Imagen de galería',
+    nameTooLong: 'El nombre debe tener 100 caracteres o menos.',
+    messageTooShort: 'El mensaje debe tener al menos 10 caracteres.',
+    messageTooLong: 'El mensaje debe tener 2000 caracteres o menos.',
+    weekAgo: 'hace 1 semana', weeksAgo: 'semanas atrás', monthAgo: 'hace 1 mes', monthsAgo: 'meses atrás',
+    phonePlaceholder: '(503) 123-4567', emailPlaceholder: 'tu@correo.com'
+  }
+};
+
+// ===== ASSET PATH NORMALIZER =====
+// Rewrites Supabase-returned /lovable-uploads/ paths to /assets/ with clean filenames
+const ASSET_PATH_MAP = {
+  '1290fb5e-e45c-4fc3-b523-e71d756ec1ef.png': 'logo.png',
+  'afc0de17-b407-4b29-b6a2-6f44d5dcad0d.png': 'hero-bg.png',
+  'b0182aa8-dde3-4175-8f09-21b6122f47f4.png': 'favicon.png',
+};
+function normalizeAssetPath(url) {
+  if (!url || typeof url !== 'string') return url;
+  if (!url.includes('/lovable-uploads/')) return url;
+  let normalized = url.replace('/lovable-uploads/', 'assets/');
+  for (const [uuid, name] of Object.entries(ASSET_PATH_MAP))
+    normalized = normalized.replace(uuid, name);
+  return normalized;
+}
+
+// ===== REVIEWS =====
+const reviews = {
+  en: [
+    { name: "Maria Rodriguez", rating: 5, dateNum: 2, dateUnit: 'weeksAgo', text: "Excellent service! They installed my new tires quickly and the price was very fair. The staff speaks Spanish which made communication easy." },
+    { name: "James Thompson", rating: 5, dateNum: 1, dateUnit: 'monthAgo', text: "Been coming here for years. They always do quality work and are honest about what needs to be done." },
+    { name: "Sarah Chen", rating: 5, dateNum: 3, dateUnit: 'weeksAgo', text: "Fast and professional service. Had a flat tire emergency and they got me back on the road in 30 minutes." },
+    { name: "Roberto Gonzalez", rating: 5, dateNum: 2, dateUnit: 'monthsAgo', text: "Excellent service! They helped me with my tire alignment. Very friendly staff and fair prices." },
+    { name: "Jennifer Smith", rating: 4, dateNum: 1, dateUnit: 'weekAgo', text: "Good experience overall. They diagnosed my car trouble quickly and fixed it at a reasonable price." },
+    { name: "Miguel Santos", rating: 5, dateNum: 4, dateUnit: 'weeksAgo', text: "Very helpful staff. They explained everything clearly in Spanish and English. Quality tire installation." },
+    { name: "David Miller", rating: 5, dateNum: 3, dateUnit: 'monthsAgo', text: "Oregon Tires always takes care of my family's vehicles. Honest, reliable service." },
+    { name: "Carmen Lopez", rating: 5, dateNum: 2, dateUnit: 'weeksAgo', text: "I love this place! They always treat me well and do excellent work." },
+    { name: "Lisa Johnson", rating: 5, dateNum: 3, dateUnit: 'weeksAgo', text: "Amazing customer service! They went above and beyond to help with my tire emergency." },
+    { name: "Carlos Ramirez", rating: 5, dateNum: 2, dateUnit: 'monthsAgo', text: "Excellent customer service. They repaired my tire quickly and with warranty." },
+    { name: "Christine Clark", rating: 5, dateNum: 4, dateUnit: 'weeksAgo', text: "Love this place! They're honest, reliable, and do great work." },
+    { name: "Mark Wilson", rating: 5, dateNum: 4, dateUnit: 'monthsAgo', text: "Been a customer for over 10 years. Always reliable, fair prices, and quality work." }
+  ],
+  es: [
+    { name: "Maria Rodriguez", rating: 5, dateNum: 2, dateUnit: 'weeksAgo', text: "¡Excelente servicio! Instalaron mis llantas nuevas rápidamente y el precio fue muy justo. El personal habla español, lo que facilitó la comunicación." },
+    { name: "James Thompson", rating: 5, dateNum: 1, dateUnit: 'monthAgo', text: "Vengo aquí desde hace años. Siempre hacen trabajo de calidad y son honestos sobre lo que se necesita hacer." },
+    { name: "Sarah Chen", rating: 5, dateNum: 3, dateUnit: 'weeksAgo', text: "Servicio rápido y profesional. Tuve una emergencia con una llanta ponchada y me pusieron de vuelta en el camino en 30 minutos." },
+    { name: "Roberto Gonzalez", rating: 5, dateNum: 2, dateUnit: 'monthsAgo', text: "¡Servicio excelente! Me ayudaron con la alineación de mis llantas. Personal muy amable y precios justos." },
+    { name: "Jennifer Smith", rating: 4, dateNum: 1, dateUnit: 'weekAgo', text: "Buena experiencia en general. Diagnosticaron el problema de mi carro rápidamente y lo repararon a un precio razonable." },
+    { name: "Miguel Santos", rating: 5, dateNum: 4, dateUnit: 'weeksAgo', text: "Personal muy servicial. Explicaron todo claramente en español e inglés. Instalación de llantas de calidad." },
+    { name: "David Miller", rating: 5, dateNum: 3, dateUnit: 'monthsAgo', text: "Oregon Tires siempre cuida los vehículos de mi familia. Servicio honesto y confiable." },
+    { name: "Carmen Lopez", rating: 5, dateNum: 2, dateUnit: 'weeksAgo', text: "¡Me encanta este lugar! Siempre me tratan bien y hacen un trabajo excelente." },
+    { name: "Lisa Johnson", rating: 5, dateNum: 3, dateUnit: 'weeksAgo', text: "¡Increíble servicio al cliente! Hicieron todo lo posible para ayudarme con mi emergencia de llanta." },
+    { name: "Carlos Ramirez", rating: 5, dateNum: 2, dateUnit: 'monthsAgo', text: "Excelente atención al cliente. Repararon mi llanta rápidamente y con garantía." },
+    { name: "Christine Clark", rating: 5, dateNum: 4, dateUnit: 'weeksAgo', text: "¡Me encanta este lugar! Son honestos, confiables y hacen un gran trabajo." },
+    { name: "Mark Wilson", rating: 5, dateNum: 4, dateUnit: 'monthsAgo', text: "He sido cliente por más de 10 años. Siempre confiables, precios justos y trabajo de calidad." }
+  ]
+};
+
+function formatReviewDate(r) {
+  const unit = t[currentLang][r.dateUnit] || r.dateUnit;
+  if (r.dateUnit === 'weekAgo' || r.dateUnit === 'monthAgo') return unit;
+  return r.dateNum + ' ' + unit;
+}
+function renderReviews() {
+  const langReviews = reviews[currentLang] || reviews.en;
+  const shuffled = [...langReviews].sort(() => 0.5 - Math.random()).slice(0, 3);
+  const grid = document.getElementById('reviews-grid');
+  grid.textContent = '';
+  shuffled.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'bg-white rounded-xl shadow-md p-6 fade-in';
+    const stars = document.createElement('div');
+    stars.className = 'flex items-center gap-2 mb-2';
+    const starSpan = document.createElement('span');
+    starSpan.className = 'star';
+    starSpan.textContent = '\u2605'.repeat(r.rating) + '\u2606'.repeat(5 - r.rating);
+    const badge = document.createElement('span');
+    badge.className = 'text-xs bg-gray-100 px-2 py-1 rounded';
+    badge.textContent = t[currentLang].verified;
+    stars.appendChild(starSpan);
+    stars.appendChild(badge);
+    const name = document.createElement('h4');
+    name.className = 'font-bold text-lg';
+    name.textContent = r.name;
+    const date = document.createElement('p');
+    date.className = 'text-sm text-gray-500 mb-2';
+    date.textContent = formatReviewDate(r);
+    const text = document.createElement('p');
+    text.className = 'text-gray-600';
+    text.textContent = r.text;
+    card.appendChild(stars);
+    card.appendChild(name);
+    card.appendChild(date);
+    card.appendChild(text);
+    grid.appendChild(card);
+  });
+}
+renderReviews();
+
+// ===== DYNAMIC IMAGES FROM SUPABASE =====
+const fallbackImages = {
+  'hero-background': 'assets/hero-bg.png',
+  'expert-technicians': 'images/expert-technicians.jpg',
+  'fast-cars': 'images/fast-cars.jpg',
+  'quality-car-parts': 'images/quality-parts.jpg',
+  'bilingual-support': 'images/bilingual-service.jpg',
+  'tire-shop': 'images/tire-services.jpg',
+  'auto-repair': 'images/auto-maintenance.jpg',
+  'specialized-tools': 'images/specialized-services.jpg',
+};
+
+function tryLoadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.loading = 'lazy';
+    img.onload = () => resolve(url);
+    img.onerror = () => reject(url);
+    img.src = url;
+  });
+}
+
+function applyBg(el, url, pos, scale) {
+  el.style.backgroundImage = `url('${url}')`;
+  el.style.backgroundPosition = pos;
+  if (scale && scale !== 1) el.style.backgroundSize = `${scale * 100}%`;
+}
+
+async function loadServiceImagesForSite() {
+  let imgMap = {};
+  try {
+    const { data, error } = await sb.from('oretir_service_images').select('*').eq('is_current', true);
+    if (!error && data) data.forEach(i => { imgMap[i.service_key] = i; });
+  } catch (e) {
+    console.error('Error querying service images:', e);
+  }
+
+  // Hero background
+  const heroEl = document.getElementById('home');
+  const heroDb = imgMap['hero-background'];
+  const heroUrl = normalizeAssetPath(heroDb?.image_url);
+  const heroPos = heroDb ? `${heroDb.position_x||50}% ${heroDb.position_y||50}%` : 'center';
+  try {
+    if (heroUrl) { await tryLoadImage(heroUrl); applyBg(heroEl, heroUrl, heroPos); }
+    else throw 'no db url';
+  } catch { applyBg(heroEl, fallbackImages['hero-background'], 'center'); }
+
+  // Feature card images — all 7 service keys
+  const keys = ['expert-technicians','fast-cars','quality-car-parts','bilingual-support','tire-shop','auto-repair','specialized-tools'];
+  keys.forEach(async key => {
+    const el = document.getElementById('svc-img-'+key);
+    if (!el) return;
+    const img = imgMap[key];
+    const url = normalizeAssetPath(img?.image_url);
+    const pos = img ? `${img.position_x||50}% ${img.position_y||50}%` : 'center';
+    const scale = img?.scale || 1;
+    try {
+      if (url) { await tryLoadImage(url); applyBg(el, url, pos, scale); }
+      else throw 'no db url';
+    } catch { applyBg(el, fallbackImages[key], 'center'); }
+  });
+}
+
+async function loadGalleryForSite() {
+  try {
+    const lang = currentLang === 'en' ? 'english' : 'spanish';
+    const { data, error } = await sb.from('oretir_gallery_images').select('*').eq('is_active', true).order('display_order', { ascending: true });
+    const grid = document.getElementById('gallery-section-grid');
+    const images = data || [];
+    if (!images.length) {
+      grid.innerHTML = '<div class="text-center py-8 text-gray-400 col-span-full">' + t[currentLang].noGalleryImages + '</div>';
+      return;
+    }
+    grid.innerHTML = images.map(img => `
+      <div class="rounded-xl overflow-hidden shadow-md hover:shadow-lg transition group">
+        <div class="relative h-56 bg-gray-200">
+          <img src="${esc(img.image_url)}" alt="${esc(img.title) || t[currentLang].galleryImage}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+        </div>
+        ${img.title ? `<div class="p-4 bg-white"><h4 class="font-semibold text-brand">${esc(img.title)}</h4>${img.description ? `<p class="text-sm text-gray-600 mt-1">${esc(img.description)}</p>` : ''}</div>` : ''}
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Error loading gallery:', e);
+    document.getElementById('gallery-section-grid').innerHTML = '<div class="text-center py-8 text-gray-400 col-span-full">' + t[currentLang].galleryLoadError + '</div>';
+  }
+}
+
+// Init calls are deferred to after currentLang is defined (see below)
+
+
+let lastContactSubmitTime = 0;
+document.getElementById('contact-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const now = Date.now();
+  if (now - lastContactSubmitTime < 30000) {
+    const statusEl = document.getElementById('form-status');
+    statusEl.textContent = t[currentLang].pleaseWait;
+    statusEl.className = 'mt-3 text-center text-orange-600 font-semibold';
+    statusEl.classList.remove('hidden');
+    return;
+  }
+  const form = e.target;
+  const submitBtn = document.getElementById('contact-submit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = t[currentLang].sending || 'Sending...';
+
+  const data = {
+    first_name: form.firstName.value,
+    last_name: form.lastName.value,
+    email: form.email.value,
+    phone: form.phone.value,
+    message: form.message.value,
+    status: 'new',
+    language: currentLang === 'en' ? 'english' : 'spanish'
+  };
+
+  // Input validation
+  const firstName = data.first_name.trim();
+  const lastName = data.last_name.trim();
+  const message = data.message.trim();
+  data.first_name = firstName;
+  data.last_name = lastName;
+  data.message = message;
+  data.email = data.email.trim();
+  data.phone = data.phone.trim();
+
+  if (firstName.length > 100 || lastName.length > 100) {
+    const statusEl = document.getElementById('form-status');
+    statusEl.textContent = t[currentLang].nameTooLong;
+    statusEl.className = 'mt-3 text-center text-red-600 font-semibold';
+    statusEl.classList.remove('hidden');
+    submitBtn.disabled = false;
+    submitBtn.textContent = t[currentLang].sendMessage;
+    return;
+  }
+  if (message.length < 10) {
+    const statusEl = document.getElementById('form-status');
+    statusEl.textContent = t[currentLang].messageTooShort;
+    statusEl.className = 'mt-3 text-center text-red-600 font-semibold';
+    statusEl.classList.remove('hidden');
+    submitBtn.disabled = false;
+    submitBtn.textContent = t[currentLang].sendMessage;
+    return;
+  }
+  if (message.length > 2000) {
+    const statusEl = document.getElementById('form-status');
+    statusEl.textContent = t[currentLang].messageTooLong;
+    statusEl.className = 'mt-3 text-center text-red-600 font-semibold';
+    statusEl.classList.remove('hidden');
+    submitBtn.disabled = false;
+    submitBtn.textContent = t[currentLang].sendMessage;
+    return;
+  }
+
+  const statusEl = document.getElementById('form-status');
+  try {
+    const { error } = await sb.from('oretir_contact_messages').insert([data]);
+    if (error) throw error;
+    lastContactSubmitTime = Date.now();
+    statusEl.textContent = '✅ ' + t[currentLang].messageSent;
+    statusEl.className = 'mt-3 text-center text-green-600 font-semibold';
+    statusEl.classList.remove('hidden');
+    form.reset();
+    if (typeof gtag === 'function') gtag('event', 'form_submit', { event_category: 'contact', event_label: 'contact_form' });
+  } catch (err) {
+    statusEl.textContent = '❌ ' + t[currentLang].messageError;
+    statusEl.className = 'mt-3 text-center text-red-600 font-semibold';
+    statusEl.classList.remove('hidden');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = t[currentLang].sendMessage;
+  }
+});
+
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const btn = document.getElementById('mobile-menu-btn');
+  menu.classList.toggle('hidden');
+  const isExpanded = !menu.classList.contains('hidden');
+  btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+}
+
+// ===== LAZY-LOAD GOOGLE MAPS =====
+const mapObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const iframe = document.querySelector('#map-frame');
+      if (iframe && iframe.dataset.src) {
+        iframe.src = iframe.dataset.src;
+        iframe.classList.remove('hidden');
+        document.getElementById('map-placeholder')?.remove();
+        mapObserver.disconnect();
+      }
+    }
+  });
+}, { rootMargin: '200px' });
+const contactSection = document.querySelector('#contact');
+if (contactSection) mapObserver.observe(contactSection);
+
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'es' : 'en';
+  document.documentElement.lang = currentLang;
+  if (typeof gtag === 'function') gtag('event', 'language_switch', { event_category: 'engagement', event_label: currentLang });
+  document.getElementById('lang-toggle').textContent = currentLang === 'en' ? '🌐 ES' : '🌐 EN';
+  document.getElementById('top-hours').textContent = '🕐 ' + t[currentLang].monSat;
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    if (t[currentLang][key]) el.textContent = t[currentLang][key];
+  });
+  // Update form placeholders
+  const phoneInput = document.querySelector('input[name="phone"]');
+  if (phoneInput) phoneInput.placeholder = t[currentLang].phonePlaceholder;
+  const emailInput = document.querySelector('input[name="email"]');
+  if (emailInput) emailInput.placeholder = t[currentLang].emailPlaceholder;
+  renderReviews();
+  loadGalleryForSite();
+}
+
+// Track Schedule Service CTA clicks
+document.querySelectorAll('[data-t="scheduleService"]').forEach(function(el) {
+  el.addEventListener('click', function() {
+    if (typeof gtag === 'function') gtag('event', 'cta_click', { event_category: 'conversion', event_label: 'schedule_service' });
+  });
+});
+
+// Load dynamic images now that currentLang is defined
+loadServiceImagesForSite();
+loadGalleryForSite();
+
+// ===== DARK MODE =====
+function toggleDarkMode() {
+  const html = document.documentElement;
+  const isDark = html.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  document.getElementById('dark-mode-toggle').textContent = isDark ? '☀️' : '🌙';
+}
+
+// Initialize dark mode from preference
+(function() {
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (saved === 'dark' || (!saved && prefersDark)) {
+    document.documentElement.classList.add('dark');
+    const btn = document.getElementById('dark-mode-toggle');
+    if (btn) btn.textContent = '☀️';
+  }
+})();
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+// ===== WEB VITALS MONITORING =====
+if ('PerformanceObserver' in window) {
+  // LCP
+  try {
+    new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+      const lastEntry = entries[entries.length - 1];
+      if (typeof gtag === 'function') gtag('event', 'web_vitals', { event_category: 'Web Vitals', event_label: 'LCP', value: Math.round(lastEntry.startTime) });
+    }).observe({ type: 'largest-contentful-paint', buffered: true });
+  } catch(e) {}
+
+  // CLS
+  try {
+    let clsValue = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!entry.hadRecentInput) clsValue += entry.value;
+      }
+      if (typeof gtag === 'function') gtag('event', 'web_vitals', { event_category: 'Web Vitals', event_label: 'CLS', value: Math.round(clsValue * 1000) });
+    }).observe({ type: 'layout-shift', buffered: true });
+  } catch(e) {}
+}
+</script>
+</body>
+</html>

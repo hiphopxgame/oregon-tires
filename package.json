@@ -1,0 +1,19 @@
+{
+  "name": "oregon-tires",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve public -l 3000 --no-clipboard",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "npx playwright test",
+    "test:all": "vitest run && npx playwright test"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0",
+    "jsdom": "^25.0.0",
+    "@playwright/test": "^1.50.0",
+    "serve": "^14.2.0"
+  }
+}

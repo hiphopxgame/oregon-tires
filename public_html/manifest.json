@@ -1,0 +1,23 @@
+{
+  "name": "Oregon Tires Auto Care",
+  "short_name": "Oregon Tires",
+  "description": "Professional tire & auto services in Portland, OR. Bilingual - English & Spanish.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#15803d",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/assets/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/og-image.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

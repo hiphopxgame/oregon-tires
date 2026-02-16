@@ -1,0 +1,7 @@
+node_modules/
+_uploads/
+test-results/
+.env
+*.bak
+*.tmp
+.DS_Store
