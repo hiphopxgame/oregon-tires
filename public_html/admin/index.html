@@ -35,9 +35,28 @@
     .modal-overlay { background: rgba(0,0,0,0.5); }
     .scrollbar-thin::-webkit-scrollbar { width: 6px; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    /* Drag-and-drop upload zones */
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+    .drop-zone:hover { border-color: #007030; background: #f0fdf4; }
+    .drag-over {
+      border: 2px dashed green !important;
+      background: #f0fdf4 !important;
+      box-shadow: inset 0 0 0 2px rgba(22,163,74,0.15);
+    }
+    /* Crop preview overlay mask */
+    .crop-overlay { position: absolute; background: rgba(0,0,0,0.55); pointer-events: none; }
+    .crop-preview-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+    .crop-preview-visible { border: 2px solid #FFFE03; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); z-index: 10; pointer-events: none; }
   </style>
 
-  <!-- Google Analytics 4 — replace G-CHYMTNB6LH with your real Measurement ID -->
+  <!-- Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-CHYMTNB6LH"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -124,6 +143,7 @@
         <button onclick="switchTab('gallery')" data-tab="gallery" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 <span data-t="tabGallery">Gallery</span></button>
         <button onclick="switchTab('analytics')" data-tab="analytics" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📈 <span data-t="tabAnalytics">Analytics</span></button>
         <button onclick="switchTab('docs')" data-tab="docs" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📖 <span data-t="tabDocs">Docs</span></button>
+        <button onclick="switchTab('sitecontent')" data-tab="sitecontent" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📝 <span data-t="tabSiteContent">Site Content</span></button>
       </nav>
     </div>
   </header>
@@ -315,14 +335,20 @@
           <div id="add-gallery-form" class="hidden mb-6 p-4 border rounded-lg bg-gray-50">
             <h4 class="font-medium mb-3" data-t="addNewImage">Add New Image</h4>
             <div class="space-y-3">
-              <div><label class="text-sm font-medium" data-t="imageFile">Image File *</label><input type="file" id="gallery-file" accept="image/*" class="w-full p-2 border rounded mt-1"></div>
+              <div id="gallery-drop-zone" class="drop-zone">
+                <div class="text-gray-500 mb-2"><svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                  <span>Drag & drop images here, or click to browse</span><br><span class="text-xs text-gray-400">Supports multiple files. Images over 200KB will be auto-compressed.</span></div>
+                <input type="file" id="gallery-file" accept="image/*" multiple class="w-full p-2 border rounded mt-1">
+              </div>
+              <div id="gallery-compression-info" class="text-xs text-gray-500 hidden"><span id="compression-details"></span></div>
               <div class="grid md:grid-cols-2 gap-3">
-                <div><label class="text-sm font-medium" data-t="titleRequired">Title *</label><input id="gallery-title" class="w-full p-2 border rounded mt-1" placeholder="Image title"></div>
+                <div><label class="text-sm font-medium" data-t="titleRequired">Title *</label><input id="gallery-title" class="w-full p-2 border rounded mt-1" placeholder="Image title (used for single upload)"></div>
                 <div><label class="text-sm font-medium" data-t="language">Language</label><select id="gallery-lang" class="w-full p-2 border rounded mt-1"><option value="english">English</option><option value="spanish">Spanish</option></select></div>
               </div>
               <div><label class="text-sm font-medium" data-t="description">Description</label><textarea id="gallery-desc" rows="2" class="w-full p-2 border rounded mt-1" placeholder="Image description"></textarea></div>
+              <div id="gallery-upload-progress" class="hidden space-y-2"></div>
               <div class="flex gap-2">
-                <button onclick="uploadGalleryImage()" id="gallery-upload-btn" class="bg-brand text-white px-4 py-2 rounded-lg text-sm" data-t="uploadAndSave">💾 Upload & Save</button>
+                <button onclick="uploadGalleryImages()" id="gallery-upload-btn" class="bg-brand text-white px-4 py-2 rounded-lg text-sm" data-t="uploadAndSave">💾 Upload & Save</button>
                 <button onclick="toggleAddGalleryForm()" class="border px-4 py-2 rounded-lg text-sm" data-t="cancel">Cancel</button>
               </div>
             </div>
@@ -3052,6 +3078,68 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
 
       </div>
     </div>
+
+    <!-- SITE CONTENT TAB -->
+    <div id="tab-sitecontent" class="tab-content hidden fade-in">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div><h2 class="text-2xl font-bold">📝 <span data-t="siteContentHeading">Site Content</span></h2><p class="text-green-100" data-t="siteContentSubtitle">Edit business info displayed on the website</p></div>
+        <button onclick="loadSiteSettings()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30">↻ Refresh</button>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+        <p class="text-sm text-gray-500 mb-6" data-t="siteContentDesc">Changes here update the public website in real time. Each setting has an English and Spanish value.</p>
+        <div id="settings-last-updated" class="text-xs text-gray-400 mb-4"></div>
+
+        <div class="space-y-6">
+          <!-- Phone -->
+          <div class="grid md:grid-cols-3 gap-4 items-start">
+            <label class="font-medium text-sm pt-2" data-t="settingPhone">Phone Number</label>
+            <div><label class="text-xs text-gray-400">EN</label><input id="setting-phone-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="(503) 367-9714"></div>
+            <div><label class="text-xs text-gray-400">ES</label><input id="setting-phone-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="(503) 367-9714"></div>
+          </div>
+          <!-- Email -->
+          <div class="grid md:grid-cols-3 gap-4 items-start">
+            <label class="font-medium text-sm pt-2" data-t="settingEmail">Email Address</label>
+            <div><label class="text-xs text-gray-400">EN</label><input id="setting-email-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="oregontirespdx@gmail.com"></div>
+            <div><label class="text-xs text-gray-400">ES</label><input id="setting-email-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="oregontirespdx@gmail.com"></div>
+          </div>
+          <!-- Address -->
+          <div class="grid md:grid-cols-3 gap-4 items-start">
+            <label class="font-medium text-sm pt-2" data-t="settingAddress">Address</label>
+            <div><label class="text-xs text-gray-400">EN</label><input id="setting-address-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="8536 SE 82nd Ave, Portland, OR 97266"></div>
+            <div><label class="text-xs text-gray-400">ES</label><input id="setting-address-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="8536 SE 82nd Ave, Portland, OR 97266"></div>
+          </div>
+          <!-- Hours Weekday -->
+          <div class="grid md:grid-cols-3 gap-4 items-start">
+            <label class="font-medium text-sm pt-2" data-t="settingHoursWeekday">Weekday Hours</label>
+            <div><label class="text-xs text-gray-400">EN</label><input id="setting-hours_weekday-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Mon-Sat 7AM-7PM"></div>
+            <div><label class="text-xs text-gray-400">ES</label><input id="setting-hours_weekday-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Lun-Sab 7AM-7PM"></div>
+          </div>
+          <!-- Hours Sunday -->
+          <div class="grid md:grid-cols-3 gap-4 items-start">
+            <label class="font-medium text-sm pt-2" data-t="settingHoursSunday">Sunday Hours</label>
+            <div><label class="text-xs text-gray-400">EN</label><input id="setting-hours_sunday-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Sunday: Closed"></div>
+            <div><label class="text-xs text-gray-400">ES</label><input id="setting-hours_sunday-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Domingo: Cerrado"></div>
+          </div>
+          <!-- Rating Value -->
+          <div class="grid md:grid-cols-3 gap-4 items-start">
+            <label class="font-medium text-sm pt-2" data-t="settingRatingValue">Rating Value</label>
+            <div><label class="text-xs text-gray-400">EN</label><input id="setting-rating_value-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="4.8"></div>
+            <div><label class="text-xs text-gray-400">ES</label><input id="setting-rating_value-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="4.8"></div>
+          </div>
+          <!-- Review Count -->
+          <div class="grid md:grid-cols-3 gap-4 items-start">
+            <label class="font-medium text-sm pt-2" data-t="settingReviewCount">Review Count</label>
+            <div><label class="text-xs text-gray-400">EN</label><input id="setting-review_count-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="150+"></div>
+            <div><label class="text-xs text-gray-400">ES</label><input id="setting-review_count-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="150+"></div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex justify-end">
+          <button id="save-site-settings" onclick="saveSiteSettings()" class="bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition" data-t="saveSiteSettings">Save Site Settings</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 <!-- NOTES MODAL -->
@@ -3276,6 +3364,23 @@ const adminT = {
     error: 'An error occurred',
     // Service Images
     svcHeroBackground: 'Hero Background Image', svcExpertTechnicians: 'Expert Technicians', svcQuickService: 'Quick Service', svcQualityParts: 'Quality Parts', svcBilingualSupport: 'Bilingual Support', svcTireServices: 'Tire Services', svcAutoMaintenance: 'Auto Maintenance', svcSpecializedServices: 'Specialized Services',
+    // Site Content
+    tabSiteContent: 'Site Content',
+    siteContentHeading: 'Site Content',
+    siteContentSubtitle: 'Edit business info displayed on the website',
+    siteContentDesc: 'Changes here update the public website in real time. Each setting has an English and Spanish value.',
+    saveSiteSettings: 'Save Site Settings',
+    settingPhone: 'Phone Number',
+    settingEmail: 'Email Address',
+    settingAddress: 'Address',
+    settingHoursWeekday: 'Weekday Hours',
+    settingHoursSunday: 'Sunday Hours',
+    settingRatingValue: 'Rating Value',
+    settingReviewCount: 'Review Count',
+    settingsSaved: 'Site settings saved successfully',
+    settingsLoadError: 'Could not load site settings',
+    settingsSaveError: 'Could not save site settings',
+    lastUpdated: 'Last updated',
   },
   es: {
     // Login
@@ -3407,6 +3512,23 @@ const adminT = {
     error: 'Ocurri\u00F3 un error',
     // Service Images
     svcHeroBackground: 'Imagen de Fondo Principal', svcExpertTechnicians: 'T\u00E9cnicos Expertos', svcQuickService: 'Servicio R\u00E1pido', svcQualityParts: 'Partes de Calidad', svcBilingualSupport: 'Soporte Biling\u00FCe', svcTireServices: 'Servicios de Llantas', svcAutoMaintenance: 'Mantenimiento Automotriz', svcSpecializedServices: 'Servicios Especializados',
+    // Site Content
+    tabSiteContent: 'Contenido del Sitio',
+    siteContentHeading: 'Contenido del Sitio',
+    siteContentSubtitle: 'Editar informaci\u00F3n del negocio mostrada en el sitio web',
+    siteContentDesc: 'Los cambios aqu\u00ED actualizan el sitio web p\u00FAblico en tiempo real. Cada ajuste tiene un valor en ingl\u00E9s y espa\u00F1ol.',
+    saveSiteSettings: 'Guardar Configuraci\u00F3n',
+    settingPhone: 'N\u00FAmero de Tel\u00E9fono',
+    settingEmail: 'Correo Electr\u00F3nico',
+    settingAddress: 'Direcci\u00F3n',
+    settingHoursWeekday: 'Horario Entre Semana',
+    settingHoursSunday: 'Horario Domingo',
+    settingRatingValue: 'Calificaci\u00F3n',
+    settingReviewCount: 'Cantidad de Rese\u00F1as',
+    settingsSaved: 'Configuraci\u00F3n guardada exitosamente',
+    settingsLoadError: 'No se pudo cargar la configuraci\u00F3n del sitio',
+    settingsSaveError: 'No se pudo guardar la configuraci\u00F3n del sitio',
+    lastUpdated: '\u00DAltima actualizaci\u00F3n',
   }
 };
 
@@ -4042,26 +4164,161 @@ function renderGallery() {
   `).join('') : '<div class="text-center py-8 text-gray-500">No gallery images found. Add your first image above.</div>';
 }
 
-async function uploadGalleryImage() {
-  const file = document.getElementById('gallery-file').files[0];
+// ===== IMAGE COMPRESSION =====
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function compressImage(file, maxWidth, quality) {
+  maxWidth = maxWidth || 1920;
+  quality = quality || 0.85;
+  return new Promise(function(resolve, reject) {
+    // Skip compression for small files under 200KB
+    if (file.size < 200 * 1024) {
+      resolve(file);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob(function(blob) {
+          if (!blob) { reject(new Error('Compression failed')); return; }
+          const compressed = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+          resolve(compressed);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = function() { reject(new Error('Failed to load image')); };
+      img.src = e.target.result;
+    };
+    reader.onerror = function() { reject(new Error('Failed to read file')); };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ===== DRAG AND DROP =====
+function initDragAndDrop() {
+  // Gallery drop zone
+  const galleryZone = document.getElementById('gallery-drop-zone');
+  if (galleryZone) {
+    setupDropZone(galleryZone, document.getElementById('gallery-file'));
+  }
+}
+
+function setupDropZone(zone, fileInput) {
+  zone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    zone.classList.add('drag-over');
+  });
+  zone.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    zone.classList.remove('drag-over');
+  });
+  zone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    zone.classList.remove('drag-over');
+    if (e.dataTransfer.files.length && fileInput) {
+      fileInput.files = e.dataTransfer.files;
+      fileInput.dispatchEvent(new Event('change'));
+    }
+  });
+  zone.addEventListener('click', function(e) {
+    if (e.target !== fileInput && !fileInput.contains(e.target)) {
+      fileInput.click();
+    }
+  });
+  // Show compression info when files are selected
+  if (fileInput) {
+    fileInput.addEventListener('change', async function() {
+      const infoEl = document.getElementById('gallery-compression-info');
+      const detailsEl = document.getElementById('compression-details');
+      if (!infoEl || !detailsEl) return;
+      const files = Array.from(fileInput.files);
+      if (!files.length) { infoEl.classList.add('hidden'); return; }
+      const totalOriginal = files.reduce(function(s, f) { return s + f.size; }, 0);
+      detailsEl.textContent = files.length + ' file(s) selected — Total: ' + formatFileSize(totalOriginal) + ' (will auto-compress files over 200KB)';
+      infoEl.classList.remove('hidden');
+    });
+  }
+}
+
+// ===== BULK GALLERY UPLOAD =====
+async function uploadGalleryImages() {
+  const fileInput = document.getElementById('gallery-file');
+  const files = Array.from(fileInput.files);
   const title = document.getElementById('gallery-title').value;
-  if(!file||!title) { showToast('Please select a file and enter a title', true); return; }
-  const btn = document.getElementById('gallery-upload-btn'); btn.textContent = 'Uploading...'; btn.disabled = true;
-  try {
-    const ext = file.name.split('.').pop();
-    const path = `gallery/${Date.now()}.${ext}`;
-    const { error: upErr } = await sb.storage.from('gallery-images').upload(path, file);
-    if(upErr) throw upErr;
-    const { data: { publicUrl } } = sb.storage.from('gallery-images').getPublicUrl(path);
-    const { error } = await sb.from('oretir_gallery_images').insert([{
-      title, image_url: publicUrl, description: document.getElementById('gallery-desc').value,
-      language: document.getElementById('gallery-lang').value, is_active: true
-    }]);
-    if(error) throw error;
-    showToast('Image uploaded!'); toggleAddGalleryForm(); loadGalleryImages();
-    document.getElementById('gallery-file').value=''; document.getElementById('gallery-title').value=''; document.getElementById('gallery-desc').value='';
-  } catch(e) { showToast('Upload failed: '+e.message, true); }
-  finally { btn.textContent='💾 Upload & Save'; btn.disabled=false; }
+  if (!files.length) { showToast('Please select at least one file', true); return; }
+  // Single file mode requires title
+  if (files.length === 1 && !title) { showToast('Please enter a title', true); return; }
+  const btn = document.getElementById('gallery-upload-btn');
+  btn.textContent = 'Uploading...'; btn.disabled = true;
+  const progressContainer = document.getElementById('gallery-upload-progress');
+  progressContainer.classList.remove('hidden');
+  progressContainer.innerHTML = '';
+  let successCount = 0;
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const fileTitle = files.length === 1 ? title : (title || file.name.replace(/\.[^.]+$/, ''));
+    // Create progress element
+    const progEl = document.createElement('div');
+    progEl.id = 'upload-progress-' + i;
+    progEl.className = 'flex items-center gap-2 text-sm';
+    progEl.innerHTML = '<span class="flex-1 truncate">' + file.name + '</span><span class="file-progress text-gray-500">Compressing...</span>';
+    progressContainer.appendChild(progEl);
+    try {
+      // Compress image
+      const compressed = await compressImage(file, 1920, 0.85);
+      const statusEl = progEl.querySelector('.file-progress');
+      if (compressed !== file) {
+        statusEl.textContent = 'Compressed: ' + formatFileSize(file.size) + ' → ' + formatFileSize(compressed.size);
+      }
+      statusEl.textContent = 'Uploading...';
+      const ext = compressed.name.split('.').pop();
+      const path = 'gallery/' + Date.now() + '-' + i + '.' + ext;
+      const { error: upErr } = await sb.storage.from('gallery-images').upload(path, compressed);
+      if (upErr) throw upErr;
+      const { data: { publicUrl } } = sb.storage.from('gallery-images').getPublicUrl(path);
+      const { error } = await sb.from('oretir_gallery_images').insert([{
+        title: fileTitle, image_url: publicUrl,
+        description: document.getElementById('gallery-desc').value,
+        language: document.getElementById('gallery-lang').value, is_active: true
+      }]);
+      if (error) throw error;
+      statusEl.textContent = 'Done';
+      statusEl.className = 'file-progress text-green-600 font-medium';
+      successCount++;
+    } catch (e) {
+      const statusEl = progEl.querySelector('.file-progress');
+      statusEl.textContent = 'Failed: ' + e.message;
+      statusEl.className = 'file-progress text-red-600';
+    }
+  }
+  showToast(successCount + ' of ' + files.length + ' image(s) uploaded!');
+  if (successCount > 0) loadGalleryImages();
+  btn.textContent = '💾 Upload & Save'; btn.disabled = false;
+  fileInput.value = '';
+  document.getElementById('gallery-title').value = '';
+  document.getElementById('gallery-desc').value = '';
+  const infoEl = document.getElementById('gallery-compression-info');
+  if (infoEl) infoEl.classList.add('hidden');
+  setTimeout(function() { progressContainer.classList.add('hidden'); progressContainer.innerHTML = ''; }, 3000);
+}
+
+// Keep single-file function for backward compat
+async function uploadGalleryImage() {
+  return uploadGalleryImages();
 }
 
 async function deleteGalleryImage(id, url) {
@@ -4102,15 +4359,26 @@ function renderServiceImages() {
   container.innerHTML = matched.map(s => {
     const title = (adminT[currentLang] && adminT[currentLang][s.tKey]) || s.key;
     const imgUrl = s.img ? normalizeAssetPath(s.img.image_url) : null;
+    // Crop preview: hero uses 16:9 ratio, service cards use 3:1 ratio
+    const isHero = s.key === 'hero-background';
+    const aspectClass = isHero ? 'aspect-[16/9]' : 'aspect-[3/1]';
+    const aspectLabel = isHero ? '16:9 (hero viewport)' : '3:1 (service card)';
     return `
     <div class="bg-white rounded-xl shadow overflow-hidden">
       <div class="p-4"><h3 class="font-bold text-brand">${title}</h3><p class="text-xs text-gray-500">${s.key}</p></div>
-      <div class="relative h-48 bg-gray-100 overflow-hidden">
+      <div class="relative h-48 bg-gray-100 overflow-hidden" id="svc-preview-${s.key}">
         ${imgUrl ? `<div class="absolute inset-0 bg-cover" style="background-image:url(${imgUrl});background-position:${s.img.position_x||50}% ${s.img.position_y||50}%;background-size:${(s.img.scale||1)*100}%"></div>
           <div class="absolute inset-0 bg-black/30"></div>
-          <div class="absolute top-2 right-2"><span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs">🕐 Live</span></div>`
+          <div class="absolute top-2 right-2"><span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs">🕐 Live</span></div>
+          <div class="crop-preview-overlay" id="crop-overlay-${s.key}"></div>`
           : '<div class="flex items-center justify-center h-full text-gray-400">No image uploaded</div>'}
       </div>
+      ${imgUrl ? `<div class="p-3 border-t bg-yellow-50">
+        <button onclick="toggleCropPreview('${s.key}','${isHero}')" class="text-xs text-brand font-medium hover:underline">👁 Toggle Crop Preview (${aspectLabel})</button>
+        <div id="crop-demo-${s.key}" class="hidden mt-2 mx-auto overflow-hidden border-2 border-yellow-400 rounded ${aspectClass}" style="max-width:100%;">
+          <div class="w-full h-full bg-cover" style="background-image:url(${imgUrl});background-position:${s.img.position_x||50}% ${s.img.position_y||50}%;background-size:${(s.img.scale||1)*100}%;min-height:60px;"></div>
+        </div>
+      </div>` : ''}
       ${s.img ? `<div class="p-4 border-t bg-gray-50 space-y-3">
         <div>
           <label class="text-xs font-medium text-gray-600">Horizontal Position: <span id="pos-x-val-${s.key}">${s.img.position_x||50}%</span></label>
@@ -4128,13 +4396,34 @@ function renderServiceImages() {
       </div>` : ''}
       <div class="p-4 border-t">
         <label class="text-sm font-medium">Upload New Image</label>
-        <div class="flex gap-2 mt-1">
-          <input type="file" accept="image/*" id="svc-file-${s.key}" class="flex-1 text-sm border rounded p-1">
-          <button onclick="uploadServiceImage('${s.key}')" class="bg-brand text-white px-3 py-1 rounded text-sm">⬆ Upload</button>
+        <div class="svc-drop-zone drop-zone mt-1" id="svc-drop-${s.key}">
+          <div class="text-gray-400 text-xs mb-1">Drag & drop or click to browse</div>
+          <input type="file" accept="image/*" id="svc-file-${s.key}" class="w-full text-sm border rounded p-1">
         </div>
+        <button onclick="uploadServiceImage('${s.key}')" class="bg-brand text-white px-3 py-1 rounded text-sm mt-2 w-full">⬆ Upload</button>
       </div>
     </div>
   `}).join('');
+  // Initialize drag-and-drop for service image zones
+  initServiceDropZones();
+}
+
+function initServiceDropZones() {
+  document.querySelectorAll('.svc-drop-zone').forEach(function(zone) {
+    const fileInput = zone.querySelector('input[type="file"]');
+    if (!fileInput) return;
+    setupDropZone(zone, fileInput);
+  });
+}
+
+function toggleCropPreview(key, isHero) {
+  const demo = document.getElementById('crop-demo-' + key);
+  if (demo) demo.classList.toggle('hidden');
+}
+
+function showCropPreview(key) {
+  const demo = document.getElementById('crop-demo-' + key);
+  if (demo) demo.classList.remove('hidden');
 }
 
 function previewPosition(key) {
@@ -4147,6 +4436,12 @@ function previewPosition(key) {
   const s = document.getElementById('scale-'+key)?.value || 100;
   bg.style.backgroundPosition = `${x}% ${y}%`;
   bg.style.backgroundSize = `${s}%`;
+  // Also update the crop demo preview if visible
+  const cropDemo = document.getElementById('crop-demo-' + key);
+  if (cropDemo) {
+    const cropBg = cropDemo.querySelector('[style*="background-image"]');
+    if (cropBg) { cropBg.style.backgroundPosition = `${x}% ${y}%`; cropBg.style.backgroundSize = `${s}%`; }
+  }
 }
 
 async function saveImagePosition(key, imageId) {
@@ -4165,9 +4460,11 @@ async function uploadServiceImage(key) {
   const input = document.getElementById('svc-file-'+key);
   const file = input?.files?.[0]; if(!file) { showToast('Select a file first', true); return; }
   try {
-    const ext = file.name.split('.').pop();
+    // Compress before upload
+    const compressed = await compressImage(file, 1920, 0.85);
+    const ext = compressed.name.split('.').pop();
     const path = `service-images/${key}-${Date.now()}.${ext}`;
-    const { error: upErr } = await sb.storage.from('gallery-images').upload(path, file);
+    const { error: upErr } = await sb.storage.from('gallery-images').upload(path, compressed);
     if(upErr) throw upErr;
     const { data: { publicUrl } } = sb.storage.from('gallery-images').getPublicUrl(path);
     // Mark old as not current
@@ -4453,6 +4750,76 @@ async function revokeAdminByEmail(email) {
   } else { showToast('Admin not found', true); }
 }
 
+// ===== SITE SETTINGS (Editable Content) =====
+const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count'];
+const SITE_SETTINGS_DEFAULTS = {
+  phone: { en: '(503) 367-9714', es: '(503) 367-9714' },
+  email: { en: 'oregontirespdx@gmail.com', es: 'oregontirespdx@gmail.com' },
+  address: { en: '8536 SE 82nd Ave, Portland, OR 97266', es: '8536 SE 82nd Ave, Portland, OR 97266' },
+  hours_weekday: { en: 'Mon-Sat 7AM-7PM', es: 'Lun-S\u00E1b 7AM-7PM' },
+  hours_sunday: { en: 'Sunday: Closed', es: 'Domingo: Cerrado' },
+  rating_value: { en: '4.8', es: '4.8' },
+  review_count: { en: '150+', es: '150+' }
+};
+
+async function loadSiteSettings() {
+  try {
+    const { data, error } = await sb.from('oretir_site_settings').select('setting_key, value_en, value_es, updated_at');
+    if (error) throw error;
+    let latestUpdate = null;
+    if (data && data.length) {
+      for (const row of data) {
+        const enInput = document.getElementById('setting-' + row.setting_key + '-en');
+        const esInput = document.getElementById('setting-' + row.setting_key + '-es');
+        if (enInput) enInput.value = row.value_en || '';
+        if (esInput) esInput.value = row.value_es || '';
+        if (row.updated_at && (!latestUpdate || new Date(row.updated_at) > new Date(latestUpdate))) {
+          latestUpdate = row.updated_at;
+        }
+      }
+    } else {
+      // Pre-fill with defaults if no data in DB yet
+      for (const key of SITE_SETTINGS_KEYS) {
+        const enInput = document.getElementById('setting-' + key + '-en');
+        const esInput = document.getElementById('setting-' + key + '-es');
+        if (enInput) enInput.value = SITE_SETTINGS_DEFAULTS[key].en;
+        if (esInput) esInput.value = SITE_SETTINGS_DEFAULTS[key].es;
+      }
+    }
+    const updEl = document.getElementById('settings-last-updated');
+    if (updEl && latestUpdate) {
+      updEl.textContent = (adminT[currentLang].lastUpdated || 'Last updated') + ': ' + new Date(latestUpdate).toLocaleString();
+    }
+  } catch (err) {
+    console.error('loadSiteSettings error:', err);
+    showToast(adminT[currentLang].settingsLoadError || 'Could not load site settings', true);
+  }
+}
+
+async function saveSiteSettings() {
+  const btn = document.getElementById('save-site-settings');
+  btn.disabled = true;
+  btn.textContent = adminT[currentLang].loading || 'Loading...';
+  try {
+    const rows = SITE_SETTINGS_KEYS.map(key => ({
+      setting_key: key,
+      value_en: document.getElementById('setting-' + key + '-en').value.trim(),
+      value_es: document.getElementById('setting-' + key + '-es').value.trim(),
+      updated_at: new Date().toISOString()
+    }));
+    const { error } = await sb.from('oretir_site_settings').upsert(rows, { onConflict: 'setting_key' });
+    if (error) throw error;
+    showToast(adminT[currentLang].settingsSaved || 'Site settings saved successfully');
+    loadSiteSettings();
+  } catch (err) {
+    console.error('saveSiteSettings error:', err);
+    showToast(adminT[currentLang].settingsSaveError || 'Could not save site settings', true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = adminT[currentLang].saveSiteSettings || 'Save Site Settings';
+  }
+}
+
 // ===== TAB SWITCHING =====
 function switchTab(tab) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -4462,6 +4829,7 @@ function switchTab(tab) {
   if(btn) { btn.classList.add('tab-active'); btn.classList.remove('text-white','hover:bg-green-600'); btn.setAttribute('aria-selected', 'true'); }
   if(tab==='analytics') renderAnalytics();
   if(tab==='appointments') renderCalendar();
+  if(tab==='sitecontent') loadSiteSettings();
 }
 
 // Sub-tab switching for Appointments (Calendar vs List)
@@ -4585,6 +4953,9 @@ document.addEventListener('keydown', (e) => {
 
 // Apply default language translations on page load
 applyAdminTranslations();
+
+// Initialize drag-and-drop zones for gallery upload
+initDragAndDrop();
 </script>
 </body>
 </html>

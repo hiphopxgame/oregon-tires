@@ -16,6 +16,11 @@
   <link rel="canonical" href="https://oregon.tires/">
   <meta name="robots" content="index, follow">
 
+  <!-- Hreflang Tags -->
+  <link rel="alternate" hreflang="en" href="https://oregon.tires/">
+  <link rel="alternate" hreflang="es" href="https://oregon.tires/?lang=es">
+  <link rel="alternate" hreflang="x-default" href="https://oregon.tires/">
+
   <!-- Open Graph -->
   <meta property="og:title" content="Oregon Tires Auto Care">
   <meta property="og:description" content="Oregon Tires is serving Portland with honest, reliable automotive services since 2008.">
@@ -25,7 +30,7 @@
   <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:alt" content="Oregon Tires Auto Care - Spanish & English Speaking">
   <meta property="og:site_name" content="Oregon Tires Auto Care">
 
@@ -78,19 +83,97 @@
       "@type": "OfferCatalog",
       "name": "Auto Care Services",
       "itemListElement": [
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Tire Installation"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Tire Repair"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Oil Change"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Brake Service"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Wheel Alignment"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Engine Diagnostics"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Suspension Repair"}}
+        {
+          "@type": "Offer",
+          "itemOffered": {"@type": "Service", "name": "Tire Installation"},
+          "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "USD", "minPrice": "20", "maxPrice": "60"}
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {"@type": "Service", "name": "Tire Repair"},
+          "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "USD", "minPrice": "15", "maxPrice": "45"}
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {"@type": "Service", "name": "Oil Change"},
+          "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "USD", "minPrice": "35", "maxPrice": "85"}
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {"@type": "Service", "name": "Brake Service"},
+          "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "USD", "minPrice": "100", "maxPrice": "350"}
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {"@type": "Service", "name": "Wheel Alignment"},
+          "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "USD", "minPrice": "75", "maxPrice": "150"}
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {"@type": "Service", "name": "Engine Diagnostics"},
+          "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "USD", "minPrice": "50", "maxPrice": "120"}
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {"@type": "Service", "name": "Suspension Repair"},
+          "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "USD", "minPrice": "150", "maxPrice": "500"}
+        }
       ]
     },
     "priceRange": "$$",
     "currenciesAccepted": "USD",
     "paymentAccepted": "Cash, Credit Card",
     "knowsLanguage": ["en", "es"]
+  }
+  </script>
+
+  <!-- FAQPage Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What services does Oregon Tires offer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oregon Tires offers a full range of automotive services including new and used tires, tire installation and repair, oil changes, brake services, wheel alignment, engine diagnostics, suspension repair, mobile service, and roadside assistance."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you speak Spanish?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! Oregon Tires has a fully bilingual staff fluent in both English and Spanish. We are proud to serve Portland's diverse community in the language you are most comfortable with."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are your hours?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oregon Tires is open Mon-Sat 7AM-7PM. We are closed on Sunday. For emergency roadside assistance, please call (503) 367-9714."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where are you located?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oregon Tires is located at 8536 SE 82nd Ave, Portland, OR 97266. We are conveniently located on SE 82nd Avenue and serve the greater Portland metro area."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you offer mobile service?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Oregon Tires offers mobile service at your home or any location. Whether you need tire installation, repair, or roadside assistance, we can come to you. Call (503) 367-9714 to schedule."
+        }
+      }
+    ]
   }
   </script>
 
@@ -120,7 +203,7 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 
-  <!-- Google Analytics 4 — replace G-CHYMTNB6LH with your real Measurement ID -->
+  <!-- Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-CHYMTNB6LH"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -152,10 +235,10 @@
   <div class="bg-brand text-white text-sm py-2">
     <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
       <div class="flex flex-wrap items-center gap-4">
-        <span>📞 <a href="tel:5033679714" class="hover:text-yellow-300">(503) 367-9714</a></span>
-        <span>✉️ <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></span>
-        <span class="hidden md:inline">📍 8536 SE 82nd Ave, Portland, OR 97266</span>
-        <span class="hidden lg:inline" id="top-hours">🕐 Mon-Sat 7AM-7PM</span>
+        <span data-setting="phone">📞 <a href="tel:5033679714" class="hover:text-yellow-300">(503) 367-9714</a></span>
+        <span data-setting="email">✉️ <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></span>
+        <span class="hidden md:inline" data-setting="address">📍 8536 SE 82nd Ave, Portland, OR 97266</span>
+        <span class="hidden lg:inline" id="top-hours" data-setting="hours_weekday">🕐 Mon-Sat 7AM-7PM</span>
       </div>
       <div class="flex items-center gap-3">
         <a href="https://www.instagram.com/oregontires" target="_blank" class="hover:text-yellow-300">Instagram</a>
@@ -365,12 +448,12 @@
       </div>
       <div class="text-center">
         <div class="inline-block bg-white p-8 rounded-xl shadow-lg">
-          <div class="text-5xl font-bold text-brand mb-2">4.8</div>
+          <div class="text-5xl font-bold text-brand mb-2" data-setting="rating_value">4.8</div>
           <div class="text-gray-600 mb-3" data-t="outOfStars">out of 5 stars</div>
           <div class="flex justify-center mb-3">
             <span class="star text-2xl">★★★★★</span>
           </div>
-          <div class="text-gray-600 mb-4" data-t="basedOnReviews">Based on 150+ Google Reviews</div>
+          <div class="text-gray-600 mb-4" data-t="basedOnReviews" data-setting="review_count">Based on 150+ Google Reviews</div>
           <a href="https://www.google.com/search?q=Oregon+Tires+Reviews" target="_blank" class="inline-block border-2 border-brand text-brand px-6 py-2 rounded-lg font-medium hover:bg-brand/5 transition" data-t="viewAllReviews">View All Reviews on Google</a>
         </div>
       </div>
@@ -413,22 +496,22 @@
               <div class="bg-green-100 p-3 rounded-full"><span class="text-xl">📞</span></div>
               <div>
                 <h4 class="font-semibold" data-t="phone">Phone</h4>
-                <p class="text-gray-600"><a href="tel:5033679714">(503) 367-9714</a></p>
+                <p class="text-gray-600" data-setting="phone"><a href="tel:5033679714">(503) 367-9714</a></p>
               </div>
             </div>
             <div class="flex items-center gap-4">
               <div class="bg-green-100 p-3 rounded-full"><span class="text-xl">📍</span></div>
               <div>
                 <h4 class="font-semibold" data-t="address">Address</h4>
-                <p class="text-gray-600" data-t="physicalAddress">8536 SE 82nd Ave, Portland, OR 97266</p>
+                <p class="text-gray-600" data-t="physicalAddress" data-setting="address">8536 SE 82nd Ave, Portland, OR 97266</p>
               </div>
             </div>
             <div class="flex items-center gap-4">
               <div class="bg-green-100 p-3 rounded-full"><span class="text-xl">🕐</span></div>
               <div>
                 <h4 class="font-semibold" data-t="businessHours">Business Hours</h4>
-                <p class="text-gray-600" data-t="monSat">Mon-Sat 7AM-7PM</p>
-                <p class="text-gray-600" data-t="sunday">Sunday: Closed</p>
+                <p class="text-gray-600" data-t="monSat" data-setting="hours_weekday">Mon-Sat 7AM-7PM</p>
+                <p class="text-gray-600" data-t="sunday" data-setting="hours_sunday">Sunday: Closed</p>
               </div>
             </div>
           </div>
@@ -491,10 +574,10 @@
         <div>
           <h3 class="text-xl font-bold mb-4" data-t="contactInfo">Contact Information</h3>
           <div class="space-y-2 text-gray-200">
-            <p>📞 <a href="tel:5033679714" class="hover:text-yellow-300">(503) 367-9714</a></p>
-            <p>✉️ <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></p>
-            <p>📍 8536 SE 82nd Ave, Portland, OR 97266</p>
-            <p>🕐 <span data-t="monSat">Mon-Sat 7AM-7PM</span></p>
+            <p data-setting="phone">📞 <a href="tel:5033679714" class="hover:text-yellow-300">(503) 367-9714</a></p>
+            <p data-setting="email">✉️ <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></p>
+            <p data-setting="address">📍 8536 SE 82nd Ave, Portland, OR 97266</p>
+            <p>🕐 <span data-t="monSat" data-setting="hours_weekday">Mon-Sat 7AM-7PM</span></p>
           </div>
         </div>
         <div>
@@ -519,7 +602,7 @@
         </div>
       </div>
       <div class="border-t border-green-700 mt-8 pt-8 text-center text-gray-300">
-        <p>&copy; <span data-t="copyright">2025 Oregon Tires Auto Care. All rights reserved.</span></p>
+        <p>&copy; <span data-t="copyright">2026 Oregon Tires Auto Care. All rights reserved.</span></p>
         <p class="mt-3 text-xs text-gray-500"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-yellow-200 hover:text-yellow-100 transition-colors">1vsM.com</a></p>
       </div>
     </div>
@@ -531,6 +614,63 @@ const sb = supabase.createClient(
   'https://vtknmauyvmuaryttnenx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0a25tYXV5dm11YXJ5dHRuZW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1MDE1MDgsImV4cCI6MjA2NTA3NzUwOH0._bOyuxj1nRBw3U7Q3qCsDubBNg_EM-VLhQB0y5p9okY'
 );
+
+// ===== SITE SETTINGS (Editable Content from Supabase) =====
+const SITE_SETTINGS_DEFAULTS = {
+  phone: { en: '(503) 367-9714', es: '(503) 367-9714' },
+  email: { en: 'oregontirespdx@gmail.com', es: 'oregontirespdx@gmail.com' },
+  address: { en: '8536 SE 82nd Ave, Portland, OR 97266', es: '8536 SE 82nd Ave, Portland, OR 97266' },
+  hours_weekday: { en: 'Mon-Sat 7AM-7PM', es: 'Lun-S\u00E1b 7AM-7PM' },
+  hours_sunday: { en: 'Sunday: Closed', es: 'Domingo: Cerrado' },
+  rating_value: { en: '4.8', es: '4.8' },
+  review_count: { en: '150+', es: '150+' }
+};
+let siteSettingsCache = null;
+
+async function loadSiteSettings() {
+  try {
+    const { data, error } = await sb.from('oretir_site_settings').select('setting_key, value_en, value_es');
+    if (error) throw error;
+    if (data && data.length) {
+      siteSettingsCache = {};
+      for (const row of data) {
+        siteSettingsCache[row.setting_key] = { en: row.value_en, es: row.value_es };
+      }
+    }
+  } catch (err) {
+    console.warn('loadSiteSettings: falling back to defaults', err);
+  }
+  applySiteSettings();
+}
+
+function applySiteSettings() {
+  const settings = siteSettingsCache || SITE_SETTINGS_DEFAULTS;
+  const lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
+  document.querySelectorAll('[data-setting]').forEach(function(el) {
+    var key = el.getAttribute('data-setting');
+    var s = settings[key];
+    if (!s) return;
+    var val = lang === 'es' ? (s.es || s.en) : (s.en || s.es);
+    if (!val) return;
+    // For elements that contain links, update text carefully
+    if (key === 'phone') {
+      var a = el.querySelector('a[href^="tel:"]');
+      if (a) { a.textContent = val; } else { el.textContent = val; }
+    } else if (key === 'email') {
+      var a = el.querySelector('a[href^="mailto:"]');
+      if (a) { a.textContent = val; a.href = 'mailto:' + val; } else { el.textContent = val; }
+    } else {
+      // Preserve emoji prefix if present (e.g. "📍 ", "🕐 ")
+      var text = el.textContent || '';
+      var emojiMatch = text.match(/^([\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]+\s*)/u);
+      if (emojiMatch) {
+        el.textContent = emojiMatch[1] + val;
+      } else {
+        el.textContent = val;
+      }
+    }
+  });
+}
 
 // ===== HTML ESCAPE HELPER =====
 function esc(s) { if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
@@ -580,7 +720,7 @@ const t = {
     address: 'Address',
     physicalAddress: '8536 SE 82nd Ave, Portland, OR 97266',
     followUs: 'Follow Us',
-    copyright: '2025 Oregon Tires Auto Care. All rights reserved.',
+    copyright: '2026 Oregon Tires Auto Care. All rights reserved.',
     poweredBy: 'Powered by',
     noGalleryImages: 'No gallery images yet.',
     galleryLoadError: 'Could not load gallery.',
@@ -640,7 +780,7 @@ const t = {
     address: 'Dirección',
     physicalAddress: '8536 SE 82nd Ave, Portland, OR 97266',
     followUs: 'Síguenos',
-    copyright: '2025 Oregon Tires Auto Care. Todos los derechos reservados.',
+    copyright: '2026 Oregon Tires Auto Care. Todos los derechos reservados.',
     poweredBy: 'Desarrollado por',
     noGalleryImages: 'Aún no hay imágenes en la galería.',
     galleryLoadError: 'No se pudo cargar la galería.',
@@ -819,20 +959,52 @@ async function loadGalleryForSite() {
     const grid = document.getElementById('gallery-section-grid');
     const images = data || [];
     if (!images.length) {
-      grid.innerHTML = '<div class="text-center py-8 text-gray-400 col-span-full">' + t[currentLang].noGalleryImages + '</div>';
+      grid.textContent = '';
+      var empty = document.createElement('div');
+      empty.className = 'text-center py-8 text-gray-400 col-span-full';
+      empty.textContent = t[currentLang].noGalleryImages;
+      grid.appendChild(empty);
       return;
     }
-    grid.innerHTML = images.map(img => `
-      <div class="rounded-xl overflow-hidden shadow-md hover:shadow-lg transition group">
-        <div class="relative h-56 bg-gray-200">
-          <img src="${esc(img.image_url)}" alt="${esc(img.title) || t[currentLang].galleryImage}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-        </div>
-        ${img.title ? `<div class="p-4 bg-white"><h4 class="font-semibold text-brand">${esc(img.title)}</h4>${img.description ? `<p class="text-sm text-gray-600 mt-1">${esc(img.description)}</p>` : ''}</div>` : ''}
-      </div>
-    `).join('');
+    grid.textContent = '';
+    images.forEach(function(img) {
+      var card = document.createElement('div');
+      card.className = 'rounded-xl overflow-hidden shadow-md hover:shadow-lg transition group';
+      var imgWrap = document.createElement('div');
+      imgWrap.className = 'relative h-56 bg-gray-200';
+      var imgEl = document.createElement('img');
+      imgEl.src = img.image_url || '';
+      imgEl.alt = img.title || t[currentLang].galleryImage;
+      imgEl.loading = 'lazy';
+      imgEl.decoding = 'async';
+      imgEl.className = 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300';
+      imgWrap.appendChild(imgEl);
+      card.appendChild(imgWrap);
+      if (img.title) {
+        var info = document.createElement('div');
+        info.className = 'p-4 bg-white';
+        var h4 = document.createElement('h4');
+        h4.className = 'font-semibold text-brand';
+        h4.textContent = img.title;
+        info.appendChild(h4);
+        if (img.description) {
+          var desc = document.createElement('p');
+          desc.className = 'text-sm text-gray-600 mt-1';
+          desc.textContent = img.description;
+          info.appendChild(desc);
+        }
+        card.appendChild(info);
+      }
+      grid.appendChild(card);
+    });
   } catch (e) {
     console.error('Error loading gallery:', e);
-    document.getElementById('gallery-section-grid').innerHTML = '<div class="text-center py-8 text-gray-400 col-span-full">' + t[currentLang].galleryLoadError + '</div>';
+    var errGrid = document.getElementById('gallery-section-grid');
+    errGrid.textContent = '';
+    var errMsg = document.createElement('div');
+    errMsg.className = 'text-center py-8 text-gray-400 col-span-full';
+    errMsg.textContent = t[currentLang].galleryLoadError;
+    errGrid.appendChild(errMsg);
   }
 }
 
@@ -965,6 +1137,7 @@ function toggleLanguage() {
   if (emailInput) emailInput.placeholder = t[currentLang].emailPlaceholder;
   renderReviews();
   loadGalleryForSite();
+  applySiteSettings();
 }
 
 // Track Schedule Service CTA clicks
@@ -974,9 +1147,10 @@ document.querySelectorAll('[data-t="scheduleService"]').forEach(function(el) {
   });
 });
 
-// Load dynamic images now that currentLang is defined
+// Load dynamic images and site settings now that currentLang is defined
 loadServiceImagesForSite();
 loadGalleryForSite();
+loadSiteSettings();
 
 // ===== DARK MODE =====
 function toggleDarkMode() {

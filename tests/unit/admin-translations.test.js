@@ -282,8 +282,8 @@ describe('admin translations — key coverage', () => {
   let enKeys, esKeys;
 
   beforeAll(() => {
-    const enBlock = html.match(/adminT\s*=\s*\{[\s\S]*?en:\s*\{([^}]+(?:\{[^}]*\}[^}]*)*)\}/);
-    const esBlock = html.match(/adminT\s*=\s*\{[\s\S]*?es:\s*\{([^}]+(?:\{[^}]*\}[^}]*)*)\}/);
+    const enBlock = html.match(/adminT\s*=\s*\{[\s\S]*?en:\s*\{([\s\S]*?)\},\s*\n\s*es:/);
+    const esBlock = html.match(/adminT\s*=\s*\{[\s\S]*?es:\s*\{([\s\S]*?)\}\s*\n\s*\};/);
     enKeys = new Set([...enBlock[1].matchAll(/(\w+)\s*:\s*['"]/g)].map(m => m[1]));
     esKeys = new Set([...esBlock[1].matchAll(/(\w+)\s*:\s*['"]/g)].map(m => m[1]));
   });
