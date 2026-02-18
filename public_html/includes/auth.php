@@ -54,12 +54,13 @@ function adminLogin(string $email, string $password): array|string
     startSecureSession();
     session_regenerate_id(true);
 
-    $_SESSION['admin_id']    = $admin['id'];
-    $_SESSION['admin_email'] = $admin['email'];
-    $_SESSION['admin_role']  = $admin['role'];
-    $_SESSION['admin_name']  = $admin['display_name'];
-    $_SESSION['login_time']  = time();
-    $_SESSION['csrf_token']  = bin2hex(random_bytes(32));
+    $_SESSION['admin_id']       = $admin['id'];
+    $_SESSION['admin_email']    = $admin['email'];
+    $_SESSION['admin_role']     = $admin['role'];
+    $_SESSION['admin_name']     = $admin['display_name'];
+    $_SESSION['admin_language'] = $admin['language'] ?? 'both';
+    $_SESSION['login_time']     = time();
+    $_SESSION['csrf_token']     = bin2hex(random_bytes(32));
 
     return $admin;
 }
@@ -82,10 +83,11 @@ function requireAdmin(): array
     }
 
     return [
-        'id'    => $_SESSION['admin_id'],
-        'email' => $_SESSION['admin_email'],
-        'role'  => $_SESSION['admin_role'],
-        'name'  => $_SESSION['admin_name'],
+        'id'       => $_SESSION['admin_id'],
+        'email'    => $_SESSION['admin_email'],
+        'role'     => $_SESSION['admin_role'],
+        'name'     => $_SESSION['admin_name'],
+        'language' => $_SESSION['admin_language'] ?? 'both',
     ];
 }
 

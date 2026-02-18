@@ -26,8 +26,7 @@
     }
   </script>
 
-  <!-- Supabase CDN -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- PHP API backend — no external SDK needed -->
 
   <style>
     html { scroll-behavior: smooth; }
@@ -80,24 +79,24 @@
         <img src="/assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" loading="eager" fetchpriority="high">
       </a>
       <nav class="hidden md:flex items-center gap-6">
-        <a href="/" class="text-brand font-medium hover:opacity-70" data-t="home">Home</a>
-        <a href="/#services" class="text-brand font-medium hover:opacity-70" data-t="services">Services</a>
-        <a href="/#about" class="text-brand font-medium hover:opacity-70" data-t="about">About</a>
-        <a href="/#reviews" class="text-brand font-medium hover:opacity-70" data-t="testimonials">Reviews</a>
-        <a href="/#gallery" class="text-brand font-medium hover:opacity-70" data-t="gallery">Gallery</a>
-        <a href="/#contact" class="text-brand font-medium hover:opacity-70" data-t="contact">Contact</a>
+        <a href="/" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="home">Home</a>
+        <a href="/#services" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="services">Services</a>
+        <a href="/#about" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="about">About</a>
+        <a href="/#reviews" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="testimonials">Reviews</a>
+        <a href="/#gallery" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="gallery">Gallery</a>
+        <a href="/#contact" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="contact">Contact</a>
         <a href="/book-appointment" class="bg-yellow-400 text-black px-5 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition" data-t="scheduleService">Schedule Service</a>
       </nav>
-      <button onclick="toggleMobileMenu()" class="md:hidden text-brand text-2xl" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
+      <button onclick="toggleMobileMenu()" class="md:hidden text-brand dark:text-green-400 text-2xl" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
     </div>
     <div id="mobile-menu" class="hidden md:hidden bg-white border-t px-4 pb-4 dark:bg-gray-800 dark:border-gray-700">
-      <a href="/" class="block py-2 text-brand" data-t="home">Home</a>
-      <a href="/#services" class="block py-2 text-brand" data-t="services">Services</a>
-      <a href="/#about" class="block py-2 text-brand" data-t="about">About</a>
-      <a href="/#reviews" class="block py-2 text-brand" data-t="testimonials">Reviews</a>
-      <a href="/#gallery" class="block py-2 text-brand" data-t="gallery">Gallery</a>
-      <a href="/#contact" class="block py-2 text-brand" data-t="contact">Contact</a>
-      <a href="/book-appointment" class="block py-2 text-brand font-semibold" data-t="scheduleService">Schedule Service</a>
+      <a href="/" class="block py-2 text-brand dark:text-green-400" data-t="home">Home</a>
+      <a href="/#services" class="block py-2 text-brand dark:text-green-400" data-t="services">Services</a>
+      <a href="/#about" class="block py-2 text-brand dark:text-green-400" data-t="about">About</a>
+      <a href="/#reviews" class="block py-2 text-brand dark:text-green-400" data-t="testimonials">Reviews</a>
+      <a href="/#gallery" class="block py-2 text-brand dark:text-green-400" data-t="gallery">Gallery</a>
+      <a href="/#contact" class="block py-2 text-brand dark:text-green-400" data-t="contact">Contact</a>
+      <a href="/book-appointment" class="block py-2 text-brand dark:text-green-400 font-semibold" data-t="scheduleService">Schedule Service</a>
     </div>
   </header>
 
@@ -120,63 +119,63 @@
 
         <!-- Step 1: Service Selection -->
         <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-700">
-          <h2 class="text-xl font-bold text-brand mb-4 flex items-center gap-2">
+          <h2 class="text-xl font-bold text-brand dark:text-green-400 mb-4 flex items-center gap-2">
             <span class="bg-brand text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">1</span>
             <span data-t="selectService">Select a Service</span>
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div class="service-card">
               <input type="radio" name="service" value="tire-installation" id="svc-tire-installation" required class="sr-only">
-              <label for="svc-tire-installation" class="block border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                <span class="block font-semibold text-brand" data-t="tireInstallation">Tire Installation</span>
+              <label for="svc-tire-installation" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
+                <span class="block font-semibold text-brand dark:text-green-400" data-t="tireInstallation">Tire Installation</span>
               </label>
             </div>
             <div class="service-card">
               <input type="radio" name="service" value="tire-repair" id="svc-tire-repair" required class="sr-only">
-              <label for="svc-tire-repair" class="block border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                <span class="block font-semibold text-brand" data-t="tireRepair">Tire Repair</span>
+              <label for="svc-tire-repair" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
+                <span class="block font-semibold text-brand dark:text-green-400" data-t="tireRepair">Tire Repair</span>
               </label>
             </div>
             <div class="service-card">
               <input type="radio" name="service" value="wheel-alignment" id="svc-wheel-alignment" required class="sr-only">
-              <label for="svc-wheel-alignment" class="block border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                <span class="block font-semibold text-brand" data-t="wheelAlignment">Wheel Alignment</span>
+              <label for="svc-wheel-alignment" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
+                <span class="block font-semibold text-brand dark:text-green-400" data-t="wheelAlignment">Wheel Alignment</span>
               </label>
             </div>
             <div class="service-card">
               <input type="radio" name="service" value="oil-change" id="svc-oil-change" required class="sr-only">
-              <label for="svc-oil-change" class="block border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                <span class="block font-semibold text-brand" data-t="oilChange">Oil Change</span>
+              <label for="svc-oil-change" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
+                <span class="block font-semibold text-brand dark:text-green-400" data-t="oilChange">Oil Change</span>
               </label>
             </div>
             <div class="service-card">
               <input type="radio" name="service" value="brake-service" id="svc-brake-service" required class="sr-only">
-              <label for="svc-brake-service" class="block border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                <span class="block font-semibold text-brand" data-t="brakeService">Brake Service</span>
+              <label for="svc-brake-service" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
+                <span class="block font-semibold text-brand dark:text-green-400" data-t="brakeService">Brake Service</span>
               </label>
             </div>
             <div class="service-card">
               <input type="radio" name="service" value="tuneup" id="svc-tuneup" required class="sr-only">
-              <label for="svc-tuneup" class="block border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                <span class="block font-semibold text-brand" data-t="tuneup">Tuneup</span>
+              <label for="svc-tuneup" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
+                <span class="block font-semibold text-brand dark:text-green-400" data-t="tuneup">Tuneup</span>
               </label>
             </div>
             <div class="service-card">
               <input type="radio" name="service" value="mechanical-inspection" id="svc-mechanical-inspection" required class="sr-only">
-              <label for="svc-mechanical-inspection" class="block border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                <span class="block font-semibold text-brand" data-t="mechanicalInspection">Mechanical Inspection</span>
+              <label for="svc-mechanical-inspection" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
+                <span class="block font-semibold text-brand dark:text-green-400" data-t="mechanicalInspection">Mechanical Inspection</span>
               </label>
             </div>
             <div class="service-card">
               <input type="radio" name="service" value="mobile-service" id="svc-mobile-service" required class="sr-only">
-              <label for="svc-mobile-service" class="block border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                <span class="block font-semibold text-brand" data-t="mobileService">Mobile Service</span>
+              <label for="svc-mobile-service" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
+                <span class="block font-semibold text-brand dark:text-green-400" data-t="mobileService">Mobile Service</span>
               </label>
             </div>
             <div class="service-card">
               <input type="radio" name="service" value="other" id="svc-other" required class="sr-only">
-              <label for="svc-other" class="block border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                <span class="block font-semibold text-brand" data-t="otherService">Other</span>
+              <label for="svc-other" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
+                <span class="block font-semibold text-brand dark:text-green-400" data-t="otherService">Other</span>
               </label>
             </div>
           </div>
@@ -184,7 +183,7 @@
 
         <!-- Step 2: Date & Time -->
         <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-700">
-          <h2 class="text-xl font-bold text-brand mb-4 flex items-center gap-2">
+          <h2 class="text-xl font-bold text-brand dark:text-green-400 mb-4 flex items-center gap-2">
             <span class="bg-brand text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">2</span>
             <span data-t="selectDateTime">Choose Date & Time</span>
           </h2>
@@ -193,7 +192,7 @@
           <div class="mb-6">
             <label for="booking-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="preferredDate">Preferred Date</label>
             <input type="date" name="date" id="booking-date" required class="w-full max-w-xs p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
-            <p class="text-xs text-gray-500 mt-1" data-t="dateNote">Monday - Saturday only. No Sundays.</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" data-t="dateNote">Monday - Saturday only. No Sundays.</p>
           </div>
 
           <!-- Time Slots -->
@@ -201,29 +200,29 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" data-t="preferredTime">Preferred Time</label>
             <input type="hidden" name="time" id="booking-time" required>
             <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2" id="time-slots-grid">
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="07:00">7:00 AM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="08:00">8:00 AM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="09:00">9:00 AM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="10:00">10:00 AM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="11:00">11:00 AM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="12:00">12:00 PM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="13:00">1:00 PM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="14:00">2:00 PM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="15:00">3:00 PM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="16:00">4:00 PM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="17:00">5:00 PM</button>
-              <button type="button" class="time-slot border-2 border-gray-200 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="18:00">6:00 PM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="07:00">7:00 AM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="08:00">8:00 AM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="09:00">9:00 AM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="10:00">10:00 AM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="11:00">11:00 AM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="12:00">12:00 PM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="13:00">1:00 PM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="14:00">2:00 PM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="15:00">3:00 PM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="16:00">4:00 PM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="17:00">5:00 PM</button>
+              <button type="button" class="time-slot border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition" data-time="18:00">6:00 PM</button>
             </div>
           </div>
         </div>
 
         <!-- Step 3: Vehicle Info (optional) -->
         <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-700">
-          <h2 class="text-xl font-bold text-brand mb-1 flex items-center gap-2">
+          <h2 class="text-xl font-bold text-brand dark:text-green-400 mb-1 flex items-center gap-2">
             <span class="bg-brand text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">3</span>
             <span data-t="vehicleInfo">Vehicle Information</span>
           </h2>
-          <p class="text-sm text-gray-500 mb-4 ml-10" data-t="vehicleOptional">Optional but helps us prepare for your visit</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 ml-10" data-t="vehicleOptional">Optional but helps us prepare for your visit</p>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
@@ -272,7 +271,7 @@
 
         <!-- Step 4: Customer Info -->
         <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-700">
-          <h2 class="text-xl font-bold text-brand mb-4 flex items-center gap-2">
+          <h2 class="text-xl font-bold text-brand dark:text-green-400 mb-4 flex items-center gap-2">
             <span class="bg-brand text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">4</span>
             <span data-t="yourInfo">Your Information</span>
           </h2>
@@ -317,20 +316,20 @@
       <!-- Confirmation Section -->
       <div id="booking-confirmation" class="hidden mt-8 bg-white rounded-xl shadow-lg p-8 text-center fade-in dark:bg-gray-700">
         <div class="text-5xl mb-4">✅</div>
-        <h2 class="text-2xl font-bold text-brand mb-2" data-t="confirmationTitle">Appointment Requested!</h2>
+        <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-2" data-t="confirmationTitle">Appointment Requested!</h2>
         <p class="text-gray-600 dark:text-gray-300 mb-6" data-t="confirmationSubtitle">We will call or text you to confirm. Thank you!</p>
         <div id="confirmation-details" class="text-left max-w-md mx-auto space-y-2 mb-6"></div>
         <div class="flex justify-center gap-4 flex-wrap">
           <a href="/" class="bg-brand text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition" data-t="backToHome">Back to Home</a>
-          <button onclick="resetBookingForm()" class="border-2 border-brand text-brand px-6 py-2 rounded-lg font-semibold hover:bg-brand/5 transition" data-t="bookAnother">Book Another</button>
+          <button onclick="resetBookingForm()" class="border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-6 py-2 rounded-lg font-semibold hover:bg-brand/5 dark:hover:bg-green-400/10 transition" data-t="bookAnother">Book Another</button>
         </div>
       </div>
 
       <!-- Contact info reminder -->
       <div class="mt-8 bg-white rounded-xl shadow-md p-6 text-center dark:bg-gray-700">
         <p class="text-gray-600 dark:text-gray-300 mb-2" data-t="preferCall">Prefer to call? We are happy to help!</p>
-        <a href="tel:5033679714" class="text-2xl font-bold text-brand hover:opacity-80 transition">📞 (503) 367-9714</a>
-        <p class="text-sm text-gray-500 mt-2" data-t="monSat">Mon-Sat 7AM-7PM</p>
+        <a href="tel:5033679714" class="text-2xl font-bold text-brand dark:text-green-400 hover:opacity-80 transition">📞 (503) 367-9714</a>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2" data-t="monSat">Mon-Sat 7AM-7PM</p>
       </div>
 
     </div>
@@ -380,14 +379,19 @@
   </footer>
 
 <script>
-// ===== SUPABASE =====
-const sb = supabase.createClient(
-  'https://vtknmauyvmuaryttnenx.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0a25tYXV5dm11YXJ5dHRuZW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1MDE1MDgsImV4cCI6MjA2NTA3NzUwOH0._bOyuxj1nRBw3U7Q3qCsDubBNg_EM-VLhQB0y5p9okY'
-);
+// ===== PHP API =====
+const API_BASE = '/api';
 
 // ===== TRANSLATIONS =====
-let currentLang = 'en';
+// Detect language: URL param > localStorage > browser > default English
+let currentLang = (function() {
+  var urlLang = new URLSearchParams(window.location.search).get('lang');
+  if (urlLang === 'es' || urlLang === 'en') { localStorage.setItem('oregontires_lang', urlLang); return urlLang; }
+  var saved = localStorage.getItem('oregontires_lang');
+  if (saved === 'es' || saved === 'en') return saved;
+  if (navigator.language && navigator.language.startsWith('es')) return 'es';
+  return 'en';
+})();
 const t = {
   en: {
     home: 'Home',
@@ -648,7 +652,7 @@ function showConfirmation(data) {
 
   fields.forEach(function(field) {
     var row = document.createElement('div');
-    row.className = 'flex justify-between py-1 border-b border-gray-100';
+    row.className = 'flex justify-between py-1 border-b border-gray-100 dark:border-gray-600';
     var labelEl = document.createElement('span');
     labelEl.className = 'font-medium text-gray-700 dark:text-gray-300';
     labelEl.textContent = field.label + ':';
@@ -723,13 +727,18 @@ document.getElementById('booking-form').addEventListener('submit', async functio
     phone: form.phone.value.trim(),
     email: form.email.value.trim(),
     notes: form.notes.value.trim() || null,
-    status: 'pending',
     language: currentLang === 'en' ? 'english' : 'spanish'
   };
 
   try {
-    var result = await sb.from('oretir_appointments').insert([data]);
-    if (result.error) throw result.error;
+    var res = await fetch(API_BASE + '/book.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(data)
+    });
+    var json = await res.json();
+    if (!res.ok || !json.success) throw new Error(json.error || 'Failed');
 
     lastBookingSubmitTime = Date.now();
     showConfirmation(data);
@@ -741,7 +750,7 @@ document.getElementById('booking-form').addEventListener('submit', async functio
       });
     }
   } catch (err) {
-    showStatus(t[currentLang].bookingError, 'red');
+    showStatus(err.message || t[currentLang].bookingError, 'red');
     console.error('Booking error:', err);
   } finally {
     submitBtn.disabled = false;
@@ -752,6 +761,7 @@ document.getElementById('booking-form').addEventListener('submit', async functio
 // ===== LANGUAGE TOGGLE =====
 function toggleLanguage() {
   currentLang = currentLang === 'en' ? 'es' : 'en';
+  localStorage.setItem('oregontires_lang', currentLang);
   document.documentElement.lang = currentLang;
   if (typeof gtag === 'function') gtag('event', 'language_switch', { event_category: 'engagement', event_label: currentLang });
   document.getElementById('lang-toggle').textContent = currentLang === 'en' ? '🌐 ES' : '🌐 EN';
@@ -765,6 +775,17 @@ function toggleLanguage() {
   if (phoneInput) phoneInput.placeholder = currentLang === 'en' ? '(503) 123-4567' : '(503) 123-4567';
   var emailInput = document.querySelector('input[name="email"]');
   if (emailInput) emailInput.placeholder = currentLang === 'en' ? 'your@email.com' : 'tu@correo.com';
+}
+
+// Apply saved language preference on page load
+if (currentLang !== 'en') {
+  document.documentElement.lang = currentLang;
+  document.getElementById('lang-toggle').textContent = currentLang === 'en' ? '🌐 ES' : '🌐 EN';
+  document.getElementById('top-hours').textContent = '🕐 ' + t[currentLang].monSat;
+  document.querySelectorAll('[data-t]').forEach(function(el) {
+    var key = el.getAttribute('data-t');
+    if (t[currentLang][key]) el.textContent = t[currentLang][key];
+  });
 }
 
 // ===== MOBILE MENU =====

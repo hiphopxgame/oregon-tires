@@ -5388,6 +5388,13 @@ function toggleAdminLanguage() {
   document.documentElement.lang = currentLang;
   document.getElementById('admin-lang-toggle').textContent = currentLang === 'en' ? 'ES' : 'EN';
   applyAdminTranslations();
+  // Persist language preference to server + update settings dropdown
+  var langEl = document.getElementById('settings-language');
+  if (langEl) langEl.value = currentLang;
+  if (currentUser) {
+    currentUser.language = currentLang;
+    api('account.php', { method: 'PUT', body: { action: 'update_language', language: currentLang } }).catch(function(){});
+  }
 }
 
 function applyAdminTranslations() {
@@ -5565,8 +5572,22 @@ function showDashboard(user) {
   document.getElementById('admin-role').textContent = user.role || 'Admin';
   document.getElementById('settings-name').value = user.name || '';
   document.getElementById('settings-email').value = user.email || '';
+
+  // Apply user's language preference to the admin panel UI
   var langEl = document.getElementById('settings-language');
   if(user.language && langEl) langEl.value = user.language;
+  if (user.language === 'en') {
+    currentLang = 'en';
+  } else if (user.language === 'es') {
+    currentLang = 'es';
+  } else {
+    // 'both' — default to Spanish (primary audience)
+    currentLang = 'es';
+  }
+  document.documentElement.lang = currentLang;
+  document.getElementById('admin-lang-toggle').textContent = currentLang === 'en' ? 'ES' : 'EN';
+  applyAdminTranslations();
+
   loadAllData();
   setupPolling();
   populateMonthFilter();
@@ -6609,6 +6630,16 @@ async function updateLanguagePreference() {
   const lang = document.getElementById('settings-language').value;
   try {
     await api('account.php', { method: 'PUT', body: { action: 'update_language', language: lang } });
+    // Sync UI language immediately
+    if (lang === 'en' || lang === 'es') {
+      currentLang = lang;
+    } else {
+      currentLang = 'es'; // 'both' defaults to Spanish
+    }
+    if (currentUser) currentUser.language = lang;
+    document.documentElement.lang = currentLang;
+    document.getElementById('admin-lang-toggle').textContent = currentLang === 'en' ? 'ES' : 'EN';
+    applyAdminTranslations();
     showToast('Language preference updated');
   } catch(e) { showToast('Error: '+e.message, true); }
 }
