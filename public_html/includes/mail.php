@@ -1,0 +1,495 @@
+<?php
+/**
+ * Oregon Tires — PHPMailer Helper + DB-driven Email Templates
+ */
+
+declare(strict_types=1);
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+
+/**
+ * Send an email using PHPMailer with SMTP settings from .env
+ */
+function sendMail(string $to, string $subject, string $htmlBody, string $textBody = ''): array
+{
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = $_ENV['SMTP_HOST'] ?? '';
+        $mail->Port       = (int) ($_ENV['SMTP_PORT'] ?? 465);
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $_ENV['SMTP_USER'] ?? '';
+        $mail->Password   = $_ENV['SMTP_PASSWORD'] ?? '';
+        $mail->CharSet    = 'UTF-8';
+
+        $port = (int) ($_ENV['SMTP_PORT'] ?? 465);
+        if ($port === 465) {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        } elseif ($port === 587) {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        }
+
+        $mail->SMTPDebug = (int) ($_ENV['SMTP_DEBUG'] ?? 0);
+        $mail->Debugoutput = function (string $str, int $level) {
+            error_log("PHPMailer [{$level}]: {$str}");
+        };
+
+        $mail->setFrom(
+            $_ENV['SMTP_FROM'] ?? $_ENV['SMTP_USER'] ?? '',
+            $_ENV['SMTP_FROM_NAME'] ?? 'Oregon Tires Auto Care'
+        );
+
+        $mail->addAddress($to);
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $htmlBody;
+        $mail->AltBody = $textBody ?: strip_tags($htmlBody);
+
+        $mail->send();
+
+        return ['success' => true, 'error' => null];
+    } catch (\Throwable $e) {
+        error_log("Oregon Tires mail error: " . $e->getMessage());
+        return ['success' => false, 'error' => $e->getMessage()];
+    }
+}
+
+/**
+ * Send notification to the shop owner.
+ */
+function notifyOwner(string $subject, string $htmlBody): array
+{
+    $contactEmail = $_ENV['CONTACT_EMAIL'] ?? $_ENV['SMTP_FROM'] ?? '';
+    if (empty($contactEmail)) {
+        return ['success' => false, 'error' => 'No contact email configured.'];
+    }
+
+    return sendMail($contactEmail, $subject, $htmlBody);
+}
+
+/**
+ * Log an email event to the database.
+ */
+function logEmail(string $type, string $description, ?string $adminEmail = null): void
+{
+    try {
+        $db = getDB();
+        $db->prepare('INSERT INTO oretir_email_logs (log_type, description, admin_email) VALUES (?, ?, ?)')
+           ->execute([$type, $description, $adminEmail]);
+    } catch (\Throwable $e) {
+        error_log("Oregon Tires email log error: " . $e->getMessage());
+    }
+}
+
+// ─── DB-Driven Email Templates ──────────────────────────────────────────────
+
+/**
+ * Load email template fields from oretir_site_settings by prefix.
+ *
+ * @param string $prefix  Template prefix: 'welcome', 'reset', 'contact'
+ * @return array ['subject_en'=>..., 'subject_es'=>..., 'greeting_en'=>..., etc.]
+ */
+function loadEmailTemplate(string $prefix): array
+{
+    $db = getDB();
+    $keyPrefix = "email_tpl_{$prefix}_";
+    $stmt = $db->prepare(
+        "SELECT setting_key, value_en, value_es FROM oretir_site_settings WHERE setting_key LIKE ?"
+    );
+    $stmt->execute([$keyPrefix . '%']);
+    $rows = $stmt->fetchAll();
+
+    $tpl = [];
+    foreach ($rows as $row) {
+        $field = str_replace($keyPrefix, '', $row['setting_key']);
+        $tpl[$field . '_en'] = $row['value_en'];
+        $tpl[$field . '_es'] = $row['value_es'];
+    }
+
+    return $tpl;
+}
+
+/**
+ * Replace {{variable}} placeholders in a string.
+ */
+function replaceTemplateVars(string $text, array $vars): string
+{
+    foreach ($vars as $key => $value) {
+        $text = str_replace('{{' . $key . '}}', htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'), $text);
+    }
+    return $text;
+}
+
+/**
+ * Replace {{variable}} placeholders — no HTML escaping (for pre-escaped template content).
+ */
+function replaceTemplateVarsRaw(string $text, array $vars): string
+{
+    foreach ($vars as $key => $value) {
+        $text = str_replace('{{' . $key . '}}', (string) $value, $text);
+    }
+    return $text;
+}
+
+/**
+ * Build a single language section (HTML) for an email.
+ */
+function buildLanguageSection(
+    string $flag,
+    string $label,
+    string $greeting,
+    string $body,
+    string $buttonText,
+    string $buttonUrl,
+    string $footer,
+    string $headingTag = 'h1',
+    string $borderColors = ''
+): string {
+    $borderBar = $borderColors ?: 'linear-gradient(90deg,#d1d5db,#d1d5db)';
+
+    return <<<HTML
+  <tr>
+    <td style="padding:0;">
+      <div style="height:3px;background:{$borderBar};"></div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:32px 36px 8px;">
+            <p style="color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:2px;margin:0 0 12px;font-weight:700;">{$flag} {$label}</p>
+            <{$headingTag} style="color:#15803d;font-size:24px;margin:0 0 8px;font-weight:800;">{$greeting}</{$headingTag}>
+            <p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 20px;">
+              {$body}
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 36px 24px;">
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="background:linear-gradient(135deg,#15803d,#166534);border-radius:12px;box-shadow:0 4px 14px rgba(21,128,61,0.35);">
+                  <a href="{$buttonUrl}" target="_blank" style="display:inline-block;padding:16px 40px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:0.5px;">
+                    🔐 {$buttonText}
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 36px 28px;">
+            <p style="color:#6b7280;font-size:13px;line-height:1.6;margin:0;">
+              {$footer}
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+HTML;
+}
+
+/**
+ * Wrap language sections in the branded email shell (header + footer).
+ */
+function wrapBrandedEmail(string $bodySections, string $baseUrl, string $buttonUrl, bool $showPasswordReqs = false): string
+{
+    $reqSection = '';
+    if ($showPasswordReqs) {
+        $reqSection = <<<HTML
+  <!-- PASSWORD REQUIREMENTS -->
+  <tr>
+    <td style="padding:0 36px 28px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
+        <tr>
+          <td style="padding:20px 24px;">
+            <p style="color:#374151;font-size:13px;font-weight:700;margin:0 0 10px;">📋 Requisitos / Requirements:</p>
+            <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:13px;color:#6b7280;">
+              <tr><td style="padding:3px 0;">✓ Mínimo 8 caracteres / Min 8 characters</td></tr>
+              <tr><td style="padding:3px 0;">✓ Una letra mayúscula / One uppercase letter</td></tr>
+              <tr><td style="padding:3px 0;">✓ Una letra minúscula / One lowercase letter</td></tr>
+              <tr><td style="padding:3px 0;">✓ Un número / One number</td></tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- FALLBACK URL -->
+  <tr>
+    <td style="padding:0 36px 28px;">
+      <p style="color:#9ca3af;font-size:12px;line-height:1.5;margin:0;">
+        Si los botones no funcionan, copia y pega este enlace en tu navegador:<br>
+        If the buttons don't work, copy and paste this link in your browser:<br>
+        <a href="{$buttonUrl}" style="color:#15803d;word-break:break-all;font-size:11px;">{$buttonUrl}</a>
+      </p>
+    </td>
+  </tr>
+HTML;
+    }
+
+    return <<<HTML
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oregon Tires Auto Care</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0fdf4;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0fdf4;">
+<tr><td align="center" style="padding:30px 15px;">
+
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+  <!-- HEADER -->
+  <tr>
+    <td style="background:linear-gradient(135deg,#15803d 0%,#166534 50%,#1a1a2e 100%);padding:0;">
+      <div style="height:4px;background:linear-gradient(90deg,#d4a843,#f5d78e,#d4a843);"></div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:32px 30px 24px;">
+            <img src="{$baseUrl}/assets/logo.png" alt="Oregon Tires Auto Care" width="140" style="display:block;max-width:140px;height:auto;margin-bottom:16px;">
+            <p style="color:#86efac;font-size:13px;margin:0;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Panel de Administración</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+{$bodySections}
+
+{$reqSection}
+
+  <!-- FOOTER -->
+  <tr>
+    <td style="background-color:#1a1a2e;padding:0;">
+      <div style="height:3px;background:linear-gradient(90deg,#d4a843,#f5d78e,#d4a843);"></div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:24px 30px;">
+            <p style="color:#d4a843;font-size:14px;font-weight:700;margin:0 0 6px;">Oregon Tires Auto Care</p>
+            <p style="color:#9ca3af;font-size:12px;margin:0 0 4px;">8536 SE 82nd Ave, Portland, OR 97266</p>
+            <p style="color:#9ca3af;font-size:12px;margin:0 0 4px;">📞 (503) 367-9714</p>
+            <p style="color:#9ca3af;font-size:12px;margin:0;">Lunes–Sábado 7:00 AM – 7:00 PM</p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 30px 20px;">
+            <p style="color:#6b7280;font-size:10px;margin:0;">
+              Este correo fue enviado desde una dirección que no acepta respuestas.<br>
+              This email was sent from a no-reply address.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+
+</body>
+</html>
+HTML;
+}
+
+/**
+ * Build bilingual plain-text email from template fields.
+ */
+function buildBilingualPlainText(array $tpl, array $vars, string $language, string $buttonUrl): string
+{
+    $esGreeting = replaceTemplateVarsRaw(strip_tags($tpl['greeting_es'] ?? ''), $vars);
+    $esBody     = replaceTemplateVarsRaw(strip_tags($tpl['body_es'] ?? ''), $vars);
+    $esButton   = replaceTemplateVarsRaw(strip_tags($tpl['button_es'] ?? ''), $vars);
+    $esFooter   = replaceTemplateVarsRaw(strip_tags($tpl['footer_es'] ?? ''), $vars);
+
+    $enGreeting = replaceTemplateVarsRaw(strip_tags($tpl['greeting_en'] ?? ''), $vars);
+    $enBody     = replaceTemplateVarsRaw(strip_tags($tpl['body_en'] ?? ''), $vars);
+    $enButton   = replaceTemplateVarsRaw(strip_tags($tpl['button_en'] ?? ''), $vars);
+    $enFooter   = replaceTemplateVarsRaw(strip_tags($tpl['footer_en'] ?? ''), $vars);
+
+    $spanish = "🇲🇽 ESPAÑOL\n\n{$esGreeting}\n\n{$esBody}\n\n🔐 {$buttonUrl}\n\n{$esFooter}";
+    $english = "🇺🇸 ENGLISH\n\n{$enGreeting}\n\n{$enBody}\n\n🔐 {$buttonUrl}\n\n{$enFooter}";
+
+    $divider = "\n\n═══════════════════════════════════════\n\n";
+
+    $body = "═══════════════════════════════════════\n";
+    $body .= "OREGON TIRES AUTO CARE — Panel de Administración\n";
+    $body .= "═══════════════════════════════════════\n\n";
+
+    // Primary language first
+    if ($language === 'en') {
+        $body .= $english . $divider . $spanish;
+    } else {
+        $body .= $spanish . $divider . $english;
+    }
+
+    $body .= "\n\n═══════════════════════════════════════\n\n";
+    $body .= "Oregon Tires Auto Care\n";
+    $body .= "8536 SE 82nd Ave, Portland, OR 97266\n";
+    $body .= "📞 (503) 367-9714\n";
+    $body .= "Lunes–Sábado 7:00 AM – 7:00 PM";
+
+    return $body;
+}
+
+/**
+ * Send a branded bilingual template email.
+ *
+ * @param string $to           Recipient email
+ * @param string $templateKey  Template prefix: 'welcome', 'reset', 'contact'
+ * @param array  $vars         Variables: name, setup_url, role, expiry_days, email, message, etc.
+ * @param string $language     User language preference: 'en', 'es', or 'both' (default)
+ * @param string $buttonUrl    The main action URL (setup link, reset link, admin panel link)
+ * @param bool   $showPasswordReqs  Show password requirements box (for welcome/reset)
+ * @return array ['success' => bool, 'error' => string|null]
+ */
+function sendBrandedTemplateEmail(
+    string $to,
+    string $templateKey,
+    array $vars,
+    string $language = 'both',
+    string $buttonUrl = '',
+    bool $showPasswordReqs = false
+): array {
+    $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $tpl = loadEmailTemplate($templateKey);
+
+    if (empty($tpl)) {
+        error_log("Oregon Tires: No email template found for key '{$templateKey}', using hardcoded fallback");
+        return ['success' => false, 'error' => "Email template '{$templateKey}' not found in database."];
+    }
+
+    // Replace variables in all template fields
+    $esGreeting = replaceTemplateVarsRaw($tpl['greeting_es'] ?? '', $vars);
+    $esBody     = replaceTemplateVarsRaw($tpl['body_es'] ?? '', $vars);
+    $esButton   = replaceTemplateVarsRaw($tpl['button_es'] ?? '', $vars);
+    $esFooter   = replaceTemplateVarsRaw($tpl['footer_es'] ?? '', $vars);
+
+    $enGreeting = replaceTemplateVarsRaw($tpl['greeting_en'] ?? '', $vars);
+    $enBody     = replaceTemplateVarsRaw($tpl['body_en'] ?? '', $vars);
+    $enButton   = replaceTemplateVarsRaw($tpl['button_en'] ?? '', $vars);
+    $enFooter   = replaceTemplateVarsRaw($tpl['footer_en'] ?? '', $vars);
+
+    // Build language sections — primary language first
+    $mexicanBar = 'linear-gradient(90deg,#c60b1e 0%,#c60b1e 33%,#ffc400 33%,#ffc400 66%,#c60b1e 66%,#c60b1e 100%)';
+    $usBar = 'linear-gradient(90deg,#002868 0%,#002868 33%,#bf0a30 33%,#bf0a30 66%,#002868 66%,#002868 100%)';
+
+    $esSection = buildLanguageSection('🇲🇽', 'Español', $esGreeting, $esBody, $esButton, $buttonUrl, $esFooter, 'h1', $mexicanBar);
+    $enSection = buildLanguageSection('🇺🇸', 'English', $enGreeting, $enBody, $enButton, $buttonUrl, $enFooter, 'h2', $usBar);
+
+    // Divider between sections
+    $divider = <<<HTML
+  <tr>
+    <td style="padding:0 36px;">
+      <div style="height:1px;background:linear-gradient(90deg,transparent,#d1d5db,transparent);"></div>
+    </td>
+  </tr>
+HTML;
+
+    // Order: primary language first
+    if ($language === 'en') {
+        $bodySections = $enSection . $divider . $esSection;
+    } else {
+        // 'es' or 'both' — Spanish first
+        $bodySections = $esSection . $divider . $enSection;
+    }
+
+    $htmlBody = wrapBrandedEmail($bodySections, $baseUrl, $buttonUrl, $showPasswordReqs);
+    $textBody = buildBilingualPlainText($tpl, $vars, $language, $buttonUrl);
+
+    // Build subject — primary language first
+    $subjectEs = replaceTemplateVarsRaw($tpl['subject_es'] ?? '', $vars);
+    $subjectEn = replaceTemplateVarsRaw($tpl['subject_en'] ?? '', $vars);
+
+    if ($language === 'en') {
+        $subject = "🔐 {$subjectEn} | {$subjectEs}";
+    } else {
+        $subject = "🔐 {$subjectEs} | {$subjectEn}";
+    }
+
+    return sendMail($to, $subject, $htmlBody, $textBody);
+}
+
+/**
+ * Send a branded bilingual setup email to an admin.
+ * Now uses DB-driven templates with language-ordered sections.
+ *
+ * @param string $email    Recipient email
+ * @param string $name     Admin display name
+ * @param string $setupUrl Full setup URL with token
+ * @param string $language 'en', 'es', or 'both' (default)
+ * @param string $role     Admin role label for template
+ * @return array ['success' => bool, 'error' => string|null]
+ */
+function sendBrandedSetupEmail(string $email, string $name, string $setupUrl, string $language = 'both', string $role = 'Admin'): array
+{
+    $vars = [
+        'name'        => $name,
+        'setup_url'   => $setupUrl,
+        'role'        => $role,
+        'expiry_days' => '7',
+        'email'       => $email,
+    ];
+
+    $result = sendBrandedTemplateEmail($email, 'welcome', $vars, $language, $setupUrl, true);
+
+    if ($result['success']) {
+        logEmail('admin_setup', "Setup email sent to {$email} (lang: {$language})", $email);
+    }
+
+    return $result;
+}
+
+/**
+ * Send a branded password reset email.
+ */
+function sendBrandedResetEmail(string $email, string $name, string $resetUrl, string $language = 'both'): array
+{
+    $vars = [
+        'name'      => $name,
+        'setup_url' => $resetUrl,
+        'email'     => $email,
+    ];
+
+    $result = sendBrandedTemplateEmail($email, 'reset', $vars, $language, $resetUrl, true);
+
+    if ($result['success']) {
+        logEmail('password_reset', "Password reset email sent to {$email}", $email);
+    }
+
+    return $result;
+}
+
+/**
+ * Send a contact notification email to the owner.
+ */
+function sendContactNotificationEmail(string $contactName, string $contactEmail, string $message): array
+{
+    $contactAddr = $_ENV['CONTACT_EMAIL'] ?? $_ENV['SMTP_FROM'] ?? '';
+    if (empty($contactAddr)) {
+        return ['success' => false, 'error' => 'No contact email configured.'];
+    }
+
+    $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $adminUrl = $baseUrl . '/admin/';
+
+    $vars = [
+        'name'    => $contactName,
+        'email'   => $contactEmail,
+        'message' => $message,
+    ];
+
+    $result = sendBrandedTemplateEmail($contactAddr, 'contact', $vars, 'both', $adminUrl, false);
+
+    if ($result['success']) {
+        logEmail('contact_notification', "Contact notification for message from {$contactEmail}", null);
+    }
+
+    return $result;
+}
