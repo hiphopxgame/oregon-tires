@@ -398,7 +398,7 @@ const t = {
     services: 'Services',
     about: 'About',
     testimonials: 'Reviews',
-    gallery: 'Gallery',
+    gallery: 'Promotions',
     contact: 'Contact',
     scheduleService: 'Schedule Service',
     bookAppointment: 'Book an Appointment',
@@ -454,14 +454,18 @@ const t = {
     confirmVehicle: 'Vehicle',
     confirmName: 'Name',
     confirmPhone: 'Phone',
-    confirmEmail: 'Email'
+    confirmEmail: 'Email',
+    vehicleMakePlaceholder: 'e.g. Toyota',
+    vehicleModelPlaceholder: 'e.g. Camry',
+    phonePlaceholder: '(503) 123-4567',
+    emailPlaceholder: 'your@email.com'
   },
   es: {
     home: 'Inicio',
     services: 'Servicios',
     about: 'Acerca de',
     testimonials: 'Reseñas',
-    gallery: 'Galería',
+    gallery: 'Promociones',
     contact: 'Contacto',
     scheduleService: 'Programar Servicio',
     bookAppointment: 'Programar una Cita',
@@ -517,7 +521,11 @@ const t = {
     confirmVehicle: 'Vehículo',
     confirmName: 'Nombre',
     confirmPhone: 'Teléfono',
-    confirmEmail: 'Correo'
+    confirmEmail: 'Correo',
+    vehicleMakePlaceholder: 'ej. Toyota',
+    vehicleModelPlaceholder: 'ej. Camry',
+    phonePlaceholder: '(503) 123-4567',
+    emailPlaceholder: 'tu@correo.com'
   }
 };
 
@@ -624,6 +632,14 @@ function formatTimeDisplay(timeStr) {
   return displayHour + ':00 ' + suffix;
 }
 
+// ===== FORMAT DATE FOR DISPLAY =====
+function formatDateDisplay(dateStr) {
+  var parts = dateStr.split('-');
+  var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  var locale = currentLang === 'es' ? 'es-MX' : 'en-US';
+  return d.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+
 // ===== SHOW CONFIRMATION =====
 function showConfirmation(data) {
   var form = document.getElementById('booking-form');
@@ -638,7 +654,7 @@ function showConfirmation(data) {
 
   var fields = [
     { label: t[currentLang].confirmService, value: serviceLabels[currentLang][data.service] || data.service },
-    { label: t[currentLang].confirmDate, value: data.preferred_date },
+    { label: t[currentLang].confirmDate, value: formatDateDisplay(data.preferred_date) },
     { label: t[currentLang].confirmTime, value: formatTimeDisplay(data.preferred_time) },
     { label: t[currentLang].confirmName, value: data.first_name + ' ' + data.last_name },
     { label: t[currentLang].confirmPhone, value: data.phone },
@@ -750,8 +766,8 @@ document.getElementById('booking-form').addEventListener('submit', async functio
       });
     }
   } catch (err) {
-    showStatus(err.message || t[currentLang].bookingError, 'red');
     console.error('Booking error:', err);
+    showStatus(t[currentLang].bookingError, 'red');
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = t[currentLang].bookNow;
@@ -772,9 +788,13 @@ function toggleLanguage() {
   });
   // Update placeholders
   var phoneInput = document.querySelector('input[name="phone"]');
-  if (phoneInput) phoneInput.placeholder = currentLang === 'en' ? '(503) 123-4567' : '(503) 123-4567';
+  if (phoneInput) phoneInput.placeholder = t[currentLang].phonePlaceholder;
   var emailInput = document.querySelector('input[name="email"]');
-  if (emailInput) emailInput.placeholder = currentLang === 'en' ? 'your@email.com' : 'tu@correo.com';
+  if (emailInput) emailInput.placeholder = t[currentLang].emailPlaceholder;
+  var makeInput = document.querySelector('input[name="vehicleMake"]');
+  if (makeInput) makeInput.placeholder = t[currentLang].vehicleMakePlaceholder;
+  var modelInput = document.querySelector('input[name="vehicleModel"]');
+  if (modelInput) modelInput.placeholder = t[currentLang].vehicleModelPlaceholder;
 }
 
 // Apply saved language preference on page load
@@ -786,6 +806,15 @@ if (currentLang !== 'en') {
     var key = el.getAttribute('data-t');
     if (t[currentLang][key]) el.textContent = t[currentLang][key];
   });
+  // Update form placeholders for Spanish
+  var phoneInput = document.querySelector('input[name="phone"]');
+  if (phoneInput) phoneInput.placeholder = t[currentLang].phonePlaceholder;
+  var emailInput = document.querySelector('input[name="email"]');
+  if (emailInput) emailInput.placeholder = t[currentLang].emailPlaceholder;
+  var makeInput = document.querySelector('input[name="vehicleMake"]');
+  if (makeInput) makeInput.placeholder = t[currentLang].vehicleMakePlaceholder;
+  var modelInput = document.querySelector('input[name="vehicleModel"]');
+  if (modelInput) modelInput.placeholder = t[currentLang].vehicleModelPlaceholder;
 }
 
 // ===== MOBILE MENU =====
