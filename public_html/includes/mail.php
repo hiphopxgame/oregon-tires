@@ -480,7 +480,8 @@ function sendBookingConfirmationEmail(
     string $date,
     string $time,
     string $vehicleInfo,
-    string $language = 'both'
+    string $language = 'both',
+    string $referenceNumber = ''
 ): array {
     $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
 
@@ -488,13 +489,19 @@ function sendBookingConfirmationEmail(
     $vehicleLine = $vehicleInfo ? "<br><strong>Vehicle:</strong> {$vehicleInfo}" : '';
     $vehicleLineEs = $vehicleInfo ? "<br><strong>Vehículo:</strong> {$vehicleInfo}" : '';
 
+    // Build reference line (only if reference number provided)
+    $refLine = $referenceNumber ? "<br><strong>Reference:</strong> {$referenceNumber}" : '';
+    $refLineEs = $referenceNumber ? "<br><strong>Referencia:</strong> {$referenceNumber}" : '';
+
     $vars = [
-        'name'         => $name,
-        'service'      => $service,
-        'date'         => $date,
-        'time'         => $time,
-        'vehicle_line' => $vehicleLine,
-        'email'        => $email,
+        'name'             => $name,
+        'service'          => $service,
+        'date'             => $date,
+        'time'             => $time,
+        'vehicle_line'     => $vehicleLine,
+        'reference_line'   => $refLine,
+        'reference_number' => $referenceNumber,
+        'email'            => $email,
     ];
 
     // Load and build using the branded template system
@@ -502,8 +509,9 @@ function sendBookingConfirmationEmail(
 
     if (empty($tpl)) {
         // Fallback: send a simple confirmation
-        $subject = "Appointment Requested — Oregon Tires Auto Care";
-        $htmlBody = "<p>Thank you, {$name}! Your appointment for {$service} on {$date} at {$time} has been received. We will call you to confirm.</p>";
+        $refText = $referenceNumber ? " (Ref: {$referenceNumber})" : '';
+        $subject = "Appointment Requested{$refText} — Oregon Tires Auto Care";
+        $htmlBody = "<p>Thank you, {$name}! Your appointment for {$service} on {$date} at {$time} has been received.{$refText} We will call you to confirm.</p>";
         $result = sendMail($email, $subject, $htmlBody);
         if ($result['success']) {
             logEmail('booking_confirmation', "Booking confirmation sent to {$email} (fallback)");
@@ -511,9 +519,10 @@ function sendBookingConfirmationEmail(
         return $result;
     }
 
-    // For customer emails, replace vehicle_line with localized version in ES fields
+    // For customer emails, replace vehicle_line and reference_line with localized versions in ES fields
     $varsEs = $vars;
     $varsEs['vehicle_line'] = $vehicleLineEs;
+    $varsEs['reference_line'] = $refLineEs;
 
     // Build language sections manually for the vehicle line localization
     $esGreeting = replaceTemplateVarsRaw($tpl['greeting_es'] ?? '', $varsEs);
@@ -557,6 +566,110 @@ function sendBookingConfirmationEmail(
     }
 
     return $result;
+}
+
+/**
+ * Send a branded appointment reminder email to the customer.
+ *
+ * Uses DB-driven templates (email_tpl_reminder_*) with the branded bilingual layout.
+ * The button links to Google Maps for the shop location.
+ *
+ * @param array $appointment  Row from oretir_appointments (must include: id, first_name,
+ *                            last_name, email, service, preferred_date, preferred_time,
+ *                            language, and optionally vehicle_year/make/model)
+ * @return bool  True if the email was sent successfully
+ */
+function sendAppointmentReminderEmail(array $appointment): bool
+{
+    $baseUrl  = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $mapsUrl  = 'https://www.google.com/maps/place/8536+SE+82nd+Ave,+Portland,+OR+97266';
+
+    $customerName = trim($appointment['first_name'] . ' ' . $appointment['last_name']);
+    $customerLang = ($appointment['language'] === 'spanish') ? 'es' : 'en';
+    $serviceDisplay = ucwords(str_replace('-', ' ', $appointment['service']));
+
+    // Format date for display (locale-aware)
+    $dateObj = new DateTime($appointment['preferred_date']);
+    $displayDate = ($customerLang === 'es')
+        ? $dateObj->format('d/m/Y')
+        : $dateObj->format('m/d/Y');
+
+    // Format time for display
+    $timeParts = explode(':', $appointment['preferred_time']);
+    $hour = (int) $timeParts[0];
+    $suffix = $hour >= 12 ? 'PM' : 'AM';
+    $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
+    $displayTime = $displayHour . ':00 ' . $suffix;
+
+    // Reference number = appointment ID zero-padded
+    $referenceNumber = str_pad((string) $appointment['id'], 5, '0', STR_PAD_LEFT);
+
+    $vars = [
+        'name'             => $customerName,
+        'service'          => $serviceDisplay,
+        'date'             => $displayDate,
+        'time'             => $displayTime,
+        'reference_number' => $referenceNumber,
+        'email'            => $appointment['email'],
+    ];
+
+    // Load DB-driven reminder template
+    $tpl = loadEmailTemplate('reminder');
+
+    if (empty($tpl)) {
+        error_log("Oregon Tires: No reminder email template found, cannot send reminder for appointment #{$appointment['id']}");
+        return false;
+    }
+
+    // Build language sections with variable replacement
+    $esGreeting = replaceTemplateVarsRaw($tpl['greeting_es'] ?? '', $vars);
+    $esBody     = replaceTemplateVarsRaw($tpl['body_es'] ?? '', $vars);
+    $esButton   = replaceTemplateVarsRaw($tpl['button_es'] ?? '', $vars);
+    $esFooter   = replaceTemplateVarsRaw($tpl['footer_es'] ?? '', $vars);
+
+    $enGreeting = replaceTemplateVarsRaw($tpl['greeting_en'] ?? '', $vars);
+    $enBody     = replaceTemplateVarsRaw($tpl['body_en'] ?? '', $vars);
+    $enButton   = replaceTemplateVarsRaw($tpl['button_en'] ?? '', $vars);
+    $enFooter   = replaceTemplateVarsRaw($tpl['footer_en'] ?? '', $vars);
+
+    $mexicanBar = 'linear-gradient(90deg,#c60b1e 0%,#c60b1e 33%,#ffc400 33%,#ffc400 66%,#c60b1e 66%,#c60b1e 100%)';
+    $usBar      = 'linear-gradient(90deg,#002868 0%,#002868 33%,#bf0a30 33%,#bf0a30 66%,#002868 66%,#002868 100%)';
+
+    $esSection = buildLanguageSection('🇲🇽', 'Español', $esGreeting, $esBody, $esButton, $mapsUrl, $esFooter, 'h1', $mexicanBar);
+    $enSection = buildLanguageSection('🇺🇸', 'English', $enGreeting, $enBody, $enButton, $mapsUrl, $enFooter, 'h2', $usBar);
+
+    $divider = '<tr><td style="padding:0 36px;"><div style="height:1px;background:linear-gradient(90deg,transparent,#d1d5db,transparent);"></div></td></tr>';
+
+    if ($customerLang === 'en') {
+        $bodySections = $enSection . $divider . $esSection;
+    } else {
+        $bodySections = $esSection . $divider . $enSection;
+    }
+
+    $htmlBody = wrapBrandedEmail($bodySections, $baseUrl, $mapsUrl, false);
+
+    // Build subject — primary language first
+    $subjectEs = replaceTemplateVarsRaw($tpl['subject_es'] ?? '', $vars);
+    $subjectEn = replaceTemplateVarsRaw($tpl['subject_en'] ?? '', $vars);
+
+    if ($customerLang === 'en') {
+        $subject = "⏰ {$subjectEn} | {$subjectEs}";
+    } else {
+        $subject = "⏰ {$subjectEs} | {$subjectEn}";
+    }
+
+    // Build plain text version
+    $textBody = buildBilingualPlainText($tpl, $vars, $customerLang, $mapsUrl);
+
+    $result = sendMail($appointment['email'], $subject, $htmlBody, $textBody);
+
+    if ($result['success']) {
+        logEmail('appointment_reminder', "Reminder sent to {$appointment['email']} for appointment #{$appointment['id']} (ref: {$referenceNumber})");
+    } else {
+        logEmail('appointment_reminder_failed', "Reminder FAILED for {$appointment['email']} appointment #{$appointment['id']}: " . ($result['error'] ?? 'unknown'));
+    }
+
+    return $result['success'];
 }
 
 /**

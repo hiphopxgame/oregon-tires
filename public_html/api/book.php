@@ -104,29 +104,57 @@ try {
         jsonError('This time slot is fully booked. Please choose a different time.', 409);
     }
 
+    // ─── Generate unique reference number ────────────────────────────────
+    $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Omit 0/O, 1/I to avoid confusion
+    $maxAttempts = 10;
+    $referenceNumber = '';
+
+    for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+        $code = '';
+        $bytes = random_bytes(8);
+        for ($i = 0; $i < 8; $i++) {
+            $code .= $chars[ord($bytes[$i]) % strlen($chars)];
+        }
+        $candidate = 'OT-' . $code;
+
+        // Check uniqueness
+        $checkStmt = $db->prepare('SELECT COUNT(*) FROM oretir_appointments WHERE reference_number = ?');
+        $checkStmt->execute([$candidate]);
+        if ((int) $checkStmt->fetchColumn() === 0) {
+            $referenceNumber = $candidate;
+            break;
+        }
+    }
+
+    if ($referenceNumber === '') {
+        error_log('Oregon Tires book.php: Failed to generate unique reference number after ' . $maxAttempts . ' attempts');
+        jsonError('Server error', 500);
+    }
+
     // ─── Insert into database ───────────────────────────────────────────────
     $stmt = $db->prepare(
         'INSERT INTO oretir_appointments
-            (service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model,
+            (reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model,
              first_name, last_name, phone, email, notes, status, language, created_at, updated_at)
          VALUES
-            (:service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model,
+            (:reference_number, :service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model,
              :first_name, :last_name, :phone, :email, :notes, :status, :language, NOW(), NOW())'
     );
     $stmt->execute([
-        ':service'        => $service,
-        ':preferred_date' => $preferredDate,
-        ':preferred_time' => $preferredTime,
-        ':vehicle_year'   => $vehicleYear ?: null,
-        ':vehicle_make'   => $vehicleMake ?: null,
-        ':vehicle_model'  => $vehicleModel ?: null,
-        ':first_name'     => $firstName,
-        ':last_name'      => $lastName,
-        ':phone'          => $phone,
-        ':email'          => $email,
-        ':notes'          => $notes ?: null,
-        ':status'         => 'new',
-        ':language'       => $language,
+        ':reference_number' => $referenceNumber,
+        ':service'          => $service,
+        ':preferred_date'   => $preferredDate,
+        ':preferred_time'   => $preferredTime,
+        ':vehicle_year'     => $vehicleYear ?: null,
+        ':vehicle_make'     => $vehicleMake ?: null,
+        ':vehicle_model'    => $vehicleModel ?: null,
+        ':first_name'       => $firstName,
+        ':last_name'        => $lastName,
+        ':phone'            => $phone,
+        ':email'            => $email,
+        ':notes'            => $notes ?: null,
+        ':status'           => 'new',
+        ':language'         => $language,
     ]);
 
     $appointmentId = (int) $db->lastInsertId();
@@ -149,10 +177,14 @@ try {
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: #1a1a2e; color: #ffffff; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
             <h2 style="margin: 0;">New Appointment Booking</h2>
-            <p style="margin: 8px 0 0; opacity: 0.9; font-size: 14px;">#{$appointmentId} &mdash; {$h($serviceDisplay)}</p>
+            <p style="margin: 8px 0 0; opacity: 0.9; font-size: 14px;">#{$appointmentId} &mdash; {$h($referenceNumber)} &mdash; {$h($serviceDisplay)}</p>
         </div>
         <div style="background: #ffffff; padding: 24px; border: 1px solid #e0e0e0;">
             <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background: #f0f9f0;">
+                    <td style="padding: 8px 12px; font-weight: bold; color: #555; width: 140px;">Reference:</td>
+                    <td style="padding: 8px 12px; font-weight: bold; color: #15803d; font-size: 16px;">{$h($referenceNumber)}</td>
+                </tr>
                 <tr>
                     <td style="padding: 8px 12px; font-weight: bold; color: #555; width: 140px;">Service:</td>
                     <td style="padding: 8px 12px;">{$h($serviceDisplay)}</td>
@@ -208,7 +240,7 @@ try {
     $htmlBody .= <<<HTML
         </div>
         <div style="background: #f0f0f0; padding: 12px; text-align: center; font-size: 12px; color: #888; border-radius: 0 0 8px 8px;">
-            Oregon Tires Auto Care &mdash; Appointment #{$appointmentId}
+            Oregon Tires Auto Care &mdash; {$h($referenceNumber)} &mdash; Appointment #{$appointmentId}
         </div>
     </div>
     HTML;
@@ -246,14 +278,18 @@ try {
             $displayDate,
             $displayTime,
             $vehicleInfo,
-            $customerLang
+            $customerLang,
+            $referenceNumber
         );
     } catch (\Throwable $e) {
         // Don't fail the booking if confirmation email fails
         error_log("Booking confirmation email failed for #{$appointmentId}: " . $e->getMessage());
     }
 
-    jsonSuccess(['appointment_id' => $appointmentId]);
+    jsonSuccess([
+        'appointment_id'   => $appointmentId,
+        'reference_number' => $referenceNumber,
+    ]);
 
 } catch (\Throwable $e) {
     error_log("Oregon Tires book.php error: " . $e->getMessage());

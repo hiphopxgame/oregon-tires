@@ -1,20 +1,21 @@
 // Bump version on each deploy to bust stale caches
-const CACHE_VERSION = '3';
+const CACHE_VERSION = '4';
 const CACHE_NAME = 'oregon-tires-v' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
   '/',
   '/manifest.json',
+  '/assets/logo.webp',
   '/assets/logo.png',
-  '/assets/hero-bg.png',
+  '/assets/hero-bg.webp',
   '/assets/favicon.png',
-  '/images/fast-cars.jpg',
-  '/images/tire-services.jpg',
-  '/images/quality-parts.jpg',
-  '/images/expert-technicians.jpg',
-  '/images/specialized-services.jpg',
-  '/images/auto-maintenance.jpg',
-  '/images/bilingual-service.jpg',
+  '/images/fast-cars.webp',
+  '/images/tire-services.webp',
+  '/images/quality-parts.webp',
+  '/images/expert-technicians.webp',
+  '/images/specialized-services.webp',
+  '/images/auto-maintenance.webp',
+  '/images/bilingual-service.webp',
 ];
 
 // ─── Install — Pre-cache critical assets ────────────────────────────────────

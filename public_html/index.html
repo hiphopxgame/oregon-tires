@@ -125,7 +125,40 @@
     "priceRange": "$$",
     "currenciesAccepted": "USD",
     "paymentAccepted": "Cash, Credit Card",
-    "knowsLanguage": ["en", "es"]
+    "knowsLanguage": ["en", "es"],
+    "sameAs": [
+      "https://www.facebook.com/61571913202998/",
+      "https://www.instagram.com/oregontires",
+      "https://www.google.com/maps/place/?q=place_id:ChIJLSxZDQyflVQRWXEi9LpJGxs"
+    ],
+    "areaServed": {
+      "@type": "City",
+      "name": "Portland",
+      "containedInPlace": { "@type": "State", "name": "Oregon" }
+    },
+    "review": [
+      {
+        "@type": "Review",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+        "author": { "@type": "Person", "name": "Maria Rodriguez" },
+        "reviewBody": "Excellent service! They installed my new tires quickly and the price was very fair. The staff speaks Spanish which made communication easy.",
+        "datePublished": "2026-01-20"
+      },
+      {
+        "@type": "Review",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+        "author": { "@type": "Person", "name": "James Thompson" },
+        "reviewBody": "Been coming here for years. They always do quality work and are honest about what needs to be done.",
+        "datePublished": "2026-01-05"
+      },
+      {
+        "@type": "Review",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+        "author": { "@type": "Person", "name": "Sarah Chen" },
+        "reviewBody": "Fast and professional service. Had a flat tire emergency and they got me back on the road in 30 minutes.",
+        "datePublished": "2026-01-28"
+      }
+    ]
   }
   </script>
 
@@ -243,7 +276,7 @@
   <header class="bg-white shadow-md sticky top-0 z-50 dark:bg-gray-800">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
       <a href="#home">
-        <img src="assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" loading="eager" fetchpriority="high">
+        <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" width="781" height="275" loading="eager" fetchpriority="high"></picture>
       </a>
       <nav class="hidden md:flex items-center gap-6">
         <a href="#home" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="home">Home</a>
@@ -270,7 +303,9 @@
 
   <!-- Hero -->
   <main id="main-content">
-  <section id="home" class="bg-brand text-white py-20 scroll-mt-24 relative bg-cover bg-center" style="background-color: #0D3618; background-image: url('assets/hero-bg.png');">
+  <section id="home" class="bg-brand text-white py-20 scroll-mt-24 relative bg-cover bg-center" style="background-color: #0D3618; background-image: url('assets/hero-bg.webp');">
+    <!-- Fallback for browsers without WebP -->
+    <script>if(!document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp')===0)document.getElementById('home').style.backgroundImage="url('assets/hero-bg.png')";</script>
     <div class="absolute inset-0 bg-black/50"></div>
     <div class="container mx-auto px-4 text-center relative z-10">
       <h1 class="text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg" data-t="heroTitle">Your Trusted Auto Care Experts in Portland</h1>
@@ -293,49 +328,49 @@
       <!-- Feature cards with dynamic images -->
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="service-feature-cards">
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-expert-technicians" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/expert-technicians.jpg');"></div>
+          <div id="svc-img-expert-technicians" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/expert-technicians.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="expertService">Expert Technicians</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="expertServiceDesc">Our certified mechanics have years of experience with all vehicle makes and models.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-fast-cars" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/fast-cars.jpg');"></div>
+          <div id="svc-img-fast-cars" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/fast-cars.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="quickService">Fast Service</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="quickServiceDesc">Most services completed while you wait. We value your time and get you back on the road quickly.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-quality-car-parts" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/quality-parts.jpg');"></div>
+          <div id="svc-img-quality-car-parts" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/quality-parts.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="qualityParts">Quality Parts</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="qualityPartsDesc">We use only premium parts and materials to ensure lasting repairs and optimal performance.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-bilingual-support" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/bilingual-service.jpg');"></div>
+          <div id="svc-img-bilingual-support" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/bilingual-service.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="bilingualService">Bilingual Support</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="bilingualServiceDesc">Fluent in both English and Spanish to serve our diverse Portland community.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-tire-shop" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/tire-services.jpg');"></div>
+          <div id="svc-img-tire-shop" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/tire-services.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="tireServices">Tire Services</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="tireServicesDesc">New and used tires, mount and balance, repair — everything your tires need.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-auto-repair" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/auto-maintenance.jpg');"></div>
+          <div id="svc-img-auto-repair" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/auto-maintenance.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="autoMaintenance">Auto Maintenance</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="autoMaintenanceDesc">Oil changes, brake services, tuneups and more to keep your vehicle running smoothly.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div id="svc-img-specialized-tools" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/specialized-services.jpg');"></div>
+          <div id="svc-img-specialized-tools" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/specialized-services.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="specializedServices">Specialized Services</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="specializedServicesDesc">Alignment, mechanical inspection, mobile service, and roadside assistance.</p>
@@ -484,7 +519,10 @@
             <span class="star text-2xl">★★★★★</span>
           </div>
           <div class="text-gray-600 dark:text-gray-300 mb-4" data-t="basedOnReviews" data-setting="review_count">Based on 150+ Google Reviews</div>
-          <a href="https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" class="inline-block border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-6 py-2 rounded-lg font-medium hover:bg-brand/5 dark:hover:bg-green-400/10 transition" data-t="viewAllReviews" id="google-review-link">View All Reviews on Google</a>
+          <div class="flex flex-wrap justify-center gap-3">
+            <a href="https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" class="inline-block border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-6 py-2 rounded-lg font-medium hover:bg-brand/5 dark:hover:bg-green-400/10 transition" data-t="viewAllReviews" id="google-review-link">View All Reviews on Google</a>
+            <a href="https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" class="inline-block bg-yellow-400 text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition" data-t="leaveReview">Leave Us a Review</a>
+          </div>
         </div>
       </div>
     </div>
@@ -518,38 +556,69 @@
       </div>
 
       <div class="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
-        <!-- Contact Info -->
+        <!-- Contact Info + Quick Actions -->
         <div>
           <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-6" data-t="contactInfo">Contact Information</h3>
-          <div class="space-y-5">
-            <div class="flex items-center gap-4">
-              <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-full"><span class="text-xl">📞</span></div>
+
+          <!-- Quick action cards -->
+          <div class="grid grid-cols-2 gap-3 mb-6">
+            <a href="tel:5033679714" class="flex flex-col items-center gap-2 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-xl p-4 hover:border-green-400 transition group">
+              <span class="text-3xl group-hover:scale-110 transition-transform">📞</span>
+              <span class="text-sm font-semibold text-brand dark:text-green-400" data-t="callNow">Call Now</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">(503) 367-9714</span>
+            </a>
+            <a href="/book-appointment" class="flex flex-col items-center gap-2 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl p-4 hover:border-yellow-400 transition group">
+              <span class="text-3xl group-hover:scale-110 transition-transform">📅</span>
+              <span class="text-sm font-semibold text-brand dark:text-green-400" data-t="bookOnline">Book Online</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400" data-t="quickEasy">Quick & easy</span>
+            </a>
+            <a href="mailto:oregontirespdx@gmail.com" class="flex flex-col items-center gap-2 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4 hover:border-blue-400 transition group">
+              <span class="text-3xl group-hover:scale-110 transition-transform">✉️</span>
+              <span class="text-sm font-semibold text-brand dark:text-green-400" data-t="emailUs">Email Us</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400 truncate">oregontirespdx</span>
+            </a>
+            <a href="https://www.google.com/maps/place/?q=place_id:ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" class="flex flex-col items-center gap-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 hover:border-red-400 transition group">
+              <span class="text-3xl group-hover:scale-110 transition-transform">📍</span>
+              <span class="text-sm font-semibold text-brand dark:text-green-400" data-t="getDirections">Directions</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">SE 82nd Ave</span>
+            </a>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
+              <span class="text-xl">📞</span>
               <div>
-                <h4 class="font-semibold" data-t="phone">Phone</h4>
-                <p class="text-gray-600 dark:text-gray-300" data-setting="phone"><a href="tel:5033679714">(503) 367-9714</a></p>
+                <h4 class="font-semibold text-sm" data-t="phone">Phone</h4>
+                <p class="text-gray-600 dark:text-gray-300" data-setting="phone"><a href="tel:5033679714" class="text-brand dark:text-green-400 font-medium">(503) 367-9714</a></p>
               </div>
             </div>
-            <div class="flex items-center gap-4">
-              <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-full"><span class="text-xl">📍</span></div>
+            <div class="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
+              <span class="text-xl">📍</span>
               <div>
-                <h4 class="font-semibold" data-t="address">Address</h4>
-                <p class="text-gray-600 dark:text-gray-300" data-t="physicalAddress" data-setting="address">8536 SE 82nd Ave, Portland, OR 97266</p>
+                <h4 class="font-semibold text-sm" data-t="address">Address</h4>
+                <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="physicalAddress" data-setting="address">8536 SE 82nd Ave, Portland, OR 97266</p>
               </div>
             </div>
-            <div class="flex items-center gap-4">
-              <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-full"><span class="text-xl">🕐</span></div>
+            <div class="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
+              <span class="text-xl">🕐</span>
               <div>
-                <h4 class="font-semibold" data-t="businessHours">Business Hours</h4>
-                <p class="text-gray-600 dark:text-gray-300" data-t="monSat" data-setting="hours_weekday">Mon-Sat 7AM-7PM</p>
-                <p class="text-gray-600 dark:text-gray-300" data-t="sunday" data-setting="hours_sunday">Sunday: Closed</p>
+                <h4 class="font-semibold text-sm" data-t="businessHours">Business Hours</h4>
+                <p class="text-gray-600 dark:text-gray-300 text-sm"><span data-t="monSat" data-setting="hours_weekday">Mon-Sat 7AM-7PM</span> · <span data-t="sunday" data-setting="hours_sunday">Sunday: Closed</span></p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Contact Form -->
-        <div class="bg-gray-50 rounded-xl p-6 dark:bg-gray-800">
-          <h3 class="text-xl font-bold text-brand dark:text-green-400 mb-4" data-t="contact">Contact</h3>
+        <!-- Message Form — Chat-style -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+          <div class="bg-brand text-white px-6 py-4 flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-lg">💬</div>
+            <div>
+              <h3 class="font-bold text-base" data-t="sendUsMessage">Send Us a Message</h3>
+              <p class="text-green-200 text-xs" data-t="weReplyFast">We typically reply within a few hours</p>
+            </div>
+          </div>
+          <div class="p-5">
           <form id="contact-form" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
@@ -573,9 +642,13 @@
               <label for="contact-message" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" data-t="message">Message</label>
               <textarea id="contact-message" name="message" rows="4" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"></textarea>
             </div>
-            <button type="submit" id="contact-submit" class="w-full bg-brand-light text-white py-3 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed" data-t="sendMessage">Send Message</button>
+            <button type="submit" id="contact-submit" class="w-full bg-brand-light text-white py-3 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" data-t="sendMessage"><span>Send Message</span> <span>→</span></button>
           </form>
           <div id="form-status" class="mt-3 text-center hidden"></div>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-3 text-center text-xs text-gray-500 dark:text-gray-400">
+            <span data-t="bilingualNote">We respond in English and Spanish</span> · <span data-t="privacyNote">Your info stays private</span>
+          </div>
         </div>
       </div>
 
@@ -597,8 +670,20 @@
 
   </main>
 
+  <!-- Sticky Mobile CTA Bar -->
+  <div id="mobile-cta" class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-brand shadow-[0_-4px_12px_rgba(0,0,0,0.15)] border-t border-green-700 safe-area-bottom">
+    <div class="flex">
+      <a href="tel:5033679714" class="flex-1 flex items-center justify-center gap-2 py-3.5 text-white font-semibold text-sm border-r border-green-700 active:bg-green-900 transition">
+        <span>📞</span> <span data-t="callNow">Call Now</span>
+      </a>
+      <a href="/book-appointment" class="flex-1 flex items-center justify-center gap-2 py-3.5 bg-yellow-400 text-black font-semibold text-sm active:bg-yellow-500 transition">
+        <span>📅</span> <span data-t="bookNow">Book Now</span>
+      </a>
+    </div>
+  </div>
+
   <!-- Footer -->
-  <footer class="bg-brand text-white py-12">
+  <footer class="bg-brand text-white py-12 pb-24 md:pb-12">
     <div class="container mx-auto px-4">
       <div class="grid md:grid-cols-3 gap-8">
         <div>
@@ -774,7 +859,14 @@ const t = {
     phonePlaceholder: '(503) 123-4567', emailPlaceholder: 'your@email.com',
     startingPrices: 'Starting Prices',
     pricingDisclaimer: 'Prices vary by vehicle. Call for an exact quote.',
-    callForQuote: 'Call for Quote'
+    callForQuote: 'Call for Quote',
+    callNow: 'Call Now', bookNow: 'Book Now', bookOnline: 'Book Online', quickEasy: 'Quick & easy',
+    emailUs: 'Email Us', getDirections: 'Directions',
+    sendUsMessage: 'Send Us a Message', weReplyFast: 'We typically reply within a few hours',
+    bilingualNote: 'We respond in English and Spanish', privacyNote: 'Your info stays private',
+    invalidEmail: 'Please enter a valid email address.',
+    invalidPhone: 'Please enter a valid phone number.',
+    leaveReview: 'Leave Us a Review'
   },
   es: {
     home: 'Inicio', services: 'Servicios', about: 'Acerca de', testimonials: 'Reseñas', contact: 'Contacto',
@@ -837,7 +929,14 @@ const t = {
     phonePlaceholder: '(503) 123-4567', emailPlaceholder: 'tu@correo.com',
     startingPrices: 'Precios Iniciales',
     pricingDisclaimer: 'Los precios varían según el vehículo. Llame para una cotización exacta.',
-    callForQuote: 'Llame para Cotizar'
+    callForQuote: 'Llame para Cotizar',
+    callNow: 'Llamar', bookNow: 'Reservar', bookOnline: 'Reservar en Línea', quickEasy: 'Rápido y fácil',
+    emailUs: 'Enviar Correo', getDirections: 'Direcciones',
+    sendUsMessage: 'Envíanos un Mensaje', weReplyFast: 'Respondemos en pocas horas',
+    bilingualNote: 'Respondemos en inglés y español', privacyNote: 'Tu información es privada',
+    invalidEmail: 'Ingresa un correo electrónico válido.',
+    invalidPhone: 'Ingresa un número de teléfono válido.',
+    leaveReview: 'Déjanos una Reseña'
   }
 };
 
@@ -933,13 +1032,13 @@ renderReviews();
 // ===== DYNAMIC IMAGES FROM SUPABASE =====
 const fallbackImages = {
   'hero-background': 'assets/hero-bg.png',
-  'expert-technicians': 'images/expert-technicians.jpg',
-  'fast-cars': 'images/fast-cars.jpg',
-  'quality-car-parts': 'images/quality-parts.jpg',
-  'bilingual-support': 'images/bilingual-service.jpg',
-  'tire-shop': 'images/tire-services.jpg',
-  'auto-repair': 'images/auto-maintenance.jpg',
-  'specialized-tools': 'images/specialized-services.jpg',
+  'expert-technicians': 'images/expert-technicians.webp',
+  'fast-cars': 'images/fast-cars.webp',
+  'quality-car-parts': 'images/quality-parts.webp',
+  'bilingual-support': 'images/bilingual-service.webp',
+  'tire-shop': 'images/tire-services.webp',
+  'auto-repair': 'images/auto-maintenance.webp',
+  'specialized-tools': 'images/specialized-services.webp',
 };
 
 function tryLoadImage(url) {
@@ -1284,6 +1383,69 @@ if ('PerformanceObserver' in window) {
     }).observe({ type: 'layout-shift', buffered: true });
   } catch(e) {}
 }
+
+// ===== REAL-TIME FORM VALIDATION =====
+(function() {
+  function showFieldError(input, msg) {
+    var err = input.parentElement.querySelector('.field-error');
+    if (!err) {
+      err = document.createElement('p');
+      err.className = 'field-error text-red-500 dark:text-red-400 text-xs mt-1';
+      input.parentElement.appendChild(err);
+    }
+    err.textContent = msg;
+    input.classList.add('border-red-400');
+    input.classList.remove('border-gray-300');
+  }
+  function clearFieldError(input) {
+    var err = input.parentElement.querySelector('.field-error');
+    if (err) err.remove();
+    input.classList.remove('border-red-400');
+    input.classList.add('border-gray-300');
+  }
+  var emailInput = document.getElementById('contact-email');
+  if (emailInput) emailInput.addEventListener('blur', function() {
+    var val = this.value.trim();
+    if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+      showFieldError(this, t[currentLang].invalidEmail);
+    } else { clearFieldError(this); }
+  });
+  var phoneInput = document.getElementById('contact-phone');
+  if (phoneInput) phoneInput.addEventListener('blur', function() {
+    var val = this.value.replace(/\D/g, '');
+    if (this.value.trim() && (val.length < 7 || val.length > 15)) {
+      showFieldError(this, t[currentLang].invalidPhone);
+    } else { clearFieldError(this); }
+  });
+  var nameFields = [document.getElementById('contact-first-name'), document.getElementById('contact-last-name')];
+  nameFields.forEach(function(f) {
+    if (f) f.addEventListener('blur', function() {
+      if (this.value.trim().length > 100) showFieldError(this, t[currentLang].nameTooLong);
+      else clearFieldError(this);
+    });
+  });
+  var msgField = document.getElementById('contact-message');
+  if (msgField) msgField.addEventListener('blur', function() {
+    var val = this.value.trim();
+    if (val && val.length < 10) showFieldError(this, t[currentLang].messageTooShort);
+    else if (val.length > 2000) showFieldError(this, t[currentLang].messageTooLong);
+    else clearFieldError(this);
+  });
+})();
+
+// ===== HIDE MOBILE CTA ON CONTACT SECTION =====
+(function() {
+  var cta = document.getElementById('mobile-cta');
+  var contact = document.getElementById('contact');
+  if (!cta || !contact) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      cta.style.transform = e.isIntersecting ? 'translateY(100%)' : 'translateY(0)';
+      cta.style.transition = 'transform 0.3s ease';
+    });
+  }, { threshold: 0.1 });
+  obs.observe(contact);
+})();
 </script>
 </body>
 </html>
