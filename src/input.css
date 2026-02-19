@@ -2,8 +2,36 @@
 
 @source "../public_html/**/*.html";
 
+/* Use class-based dark mode so JS toggle works */
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-brand: #0D3618;
   --color-accent: #FFFE03;
   --color-brand-light: #007030;
+  --color-brand-mid: #15803d;
+}
+
+/* Brand CSS custom properties for use in inline styles */
+:root {
+  --ot-green-dark: #0D3618;
+  --ot-green-mid: #15803d;
+  --ot-green-light: #007030;
+  --ot-yellow: #FFFE03;
+  --ot-white: #ffffff;
+  --ot-card-bg: #ffffff;
+  --ot-card-border: #e5e7eb;
+  --ot-text-primary: #1f2937;
+  --ot-text-secondary: #6b7280;
+  --ot-input-bg: #ffffff;
+  --ot-input-border: #d1d5db;
+}
+
+.dark {
+  --ot-card-bg: #1f2937;
+  --ot-card-border: #4b5563;
+  --ot-text-primary: #e5e7eb;
+  --ot-text-secondary: #9ca3af;
+  --ot-input-bg: #374151;
+  --ot-input-border: #4b5563;
 }

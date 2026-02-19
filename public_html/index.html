@@ -212,6 +212,8 @@
       });
     });
   </script>
+  <!-- Dark mode init (prevent FOUC) -->
+  <script>(function(){var s=localStorage.getItem('theme'),d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(s==='dark'||(!s&&d))document.documentElement.classList.add('dark');})();</script>
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
@@ -272,7 +274,7 @@
       <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90" data-t="heroSubtitle">Professional tire installation, repair, and complete automotive services. We speak Spanish and English!</p>
       <div class="flex justify-center gap-4 flex-wrap">
         <a href="#contact" class="bg-yellow-400 text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition" data-t="contact">Contact Us</a>
-        <a href="/book-appointment" class="bg-white text-brand px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition" data-t="scheduleService">Schedule Service</a>
+        <a href="/book-appointment" class="bg-white text-brand px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 dark:bg-gray-200 dark:hover:bg-gray-300 transition" data-t="scheduleService">Schedule Service</a>
       </div>
     </div>
   </section>
@@ -528,7 +530,7 @@
               <label for="contact-message" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" data-t="message">Message</label>
               <textarea id="contact-message" name="message" rows="4" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"></textarea>
             </div>
-            <button type="submit" id="contact-submit" class="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed" data-t="sendMessage">Send Message</button>
+            <button type="submit" id="contact-submit" class="w-full bg-brand-light text-white py-3 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed" data-t="sendMessage">Send Message</button>
           </form>
           <div id="form-status" class="mt-3 text-center hidden"></div>
         </div>
@@ -538,7 +540,7 @@
       <div class="mt-12 text-center">
         <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-4" data-t="visitLocation">Visit Our Location</h3>
         <p class="text-gray-600 dark:text-gray-300 mb-4" data-t="physicalAddress">8536 SE 82nd Ave, Portland, OR 97266</p>
-        <div class="bg-gray-200 h-96 rounded-xl overflow-hidden">
+        <div class="bg-gray-200 dark:bg-gray-700 h-96 rounded-xl overflow-hidden">
           <div id="map-placeholder" class="bg-gray-100 dark:bg-gray-800 rounded-xl h-full flex items-center justify-center text-gray-500 dark:text-gray-400 cursor-pointer" data-t="clickToLoadMap">Click to load map</div>
           <iframe
             id="map-frame"
@@ -588,7 +590,7 @@
       </div>
       <div class="border-t border-green-700 mt-8 pt-8 text-center text-gray-300">
         <p>&copy; <span data-t="copyright">2026 Oregon Tires Auto Care. All rights reserved.</span></p>
-        <p class="mt-3 text-xs text-gray-500"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-yellow-200 hover:text-yellow-100 transition-colors">1vsM.com</a></p>
+        <p class="mt-3 text-xs text-gray-300"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-yellow-200 hover:text-yellow-100 transition-colors">1vsM.com</a></p>
       </div>
     </div>
   </footer>
@@ -962,7 +964,7 @@ async function loadGalleryForSite() {
       var card = document.createElement('div');
       card.className = 'rounded-xl overflow-hidden shadow-md hover:shadow-lg transition group';
       var imgWrap = document.createElement('div');
-      imgWrap.className = 'relative h-56 bg-gray-200';
+      imgWrap.className = 'relative h-56 bg-gray-200 dark:bg-gray-700';
       var imgEl = document.createElement('img');
       imgEl.src = img.image_url || '';
       imgEl.alt = img.title || t[currentLang].galleryImage;
@@ -1041,7 +1043,7 @@ document.getElementById('contact-form').addEventListener('submit', async functio
   if (firstName.length > 100 || lastName.length > 100) {
     const statusEl = document.getElementById('form-status');
     statusEl.textContent = t[currentLang].nameTooLong;
-    statusEl.className = 'mt-3 text-center text-red-600 font-semibold';
+    statusEl.className = 'mt-3 text-center text-red-600 dark:text-red-400 font-semibold';
     statusEl.classList.remove('hidden');
     submitBtn.disabled = false;
     submitBtn.textContent = t[currentLang].sendMessage;
@@ -1050,7 +1052,7 @@ document.getElementById('contact-form').addEventListener('submit', async functio
   if (message.length < 10) {
     const statusEl = document.getElementById('form-status');
     statusEl.textContent = t[currentLang].messageTooShort;
-    statusEl.className = 'mt-3 text-center text-red-600 font-semibold';
+    statusEl.className = 'mt-3 text-center text-red-600 dark:text-red-400 font-semibold';
     statusEl.classList.remove('hidden');
     submitBtn.disabled = false;
     submitBtn.textContent = t[currentLang].sendMessage;
@@ -1059,7 +1061,7 @@ document.getElementById('contact-form').addEventListener('submit', async functio
   if (message.length > 2000) {
     const statusEl = document.getElementById('form-status');
     statusEl.textContent = t[currentLang].messageTooLong;
-    statusEl.className = 'mt-3 text-center text-red-600 font-semibold';
+    statusEl.className = 'mt-3 text-center text-red-600 dark:text-red-400 font-semibold';
     statusEl.classList.remove('hidden');
     submitBtn.disabled = false;
     submitBtn.textContent = t[currentLang].sendMessage;
@@ -1078,13 +1080,13 @@ document.getElementById('contact-form').addEventListener('submit', async functio
     if (!res.ok || !json.success) throw new Error(json.error || 'Failed');
     lastContactSubmitTime = Date.now();
     statusEl.textContent = t[currentLang].messageSent;
-    statusEl.className = 'mt-3 text-center text-green-600 font-semibold';
+    statusEl.className = 'mt-3 text-center text-green-600 dark:text-green-400 font-semibold';
     statusEl.classList.remove('hidden');
     form.reset();
     if (typeof gtag === 'function') gtag('event', 'form_submit', { event_category: 'contact', event_label: 'contact_form' });
   } catch (err) {
     statusEl.textContent = t[currentLang].messageError;
-    statusEl.className = 'mt-3 text-center text-red-600 font-semibold';
+    statusEl.className = 'mt-3 text-center text-red-600 dark:text-red-400 font-semibold';
     statusEl.classList.remove('hidden');
   } finally {
     submitBtn.disabled = false;

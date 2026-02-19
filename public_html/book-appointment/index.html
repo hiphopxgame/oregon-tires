@@ -39,6 +39,9 @@
       background-color: rgba(13, 54, 24, 0.05);
       box-shadow: 0 0 0 2px #15803d;
     }
+    .dark .service-card input:checked + label {
+      background-color: rgba(74, 222, 128, 0.1);
+    }
   </style>
 
   <!-- Google Analytics 4 -->
@@ -49,6 +52,8 @@
     gtag('js', new Date());
     gtag('config', 'G-CHYMTNB6LH');
   </script>
+  <!-- Dark mode init (prevent FOUC) -->
+  <script>(function(){var s=localStorage.getItem('theme'),d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(s==='dark'||(!s&&d))document.documentElement.classList.add('dark');})();</script>
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
@@ -372,7 +377,7 @@
       </div>
       <div class="border-t border-green-700 mt-8 pt-8 text-center text-gray-300">
         <p>&copy; <span data-t="copyright">2026 Oregon Tires Auto Care. All rights reserved.</span></p>
-        <p class="mt-3 text-xs text-gray-500"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-yellow-200 hover:text-yellow-100 transition-colors">1vsM.com</a></p>
+        <p class="mt-3 text-xs text-gray-300"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-yellow-200 hover:text-yellow-100 transition-colors">1vsM.com</a></p>
       </div>
     </div>
   </footer>
@@ -609,9 +614,10 @@ function setupTimeSlots() {
 function showStatus(message, color) {
   var statusEl = document.getElementById('booking-status');
   statusEl.textContent = message;
-  var colorClass = 'text-green-600';
-  if (color === 'red') colorClass = 'text-red-600';
-  if (color === 'orange') colorClass = 'text-orange-600';
+  var isDark = document.documentElement.classList.contains('dark');
+  var colorClass = isDark ? 'text-green-400' : 'text-green-600';
+  if (color === 'red') colorClass = isDark ? 'text-red-400' : 'text-red-600';
+  if (color === 'orange') colorClass = isDark ? 'text-orange-400' : 'text-orange-600';
   statusEl.className = 'mt-6 text-center font-semibold ' + colorClass;
 }
 
