@@ -1,0 +1,12 @@
+{
+  "name": "oregontires/website",
+  "description": "Oregon Tires Auto Care — PHP backend",
+  "require": {
+    "php": ">=8.0",
+    "phpmailer/phpmailer": "^6.9",
+    "vlucas/phpdotenv": "^5.6"
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}

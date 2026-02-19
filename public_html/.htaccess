@@ -49,7 +49,7 @@ Options -Indexes
 </IfModule>
 
 # --- Block access to sensitive files ---
-<FilesMatch "(\.sql|\.env|\.git|package\.json|\.bak|\.tmp)$">
+<FilesMatch "(\.sql|\.env|\.git|package\.json|composer\.(json|lock)|\.bak|\.tmp)$">
     Require all denied
 </FilesMatch>
 

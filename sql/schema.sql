@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS oretir_contact_messages (
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(30) NOT NULL,
   message TEXT NOT NULL,
-  status ENUM('new', 'read', 'replied') NOT NULL DEFAULT 'new',
+  status ENUM('new', 'priority', 'completed') NOT NULL DEFAULT 'new',
   language ENUM('english', 'spanish') NOT NULL DEFAULT 'english',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_status (status)

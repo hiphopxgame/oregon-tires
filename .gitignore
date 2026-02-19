@@ -5,3 +5,7 @@ test-results/
 *.bak
 *.tmp
 .DS_Store
+public_html/vendor/
+public_html/uploads/
+gallery/
+composer
