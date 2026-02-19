@@ -98,7 +98,7 @@
 
   <!-- Dark mode init (prevent FOUC) -->
   <script>
-    (function(){var s=localStorage.getItem('theme'),d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(s==='dark'||(!s&&d))document.documentElement.classList.add('dark');})();
+    (function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();
   </script>
 
   <!-- Google Analytics 4 -->
@@ -5514,8 +5514,7 @@ function toggleAdminDarkMode() {
 
 (function() {
   const saved = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  if (saved === 'dark' || (!saved && prefersDark)) {
+  if (saved === 'dark') {
     document.documentElement.classList.add('dark');
     const btn = document.getElementById('admin-dark-toggle');
     if (btn) btn.textContent = '\u2600\uFE0F';
