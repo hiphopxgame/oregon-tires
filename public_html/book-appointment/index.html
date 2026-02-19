@@ -45,13 +45,30 @@
     }
   </style>
 
-  <!-- Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CHYMTNB6LH"></script>
+  <!-- Google Analytics 4 — Hybrid loader (configurable via admin panel) -->
   <script>
+  (function(){
+    var DEFAULT_GA = 'G-CHYMTNB6LH';
+    var cached = null;
+    try { cached = localStorage.getItem('oregontires_ga_id'); } catch(e){}
+    var id = cached || DEFAULT_GA;
+    var s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+    document.head.appendChild(s);
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
     gtag('js', new Date());
-    gtag('config', 'G-CHYMTNB6LH');
+    gtag('config', id);
+    window.__gaId = id;
+    window.__updateGaId = function(newId) {
+      if (!newId || newId === window.__gaId) return;
+      if (!/^G-[A-Z0-9]{6,12}$/.test(newId)) return;
+      window.__gaId = newId;
+      try { localStorage.setItem('oregontires_ga_id', newId); } catch(e){}
+      gtag('config', newId, { send_page_view: false });
+    };
+  })();
   </script>
   <!-- Dark mode init (prevent FOUC) -->
   <script>(function(){var s=localStorage.getItem('theme');if(s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');})();</script>
@@ -1022,6 +1039,17 @@ setupTimeSlots();
     else clearErr(this);
   });
 })();
+
+// ===== UPDATE GA ID FROM SETTINGS =====
+fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json){
+  var data = json.data || [];
+  for (var i = 0; i < data.length; i++) {
+    if (data[i].setting_key === 'google_analytics_id' && data[i].value_en) {
+      if (typeof window.__updateGaId === 'function') window.__updateGaId(data[i].value_en);
+      break;
+    }
+  }
+}).catch(function(){});
 </script>
 </body>
 </html>

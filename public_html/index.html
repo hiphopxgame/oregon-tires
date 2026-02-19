@@ -224,13 +224,30 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 
-  <!-- Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CHYMTNB6LH"></script>
+  <!-- Google Analytics 4 — Hybrid loader (configurable via admin panel) -->
   <script>
+  (function(){
+    var DEFAULT_GA = 'G-CHYMTNB6LH';
+    var cached = null;
+    try { cached = localStorage.getItem('oregontires_ga_id'); } catch(e){}
+    var id = cached || DEFAULT_GA;
+    var s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+    document.head.appendChild(s);
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
     gtag('js', new Date());
-    gtag('config', 'G-CHYMTNB6LH');
+    gtag('config', id);
+    window.__gaId = id;
+    window.__updateGaId = function(newId) {
+      if (!newId || newId === window.__gaId) return;
+      if (!/^G-[A-Z0-9]{6,12}$/.test(newId)) return;
+      window.__gaId = newId;
+      try { localStorage.setItem('oregontires_ga_id', newId); } catch(e){}
+      gtag('config', newId, { send_page_view: false });
+    };
+  })();
   </script>
 
   <!-- Basic error tracking via GA4 -->
@@ -782,6 +799,9 @@ function applySiteSettings() {
       }
     }
   });
+  // Update GA tracking ID from settings
+  var ga = settings.google_analytics_id;
+  if (ga && typeof window.__updateGaId === 'function') window.__updateGaId(ga.en || ga.es);
 }
 
 // ===== HTML ESCAPE HELPER =====

@@ -31,7 +31,7 @@ try {
     $validKeys = [
         'phone', 'email', 'address',
         'hours_weekday', 'hours_sunday',
-        'rating_value', 'review_count',
+        'rating_value', 'review_count', 'google_analytics_id',
         // Email templates — welcome
         'email_tpl_welcome_subject', 'email_tpl_welcome_greeting',
         'email_tpl_welcome_body', 'email_tpl_welcome_button', 'email_tpl_welcome_footer',
@@ -75,6 +75,15 @@ try {
         } else {
             $valueEn = sanitize((string) ($setting['value_en'] ?? ''), $maxLen);
             $valueEs = sanitize((string) ($setting['value_es'] ?? ''), $maxLen);
+        }
+
+        // Validate GA ID format if provided
+        if ($key === 'google_analytics_id') {
+            foreach ([$valueEn, $valueEs] as $v) {
+                if ($v !== '' && !preg_match('/^G-[A-Z0-9]{6,12}$/', $v)) {
+                    jsonError('Invalid Google Analytics ID format. Expected: G-XXXXXXXXXX', 400);
+                }
+            }
         }
 
         $stmt->execute([$key, $valueEn, $valueEs]);

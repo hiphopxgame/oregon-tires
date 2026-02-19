@@ -140,7 +140,8 @@ INSERT INTO oretir_site_settings (setting_key, value_en, value_es) VALUES
   ('hours_weekday', 'Mon-Sat 7AM-7PM', 'Lun-Sab 7AM-7PM'),
   ('hours_sunday', 'Sunday: Closed', 'Domingo: Cerrado'),
   ('rating_value', '4.8', '4.8'),
-  ('review_count', '150+', '150+')
+  ('review_count', '150+', '150+'),
+  ('google_analytics_id', 'G-CHYMTNB6LH', 'G-CHYMTNB6LH')
 ON DUPLICATE KEY UPDATE setting_key = setting_key;
 
 -- ─── Seed: Email Templates (bilingual, editable from admin panel) ──────────

@@ -101,13 +101,30 @@
     (function(){var s=localStorage.getItem('theme');if(s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');})();
   </script>
 
-  <!-- Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CHYMTNB6LH"></script>
+  <!-- Google Analytics 4 — Hybrid loader (configurable via admin panel) -->
   <script>
+  (function(){
+    var DEFAULT_GA = 'G-CHYMTNB6LH';
+    var cached = null;
+    try { cached = localStorage.getItem('oregontires_ga_id'); } catch(e){}
+    var id = cached || DEFAULT_GA;
+    var s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+    document.head.appendChild(s);
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
     gtag('js', new Date());
-    gtag('config', 'G-CHYMTNB6LH');
+    gtag('config', id);
+    window.__gaId = id;
+    window.__updateGaId = function(newId) {
+      if (!newId || newId === window.__gaId) return;
+      if (!/^G-[A-Z0-9]{6,12}$/.test(newId)) return;
+      window.__gaId = newId;
+      try { localStorage.setItem('oregontires_ga_id', newId); } catch(e){}
+      gtag('config', newId, { send_page_view: false });
+    };
+  })();
   </script>
 
   <!-- Basic error tracking via GA4 -->
@@ -4915,6 +4932,19 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
           </div>
         </div>
 
+        <!-- Integrations -->
+        <div class="mt-8 border-t pt-6">
+          <h4 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4">Integrations</h4>
+          <div class="grid md:grid-cols-3 gap-4 items-start">
+            <label class="font-medium text-sm pt-2 dark:text-gray-300">Google Analytics ID</label>
+            <div class="md:col-span-2">
+              <input id="setting-google_analytics_id-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 font-mono" placeholder="G-CHYMTNB6LH" pattern="^G-[A-Z0-9]{6,12}$" oninput="document.getElementById('setting-google_analytics_id-es').value=this.value">
+              <input type="hidden" id="setting-google_analytics_id-es">
+              <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">GA4 Measurement ID (e.g. G-CHYMTNB6LH). Same value for both languages.</p>
+            </div>
+          </div>
+        </div>
+
         <div class="mt-6 flex justify-end">
           <button id="save-site-settings" onclick="saveSiteSettings()" class="bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition" data-t="saveSiteSettings">Save Site Settings</button>
         </div>
@@ -6786,7 +6816,7 @@ async function revokeAdminByEmail(email) {
 }
 
 // ===== SITE SETTINGS (Editable Content) =====
-const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count'];
+const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count', 'google_analytics_id'];
 const SITE_SETTINGS_DEFAULTS = {
   phone: { en: '(503) 367-9714', es: '(503) 367-9714' },
   email: { en: 'oregontirespdx@gmail.com', es: 'oregontirespdx@gmail.com' },
@@ -6794,7 +6824,8 @@ const SITE_SETTINGS_DEFAULTS = {
   hours_weekday: { en: 'Mon-Sat 7AM-7PM', es: 'Lun-S\u00E1b 7AM-7PM' },
   hours_sunday: { en: 'Sunday: Closed', es: 'Domingo: Cerrado' },
   rating_value: { en: '4.8', es: '4.8' },
-  review_count: { en: '150+', es: '150+' }
+  review_count: { en: '150+', es: '150+' },
+  google_analytics_id: { en: 'G-CHYMTNB6LH', es: 'G-CHYMTNB6LH' }
 };
 
 async function loadSiteSettings() {
@@ -6824,6 +6855,9 @@ async function loadSiteSettings() {
     if (updEl && latestUpdate) {
       updEl.textContent = (adminT[currentLang].lastUpdated || 'Last updated') + ': ' + new Date(latestUpdate).toLocaleString();
     }
+    // Update GA tracking ID from loaded settings
+    const gaInput = document.getElementById('setting-google_analytics_id-en');
+    if (gaInput && gaInput.value && typeof window.__updateGaId === 'function') window.__updateGaId(gaInput.value);
   } catch (err) {
     console.error('loadSiteSettings error:', err);
     showToast(adminT[currentLang].settingsLoadError || 'Could not load site settings', true);
@@ -6835,6 +6869,12 @@ async function saveSiteSettings() {
   btn.disabled = true;
   btn.textContent = adminT[currentLang].loading || 'Loading...';
   try {
+    // Validate GA ID format before saving
+    const gaVal = document.getElementById('setting-google_analytics_id-en').value.trim();
+    if (gaVal && !/^G-[A-Z0-9]{6,12}$/.test(gaVal)) {
+      showToast('Invalid Google Analytics ID format. Expected: G-XXXXXXXXXX', true);
+      return;
+    }
     const settings = SITE_SETTINGS_KEYS.map(key => ({
       setting_key: key,
       value_en: document.getElementById('setting-' + key + '-en').value.trim(),
