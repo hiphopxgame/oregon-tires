@@ -24,8 +24,8 @@ if (!file_exists($vendorAutoload)) {
 require_once $vendorAutoload;
 
 // ─── Environment ────────────────────────────────────────────────────────────
-// Prefer .env above public_html (safer), fall back to public_html root
-$envDir = file_exists(__DIR__ . '/../../.env') ? __DIR__ . '/../..' : __DIR__ . '/..';
+// Load .env from the project root (one level up from includes/)
+$envDir = __DIR__ . '/..';
 $dotenv = Dotenv\Dotenv::createImmutable($envDir);
 $dotenv->load();
 $dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'])->notEmpty();
