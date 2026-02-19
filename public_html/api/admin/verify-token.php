@@ -13,6 +13,9 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 try {
     requireMethod('GET');
 
+    // Rate limit: 10 token verifications per IP per hour
+    checkRateLimit('verify_token', 10, 3600);
+
     $token = sanitize((string) ($_GET['token'] ?? ''), 64);
 
     if (!preg_match('/^[a-f0-9]{64}$/', $token)) {

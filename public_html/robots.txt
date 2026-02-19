@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /book-appointment/
+Disallow: /api/
+Disallow: /cli/
+Disallow: /includes/
 
 Sitemap: https://oregon.tires/sitemap.xml

@@ -467,6 +467,95 @@ function sendBrandedResetEmail(string $email, string $name, string $resetUrl, st
 }
 
 /**
+ * Send a branded booking confirmation email to the customer.
+ */
+function sendBookingConfirmationEmail(
+    string $email,
+    string $name,
+    string $service,
+    string $date,
+    string $time,
+    string $vehicleInfo,
+    string $language = 'both'
+): array {
+    $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+
+    // Build vehicle line (only if vehicle info provided)
+    $vehicleLine = $vehicleInfo ? "<br><strong>Vehicle:</strong> {$vehicleInfo}" : '';
+    $vehicleLineEs = $vehicleInfo ? "<br><strong>Vehículo:</strong> {$vehicleInfo}" : '';
+
+    $vars = [
+        'name'         => $name,
+        'service'      => $service,
+        'date'         => $date,
+        'time'         => $time,
+        'vehicle_line' => $vehicleLine,
+        'email'        => $email,
+    ];
+
+    // Load and build using the branded template system
+    $tpl = loadEmailTemplate('booking');
+
+    if (empty($tpl)) {
+        // Fallback: send a simple confirmation
+        $subject = "Appointment Requested — Oregon Tires Auto Care";
+        $htmlBody = "<p>Thank you, {$name}! Your appointment for {$service} on {$date} at {$time} has been received. We will call you to confirm.</p>";
+        $result = sendMail($email, $subject, $htmlBody);
+        if ($result['success']) {
+            logEmail('booking_confirmation', "Booking confirmation sent to {$email} (fallback)");
+        }
+        return $result;
+    }
+
+    // For customer emails, replace vehicle_line with localized version in ES fields
+    $varsEs = $vars;
+    $varsEs['vehicle_line'] = $vehicleLineEs;
+
+    // Build language sections manually for the vehicle line localization
+    $esGreeting = replaceTemplateVarsRaw($tpl['greeting_es'] ?? '', $varsEs);
+    $esBody     = replaceTemplateVarsRaw($tpl['body_es'] ?? '', $varsEs);
+    $esButton   = replaceTemplateVarsRaw($tpl['button_es'] ?? '', $varsEs);
+    $esFooter   = replaceTemplateVarsRaw($tpl['footer_es'] ?? '', $varsEs);
+
+    $enGreeting = replaceTemplateVarsRaw($tpl['greeting_en'] ?? '', $vars);
+    $enBody     = replaceTemplateVarsRaw($tpl['body_en'] ?? '', $vars);
+    $enButton   = replaceTemplateVarsRaw($tpl['button_en'] ?? '', $vars);
+    $enFooter   = replaceTemplateVarsRaw($tpl['footer_en'] ?? '', $vars);
+
+    $mexicanBar = 'linear-gradient(90deg,#c60b1e 0%,#c60b1e 33%,#ffc400 33%,#ffc400 66%,#c60b1e 66%,#c60b1e 100%)';
+    $usBar = 'linear-gradient(90deg,#002868 0%,#002868 33%,#bf0a30 33%,#bf0a30 66%,#002868 66%,#002868 100%)';
+
+    $esSection = buildLanguageSection('🇲🇽', 'Español', $esGreeting, $esBody, $esButton, $baseUrl, $esFooter, 'h1', $mexicanBar);
+    $enSection = buildLanguageSection('🇺🇸', 'English', $enGreeting, $enBody, $enButton, $baseUrl, $enFooter, 'h2', $usBar);
+
+    $divider = '<tr><td style="padding:0 36px;"><div style="height:1px;background:linear-gradient(90deg,transparent,#d1d5db,transparent);"></div></td></tr>';
+
+    if ($language === 'en') {
+        $bodySections = $enSection . $divider . $esSection;
+    } else {
+        $bodySections = $esSection . $divider . $enSection;
+    }
+
+    $htmlBody = wrapBrandedEmail($bodySections, $baseUrl, $baseUrl, false);
+
+    // Build subject
+    $subjectEs = replaceTemplateVarsRaw($tpl['subject_es'] ?? '', $vars);
+    $subjectEn = replaceTemplateVarsRaw($tpl['subject_en'] ?? '', $vars);
+    $subject = ($language === 'en') ? "✅ {$subjectEn} | {$subjectEs}" : "✅ {$subjectEs} | {$subjectEn}";
+
+    // Build plain text
+    $textBody = buildBilingualPlainText($tpl, $vars, $language, $baseUrl);
+
+    $result = sendMail($email, $subject, $htmlBody, $textBody);
+
+    if ($result['success']) {
+        logEmail('booking_confirmation', "Booking confirmation sent to {$email}");
+    }
+
+    return $result;
+}
+
+/**
  * Send a contact notification email to the owner.
  */
 function sendContactNotificationEmail(string $contactName, string $contactEmail, string $message): array

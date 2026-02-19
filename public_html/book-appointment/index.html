@@ -6,27 +6,25 @@
   <title>Book an Appointment - Oregon Tires Auto Care</title>
   <meta name="description" content="Schedule your tire installation, repair, oil change, brake service, or other automotive service at Oregon Tires Auto Care in Portland, OR. Bilingual service in English and Spanish.">
   <link rel="icon" href="/assets/favicon.png" type="image/png">
-  <link rel="apple-touch-icon" href="/assets/og-image.jpg">
+  <link rel="apple-touch-icon" href="/assets/icon-192.png">
   <meta name="theme-color" content="#15803d">
   <link rel="canonical" href="https://oregon.tires/book-appointment/">
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: '#0D3618',
-            accent: '#FFFE03',
-          }
-        }
-      }
-    }
-  </script>
+  <!-- Open Graph -->
+  <meta property="og:title" content="Book an Appointment - Oregon Tires Auto Care">
+  <meta property="og:description" content="Schedule your tire installation, repair, oil change, or brake service online. Bilingual service in English and Spanish.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://oregon.tires/book-appointment/">
+  <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="es_MX">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Book an Appointment - Oregon Tires Auto Care">
+  <meta name="twitter:description" content="Schedule your tire or auto service online. Bilingual English/Spanish.">
+  <meta name="twitter:image" content="https://oregon.tires/assets/og-image.jpg">
 
-  <!-- PHP API backend — no external SDK needed -->
+  <!-- Tailwind CSS (built) -->
+  <link rel="stylesheet" href="/assets/styles.css">
 
   <style>
     html { scroll-behavior: smooth; }
@@ -279,21 +277,21 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <label for="booking-first-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="firstName">First Name</label>
-              <input type="text" name="firstName" id="booking-first-name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="text" name="firstName" id="booking-first-name" required autocomplete="given-name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
             <div>
               <label for="booking-last-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="lastName">Last Name</label>
-              <input type="text" name="lastName" id="booking-last-name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="text" name="lastName" id="booking-last-name" required autocomplete="family-name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <label for="booking-phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="phone">Phone</label>
-              <input type="tel" name="phone" id="booking-phone" required placeholder="(503) 123-4567" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="tel" name="phone" id="booking-phone" required autocomplete="tel" placeholder="(503) 123-4567" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
             <div>
               <label for="booking-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="email">Email</label>
-              <input type="email" name="email" id="booking-email" required placeholder="your@email.com" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="email" name="email" id="booking-email" required autocomplete="email" placeholder="your@email.com" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
           </div>
 
