@@ -35,3 +35,21 @@
   --ot-input-bg: #374151;
   --ot-input-border: #4b5563;
 }
+
+/* Dark mode readability improvements */
+.dark body,
+.dark .bg-gray-50 { background-color: #111827 !important; }
+.dark .bg-white { background-color: #1e293b !important; }
+.dark .bg-gray-700 { background-color: #2d3748 !important; }
+.dark .text-gray-600 { color: #cbd5e1 !important; }
+.dark .text-gray-700 { color: #d1d5db !important; }
+.dark .text-gray-800 { color: #e2e8f0 !important; }
+.dark .border-gray-300 { border-color: #475569 !important; }
+.dark input, .dark textarea, .dark select {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border-color: #475569 !important;
+}
+.dark input::placeholder, .dark textarea::placeholder {
+  color: #94a3b8 !important;
+}

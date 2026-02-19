@@ -98,7 +98,7 @@
 
   <!-- Dark mode init (prevent FOUC) -->
   <script>
-    (function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();
+    (function(){var s=localStorage.getItem('theme');if(s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');})();
   </script>
 
   <!-- Google Analytics 4 -->
@@ -5513,12 +5513,16 @@ function toggleAdminDarkMode() {
 }
 
 (function() {
-  const saved = localStorage.getItem('theme');
-  if (saved === 'dark') {
+  var saved = localStorage.getItem('theme');
+  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var shouldBeDark = saved === 'dark' || (saved !== 'light' && prefersDark);
+  if (shouldBeDark) {
     document.documentElement.classList.add('dark');
-    const btn = document.getElementById('admin-dark-toggle');
-    if (btn) btn.textContent = '\u2600\uFE0F';
+  } else {
+    document.documentElement.classList.remove('dark');
   }
+  var btn = document.getElementById('admin-dark-toggle');
+  if (btn) btn.textContent = shouldBeDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
 })();
 
 // ===== API CONFIG =====
