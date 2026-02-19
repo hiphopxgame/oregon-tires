@@ -11,7 +11,7 @@ use PHPMailer\PHPMailer\SMTP;
 /**
  * Send an email using PHPMailer with SMTP settings from .env
  */
-function sendMail(string $to, string $subject, string $htmlBody, string $textBody = ''): array
+function sendMail(string $to, string $subject, string $htmlBody, string $textBody = '', string $replyTo = ''): array
 {
     $mail = new PHPMailer(true);
 
@@ -43,6 +43,10 @@ function sendMail(string $to, string $subject, string $htmlBody, string $textBod
 
         $mail->addAddress($to);
 
+        if ($replyTo !== '' && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
+            $mail->addReplyTo($replyTo);
+        }
+
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body    = $htmlBody;
@@ -60,14 +64,14 @@ function sendMail(string $to, string $subject, string $htmlBody, string $textBod
 /**
  * Send notification to the shop owner.
  */
-function notifyOwner(string $subject, string $htmlBody): array
+function notifyOwner(string $subject, string $htmlBody, string $replyTo = ''): array
 {
     $contactEmail = $_ENV['CONTACT_EMAIL'] ?? $_ENV['SMTP_FROM'] ?? '';
     if (empty($contactEmail)) {
         return ['success' => false, 'error' => 'No contact email configured.'];
     }
 
-    return sendMail($contactEmail, $subject, $htmlBody);
+    return sendMail($contactEmail, $subject, $htmlBody, '', $replyTo);
 }
 
 /**

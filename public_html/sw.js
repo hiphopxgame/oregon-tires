@@ -1,4 +1,6 @@
-const CACHE_NAME = 'oregon-tires-v1';
+// Bump version on each deploy to bust stale caches
+const CACHE_VERSION = '2';
+const CACHE_NAME = 'oregon-tires-v' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
   '/',
@@ -44,8 +46,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
-  // 1. Supabase API calls — network-only, never cache
-  if (request.url.includes('supabase.co')) {
+  // 1. API calls — network-only, never cache
+  if (request.url.includes('supabase.co') || request.url.includes('/api/')) {
     return;
   }
 

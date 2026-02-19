@@ -373,6 +373,46 @@
         </div>
       </div>
 
+      <!-- Service Pricing -->
+      <div class="mt-12 max-w-4xl mx-auto" id="pricing">
+        <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-6 text-center" data-t="startingPrices">Starting Prices</h3>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
+            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tireInstallation">Tire Installation</div>
+            <div class="text-2xl font-bold text-brand dark:text-green-400">$20<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
+            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tireRepair">Tire Repair</div>
+            <div class="text-2xl font-bold text-brand dark:text-green-400">$15<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
+            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="oilChange">Oil Change</div>
+            <div class="text-2xl font-bold text-brand dark:text-green-400">$35<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
+            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="brakeService">Brake Service</div>
+            <div class="text-2xl font-bold text-brand dark:text-green-400">$100<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
+            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="wheelAlignment">Wheel Alignment</div>
+            <div class="text-2xl font-bold text-brand dark:text-green-400">$75<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
+            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tuneup">Tuneup</div>
+            <div class="text-2xl font-bold text-brand dark:text-green-400">$80<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
+            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="mechanicalInspection">Mechanical Inspection</div>
+            <div class="text-2xl font-bold text-brand dark:text-green-400">$50<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
+            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="homeService">Mobile Service</div>
+            <div class="text-2xl font-bold text-brand dark:text-green-400" data-t="callForQuote">Call for Quote</div>
+          </div>
+        </div>
+        <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-3" data-t="pricingDisclaimer">Prices vary by vehicle. Call for an exact quote.</p>
+      </div>
+
       <!-- Service Promise -->
       <div class="mt-12 max-w-4xl mx-auto bg-brand/5 dark:bg-gray-700 rounded-xl p-8 text-center">
         <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-4" data-t="ourServicePromise">Our Service Promise</h3>
@@ -441,7 +481,7 @@
             <span class="star text-2xl">★★★★★</span>
           </div>
           <div class="text-gray-600 dark:text-gray-300 mb-4" data-t="basedOnReviews" data-setting="review_count">Based on 150+ Google Reviews</div>
-          <a href="https://www.google.com/search?q=Oregon+Tires+Reviews" target="_blank" class="inline-block border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-6 py-2 rounded-lg font-medium hover:bg-brand/5 dark:hover:bg-green-400/10 transition" data-t="viewAllReviews">View All Reviews on Google</a>
+          <a href="https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" class="inline-block border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-6 py-2 rounded-lg font-medium hover:bg-brand/5 dark:hover:bg-green-400/10 transition" data-t="viewAllReviews" id="google-review-link">View All Reviews on Google</a>
         </div>
       </div>
     </div>
@@ -728,7 +768,10 @@ const t = {
     messageTooShort: 'Message must be at least 10 characters.',
     messageTooLong: 'Message must be 2000 characters or less.',
     weekAgo: '1 week ago', weeksAgo: 'weeks ago', monthAgo: '1 month ago', monthsAgo: 'months ago',
-    phonePlaceholder: '(503) 123-4567', emailPlaceholder: 'your@email.com'
+    phonePlaceholder: '(503) 123-4567', emailPlaceholder: 'your@email.com',
+    startingPrices: 'Starting Prices',
+    pricingDisclaimer: 'Prices vary by vehicle. Call for an exact quote.',
+    callForQuote: 'Call for Quote'
   },
   es: {
     home: 'Inicio', services: 'Servicios', about: 'Acerca de', testimonials: 'Reseñas', contact: 'Contacto',
@@ -788,7 +831,10 @@ const t = {
     messageTooShort: 'El mensaje debe tener al menos 10 caracteres.',
     messageTooLong: 'El mensaje debe tener 2000 caracteres o menos.',
     weekAgo: 'hace 1 semana', weeksAgo: 'semanas atrás', monthAgo: 'hace 1 mes', monthsAgo: 'meses atrás',
-    phonePlaceholder: '(503) 123-4567', emailPlaceholder: 'tu@correo.com'
+    phonePlaceholder: '(503) 123-4567', emailPlaceholder: 'tu@correo.com',
+    startingPrices: 'Precios Iniciales',
+    pricingDisclaimer: 'Los precios varían según el vehículo. Llame para una cotización exacta.',
+    callForQuote: 'Llame para Cotizar'
   }
 };
 
@@ -1102,6 +1148,14 @@ function toggleMobileMenu() {
   btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
 }
 
+// Close mobile menu on nav link click
+document.querySelectorAll('#mobile-menu a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    document.getElementById('mobile-menu').classList.add('hidden');
+    document.getElementById('mobile-menu-btn').setAttribute('aria-expanded', 'false');
+  });
+});
+
 // ===== LAZY-LOAD GOOGLE MAPS =====
 const mapObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -1147,6 +1201,15 @@ document.querySelectorAll('[data-t="scheduleService"]').forEach(function(el) {
   });
 });
 
+// Track phone call clicks (GA4)
+document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
+  link.addEventListener('click', function() {
+    if (typeof gtag === 'function') gtag('event', 'phone_call', {
+      event_category: 'contact', event_label: this.href
+    });
+  });
+});
+
 // Apply saved language preference on page load
 if (currentLang !== 'en') {
   document.documentElement.lang = currentLang;
@@ -1189,7 +1252,7 @@ function toggleDarkMode() {
 
 // ===== SERVICE WORKER =====
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
+  navigator.serviceWorker.register('/sw.js?v=2').catch(() => {});
 }
 
 // ===== WEB VITALS MONITORING =====

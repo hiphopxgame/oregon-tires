@@ -233,33 +233,6 @@
               <label for="vehicle-year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="vehicleYear">Year</label>
               <select name="vehicleYear" id="vehicle-year" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
                 <option value="">--</option>
-                <option value="2026">2026</option>
-                <option value="2025">2025</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-                <option value="2021">2021</option>
-                <option value="2020">2020</option>
-                <option value="2019">2019</option>
-                <option value="2018">2018</option>
-                <option value="2017">2017</option>
-                <option value="2016">2016</option>
-                <option value="2015">2015</option>
-                <option value="2014">2014</option>
-                <option value="2013">2013</option>
-                <option value="2012">2012</option>
-                <option value="2011">2011</option>
-                <option value="2010">2010</option>
-                <option value="2009">2009</option>
-                <option value="2008">2008</option>
-                <option value="2007">2007</option>
-                <option value="2006">2006</option>
-                <option value="2005">2005</option>
-                <option value="2004">2004</option>
-                <option value="2003">2003</option>
-                <option value="2002">2002</option>
-                <option value="2001">2001</option>
-                <option value="2000">2000</option>
               </select>
             </div>
             <div>
@@ -434,7 +407,7 @@ const t = {
     notes: 'Notes',
     bookNow: 'Book Appointment',
     confirmationTitle: 'Appointment Requested!',
-    confirmationSubtitle: 'We will call or text you to confirm. Thank you!',
+    confirmationSubtitle: 'We will call or text you to confirm. A confirmation email has been sent to your inbox. Thank you!',
     backToHome: 'Back to Home',
     bookAnother: 'Book Another',
     preferCall: 'Prefer to call? We are happy to help!',
@@ -501,7 +474,7 @@ const t = {
     notes: 'Notas',
     bookNow: 'Programar Cita',
     confirmationTitle: '¡Cita Solicitada!',
-    confirmationSubtitle: 'Le llamaremos o enviaremos un mensaje para confirmar. ¡Gracias!',
+    confirmationSubtitle: 'Le llamaremos o enviaremos un mensaje para confirmar. Se ha enviado un correo de confirmacion a su bandeja de entrada. ¡Gracias!',
     backToHome: 'Volver al Inicio',
     bookAnother: 'Programar Otra',
     preferCall: '¿Prefiere llamar? ¡Con gusto le ayudamos!',
@@ -849,7 +822,116 @@ function toggleDarkMode() {
   }
 })();
 
+// ===== VEHICLE YEAR DROPDOWN (dynamic, back to 1990) =====
+function populateYearDropdown() {
+  var select = document.getElementById('vehicle-year');
+  var currentYear = new Date().getFullYear() + 1; // include next year
+  for (var y = currentYear; y >= 1990; y--) {
+    var opt = document.createElement('option');
+    opt.value = String(y);
+    opt.textContent = String(y);
+    select.appendChild(opt);
+  }
+}
+
+// ===== MOBILE MENU — CLOSE ON NAV CLICK =====
+document.querySelectorAll('#mobile-menu a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    document.getElementById('mobile-menu').classList.add('hidden');
+    document.getElementById('mobile-menu-btn').setAttribute('aria-expanded', 'false');
+  });
+});
+
+// ===== AVAILABLE TIMES — GREY OUT FULL SLOTS =====
+async function loadAvailableTimes(date) {
+  if (!date) return;
+  var slots = document.querySelectorAll('[data-time]');
+  // Reset all slots
+  slots.forEach(function(s) {
+    s.disabled = false;
+    s.classList.remove('opacity-40', 'cursor-not-allowed', 'line-through');
+    s.title = '';
+  });
+  try {
+    var res = await fetch(API_BASE + '/available-times.php?date=' + encodeURIComponent(date), { credentials: 'include' });
+    var json = await res.json();
+    if (json.success && json.data && json.data.slots) {
+      var slotData = json.data.slots;
+      slots.forEach(function(s) {
+        var time = s.getAttribute('data-time');
+        var info = slotData[time];
+        if (info && !info.available) {
+          s.disabled = true;
+          s.classList.add('opacity-40', 'cursor-not-allowed', 'line-through');
+          s.title = currentLang === 'es' ? 'Horario lleno' : 'Time slot full';
+          // Deselect if currently selected
+          if (s.classList.contains('selected')) {
+            s.classList.remove('selected');
+            document.getElementById('booking-time').value = '';
+          }
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('Could not load available times:', e);
+  }
+}
+
+// Hook into date change to load availability
+document.getElementById('booking-date').addEventListener('change', function() {
+  if (this.value) loadAvailableTimes(this.value);
+});
+
+// ===== BOOKING FUNNEL TRACKING (GA4) =====
+// Track service selection
+document.querySelectorAll('input[name="service"]').forEach(function(radio) {
+  radio.addEventListener('change', function() {
+    if (typeof gtag === 'function') gtag('event', 'booking_step', {
+      event_category: 'booking_funnel', step: 'service_selected', service: this.value
+    });
+  });
+});
+
+// Track date selection
+document.getElementById('booking-date').addEventListener('change', function() {
+  if (this.value && typeof gtag === 'function') gtag('event', 'booking_step', {
+    event_category: 'booking_funnel', step: 'date_selected'
+  });
+});
+
+// Track time selection (via existing setupTimeSlots, add tracking)
+document.querySelectorAll('[data-time]').forEach(function(slot) {
+  slot.addEventListener('click', function() {
+    if (!this.disabled && typeof gtag === 'function') gtag('event', 'booking_step', {
+      event_category: 'booking_funnel', step: 'time_selected'
+    });
+  });
+});
+
+// Track form field focus (first interaction with customer info)
+var formTracked = false;
+document.querySelectorAll('#booking-first-name, #booking-last-name, #booking-phone, #booking-email').forEach(function(input) {
+  input.addEventListener('focus', function() {
+    if (!formTracked) {
+      formTracked = true;
+      if (typeof gtag === 'function') gtag('event', 'booking_step', {
+        event_category: 'booking_funnel', step: 'info_started'
+      });
+    }
+  });
+});
+
+// ===== PHONE CLICK TRACKING =====
+document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
+  link.addEventListener('click', function() {
+    if (typeof gtag === 'function') gtag('event', 'phone_call', {
+      event_category: 'contact', event_label: this.href
+    });
+  });
+});
+
 // ===== INIT =====
+populateYearDropdown();
 setupDateInput();
 setupTimeSlots();
 </script>
