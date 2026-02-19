@@ -132,7 +132,7 @@
 <div id="login-screen" class="min-h-screen flex items-center justify-center bg-brand">
   <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md dark:bg-gray-800 dark:border-gray-700">
     <div class="text-center mb-6">
-      <img src="../assets/logo.png" alt="Oregon Tires" class="h-16 mx-auto mb-4">
+      <a href="/"><img src="../assets/logo.png" alt="Oregon Tires" class="h-16 mx-auto mb-4"></a>
       <h1 class="text-2xl font-bold text-brand dark:text-green-400" data-t="adminDashboard">Admin Dashboard</h1>
       <p class="text-gray-500 mt-1 dark:text-gray-400" data-t="signInSubtitle">Sign in to manage your business</p>
     </div>
@@ -161,7 +161,7 @@
 <div id="forgot-password-screen" class="min-h-screen flex items-center justify-center bg-brand hidden">
   <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md dark:bg-gray-800 dark:border-gray-700">
     <div class="text-center mb-6">
-      <img src="../assets/logo.png" alt="Oregon Tires" class="h-16 mx-auto mb-4">
+      <a href="/"><img src="../assets/logo.png" alt="Oregon Tires" class="h-16 mx-auto mb-4"></a>
       <h1 class="text-2xl font-bold text-brand dark:text-green-400" data-t="resetPassword">Reset Password</h1>
       <p class="text-gray-500 mt-1 dark:text-gray-400" data-t="resetSubtitle">Enter your email to receive a reset link</p>
     </div>
@@ -173,8 +173,10 @@
       <button type="submit" id="forgot-btn" class="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:opacity-90 transition" data-t="sendResetLink">Send Reset Link</button>
       <div id="forgot-status" class="text-sm text-center hidden"></div>
     </form>
-    <div class="mt-4 text-center">
+    <div class="mt-4 text-center space-y-2">
       <button type="button" onclick="showLoginScreen()" class="text-brand dark:text-green-400 text-sm hover:underline cursor-pointer" data-t="backToLogin">← Back to Sign In</button>
+      <br>
+      <a href="/" class="text-brand dark:text-green-400 text-sm hover:underline" data-t="backToWebsite">← Back to website</a>
     </div>
   </div>
 </div>
@@ -199,7 +201,7 @@
           </div>
           <button id="admin-dark-toggle" onclick="toggleAdminDarkMode()" aria-label="Toggle dark mode" class="text-sm text-white hover:text-green-200 transition-colors">🌙</button>
           <button id="admin-lang-toggle" onclick="toggleAdminLanguage()" aria-label="Toggle language" class="text-sm text-white hover:text-green-200 transition-colors">EN</button>
-          <a href="/" class="text-sm hover:text-yellow-200 hidden md:inline" data-t="viewSite">View Site</a>
+          <a href="/" class="text-sm hover:text-yellow-200" data-t="viewSite">View Site</a>
           <button onclick="signOut()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition" data-t="signOut">Sign Out</button>
         </div>
       </div>
