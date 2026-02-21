@@ -40,6 +40,60 @@ $appUrl = htmlspecialchars($_ENV['APP_URL'] ?? 'https://oregon.tires', ENT_QUOTE
     <link rel="icon" href="/assets/favicon.ico" sizes="any">
     <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
     <link rel="stylesheet" href="/assets/styles.css">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "Contact Oregon Tires Auto Care",
+      "description": "Contact Oregon Tires Auto Care in Portland, OR for tire installation, brake service, oil changes, and all automotive needs. Bilingual English and Spanish service.",
+      "url": "https://oregon.tires/contact",
+      "mainEntity": {
+        "@type": "AutomotiveBusiness",
+        "name": "Oregon Tires Auto Care",
+        "url": "https://oregon.tires",
+        "image": "https://oregon.tires/assets/og-image.jpg",
+        "telephone": "(503) 367-9714",
+        "email": "oregontirespdx@gmail.com",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "8536 SE 82nd Ave",
+          "addressLocality": "Portland",
+          "addressRegion": "OR",
+          "postalCode": "97266",
+          "addressCountry": "US"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 45.46123,
+          "longitude": -122.57895
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+            "opens": "07:00",
+            "closes": "19:00"
+          }
+        ],
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "telephone": "(503) 367-9714",
+            "contactType": "customer service",
+            "availableLanguage": ["English", "Spanish"],
+            "areaServed": {
+              "@type": "City",
+              "name": "Portland",
+              "containedInPlace": { "@type": "State", "name": "Oregon" }
+            }
+          }
+        ]
+      }
+    }
+    </script>
+
     <script>if(localStorage.getItem('oregontires_dark')==='true'||(!localStorage.getItem('oregontires_dark')&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');</script>
 </head>
 <body class="bg-white dark:bg-[#0A0A0A] min-h-screen flex flex-col">

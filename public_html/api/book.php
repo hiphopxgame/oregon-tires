@@ -324,99 +324,27 @@ try {
         }
     }
 
-    // ─── Format service name for display ────────────────────────────────────
-    $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
-    $serviceDisplay = ucwords(str_replace('-', ' ', $service));
-
-    // ─── Email notification to shop owner ───────────────────────────────────
-    $subject = "New Appointment: {$h($serviceDisplay)} — {$h($firstName)} {$h($lastName)}";
-
-    // Build vehicle info line
+    // ─── Email notification to shop owner (branded template) ────────────────
     $vehicleInfo = '';
     if ($vehicleYear || $vehicleMake || $vehicleModel) {
         $vehicleParts = array_filter([$vehicleYear, $vehicleMake, $vehicleModel]);
         $vehicleInfo = implode(' ', $vehicleParts);
     }
 
-    $htmlBody = <<<HTML
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <div style="background: #1a1a2e; color: #ffffff; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-            <h2 style="margin: 0;">New Appointment Booking</h2>
-            <p style="margin: 8px 0 0; opacity: 0.9; font-size: 14px;">#{$appointmentId} &mdash; {$h($referenceNumber)} &mdash; {$h($serviceDisplay)}</p>
-        </div>
-        <div style="background: #ffffff; padding: 24px; border: 1px solid #e0e0e0;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr style="background: #f0f9f0;">
-                    <td style="padding: 8px 12px; font-weight: bold; color: #555; width: 140px;">Reference:</td>
-                    <td style="padding: 8px 12px; font-weight: bold; color: #15803d; font-size: 16px;">{$h($referenceNumber)}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px 12px; font-weight: bold; color: #555; width: 140px;">Service:</td>
-                    <td style="padding: 8px 12px;">{$h($serviceDisplay)}</td>
-                </tr>
-                <tr style="background: #f9f9f9;">
-                    <td style="padding: 8px 12px; font-weight: bold; color: #555;">Date:</td>
-                    <td style="padding: 8px 12px;">{$h($preferredDate)}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px 12px; font-weight: bold; color: #555;">Time:</td>
-                    <td style="padding: 8px 12px;">{$h($preferredTime)}</td>
-                </tr>
-                <tr style="background: #f9f9f9;">
-                    <td style="padding: 8px 12px; font-weight: bold; color: #555;">Customer:</td>
-                    <td style="padding: 8px 12px;">{$h($firstName)} {$h($lastName)}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px 12px; font-weight: bold; color: #555;">Email:</td>
-                    <td style="padding: 8px 12px;"><a href="mailto:{$h($email)}">{$h($email)}</a></td>
-                </tr>
-                <tr style="background: #f9f9f9;">
-                    <td style="padding: 8px 12px; font-weight: bold; color: #555;">Phone:</td>
-                    <td style="padding: 8px 12px;"><a href="tel:{$h($phone)}">{$h($phone)}</a></td>
-                </tr>
-    HTML;
-
-    if ($vehicleInfo) {
-        $htmlBody .= <<<HTML
-                <tr>
-                    <td style="padding: 8px 12px; font-weight: bold; color: #555;">Vehicle:</td>
-                    <td style="padding: 8px 12px;">{$h($vehicleInfo)}</td>
-                </tr>
-        HTML;
-    }
-
-    $htmlBody .= <<<HTML
-                <tr style="background: #f9f9f9;">
-                    <td style="padding: 8px 12px; font-weight: bold; color: #555;">Language:</td>
-                    <td style="padding: 8px 12px;">{$h($language)}</td>
-                </tr>
-            </table>
-    HTML;
-
-    if ($notes) {
-        $htmlBody .= <<<HTML
-            <div style="margin-top: 16px; padding: 16px; background: #f5f5f5; border-left: 4px solid #1a1a2e; border-radius: 4px;">
-                <strong style="color: #555;">Notes:</strong>
-                <p style="margin: 8px 0 0; color: #333; line-height: 1.6;">{$h($notes)}</p>
-            </div>
-        HTML;
-    }
-
-    $htmlBody .= <<<HTML
-        </div>
-        <div style="background: #f0f0f0; padding: 12px; text-align: center; font-size: 12px; color: #888; border-radius: 0 0 8px 8px;">
-            Oregon Tires Auto Care &mdash; {$h($referenceNumber)} &mdash; Appointment #{$appointmentId}
-        </div>
-    </div>
-    HTML;
-
-    $mailResult = notifyOwner($subject, $htmlBody);
-
-    // Log the email attempt
-    $logDesc = $mailResult['success']
-        ? "Booking notification sent for appointment #{$appointmentId}"
-        : "Booking notification FAILED for appointment #{$appointmentId}: " . ($mailResult['error'] ?? 'unknown');
-    logEmail('booking', $logDesc);
+    sendBookingOwnerNotification(
+        $appointmentId,
+        $referenceNumber,
+        $service,
+        $preferredDate,
+        $preferredTime,
+        $firstName,
+        $lastName,
+        $email,
+        $phone,
+        $vehicleInfo,
+        $language,
+        $notes
+    );
 
     // ─── Send confirmation email to customer ──────────────────────────────
     $customerLang = $language === 'spanish' ? 'es' : 'en';
@@ -444,7 +372,10 @@ try {
             $displayTime,
             $vehicleInfo,
             $customerLang,
-            $referenceNumber
+            $referenceNumber,
+            $service,          // raw service slug for calendar
+            $preferredDate,    // raw YYYY-MM-DD for calendar
+            $preferredTime     // raw HH:MM for calendar
         );
     } catch (\Throwable $e) {
         // Don't fail the booking if confirmation email fails

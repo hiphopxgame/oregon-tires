@@ -471,6 +471,47 @@ function sendBrandedResetEmail(string $email, string $name, string $resetUrl, st
 }
 
 /**
+ * Build "Add to Calendar" links for an appointment.
+ *
+ * @return array ['google_url' => string, 'ics_url' => string]
+ */
+function buildCalendarLinks(
+    string $service,
+    string $preferredDate,
+    string $preferredTime,
+    string $referenceNumber
+): array {
+    $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $serviceDisplay = ucwords(str_replace('-', ' ', $service));
+
+    // Build Google Calendar URL
+    $tz = new \DateTimeZone('America/Los_Angeles');
+    $start = new \DateTime("{$preferredDate} {$preferredTime}", $tz);
+    $end   = clone $start;
+    $end->modify('+1 hour');
+
+    // Google Calendar uses UTC format
+    $startUtc = clone $start;
+    $startUtc->setTimezone(new \DateTimeZone('UTC'));
+    $endUtc = clone $end;
+    $endUtc->setTimezone(new \DateTimeZone('UTC'));
+
+    $gcalParams = http_build_query([
+        'action'   => 'TEMPLATE',
+        'text'     => "{$serviceDisplay} — Oregon Tires Auto Care",
+        'dates'    => $startUtc->format('Ymd\THis\Z') . '/' . $endUtc->format('Ymd\THis\Z'),
+        'details'  => "Appointment Ref: {$referenceNumber}\nService: {$serviceDisplay}\n\nOregon Tires Auto Care\n(503) 367-9714",
+        'location' => '8536 SE 82nd Ave, Portland, OR 97266',
+        'ctz'      => 'America/Los_Angeles',
+    ]);
+
+    return [
+        'google_url' => 'https://calendar.google.com/calendar/render?' . $gcalParams,
+        'ics_url'    => "{$baseUrl}/api/calendar-event.php?ref=" . urlencode($referenceNumber),
+    ];
+}
+
+/**
  * Send a branded booking confirmation email to the customer.
  */
 function sendBookingConfirmationEmail(
@@ -481,7 +522,10 @@ function sendBookingConfirmationEmail(
     string $time,
     string $vehicleInfo,
     string $language = 'both',
-    string $referenceNumber = ''
+    string $referenceNumber = '',
+    string $rawService = '',
+    string $rawDate = '',
+    string $rawTime = ''
 ): array {
     $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
 
@@ -492,6 +536,39 @@ function sendBookingConfirmationEmail(
     // Build reference line (only if reference number provided)
     $refLine = $referenceNumber ? "<br><strong>Reference:</strong> {$referenceNumber}" : '';
     $refLineEs = $referenceNumber ? "<br><strong>Referencia:</strong> {$referenceNumber}" : '';
+
+    // Build calendar links if raw values are available
+    $calendarHtml = '';
+    if ($rawDate && $rawTime && $referenceNumber) {
+        $calLinks = buildCalendarLinks(
+            $rawService ?: strtolower(str_replace(' ', '-', $service)),
+            $rawDate,
+            $rawTime,
+            $referenceNumber
+        );
+        $gcalUrl = htmlspecialchars($calLinks['google_url'], ENT_QUOTES, 'UTF-8');
+        $icsUrl  = htmlspecialchars($calLinks['ics_url'], ENT_QUOTES, 'UTF-8');
+
+        $calendarHtml = <<<HTML
+  <tr>
+    <td style="padding:0 36px 24px;">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;text-align:center;">
+        <p style="color:#15803d;font-size:14px;font-weight:700;margin:0 0 12px;">📅 Add to Your Calendar / Agregar a su Calendario</p>
+        <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+          <tr>
+            <td style="padding:0 6px;">
+              <a href="{$gcalUrl}" target="_blank" style="display:inline-block;padding:10px 20px;background:#4285F4;color:#fff;text-decoration:none;font-size:13px;font-weight:600;border-radius:8px;">📅 Google Calendar</a>
+            </td>
+            <td style="padding:0 6px;">
+              <a href="{$icsUrl}" target="_blank" style="display:inline-block;padding:10px 20px;background:#374151;color:#fff;text-decoration:none;font-size:13px;font-weight:600;border-radius:8px;">📥 Apple / Outlook (.ics)</a>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+HTML;
+    }
 
     $vars = [
         'name'             => $name,
@@ -508,10 +585,13 @@ function sendBookingConfirmationEmail(
     $tpl = loadEmailTemplate('booking');
 
     if (empty($tpl)) {
-        // Fallback: send a simple confirmation
+        // Fallback: send a simple confirmation with calendar links
         $refText = $referenceNumber ? " (Ref: {$referenceNumber})" : '';
         $subject = "Appointment Requested{$refText} — Oregon Tires Auto Care";
         $htmlBody = "<p>Thank you, {$name}! Your appointment for {$service} on {$date} at {$time} has been received.{$refText} We will call you to confirm.</p>";
+        if ($calendarHtml) {
+            $htmlBody .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' . $calendarHtml . '</table>';
+        }
         $result = sendMail($email, $subject, $htmlBody);
         if ($result['success']) {
             logEmail('booking_confirmation', "Booking confirmation sent to {$email} (fallback)");
@@ -549,6 +629,9 @@ function sendBookingConfirmationEmail(
         $bodySections = $esSection . $divider . $enSection;
     }
 
+    // Insert calendar links after the language sections
+    $bodySections .= $calendarHtml;
+
     $htmlBody = wrapBrandedEmail($bodySections, $baseUrl, $baseUrl, false);
 
     // Build subject
@@ -556,8 +639,17 @@ function sendBookingConfirmationEmail(
     $subjectEn = replaceTemplateVarsRaw($tpl['subject_en'] ?? '', $vars);
     $subject = ($language === 'en') ? "✅ {$subjectEn} | {$subjectEs}" : "✅ {$subjectEs} | {$subjectEn}";
 
-    // Build plain text
+    // Build plain text (include calendar links)
     $textBody = buildBilingualPlainText($tpl, $vars, $language, $baseUrl);
+    if ($rawDate && $rawTime && $referenceNumber) {
+        $calLinks = buildCalendarLinks(
+            $rawService ?: strtolower(str_replace(' ', '-', $service)),
+            $rawDate, $rawTime, $referenceNumber
+        );
+        $textBody .= "\n\n📅 Add to Calendar / Agregar a Calendario:\n";
+        $textBody .= "Google Calendar: {$calLinks['google_url']}\n";
+        $textBody .= "Apple/Outlook (.ics): {$calLinks['ics_url']}\n";
+    }
 
     $result = sendMail($email, $subject, $htmlBody, $textBody);
 
@@ -670,6 +762,110 @@ function sendAppointmentReminderEmail(array $appointment): bool
     }
 
     return $result['success'];
+}
+
+/**
+ * Send a branded booking notification email to the shop owner.
+ */
+function sendBookingOwnerNotification(
+    int $appointmentId,
+    string $referenceNumber,
+    string $service,
+    string $preferredDate,
+    string $preferredTime,
+    string $firstName,
+    string $lastName,
+    string $email,
+    string $phone,
+    string $vehicleInfo,
+    string $language,
+    string $notes
+): array {
+    $contactAddr = $_ENV['CONTACT_EMAIL'] ?? $_ENV['SMTP_FROM'] ?? '';
+    if (empty($contactAddr)) {
+        return ['success' => false, 'error' => 'No contact email configured.'];
+    }
+
+    $baseUrl  = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $adminUrl = $baseUrl . '/admin/';
+
+    $serviceDisplay = ucwords(str_replace('-', ' ', $service));
+
+    // Format time for display
+    $timeParts = explode(':', $preferredTime);
+    $hour = (int) $timeParts[0];
+    $suffix = $hour >= 12 ? 'PM' : 'AM';
+    $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
+    $displayTime = $displayHour . ':00 ' . $suffix;
+
+    $vars = [
+        'appointment_id'   => $appointmentId,
+        'reference_number' => $referenceNumber,
+        'service'          => $serviceDisplay,
+        'date'             => $preferredDate,
+        'time'             => $displayTime,
+        'name'             => "{$firstName} {$lastName}",
+        'email'            => $email,
+        'phone'            => $phone,
+        'vehicle'          => $vehicleInfo ?: 'N/A',
+        'language'         => $language,
+        'notes'            => $notes ?: 'None',
+    ];
+
+    $result = sendBrandedTemplateEmail($contactAddr, 'booking_owner', $vars, 'both', $adminUrl, false);
+
+    // Fallback: if no DB template exists, send simple HTML notification
+    if (!$result['success'] && str_contains(($result['error'] ?? ''), 'not found')) {
+        $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+        $subject = "New Appointment: {$h($serviceDisplay)} — {$h($firstName)} {$h($lastName)}";
+
+        $htmlBody = <<<HTML
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+            <div style="background:linear-gradient(135deg,#15803d,#166534);color:#fff;padding:20px;text-align:center;border-radius:8px 8px 0 0;">
+                <h2 style="margin:0;">New Appointment Booking</h2>
+                <p style="margin:8px 0 0;opacity:0.9;font-size:14px;">#{$appointmentId} — {$h($referenceNumber)} — {$h($serviceDisplay)}</p>
+            </div>
+            <div style="background:#fff;padding:24px;border:1px solid #e0e0e0;">
+                <table style="width:100%;border-collapse:collapse;">
+                    <tr style="background:#f0f9f0;"><td style="padding:8px 12px;font-weight:bold;color:#555;width:140px;">Reference:</td><td style="padding:8px 12px;font-weight:bold;color:#15803d;font-size:16px;">{$h($referenceNumber)}</td></tr>
+                    <tr><td style="padding:8px 12px;font-weight:bold;color:#555;">Service:</td><td style="padding:8px 12px;">{$h($serviceDisplay)}</td></tr>
+                    <tr style="background:#f9f9f9;"><td style="padding:8px 12px;font-weight:bold;color:#555;">Date:</td><td style="padding:8px 12px;">{$h($preferredDate)}</td></tr>
+                    <tr><td style="padding:8px 12px;font-weight:bold;color:#555;">Time:</td><td style="padding:8px 12px;">{$h($displayTime)}</td></tr>
+                    <tr style="background:#f9f9f9;"><td style="padding:8px 12px;font-weight:bold;color:#555;">Customer:</td><td style="padding:8px 12px;">{$h($firstName)} {$h($lastName)}</td></tr>
+                    <tr><td style="padding:8px 12px;font-weight:bold;color:#555;">Email:</td><td style="padding:8px 12px;"><a href="mailto:{$h($email)}">{$h($email)}</a></td></tr>
+                    <tr style="background:#f9f9f9;"><td style="padding:8px 12px;font-weight:bold;color:#555;">Phone:</td><td style="padding:8px 12px;"><a href="tel:{$h($phone)}">{$h($phone)}</a></td></tr>
+        HTML;
+
+        if ($vehicleInfo) {
+            $htmlBody .= "<tr><td style=\"padding:8px 12px;font-weight:bold;color:#555;\">Vehicle:</td><td style=\"padding:8px 12px;\">{$h($vehicleInfo)}</td></tr>";
+        }
+
+        $htmlBody .= <<<HTML
+                    <tr style="background:#f9f9f9;"><td style="padding:8px 12px;font-weight:bold;color:#555;">Language:</td><td style="padding:8px 12px;">{$h($language)}</td></tr>
+                </table>
+        HTML;
+
+        if ($notes) {
+            $htmlBody .= "<div style=\"margin-top:16px;padding:16px;background:#f5f5f5;border-left:4px solid #15803d;border-radius:4px;\"><strong style=\"color:#555;\">Notes:</strong><p style=\"margin:8px 0 0;color:#333;line-height:1.6;\">{$h($notes)}</p></div>";
+        }
+
+        $htmlBody .= <<<HTML
+            </div>
+            <div style="background:#15803d;padding:12px;text-align:center;font-size:12px;color:#fff;border-radius:0 0 8px 8px;">
+                Oregon Tires Auto Care — {$h($referenceNumber)} — Appointment #{$appointmentId}
+            </div>
+        </div>
+        HTML;
+
+        $result = sendMail($contactAddr, $subject, $htmlBody);
+    }
+
+    $logDesc = $result['success']
+        ? "Booking notification sent for appointment #{$appointmentId}"
+        : "Booking notification FAILED for appointment #{$appointmentId}: " . ($result['error'] ?? 'unknown');
+    logEmail('booking', $logDesc);
+
+    return $result;
 }
 
 /**
