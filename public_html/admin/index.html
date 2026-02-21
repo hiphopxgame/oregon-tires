@@ -82,7 +82,7 @@
     .dark .bg-green-50:not([class*="dark:bg"]) { background-color: rgba(0,112,48,0.15); }
     .dark .bg-blue-50:not([class*="dark:bg"]) { background-color: rgba(30,58,95,0.3); }
     .dark .bg-red-50:not([class*="dark:bg"]) { background-color: rgba(127,29,29,0.2); }
-    .dark .bg-yellow-50:not([class*="dark:bg"]) { background-color: rgba(120,53,15,0.2); }
+    .dark .bg-amber-50:not([class*="dark:bg"]) { background-color: rgba(120,53,15,0.2); }
     .dark .bg-green-100:not([class*="dark:bg"]) { background-color: rgba(0,112,48,0.2); }
     /* Borders */
     .dark .border-gray-200:not([class*="dark:border"]) { border-color: #4b5563; }
@@ -108,7 +108,7 @@
 
   <!-- Dark mode init (prevent FOUC) -->
   <script>
-    (function(){var s=localStorage.getItem('theme');if(s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');})();
+    (function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();
   </script>
 
   <!-- Google Analytics 4 — Hybrid loader (configurable via admin panel) -->
@@ -224,11 +224,11 @@
         <div class="flex items-center gap-3">
           <div class="bg-white/10 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-white/20 transition" onclick="openAccountSettings()">
             <div class="font-medium" id="admin-email"></div>
-            <div class="text-xs text-yellow-200" id="admin-role" data-t="accountSettings">⚙️ Account Settings</div>
+            <div class="text-xs text-amber-200" id="admin-role" data-t="accountSettings">⚙️ Account Settings</div>
           </div>
           <button id="admin-dark-toggle" onclick="toggleAdminDarkMode()" aria-label="Toggle dark mode" class="text-sm text-white hover:text-green-200 transition-colors">🌙</button>
           <button id="admin-lang-toggle" onclick="toggleAdminLanguage()" aria-label="Toggle language" class="text-sm text-white hover:text-green-200 transition-colors">EN</button>
-          <a href="/" class="text-sm hover:text-yellow-200" data-t="viewSite">View Site</a>
+          <a href="/" class="text-sm hover:text-amber-200" data-t="viewSite">View Site</a>
           <button onclick="signOut()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition" data-t="signOut">Sign Out</button>
         </div>
       </div>
@@ -290,7 +290,7 @@
               <!-- Legend -->
               <div class="mt-4 pt-3 border-t text-xs text-gray-500 dark:text-gray-400 space-y-1">
                 <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-green-100 border-2 border-green-500"></div> Has appointments</div>
-                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded ring-2 ring-yellow-400"></div> Today</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded ring-2 ring-amber-500"></div> Today</div>
                 <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-brand"></div> Selected</div>
               </div>
             </div>
@@ -341,7 +341,7 @@
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
-              <thead><tr class="bg-yellow-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
+              <thead><tr class="bg-amber-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
                 <th class="px-4 py-3"><input type="checkbox" id="select-all-appts" onchange="toggleSelectAll(this.checked)" class="rounded"></th>
                 <th class="p-3 cursor-pointer" onclick="sortAppts('customer')" data-t="thCustomer">Customer ↕</th>
                 <th class="p-3 cursor-pointer" onclick="sortAppts('service')" data-t="thService">Service ↕</th>
@@ -371,7 +371,7 @@
           <div class="flex justify-end mb-4"><button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
-              <thead><tr class="bg-yellow-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
+              <thead><tr class="bg-amber-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
                 <th class="p-3" data-t="thCustomer">Customer</th><th class="p-3" data-t="thContact">Contact</th><th class="p-3" data-t="thMessage">Message</th><th class="p-3" data-t="thDate">Date</th><th class="p-3" data-t="thStatus">Status</th>
               </tr></thead>
               <tbody id="messages-table"></tbody>
@@ -494,7 +494,7 @@
           <button onclick="switchDocsView('manual')" id="docs-view-manual" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">📋 <span data-t="docsManual">Manual</span></button>
           <button onclick="switchDocsView('features')" id="docs-view-features" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">✅ <span data-t="docsFeatures">Features</span></button>
           <button onclick="switchDocsView('improvements')" id="docs-view-improvements" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">🔧 <span data-t="docsImprovements">Improvements</span></button>
-          <button onclick="switchDocsView('vision')" id="docs-view-vision" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 bg-gradient-to-r from-green-50 to-yellow-50 border-green-300">🚀 <span data-t="docsRoadmap">Roadmap</span></button>
+          <button onclick="switchDocsView('vision')" id="docs-view-vision" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 bg-gradient-to-r from-green-50 to-amber-50 border-green-300">🚀 <span data-t="docsRoadmap">Roadmap</span></button>
         </div>
 
         <!-- Manual Sub-Tab -->
@@ -2994,7 +2994,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <li>Yellow-200 hover text on dark green = 2.8:1 ratio (fails)</li>
 </ul>
 
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Fix:</strong> Use <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-gray-700 dark:text-gray-300">text-gray-900 font-bold</code> on yellow buttons. Use <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-gray-700 dark:text-gray-300">yellow-300</code> instead of <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-gray-700 dark:text-gray-300">yellow-200</code> for hover states.</p>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Fix:</strong> Use <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-gray-700 dark:text-gray-300">text-gray-900 font-bold</code> on yellow buttons. Use <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-gray-700 dark:text-gray-300">amber-300</code> instead of <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-gray-700 dark:text-gray-300">amber-200</code> for hover states.</p>
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
@@ -3205,7 +3205,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
 
 <!-- Header -->
 <div class="text-center mb-10">
-  <div class="inline-block bg-gradient-to-r from-green-500 to-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 tracking-wider uppercase">Strategic Growth Plan</div>
+  <div class="inline-block bg-gradient-to-r from-green-500 to-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 tracking-wider uppercase">Strategic Growth Plan</div>
   <h1 class="text-4xl font-extrabold text-gray-900 mb-3 dark:text-white">Oregon Tires Auto Care</h1>
   <h2 class="text-2xl font-semibold text-green-700 mb-2 dark:text-green-400">Feature Roadmap</h2>
   <p class="text-gray-500 text-sm dark:text-gray-400">Every feature a world-class tire shop &amp; auto repair business needs to dominate the Portland market</p>
@@ -3215,7 +3215,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
 <hr class="border-t-2 border-green-200 my-8 dark:border-green-900">
 
 <!-- Executive Summary -->
-<div class="bg-gradient-to-br from-green-50 to-yellow-50 border border-green-200 rounded-xl p-6 mb-8 dark:from-green-900/20 dark:to-yellow-900/20 dark:border-green-800">
+<div class="bg-gradient-to-br from-green-50 to-amber-50 border border-green-200 rounded-xl p-6 mb-8 dark:from-green-900/20 dark:to-amber-900/20 dark:border-green-800">
   <h3 class="text-xl font-bold text-green-800 mb-3 dark:text-green-300">📊 Executive Summary</h3>
   <p class="text-gray-700 leading-relaxed mb-3 dark:text-gray-300">This document outlines <strong>40+ features</strong> organized into <strong>6 tiers</strong> that will transform Oregon Tires from a local tire shop website into a <strong>fully integrated digital business platform</strong>. Each feature includes an explanation of how it directly improves revenue, customer retention, or operational efficiency.</p>
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
@@ -3302,7 +3302,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <div class="border border-gray-200 rounded-lg mb-4 dark:border-gray-700">
     <div class="bg-gray-50 px-5 py-3 rounded-t-lg flex items-center justify-between dark:bg-gray-700">
       <h4 class="font-bold text-gray-800 dark:text-white">⭐ Customer Loyalty &amp; Rewards Program</h4>
-      <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium dark:bg-yellow-900 dark:text-yellow-300">Retention</span>
+      <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium dark:bg-amber-900 dark:text-amber-300">Retention</span>
     </div>
     <div class="px-5 py-4">
       <p class="text-gray-600 mb-3 dark:text-gray-300">Points-based loyalty system: customers earn points per dollar spent, redeemable for free services (free rotation after 4 oil changes, free alignment after tire purchase). Includes membership tiers (Bronze/Silver/Gold), birthday rewards, and referral bonuses. Loyalty status visible in the customer&rsquo;s online portal.</p>
@@ -3316,7 +3316,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <div class="border border-gray-200 rounded-lg mb-4 dark:border-gray-700">
     <div class="bg-gray-50 px-5 py-3 rounded-t-lg flex items-center justify-between dark:bg-gray-700">
       <h4 class="font-bold text-gray-800 dark:text-white">🤝 Referral &amp; Word-of-Mouth Engine</h4>
-      <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium dark:bg-yellow-900 dark:text-yellow-300">Growth</span>
+      <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium dark:bg-amber-900 dark:text-amber-300">Growth</span>
     </div>
     <div class="px-5 py-4">
       <p class="text-gray-600 mb-3 dark:text-gray-300">Every customer gets a unique referral code/link. When a friend books using their code, both the referrer and new customer receive a discount or credit. The admin panel tracks referral chains, top referrers, and conversion rates. QR-code referral cards can be printed for in-store distribution.</p>
@@ -4017,7 +4017,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
         <li>❌ No customer communication after service</li>
       </ul>
     </div>
-    <div class="bg-gradient-to-br from-yellow-50 to-green-50 border border-green-300 rounded-lg p-4 dark:from-yellow-900/20 dark:to-green-900/10 dark:border-green-700">
+    <div class="bg-gradient-to-br from-amber-50 to-green-50 border border-green-300 rounded-lg p-4 dark:from-amber-900/20 dark:to-green-900/10 dark:border-green-700">
       <h4 class="font-bold text-green-800 mb-2 dark:text-green-300">What Oregon Tires Will Have</h4>
       <ul class="text-sm text-gray-600 space-y-1 dark:text-gray-400">
         <li>✅ Fully digital operations &amp; work orders</li>
@@ -4053,7 +4053,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
 
 <!-- Encabezado -->
 <div class="text-center mb-10">
-  <div class="inline-block bg-gradient-to-r from-green-500 to-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 tracking-wider uppercase">Plan de Crecimiento Estrat&eacute;gico</div>
+  <div class="inline-block bg-gradient-to-r from-green-500 to-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 tracking-wider uppercase">Plan de Crecimiento Estrat&eacute;gico</div>
   <h1 class="text-4xl font-extrabold text-gray-900 mb-3 dark:text-white">Oregon Tires Auto Care</h1>
   <h2 class="text-2xl font-semibold text-green-700 mb-2 dark:text-green-400">Hoja de Ruta y Funcionalidades</h2>
   <p class="text-gray-500 text-sm dark:text-gray-400">Todas las funciones que un taller de llantas y reparaci&oacute;n automotriz de clase mundial necesita para dominar el mercado de Portland</p>
@@ -4063,7 +4063,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
 <hr class="border-t-2 border-green-200 my-8 dark:border-green-900">
 
 <!-- Resumen Ejecutivo -->
-<div class="bg-gradient-to-br from-green-50 to-yellow-50 border border-green-200 rounded-xl p-6 mb-8 dark:from-green-900/20 dark:to-yellow-900/20 dark:border-green-800">
+<div class="bg-gradient-to-br from-green-50 to-amber-50 border border-green-200 rounded-xl p-6 mb-8 dark:from-green-900/20 dark:to-amber-900/20 dark:border-green-800">
   <h3 class="text-xl font-bold text-green-800 mb-3 dark:text-green-300">&#128202; Resumen Ejecutivo</h3>
   <p class="text-gray-700 leading-relaxed mb-3 dark:text-gray-300">Este documento describe <strong>m&aacute;s de 40 funciones</strong> organizadas en <strong>6 niveles</strong> que transformar&aacute;n Oregon Tires de un sitio web de taller de llantas local en una <strong>plataforma de negocios digital totalmente integrada</strong>. Cada funci&oacute;n incluye una explicaci&oacute;n de c&oacute;mo mejora directamente los ingresos, la retenci&oacute;n de clientes o la eficiencia operativa.</p>
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
@@ -4150,7 +4150,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <div class="border border-gray-200 rounded-lg mb-4 dark:border-gray-700">
     <div class="bg-gray-50 px-5 py-3 rounded-t-lg flex items-center justify-between dark:bg-gray-700">
       <h4 class="font-bold text-gray-800 dark:text-white">&#11088; Programa de Lealtad y Recompensas</h4>
-      <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium dark:bg-yellow-900 dark:text-yellow-300">Retenci&oacute;n</span>
+      <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium dark:bg-amber-900 dark:text-amber-300">Retenci&oacute;n</span>
     </div>
     <div class="px-5 py-4">
       <p class="text-gray-600 mb-3 dark:text-gray-300">Sistema de lealtad basado en puntos: los clientes ganan puntos por d&oacute;lar gastado, canjeables por servicios gratis (rotaci&oacute;n gratis despu&eacute;s de 4 cambios de aceite, alineaci&oacute;n gratis despu&eacute;s de comprar llantas). Incluye niveles de membres&iacute;a (Bronce/Plata/Oro), recompensas de cumplea&ntilde;os y bonos por referidos. El estatus de lealtad es visible en el portal del cliente.</p>
@@ -4164,7 +4164,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <div class="border border-gray-200 rounded-lg mb-4 dark:border-gray-700">
     <div class="bg-gray-50 px-5 py-3 rounded-t-lg flex items-center justify-between dark:bg-gray-700">
       <h4 class="font-bold text-gray-800 dark:text-white">&#129309; Motor de Referidos y Boca a Boca</h4>
-      <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium dark:bg-yellow-900 dark:text-yellow-300">Crecimiento</span>
+      <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium dark:bg-amber-900 dark:text-amber-300">Crecimiento</span>
     </div>
     <div class="px-5 py-4">
       <p class="text-gray-600 mb-3 dark:text-gray-300">Cada cliente recibe un c&oacute;digo/enlace de referido &uacute;nico. Cuando un amigo reserva usando su c&oacute;digo, tanto el referidor como el nuevo cliente reciben un descuento o cr&eacute;dito. El panel de administraci&oacute;n rastrea cadenas de referidos, los mejores referidores y tasas de conversi&oacute;n. Se pueden imprimir tarjetas de referido con c&oacute;digo QR para distribuci&oacute;n en tienda.</p>
@@ -4854,7 +4854,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
         <li>&#10060; Sin comunicaci&oacute;n con el cliente despu&eacute;s del servicio</li>
       </ul>
     </div>
-    <div class="bg-gradient-to-br from-yellow-50 to-green-50 border border-green-300 rounded-lg p-4 dark:from-yellow-900/20 dark:to-green-900/10 dark:border-green-700">
+    <div class="bg-gradient-to-br from-amber-50 to-green-50 border border-green-300 rounded-lg p-4 dark:from-amber-900/20 dark:to-green-900/10 dark:border-green-700">
       <h4 class="font-bold text-green-800 mb-2 dark:text-green-300">Lo que Oregon Tires Tendr&aacute;</h4>
       <ul class="text-sm text-gray-600 space-y-1 dark:text-gray-400">
         <li>&#10004; Operaciones y &oacute;rdenes de trabajo completamente digitales</li>
@@ -5554,8 +5554,7 @@ function toggleAdminDarkMode() {
 
 (function() {
   var saved = localStorage.getItem('theme');
-  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  var shouldBeDark = saved === 'dark' || (saved !== 'light' && prefersDark);
+  var shouldBeDark = saved === 'dark';
   if (shouldBeDark) {
     document.documentElement.classList.add('dark');
   } else {
@@ -5858,9 +5857,9 @@ function renderOverview() {
     const d = new Date(date+'T00:00:00');
     const dayLabel = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
     const isToday = date === new Date().toISOString().split('T')[0];
-    return `<div class="border-l-4 ${apts.length ? 'border-green-600 bg-green-50' : 'border-gray-300'} pl-4 py-2 rounded-r-lg ${isToday ? 'ring-2 ring-yellow-400 bg-yellow-50' : ''}">
+    return `<div class="border-l-4 ${apts.length ? 'border-green-600 bg-green-50' : 'border-gray-300'} pl-4 py-2 rounded-r-lg ${isToday ? 'ring-2 ring-amber-500 bg-amber-50' : ''}">
       <div class="flex justify-between items-center mb-1">
-        <h4 class="font-semibold text-sm ${isToday ? 'text-yellow-800' : ''}">${isToday ? '⭐ Today — ' : ''}${dayLabel}</h4>
+        <h4 class="font-semibold text-sm ${isToday ? 'text-amber-800' : ''}">${isToday ? '⭐ Today — ' : ''}${dayLabel}</h4>
         ${apts.length ? `<span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-bold">${apts.length} appt${apts.length>1?'s':''}</span>` : '<span class="text-xs text-gray-400 italic">Open</span>'}
       </div>
       ${apts.length ? apts.slice(0,3).map(a => `<div class="text-sm flex justify-between items-center bg-white p-2 rounded mb-1 border">
@@ -5900,7 +5899,7 @@ function renderCalendar() {
     let cellClasses = 'p-1 text-center cursor-pointer rounded-lg hover:bg-gray-100 relative';
     if(isSelected) cellClasses += ' bg-brand text-white hover:bg-brand';
     else if(hasAppts) cellClasses += ' bg-green-100 border-2 border-green-500 font-bold';
-    if(isToday && !isSelected) cellClasses += ' ring-2 ring-yellow-400';
+    if(isToday && !isSelected) cellClasses += ' ring-2 ring-amber-500';
     html += `<div onclick="selectCalDay('${dateStr}')" class="${cellClasses}">
       <div class="text-sm">${d}</div>
       ${count ? `<div class="text-xs ${isSelected?'text-white/80':'text-green-700'} font-bold">${count} appt${count>1?'s':''}</div>` : ''}
@@ -6070,7 +6069,7 @@ function renderEmailLogs() {
   const container = document.getElementById('email-logs-list');
   if(!emailLogs.length) { container.innerHTML = '<div class="bg-white rounded-xl shadow p-8 text-center text-gray-500">📧 No emails have been sent yet.</div>'; return; }
   container.innerHTML = emailLogs.map(log => {
-    const typeColors = {appointment_created:'bg-blue-100 text-blue-800',appointment_assigned:'bg-yellow-100 text-yellow-800',appointment_completed:'bg-green-100 text-green-800'};
+    const typeColors = {appointment_created:'bg-blue-100 text-blue-800',appointment_assigned:'bg-amber-100 text-amber-800',appointment_completed:'bg-green-100 text-green-800'};
     const typeLabels = {appointment_created:'Confirmation',appointment_assigned:'Assignment',appointment_completed:'Completion'};
     return `<div class="bg-white rounded-xl shadow p-4 hover:shadow-md transition">
       <div class="flex justify-between items-start">
@@ -6147,7 +6146,7 @@ function renderEmployees() {
         const status = u.invite_status || 'no_invite';
         const statusBadge = status === 'active' ? '<span class="bg-green-600 text-white px-2 py-0.5 rounded-full text-xs">✅ Active</span>'
           : status === 'password_set' ? '<span class="bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs">🔑 Password Set</span>'
-          : status === 'invited' ? '<span class="bg-yellow-500 text-white px-2 py-0.5 rounded-full text-xs">📨 Invited</span>'
+          : status === 'invited' ? '<span class="bg-amber-500 text-white px-2 py-0.5 rounded-full text-xs">📨 Invited</span>'
           : status === 'invite_expired' ? '<span class="bg-red-500 text-white px-2 py-0.5 rounded-full text-xs">⏰ Invite Expired</span>'
           : '<span class="bg-gray-400 text-white px-2 py-0.5 rounded-full text-xs">No Invite</span>';
         const statusLine = status === 'active' ? 'Last login: ' + new Date(u.last_login_at).toLocaleDateString()
@@ -6436,9 +6435,9 @@ function renderServiceImages() {
           <div class="crop-preview-overlay" id="crop-overlay-${s.key}"></div>`
           : '<div class="flex items-center justify-center h-full text-gray-400">No image uploaded</div>'}
       </div>
-      ${imgUrl ? `<div class="p-3 border-t bg-yellow-50">
+      ${imgUrl ? `<div class="p-3 border-t bg-amber-50">
         <button onclick="toggleCropPreview('${s.key}','${isHero}')" class="text-xs text-brand font-medium hover:underline">👁 Toggle Crop Preview (${aspectLabel})</button>
-        <div id="crop-demo-${s.key}" class="hidden mt-2 mx-auto overflow-hidden border-2 border-yellow-400 rounded ${aspectClass}" style="max-width:100%;">
+        <div id="crop-demo-${s.key}" class="hidden mt-2 mx-auto overflow-hidden border-2 border-amber-500 rounded ${aspectClass}" style="max-width:100%;">
           <div class="w-full h-full bg-cover" style="background-image:url(${imgUrl});background-position:${s.img.position_x||50}% ${s.img.position_y||50}%;background-size:${(s.img.scale||1)*100}%;min-height:60px;"></div>
         </div>
       </div>` : ''}
@@ -7003,7 +7002,7 @@ function switchDocsView(view) {
   var active = 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white';
   var inactive = 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
   var visionActive = 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white';
-  var visionInactive = 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 bg-gradient-to-r from-green-50 to-yellow-50 border-green-300';
+  var visionInactive = 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 bg-gradient-to-r from-green-50 to-amber-50 border-green-300';
   tabs.forEach(function(t) {
     document.getElementById('docs-subtab-'+t).classList.toggle('hidden', view !== t);
     var btn = document.getElementById('docs-view-'+t);

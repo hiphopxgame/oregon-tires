@@ -9,7 +9,7 @@
   <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
   <link rel="stylesheet" href="/assets/styles.css">
-  <script>(function(){var s=localStorage.getItem('theme');if(s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');})();</script>
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
 </head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
   <!-- Header -->
@@ -20,7 +20,7 @@
       </a>
       <nav class="flex items-center gap-4">
         <a href="/" class="text-brand dark:text-green-400 font-medium hover:opacity-70">Home</a>
-        <a href="/book-appointment" class="bg-yellow-400 text-black px-5 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition">Schedule Service</a>
+        <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition">Schedule Service</a>
       </nav>
     </div>
   </header>
@@ -50,7 +50,7 @@
   <footer class="bg-brand text-white py-6">
     <div class="container mx-auto px-4 text-center">
       <p class="text-gray-200">&copy; 2026 Oregon Tires Auto Care. All rights reserved.</p>
-      <p class="mt-2 text-xs text-gray-300">Powered by <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-yellow-200 hover:text-yellow-100 transition-colors">1vsM.com</a></p>
+      <p class="mt-2 text-xs text-gray-300">Powered by <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-amber-200 hover:text-amber-100 transition-colors">1vsM.com</a></p>
     </div>
   </footer>
 </body>

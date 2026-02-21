@@ -45,7 +45,7 @@ $paypalClientId = $_ENV['PAYPAL_CLIENT_ID'] ?? '';
   </style>
 
   <!-- Dark mode init (prevent FOUC) -->
-  <script>(function(){var s=localStorage.getItem('theme');if(s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');})();</script>
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
 </head>
 <body class="bg-[#0A0A0A] text-white min-h-screen">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
@@ -105,10 +105,10 @@ $paypalClientId = $_ENV['PAYPAL_CLIENT_ID'] ?? '';
       <!-- ============ CRYPTO PROCESSING STATE ============ -->
       <div id="state-crypto-processing" class="hidden fade-in">
         <div class="bg-[#111827] border border-gray-800 rounded-xl p-8 text-center">
-          <div class="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div class="w-20 h-20 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg class="w-10 h-10 text-black animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
           </div>
-          <h2 class="text-2xl font-bold text-yellow-400 mb-2" data-t="processing">Processing your payment...</h2>
+          <h2 class="text-2xl font-bold text-amber-500 mb-2" data-t="processing">Processing your payment...</h2>
           <p class="text-gray-400 mb-2" data-t="cryptoProcessingMsg">We have received your transaction hash. Our team will verify the payment shortly.</p>
           <div id="processing-order-ref" class="bg-[#0A0A0A] border border-gray-800 rounded-lg p-4 inline-block mt-4">
             <span class="text-gray-400 text-sm" data-t="orderRef">Order Reference</span>

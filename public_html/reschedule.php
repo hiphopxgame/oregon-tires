@@ -8,7 +8,7 @@
     <link rel="icon" href="/assets/favicon.ico" sizes="any">
     <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
     <link rel="stylesheet" href="/assets/styles.css">
-    <script>if(localStorage.getItem('oregontires_dark')==='true'||(!localStorage.getItem('oregontires_dark')&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');</script>
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
 </head>
 <body class="bg-white dark:bg-[#0A0A0A] min-h-screen flex flex-col">
 

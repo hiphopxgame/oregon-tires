@@ -94,7 +94,7 @@ $appUrl = htmlspecialchars($_ENV['APP_URL'] ?? 'https://oregon.tires', ENT_QUOTE
     }
     </script>
 
-    <script>if(localStorage.getItem('oregontires_dark')==='true'||(!localStorage.getItem('oregontires_dark')&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');</script>
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
 </head>
 <body class="bg-white dark:bg-[#0A0A0A] min-h-screen flex flex-col">
 
