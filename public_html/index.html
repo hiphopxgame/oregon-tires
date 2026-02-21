@@ -222,6 +222,11 @@
     .star { color: #facc15; }
     .fade-in { animation: fadeIn 0.6s ease-in; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    /* FAQ accordion chevron */
+    .faq-item summary { list-style: none; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary .faq-chevron { transition: transform 0.2s ease; }
+    .faq-item[open] summary .faq-chevron { transform: rotate(180deg); }
   </style>
 
   <!-- Google Analytics 4 — Hybrid loader (configurable via admin panel) -->
@@ -301,6 +306,7 @@
         <a href="#about" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="about">About</a>
         <a href="#reviews" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="testimonials">Reviews</a>
         <a href="#gallery" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="gallery">Promotions</a>
+        <a href="#faq" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="faqNav">FAQ</a>
         <a href="#contact" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="contact">Contact</a>
         <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="scheduleService">Schedule Service</a>
       </nav>
@@ -313,6 +319,7 @@
       <a href="#about" class="block py-2 text-brand dark:text-green-400" data-t="about">About</a>
       <a href="#reviews" class="block py-2 text-brand dark:text-green-400" data-t="testimonials">Reviews</a>
       <a href="#gallery" class="block py-2 text-brand dark:text-green-400" data-t="gallery">Promotions</a>
+      <a href="#faq" class="block py-2 text-brand dark:text-green-400" data-t="faqNav">FAQ</a>
       <a href="#contact" class="block py-2 text-brand dark:text-green-400" data-t="contact">Contact</a>
       <a href="/book-appointment" class="block py-2 text-brand dark:text-green-400 font-semibold" data-t="scheduleService">Schedule Service</a>
     </div>
@@ -564,6 +571,69 @@
     </div>
   </section>
 
+  <!-- FAQ -->
+  <section id="faq" class="scroll-mt-24 py-16 bg-gray-50 dark:bg-gray-800">
+    <div class="max-w-3xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center text-brand dark:text-green-400 mb-8" data-t="faqTitle">Frequently Asked Questions</h2>
+      <div class="space-y-3">
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ1">What services do you offer?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA1">We offer a full range of automotive services including tire installation, rotation, and balancing, oil changes, brake services, wheel alignment, engine diagnostics, suspension repair, and mobile service. Whether you need new or used tires or a full vehicle checkup, we have you covered.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ2">Do you speak Spanish?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA2">Yes! Our entire staff is fully bilingual in English and Spanish. We are proud to serve Portland's diverse community in the language you are most comfortable with.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ3">What are your hours?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA3">We are open Monday through Saturday, 7AM to 7PM. We are closed on Sundays. For emergency roadside assistance, call us anytime at (503) 367-9714.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ4">Where are you located?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA4">We are located at 8536 SE 82nd Ave, Portland, OR 97266. We are conveniently situated on SE 82nd Avenue and serve the greater Portland metro area.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ5">Do I need an appointment?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA5">Appointments are recommended to ensure we can serve you promptly, but walk-ins are always welcome! You can book online or call us at (503) 367-9714.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ6">Do you offer mobile service?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA6">Yes! We offer mobile service and can come to your home, office, or any location. Whether you need tire installation, repair, or roadside assistance, we will come to you. Call (503) 367-9714 to schedule.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
   <!-- Contact -->
   <section id="contact" class="py-16 bg-white scroll-mt-24 dark:bg-gray-900">
     <div class="container mx-auto px-4">
@@ -661,7 +731,7 @@
             </div>
             <button type="submit" id="contact-submit" class="w-full bg-brand-light text-white py-3 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" data-t="sendMessage"><span>Send Message</span> <span>→</span></button>
           </form>
-          <div id="form-status" class="mt-3 text-center hidden"></div>
+          <div id="form-status" role="alert" aria-live="polite" class="mt-3 text-center hidden"></div>
           </div>
           <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-3 text-center text-xs text-gray-500 dark:text-gray-400">
             <span data-t="bilingualNote">We respond in English and Spanish</span> · <span data-t="privacyNote">Your info stays private</span>
@@ -679,6 +749,7 @@
             id="map-frame"
             data-src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.8567891234567!2d-122.57895!3d45.46123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5495a0b91234567%3A0x1234567890abcdef!2s8536%20SE%2082nd%20Ave%2C%20Portland%2C%20OR%2097266!5e0!3m2!1sen!2sus!4v1234567890123"
             width="100%" height="100%" style="border:0;" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+            title="Google Maps - Oregon Tires Auto Care, 8536 SE 82nd Ave, Portland, OR 97266"
             class="rounded-xl hidden"></iframe>
         </div>
       </div>
@@ -886,7 +957,21 @@ const t = {
     bilingualNote: 'We respond in English and Spanish', privacyNote: 'Your info stays private',
     invalidEmail: 'Please enter a valid email address.',
     invalidPhone: 'Please enter a valid phone number.',
-    leaveReview: 'Leave Us a Review'
+    leaveReview: 'Leave Us a Review',
+    faqNav: 'FAQ',
+    faqTitle: 'Frequently Asked Questions',
+    faqQ1: 'What services do you offer?',
+    faqA1: 'We offer a full range of automotive services including tire installation, rotation, and balancing, oil changes, brake services, wheel alignment, engine diagnostics, suspension repair, and mobile service. Whether you need new or used tires or a full vehicle checkup, we have you covered.',
+    faqQ2: 'Do you speak Spanish?',
+    faqA2: 'Yes! Our entire staff is fully bilingual in English and Spanish. We are proud to serve Portland\'s diverse community in the language you are most comfortable with.',
+    faqQ3: 'What are your hours?',
+    faqA3: 'We are open Monday through Saturday, 7AM to 7PM. We are closed on Sundays. For emergency roadside assistance, call us anytime at (503) 367-9714.',
+    faqQ4: 'Where are you located?',
+    faqA4: 'We are located at 8536 SE 82nd Ave, Portland, OR 97266. We are conveniently situated on SE 82nd Avenue and serve the greater Portland metro area.',
+    faqQ5: 'Do I need an appointment?',
+    faqA5: 'Appointments are recommended to ensure we can serve you promptly, but walk-ins are always welcome! You can book online or call us at (503) 367-9714.',
+    faqQ6: 'Do you offer mobile service?',
+    faqA6: 'Yes! We offer mobile service and can come to your home, office, or any location. Whether you need tire installation, repair, or roadside assistance, we will come to you. Call (503) 367-9714 to schedule.'
   },
   es: {
     home: 'Inicio', services: 'Servicios', about: 'Acerca de', testimonials: 'Reseñas', contact: 'Contacto',
@@ -956,7 +1041,21 @@ const t = {
     bilingualNote: 'Respondemos en inglés y español', privacyNote: 'Tu información es privada',
     invalidEmail: 'Ingresa un correo electrónico válido.',
     invalidPhone: 'Ingresa un número de teléfono válido.',
-    leaveReview: 'Déjanos una Reseña'
+    leaveReview: 'Déjanos una Reseña',
+    faqNav: 'Preguntas',
+    faqTitle: 'Preguntas Frecuentes',
+    faqQ1: '¿Qué servicios ofrecen?',
+    faqA1: 'Ofrecemos una gama completa de servicios automotrices incluyendo instalación, rotación y balanceo de llantas, cambios de aceite, servicios de frenos, alineación de ruedas, diagnóstico de motor, reparación de suspensión y servicio móvil. Ya sea que necesite llantas nuevas o usadas o una revisión completa del vehículo, lo tenemos cubierto.',
+    faqQ2: '¿Hablan español?',
+    faqA2: '¡Sí! Todo nuestro personal es completamente bilingüe en inglés y español. Estamos orgullosos de servir a la diversa comunidad de Portland en el idioma en que se sienta más cómodo.',
+    faqQ3: '¿Cuál es su horario?',
+    faqA3: 'Estamos abiertos de lunes a sábado, de 7AM a 7PM. Los domingos estamos cerrados. Para asistencia de emergencia en carretera, llámenos en cualquier momento al (503) 367-9714.',
+    faqQ4: '¿Dónde están ubicados?',
+    faqA4: 'Estamos ubicados en 8536 SE 82nd Ave, Portland, OR 97266. Estamos convenientemente situados en la avenida SE 82nd y servimos al área metropolitana de Portland.',
+    faqQ5: '¿Necesito una cita?',
+    faqA5: 'Se recomienda hacer cita para asegurar que podamos atenderlo rápidamente, ¡pero los clientes sin cita siempre son bienvenidos! Puede reservar en línea o llamarnos al (503) 367-9714.',
+    faqQ6: '¿Ofrecen servicio móvil?',
+    faqA6: '¡Sí! Ofrecemos servicio móvil y podemos ir a su casa, oficina o cualquier ubicación. Ya sea que necesite instalación de llantas, reparación o asistencia en carretera, iremos a usted. Llame al (503) 367-9714 para programar.'
   }
 };
 

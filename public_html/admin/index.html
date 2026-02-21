@@ -482,7 +482,10 @@
 
     <!-- ANALYTICS TAB -->
     <div id="tab-analytics" class="tab-content hidden fade-in">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6"><h2 class="text-2xl font-bold" data-t="analyticsDashboard">Analytics Dashboard</h2><p class="text-green-100" data-t="analyticsSubtitle">Overview of your business metrics</p></div>
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div><h2 class="text-2xl font-bold" data-t="analyticsDashboard">Analytics Dashboard</h2><p class="text-green-100" data-t="analyticsSubtitle">Overview of your business metrics</p></div>
+        <button onclick="loadAnalytics()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="analyticsRefresh">Refresh</button>
+      </div>
       <div id="analytics-content"></div>
     </div>
 
@@ -5220,7 +5223,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
 </div>
 
 <!-- Toast -->
-<div id="toast" class="hidden fixed bottom-4 right-4 z-50 bg-brand text-white px-6 py-3 rounded-lg shadow-lg transition-all"></div>
+<div id="toast" role="alert" aria-live="polite" class="hidden fixed bottom-4 right-4 z-50 bg-brand text-white px-6 py-3 rounded-lg shadow-lg transition-all"></div>
 
 <script>
 // ===== TRANSLATION SYSTEM =====
@@ -5563,6 +5566,43 @@ const adminT = {
     // Analytics
     analyticsDashboard: 'Panel de Anal\u00EDticas',
     analyticsSubtitle: 'Resumen de las m\u00E9tricas de tu negocio',
+    analyticsLoading: 'Cargando anal\u00EDticas...',
+    analyticsError: 'No se pudieron cargar los datos anal\u00EDticos',
+    analyticsRefresh: 'Actualizar',
+    analyticsTotalAppts: 'Total de Citas',
+    analyticsThisWeek: 'Esta Semana',
+    analyticsMessages: 'Mensajes',
+    analyticsEmployees: 'Empleados Activos',
+    analyticsConfirmedRate: 'Tasa de Confirmaci\u00F3n',
+    analyticsCompletionRate: 'Tasa de Completaci\u00F3n',
+    analyticsCancellationRate: 'Tasa de Cancelaci\u00F3n',
+    analyticsNewRate: 'Nuevas / Pendientes',
+    analyticsStatusBreakdown: 'Desglose por Estado',
+    analyticsPopularServices: 'Servicios Populares',
+    analyticsPeakTimes: 'Horarios M\u00E1s Solicitados',
+    analyticsBookingsTrend: 'Tendencia de Reservas (\u00DAltimos 30 D\u00EDas)',
+    analyticsEmployeePerf: 'Rendimiento de Empleados',
+    analyticsEmployee: 'Empleado',
+    analyticsTotal: 'Total',
+    analyticsCompleted: 'Completadas',
+    analyticsTotalTime: 'Tiempo Total',
+    analyticsAvgTime: 'Tiempo Prom.',
+    analyticsNoData: 'A\u00FAn no hay datos disponibles',
+    analyticsAppointments: 'citas',
+    analyticsCustomers: 'Clientes',
+    analyticsRecurring: 'Recurrentes',
+    analyticsAvgDuration: 'Duraci\u00F3n Prom.',
+    analyticsMinutes: 'min',
+    analyticsNew: 'Nuevas',
+    analyticsConfirmed: 'Confirmadas',
+    analyticsCompletedStatus: 'Completadas',
+    analyticsCancelled: 'Canceladas',
+    analyticsPending: 'Pendientes',
+    analyticsMessagesSection: 'Resumen de Mensajes',
+    analyticsUnread: 'Sin Leer',
+    analyticsPriority: 'Prioritarios',
+    analyticsResolved: 'Resueltos',
+    analyticsBookings: 'reservas',
     // Docs
     documentation: 'Documentaci\u00F3n',
     docsSubtitle: 'Manual de instrucciones, lista de funciones y mejoras',
@@ -6128,7 +6168,7 @@ function renderCalDay() {
           <div>
             <label class="text-xs font-medium text-gray-500">Employee</label>
             <select onchange="updateApptAssignment('${a.id}',this.value)" class="w-full border rounded px-2 py-1.5 text-sm ${!a.assigned_employee_id ? 'border-orange-400 bg-orange-50' : 'border-green-400 bg-green-50'}">
-              <option value="">— Unassigned —</option>
+              <option value="">${adminT[currentLang].unassigned}</option>
               ${activeEmps.map(e=>`<option value="${e.id}" ${a.assigned_employee_id===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}
             </select>
           </div>
@@ -6191,7 +6231,7 @@ function renderAppointments() {
       <td class="p-3"><div class="font-medium">${fmtDate(a.preferred_date)}</div><div class="text-xs text-gray-500">${fmtTime(a.preferred_time)}</div>
         ${a.status==='completed'&&a.actual_duration_minutes?`<div class="text-xs text-green-700 font-medium mt-1">Completed in ${a.actual_duration_minutes}min</div>`:''}</td>
       <td class="p-3"><div class="text-sm">${esc(a.email)}</div>${a.phone?`<div class="text-xs text-gray-500">${esc(a.phone)}</div>`:''}</td>
-      <td class="p-3 text-sm">${a.assigned_employee_id ? esc(employees.find(e=>e.id===a.assigned_employee_id)?.name||'Unknown') : '<span class="text-gray-400">Unassigned</span>'}</td>
+      <td class="p-3 text-sm">${a.assigned_employee_id ? esc(employees.find(e=>e.id===a.assigned_employee_id)?.name||'Unknown') : '<span class="text-gray-400">' + adminT[currentLang].unassignedLabel + '</span>'}</td>
       <td class="p-3">${statusBadge(a.status)}${calSyncBadge(a)}</td>
       <td class="p-3"><div class="flex flex-col gap-1">
         <select onchange="updateApptStatus('${a.id}',this.value)" class="border rounded px-2 py-1 text-xs">
@@ -6199,7 +6239,7 @@ function renderAppointments() {
           <option value="completed" ${a.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${a.status==='cancelled'?'selected':''}>Cancelled</option>
         </select>
         <select onchange="updateApptAssignment('${a.id}',this.value)" class="border rounded px-2 py-1 text-xs">
-          <option value="">Unassigned</option>${employees.filter(e=>e.is_active).map(e=>`<option value="${e.id}" ${a.assigned_employee_id===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}
+          <option value="">${adminT[currentLang].unassignedLabel}</option>${employees.filter(e=>e.is_active).map(e=>`<option value="${e.id}" ${a.assigned_employee_id===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}
         </select>
         <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100">📝 Notes</button>
       </div></td>
@@ -6709,83 +6749,404 @@ async function uploadServiceImage(key) {
 }
 
 // ===== ANALYTICS =====
-function renderAnalytics() {
-  const total = appointments.length;
-  const newA = appointments.filter(a=>a.status==='new').length;
-  const confirmed = appointments.filter(a=>a.status==='confirmed').length;
-  const completed = appointments.filter(a=>a.status==='completed').length;
-  const cancelled = appointments.filter(a=>a.status==='cancelled').length;
-  const thisWeek = new Date(); thisWeek.setDate(thisWeek.getDate()-7);
-  const recent = appointments.filter(a=>new Date(a.created_at)>thisWeek).length;
-  const totalMsgs = messages.length;
-  const unreadMsgs = messages.filter(m=>m.status==='new').length;
+let analyticsLoaded = false;
 
-  // Customers
-  const custMap = {};
-  appointments.forEach(a => {
-    const k = a.email.toLowerCase();
-    if(!custMap[k]) custMap[k] = {name:`${a.first_name} ${a.last_name}`,email:a.email,count:0,services:[]};
-    custMap[k].count++; custMap[k].services.push(a.service);
-  });
-  const totalCustomers = Object.keys(custMap).length;
-  const recurring = Object.values(custMap).filter(c=>c.count>1).length;
+async function loadAnalytics() {
+  var T = adminT[currentLang];
+  var container = document.getElementById('analytics-content');
 
-  // Avg time
-  const withTime = appointments.filter(a=>a.status==='completed'&&a.actual_duration_minutes);
-  const avgTime = withTime.length ? Math.round(withTime.reduce((s,a)=>s+(a.actual_duration_minutes||0),0)/withTime.length) : 0;
+  // Show loading state
+  container.textContent = '';
+  var loadingDiv = document.createElement('div');
+  loadingDiv.className = 'flex items-center justify-center py-16';
+  var spinWrap = document.createElement('div');
+  spinWrap.className = 'text-center';
+  var spinner = document.createElement('div');
+  spinner.className = 'inline-block w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin mb-4';
+  var loadText = document.createElement('p');
+  loadText.className = 'text-gray-500 dark:text-gray-400';
+  loadText.textContent = T.analyticsLoading;
+  spinWrap.appendChild(spinner);
+  spinWrap.appendChild(loadText);
+  loadingDiv.appendChild(spinWrap);
+  container.appendChild(loadingDiv);
 
-  // Employee stats
-  const empStats = employees.filter(e=>e.is_active).map(e => {
-    const eApts = appointments.filter(a=>a.assigned_employee_id===e.id);
-    const eDone = eApts.filter(a=>a.status==='completed'&&a.actual_duration_minutes);
-    const totalTime = eDone.reduce((s,a)=>s+(a.actual_duration_minutes||0),0);
-    return { name: e.name, total: eApts.length, completed: eDone.length, totalTime, avgTime: eDone.length ? Math.round(totalTime/eDone.length) : 0 };
-  });
+  try {
+    // Fetch server-side analytics + use local appointment/employee/message data
+    var serverData = await api('analytics.php').catch(function() { return { data: null }; });
+    var sData = serverData.data || serverData;
 
-  // Time frequency
-  const timeCounts = {};
-  appointments.forEach(a => { timeCounts[a.preferred_time] = (timeCounts[a.preferred_time]||0)+1; });
-  const topTimes = Object.entries(timeCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    // Local data computations
+    var total = appointments.length;
+    var thisWeek = new Date(); thisWeek.setDate(thisWeek.getDate() - 7);
+    var recent = appointments.filter(function(a) { return new Date(a.created_at) > thisWeek; }).length;
 
-  document.getElementById('analytics-content').innerHTML = `
-    <div class="grid md:grid-cols-2 gap-6 mb-6">
-      <div class="bg-gray-50 p-4 rounded-lg border hover:bg-gray-100 cursor-pointer"><h3 class="font-semibold">Total Appointments</h3><p class="text-3xl font-bold text-brand dark:text-green-400">${total}</p></div>
-      <div class="bg-gray-50 p-4 rounded-lg border hover:bg-gray-100 cursor-pointer"><h3 class="font-semibold">This Week</h3><p class="text-3xl font-bold text-brand dark:text-green-400">${recent}</p></div>
-    </div>
-    <div class="grid md:grid-cols-4 gap-4 mb-6">
-      <div class="bg-blue-50 p-4 rounded-lg border"><h3 class="text-sm text-blue-800">New</h3><p class="text-2xl font-bold text-blue-600">${newA}</p></div>
-      <div class="bg-green-50 p-4 rounded-lg border"><h3 class="text-sm text-green-800">Confirmed</h3><p class="text-2xl font-bold text-green-600">${confirmed}</p></div>
-      <div class="bg-gray-50 p-4 rounded-lg border"><h3 class="text-sm text-gray-800">Completed</h3><p class="text-2xl font-bold text-gray-600">${completed}</p></div>
-      <div class="bg-red-50 p-4 rounded-lg border"><h3 class="text-sm text-red-800">Cancelled</h3><p class="text-2xl font-bold text-red-600">${cancelled}</p></div>
-    </div>
-    <div class="grid md:grid-cols-2 gap-6 mb-6">
-      <div class="bg-white rounded-xl shadow p-6">
-        <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4">📬 Messages</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-gray-50 p-4 rounded-lg"><p class="text-sm text-gray-600">Total</p><p class="text-2xl font-bold">${totalMsgs}</p></div>
-          <div class="bg-gray-50 p-4 rounded-lg"><p class="text-sm text-gray-600">Unread</p><p class="text-2xl font-bold text-blue-600">${unreadMsgs}</p></div>
-        </div>
-      </div>
-      <div class="bg-white rounded-xl shadow p-6">
-        <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4">👥 Customers</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-gray-50 p-4 rounded-lg"><p class="text-sm text-gray-600">Total</p><p class="text-2xl font-bold">${totalCustomers}</p></div>
-          <div class="bg-purple-50 p-4 rounded-lg"><p class="text-sm text-gray-600">Recurring</p><p class="text-2xl font-bold text-purple-600">${recurring}</p></div>
-        </div>
-      </div>
-    </div>
-    ${avgTime ? `<div class="bg-white rounded-xl shadow p-6 mb-6"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4">⏱ Time Tracking</h3>
-      <p>Average appointment time: <strong>${avgTime} minutes</strong> (from ${withTime.length} completed)</p></div>` : ''}
-    ${empStats.length ? `<div class="bg-white rounded-xl shadow p-6 mb-6"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4">👷 Employee Performance</h3>
-      <table class="w-full text-sm"><thead><tr class="border-b"><th class="text-left p-2">Employee</th><th class="p-2">Total</th><th class="p-2">Completed</th><th class="p-2">Total Time</th><th class="p-2">Avg Time</th></tr></thead>
-      <tbody>${empStats.map(e=>`<tr class="border-b"><td class="p-2 font-medium">${esc(e.name)}</td><td class="p-2 text-center">${e.total}</td><td class="p-2 text-center">${e.completed}</td><td class="p-2 text-center">${e.totalTime}min</td><td class="p-2 text-center">${e.avgTime}min</td></tr>`).join('')}</tbody></table></div>` : ''}
-    ${topTimes.length ? `<div class="bg-white rounded-xl shadow p-6"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4">🕐 Popular Appointment Times</h3>
-      <div class="space-y-2">${topTimes.map(([time,count])=>{
-        const pct = Math.round(count/total*100);
-        return `<div class="flex items-center gap-3"><span class="w-20 text-sm font-medium">${fmtTime(time)}</span><div class="flex-1 bg-gray-200 rounded-full h-4"><div class="bg-brand rounded-full h-4" style="width:${pct}%"></div></div><span class="text-sm text-gray-600">${count}</span></div>`;
-      }).join('')}</div></div>` : ''}
-  `;
+    // Status counts from server or local fallback
+    var statusMap = {};
+    if (sData && sData.appointments_by_status) {
+      sData.appointments_by_status.forEach(function(s) { statusMap[s.status] = parseInt(s.count); });
+    } else {
+      appointments.forEach(function(a) { statusMap[a.status] = (statusMap[a.status] || 0) + 1; });
+    }
+    var newA = statusMap['new'] || 0;
+    var pending = statusMap['pending'] || 0;
+    var confirmed = statusMap['confirmed'] || 0;
+    var completed = statusMap['completed'] || 0;
+    var cancelled = statusMap['cancelled'] || 0;
+    var totalFromStatus = newA + pending + confirmed + completed + cancelled || total;
+
+    // Rates
+    var confirmedRate = totalFromStatus ? Math.round((confirmed / totalFromStatus) * 100) : 0;
+    var completionRate = totalFromStatus ? Math.round((completed / totalFromStatus) * 100) : 0;
+    var cancellationRate = totalFromStatus ? Math.round((cancelled / totalFromStatus) * 100) : 0;
+
+    // Services from server or local
+    var serviceData = [];
+    if (sData && sData.appointments_by_service) {
+      serviceData = sData.appointments_by_service;
+    } else {
+      var svcMap = {};
+      appointments.forEach(function(a) { svcMap[a.service] = (svcMap[a.service] || 0) + 1; });
+      serviceData = Object.entries(svcMap).map(function(e) { return { service: e[0], count: e[1] }; }).sort(function(a, b) { return b.count - a.count; });
+    }
+    var maxSvc = serviceData.length ? Math.max.apply(null, serviceData.map(function(s) { return parseInt(s.count); })) : 1;
+
+    // Peak times from server or local
+    var peakData = [];
+    if (sData && sData.peak_times) {
+      peakData = sData.peak_times;
+    } else {
+      var timeCounts = {};
+      appointments.forEach(function(a) {
+        if (a.preferred_time) {
+          var h = parseInt(a.preferred_time.split(':')[0]);
+          timeCounts[h] = (timeCounts[h] || 0) + 1;
+        }
+      });
+      peakData = Object.entries(timeCounts).map(function(e) { return { hour_slot: parseInt(e[0]), count: parseInt(e[1]) }; }).sort(function(a, b) { return a.hour_slot - b.hour_slot; });
+    }
+    var maxPeak = peakData.length ? Math.max.apply(null, peakData.map(function(p) { return parseInt(p.count); })) : 1;
+
+    // Bookings trend from server
+    var trendData = (sData && sData.bookings_trend) || [];
+
+    // Messages from server or local
+    var msgStatusMap = {};
+    if (sData && sData.messages_by_status) {
+      sData.messages_by_status.forEach(function(m) { msgStatusMap[m.status] = parseInt(m.count); });
+    } else {
+      messages.forEach(function(m) { msgStatusMap[m.status] = (msgStatusMap[m.status] || 0) + 1; });
+    }
+    var totalMsgs = sData ? (sData.total_messages || 0) : messages.length;
+    var unreadMsgs = msgStatusMap['new'] || 0;
+    var priorityMsgs = msgStatusMap['priority'] || 0;
+    var resolvedMsgs = msgStatusMap['completed'] || 0;
+
+    // Employees
+    var totalEmps = sData ? (sData.total_employees || 0) : employees.filter(function(e) { return e.is_active; }).length;
+
+    // Customers (local only)
+    var custMap = {};
+    appointments.forEach(function(a) {
+      var k = a.email.toLowerCase();
+      if (!custMap[k]) custMap[k] = { count: 0 };
+      custMap[k].count++;
+    });
+    var totalCustomers = Object.keys(custMap).length;
+    var recurringCustomers = Object.values(custMap).filter(function(c) { return c.count > 1; }).length;
+
+    // Avg duration (local)
+    var withTime = appointments.filter(function(a) { return a.status === 'completed' && a.actual_duration_minutes; });
+    var avgDuration = withTime.length ? Math.round(withTime.reduce(function(s, a) { return s + (a.actual_duration_minutes || 0); }, 0) / withTime.length) : 0;
+
+    // Employee performance (local)
+    var empStats = employees.filter(function(e) { return e.is_active; }).map(function(e) {
+      var eApts = appointments.filter(function(a) { return a.assigned_employee_id === e.id; });
+      var eDone = eApts.filter(function(a) { return a.status === 'completed' && a.actual_duration_minutes; });
+      var totalTime = eDone.reduce(function(s, a) { return s + (a.actual_duration_minutes || 0); }, 0);
+      return { name: e.name, total: eApts.length, completed: eDone.length, totalTime: totalTime, avgTime: eDone.length ? Math.round(totalTime / eDone.length) : 0 };
+    });
+
+    // Format hour helper
+    function fmtHour(h) { var hr = parseInt(h); return (hr % 12 || 12) + ':00 ' + (hr >= 12 ? 'PM' : 'AM'); }
+
+    // ---- BUILD DOM ----
+    container.textContent = '';
+    var frag = document.createDocumentFragment();
+
+    // Helper to create elements
+    function el(tag, cls, text) {
+      var e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text !== undefined) e.textContent = text;
+      return e;
+    }
+
+    // -- Top Stats Row (4 cards) --
+    var topRow = el('div', 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6');
+
+    var card1 = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
+    card1.appendChild(el('div', 'text-sm text-gray-500 dark:text-gray-400', T.analyticsTotalAppts));
+    card1.appendChild(el('div', 'text-3xl font-bold text-brand dark:text-green-400', String(totalFromStatus)));
+    var sub1 = el('p', 'text-xs text-gray-400 dark:text-gray-500 mt-1', T.analyticsThisWeek + ': ' + recent);
+    card1.appendChild(sub1);
+    topRow.appendChild(card1);
+
+    var card2 = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
+    card2.appendChild(el('div', 'text-sm text-gray-500 dark:text-gray-400', T.analyticsMessages));
+    card2.appendChild(el('div', 'text-3xl font-bold text-blue-600', String(totalMsgs)));
+    card2.appendChild(el('p', 'text-xs text-gray-400 dark:text-gray-500 mt-1', T.analyticsUnread + ': ' + unreadMsgs));
+    topRow.appendChild(card2);
+
+    var card3 = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
+    card3.appendChild(el('div', 'text-sm text-gray-500 dark:text-gray-400', T.analyticsCustomers));
+    card3.appendChild(el('div', 'text-3xl font-bold text-purple-600', String(totalCustomers)));
+    card3.appendChild(el('p', 'text-xs text-gray-400 dark:text-gray-500 mt-1', T.analyticsRecurring + ': ' + recurringCustomers));
+    topRow.appendChild(card3);
+
+    var card4 = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
+    card4.appendChild(el('div', 'text-sm text-gray-500 dark:text-gray-400', T.analyticsEmployees));
+    card4.appendChild(el('div', 'text-3xl font-bold text-amber-600', String(totalEmps)));
+    if (avgDuration) card4.appendChild(el('p', 'text-xs text-gray-400 dark:text-gray-500 mt-1', T.analyticsAvgDuration + ': ' + avgDuration + ' ' + T.analyticsMinutes));
+    topRow.appendChild(card4);
+
+    frag.appendChild(topRow);
+
+    // -- Rate Cards Row (4 cards) --
+    var rateRow = el('div', 'grid grid-cols-2 md:grid-cols-4 gap-4 mb-6');
+
+    var r1 = el('div', 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 text-center');
+    r1.appendChild(el('div', 'text-sm text-blue-800 dark:text-blue-300', T.analyticsNewRate));
+    r1.appendChild(el('div', 'text-2xl font-bold text-blue-600 dark:text-blue-400', String(newA + pending)));
+    rateRow.appendChild(r1);
+
+    var r2 = el('div', 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 text-center');
+    r2.appendChild(el('div', 'text-sm text-green-800 dark:text-green-300', T.analyticsConfirmedRate));
+    r2.appendChild(el('div', 'text-2xl font-bold text-green-600 dark:text-green-400', confirmedRate + '%'));
+    rateRow.appendChild(r2);
+
+    var r3 = el('div', 'bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-4 text-center');
+    r3.appendChild(el('div', 'text-sm text-gray-800 dark:text-gray-300', T.analyticsCompletionRate));
+    r3.appendChild(el('div', 'text-2xl font-bold text-gray-600 dark:text-gray-300', completionRate + '%'));
+    rateRow.appendChild(r3);
+
+    var r4 = el('div', 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-center');
+    r4.appendChild(el('div', 'text-sm text-red-800 dark:text-red-300', T.analyticsCancellationRate));
+    r4.appendChild(el('div', 'text-2xl font-bold text-red-600 dark:text-red-400', cancellationRate + '%'));
+    rateRow.appendChild(r4);
+
+    frag.appendChild(rateRow);
+
+    // -- Two-Column: Popular Services + Status Breakdown --
+    var midRow = el('div', 'grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6');
+
+    // Popular Services
+    var svcCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
+    svcCard.appendChild(el('h3', 'text-lg font-bold text-gray-800 dark:text-gray-200 mb-4', T.analyticsPopularServices));
+    if (serviceData.length) {
+      var svcList = el('div', 'space-y-3');
+      serviceData.forEach(function(s) {
+        var pct = Math.round((parseInt(s.count) / maxSvc) * 100);
+        var row = el('div', '');
+        var hdr = el('div', 'flex justify-between text-sm mb-1');
+        hdr.appendChild(el('span', 'font-medium text-gray-700 dark:text-gray-300', s.service));
+        hdr.appendChild(el('span', 'text-gray-500 dark:text-gray-400', s.count + ' ' + T.analyticsAppointments));
+        row.appendChild(hdr);
+        var barBg = el('div', 'w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3');
+        var barFill = el('div', 'bg-brand rounded-full h-3 transition-all');
+        barFill.style.width = pct + '%';
+        barBg.appendChild(barFill);
+        row.appendChild(barBg);
+        svcList.appendChild(row);
+      });
+      svcCard.appendChild(svcList);
+    } else {
+      svcCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    midRow.appendChild(svcCard);
+
+    // Status Breakdown
+    var statusCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
+    statusCard.appendChild(el('h3', 'text-lg font-bold text-gray-800 dark:text-gray-200 mb-4', T.analyticsStatusBreakdown));
+    if (totalFromStatus) {
+      var statusItems = [
+        { label: T.analyticsNew, count: newA, color: 'bg-blue-500', textColor: 'text-blue-600 dark:text-blue-400' },
+        { label: T.analyticsPending, count: pending, color: 'bg-yellow-500', textColor: 'text-yellow-600 dark:text-yellow-400' },
+        { label: T.analyticsConfirmed, count: confirmed, color: 'bg-green-500', textColor: 'text-green-600 dark:text-green-400' },
+        { label: T.analyticsCompletedStatus, count: completed, color: 'bg-gray-500', textColor: 'text-gray-600 dark:text-gray-400' },
+        { label: T.analyticsCancelled, count: cancelled, color: 'bg-red-500', textColor: 'text-red-600 dark:text-red-400' }
+      ];
+      // Stacked bar
+      var stackedBar = el('div', 'flex rounded-full h-6 overflow-hidden mb-4');
+      statusItems.forEach(function(item) {
+        if (item.count > 0) {
+          var pct = Math.max(Math.round((item.count / totalFromStatus) * 100), 2);
+          var seg = el('div', item.color + ' transition-all');
+          seg.style.width = pct + '%';
+          seg.title = item.label + ': ' + item.count;
+          stackedBar.appendChild(seg);
+        }
+      });
+      statusCard.appendChild(stackedBar);
+      // Legend
+      var legend = el('div', 'grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4');
+      statusItems.forEach(function(item) {
+        var legItem = el('div', 'flex items-center gap-2');
+        legItem.appendChild(el('div', 'w-3 h-3 rounded-full ' + item.color));
+        legItem.appendChild(el('span', 'text-sm text-gray-600 dark:text-gray-400', item.label));
+        legItem.appendChild(el('span', 'text-sm font-bold ' + item.textColor, String(item.count)));
+        legend.appendChild(legItem);
+      });
+      statusCard.appendChild(legend);
+    } else {
+      statusCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    midRow.appendChild(statusCard);
+
+    frag.appendChild(midRow);
+
+    // -- Two-Column: Peak Times + Bookings Trend --
+    var timeRow = el('div', 'grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6');
+
+    // Peak Times
+    var peakCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
+    peakCard.appendChild(el('h3', 'text-lg font-bold text-gray-800 dark:text-gray-200 mb-4', T.analyticsPeakTimes));
+    if (peakData.length) {
+      var peakList = el('div', 'space-y-2');
+      peakData.forEach(function(p) {
+        var pct = Math.round((parseInt(p.count) / maxPeak) * 100);
+        var peakRow = el('div', 'flex items-center gap-3');
+        peakRow.appendChild(el('span', 'w-20 text-sm font-medium text-gray-700 dark:text-gray-300', fmtHour(p.hour_slot)));
+        var pBarBg = el('div', 'flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4');
+        var pBarFill = el('div', 'bg-amber-500 rounded-full h-4 transition-all');
+        pBarFill.style.width = pct + '%';
+        pBarBg.appendChild(pBarFill);
+        peakRow.appendChild(pBarBg);
+        peakRow.appendChild(el('span', 'text-sm text-gray-500 dark:text-gray-400 w-8 text-right', String(p.count)));
+        peakList.appendChild(peakRow);
+      });
+      peakCard.appendChild(peakList);
+    } else {
+      peakCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    timeRow.appendChild(peakCard);
+
+    // Bookings Trend
+    var trendCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
+    trendCard.appendChild(el('h3', 'text-lg font-bold text-gray-800 dark:text-gray-200 mb-4', T.analyticsBookingsTrend));
+    if (trendData.length) {
+      var maxTrend = Math.max.apply(null, trendData.map(function(t) { return parseInt(t.count); }));
+      var chartWrap = el('div', 'flex items-end gap-1 h-40');
+      trendData.forEach(function(d) {
+        var pct = maxTrend ? Math.round((parseInt(d.count) / maxTrend) * 100) : 0;
+        var barH = Math.max(pct, 4);
+        var colDiv = el('div', 'flex-1 flex flex-col items-center justify-end h-full group relative');
+        var tooltip = el('div', 'absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10', d.date + ': ' + d.count + ' ' + T.analyticsBookings);
+        colDiv.appendChild(tooltip);
+        var bar = el('div', 'w-full bg-brand rounded-t transition-all hover:bg-green-600');
+        bar.style.height = barH + '%';
+        colDiv.appendChild(bar);
+        chartWrap.appendChild(colDiv);
+      });
+      trendCard.appendChild(chartWrap);
+      // X-axis labels
+      if (trendData.length >= 3) {
+        var xAxis = el('div', 'flex justify-between text-xs text-gray-400 dark:text-gray-500 mt-2 px-1');
+        xAxis.appendChild(el('span', '', trendData[0].date.substring(5)));
+        xAxis.appendChild(el('span', '', trendData[Math.floor(trendData.length / 2)].date.substring(5)));
+        xAxis.appendChild(el('span', '', trendData[trendData.length - 1].date.substring(5)));
+        trendCard.appendChild(xAxis);
+      }
+    } else {
+      trendCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    timeRow.appendChild(trendCard);
+
+    frag.appendChild(timeRow);
+
+    // -- Bottom Row: Messages + Employee Performance --
+    var btmRow = el('div', 'grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6');
+
+    // Messages Overview
+    var msgCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
+    msgCard.appendChild(el('h3', 'text-lg font-bold text-gray-800 dark:text-gray-200 mb-4', T.analyticsMessagesSection));
+    var msgGrid = el('div', 'grid grid-cols-2 gap-4');
+    var mg1 = el('div', 'bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-center');
+    mg1.appendChild(el('p', 'text-sm text-gray-600 dark:text-gray-400', T.analyticsTotal));
+    mg1.appendChild(el('p', 'text-2xl font-bold text-gray-800 dark:text-gray-200', String(totalMsgs)));
+    msgGrid.appendChild(mg1);
+    var mg2 = el('div', 'bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg text-center');
+    mg2.appendChild(el('p', 'text-sm text-blue-600 dark:text-blue-400', T.analyticsUnread));
+    mg2.appendChild(el('p', 'text-2xl font-bold text-blue-600 dark:text-blue-400', String(unreadMsgs)));
+    msgGrid.appendChild(mg2);
+    var mg3 = el('div', 'bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg text-center');
+    mg3.appendChild(el('p', 'text-sm text-amber-600 dark:text-amber-400', T.analyticsPriority));
+    mg3.appendChild(el('p', 'text-2xl font-bold text-amber-600 dark:text-amber-400', String(priorityMsgs)));
+    msgGrid.appendChild(mg3);
+    var mg4 = el('div', 'bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-center');
+    mg4.appendChild(el('p', 'text-sm text-green-600 dark:text-green-400', T.analyticsResolved));
+    mg4.appendChild(el('p', 'text-2xl font-bold text-green-600 dark:text-green-400', String(resolvedMsgs)));
+    msgGrid.appendChild(mg4);
+    msgCard.appendChild(msgGrid);
+    btmRow.appendChild(msgCard);
+
+    // Employee Performance
+    var empCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
+    empCard.appendChild(el('h3', 'text-lg font-bold text-gray-800 dark:text-gray-200 mb-4', T.analyticsEmployeePerf));
+    if (empStats.length) {
+      var tableWrap = el('div', 'overflow-x-auto');
+      var table = el('table', 'w-full text-sm');
+      var thead = document.createElement('thead');
+      var headRow = document.createElement('tr');
+      headRow.className = 'border-b dark:border-gray-700';
+      [T.analyticsEmployee, T.analyticsTotal, T.analyticsCompleted, T.analyticsTotalTime, T.analyticsAvgTime].forEach(function(label, i) {
+        var th = document.createElement('th');
+        th.className = i === 0 ? 'text-left p-2 text-gray-600 dark:text-gray-400' : 'p-2 text-gray-600 dark:text-gray-400';
+        th.textContent = label;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+      var tbody = document.createElement('tbody');
+      empStats.forEach(function(e) {
+        var tr = document.createElement('tr');
+        tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+        var td1 = el('td', 'p-2 font-medium text-gray-800 dark:text-gray-200', e.name);
+        var td2 = el('td', 'p-2 text-center text-gray-700 dark:text-gray-300', String(e.total));
+        var td3 = el('td', 'p-2 text-center text-green-600 dark:text-green-400 font-semibold', String(e.completed));
+        var td4 = el('td', 'p-2 text-center text-gray-700 dark:text-gray-300', e.totalTime + ' ' + T.analyticsMinutes);
+        var td5 = el('td', 'p-2 text-center text-gray-700 dark:text-gray-300', e.avgTime + ' ' + T.analyticsMinutes);
+        tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4); tr.appendChild(td5);
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrap.appendChild(table);
+      empCard.appendChild(tableWrap);
+    } else {
+      empCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    btmRow.appendChild(empCard);
+
+    frag.appendChild(btmRow);
+
+    container.textContent = '';
+    container.appendChild(frag);
+    analyticsLoaded = true;
+
+  } catch (err) {
+    console.error('loadAnalytics error:', err);
+    container.textContent = '';
+    var errDiv = el('div', 'text-center py-16');
+    errDiv.appendChild(el('p', 'text-red-500 text-lg mb-4', T.analyticsError));
+    var retryBtn = el('button', 'bg-brand text-white px-6 py-2 rounded-lg hover:bg-green-700 transition', T.analyticsRefresh);
+    retryBtn.addEventListener('click', loadAnalytics);
+    errDiv.appendChild(retryBtn);
+    container.appendChild(errDiv);
+  }
 }
+
+// Keep backward compatibility
+function renderAnalytics() { loadAnalytics(); }
 
 // ===== ACTIONS =====
 async function updateApptStatus(id, status) {
@@ -6794,7 +7155,7 @@ async function updateApptStatus(id, status) {
     await api('appointments.php', { method: 'PUT', body: { id, status } });
     showToast(adminT[currentLang].statusUpdated + ' \u2192 ' + status);
     loadAppointments();
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 async function updateApptAssignment(id, empId) {
@@ -6804,7 +7165,7 @@ async function updateApptAssignment(id, empId) {
     await api('appointments.php', { method: 'PUT', body: update });
     showToast(empId ? adminT[currentLang].employeeAssigned : adminT[currentLang].assignmentRemoved);
     loadAppointments();
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 // ===== BULK OPERATIONS =====
@@ -6835,7 +7196,7 @@ async function applyBulkStatus() {
     await api('appointments.php', { method: 'POST', body: { action: 'bulk_status', ids, status } });
     showToast(ids.length + ' ' + (adminT[currentLang].appointmentsUpdated || 'appointments updated'));
     loadAppointments();
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 async function applyBulkAssign() {
@@ -6847,7 +7208,7 @@ async function applyBulkAssign() {
     await api('appointments.php', { method: 'POST', body: { action: 'bulk_assign', ids, employee_id: empId } });
     showToast(ids.length + ' ' + (adminT[currentLang].appointmentsAssigned || 'appointments assigned'));
     loadAppointments();
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 function exportAppointmentsCsv() {
@@ -6881,7 +7242,7 @@ async function updateMsgStatus(id, status) {
   try {
     await api('messages.php', { method: 'PUT', body: { id, status } });
     showToast(adminT[currentLang].messageStatusUpdated + ' \u2192 ' + status); loadMessages();
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 function openNotesModal(id) {
@@ -6896,7 +7257,7 @@ async function saveNotes() {
   try {
     await api('appointments.php', { method: 'PUT', body: { id: currentNotesId, admin_notes: notes } });
     showToast(adminT[currentLang].notesSaved); closeModal('notes-modal'); loadAppointments();
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 async function addEmployee() {
@@ -6913,14 +7274,14 @@ async function addEmployee() {
     toggleAddEmployeeForm();
     document.getElementById('new-emp-name').value=''; document.getElementById('new-emp-email').value='';
     document.getElementById('new-emp-phone').value=''; loadEmployees();
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 async function toggleEmployeeStatus(id, newStatus) {
   try {
     await api('employees.php', { method: 'PUT', body: { id, is_active: newStatus } });
     showToast(newStatus ? adminT[currentLang].employeeActivated : adminT[currentLang].employeeDeactivated); loadEmployees();
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 function startEditEmployee(id) {
@@ -6941,7 +7302,7 @@ async function saveEditEmployee(id) {
       role: document.getElementById('edit-emp-role-'+id).value
     }});
     showToast(adminT[currentLang].employeeUpdated); loadEmployees();
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 async function makeAdmin(email, name, role, language) {
@@ -6953,7 +7314,7 @@ async function makeAdmin(email, name, role, language) {
       showToast(adminT[currentLang].adminCreatedEmailFailed + ': ' + (json.data?.email_error || 'unknown'));
     }
     loadAdminUsers();
-  } catch(e) { showToast('Failed: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 async function addAdmin() {
@@ -6976,7 +7337,7 @@ async function revokeAdmin(userId) {
   try {
     await api('admins.php?id=' + userId, { method: 'DELETE' });
     showToast(adminT[currentLang].adminAccessRevoked); loadAdminUsers(); loadEmployees();
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 async function resendAdminInvite(userId) {
@@ -6984,7 +7345,7 @@ async function resendAdminInvite(userId) {
     await api('admins.php?action=resend_invite&id=' + userId, { method: 'POST', body: { action: 'resend_invite', id: parseInt(userId) } });
     showToast(adminT[currentLang].setupEmailResent);
     loadAdminUsers();
-  } catch(e) { showToast('Failed: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 function openSetPasswordModal(userId, displayName) {
@@ -7003,12 +7364,12 @@ async function submitSetPassword() {
   var errorEl = document.getElementById('set-pw-error');
   errorEl.textContent = '';
 
-  if (password.length < 8) { errorEl.textContent = 'Password must be at least 8 characters.'; return; }
-  if (password.length > 72) { errorEl.textContent = 'Password must not exceed 72 characters.'; return; }
-  if (!/[A-Z]/.test(password)) { errorEl.textContent = 'Must contain an uppercase letter.'; return; }
-  if (!/[a-z]/.test(password)) { errorEl.textContent = 'Must contain a lowercase letter.'; return; }
-  if (!/[0-9]/.test(password)) { errorEl.textContent = 'Must contain a number.'; return; }
-  if (password !== confirm) { errorEl.textContent = 'Passwords do not match.'; return; }
+  if (password.length < 8) { errorEl.textContent = adminT[currentLang].passwordMin8; return; }
+  if (password.length > 72) { errorEl.textContent = adminT[currentLang].passwordMax72; return; }
+  if (!/[A-Z]/.test(password)) { errorEl.textContent = adminT[currentLang].mustContainUppercase; return; }
+  if (!/[a-z]/.test(password)) { errorEl.textContent = adminT[currentLang].mustContainLowercase; return; }
+  if (!/[0-9]/.test(password)) { errorEl.textContent = adminT[currentLang].mustContainNumber; return; }
+  if (password !== confirm) { errorEl.textContent = adminT[currentLang].passwordsNoMatch; return; }
 
   try {
     await api('admins.php', { method: 'POST', body: { action: 'set_password', id: parseInt(adminId), password: password } });
@@ -7033,7 +7394,7 @@ async function updateLanguagePreference() {
     document.getElementById('admin-lang-toggle').textContent = currentLang === 'en' ? 'ES' : 'EN';
     applyAdminTranslations();
     showToast(adminT[currentLang].languageUpdated);
-  } catch(e) { showToast('Error: '+e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
 async function revokeAdminByEmail(email) {
@@ -7043,7 +7404,7 @@ async function revokeAdminByEmail(email) {
     try {
       await api('admins.php?id=' + admin.id, { method: 'DELETE' });
       showToast(adminT[currentLang].adminAccessRevoked); loadAdminUsers(); loadEmployees();
-    } catch(e) { showToast('Error: '+e.message, true); }
+    } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
   } else { showToast(adminT[currentLang].adminNotFound, true); }
 }
 
@@ -7104,7 +7465,7 @@ async function saveSiteSettings() {
     // Validate GA ID format before saving
     const gaVal = document.getElementById('setting-google_analytics_id-en').value.trim();
     if (gaVal && !/^G-[A-Z0-9]{6,12}$/.test(gaVal)) {
-      showToast('Invalid Google Analytics ID format. Expected: G-XXXXXXXXXX', true);
+      showToast(adminT[currentLang].gaIdInvalid, true);
       return;
     }
     const settings = SITE_SETTINGS_KEYS.map(key => ({
@@ -7190,7 +7551,7 @@ function switchTab(tab) {
   document.getElementById('tab-' + tab).classList.remove('hidden');
   const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
   if(btn) { btn.classList.add('tab-active'); btn.classList.remove('text-white','hover:bg-green-600'); btn.setAttribute('aria-selected', 'true'); }
-  if(tab==='analytics') renderAnalytics();
+  if(tab==='analytics') loadAnalytics();
   if(tab==='appointments') renderCalendar();
   if(tab==='sitecontent') { loadSiteSettings(); loadEmailTemplates(); }
 }
@@ -7272,7 +7633,7 @@ async function updateNotificationEmail() {
   try {
     await api('account.php', { method: 'PUT', body: { action: 'update_notification_email', notification_email: email } });
     showToast(adminT[currentLang].notificationEmailUpdated + ' ' + email);
-  } catch(e) { showToast('Error: ' + e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': ' + e.message, true); }
 }
 
 async function updateAccountName() {
@@ -7283,7 +7644,7 @@ async function updateAccountName() {
     document.getElementById('admin-email').textContent = name;
     currentUser.name = name;
     showToast(adminT[currentLang].nameUpdated);
-  } catch(e) { showToast('Error: ' + e.message, true); }
+  } catch(e) { showToast(adminT[currentLang].error + ': ' + e.message, true); }
 }
 
 async function updateAccountEmail() {

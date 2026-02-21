@@ -104,6 +104,18 @@ try {
         jsonError('This time slot is fully booked. Please choose a different time.', 409);
     }
 
+    // ─── Duplicate booking prevention ────────────────────────────────────────
+    $dupeStmt = $db->prepare(
+        'SELECT id FROM oretir_appointments
+         WHERE email = ? AND preferred_date = ? AND preferred_time = ? AND status != ?
+         LIMIT 1'
+    );
+    $dupeStmt->execute([$email, $preferredDate, $preferredTime, 'cancelled']);
+
+    if ($dupeStmt->fetch()) {
+        jsonError('You already have an appointment at this time. Please choose a different slot. / Ya tiene una cita a esta hora. Por favor elija otro horario.', 409);
+    }
+
     // ─── Generate unique reference number ────────────────────────────────
     $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Omit 0/O, 1/I to avoid confusion
     $maxAttempts = 10;
