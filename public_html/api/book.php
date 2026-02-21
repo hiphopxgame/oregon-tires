@@ -292,6 +292,16 @@ try {
                 'send_invites'     => true,
                 'timezone'         => 'America/Los_Angeles',
                 'default_duration' => 60,
+                'service_colors'   => [
+                    'tire-installation'     => '9',  // blue
+                    'tire-repair'           => '9',
+                    'oil-change'            => '6',  // orange
+                    'brake-service'         => '11', // red
+                    'wheel-alignment'       => '3',  // purple
+                    'tuneup'                => '2',  // green
+                    'mechanical-inspection' => '7',  // cyan
+                    'mobile-service'        => '5',  // yellow
+                ],
             ]);
 
             $appointmentData = [
@@ -315,11 +325,13 @@ try {
             $googleEventId = $calResult['id'] ?? null;
 
             if ($googleEventId) {
-                $db->prepare('UPDATE oretir_appointments SET google_event_id = ? WHERE id = ?')
-                   ->execute([$googleEventId, $appointmentId]);
+                $db->prepare('UPDATE oretir_appointments SET google_event_id = ?, calendar_sync_status = ?, calendar_synced_at = NOW() WHERE id = ?')
+                   ->execute([$googleEventId, 'success', $appointmentId]);
             }
         } catch (\Throwable $e) {
-            // Calendar failure should never break the booking
+            // Calendar failure should never break the booking — track the error
+            $db->prepare('UPDATE oretir_appointments SET calendar_sync_status = ?, calendar_sync_error = ? WHERE id = ?')
+               ->execute(['failed', substr($e->getMessage(), 0, 500), $appointmentId]);
             error_log("Oregon Tires book.php: Google Calendar error for appointment #{$appointmentId}: " . $e->getMessage());
         }
     }

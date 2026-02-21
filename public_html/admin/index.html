@@ -28,6 +28,16 @@
     .fade-in { animation: fadeIn 0.3s ease-in; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .modal-overlay { background: rgba(0,0,0,0.5); }
+    /* Calendar sync badges */
+    .cal-sync-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 9999px; font-size: 11px; font-weight: 500; vertical-align: middle; margin-left: 4px; cursor: default; }
+    .cal-sync-success { background: #d1fae5; color: #065f46; }
+    .cal-sync-failed  { background: #fee2e2; color: #991b1b; }
+    .cal-sync-pending { background: #fef3c7; color: #92400e; }
+    .dark .cal-sync-success { background: #064e3b; color: #6ee7b7; }
+    .dark .cal-sync-failed  { background: #7f1d1d; color: #fca5a5; }
+    .dark .cal-sync-pending { background: #78350f; color: #fcd34d; }
+    @keyframes calPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .cal-sync-pending { animation: calPulse 1.5s ease-in-out infinite; }
     .scrollbar-thin::-webkit-scrollbar { width: 6px; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     /* Drag-and-drop upload zones */
@@ -5623,6 +5633,20 @@ function showToast(msg, isError) {
   setTimeout(() => t.classList.add('hidden'), 3000);
 }
 function statusBadge(s) { return `<span class="px-2 py-1 rounded-full text-xs font-medium status-${s||'new'}">${(s||'new').charAt(0).toUpperCase()+(s||'new').slice(1)}</span>`; }
+function calSyncBadge(a) {
+  if (!a) return '';
+  if (a.google_event_id && a.calendar_sync_status === 'success') {
+    var syncDate = a.calendar_synced_at ? new Date(a.calendar_synced_at).toLocaleString() : '';
+    return `<span class="cal-sync-badge cal-sync-success" title="Synced to Google Calendar${syncDate ? ' on ' + syncDate : ''}">&#x1F4C5; Synced</span>`;
+  }
+  if (a.calendar_sync_status === 'failed') {
+    return `<span class="cal-sync-badge cal-sync-failed" title="${esc(a.calendar_sync_error || 'Sync failed')}">&#x1F4C5; Failed</span>`;
+  }
+  if (a.calendar_sync_status === 'pending') {
+    return `<span class="cal-sync-badge cal-sync-pending" title="Calendar sync pending">&#x1F4C5; Syncing...</span>`;
+  }
+  return '';
+}
 function fmtDate(d) { if(!d) return '—'; return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
 function fmtTime(t) { if(!t) return '—'; const [h,m]=t.split(':'); const hr=parseInt(h); return `${hr%12||12}:${m} ${hr>=12?'PM':'AM'}`; }
 function fmtDateTime(d) { return new Date(d).toLocaleString(); }
@@ -5840,7 +5864,7 @@ function renderOverview() {
         ${apts.length ? `<span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-bold">${apts.length} appt${apts.length>1?'s':''}</span>` : '<span class="text-xs text-gray-400 italic">Open</span>'}
       </div>
       ${apts.length ? apts.slice(0,3).map(a => `<div class="text-sm flex justify-between items-center bg-white p-2 rounded mb-1 border">
-        <span><strong>${fmtTime(a.preferred_time)}</strong> — ${esc(a.first_name)} ${esc(a.last_name)} <span class="text-gray-500 text-xs">(${esc(a.service)})</span></span>${statusBadge(a.status)}
+        <span><strong>${fmtTime(a.preferred_time)}</strong> — ${esc(a.first_name)} ${esc(a.last_name)} <span class="text-gray-500 text-xs">(${esc(a.service)})</span></span>${statusBadge(a.status)}${calSyncBadge(a)}
       </div>`).join('') + (apts.length>3 ? `<p class="text-xs text-gray-400">+${apts.length-3} more</p>` : '') : ''}
     </div>`;
   }).join('');
@@ -5916,7 +5940,7 @@ function renderCalDay() {
         <div class="flex-1">
           <div class="flex items-center gap-2 mb-1">
             <span class="text-lg font-bold text-brand dark:text-green-400">${fmtTime(a.preferred_time)}</span>
-            ${statusBadge(a.status)}
+            ${statusBadge(a.status)}${calSyncBadge(a)}
           </div>
           <h4 class="font-medium">${esc(a.first_name)} ${esc(a.last_name)}</h4>
           <p class="text-sm text-gray-600">${esc(a.service)}</p>
@@ -5992,7 +6016,7 @@ function renderAppointments() {
         ${a.status==='completed'&&a.actual_duration_minutes?`<div class="text-xs text-green-700 font-medium mt-1">Completed in ${a.actual_duration_minutes}min</div>`:''}</td>
       <td class="p-3"><div class="text-sm">${esc(a.email)}</div>${a.phone?`<div class="text-xs text-gray-500">${esc(a.phone)}</div>`:''}</td>
       <td class="p-3 text-sm">${a.assigned_employee_id ? esc(employees.find(e=>e.id===a.assigned_employee_id)?.name||'Unknown') : '<span class="text-gray-400">Unassigned</span>'}</td>
-      <td class="p-3">${statusBadge(a.status)}</td>
+      <td class="p-3">${statusBadge(a.status)}${calSyncBadge(a)}</td>
       <td class="p-3"><div class="flex flex-col gap-1">
         <select onchange="updateApptStatus('${a.id}',this.value)" class="border rounded px-2 py-1 text-xs">
           <option value="new" ${a.status==='new'?'selected':''}>New</option><option value="confirmed" ${a.status==='confirmed'?'selected':''}>Confirmed</option>
