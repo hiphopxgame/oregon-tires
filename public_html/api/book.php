@@ -159,6 +159,12 @@ try {
 
     $appointmentId = (int) $db->lastInsertId();
 
+    // ─── Generate cancel/reschedule token ─────────────────────────────────
+    $cancelToken = bin2hex(random_bytes(32));
+    $cancelExpires = date('Y-m-d H:i:s', strtotime('+30 days'));
+    $db->prepare('UPDATE oretir_appointments SET cancel_token = ?, cancel_token_expires = ? WHERE id = ?')
+       ->execute([$cancelToken, $cancelExpires, $appointmentId]);
+
     // ─── Optional Payment Integration ─────────────────────────────────────
     $paymentResponse = null;
     $paymentMethod = sanitize((string) ($data['payment_method'] ?? ''), 20);
@@ -387,7 +393,8 @@ try {
             $referenceNumber,
             $service,          // raw service slug for calendar
             $preferredDate,    // raw YYYY-MM-DD for calendar
-            $preferredTime     // raw HH:MM for calendar
+            $preferredTime,    // raw HH:MM for calendar
+            $cancelToken       // cancel/reschedule token
         );
     } catch (\Throwable $e) {
         // Don't fail the booking if confirmation email fails

@@ -6,7 +6,6 @@
 declare(strict_types=1);
 
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 
 /**
  * Send an email using PHPMailer with SMTP settings from .env
@@ -525,7 +524,8 @@ function sendBookingConfirmationEmail(
     string $referenceNumber = '',
     string $rawService = '',
     string $rawDate = '',
-    string $rawTime = ''
+    string $rawTime = '',
+    string $cancelToken = ''
 ): array {
     $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
 
@@ -561,6 +561,37 @@ function sendBookingConfirmationEmail(
             </td>
             <td style="padding:0 6px;">
               <a href="{$icsUrl}" target="_blank" style="display:inline-block;padding:10px 20px;background:#374151;color:#fff;text-decoration:none;font-size:13px;font-weight:600;border-radius:8px;">📥 Apple / Outlook (.ics)</a>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+HTML;
+    }
+
+    // Build cancel/reschedule links (only if token provided)
+    $cancelRescheduleHtml = '';
+    if ($cancelToken !== '') {
+        $cancelUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/cancel.php?token=' . urlencode($cancelToken);
+        $rescheduleUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/reschedule.php?token=' . urlencode($cancelToken);
+        $cancelUrlSafe = htmlspecialchars($cancelUrl, ENT_QUOTES, 'UTF-8');
+        $rescheduleUrlSafe = htmlspecialchars($rescheduleUrl, ENT_QUOTES, 'UTF-8');
+
+        $cancelRescheduleHtml = <<<HTML
+  <tr>
+    <td style="padding:0 36px 24px;">
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px;text-align:center;">
+        <p style="color:#6b7280;font-size:13px;margin:0 0 12px;">
+          Need to change your plans? / &iquest;Necesita cambiar sus planes?
+        </p>
+        <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+          <tr>
+            <td style="padding:0 6px;">
+              <a href="{$rescheduleUrlSafe}" target="_blank" style="display:inline-block;padding:10px 20px;background:#f59e0b;color:#fff;text-decoration:none;font-size:13px;font-weight:600;border-radius:8px;">Reschedule / Reprogramar</a>
+            </td>
+            <td style="padding:0 6px;">
+              <a href="{$cancelUrlSafe}" target="_blank" style="display:inline-block;padding:10px 20px;background:#6b7280;color:#fff;text-decoration:none;font-size:13px;font-weight:600;border-radius:8px;">Cancel / Cancelar</a>
             </td>
           </tr>
         </table>
@@ -632,6 +663,9 @@ HTML;
     // Insert calendar links after the language sections
     $bodySections .= $calendarHtml;
 
+    // Insert cancel/reschedule links after calendar links
+    $bodySections .= $cancelRescheduleHtml;
+
     $htmlBody = wrapBrandedEmail($bodySections, $baseUrl, $baseUrl, false);
 
     // Build subject
@@ -649,6 +683,15 @@ HTML;
         $textBody .= "\n\n📅 Add to Calendar / Agregar a Calendario:\n";
         $textBody .= "Google Calendar: {$calLinks['google_url']}\n";
         $textBody .= "Apple/Outlook (.ics): {$calLinks['ics_url']}\n";
+    }
+
+    // Add cancel/reschedule links to plain text
+    if ($cancelToken !== '') {
+        $cancelUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/cancel.php?token=' . urlencode($cancelToken);
+        $rescheduleUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/reschedule.php?token=' . urlencode($cancelToken);
+        $textBody .= "\n\nNeed to change your plans? / Necesita cambiar sus planes?\n";
+        $textBody .= "Reschedule / Reprogramar: {$rescheduleUrl}\n";
+        $textBody .= "Cancel / Cancelar: {$cancelUrl}\n";
     }
 
     $result = sendMail($email, $subject, $htmlBody, $textBody);
