@@ -10,7 +10,7 @@ require_once __DIR__ . '/../includes/bootstrap.php';
 
 // Require admin session
 startSession();
-if (empty($_SESSION['admin'])) {
+if (empty($_SESSION['admin_id'])) {
     http_response_code(302);
     header('Location: /admin/');
     exit;
