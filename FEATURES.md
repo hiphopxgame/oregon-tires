@@ -1,8 +1,8 @@
 # Oregon Tires Auto Care -- Feature List
 
-> **Last updated:** 2026-02-15
-> **Stack:** Static HTML/CSS/JS | Supabase Backend | cPanel/Apache Hosting
-> **URL structure:** `index.html` (public site), `admin/index.html` (dashboard), `book-appointment/index.html` (redirect stub)
+> **Last updated:** 2026-02-21
+> **Stack:** Static HTML/CSS/JS | PHP API + MySQL + PHPMailer | cPanel/Apache Hosting
+> **URL structure:** `index.html` (public site), `admin/index.html` (dashboard), `book-appointment/index.html` (redirect stub), `contact.php`, `cancel.php`, `reschedule.php`, `checkout.php`
 
 ---
 
@@ -28,19 +28,21 @@
    - [Employees Tab](#25-employees-tab)
    - [Gallery Tab](#26-gallery-tab)
    - [Analytics Tab](#27-analytics-tab)
-   - [Realtime Updates](#28-realtime-updates)
+   - [Data Refresh](#28-data-refresh)
    - [Account Settings](#29-account-settings)
    - [Utility Functions](#210-utility-functions)
    - [Documentation Tab](#211-documentation-tab)
 3. [Book Appointment Page](#3-book-appointment-page)
-4. [Database Schema](#4-database-schema)
-5. [Infrastructure](#5-infrastructure)
+4. [Customer Self-Service](#4-customer-self-service)
+5. [Database Schema](#5-database-schema)
+6. [Infrastructure](#6-infrastructure)
+7. [Shared Kit Integrations](#7-shared-kit-integrations)
 
 ---
 
 ## 1. Public Website
 
-**File:** `public_html/index.html` (697 lines -- single-file SPA)
+**File:** `public_html/index.html` (single-file SPA)
 
 ### 1.1 Navigation and Layout
 
@@ -56,8 +58,8 @@
 
 ### 1.2 Hero Section
 
-- Dynamic background image loaded from Supabase `oretir_service_images` table (key: `hero-background`)
-- Local fallback image (`assets/hero-bg.png`) if Supabase URL fails or is unavailable
+- Dynamic background image loaded from PHP API `/api/service-images.php` (key: `hero-background`)
+- Local fallback image (`assets/hero-bg.png`) if API URL fails or is unavailable
 - Semi-transparent black overlay (`bg-black/50`) for text readability
 - Bilingual headline and subtitle (swapped via `data-t` translation keys)
 - Two CTA buttons:
@@ -78,7 +80,7 @@
 | Auto Maintenance | `svc-img-auto-repair` | `images/auto-maintenance.jpg` |
 | Specialized Services | `svc-img-specialized-tools` | `images/specialized-services.jpg` |
 
-- Each card loads its background image dynamically from Supabase with position and scale controls
+- Each card loads its background image dynamically from the PHP API with position and scale controls
 - `tryLoadImage()` validates every URL before applying -- broken URLs fall back to local images
 - Cards display a title and description, both fully translatable
 
@@ -127,7 +129,7 @@
 
 ### 1.6 Gallery Section
 
-- Dynamic image grid loaded from Supabase (`oretir_gallery_images` table)
+- Dynamic image grid loaded from PHP API (`GET /api/gallery.php`)
 - Filters by `is_active = true`, ordered by `display_order`
 - **Hover zoom animation:** `group-hover:scale-105` with CSS transition on images
 - Optional title and description displayed below each image (if populated)
@@ -147,8 +149,10 @@
 | Email | email | Yes |
 | Message | textarea (4 rows) | Yes |
 
-- Form submits to Supabase `oretir_contact_messages` table via `sb.from().insert()`
+- Form submits to PHP API endpoint `POST /api/contact.php`
 - Stores the current language with the message (`english` or `spanish`)
+- Admin notification email sent via PHPMailer using bilingual DB-driven templates
+- Reply-To header set to the customer's email address
 - **Success feedback:** Green text -- "Message sent successfully!" / Spanish equivalent
 - **Error feedback:** Red text -- "Error sending message. Please try again." / Spanish equivalent
 
@@ -171,13 +175,14 @@
 | Aspect | Implementation |
 |--------|----------------|
 | Toggle button | Top bar and footer -- switches between EN/ES |
-| Translation keys | 74 keys covering all UI text |
+| Translation keys | 74+ keys covering all UI text |
 | Attribute system | `data-t` attribute on all translatable elements |
 | Toggle function | `toggleLanguage()` swaps all `data-t` elements simultaneously |
 | Language state | `currentLang` variable (`'en'` or `'es'`) |
 | Gallery reload | Gallery images reload on language switch |
 | Form messages | Success/error messages display in the active language |
 | Contact storage | Language is stored with each submitted contact message |
+| Email templates | DB-driven bilingual templates (`value_en` / `value_es` columns in `oretir_site_settings`) |
 
 ### 1.9 SEO and Structured Data
 
@@ -206,9 +211,11 @@
 
 | Service | Usage |
 |---------|-------|
-| Supabase JS SDK v2 | Database queries, storage, realtime subscriptions |
-| Tailwind CSS CDN | All styling via utility classes |
+| PHP API (custom REST endpoints) | Database queries, file uploads, email, authentication |
+| PHPMailer | SMTP email delivery with bilingual DB-driven templates |
+| Tailwind CSS v4 (compiled) | All styling via utility classes, built from `src/input.css` |
 | Google Maps Embed API | Location iframe in contact section |
+| Google Analytics | Tracking ID stored in `oretir_site_settings` |
 | Instagram | Social link to `instagram.com/oregontires` |
 | Facebook | Social link to business page |
 
@@ -233,6 +240,10 @@
 
 **Path strategy:** All paths are relative (no leading `/`) for cPanel subdirectory compatibility
 
+**Service Worker (`sw.js`):**
+- `CACHE_VERSION` constant -- bumped on each deploy to invalidate stale caches
+- Caches static assets for offline/fast repeat loads
+
 ---
 
 ## 2. Admin Dashboard
@@ -244,12 +255,15 @@
 
 | Feature | Details |
 |---------|---------|
-| Login method | Email/password via `sb.auth.signInWithPassword()` |
-| Admin verification | Checks `oretir_profiles.is_admin = true` for the user's UUID and `project_id = 'oregon-tires'` |
-| Super-admin bypass | Hardcoded email `tyronenorris@gmail.com` always passes admin check |
-| Auto-session restore | On page load, calls `sb.auth.getSession()` and auto-shows dashboard if valid admin session exists |
-| Sign out | `sb.auth.signOut()` clears session and returns to login screen |
+| Login method | Email/password via PHP session-based auth (`POST /api/admin/login.php`) |
+| Admin verification | Checks `oretir_admins` table for matching email, verifies BCrypt password hash, confirms `is_active = 1` |
+| Role-based access | `role` column in `oretir_admins`: `admin` or `superadmin` (superadmin sees Improvements tab in docs) |
+| Account lockout | After 5 failed attempts, account locked for 15 minutes (`locked_until` column) |
+| Session restore | On page load, calls `GET /api/admin/session.php` to check for valid PHP session |
+| Sign out | `POST /api/admin/logout.php` destroys PHP session and returns to login screen |
 | Login feedback | Error messages displayed below form; button shows "Signing in..." during auth |
+| Password setup | New admins receive email with setup link via `/admin/setup-password.html` |
+| Forgot password | `POST /api/admin/forgot-password.php` sends reset link with time-limited token |
 
 ### 2.2 Overview Tab
 
@@ -304,16 +318,17 @@
 | Sortable columns | Customer, Service, Date & Time, Status (click to toggle asc/desc) |
 | Pagination | Numbered page buttons with Previous/Next navigation |
 | Per-row actions | Status dropdown, employee assignment dropdown, notes button |
-| Duration display | Completed appointments show actual duration in minutes |
+| Reference number | Each appointment has a unique `OT-XXXXXXXX` reference number for tracking |
 
 **Appointment Actions:**
 - **Assign employee:** Dropdown of active employees; auto-confirms status on assignment
 - **Change status:** New, Confirmed, Completed, Cancelled
 - **Confirmation guard:** Cannot confirm an appointment without an assigned employee
 - **Admin notes:** Modal with textarea for per-appointment notes, saved to `admin_notes` column
-- **Email notifications:** Triggered via Supabase edge function `send-appointment-emails` on:
+- **Email notifications:** Triggered via PHPMailer (`includes/mail.php`) using `sendBrandedTemplateEmail()` on:
   - Employee assignment (`appointment_assigned`)
   - Completion (`appointment_completed`)
+  - Booking confirmation (sent to customer at time of booking)
 
 ### 2.4 Messages Tab
 
@@ -327,7 +342,7 @@
 | Status management | Dropdown per message: New, Priority, Completed |
 | Full message modal | Shows name, email, phone, date, full message text, and status selector |
 | Read full link | Appears when message exceeds 80 characters |
-| Refresh button | Manual reload of messages from Supabase |
+| Refresh button | Manual reload of messages from PHP API |
 
 #### Website Changes Sub-Tab
 
@@ -336,7 +351,7 @@
 | Email history list | Card-based layout showing all sent emails |
 | Type badges | Color-coded: Confirmation (blue), Assignment (yellow), Completion (green) |
 | Recipient type badge | Shows whether email was sent to customer or employee |
-| Email detail modal | Shows subject, To, Type, Sent date, Resend Message ID, and full HTML body |
+| Email detail modal | Shows subject, To, Type, Sent date, and full HTML body |
 | Refresh button | Manual reload of email logs |
 
 ### 2.5 Employees Tab
@@ -346,7 +361,7 @@
 | Feature | Details |
 |---------|---------|
 | Add employee form | Fields: Name (required), Email, Phone, Role (Employee/Manager) |
-| Account creation | If email provided, invokes `create-employee-account` Supabase edge function to create auth account and send credentials |
+| Account creation | If email provided, PHP API creates admin account and sends setup credentials via PHPMailer |
 | Edit employee | Inline edit form with Name, Email, Phone, Role fields |
 | Toggle active/inactive | Activate or deactivate employees (soft delete) |
 | Upcoming appointments | Badge showing count and next appointment date per active employee |
@@ -356,11 +371,11 @@
 
 | Feature | Details |
 |---------|---------|
-| Add admin form | Email input, creates account if user does not exist via edge function |
-| Grant admin access | Calls `set_admin_by_email` RPC to set `is_admin = true` in `oretir_profiles` |
-| Revoke admin access | Sets `is_admin = false` with confirmation dialog |
+| Add admin form | Email input; creates `oretir_admins` record with setup token |
+| Grant admin access | PHP endpoint `POST /api/admin/admins.php` creates account and sends setup email |
+| Revoke admin access | Sets `is_active = 0` in `oretir_admins` with confirmation dialog |
 | Admin-only user display | Separate section showing dashboard admins not in employee list |
-| Last login info | Shows last sign-in date or account creation date for each admin |
+| Last login info | Shows last login date or account creation date for each admin |
 | Admin badge | Green shield badge on employees who also have admin access |
 
 ### 2.6 Gallery Tab
@@ -372,9 +387,9 @@
 | Feature | Details |
 |---------|---------|
 | Upload form | File picker (image only), Title (required), Language (English/Spanish), Description |
-| Upload process | File uploaded to Supabase Storage `gallery-images` bucket, public URL stored in `oretir_gallery_images` |
+| Upload process | File uploaded to server `uploads/` directory via PHP endpoint `POST /api/admin/gallery.php`; URL stored in `oretir_gallery_images` |
 | Image list | Card layout with thumbnail, title, language, display order, active status, description |
-| Delete | Removes from both Supabase Storage and database with confirmation dialog |
+| Delete | Removes file from server storage and database record with confirmation dialog |
 
 #### Service Images Sub-Tab
 
@@ -445,26 +460,24 @@
 - Horizontal bar chart with percentage fill
 - Shows formatted time (12-hour AM/PM) and count
 
-### 2.8 Realtime Updates
+### 2.8 Data Refresh
 
-| Subscription | Table | Behavior |
-|--------------|-------|----------|
-| Appointments | `oretir_appointments` | Toast notification on INSERT showing customer name; reloads appointment data on any change (INSERT, UPDATE, DELETE) |
-| Contact Messages | `oretir_contact_messages` | Reloads messages on any change |
-
-- Uses Supabase Realtime `postgres_changes` channel
-- Unique channel name per session via random string
+| Feature | Details |
+|---------|---------|
+| Manual refresh | Refresh buttons on each tab reload data from PHP API endpoints |
+| Periodic polling | Dashboard periodically fetches updated data from API |
+| Legacy note | Supabase Realtime was removed during migration; data updates are now pull-based |
 
 ### 2.9 Account Settings
 
-Accessible via clicking the admin email/role display in the header. Opens a modal with four setting panels:
+Accessible via clicking the admin email/role display in the header. Opens a modal with setting panels:
 
 | Setting | Details |
 |---------|---------|
-| Admin Notification Email | CC address for all appointment confirmations, employee emails, and assignment notifications; stored in `oretir_settings` table |
-| Update Display Name | Updates `full_name` in Supabase Auth user metadata |
-| Update Email | Sends confirmation email to both old and new addresses via `sb.auth.updateUser()` |
-| Update Password | Minimum 6 characters, confirmation field required to match; updates via `sb.auth.updateUser()` |
+| Admin Notification Email | CC address for all appointment confirmations, employee emails, and assignment notifications; stored in `oretir_site_settings` table |
+| Update Display Name | Updates `display_name` in `oretir_admins` via `PUT /api/admin/account.php` |
+| Update Email | Updates email in `oretir_admins` via `PUT /api/admin/account.php` |
+| Update Password | Minimum 6 characters, confirmation field required to match; updates BCrypt hash via `PUT /api/admin/account.php` |
 
 ### 2.10 Utility Functions
 
@@ -481,16 +494,17 @@ Accessible via clicking the admin email/role display in the header. Opens a moda
 
 ### 2.11 Documentation Tab
 
-**Self-documenting admin panel** with three sub-tabs toggled via `switchDocsView()`:
+**Self-documenting admin panel** with four sub-tabs toggled via `switchDocsView()`:
 
 | Sub-Tab | Content |
 |---------|---------|
 | Manual | Full instruction manual for the admin team (Getting Started, Appointments, Messages, Employees, Gallery, Service Images, Analytics, Account Settings, Public Website Features, Troubleshooting) |
 | Features | Complete feature list documenting every function of the public site, admin dashboard, database schema, and infrastructure |
-| Improvements | Prioritized improvement roadmap with Critical, High Priority, Medium Priority, and Low Priority items plus a 4-week action plan |
+| Improvements | Prioritized improvement roadmap with Critical, High Priority, Medium Priority, and Low Priority items plus a 4-week action plan (superadmin only) |
+| Roadmap | Future development roadmap and planned features |
 
 - Sub-tab toggle: `switchDocsView(view)` shows/hides content divs and updates button styles
-- Manual sub-tab visible by default; Features and Improvements start hidden
+- Manual sub-tab visible by default; Features, Improvements, and Roadmap start hidden
 - Scrollable content areas with `max-h-[75vh] overflow-y-auto`
 - All documentation rendered as styled HTML with Tailwind CSS classes
 
@@ -507,70 +521,190 @@ Accessible via clicking the admin email/role display in the header. Opens a moda
 
 ---
 
-## 4. Database Schema
+## 4. Customer Self-Service
 
-**Backend:** Supabase PostgreSQL
-**Prefix:** `oretir_` for Oregon Tires tables (some legacy tables use `oregon_tires_` prefix)
+### 4.1 Appointment Cancellation
+
+**File:** `public_html/cancel.php`
+
+| Feature | Details |
+|---------|---------|
+| Token-based access | Unique `cancel_token` (64 hex chars) generated at booking time |
+| Token expiration | Tokens expire after a configurable period (`cancel_token_expires` column) |
+| Confirmation page | Displays appointment details and asks customer to confirm cancellation |
+| Status update | Sets appointment status to `cancelled` on confirmation |
+| Bilingual | Page renders in the language stored with the appointment |
+
+### 4.2 Appointment Rescheduling
+
+**File:** `public_html/reschedule.php`
+
+| Feature | Details |
+|---------|---------|
+| Token-based access | Uses the same `cancel_token` as cancellation |
+| Date/time picker | Customer selects new preferred date and time |
+| Available times check | Calls `/api/available-times.php` to show only open slots |
+| Status preservation | Appointment remains in current status after rescheduling |
+| Bilingual | Page renders in the language stored with the appointment |
+
+### 4.3 Appointment Reminders
+
+**Cron job:** `cli/send-reminders.php` (runs daily at 6 PM via server cron)
+
+| Feature | Details |
+|---------|---------|
+| Target | Appointments scheduled for the next day with `reminder_sent = 0` |
+| Email content | Bilingual reminder with appointment details, cancel/reschedule links |
+| Sent tracking | Sets `reminder_sent = 1` after successful send to prevent duplicates |
+| Template | Uses `sendBrandedTemplateEmail()` from `includes/mail.php` |
+
+---
+
+## 5. Database Schema
+
+**Backend:** MySQL (cPanel shared hosting)
+**Database:** `hiphopwo_oregon_tires`
+**Prefix:** `oretir_` for all Oregon Tires tables
+**Charset:** `utf8mb4` with `utf8mb4_unicode_ci` collation
 
 ### Tables Overview
 
 | # | Table | Purpose | Key Columns |
 |---|-------|---------|-------------|
-| 1 | `admin_accounts` | Admin account registry | id, email, full_name, is_active, project_id, user_id |
-| 2 | `oretir_profiles` | User profile with admin flag | id (UUID PK), is_admin, project_id |
-| 3 | `oretir_appointments` | Appointment records (25+ columns) | id, first/last_name, email, phone, service, preferred_date/time, status, assigned_employee_id, tire_size, license_plate, vin, service_location, customer_address/city/state/zip, vehicle_id, travel_distance/cost, started_at, completed_at, actual_duration_minutes/seconds, admin_notes |
-| 4 | `oretir_contact_messages` | Contact form submissions | id, first/last_name, email, phone, message, status, language |
-| 5 | `oretir_admin_notifications` | Admin notification records | id, type, title, message, read, appointment_id |
-| 6 | `oretir_employees` | Employee records | id, name, email, phone, role, is_active, color, user_id |
-| 7 | `oretir_employee_schedules` | Weekly employee availability | id, employee_id (FK), day_of_week, start_time, end_time, is_available |
-| 8 | `oretir_custom_hours` | Business custom hours per day | id, day_of_week (unique), open_time, close_time, is_closed, max_simultaneous_bookings |
-| 9 | `oretir_gallery_images` | Gallery image records | id, image_url, title, description, display_order, is_active |
-| 10 | `oretir_service_images` | Service section hero images | id, service_key (unique), image_url, alt_text, position_x, position_y, scale, is_current |
-| 11 | `customer_vehicles` | Customer vehicle records | id, customer_name, customer_email, make, model, year, license_plate, vin |
+| 1 | `oretir_admins` | Admin accounts with role-based access | id, email, password_hash, display_name, role (admin/superadmin), language, notification_email, is_active, login_attempts, locked_until, password_reset_token, password_reset_expires, setup_completed_at, last_login_at |
+| 2 | `oretir_employees` | Employee records | id, name, email, phone, role (Employee/Manager), is_active |
+| 3 | `oretir_appointments` | Appointment records | id, reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, first_name, last_name, phone, email, notes, status, language, reminder_sent, assigned_employee_id (FK), admin_notes, cancel_token, cancel_token_expires |
+| 4 | `oretir_contact_messages` | Contact form submissions | id, first_name, last_name, email, phone, message, status (new/priority/completed), language |
+| 5 | `oretir_gallery_images` | Gallery image records | id, image_url, title, description, is_active, display_order |
+| 6 | `oretir_service_images` | Service section hero images | id, service_key (unique per current), image_url, position_x, position_y, scale, is_current |
+| 7 | `oretir_site_settings` | Key-value settings and email templates | id, setting_key (unique), value_en, value_es |
+| 8 | `oretir_email_logs` | Email and change audit trail | id, log_type, description, admin_email, created_at |
+| 9 | `oretir_rate_limits` | API rate limiting | id, ip_address, action, created_at |
 
-### Additional Database Objects
+### Email Templates (stored in `oretir_site_settings`)
 
-| Object | Type | Purpose |
-|--------|------|---------|
-| `oretir_email_logs` | Table | Stores sent email history (subject, body, recipient, type, resend_message_id) |
-| `oretir_settings` | Table | Key-value settings store (e.g., `admin_email` notification address) |
-| `get_admin_users` | RPC Function | Returns list of admin users with login metadata |
-| `set_admin_by_email` | RPC Function | Grants or revokes admin access by email for a specific project |
-| `app_role` | Enum Type | `admin`, `user`, `artist` |
+| Template Key Prefix | Purpose |
+|---------------------|---------|
+| `email_tpl_welcome_*` | Admin account setup invitation (subject, greeting, body, button, footer) |
+| `email_tpl_reset_*` | Password reset email (subject, greeting, body, button, footer) |
+| `email_tpl_contact_*` | Contact form notification to admin (subject, greeting, body, button, footer) |
+| `email_tpl_booking_*` | Booking confirmation to customer |
+| `email_tpl_reminder_*` | Appointment reminder to customer |
+
+All templates are bilingual (`value_en` / `value_es`) and support `{{variable}}` placeholders.
+
+### Indexes
+
+| Table | Index | Columns |
+|-------|-------|---------|
+| `oretir_appointments` | `idx_status` | status |
+| `oretir_appointments` | `idx_date` | preferred_date |
+| `oretir_appointments` | `idx_employee` | assigned_employee_id |
+| `oretir_appointments` | `idx_reference` | reference_number (unique) |
+| `oretir_appointments` | `idx_cancel_token` | cancel_token (unique) |
+| `oretir_appointments` | `idx_appointments_reminder` | preferred_date, status, reminder_sent |
+| `oretir_gallery_images` | `idx_active_order` | is_active, display_order |
+| `oretir_service_images` | `idx_current` | service_key, is_current |
+| `oretir_rate_limits` | `idx_ip_action` | ip_address, action, created_at |
+| `oretir_email_logs` | `idx_type` | log_type |
+| `oretir_email_logs` | `idx_created` | created_at |
 
 ---
 
-## 5. Infrastructure
+## 6. Infrastructure
 
 ### Architecture
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | Static HTML, CSS (Tailwind CDN), vanilla JavaScript |
-| Backend | Supabase (PostgreSQL, Auth, Storage, Edge Functions, Realtime) |
+| Frontend | Static HTML, CSS (Tailwind CSS v4, compiled), vanilla JavaScript |
+| Backend | PHP API (custom REST endpoints) + MySQL |
+| Email | PHPMailer via SMTP with bilingual DB-driven templates |
 | Hosting | cPanel with Apache (`.htaccess` configuration) |
-| Build step | None -- files served as-is |
+| Build step | Tailwind CSS compiled via `npx @tailwindcss/cli` (in `deploy.sh`) |
 
-### Supabase Services Used
+### PHP Backend Components
 
-| Service | Usage |
-|---------|-------|
-| PostgreSQL | All data storage (11+ tables) |
-| Auth | Email/password login, session management, user metadata |
-| Storage | `gallery-images` bucket for gallery and service image uploads |
-| Edge Functions | `send-appointment-emails` (email notifications), `create-employee-account` (employee onboarding) |
-| Realtime | Live subscriptions to `oretir_appointments` and `oretir_contact_messages` changes |
-| RPC | `get_admin_users`, `set_admin_by_email` database functions |
+| Component | File | Purpose |
+|-----------|------|---------|
+| Bootstrap | `includes/bootstrap.php` | Loads `.env` via phpdotenv, establishes PDO connection |
+| Database | `includes/db.php` | PDO MySQL connection helper |
+| Auth | `includes/auth.php` | Session-based authentication, admin verification |
+| Mail | `includes/mail.php` | PHPMailer wrapper, `sendBrandedTemplateEmail()` for bilingual emails |
+| Rate Limiting | `includes/rate-limit.php` | DB-backed rate limiting per IP/action |
+| Validation | `includes/validate.php` | Input sanitization and validation helpers |
+| Response | `includes/response.php` | JSON response helpers with proper HTTP status codes |
+
+### API Endpoints
+
+**Public Endpoints:**
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/book.php` | Create appointment (with optional payment via Commerce Kit) |
+| POST | `/api/contact.php` | Submit contact form |
+| GET | `/api/available-times.php?date=YYYY-MM-DD` | Slot availability |
+| GET | `/api/settings.php` | Site settings (phone, hours, etc.) |
+| GET | `/api/gallery.php` | Gallery images |
+| GET | `/api/service-images.php` | Service card images |
+| GET | `/api/calendar-event.php` | iCal download for appointment |
+| POST | `/api/appointment-cancel.php` | Cancel appointment via token |
+| POST | `/api/appointment-reschedule.php` | Reschedule appointment via token |
+
+**Admin Endpoints (require session auth):**
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/admin/login.php` | Email/password login |
+| GET | `/api/admin/session.php` | Check active session |
+| POST | `/api/admin/logout.php` | Destroy session |
+| GET/PUT | `/api/admin/appointments.php` | List and update appointments |
+| GET/PUT | `/api/admin/messages.php` | List and update contact messages |
+| GET/POST/PUT | `/api/admin/employees.php` | CRUD employees |
+| GET/POST/DELETE | `/api/admin/gallery.php` | CRUD gallery images (with file upload) |
+| GET/POST/PUT | `/api/admin/service-images.php` | CRUD service images (with file upload) |
+| GET/POST/PUT | `/api/admin/admins.php` | Manage admin accounts |
+| GET/PUT | `/api/admin/account.php` | Current admin's account settings |
+| GET | `/api/admin/email-logs.php` | Email audit trail |
+| GET | `/api/admin/analytics.php` | Dashboard analytics data |
+| GET | `/api/admin/export.php` | Data export (CSV) |
+| GET/PUT | `/api/admin/site-settings.php` | Manage site settings and email templates |
+| GET | `/api/admin/email-template-vars.php` | Available template variables |
+| POST | `/api/admin/forgot-password.php` | Send password reset email |
+| POST | `/api/admin/setup-password.php` | Set password via setup token |
+| POST | `/api/admin/verify-token.php` | Verify setup/reset token |
+| GET | `/api/admin/calendar-health.php` | Google Calendar sync health check |
+| POST | `/api/admin/calendar-retry-sync.php` | Retry failed calendar syncs |
+| POST | `/api/admin/calendar-test-sync.php` | Test calendar sync connection |
+
+### CLI Scripts (Server Cron)
+
+| Schedule | Script | Purpose |
+|----------|--------|---------|
+| `0 18 * * *` | `cli/send-reminders.php` | Send appointment reminders for next day |
+
+**Other CLI scripts (run manually):**
+
+| Script | Purpose |
+|--------|---------|
+| `cli/create-admins-feb2026.php` | Bulk admin account creation |
+| `cli/resend-setup-emails.php` | Resend setup invitation emails |
+| `cli/seed-email-templates.php` | Seed/update bilingual email templates |
+| `cli/test-smtp-debug.php` | SMTP connectivity test |
 
 ### Hosting and Deployment
 
 | Aspect | Details |
 |--------|---------|
-| Server | cPanel/Apache shared hosting |
+| Server | cPanel/Apache shared hosting (`ssh hiphopworld`) |
+| Remote path | `/home/hiphopwo/public_html/---oregon.tires/` |
 | Source directory | `public_html/` (local development) |
 | Staging directory | `_uploads/` (temporary staging for modified files only) |
-| Deployment method | Manual file upload -- only changed files, mirroring directory structure |
+| Deployment | `./deploy.sh` -- builds Tailwind CSS, stages changed files, SCPs to server |
+| Deploy modes | `deploy` (default), `diff` (dry run), `status` (remote state), `build` (CSS only) |
+| CSS build | `npx @tailwindcss/cli -i src/input.css -o public_html/assets/styles.css --minify` |
 | Path strategy | Relative paths throughout (no leading `/` on asset references) for cPanel compatibility |
+| Service worker | `sw.js` with `CACHE_VERSION` -- bump on each deploy |
 
 ### Testing
 
@@ -583,12 +717,51 @@ Accessible via clicking the admin email/role display in the header. Opens a moda
 
 ```
 public_html/
-  index.html              # Public website (697 lines)
+  index.html              # Public website (single-file SPA)
+  contact.php             # Contact page (Form Kit integration)
+  cancel.php              # Appointment cancellation (token-based)
+  reschedule.php          # Appointment rescheduling (token-based)
+  checkout.php            # Payment page (Commerce Kit integration)
+  sw.js                   # Service worker
+  manifest.json           # PWA manifest
+  robots.txt              # Search engine directives
+  sitemap.xml             # XML sitemap
+  404.html                # Custom 404 page
+  .htaccess               # Apache rewrite rules
   admin/
     index.html            # Admin dashboard (~3,870 lines, includes embedded docs)
+    setup-password.html   # Admin password setup page
   book-appointment/
     index.html            # Redirect stub (11 lines)
+  about/
+    index.html            # About page
+  services/
+    index.html            # Services page
+  faq/
+    index.html            # FAQ page
+  api/
+    book.php              # Booking endpoint
+    contact.php           # Contact form endpoint
+    available-times.php   # Slot availability
+    settings.php          # Site settings
+    gallery.php           # Gallery images
+    service-images.php    # Service card images
+    calendar-event.php    # iCal download
+    appointment-cancel.php
+    appointment-reschedule.php
+    admin/                # 20+ admin CRUD endpoints (session-protected)
+    commerce/             # 7 Commerce Kit wrapper endpoints
+    form/                 # 5 Form Kit wrapper endpoints
+  includes/
+    bootstrap.php         # .env loader + PDO init
+    db.php                # Database connection
+    auth.php              # Session auth helpers
+    mail.php              # PHPMailer wrapper + branded templates
+    rate-limit.php        # Rate limiting
+    validate.php          # Input validation
+    response.php          # JSON response helpers
   assets/
+    styles.css            # Compiled Tailwind CSS v4
     logo.png              # Site logo
     hero-bg.png           # Hero background fallback
     favicon.png           # Browser favicon
@@ -600,18 +773,67 @@ public_html/
     tire-services.jpg
     auto-maintenance.jpg
     specialized-services.jpg
+  uploads/                # User-uploaded files (gallery, service images)
+  cli/
+    send-reminders.php    # Cron: appointment reminders
+    seed-email-templates.php
+    create-admins-feb2026.php
+    resend-setup-emails.php
+    test-smtp-debug.php
+  vendor/                 # Composer dependencies (PHPMailer, phpdotenv)
+sql/
+  schema.sql              # Full MySQL schema
+  seed-images.sql         # Default service image seeds
+  migrate-*.sql           # Database migrations
+src/
+  input.css               # Tailwind CSS v4 source
+deploy.sh                 # Build + deploy script
 ```
 
 ### Security Measures
 
-| Measure | Location |
-|---------|----------|
-| Admin role verification | Dashboard login checks `oretir_profiles.is_admin` before granting access |
-| XSS prevention | `esc()` function uses `textContent` assignment for all user-generated content |
+| Measure | Details |
+|---------|---------|
+| PHP prepared statements | All database queries use PDO prepared statements (parameterized) |
+| BCrypt password hashing | `password_hash()` with `PASSWORD_BCRYPT` cost 12 |
+| Session management | `session_regenerate_id(true)` on login; `httponly`, `secure`, `samesite` cookie flags |
+| Rate limiting | DB-backed rate limiting per IP/action (`oretir_rate_limits` table) |
+| Input validation | Server-side validation via `includes/validate.php` for all form submissions |
+| XSS prevention | `esc()` function uses `textContent` assignment; no `innerHTML` for user content |
 | `noindex, nofollow` | Admin page excluded from search engines |
-| Supabase RLS | Row Level Security on database tables (managed in Supabase) |
-| Anon key only | Frontend uses Supabase anonymous key; sensitive operations go through edge functions |
-| Modal overlay dismissal | Modals close on overlay click to prevent accidental data exposure |
+| `.htaccess` protection | `includes/` directory blocked from direct HTTP access |
+| Token-based actions | Cancel/reschedule tokens use `bin2hex(random_bytes(32))` with expiration |
+| Account lockout | 5 failed login attempts triggers 15-minute lockout |
+| Error handling | All API endpoints catch `\Throwable` to prevent stack trace leakage |
+| SMTP credentials | Stored in `.env` (never committed to git), loaded via phpdotenv |
+
+---
+
+## 7. Shared Kit Integrations
+
+### 7.1 Form Kit
+
+**Source:** Shared Form Kit (`/home/hiphopwo/shared/form-kit/` on server)
+
+| Feature | Details |
+|---------|---------|
+| Contact page | `contact.php` uses Form Kit renderer for a bilingual dark-theme contact form |
+| API wrappers | 5 thin wrappers in `/api/form/`: `submit.php`, `submissions.php`, `mark-read.php`, `stats.php`, `config.php` |
+| Admin inbox | Contact submissions viewable via Form Kit admin interface |
+| Mail delivery | 3-tier: site's mail helper (auto-detects signature) -> PHPMailer -> `mail()` |
+| Rate limiting | Form Kit's built-in DB-backed rate limiter |
+
+### 7.2 Commerce Kit
+
+**Source:** Shared Commerce Kit (`/home/hiphopwo/shared/commerce-kit/` on server)
+
+| Feature | Details |
+|---------|---------|
+| Checkout page | `checkout.php` provides optional payment flow for appointments |
+| API wrappers | 7 thin wrappers in `/api/commerce/`: `checkout.php`, `checkout-return.php`, `orders.php`, `stats.php`, `webhook.php`, `paypal-webhook.php`, `crypto-confirm.php` |
+| Providers | PayPal (live), Crypto (active), Stripe (needs credentials), Manual |
+| Order tracking | `commerce_orders`, `commerce_line_items`, `commerce_transactions` tables |
+| Webhook support | PayPal IPN and crypto confirmation webhooks |
 
 ---
 

@@ -28,7 +28,8 @@ growwithmagi@gmail.com
 7. [Viewing Analytics](#7-viewing-analytics)
 8. [Account Settings](#8-account-settings)
 9. [Public Website Features (What Your Customers See)](#9-public-website-features-what-your-customers-see)
-10. [Troubleshooting](#10-troubleshooting)
+10. [Documentation Tab](#10-documentation-tab)
+11. [Troubleshooting](#11-troubleshooting)
 
 ---
 
@@ -55,7 +56,7 @@ After a successful login, you land on the **Overview** tab. This screen shows yo
 - Number of new contact messages
 - Recent activity highlights
 
-Use the **navigation tabs** along the top of the dashboard to move between sections: Appointments, Messages, Employees, Gallery, Analytics, and Settings.
+Use the **navigation tabs** along the top of the dashboard to move between sections: Appointments, Messages, Employees, Gallery, Analytics, Docs, and Settings.
 
 ---
 
@@ -240,7 +241,7 @@ Gallery images appear on the public website in the Gallery section that customer
    - **Spanish** -- The image will appear when the site is in Spanish.
 6. Add an optional **Description** if you want to include extra details about the image.
 7. Click **Upload**.
-8. The image is stored securely in cloud storage (Supabase) and will appear on the website automatically.
+8. The image is uploaded to the server and will appear on the website automatically.
 
 ### Deleting an Image
 
@@ -363,7 +364,7 @@ The Analytics tab gives you a bird's-eye view of your business performance.
 ### Changing Your Password
 
 1. Find the **Password** section in settings.
-2. Enter your new password. It must be at least **6 characters** long.
+2. Enter your new password. It must be at least **8 characters** long, including an uppercase letter, a lowercase letter, and a number.
 3. Confirm the new password by typing it again (if prompted).
 4. Click **Save**.
 
@@ -383,7 +384,7 @@ This section describes the features that your customers interact with on the pub
 ### Contact Form
 
 - The website has a **contact form** where visitors can send you a message.
-- When a visitor submits the form, their message immediately appears in your **Messages** tab in the admin dashboard.
+- When a visitor submits the form, their message is sent to the server API and immediately appears in your **Messages** tab in the admin dashboard.
 - The form collects the visitor's name, contact details, and their message.
 
 ### Schedule Service
@@ -407,7 +408,27 @@ This section describes the features that your customers interact with on the pub
 
 ---
 
-## 10. Troubleshooting
+## 10. Documentation Tab
+
+The Docs tab provides built-in documentation directly inside the admin dashboard.
+
+### Viewing Documentation
+
+1. Click the **Docs** tab in the dashboard.
+2. You will see sub-tabs for different documents:
+   - **Manual** -- This instruction manual.
+   - **Features** -- A complete list of all site features.
+   - **Roadmap** -- The strategic growth plan and future features.
+3. Each document is available in both English and Spanish. The language shown matches your dashboard language setting.
+
+### Bilingual Documentation
+
+- Documentation sections automatically display in your selected language.
+- Use the language toggle in the dashboard header to switch between English and Spanish.
+
+---
+
+## 11. Troubleshooting
 
 ### "I can't log in to the admin dashboard."
 
@@ -418,14 +439,14 @@ This section describes the features that your customers interact with on the pub
 
 ### "Images I uploaded are not showing on the website."
 
-1. When you upload images through the admin dashboard, they are stored in the cloud database. The website loads them from there.
+1. When you upload images through the admin dashboard, they are stored on the server. The website loads them from there.
 2. If no images have been uploaded for a particular section, the website uses **fallback images** from the `/images/` folder on the server.
 3. Make sure the fallback images exist on the server if you have not uploaded replacements through the dashboard.
 4. Try refreshing the page (press Ctrl+F5 on Windows or Cmd+Shift+R on Mac to do a hard refresh that clears the cache).
 
 ### "The contact form is not working."
 
-1. The contact form saves submissions to a cloud database, so it requires an **active internet connection** to work.
+1. The contact form submits data to the server via the website.
 2. Ask the customer to check their internet connection.
 3. If the problem persists, open the browser's developer tools (press F12) and check the **Console** tab for error messages. Share these with a developer if needed.
 
@@ -444,7 +465,7 @@ This section describes the features that your customers interact with on the pub
 
 ### "The site looks broken or unstyled on a device."
 
-1. The website uses **Tailwind CSS** loaded from an online source (CDN). If the visitor's internet connection is slow or the CDN is temporarily unavailable, the site may appear unstyled.
+1. The website uses **Tailwind CSS** that is compiled and included with the site, so styling works even if external resources are unavailable. If the site still appears unstyled, try refreshing the page.
 2. Ask the visitor to refresh the page once their connection is stable.
 3. The site is designed to be **responsive** (it adjusts to phones, tablets, and desktops). If something looks off on a specific device, take a screenshot and share it with a developer.
 
@@ -467,6 +488,7 @@ This section describes the features that your customers interact with on the pub
 | **Employees** | Add, edit, activate/deactivate employees and manage admin access |
 | **Gallery** | Upload and manage gallery images and service images |
 | **Analytics** | View appointment, customer, and employee performance stats |
+| **Docs** | View instruction manual, features, and roadmap |
 | **Settings** | Update your profile, email, and password |
 
 ---
