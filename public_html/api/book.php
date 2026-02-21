@@ -159,6 +159,124 @@ try {
 
     $appointmentId = (int) $db->lastInsertId();
 
+    // ─── Optional Payment Integration ─────────────────────────────────────
+    $paymentResponse = null;
+    $paymentMethod = sanitize((string) ($data['payment_method'] ?? ''), 20);
+
+    if ($paymentMethod !== '' && in_array($paymentMethod, ['stripe', 'paypal', 'crypto'], true)) {
+        $servicePrice = (float) ($data['service_price'] ?? 0);
+        if ($servicePrice <= 0) {
+            // Payment method specified but no valid price — skip payment, booking still succeeds
+            error_log("Oregon Tires book.php: payment_method={$paymentMethod} but no valid service_price for appointment #{$appointmentId}");
+        } else {
+            try {
+                $commerceKitPath = $_ENV['COMMERCE_KIT_PATH'] ?? __DIR__ . '/../../../---commerce-kit';
+                require_once $commerceKitPath . '/loader.php';
+
+                $siteKey = 'oregon.tires';
+                $providers = CommerceBootstrap::init($db, $siteKey, [
+                    'stripe' => true,
+                    'stripe_config' => [
+                        'secret_key'     => $_ENV['STRIPE_SECRET_KEY'] ?? '',
+                        'webhook_secret' => $_ENV['STRIPE_WEBHOOK_SECRET'] ?? '',
+                    ],
+                    'paypal' => true,
+                    'paypal_config' => [
+                        'client_id' => $_ENV['PAYPAL_CLIENT_ID'] ?? '',
+                        'secret'    => $_ENV['PAYPAL_SECRET'] ?? '',
+                        'mode'      => $_ENV['PAYPAL_MODE'] ?? 'sandbox',
+                    ],
+                    'crypto' => true,
+                    'crypto_config' => [
+                        'wallet_addresses' => [
+                            'ETH'  => $_ENV['CRYPTO_ETH_ADDRESS'] ?? '',
+                            'BTC'  => $_ENV['CRYPTO_BTC_ADDRESS'] ?? '',
+                            'SOL'  => $_ENV['CRYPTO_SOL_ADDRESS'] ?? '',
+                            'USDT' => $_ENV['CRYPTO_USDT_ADDRESS'] ?? '',
+                            'USDC' => $_ENV['CRYPTO_USDC_ADDRESS'] ?? '',
+                        ],
+                        'expiry_minutes' => 30,
+                    ],
+                ]);
+
+                if (!isset($providers[$paymentMethod])) {
+                    error_log("Oregon Tires book.php: provider '{$paymentMethod}' not available for appointment #{$appointmentId}");
+                } else {
+                    $serviceDisplay = ucwords(str_replace('-', ' ', $service));
+                    $appUrl = $_ENV['APP_URL'] ?? 'https://oregon.tires';
+
+                    $paymentData = [
+                        'items' => [[
+                            'description' => $serviceDisplay,
+                            'quantity'    => 1,
+                            'unit_price'  => $servicePrice,
+                            'metadata'    => [
+                                'appointment_ref' => $referenceNumber,
+                                'appointment_id'  => $appointmentId,
+                            ],
+                        ]],
+                        'customer_name'  => "{$firstName} {$lastName}",
+                        'customer_email' => $email,
+                        'customer_phone' => $phone,
+                        'metadata' => [
+                            'appointment_ref' => $referenceNumber,
+                            'appointment_id'  => $appointmentId,
+                        ],
+                    ];
+
+                    // Provider-specific URLs and data
+                    if ($paymentMethod === 'stripe') {
+                        $paymentData['success_url'] = $appUrl . '/booking-success?ref=' . $referenceNumber . '&order_ref={CHECKOUT_SESSION_ID}';
+                        $paymentData['cancel_url']  = $appUrl . '/booking-cancelled?ref=' . $referenceNumber;
+                    } elseif ($paymentMethod === 'paypal') {
+                        $paymentData['return_url'] = $appUrl . '/booking-success?ref=' . $referenceNumber;
+                        $paymentData['cancel_url'] = $appUrl . '/booking-cancelled?ref=' . $referenceNumber;
+                    } elseif ($paymentMethod === 'crypto') {
+                        $paymentData['crypto_currency'] = strtoupper(sanitize((string) ($data['crypto_currency'] ?? 'ETH'), 10));
+                        $paymentData['crypto_amount']   = (float) ($data['crypto_amount'] ?? 0);
+                    }
+
+                    /** @var CommerceProvider $provider */
+                    $provider = $providers[$paymentMethod];
+                    $paymentResult = $provider->initiate($siteKey, $paymentData);
+
+                    if ($paymentResult['success'] ?? false) {
+                        $paymentResponse = ['payment_initiated' => true];
+
+                        // Include checkout URL for stripe/paypal
+                        if ($paymentMethod === 'stripe' && !empty($paymentResult['checkout_url'])) {
+                            $paymentResponse['checkout_url'] = $paymentResult['checkout_url'];
+                        } elseif ($paymentMethod === 'paypal' && !empty($paymentResult['approval_url'])) {
+                            $paymentResponse['checkout_url'] = $paymentResult['approval_url'];
+                        } elseif ($paymentMethod === 'crypto') {
+                            $paymentResponse['wallet_address']  = $paymentResult['wallet_address'] ?? '';
+                            $paymentResponse['crypto_currency'] = $paymentResult['crypto_currency'] ?? '';
+                            $paymentResponse['crypto_amount']   = $paymentResult['crypto_amount'] ?? null;
+                            $paymentResponse['expires_at']      = $paymentResult['expires_at'] ?? null;
+                        }
+
+                        $paymentResponse['order_ref'] = $paymentResult['order_ref'] ?? '';
+                        $paymentResponse['total']     = $paymentResult['total'] ?? $servicePrice;
+                    } else {
+                        // Payment initiation failed — booking still succeeds, log the error
+                        $paymentResponse = [
+                            'payment_initiated' => false,
+                            'payment_error'     => $paymentResult['error'] ?? 'Payment initiation failed',
+                        ];
+                        error_log("Oregon Tires book.php: payment initiation failed for appointment #{$appointmentId}: " . ($paymentResult['error'] ?? 'unknown'));
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Payment failure should never break the booking
+                $paymentResponse = [
+                    'payment_initiated' => false,
+                    'payment_error'     => 'Payment service unavailable',
+                ];
+                error_log("Oregon Tires book.php: payment exception for appointment #{$appointmentId}: " . $e->getMessage());
+            }
+        }
+    }
+
     // ─── Format service name for display ────────────────────────────────────
     $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
     $serviceDisplay = ucwords(str_replace('-', ' ', $service));
@@ -286,10 +404,16 @@ try {
         error_log("Booking confirmation email failed for #{$appointmentId}: " . $e->getMessage());
     }
 
-    jsonSuccess([
+    $response = [
         'appointment_id'   => $appointmentId,
         'reference_number' => $referenceNumber,
-    ]);
+    ];
+
+    if ($paymentResponse !== null) {
+        $response['payment'] = $paymentResponse;
+    }
+
+    jsonSuccess($response);
 
 } catch (\Throwable $e) {
     error_log("Oregon Tires book.php error: " . $e->getMessage());
