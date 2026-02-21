@@ -5711,13 +5711,14 @@ document.getElementById('forgot-form').addEventListener('submit', async function
   btn.textContent = adminT[currentLang].sending || 'Sending...';
   statusEl.classList.add('hidden');
   try {
-    var res = await fetch(API_BASE + '/admin/forgot-password.php', {
+    var res = await fetch(API + '/forgot-password.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({ email: emailVal })
     });
     var json = await res.json();
+    if (!res.ok || !json.success) throw new Error(json.error || 'Request failed');
     statusEl.className = 'text-sm text-center text-green-600 dark:text-green-400';
     statusEl.textContent = adminT[currentLang].resetLinkSent || 'If an account with that email exists, a reset link has been sent.';
     statusEl.classList.remove('hidden');
