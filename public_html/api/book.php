@@ -277,6 +277,53 @@ try {
         }
     }
 
+    // ─── Google Calendar Integration ────────────────────────────────────────
+    $googleEventId = null;
+    if (!empty($_ENV['GOOGLE_CALENDAR_CREDENTIALS'])) {
+        try {
+            $formKitPath = $_ENV['FORM_KIT_PATH'] ?? __DIR__ . '/../../../---form-kit';
+            require_once $formKitPath . '/loader.php';
+            require_once $formKitPath . '/actions/google-calendar.php';
+
+            FormManager::init($db, ['site_key' => 'oregon.tires']);
+            GoogleCalendarAction::register([
+                'credentials_path' => $_ENV['GOOGLE_CALENDAR_CREDENTIALS'],
+                'calendar_id'      => $_ENV['GOOGLE_CALENDAR_ID'] ?? 'primary',
+                'send_invites'     => true,
+                'timezone'         => 'America/Los_Angeles',
+                'default_duration' => 60,
+            ]);
+
+            $appointmentData = [
+                'id'               => $appointmentId,
+                'reference_number' => $referenceNumber,
+                'service'          => $service,
+                'preferred_date'   => $preferredDate,
+                'preferred_time'   => $preferredTime,
+                'first_name'       => $firstName,
+                'last_name'        => $lastName,
+                'email'            => $email,
+                'phone'            => $phone,
+                'vehicle_year'     => $vehicleYear,
+                'vehicle_make'     => $vehicleMake,
+                'vehicle_model'    => $vehicleModel,
+                'notes'            => $notes,
+            ];
+
+            $calEvent = GoogleCalendarAction::buildEventFromAppointment($appointmentData);
+            $calResult = GoogleCalendarAction::createEvent($calEvent);
+            $googleEventId = $calResult['id'] ?? null;
+
+            if ($googleEventId) {
+                $db->prepare('UPDATE oretir_appointments SET google_event_id = ? WHERE id = ?')
+                   ->execute([$googleEventId, $appointmentId]);
+            }
+        } catch (\Throwable $e) {
+            // Calendar failure should never break the booking
+            error_log("Oregon Tires book.php: Google Calendar error for appointment #{$appointmentId}: " . $e->getMessage());
+        }
+    }
+
     // ─── Format service name for display ────────────────────────────────────
     $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
     $serviceDisplay = ucwords(str_replace('-', ' ', $service));

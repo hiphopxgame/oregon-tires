@@ -26,4 +26,17 @@ FormManager::init($pdo, [
     'success_message' => 'Thank you for your message. We will get back to you soon.',
 ]);
 
+// Register Google Calendar action (creates event on contact form submission)
+if (!empty($_ENV['GOOGLE_CALENDAR_CREDENTIALS'])) {
+    require_once $formKitPath . '/actions/google-calendar.php';
+    GoogleCalendarAction::register([
+        'credentials_path' => $_ENV['GOOGLE_CALENDAR_CREDENTIALS'],
+        'calendar_id'      => $_ENV['GOOGLE_CALENDAR_ID'] ?? 'primary',
+        'send_invites'     => true,
+        'timezone'         => 'America/Los_Angeles',
+        'default_duration' => 30,
+        'event_title'      => 'Oregon Tires Contact: {name}',
+    ]);
+}
+
 require $formKitPath . '/api/form/submit.php';

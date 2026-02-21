@@ -148,6 +148,41 @@ try {
         $sql = 'UPDATE oretir_appointments SET ' . implode(', ', $fields) . ' WHERE id = ?';
         $db->prepare($sql)->execute($params);
 
+        // Sync status change to Google Calendar
+        if (isset($body['status']) && !empty($_ENV['GOOGLE_CALENDAR_CREDENTIALS'])) {
+            try {
+                $apptStmt = $db->prepare('SELECT google_event_id FROM oretir_appointments WHERE id = ?');
+                $apptStmt->execute([$id]);
+                $apptRow = $apptStmt->fetch();
+                $eventId = $apptRow['google_event_id'] ?? null;
+
+                if ($eventId) {
+                    $formKitPath = $_ENV['FORM_KIT_PATH'] ?? __DIR__ . '/../../../---form-kit';
+                    require_once $formKitPath . '/loader.php';
+                    require_once $formKitPath . '/actions/google-calendar.php';
+
+                    FormManager::init($db, ['site_key' => 'oregon.tires']);
+                    GoogleCalendarAction::register([
+                        'credentials_path' => $_ENV['GOOGLE_CALENDAR_CREDENTIALS'],
+                        'calendar_id'      => $_ENV['GOOGLE_CALENDAR_ID'] ?? 'primary',
+                        'send_invites'     => true,
+                        'timezone'         => 'America/Los_Angeles',
+                    ]);
+
+                    if ($body['status'] === 'cancelled') {
+                        GoogleCalendarAction::deleteEvent($eventId);
+                    } elseif ($body['status'] === 'confirmed') {
+                        GoogleCalendarAction::updateEvent($eventId, ['colorId' => '10']); // Green
+                    } elseif ($body['status'] === 'completed') {
+                        GoogleCalendarAction::updateEvent($eventId, ['colorId' => '8']); // Graphite
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Calendar sync failure should not break the status update
+                error_log("appointments.php: Google Calendar sync error for appointment #{$id}: " . $e->getMessage());
+            }
+        }
+
         jsonSuccess(['updated' => $id]);
     }
 
