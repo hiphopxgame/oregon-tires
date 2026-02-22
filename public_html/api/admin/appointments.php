@@ -149,6 +149,59 @@ try {
         $sql = 'UPDATE oretir_appointments SET ' . implode(', ', $fields) . ' WHERE id = ?';
         $db->prepare($sql)->execute($params);
 
+        // ─── Send confirmation email when status changes to "confirmed" ────
+        if (isset($body['status']) && $body['status'] === 'confirmed') {
+            try {
+                $confirmStmt = $db->prepare(
+                    'SELECT id, reference_number, service, preferred_date, preferred_time,
+                            first_name, last_name, email, language,
+                            vehicle_year, vehicle_make, vehicle_model,
+                            cancel_token, cancel_token_expires
+                     FROM oretir_appointments WHERE id = ?'
+                );
+                $confirmStmt->execute([$id]);
+                $row = $confirmStmt->fetch();
+
+                if ($row && !empty($row['email'])) {
+                    $custName    = trim($row['first_name'] . ' ' . $row['last_name']);
+                    $svcDisplay  = ucwords(str_replace('-', ' ', $row['service']));
+                    $custLang    = ($row['language'] ?? 'english') === 'spanish' ? 'es' : 'en';
+
+                    $dateObj     = new \DateTime($row['preferred_date']);
+                    $displayDate = $custLang === 'es' ? $dateObj->format('d/m/Y') : $dateObj->format('m/d/Y');
+
+                    $tp   = explode(':', $row['preferred_time']);
+                    $hr   = (int) $tp[0];
+                    $ampm = $hr >= 12 ? 'PM' : 'AM';
+                    $dh   = $hr > 12 ? $hr - 12 : ($hr === 0 ? 12 : $hr);
+                    $displayTime = $dh . ':00 ' . $ampm;
+
+                    $vParts      = array_filter([$row['vehicle_year'], $row['vehicle_make'], $row['vehicle_model']]);
+                    $vehicleInfo = implode(' ', $vParts);
+
+                    // Ensure cancel token exists
+                    $cancelToken = $row['cancel_token'] ?? '';
+                    if (empty($cancelToken) || (!empty($row['cancel_token_expires']) && strtotime($row['cancel_token_expires']) < time())) {
+                        $cancelToken   = bin2hex(random_bytes(32));
+                        $cancelExpires = date('Y-m-d H:i:s', strtotime('+30 days'));
+                        $db->prepare('UPDATE oretir_appointments SET cancel_token = ?, cancel_token_expires = ? WHERE id = ?')
+                           ->execute([$cancelToken, $cancelExpires, $id]);
+                    }
+
+                    sendBookingConfirmationEmail(
+                        $row['email'], $custName, $svcDisplay, $displayDate, $displayTime,
+                        $vehicleInfo, $custLang, $row['reference_number'],
+                        $row['service'], $row['preferred_date'], $row['preferred_time'],
+                        $cancelToken
+                    );
+
+                    logEmail('appointment_confirmed', "Confirmation email sent to {$row['email']} for {$row['reference_number']}");
+                }
+            } catch (\Throwable $e) {
+                error_log("appointments.php: Confirmation email error for #{$id}: " . $e->getMessage());
+            }
+        }
+
         // Sync status change to Google Calendar
         if (isset($body['status']) && !empty($_ENV['GOOGLE_CALENDAR_CREDENTIALS'])) {
             try {

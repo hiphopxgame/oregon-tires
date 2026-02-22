@@ -601,6 +601,26 @@ HTML;
 HTML;
     }
 
+    // Build status check link
+    $statusHtml = '';
+    if ($referenceNumber !== '') {
+        $statusUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/status/?ref=' . urlencode($referenceNumber) . '&email=' . urlencode($email);
+        $statusUrlSafe = htmlspecialchars($statusUrl, ENT_QUOTES, 'UTF-8');
+
+        $statusHtml = <<<HTML
+  <tr>
+    <td style="padding:0 36px 24px;">
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px;text-align:center;">
+        <p style="color:#1e40af;font-size:13px;font-weight:600;margin:0 0 8px;">
+          Check your appointment status anytime / Consulte el estado de su cita
+        </p>
+        <a href="{$statusUrlSafe}" target="_blank" style="display:inline-block;padding:8px 24px;background:#3b82f6;color:#fff;text-decoration:none;font-size:13px;font-weight:600;border-radius:8px;">View Status / Ver Estado</a>
+      </div>
+    </td>
+  </tr>
+HTML;
+    }
+
     $vars = [
         'name'             => $name,
         'service'          => $service,
@@ -665,6 +685,9 @@ HTML;
 
     // Insert cancel/reschedule links after calendar links
     $bodySections .= $cancelRescheduleHtml;
+
+    // Insert status check link after cancel/reschedule
+    $bodySections .= $statusHtml;
 
     $htmlBody = wrapBrandedEmail($bodySections, $baseUrl, $baseUrl, false);
 

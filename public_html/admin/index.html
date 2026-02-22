@@ -40,6 +40,17 @@
     .cal-sync-pending { animation: calPulse 1.5s ease-in-out infinite; }
     .scrollbar-thin::-webkit-scrollbar { width: 6px; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    /* Notification bell */
+    .notif-badge { position: absolute; top: -4px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9999px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1; pointer-events: none; }
+    .notif-dropdown { position: absolute; right: 0; top: 100%; margin-top: 8px; width: 320px; max-height: 400px; overflow-y: auto; background: #fff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,.15); z-index: 100; }
+    .dark .notif-dropdown { background: #1f2937; box-shadow: 0 10px 25px rgba(0,0,0,.4); }
+    .notif-item { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background .15s; }
+    .notif-item:hover { background: #f9fafb; }
+    .dark .notif-item { border-color: #374151; }
+    .dark .notif-item:hover { background: #374151; }
+    .notif-item:last-child { border-bottom: none; }
+    @keyframes bellShake { 0%,100%{transform:rotate(0)} 15%{transform:rotate(14deg)} 30%{transform:rotate(-14deg)} 45%{transform:rotate(10deg)} 60%{transform:rotate(-8deg)} 75%{transform:rotate(4deg)} }
+    .bell-ring { animation: bellShake 0.6s ease-in-out; }
     /* Drag-and-drop upload zones */
     .drop-zone {
       border: 2px dashed #cbd5e1;
@@ -233,6 +244,17 @@
           </div>
           <button id="admin-dark-toggle" onclick="toggleAdminDarkMode()" aria-label="Toggle dark mode" class="text-sm text-white hover:text-green-200 transition-colors">🌙</button>
           <button id="admin-lang-toggle" onclick="toggleAdminLanguage()" aria-label="Toggle language" class="text-sm text-white hover:text-green-200 transition-colors">EN</button>
+          <div class="relative" id="notif-bell-wrap">
+            <button onclick="toggleNotifPanel()" aria-label="Notifications" class="relative text-white hover:text-green-200 transition-colors text-lg" id="notif-bell-btn">🔔<span id="notif-badge" class="notif-badge hidden">0</span></button>
+            <div id="notif-dropdown" class="notif-dropdown hidden">
+              <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm" data-t="notifications">Notifications</span>
+                <button onclick="clearNotifications()" class="text-xs text-brand hover:underline" data-t="markAllRead">Mark all read</button>
+              </div>
+              <div id="notif-list" class="divide-y divide-gray-100 dark:divide-gray-700"></div>
+              <div id="notif-empty" class="px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500 hidden" data-t="noNotifications">No new notifications</div>
+            </div>
+          </div>
           <a href="/" class="text-sm hover:text-amber-200" data-t="viewSite">View Site</a>
           <button onclick="signOut()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition" data-t="signOut">Sign Out</button>
         </div>
@@ -5650,6 +5672,14 @@ const adminT = {
     createAppointment: 'Create Appointment',
     appointmentCreated: 'Appointment created!',
     creating: 'Creating...',
+    // Notifications
+    notifications: 'Notifications',
+    markAllRead: 'Mark all read',
+    noNotifications: 'No new notifications',
+    newBooking: 'New booking',
+    newMessage: 'New message',
+    justNow: 'Just now',
+    minutesAgo: '{n}m ago',
   },
   es: {
     // Login
@@ -5899,6 +5929,14 @@ const adminT = {
     createAppointment: 'Crear Cita',
     appointmentCreated: '\u00A1Cita creada!',
     creating: 'Creando...',
+    // Notifications
+    notifications: 'Notificaciones',
+    markAllRead: 'Marcar todo le\u00EDdo',
+    noNotifications: 'Sin notificaciones nuevas',
+    newBooking: 'Nueva reserva',
+    newMessage: 'Nuevo mensaje',
+    justNow: 'Ahora',
+    minutesAgo: 'hace {n}m',
   }
 };
 
@@ -7874,6 +7912,157 @@ async function createAppointment(e) {
   btn.disabled = false;
   btn.textContent = adminT[currentLang].createAppointment || 'Create Appointment';
 }
+
+// ===== NOTIFICATION BELL =====
+let prevApptIds = new Set();
+let prevMsgIds = new Set();
+let notifItems = [];
+let notifInitialized = false;
+
+function checkForNewItems() {
+  // Build current ID sets
+  var curApptIds = new Set(appointments.map(function(a) { return a.id; }));
+  var curMsgIds = new Set(messages.map(function(m) { return m.id; }));
+
+  if (!notifInitialized) {
+    prevApptIds = curApptIds;
+    prevMsgIds = curMsgIds;
+    notifInitialized = true;
+    return;
+  }
+
+  var now = Date.now();
+  // Detect new appointments
+  curApptIds.forEach(function(id) {
+    if (!prevApptIds.has(id)) {
+      var appt = appointments.find(function(a) { return a.id === id; });
+      if (appt) {
+        notifItems.unshift({
+          type: 'booking',
+          title: (adminT[currentLang].newBooking || 'New booking'),
+          detail: (appt.first_name || '') + ' ' + (appt.last_name || '') + ' — ' + ucFirst(appt.service || ''),
+          time: now,
+          tab: 'appointments'
+        });
+      }
+    }
+  });
+
+  // Detect new messages
+  curMsgIds.forEach(function(id) {
+    if (!prevMsgIds.has(id)) {
+      var msg = messages.find(function(m) { return m.id === id; });
+      if (msg) {
+        notifItems.unshift({
+          type: 'message',
+          title: (adminT[currentLang].newMessage || 'New message'),
+          detail: (msg.name || '') + ': ' + ((msg.message || '').substring(0, 60)),
+          time: now,
+          tab: 'messages'
+        });
+      }
+    }
+  });
+
+  // Keep max 20 notifications
+  if (notifItems.length > 20) notifItems = notifItems.slice(0, 20);
+
+  prevApptIds = curApptIds;
+  prevMsgIds = curMsgIds;
+  renderNotifications();
+}
+
+function ucFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ') : ''; }
+
+function renderNotifications() {
+  var badge = document.getElementById('notif-badge');
+  var list = document.getElementById('notif-list');
+  var empty = document.getElementById('notif-empty');
+  if (!badge || !list) return;
+
+  var count = notifItems.length;
+  if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : count;
+    badge.classList.remove('hidden');
+    // Ring the bell
+    var bellBtn = document.getElementById('notif-bell-btn');
+    if (bellBtn) { bellBtn.classList.add('bell-ring'); setTimeout(function() { bellBtn.classList.remove('bell-ring'); }, 700); }
+  } else {
+    badge.classList.add('hidden');
+  }
+
+  list.textContent = '';
+  if (count === 0) {
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  notifItems.forEach(function(item, idx) {
+    var div = document.createElement('div');
+    div.className = 'notif-item';
+    var icon = item.type === 'booking' ? '📅' : '💬';
+    var ago = timeAgo(item.time);
+    var titleEl = document.createElement('div');
+    titleEl.className = 'flex justify-between items-center';
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'text-sm font-medium text-gray-800 dark:text-gray-200';
+    nameSpan.textContent = icon + ' ' + item.title;
+    var timeSpan = document.createElement('span');
+    timeSpan.className = 'text-xs text-gray-400';
+    timeSpan.textContent = ago;
+    titleEl.appendChild(nameSpan);
+    titleEl.appendChild(timeSpan);
+    var detailEl = document.createElement('div');
+    detailEl.className = 'text-xs text-gray-500 dark:text-gray-400 mt-1 truncate';
+    detailEl.textContent = item.detail;
+    div.appendChild(titleEl);
+    div.appendChild(detailEl);
+    div.addEventListener('click', function() {
+      switchTab(item.tab);
+      closeNotifPanel();
+    });
+    list.appendChild(div);
+  });
+}
+
+function timeAgo(ts) {
+  var diff = Math.floor((Date.now() - ts) / 60000);
+  if (diff < 1) return adminT[currentLang].justNow || 'Just now';
+  return (adminT[currentLang].minutesAgo || '{n}m ago').replace('{n}', diff);
+}
+
+function toggleNotifPanel() {
+  var dd = document.getElementById('notif-dropdown');
+  dd.classList.toggle('hidden');
+}
+
+function closeNotifPanel() {
+  document.getElementById('notif-dropdown').classList.add('hidden');
+}
+
+function clearNotifications() {
+  notifItems = [];
+  renderNotifications();
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  var wrap = document.getElementById('notif-bell-wrap');
+  if (wrap && !wrap.contains(e.target)) closeNotifPanel();
+});
+
+// Hook into existing data load functions to detect new items
+var _origLoadAppts = loadAppointments;
+loadAppointments = async function() {
+  await _origLoadAppts();
+  checkForNewItems();
+};
+var _origLoadMsgs = loadMessages;
+loadMessages = async function() {
+  await _origLoadMsgs();
+  checkForNewItems();
+};
 </script>
 </body>
 </html>
