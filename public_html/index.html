@@ -442,34 +442,42 @@
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tireInstallation">Tire Installation</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$20<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+            <a href="/book-appointment/?service=tire-installation" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tireRepair">Tire Repair</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$15<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+            <a href="/book-appointment/?service=tire-repair" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="oilChange">Oil Change</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$35<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+            <a href="/book-appointment/?service=oil-change" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="brakeService">Brake Service</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$100<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+            <a href="/book-appointment/?service=brake-service" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="wheelAlignment">Wheel Alignment</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$75<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+            <a href="/book-appointment/?service=wheel-alignment" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tuneup">Tuneup</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$80<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+            <a href="/book-appointment/?service=tuneup" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="mechanicalInspection">Mechanical Inspection</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$50<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
+            <a href="/book-appointment/?service=mechanical-inspection" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="homeService">Mobile Service</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400" data-t="callForQuote">Call for Quote</div>
+            <a href="/book-appointment/?service=mobile-service" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
           </div>
         </div>
         <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-3" data-t="pricingDisclaimer">Prices vary by vehicle. Call for an exact quote.</p>
@@ -952,6 +960,7 @@ const t = {
     pricingDisclaimer: 'Prices vary by vehicle. Call for an exact quote.',
     callForQuote: 'Call for Quote',
     callNow: 'Call Now', bookNow: 'Book Now', bookOnline: 'Book Online', quickEasy: 'Quick & easy',
+    bookThisService: 'Book Now \u2192',
     emailUs: 'Email Us', getDirections: 'Directions',
     sendUsMessage: 'Send Us a Message', weReplyFast: 'We typically reply within a few hours',
     bilingualNote: 'We respond in English and Spanish', privacyNote: 'Your info stays private',
@@ -1036,6 +1045,7 @@ const t = {
     pricingDisclaimer: 'Los precios varían según el vehículo. Llame para una cotización exacta.',
     callForQuote: 'Llame para Cotizar',
     callNow: 'Llamar', bookNow: 'Reservar', bookOnline: 'Reservar en Línea', quickEasy: 'Rápido y fácil',
+    bookThisService: 'Reservar \u2192',
     emailUs: 'Enviar Correo', getDirections: 'Direcciones',
     sendUsMessage: 'Envíanos un Mensaje', weReplyFast: 'Respondemos en pocas horas',
     bilingualNote: 'Respondemos en inglés y español', privacyNote: 'Tu información es privada',

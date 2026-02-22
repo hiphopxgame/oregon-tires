@@ -1195,6 +1195,30 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
     }
   }
 }).catch(function(){});
+
+// ===== URL PARAM: AUTO-SELECT SERVICE =====
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var serviceSlug = params.get('service');
+  if (!serviceSlug) return;
+  var validSlugs = ['tire-installation','tire-repair','wheel-alignment','oil-change','brake-service','tuneup','mechanical-inspection','mobile-service','other'];
+  if (validSlugs.indexOf(serviceSlug) === -1) return;
+  var radio = document.getElementById('svc-' + serviceSlug);
+  if (!radio) return;
+  radio.checked = true;
+  radio.dispatchEvent(new Event('change', { bubbles: true }));
+  // Scroll to Step 2 (date/time) so user sees the next action
+  var step2 = document.querySelector('#booking-form > div:nth-child(2)');
+  if (step2) {
+    setTimeout(function() {
+      step2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+  }
+  // Track deeplink in GA
+  if (typeof gtag === 'function') gtag('event', 'booking_deeplink', {
+    event_category: 'booking_funnel', service: serviceSlug
+  });
+})();
 </script>
 </body>
 </html>

@@ -263,6 +263,7 @@
       <nav class="flex flex-wrap gap-1" id="nav-tabs">
         <button onclick="switchTab('overview')" data-tab="overview" role="tab" aria-selected="true" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition">📊 <span data-t="tabOverview">Overview</span></button>
         <button onclick="switchTab('appointments')" data-tab="appointments" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📅 <span data-t="tabAppointments">Appointments</span></button>
+        <button onclick="switchTab('customers')" data-tab="customers" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👤 <span data-t="tabCustomers">Customers</span></button>
         <button onclick="switchTab('messages')" data-tab="messages" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">💬 <span data-t="tabMessages">Messages</span></button>
         <button onclick="switchTab('employees')" data-tab="employees" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👥 <span data-t="tabEmployees">Employees</span></button>
         <button onclick="switchTab('gallery')" data-tab="gallery" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 <span data-t="tabGallery">Gallery</span></button>
@@ -411,6 +412,36 @@
         <div id="msg-subtab-emaillogs" class="hidden">
           <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-brand dark:text-green-400" data-t="websiteChanges">Website Changes</h2><button onclick="loadEmailLogs()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button></div>
           <div id="email-logs-list" class="space-y-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS TAB -->
+    <div id="tab-customers" class="tab-content hidden fade-in">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div><h2 class="text-2xl font-bold">👤 <span data-t="customerDirectory">Customer Directory</span></h2><p class="text-green-100" data-t="customerSubtitle">View customer history and returning visitors</p></div>
+        <div class="flex items-center gap-3">
+          <span id="returning-badge" class="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium"></span>
+          <button onclick="loadCustomers()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+        <div class="mb-4">
+          <input type="text" id="customer-search" oninput="renderCustomers()" class="w-full md:w-80 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" data-t="searchCustomers" placeholder="Search by name, email, phone...">
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="bg-amber-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
+              <th class="p-3" data-t="thCustomer">Customer</th>
+              <th class="p-3" data-t="thContact">Contact</th>
+              <th class="p-3">Vehicle</th>
+              <th class="p-3" data-t="totalVisits">Visits</th>
+              <th class="p-3" data-t="lastVisit">Last Visit</th>
+              <th class="p-3">Services</th>
+              <th class="p-3" data-t="thActions">Actions</th>
+            </tr></thead>
+            <tbody id="customers-table"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -5199,6 +5230,18 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   </div>
 </div>
 
+<!-- CUSTOMER HISTORY MODAL -->
+<div id="customer-history-modal" role="dialog" aria-modal="true" aria-labelledby="customer-history-title" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto dark:bg-gray-800">
+    <div class="flex justify-between items-center mb-4">
+      <h3 id="customer-history-title" class="text-lg font-bold text-gray-800 dark:text-gray-200" data-t="customerHistory">Customer History</h3>
+      <button onclick="closeModal('customer-history-modal')" aria-label="Close" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+    </div>
+    <div id="customer-history-info" class="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"></div>
+    <div id="customer-history-table" class="overflow-x-auto"></div>
+  </div>
+</div>
+
 <!-- ACCOUNT SETTINGS MODAL -->
 <div id="account-modal" role="dialog" aria-modal="true" aria-labelledby="account-modal-title" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
   <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto dark:bg-gray-800">
@@ -5672,6 +5715,18 @@ const adminT = {
     createAppointment: 'Create Appointment',
     appointmentCreated: 'Appointment created!',
     creating: 'Creating...',
+    // Customers
+    tabCustomers: 'Customers',
+    customerDirectory: 'Customer Directory',
+    customerSubtitle: 'View customer history and returning visitors',
+    searchCustomers: 'Search by name, email, phone...',
+    totalVisits: 'Visits',
+    lastVisit: 'Last Visit',
+    firstVisit: 'First Visit',
+    customerHistory: 'Customer History',
+    returningCustomers: 'Returning',
+    noCustomers: 'No customers found',
+    viewHistory: 'View History',
     // Notifications
     notifications: 'Notifications',
     markAllRead: 'Mark all read',
@@ -5929,6 +5984,18 @@ const adminT = {
     createAppointment: 'Crear Cita',
     appointmentCreated: '\u00A1Cita creada!',
     creating: 'Creando...',
+    // Customers
+    tabCustomers: 'Clientes',
+    customerDirectory: 'Directorio de Clientes',
+    customerSubtitle: 'Ver historial de clientes y visitantes recurrentes',
+    searchCustomers: 'Buscar por nombre, correo, tel\u00E9fono...',
+    totalVisits: 'Visitas',
+    lastVisit: '\u00DAltima Visita',
+    firstVisit: 'Primera Visita',
+    customerHistory: 'Historial del Cliente',
+    returningCustomers: 'Recurrentes',
+    noCustomers: 'No se encontraron clientes',
+    viewHistory: 'Ver Historial',
     // Notifications
     notifications: 'Notificaciones',
     markAllRead: 'Marcar todo le\u00EDdo',
@@ -5999,7 +6066,7 @@ const API = '/api/admin';
 let csrfToken = '';
 
 // ===== STATE =====
-let appointments = [], messages = [], employees = [], emailLogs = [], galleryImages = [], serviceImages = [];
+let appointments = [], messages = [], employees = [], emailLogs = [], galleryImages = [], serviceImages = [], customers = [];
 let currentNotesId = null, apptPage = 1, apptSortBy = 'created', apptSortOrder = 'desc';
 let calDate = new Date(), calSelectedDate = new Date();
 let adminUsers = [], currentUser = null;
@@ -6212,7 +6279,7 @@ function showDashboard(user) {
 }
 
 // ===== DATA =====
-async function loadAllData() { await Promise.all([loadAppointments(), loadMessages(), loadEmployees(), loadEmailLogs(), loadGalleryImages(), loadServiceImages(), loadAdminUsers()]); }
+async function loadAllData() { await Promise.all([loadAppointments(), loadMessages(), loadEmployees(), loadEmailLogs(), loadGalleryImages(), loadServiceImages(), loadAdminUsers(), loadCustomers()]); }
 
 async function loadAppointments() {
   try { const json = await api('appointments.php'); appointments = json.data || []; } catch(e) { appointments = []; }
@@ -7708,6 +7775,7 @@ function switchTab(tab) {
   if(btn) { btn.classList.add('tab-active'); btn.classList.remove('text-white','hover:bg-green-600'); btn.setAttribute('aria-selected', 'true'); }
   if(tab==='analytics') loadAnalytics();
   if(tab==='appointments') renderCalendar();
+  if(tab==='customers') loadCustomers();
   if(tab==='sitecontent') { loadSiteSettings(); loadEmailTemplates(); }
 }
 
@@ -7911,6 +7979,113 @@ async function createAppointment(e) {
   }
   btn.disabled = false;
   btn.textContent = adminT[currentLang].createAppointment || 'Create Appointment';
+}
+
+// ===== CUSTOMERS =====
+async function loadCustomers() {
+  try {
+    var json = await api('customers.php');
+    customers = json.data || [];
+  } catch(e) {
+    customers = [];
+  }
+  renderCustomers();
+}
+
+function renderCustomers() {
+  var tbody = document.getElementById('customers-table');
+  if (!tbody) return;
+  var search = (document.getElementById('customer-search')?.value || '').toLowerCase();
+  var filtered = customers.filter(function(c) {
+    if (!search) return true;
+    var s = (c.first_name + ' ' + c.last_name + ' ' + c.email + ' ' + (c.phone || '')).toLowerCase();
+    return s.includes(search);
+  });
+
+  // Update returning customers badge
+  var returning = customers.filter(function(c) { return parseInt(c.total_visits) >= 2; }).length;
+  var badge = document.getElementById('returning-badge');
+  if (badge) badge.textContent = '🔄 ' + (adminT[currentLang].returningCustomers || 'Returning') + ': ' + returning;
+
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-gray-500">' + esc(adminT[currentLang].noCustomers || 'No customers found') + '</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(function(c) {
+    var name = esc(c.first_name) + ' ' + esc(c.last_name);
+    var vehicle = [c.vehicle_year, c.vehicle_make, c.vehicle_model].filter(Boolean).join(' ');
+    var visits = parseInt(c.total_visits);
+    var visitBadge = visits >= 2
+      ? '<span class="inline-block ml-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-1.5 py-0.5 rounded-full text-xs font-medium">🔄 ' + visits + '</span>'
+      : '<span class="text-gray-600 dark:text-gray-400">' + visits + '</span>';
+    return '<tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="showCustomerHistory(\'' + esc(c.email).replace(/'/g, "\\'") + '\')">'
+      + '<td class="p-3"><div class="font-medium">' + name + '</div></td>'
+      + '<td class="p-3"><div class="text-sm">' + esc(c.email) + '</div>' + (c.phone ? '<div class="text-xs text-gray-500">' + esc(c.phone) + '</div>' : '') + '</td>'
+      + '<td class="p-3 text-sm">' + esc(vehicle) + '</td>'
+      + '<td class="p-3 text-center">' + visitBadge + '</td>'
+      + '<td class="p-3 text-sm">' + fmtDate(c.last_visit) + '</td>'
+      + '<td class="p-3 text-sm max-w-xs truncate">' + esc(c.services) + '</td>'
+      + '<td class="p-3"><button onclick="event.stopPropagation();showCustomerHistory(\'' + esc(c.email).replace(/'/g, "\\'") + '\')" class="bg-brand text-white px-3 py-1 rounded text-xs hover:bg-green-700">' + (adminT[currentLang].viewHistory || 'View History') + '</button></td>'
+      + '</tr>';
+  }).join('');
+}
+
+async function showCustomerHistory(email) {
+  var infoDiv = document.getElementById('customer-history-info');
+  var tableDiv = document.getElementById('customer-history-table');
+
+  // Find customer from loaded data
+  var customer = customers.find(function(c) { return c.email === email; });
+  if (!customer) { showToast(adminT[currentLang].error || 'Error', true); return; }
+
+  var name = esc(customer.first_name) + ' ' + esc(customer.last_name);
+  var vehicle = [customer.vehicle_year, customer.vehicle_make, customer.vehicle_model].filter(Boolean).join(' ');
+
+  infoDiv.innerHTML = '<div class="grid grid-cols-2 gap-3">'
+    + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].thCustomer || 'Customer') + '</span><div class="font-semibold text-gray-800 dark:text-gray-200">' + name + '</div></div>'
+    + '<div><span class="text-xs text-gray-500 dark:text-gray-400">Email</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(customer.email) + '</div></div>'
+    + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].phone || 'Phone') + '</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(customer.phone || '—') + '</div></div>'
+    + '<div><span class="text-xs text-gray-500 dark:text-gray-400">Vehicle</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(vehicle || '—') + '</div></div>'
+    + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].totalVisits || 'Visits') + '</span><div class="font-semibold text-brand dark:text-green-400">' + esc(String(customer.total_visits)) + '</div></div>'
+    + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].firstVisit || 'First Visit') + '</span><div class="text-sm text-gray-700 dark:text-gray-300">' + fmtDate(customer.first_visit) + '</div></div>'
+    + '</div>';
+
+  // Show loading state
+  tableDiv.innerHTML = '<p class="text-center text-gray-500 py-4">' + (adminT[currentLang].loading || 'Loading...') + '</p>';
+  document.getElementById('customer-history-modal').classList.remove('hidden');
+
+  // Fetch this customer's appointments
+  try {
+    var json = await api('appointments.php?search=' + encodeURIComponent(email));
+    var appts = (json.data || []).filter(function(a) { return a.email === email; });
+    appts.sort(function(a, b) { return new Date(b.preferred_date).getTime() - new Date(a.preferred_date).getTime(); });
+
+    if (!appts.length) {
+      tableDiv.innerHTML = '<p class="text-center text-gray-500 py-4">' + esc(adminT[currentLang].noAppointments || 'No appointments found') + '</p>';
+      return;
+    }
+
+    tableDiv.innerHTML = '<table class="w-full text-sm">'
+      + '<thead><tr class="bg-gray-100 dark:bg-gray-700 text-left">'
+      + '<th class="p-2">' + (adminT[currentLang].thDateTime || 'Date & Time') + '</th>'
+      + '<th class="p-2">' + (adminT[currentLang].thService || 'Service') + '</th>'
+      + '<th class="p-2">' + (adminT[currentLang].thStatus || 'Status') + '</th>'
+      + '<th class="p-2">' + (adminT[currentLang].thEmployee || 'Employee') + '</th>'
+      + '</tr></thead><tbody>'
+      + appts.map(function(a) {
+          var empName = a.employee_name || (a.assigned_employee_id ? esc(employees.find(function(e) { return e.id === a.assigned_employee_id; })?.name || '—') : '—');
+          return '<tr class="border-b dark:border-gray-600">'
+            + '<td class="p-2"><div class="font-medium">' + fmtDate(a.preferred_date) + '</div><div class="text-xs text-gray-500">' + fmtTime(a.preferred_time) + '</div></td>'
+            + '<td class="p-2">' + esc(a.service) + '</td>'
+            + '<td class="p-2">' + statusBadge(a.status) + '</td>'
+            + '<td class="p-2 text-sm">' + esc(empName) + '</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+  } catch(e) {
+    tableDiv.innerHTML = '<p class="text-center text-red-500 py-4">' + esc(adminT[currentLang].error || 'Error') + '</p>';
+  }
 }
 
 // ===== NOTIFICATION BELL =====

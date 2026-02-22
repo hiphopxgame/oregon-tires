@@ -961,3 +961,268 @@ function sendContactNotificationEmail(string $contactName, string $contactEmail,
 
     return $result;
 }
+
+/**
+ * Send a post-service Google Review request email to the customer.
+ *
+ * Sends a branded bilingual email thanking the customer for their visit
+ * and inviting them to leave a Google review with a prominent CTA button.
+ *
+ * @param array $appt  Row from oretir_appointments (must include: id, first_name,
+ *                     last_name, email, service, preferred_date, preferred_time, language)
+ * @return bool  True if the email was sent successfully
+ */
+function sendReviewRequestEmail(array $appt): bool
+{
+    $baseUrl   = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $reviewUrl = 'https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs';
+
+    $customerName   = trim($appt['first_name'] . ' ' . $appt['last_name']);
+    $customerLang   = ($appt['language'] === 'spanish') ? 'es' : 'en';
+    $serviceDisplay = ucwords(str_replace('-', ' ', $appt['service']));
+
+    // Format date for display (locale-aware)
+    $dateObj     = new DateTime($appt['preferred_date']);
+    $displayDate = ($customerLang === 'es')
+        ? $dateObj->format('d/m/Y')
+        : $dateObj->format('m/d/Y');
+
+    // Format time for display
+    $timeParts   = explode(':', $appt['preferred_time']);
+    $hour        = (int) $timeParts[0];
+    $suffix      = $hour >= 12 ? 'PM' : 'AM';
+    $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
+    $displayTime = $displayHour . ':00 ' . $suffix;
+
+    $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+
+    // ── Build bilingual body sections ─────────────────────────────────────
+
+    $mexicanBar = 'linear-gradient(90deg,#c60b1e 0%,#c60b1e 33%,#ffc400 33%,#ffc400 66%,#c60b1e 66%,#c60b1e 100%)';
+    $usBar      = 'linear-gradient(90deg,#002868 0%,#002868 33%,#bf0a30 33%,#bf0a30 66%,#002868 66%,#002868 100%)';
+
+    // Spanish section
+    $esSection = <<<HTML
+  <tr>
+    <td style="padding:0;">
+      <div style="height:3px;background:{$mexicanBar};"></div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:32px 36px 8px;">
+            <p style="color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:2px;margin:0 0 12px;font-weight:700;">&#x1F1F2;&#x1F1FD; Espa&ntilde;ol</p>
+            <h1 style="color:#15803d;font-size:24px;margin:0 0 8px;font-weight:800;">&iexcl;Gracias por su visita, {$h($customerName)}!</h1>
+            <p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 8px;">
+              Esperamos que haya tenido una excelente experiencia en Oregon Tires Auto Care.
+            </p>
+            <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px 18px;margin:0 0 20px;">
+              <p style="color:#374151;font-size:14px;line-height:1.6;margin:0;">
+                <strong>Servicio:</strong> {$h($serviceDisplay)}<br>
+                <strong>Fecha:</strong> {$h($displayDate)}
+              </p>
+            </div>
+            <p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 20px;">
+              Su opini&oacute;n es muy importante para nosotros. &iquest;Podr&iacute;a tomarse un momento para compartir su experiencia?
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 36px 24px;">
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="background:linear-gradient(135deg,#d4a843,#f5d78e,#d4a843);border-radius:12px;box-shadow:0 4px 14px rgba(212,168,67,0.4);">
+                  <a href="{$reviewUrl}" target="_blank" style="display:inline-block;padding:16px 40px;color:#1a1a2e;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:0.5px;">
+                    &#11088; Califique su Experiencia
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 36px 28px;">
+            <p style="color:#6b7280;font-size:13px;line-height:1.6;margin:0;">
+              Gracias por elegir Oregon Tires Auto Care. &iexcl;Lo esperamos pronto!
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+HTML;
+
+    // English section
+    $enSection = <<<HTML
+  <tr>
+    <td style="padding:0;">
+      <div style="height:3px;background:{$usBar};"></div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:32px 36px 8px;">
+            <p style="color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:2px;margin:0 0 12px;font-weight:700;">&#x1F1FA;&#x1F1F8; English</p>
+            <h2 style="color:#15803d;font-size:24px;margin:0 0 8px;font-weight:800;">Thank you for your visit, {$h($customerName)}!</h2>
+            <p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 8px;">
+              We hope you had a great experience at Oregon Tires Auto Care.
+            </p>
+            <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px 18px;margin:0 0 20px;">
+              <p style="color:#374151;font-size:14px;line-height:1.6;margin:0;">
+                <strong>Service:</strong> {$h($serviceDisplay)}<br>
+                <strong>Date:</strong> {$h($displayDate)}
+              </p>
+            </div>
+            <p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 20px;">
+              Your feedback means a lot to us. Would you take a moment to share your experience?
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 36px 24px;">
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="background:linear-gradient(135deg,#d4a843,#f5d78e,#d4a843);border-radius:12px;box-shadow:0 4px 14px rgba(212,168,67,0.4);">
+                  <a href="{$reviewUrl}" target="_blank" style="display:inline-block;padding:16px 40px;color:#1a1a2e;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:0.5px;">
+                    &#11088; Rate Your Experience
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 36px 28px;">
+            <p style="color:#6b7280;font-size:13px;line-height:1.6;margin:0;">
+              Thank you for choosing Oregon Tires Auto Care. We look forward to seeing you again!
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+HTML;
+
+    $divider = '<tr><td style="padding:0 36px;"><div style="height:1px;background:linear-gradient(90deg,transparent,#d1d5db,transparent);"></div></td></tr>';
+
+    if ($customerLang === 'en') {
+        $bodySections = $enSection . $divider . $esSection;
+    } else {
+        $bodySections = $esSection . $divider . $enSection;
+    }
+
+    // ── Build full HTML email ─────────────────────────────────────────────
+
+    $htmlBody = <<<HTML
+<!DOCTYPE html>
+<html lang="{$customerLang}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oregon Tires Auto Care</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0fdf4;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0fdf4;">
+<tr><td align="center" style="padding:30px 15px;">
+
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+  <!-- HEADER -->
+  <tr>
+    <td style="background:linear-gradient(135deg,#15803d 0%,#166534 50%,#1a1a2e 100%);padding:0;">
+      <div style="height:4px;background:linear-gradient(90deg,#d4a843,#f5d78e,#d4a843);"></div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:32px 30px 24px;">
+            <img src="{$baseUrl}/assets/logo.png" alt="Oregon Tires Auto Care" width="140" style="display:block;max-width:140px;height:auto;margin-bottom:16px;">
+            <p style="color:#f5d78e;font-size:13px;margin:0;letter-spacing:2px;text-transform:uppercase;font-weight:600;">&#11088; &#11088; &#11088; &#11088; &#11088;</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+{$bodySections}
+
+  <!-- FOOTER -->
+  <tr>
+    <td style="background-color:#1a1a2e;padding:0;">
+      <div style="height:3px;background:linear-gradient(90deg,#d4a843,#f5d78e,#d4a843);"></div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:24px 30px;">
+            <p style="color:#d4a843;font-size:14px;font-weight:700;margin:0 0 6px;">Oregon Tires Auto Care</p>
+            <p style="color:#9ca3af;font-size:12px;margin:0 0 4px;">8536 SE 82nd Ave, Portland, OR 97266</p>
+            <p style="color:#9ca3af;font-size:12px;margin:0 0 4px;">&#128222; (503) 367-9714</p>
+            <p style="color:#9ca3af;font-size:12px;margin:0;">Lunes&ndash;S&aacute;bado 7:00 AM &ndash; 7:00 PM</p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 30px 20px;">
+            <p style="color:#6b7280;font-size:10px;margin:0;">
+              Este correo fue enviado desde una direcci&oacute;n que no acepta respuestas.<br>
+              This email was sent from a no-reply address.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+
+</body>
+</html>
+HTML;
+
+    // ── Build plain-text version ──────────────────────────────────────────
+
+    $textEs  = "OREGON TIRES AUTO CARE\n";
+    $textEs .= "========================================\n\n";
+    $textEs .= "Gracias por su visita, {$customerName}!\n\n";
+    $textEs .= "Servicio: {$serviceDisplay}\n";
+    $textEs .= "Fecha: {$displayDate}\n\n";
+    $textEs .= "Su opinion es muy importante para nosotros.\n";
+    $textEs .= "Califique su experiencia: {$reviewUrl}\n\n";
+    $textEs .= "Gracias por elegir Oregon Tires Auto Care.\n";
+
+    $textEn  = "OREGON TIRES AUTO CARE\n";
+    $textEn .= "========================================\n\n";
+    $textEn .= "Thank you for your visit, {$customerName}!\n\n";
+    $textEn .= "Service: {$serviceDisplay}\n";
+    $textEn .= "Date: {$displayDate}\n\n";
+    $textEn .= "Your feedback means a lot to us.\n";
+    $textEn .= "Rate your experience: {$reviewUrl}\n\n";
+    $textEn .= "Thank you for choosing Oregon Tires Auto Care.\n";
+
+    $textFooter  = "\n========================================\n";
+    $textFooter .= "Oregon Tires Auto Care\n";
+    $textFooter .= "8536 SE 82nd Ave, Portland, OR 97266\n";
+    $textFooter .= "(503) 367-9714\n";
+    $textFooter .= "Mon-Sat 7:00 AM - 7:00 PM";
+
+    if ($customerLang === 'en') {
+        $textBody = $textEn . "\n========================================\n\n" . $textEs . $textFooter;
+    } else {
+        $textBody = $textEs . "\n========================================\n\n" . $textEn . $textFooter;
+    }
+
+    // ── Build subject line ────────────────────────────────────────────────
+
+    if ($customerLang === 'en') {
+        $subject = "How was your visit? | Como fue su visita? — Oregon Tires";
+    } else {
+        $subject = "Como fue su visita? | How was your visit? — Oregon Tires";
+    }
+
+    // ── Send ──────────────────────────────────────────────────────────────
+
+    $result = sendMail($appt['email'], $subject, $htmlBody, $textBody);
+
+    if ($result['success']) {
+        logEmail('review_request', "Review request sent to {$appt['email']} for appointment #{$appt['id']}");
+    } else {
+        logEmail('review_request_failed', "Review request FAILED for {$appt['email']} appointment #{$appt['id']}: " . ($result['error'] ?? 'unknown'));
+    }
+
+    return $result['success'];
+}
