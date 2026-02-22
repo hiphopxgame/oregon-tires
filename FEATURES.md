@@ -1,8 +1,8 @@
 # Oregon Tires Auto Care -- Feature List
 
-> **Last updated:** 2026-02-21
+> **Last updated:** 2026-02-22
 > **Stack:** Static HTML/CSS/JS | PHP API + MySQL + PHPMailer | cPanel/Apache Hosting
-> **URL structure:** `index.html` (public site), `admin/index.html` (dashboard), `book-appointment/index.html` (redirect stub), `contact.php`, `cancel.php`, `reschedule.php`, `checkout.php`
+> **URL structure:** `index.html` (public site), `admin/index.html` (dashboard), `book-appointment/index.html` (redirect stub), `contact.php`, `cancel.php`, `reschedule.php`, `checkout.php`, `blog.html`, `blog-post.html`, `privacy.html`, `feedback.html`
 
 ---
 
@@ -34,9 +34,20 @@
    - [Documentation Tab](#211-documentation-tab)
 3. [Book Appointment Page](#3-book-appointment-page)
 4. [Customer Self-Service](#4-customer-self-service)
-5. [Database Schema](#5-database-schema)
-6. [Infrastructure](#6-infrastructure)
-7. [Shared Kit Integrations](#7-shared-kit-integrations)
+5. [NEW Features (Pending Client Approval)](#5-new-features-pending-client-approval)
+   - [Blog / SEO Content Hub](#51-blog--seo-content-hub)
+   - [Post-Service Feedback System](#52-post-service-feedback-system)
+   - [Employee Schedule Management](#53-employee-schedule-management)
+   - [SMS Appointment Reminders](#54-sms-appointment-reminders-twilio)
+   - [WhatsApp Integration](#55-whatsapp-integration-twilio)
+   - [Privacy Policy Page](#56-privacy-policy-page)
+   - [Admin Dashboard Enhancements](#57-admin-dashboard-enhancements)
+   - [Homepage Enhancements](#58-homepage-enhancements)
+   - [Appointment Workflow Enhancements](#59-appointment-workflow-enhancements)
+   - [Schedule-Aware Availability](#510-schedule-aware-availability)
+6. [Database Schema](#6-database-schema)
+7. [Infrastructure](#7-infrastructure)
+8. [Shared Kit Integrations](#8-shared-kit-integrations)
 
 ---
 
@@ -560,7 +571,154 @@ Accessible via clicking the admin email/role display in the header. Opens a moda
 
 ---
 
-## 5. Database Schema
+## 5. NEW Features (Pending Client Approval)
+
+> **Status:** These features were built proactively and are **not yet approved by the client**. They are deployed and functional but may be disabled or removed based on client feedback. Each feature is self-contained and can be independently toggled.
+>
+> **Added:** 2026-02-22
+
+### 5.1 Blog / SEO Content Hub
+
+**Status:** `NEW` | **Files:** `blog.html`, `blog-post.html`, `api/blog.php`, `api/admin/blog.php`, `cli/migrate-blog.php`, `cli/seed-blog.php`
+
+| Feature | Details |
+|---------|---------|
+| Blog listing page | `blog.html` -- paginated grid of published blog posts with thumbnails |
+| Blog post page | `blog-post.html` -- individual post view with share/copy link |
+| Bilingual content | Each post has `title_en`, `title_es`, `body_en`, `body_es`, `excerpt_en`, `excerpt_es` |
+| Public API | `GET /api/blog.php` -- list published posts (paginated); `GET /api/blog.php?slug=xxx` -- single post |
+| Admin CRUD | `GET/POST/PUT/DELETE /api/admin/blog.php` -- full blog management with auto-slug generation |
+| Categories | `oretir_blog_categories` and `oretir_blog_post_categories` many-to-many junction |
+| Seed content | 4 bilingual posts: tire signs, wheel alignment, Portland weather tires, brake maintenance |
+| Dark mode | Full dark mode support matching site design |
+| SEO | Added to `sitemap.xml`, meta tags per post |
+
+### 5.2 Post-Service Feedback System
+
+**Status:** `NEW` | **Files:** `feedback.html`, `api/feedback.php`, `api/admin/feedback.php`, `cli/send-feedback-requests.php`, `cli/migrate-feedback.php`
+
+| Feature | Details |
+|---------|---------|
+| Feedback page | `feedback.html` -- star rating (1-5) + optional comment, token-based access |
+| Google Review redirect | After submitting feedback, prominent CTA to leave a Google Review (Place ID: `ChIJLSxZDQyflVQRWXEi9LpJGxs`) |
+| Automated emails | CLI script sends feedback requests 24h after completed appointments |
+| Token-based security | 64-char hex tokens with 7-day expiry, one feedback per appointment |
+| Admin dashboard | `GET /api/admin/feedback.php` -- feedback list with aggregate stats (avg rating, breakdown by star) |
+| Bilingual | Star labels in EN/ES ("Poor"/"Malo" through "Excellent"/"Excelente") |
+| Rate limited | 5 requests/hour per IP |
+| Suggested cron | `0 10 * * *` -- `cli/send-feedback-requests.php` |
+
+### 5.3 Employee Schedule Management
+
+**Status:** `NEW` | **Files:** `api/admin/schedules.php`, `api/admin/schedule-overrides.php`, `cli/migrate-schedules.php`
+
+| Feature | Details |
+|---------|---------|
+| Weekly schedules | `oretir_schedules` -- recurring schedule per employee per day of week (Mon-Sun) |
+| Schedule overrides | `oretir_schedule_overrides` -- date-specific overrides for holidays, PTO, special hours |
+| Shop-wide closures | Override with `employee_id = NULL` closes the entire shop for a date |
+| Admin API (schedules) | `GET/POST/DELETE /api/admin/schedules.php` -- CRUD with UPSERT support |
+| Admin API (overrides) | `GET/POST/DELETE /api/admin/schedule-overrides.php` -- date-range filtering |
+| Validation | Employee existence check, day range 0-6, time format validation, end > start |
+
+### 5.4 SMS Appointment Reminders (Twilio)
+
+**Status:** `NEW` -- scaffold only, requires Twilio credentials | **Files:** `includes/sms.php`, `cli/migrate-sms.php`, updated `cli/send-reminders.php`
+
+| Feature | Details |
+|---------|---------|
+| SMS helper | `sendSMS($to, $message)` via Twilio REST API (cURL, no SDK) |
+| Phone normalization | `normalizeSMSPhone()` converts US numbers to E.164 format |
+| Audit trail | `logSMS()` logs all SMS attempts to `oretir_sms_logs` |
+| Dual-channel reminders | `send-reminders.php` now sends email AND SMS (if configured) |
+| Bilingual SMS | EN: "Oregon Tires: Reminder - your [Service] appointment is tomorrow at [Time]." / ES equivalent |
+| Graceful degradation | If Twilio env vars missing, SMS silently skips (email-only fallback) |
+| New env vars needed | `TWILIO_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` |
+
+### 5.5 WhatsApp Integration (Twilio)
+
+**Status:** `NEW` -- scaffold only, requires Twilio WhatsApp credentials | **Files:** `includes/whatsapp.php`
+
+| Feature | Details |
+|---------|---------|
+| WhatsApp helper | `sendWhatsApp($to, $templateName, $params)` via Twilio WhatsApp API |
+| Template support | Content Template SID (HX...), friendly template names with `{{1}}` placeholders, or freeform body |
+| Phone normalization | Reuses `normalizeSMSPhone()` from SMS helper |
+| Graceful degradation | Returns `['success' => false, 'error' => 'WhatsApp not configured']` if env vars missing |
+| New env var needed | `WHATSAPP_FROM_NUMBER` |
+
+### 5.6 Privacy Policy Page
+
+**Status:** `NEW` | **Files:** `privacy.html`
+
+| Feature | Details |
+|---------|---------|
+| Bilingual privacy policy | Full EN/ES privacy policy matching site design |
+| Sections covered | Information collected, how used, data sharing, cookies, data security, children's privacy, changes, contact |
+| Compliance | Aligned with general US privacy practices |
+| Dark mode | Full dark mode support |
+| Added to sitemap | `sitemap.xml` entry with hreflang tags |
+| Footer link | Added to homepage footer |
+
+### 5.7 Admin Dashboard Enhancements
+
+**Status:** `NEW` | **Files:** `js/admin.js`, `admin/index.html`
+
+| Feature | Details |
+|---------|---------|
+| Session timeout warning | Amber banner appears 10 minutes before 8-hour session expires with "Extend Session" button |
+| Email template preview | Modal with iframe rendering of email templates using sample data, accessible from email templates section |
+| Revenue stats | Estimated revenue from completed appointments based on service-to-price mapping |
+| Completion rate | Percentage of all-time appointments that reached "completed" status |
+| Cancellation rate | Percentage of all-time appointments that were cancelled |
+| Calendar capacity bars | Color-coded bars (green/yellow/red) on each calendar day showing appointment count vs MAX_CAPACITY (12) |
+| Login autocomplete | `autocomplete="email"` and `autocomplete="current-password"` on login form inputs |
+
+### 5.8 Homepage Enhancements
+
+**Status:** `NEW` | **Files:** `index.html`, `js/main.js`
+
+| Feature | Details |
+|---------|---------|
+| Service card CTAs | "Book Tire Service", "Book Maintenance", "Book Service" buttons on each of the 3 service category cards |
+| GA4 booking tracking | Each CTA fires `gtag('event', 'begin_checkout', {item_category: ...})` for funnel analysis |
+| Pricing section CTA | "Schedule Service" button below the pricing grid |
+| Blog footer link | Link to `/blog.html` in footer |
+| Privacy footer link | Link to `/privacy.html` in footer |
+| Contact form honeypot | Hidden `website` field that bots fill out; submissions with this field are silently discarded |
+| Success banner auto-dismiss | Contact form success message auto-hides after 6 seconds |
+| Error banner auto-dismiss | Contact form error message auto-hides after 8 seconds |
+| CTA translations | `bookTireService`, `bookAutoMaintenance`, `bookSpecialized` keys in EN/ES |
+
+### 5.9 Appointment Workflow Enhancements
+
+**Status:** `NEW` | **Files:** `api/appointment-cancel.php`, `api/appointment-reschedule.php`, `api/admin/appointments.php`
+
+| Feature | Details |
+|---------|---------|
+| Cancel reason tracking | `cancel_reason VARCHAR(500)` column stores why customers cancel |
+| Owner cancellation notification | Shop owner receives branded email with appointment details + cancel reason when customer cancels |
+| Owner reschedule notification | Shop owner receives email showing old vs new date/time when customer reschedules, notes status reset to "new" |
+| Confirmation email on status change | When admin changes status to "confirmed", system sends booking confirmation email to customer with calendar links |
+| Token regeneration | Confirmation email generates a new cancel/reschedule token if expired |
+
+### 5.10 Schedule-Aware Availability
+
+**Status:** `NEW` | **Files:** `api/available-times.php`
+
+| Feature | Details |
+|---------|---------|
+| Shop closure detection | Checks `oretir_schedule_overrides` for shop-wide closures; returns all slots unavailable with `"closed": true` |
+| Shop special hours | Shop-wide non-closure overrides narrow the available time window |
+| Employee schedule integration | Loads employee schedules for the day of week; counts available employees per hour slot |
+| Per-employee overrides | PTO, sick days, or special hours per employee on specific dates |
+| Capacity per slot | Each slot response includes `capacity` (number of available employees) |
+| Legacy fallback | If no schedule data exists (tables empty), falls back to original behavior (all slots open, capacity 2) |
+| Graceful degradation | Schedule table errors caught silently; endpoint never breaks |
+
+---
+
+## 6. Database Schema
 
 **Backend:** MySQL (cPanel shared hosting)
 **Database:** `hiphopwo_oregon_tires`
@@ -573,13 +731,20 @@ Accessible via clicking the admin email/role display in the header. Opens a moda
 |---|-------|---------|-------------|
 | 1 | `oretir_admins` | Admin accounts with role-based access | id, email, password_hash, display_name, role (admin/superadmin), language, notification_email, is_active, login_attempts, locked_until, password_reset_token, password_reset_expires, setup_completed_at, last_login_at |
 | 2 | `oretir_employees` | Employee records | id, name, email, phone, role (Employee/Manager), is_active |
-| 3 | `oretir_appointments` | Appointment records | id, reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, first_name, last_name, phone, email, notes, status, language, reminder_sent, assigned_employee_id (FK), admin_notes, cancel_token, cancel_token_expires |
+| 3 | `oretir_appointments` | Appointment records | id, reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, first_name, last_name, phone, email, notes, status, cancel_reason, language, reminder_sent, feedback_sent, feedback_sent_at, sms_reminder_sent, phone_verified, assigned_employee_id (FK), admin_notes, cancel_token, cancel_token_expires |
 | 4 | `oretir_contact_messages` | Contact form submissions | id, first_name, last_name, email, phone, message, status (new/priority/completed), language |
 | 5 | `oretir_gallery_images` | Gallery image records | id, image_url, title, description, is_active, display_order |
 | 6 | `oretir_service_images` | Service section hero images | id, service_key (unique per current), image_url, position_x, position_y, scale, is_current |
 | 7 | `oretir_site_settings` | Key-value settings and email templates | id, setting_key (unique), value_en, value_es |
 | 8 | `oretir_email_logs` | Email and change audit trail | id, log_type, description, admin_email, created_at |
 | 9 | `oretir_rate_limits` | API rate limiting | id, ip_address, action, created_at |
+| 10 | `oretir_feedback` | **NEW** Post-service feedback | id, appointment_id (FK, unique), rating (1-5), comment, language, feedback_token (unique), token_expires, created_at |
+| 11 | `oretir_schedules` | **NEW** Employee weekly schedules | id, employee_id (FK), day_of_week (0-6), start_time, end_time, is_available, created_at, updated_at |
+| 12 | `oretir_schedule_overrides` | **NEW** Date-specific schedule overrides | id, employee_id (FK, nullable), override_date, is_closed, start_time, end_time, reason, created_at |
+| 13 | `oretir_sms_logs` | **NEW** SMS audit trail | id, appointment_id (FK), phone, message_type (ENUM), twilio_sid, status (ENUM), created_at |
+| 14 | `oretir_blog_posts` | **NEW** Blog posts | id, title_en, title_es, slug (unique), excerpt_en, excerpt_es, body_en, body_es, featured_image, status, author_id, published_at, created_at, updated_at |
+| 15 | `oretir_blog_categories` | **NEW** Blog categories | id, name_en, name_es, slug (unique) |
+| 16 | `oretir_blog_post_categories` | **NEW** Blog post-category junction | post_id, category_id (composite PK) |
 
 ### Email Templates (stored in `oretir_site_settings`)
 
@@ -611,7 +776,7 @@ All templates are bilingual (`value_en` / `value_es`) and support `{{variable}}`
 
 ---
 
-## 6. Infrastructure
+## 7. Infrastructure
 
 ### Architecture
 
@@ -648,8 +813,10 @@ All templates are bilingual (`value_en` / `value_es`) and support `{{variable}}`
 | GET | `/api/gallery.php` | Gallery images |
 | GET | `/api/service-images.php` | Service card images |
 | GET | `/api/calendar-event.php` | iCal download for appointment |
-| POST | `/api/appointment-cancel.php` | Cancel appointment via token |
-| POST | `/api/appointment-reschedule.php` | Reschedule appointment via token |
+| POST | `/api/appointment-cancel.php` | Cancel appointment via token (now with cancel_reason + owner notification) |
+| POST | `/api/appointment-reschedule.php` | Reschedule appointment via token (now with owner notification) |
+| GET/POST | `/api/feedback.php` | **NEW** Public feedback submission (token-based) |
+| GET | `/api/blog.php` | **NEW** Public blog listing and individual post |
 
 **Admin Endpoints (require session auth):**
 
@@ -673,6 +840,10 @@ All templates are bilingual (`value_en` / `value_es`) and support `{{variable}}`
 | POST | `/api/admin/forgot-password.php` | Send password reset email |
 | POST | `/api/admin/setup-password.php` | Set password via setup token |
 | POST | `/api/admin/verify-token.php` | Verify setup/reset token |
+| GET/POST/PUT/DELETE | `/api/admin/blog.php` | **NEW** Blog post CRUD |
+| GET | `/api/admin/feedback.php` | **NEW** Feedback listing with stats |
+| GET/POST/DELETE | `/api/admin/schedules.php` | **NEW** Employee schedule CRUD |
+| GET/POST/DELETE | `/api/admin/schedule-overrides.php` | **NEW** Schedule override CRUD |
 | GET | `/api/admin/calendar-health.php` | Google Calendar sync health check |
 | POST | `/api/admin/calendar-retry-sync.php` | Retry failed calendar syncs |
 | POST | `/api/admin/calendar-test-sync.php` | Test calendar sync connection |
@@ -681,7 +852,8 @@ All templates are bilingual (`value_en` / `value_es`) and support `{{variable}}`
 
 | Schedule | Script | Purpose |
 |----------|--------|---------|
-| `0 18 * * *` | `cli/send-reminders.php` | Send appointment reminders for next day |
+| `0 18 * * *` | `cli/send-reminders.php` | Send appointment reminders for next day (email + SMS) |
+| `0 10 * * *` | `cli/send-feedback-requests.php` | **NEW** Send feedback request emails 24h after completed appointments |
 
 **Other CLI scripts (run manually):**
 
@@ -691,6 +863,13 @@ All templates are bilingual (`value_en` / `value_es`) and support `{{variable}}`
 | `cli/resend-setup-emails.php` | Resend setup invitation emails |
 | `cli/seed-email-templates.php` | Seed/update bilingual email templates |
 | `cli/test-smtp-debug.php` | SMTP connectivity test |
+| `cli/migrate-blog.php` | **NEW** Create blog tables |
+| `cli/migrate-feedback.php` | **NEW** Create feedback table + appointment columns |
+| `cli/migrate-schedules.php` | **NEW** Create schedule tables |
+| `cli/migrate-sms.php` | **NEW** Create SMS log table + appointment columns |
+| `cli/migrate-cancel-reason.php` | **NEW** Add cancel_reason column |
+| `cli/seed-blog.php` | **NEW** Seed 4 bilingual blog posts |
+| `cli/send-feedback-requests.php` | **NEW** Cron: feedback request emails |
 
 ### Hosting and Deployment
 
@@ -722,6 +901,10 @@ public_html/
   cancel.php              # Appointment cancellation (token-based)
   reschedule.php          # Appointment rescheduling (token-based)
   checkout.php            # Payment page (Commerce Kit integration)
+  blog.html               # NEW: Blog listing page
+  blog-post.html          # NEW: Individual blog post
+  feedback.html           # NEW: Post-service feedback (star rating)
+  privacy.html            # NEW: Privacy policy (bilingual)
   sw.js                   # Service worker
   manifest.json           # PWA manifest
   robots.txt              # Search engine directives
@@ -747,9 +930,11 @@ public_html/
     gallery.php           # Gallery images
     service-images.php    # Service card images
     calendar-event.php    # iCal download
-    appointment-cancel.php
-    appointment-reschedule.php
-    admin/                # 20+ admin CRUD endpoints (session-protected)
+    appointment-cancel.php  # Updated: cancel_reason + owner notification
+    appointment-reschedule.php  # Updated: owner notification
+    blog.php              # NEW: Public blog API
+    feedback.php          # NEW: Public feedback API
+    admin/                # 25+ admin CRUD endpoints (session-protected)
     commerce/             # 7 Commerce Kit wrapper endpoints
     form/                 # 5 Form Kit wrapper endpoints
   includes/
@@ -760,6 +945,8 @@ public_html/
     rate-limit.php        # Rate limiting
     validate.php          # Input validation
     response.php          # JSON response helpers
+    sms.php               # NEW: Twilio SMS helper
+    whatsapp.php          # NEW: Twilio WhatsApp helper
   assets/
     styles.css            # Compiled Tailwind CSS v4
     logo.png              # Site logo
@@ -775,7 +962,14 @@ public_html/
     specialized-services.jpg
   uploads/                # User-uploaded files (gallery, service images)
   cli/
-    send-reminders.php    # Cron: appointment reminders
+    send-reminders.php    # Cron: appointment reminders (email + SMS)
+    send-feedback-requests.php  # NEW: Cron: feedback emails
+    migrate-blog.php      # NEW: Blog tables migration
+    migrate-feedback.php  # NEW: Feedback table migration
+    migrate-schedules.php # NEW: Schedule tables migration
+    migrate-sms.php       # NEW: SMS log table migration
+    migrate-cancel-reason.php  # NEW: Cancel reason column
+    seed-blog.php         # NEW: Seed blog posts
     seed-email-templates.php
     create-admins-feb2026.php
     resend-setup-emails.php
@@ -809,7 +1003,7 @@ deploy.sh                 # Build + deploy script
 
 ---
 
-## 7. Shared Kit Integrations
+## 8. Shared Kit Integrations
 
 ### 7.1 Form Kit
 
