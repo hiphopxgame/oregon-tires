@@ -5508,7 +5508,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
 </div>
 
 <!-- New Appointment Modal -->
-<div id="new-appt-modal" role="dialog" aria-modal="true" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.5)">
+<div id="new-appt-modal" role="dialog" aria-modal="true" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
   <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto p-6">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200" data-t="newAppointment">New Appointment</h3>
@@ -5543,7 +5543,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
           </div>
         </div>
         <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Phone *</span>
-          <input type="tel" name="appt-phone" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          <input type="tel" name="appt-phone" required autocomplete="off" oninput="searchCustomerSuggestions(this.value)" class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
         </label>
       </div>
       <div class="grid grid-cols-2 gap-4 mb-4">
@@ -8282,11 +8282,10 @@ function showNewApptModal() {
     opt.textContent = e.name;
     empSelect.appendChild(opt);
   });
+  document.getElementById('new-appt-form').reset();
   var today = new Date().toISOString().split('T')[0];
   var dateInput = document.querySelector('#new-appt-form [name="appt-date"]');
   dateInput.setAttribute('min', today);
-  dateInput.value = today;
-  document.getElementById('new-appt-form').reset();
   dateInput.value = today;
   document.getElementById('new-appt-error').classList.add('hidden');
   var suggBox = document.getElementById('customer-suggestions');
@@ -8329,6 +8328,7 @@ async function createAppointment(e) {
   try {
     var json = await api('appointments.php', { method: 'POST', body: data });
     showToast((adminT[currentLang].appointmentCreated || 'Appointment created!') + ' \u2014 ' + json.data.reference_number);
+    document.getElementById('new-appt-form').reset();
     document.getElementById('new-appt-modal').classList.add('hidden');
     loadAppointments();
   } catch (err) {

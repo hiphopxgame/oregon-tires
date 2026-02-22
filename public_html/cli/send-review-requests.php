@@ -8,7 +8,7 @@
  * or the day before, and review_request_sent is not yet flagged.
  *
  * Usage:  php send-review-requests.php
- * Cron:   0 10 * * * php /home/hiphopwo/public_html/---oregon.tires/cli/send-review-requests.php >> /tmp/ot-review-requests.log 2>&1
+ * Cron:   0 10 * * * php /home/hiphopwo/public_html/---oregon.tires/cli/send-review-requests.php >> /home/hiphopwo/logs/ot-review-requests.log 2>&1
  *
  * Recommended: Run daily at 10 AM to catch recently completed appointments.
  *

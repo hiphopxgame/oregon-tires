@@ -975,7 +975,13 @@ function sendContactNotificationEmail(string $contactName, string $contactEmail,
 function sendReviewRequestEmail(array $appt): bool
 {
     $baseUrl   = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
-    $reviewUrl = 'https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs';
+    $reviewUrl    = 'https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs';
+    $refEncoded   = urlencode($appt['reference_number'] ?? '');
+    $emailEncoded = urlencode($appt['email'] ?? '');
+    $feedbackBase = $baseUrl . '/feedback/?ref=' . $refEncoded . '&email=' . $emailEncoded . '&rating=';
+    $fb1 = $feedbackBase . '1';
+    $fb2 = $feedbackBase . '2';
+    $fb3 = $feedbackBase . '3';
 
     $customerName   = trim($appt['first_name'] . ' ' . $appt['last_name']);
     $customerLang   = ($appt['language'] === 'spanish') ? 'es' : 'en';
@@ -1027,13 +1033,14 @@ function sendReviewRequestEmail(array $appt): bool
         </tr>
         <tr>
           <td align="center" style="padding:0 36px 24px;">
+            <p style="color:#374151;font-size:13px;font-weight:600;margin:0 0 14px;">&iquest;C&oacute;mo calificar&iacute;a su visita?</p>
             <table role="presentation" cellpadding="0" cellspacing="0">
               <tr>
-                <td style="background:linear-gradient(135deg,#d4a843,#f5d78e,#d4a843);border-radius:12px;box-shadow:0 4px 14px rgba(212,168,67,0.4);">
-                  <a href="{$reviewUrl}" target="_blank" style="display:inline-block;padding:16px 40px;color:#1a1a2e;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:0.5px;">
-                    &#11088; Califique su Experiencia
-                  </a>
-                </td>
+                <td style="padding:3px;"><a href="{$fb1}" target="_blank" style="display:inline-block;padding:10px 11px;background:#f3f4f6;color:#374151;text-decoration:none;border:2px solid #d1d5db;border-radius:10px;font-size:14px;font-weight:700;text-align:center;">&#9733;<br><small style="font-size:10px;color:#6b7280;">1</small></a></td>
+                <td style="padding:3px;"><a href="{$fb2}" target="_blank" style="display:inline-block;padding:10px 11px;background:#f3f4f6;color:#374151;text-decoration:none;border:2px solid #d1d5db;border-radius:10px;font-size:14px;font-weight:700;text-align:center;">&#9733;&#9733;<br><small style="font-size:10px;color:#6b7280;">2</small></a></td>
+                <td style="padding:3px;"><a href="{$fb3}" target="_blank" style="display:inline-block;padding:10px 11px;background:#f3f4f6;color:#374151;text-decoration:none;border:2px solid #d1d5db;border-radius:10px;font-size:14px;font-weight:700;text-align:center;">&#9733;&#9733;&#9733;<br><small style="font-size:10px;color:#6b7280;">3</small></a></td>
+                <td style="padding:3px;"><a href="{$reviewUrl}" target="_blank" style="display:inline-block;padding:10px 11px;background:#d4a843;color:#1a1a2e;text-decoration:none;border:2px solid #b8922a;border-radius:10px;font-size:14px;font-weight:700;text-align:center;">&#9733;&#9733;&#9733;&#9733;<br><small style="font-size:10px;color:#78350f;">4</small></a></td>
+                <td style="padding:3px;"><a href="{$reviewUrl}" target="_blank" style="display:inline-block;padding:10px 11px;background:#d4a843;color:#1a1a2e;text-decoration:none;border:2px solid #b8922a;border-radius:10px;font-size:14px;font-weight:700;text-align:center;">&#9733;&#9733;&#9733;&#9733;&#9733;<br><small style="font-size:10px;color:#78350f;">5</small></a></td>
               </tr>
             </table>
           </td>
@@ -1076,13 +1083,14 @@ HTML;
         </tr>
         <tr>
           <td align="center" style="padding:0 36px 24px;">
+            <p style="color:#374151;font-size:13px;font-weight:600;margin:0 0 14px;">How would you rate your visit?</p>
             <table role="presentation" cellpadding="0" cellspacing="0">
               <tr>
-                <td style="background:linear-gradient(135deg,#d4a843,#f5d78e,#d4a843);border-radius:12px;box-shadow:0 4px 14px rgba(212,168,67,0.4);">
-                  <a href="{$reviewUrl}" target="_blank" style="display:inline-block;padding:16px 40px;color:#1a1a2e;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:0.5px;">
-                    &#11088; Rate Your Experience
-                  </a>
-                </td>
+                <td style="padding:3px;"><a href="{$fb1}" target="_blank" style="display:inline-block;padding:10px 11px;background:#f3f4f6;color:#374151;text-decoration:none;border:2px solid #d1d5db;border-radius:10px;font-size:14px;font-weight:700;text-align:center;">&#9733;<br><small style="font-size:10px;color:#6b7280;">1</small></a></td>
+                <td style="padding:3px;"><a href="{$fb2}" target="_blank" style="display:inline-block;padding:10px 11px;background:#f3f4f6;color:#374151;text-decoration:none;border:2px solid #d1d5db;border-radius:10px;font-size:14px;font-weight:700;text-align:center;">&#9733;&#9733;<br><small style="font-size:10px;color:#6b7280;">2</small></a></td>
+                <td style="padding:3px;"><a href="{$fb3}" target="_blank" style="display:inline-block;padding:10px 11px;background:#f3f4f6;color:#374151;text-decoration:none;border:2px solid #d1d5db;border-radius:10px;font-size:14px;font-weight:700;text-align:center;">&#9733;&#9733;&#9733;<br><small style="font-size:10px;color:#6b7280;">3</small></a></td>
+                <td style="padding:3px;"><a href="{$reviewUrl}" target="_blank" style="display:inline-block;padding:10px 11px;background:#d4a843;color:#1a1a2e;text-decoration:none;border:2px solid #b8922a;border-radius:10px;font-size:14px;font-weight:700;text-align:center;">&#9733;&#9733;&#9733;&#9733;<br><small style="font-size:10px;color:#78350f;">4</small></a></td>
+                <td style="padding:3px;"><a href="{$reviewUrl}" target="_blank" style="display:inline-block;padding:10px 11px;background:#d4a843;color:#1a1a2e;text-decoration:none;border:2px solid #b8922a;border-radius:10px;font-size:14px;font-weight:700;text-align:center;">&#9733;&#9733;&#9733;&#9733;&#9733;<br><small style="font-size:10px;color:#78350f;">5</small></a></td>
               </tr>
             </table>
           </td>
@@ -1182,7 +1190,8 @@ HTML;
     $textEs .= "Servicio: {$serviceDisplay}\n";
     $textEs .= "Fecha: {$displayDate}\n\n";
     $textEs .= "Su opinion es muy importante para nosotros.\n";
-    $textEs .= "Califique su experiencia: {$reviewUrl}\n\n";
+    $textEs .= "Calificacion 1-3 estrellas: {$fb3}\n";
+    $textEs .= "Calificacion 4-5 estrellas: {$reviewUrl}\n\n";
     $textEs .= "Gracias por elegir Oregon Tires Auto Care.\n";
 
     $textEn  = "OREGON TIRES AUTO CARE\n";
@@ -1191,7 +1200,8 @@ HTML;
     $textEn .= "Service: {$serviceDisplay}\n";
     $textEn .= "Date: {$displayDate}\n\n";
     $textEn .= "Your feedback means a lot to us.\n";
-    $textEn .= "Rate your experience: {$reviewUrl}\n\n";
+    $textEn .= "Rate 1-3 stars (private feedback): {$fb3}\n";
+    $textEn .= "Rate 4-5 stars (Google Reviews): {$reviewUrl}\n\n";
     $textEn .= "Thank you for choosing Oregon Tires Auto Care.\n";
 
     $textFooter  = "\n========================================\n";

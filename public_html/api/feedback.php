@@ -51,7 +51,7 @@ try {
     }
 
     // Validate rating
-    if ($rating < 1 || $rating > 5) {
+    if ($rating < 1 || $rating > 3) {
         jsonError('Rating must be between 1 and 5.');
     }
 
