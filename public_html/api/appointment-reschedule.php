@@ -219,6 +219,61 @@ try {
         error_log("appointment-reschedule.php: Reschedule email failed for #{$appointment['id']}: " . $e->getMessage());
     }
 
+    // Send reschedule notification to shop owner
+    try {
+        $customerName = $appointment['first_name'] . ' ' . $appointment['last_name'];
+        $serviceDisplay = ucwords(str_replace('-', ' ', $appointment['service']));
+
+        // Format previous date/time
+        $prevDateObj = new \DateTime($appointment['preferred_date']);
+        $prevDisplayDate = $prevDateObj->format('m/d/Y');
+        $prevTimeParts = explode(':', $appointment['preferred_time']);
+        $prevHour = (int) $prevTimeParts[0];
+        $prevSuffix = $prevHour >= 12 ? 'PM' : 'AM';
+        $prevDisplayHour = $prevHour > 12 ? $prevHour - 12 : ($prevHour === 0 ? 12 : $prevHour);
+        $prevDisplayTime = $prevDisplayHour . ':00 ' . $prevSuffix;
+
+        // Format new date/time for owner
+        $ownerNewDateObj = new \DateTime($newDate);
+        $ownerNewDisplayDate = $ownerNewDateObj->format('m/d/Y');
+        $ownerTimeParts = explode(':', $newTime);
+        $ownerHour = (int) $ownerTimeParts[0];
+        $ownerSuffix = $ownerHour >= 12 ? 'PM' : 'AM';
+        $ownerDisplayHour = $ownerHour > 12 ? $ownerHour - 12 : ($ownerHour === 0 ? 12 : $ownerHour);
+        $ownerNewDisplayTime = $ownerDisplayHour . ':00 ' . $ownerSuffix;
+
+        $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+
+        $ownerSubject = "Appointment Rescheduled — {$appointment['reference_number']}";
+        $ownerBody = <<<HTML
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+    <div style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:20px;text-align:center;border-radius:8px 8px 0 0;">
+        <h2 style="margin:0;">Appointment Rescheduled</h2>
+        <p style="margin:8px 0 0;opacity:0.9;font-size:14px;">{$h($appointment['reference_number'])} — {$h($serviceDisplay)}</p>
+    </div>
+    <div style="background:#fff;padding:24px;border:1px solid #e0e0e0;">
+        <table style="width:100%;border-collapse:collapse;">
+            <tr style="background:#f0f9f0;"><td style="padding:8px 12px;font-weight:bold;color:#555;width:140px;">Reference:</td><td style="padding:8px 12px;font-weight:bold;color:#15803d;font-size:16px;">{$h($appointment['reference_number'])}</td></tr>
+            <tr><td style="padding:8px 12px;font-weight:bold;color:#555;">Service:</td><td style="padding:8px 12px;">{$h($serviceDisplay)}</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:8px 12px;font-weight:bold;color:#555;">Customer:</td><td style="padding:8px 12px;">{$h(trim($customerName))}</td></tr>
+            <tr><td style="padding:8px 12px;font-weight:bold;color:#555;">Email:</td><td style="padding:8px 12px;"><a href="mailto:{$h($appointment['email'])}">{$h($appointment['email'])}</a></td></tr>
+            <tr style="background:#fef3c7;"><td style="padding:8px 12px;font-weight:bold;color:#92400e;">Previous Date:</td><td style="padding:8px 12px;color:#92400e;text-decoration:line-through;">{$h($prevDisplayDate)} at {$h($prevDisplayTime)}</td></tr>
+            <tr style="background:#d1fae5;"><td style="padding:8px 12px;font-weight:bold;color:#065f46;">New Date:</td><td style="padding:8px 12px;color:#065f46;font-weight:bold;">{$h($ownerNewDisplayDate)} at {$h($ownerNewDisplayTime)}</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:8px 12px;font-weight:bold;color:#555;">Status:</td><td style="padding:8px 12px;">Reset to <strong>new</strong> (needs confirmation)</td></tr>
+        </table>
+    </div>
+    <div style="background:#1a1a2e;padding:12px;text-align:center;font-size:12px;color:#9ca3af;border-radius:0 0 8px 8px;">
+        Oregon Tires Auto Care — Reschedule Notification
+    </div>
+</div>
+HTML;
+
+        notifyOwner($ownerSubject, $ownerBody, $appointment['email']);
+        logEmail('reschedule_owner_notified', "Owner notified of reschedule for {$appointment['reference_number']} by {$appointment['email']}");
+    } catch (\Throwable $e) {
+        error_log("appointment-reschedule.php: Owner notification failed for #{$appointment['id']}: " . $e->getMessage());
+    }
+
     // Format response
     $newDateObj = new \DateTime($newDate);
     $responseDateDisplay = $newDateObj->format('m/d/Y');

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/mail.php';
 
 try {
     requireMethod('GET', 'PUT', 'POST');
@@ -188,6 +189,78 @@ try {
 
     // POST — bulk operations
     $action = $body['action'] ?? '';
+
+    // ─── Create new appointment (admin walk-in / phone) ────────────────
+    if ($action === 'create') {
+        $service       = sanitize((string) ($body['service'] ?? ''), 50);
+        $preferredDate = sanitize((string) ($body['preferred_date'] ?? ''), 10);
+        $preferredTime = sanitize((string) ($body['preferred_time'] ?? ''), 20);
+        $firstName     = sanitize((string) ($body['first_name'] ?? ''), 100);
+        $lastName      = sanitize((string) ($body['last_name'] ?? ''), 100);
+        $phone         = sanitize((string) ($body['phone'] ?? ''), 30);
+        $email         = sanitize((string) ($body['email'] ?? ''), 254);
+        $vehicleYear   = sanitize((string) ($body['vehicle_year'] ?? ''), 4);
+        $vehicleMake   = sanitize((string) ($body['vehicle_make'] ?? ''), 50);
+        $vehicleModel  = sanitize((string) ($body['vehicle_model'] ?? ''), 50);
+        $notes         = sanitize((string) ($body['notes'] ?? ''), 2000);
+        $language      = sanitize((string) ($body['language'] ?? 'english'), 20);
+        $source        = sanitize((string) ($body['source'] ?? 'walk-in'), 20);
+        $employeeId    = isset($body['assigned_employee_id']) && $body['assigned_employee_id'] !== ''
+                         ? (int) $body['assigned_employee_id'] : null;
+
+        // Validate required fields
+        if (!$firstName || !$lastName || !$email || !$phone || !$service || !$preferredDate || !$preferredTime) {
+            jsonError('Missing required fields.', 400);
+        }
+        if (!isValidService($service)) jsonError('Invalid service type.', 400);
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $preferredDate)) jsonError('Invalid date format.', 400);
+        if (!isValidTimeSlot($preferredTime)) jsonError('Invalid time slot.', 400);
+        if (!isValidEmail($email)) jsonError('Invalid email address.', 400);
+        if (!isValidPhone($phone)) jsonError('Invalid phone number.', 400);
+        if (!in_array($language, ['english', 'spanish'], true)) $language = 'english';
+        if (!in_array($source, ['walk-in', 'phone', 'admin'], true)) $source = 'walk-in';
+
+        // Generate unique reference number
+        $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        $referenceNumber = '';
+        for ($attempt = 0; $attempt < 10; $attempt++) {
+            $code = '';
+            $bytes = random_bytes(8);
+            for ($i = 0; $i < 8; $i++) $code .= $chars[ord($bytes[$i]) % strlen($chars)];
+            $candidate = 'OT-' . $code;
+            $checkStmt = $db->prepare('SELECT COUNT(*) FROM oretir_appointments WHERE reference_number = ?');
+            $checkStmt->execute([$candidate]);
+            if ((int) $checkStmt->fetchColumn() === 0) { $referenceNumber = $candidate; break; }
+        }
+        if (!$referenceNumber) jsonError('Could not generate reference number.', 500);
+
+        $adminNotes = '[' . strtoupper($source) . '] Created by admin';
+
+        $stmt = $db->prepare(
+            'INSERT INTO oretir_appointments
+                (reference_number, service, preferred_date, preferred_time,
+                 vehicle_year, vehicle_make, vehicle_model,
+                 first_name, last_name, phone, email, notes,
+                 status, language, assigned_employee_id, admin_notes,
+                 created_at, updated_at)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())'
+        );
+        $stmt->execute([
+            $referenceNumber, $service, $preferredDate, $preferredTime,
+            $vehicleYear ?: null, $vehicleMake ?: null, $vehicleModel ?: null,
+            $firstName, $lastName, $phone, $email, $notes ?: null,
+            'confirmed', $language, $employeeId, $adminNotes
+        ]);
+        $appointmentId = (int) $db->lastInsertId();
+
+        // Generate cancel token
+        $cancelToken = bin2hex(random_bytes(32));
+        $db->prepare('UPDATE oretir_appointments SET cancel_token = ?, cancel_token_expires = ? WHERE id = ?')
+           ->execute([$cancelToken, date('Y-m-d H:i:s', strtotime('+30 days')), $appointmentId]);
+
+        jsonSuccess(['appointment_id' => $appointmentId, 'reference_number' => $referenceNumber]);
+    }
+
     $ids = $body['ids'] ?? [];
 
     if (!is_array($ids) || empty($ids)) {

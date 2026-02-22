@@ -69,6 +69,7 @@ try {
 
     // ─── POST: Cancel the appointment ────────────────────────────────────────
     $data = getJsonBody();
+    $cancelReason = isset($data['reason']) ? substr(trim($data['reason']), 0, 500) : null;
     $token = $data['token'] ?? '';
 
     if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
@@ -78,7 +79,7 @@ try {
     // Find appointment by token
     $stmt = $db->prepare(
         'SELECT id, reference_number, service, preferred_date, preferred_time,
-                first_name, last_name, email, language, google_event_id, status
+                first_name, last_name, email, phone, language, google_event_id, status
          FROM oretir_appointments
          WHERE cancel_token = ?
            AND cancel_token_expires > NOW()
@@ -94,9 +95,9 @@ try {
     // Update status to cancelled and clear the token
     $db->prepare(
         'UPDATE oretir_appointments
-         SET status = ?, cancel_token = NULL, cancel_token_expires = NULL, updated_at = NOW()
+         SET status = ?, cancel_reason = ?, cancel_token = NULL, cancel_token_expires = NULL, updated_at = NOW()
          WHERE id = ?'
-    )->execute(['cancelled', $appointment['id']]);
+    )->execute(['cancelled', $cancelReason, $appointment['id']]);
 
     // Delete Google Calendar event if exists
     if (!empty($appointment['google_event_id']) && !empty($_ENV['GOOGLE_CALENDAR_CREDENTIALS'])) {
@@ -189,6 +190,57 @@ HTML;
         logEmail('appointment_cancelled', "Cancellation confirmation sent to {$appointment['email']} for {$appointment['reference_number']}");
     } catch (\Throwable $e) {
         error_log("appointment-cancel.php: Cancellation email failed for #{$appointment['id']}: " . $e->getMessage());
+    }
+
+    // Send cancellation notification to shop owner
+    try {
+        $customerName = ($appointment['first_name'] ?? '') . ' ' . ($appointment['last_name'] ?? '');
+        $serviceDisplay = ucwords(str_replace('-', ' ', $appointment['service']));
+
+        $dateObj = new \DateTime($appointment['preferred_date']);
+        $displayDate = $dateObj->format('m/d/Y');
+
+        $timeParts = explode(':', $appointment['preferred_time']);
+        $hour = (int) $timeParts[0];
+        $suffix = $hour >= 12 ? 'PM' : 'AM';
+        $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
+        $displayTime = $displayHour . ':00 ' . $suffix;
+
+        $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+
+        $reasonHtml = $cancelReason
+            ? "<tr style=\"background:#fef2f2;\"><td style=\"padding:8px 12px;font-weight:bold;color:#555;\">Cancel Reason:</td><td style=\"padding:8px 12px;color:#dc2626;\">{$h($cancelReason)}</td></tr>"
+            : '';
+
+        $ownerSubject = "Appointment Cancelled — {$appointment['reference_number']}";
+        $ownerBody = <<<HTML
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+    <div style="background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;padding:20px;text-align:center;border-radius:8px 8px 0 0;">
+        <h2 style="margin:0;">Appointment Cancelled</h2>
+        <p style="margin:8px 0 0;opacity:0.9;font-size:14px;">{$h($appointment['reference_number'])} — {$h($serviceDisplay)}</p>
+    </div>
+    <div style="background:#fff;padding:24px;border:1px solid #e0e0e0;">
+        <table style="width:100%;border-collapse:collapse;">
+            <tr style="background:#f0f9f0;"><td style="padding:8px 12px;font-weight:bold;color:#555;width:140px;">Reference:</td><td style="padding:8px 12px;font-weight:bold;color:#15803d;font-size:16px;">{$h($appointment['reference_number'])}</td></tr>
+            <tr><td style="padding:8px 12px;font-weight:bold;color:#555;">Service:</td><td style="padding:8px 12px;">{$h($serviceDisplay)}</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:8px 12px;font-weight:bold;color:#555;">Date:</td><td style="padding:8px 12px;">{$h($displayDate)}</td></tr>
+            <tr><td style="padding:8px 12px;font-weight:bold;color:#555;">Time:</td><td style="padding:8px 12px;">{$h($displayTime)}</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:8px 12px;font-weight:bold;color:#555;">Customer:</td><td style="padding:8px 12px;">{$h(trim($customerName))}</td></tr>
+            <tr><td style="padding:8px 12px;font-weight:bold;color:#555;">Email:</td><td style="padding:8px 12px;"><a href="mailto:{$h($appointment['email'])}">{$h($appointment['email'])}</a></td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:8px 12px;font-weight:bold;color:#555;">Phone:</td><td style="padding:8px 12px;"><a href="tel:{$h($appointment['phone'] ?? '')}">{$h($appointment['phone'] ?? 'N/A')}</a></td></tr>
+            {$reasonHtml}
+        </table>
+    </div>
+    <div style="background:#1a1a2e;padding:12px;text-align:center;font-size:12px;color:#9ca3af;border-radius:0 0 8px 8px;">
+        Oregon Tires Auto Care — Cancellation Notification
+    </div>
+</div>
+HTML;
+
+        notifyOwner($ownerSubject, $ownerBody, $appointment['email']);
+        logEmail('cancellation_owner_notified', "Owner notified of cancellation for {$appointment['reference_number']} by {$appointment['email']}");
+    } catch (\Throwable $e) {
+        error_log("appointment-cancel.php: Owner notification failed for #{$appointment['id']}: " . $e->getMessage());
     }
 
     jsonSuccess(['message' => 'Appointment cancelled successfully.']);
