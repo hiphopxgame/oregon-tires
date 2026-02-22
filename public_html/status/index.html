@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointment Status - Oregon Tires Auto Care Portland, OR</title>
+  <meta name="description" content="Check your appointment status at Oregon Tires Auto Care in Portland, OR. Enter your reference number and email to view details.">
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#15803d">
+  <meta name="msapplication-TileColor" content="#15803d">
+  <link rel="canonical" href="https://oregon.tires/status/">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Check Appointment Status - Oregon Tires Auto Care">
+  <meta property="og:description" content="Look up the status of your tire or auto service appointment. Bilingual English and Spanish service.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://oregon.tires/status/">
+  <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="es_MX">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Check Appointment Status - Oregon Tires Auto Care">
+  <meta name="twitter:description" content="Look up the status of your tire or auto service appointment.">
+  <meta name="twitter:image" content="https://oregon.tires/assets/og-image.jpg">
+
+  <!-- Tailwind CSS (built) -->
+  <link rel="stylesheet" href="/assets/styles.css">
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .fade-in { animation: fadeIn 0.6s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .spinner { animation: spin 1s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  </style>
+
+  <!-- Google Analytics 4 -->
+  <script>
+  (function(){
+    var DEFAULT_GA = 'G-CHYMTNB6LH';
+    var cached = null;
+    try { cached = localStorage.getItem('oregontires_ga_id'); } catch(e){}
+    var id = cached || DEFAULT_GA;
+    var s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', id);
+    window.__gaId = id;
+    window.__updateGaId = function(newId) {
+      if (!newId || newId === window.__gaId) return;
+      if (!/^G-[A-Z0-9]{6,12}$/.test(newId)) return;
+      window.__gaId = newId;
+      try { localStorage.setItem('oregontires_ga_id', newId); } catch(e){}
+      gtag('config', newId, { send_page_view: false });
+    };
+  })();
+  </script>
+  <!-- Dark mode init (prevent FOUC) -->
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
+</head>
+<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
+
+  <!-- Top Bar -->
+  <div class="bg-brand text-white text-sm py-2">
+    <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
+      <div class="flex flex-wrap items-center gap-4">
+        <span>&#128222; <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></span>
+        <span>&#9993;&#65039; <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></span>
+        <span class="hidden md:inline">&#128205; 8536 SE 82nd Ave, Portland, OR 97266</span>
+        <span class="hidden lg:inline" id="top-hours">&#128336; Mon-Sat 7AM-7PM</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="https://www.instagram.com/oregontires" target="_blank" class="hover:text-amber-300">Instagram</a>
+        <a href="https://www.facebook.com/61571913202998/" target="_blank" class="hover:text-amber-300">Facebook</a>
+        <button id="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode" class="text-sm text-white hover:text-amber-300 transition-colors">&#127769;</button>
+        <button onclick="toggleLanguage()" class="hover:text-amber-300 font-medium" id="lang-toggle" aria-label="Switch language">&#127760; ES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-white shadow-md sticky top-0 z-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/">
+        <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="/assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" width="781" height="275" loading="eager" fetchpriority="high"></picture>
+      </a>
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="/" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="home">Home</a>
+        <a href="/#services" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="services">Services</a>
+        <a href="/#about" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="about">About</a>
+        <a href="/#reviews" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="testimonials">Reviews</a>
+        <a href="/#gallery" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="gallery">Promotions</a>
+        <a href="/#contact" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="contact">Contact</a>
+        <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="scheduleService">Schedule Service</a>
+      </nav>
+      <button onclick="toggleMobileMenu()" class="md:hidden text-brand dark:text-green-400 text-2xl" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">&#9776;</button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t px-4 pb-4 dark:bg-gray-800 dark:border-gray-700">
+      <a href="/" class="block py-2 text-brand dark:text-green-400" data-t="home">Home</a>
+      <a href="/#services" class="block py-2 text-brand dark:text-green-400" data-t="services">Services</a>
+      <a href="/#about" class="block py-2 text-brand dark:text-green-400" data-t="about">About</a>
+      <a href="/#reviews" class="block py-2 text-brand dark:text-green-400" data-t="testimonials">Reviews</a>
+      <a href="/#gallery" class="block py-2 text-brand dark:text-green-400" data-t="gallery">Promotions</a>
+      <a href="/#contact" class="block py-2 text-brand dark:text-green-400" data-t="contact">Contact</a>
+      <a href="/book-appointment" class="block py-2 text-brand dark:text-green-400 font-semibold" data-t="scheduleService">Schedule Service</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content">
+
+  <!-- Hero Banner -->
+  <section class="bg-brand text-white py-12">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-3xl md:text-4xl font-bold mb-3" data-t="pageTitle">Appointment Status</h1>
+      <p class="text-lg opacity-90 max-w-2xl mx-auto" data-t="pageSubtitle">Look up the status of your scheduled service appointment.</p>
+    </div>
+  </section>
+
+  <!-- Lookup Section -->
+  <section class="py-12 bg-gray-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4 max-w-lg">
+
+      <!-- Lookup Form -->
+      <div id="lookup-form-card" class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-700">
+        <h2 class="text-xl font-bold text-brand dark:text-green-400 mb-1" data-t="lookupTitle">Find Your Appointment</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6" data-t="lookupSubtitle">Enter the reference number from your confirmation email and the email address you used when booking.</p>
+
+        <form id="status-form" class="space-y-4" novalidate>
+          <div>
+            <label for="ref-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="referenceLabel">Reference Number</label>
+            <input type="text" id="ref-input" name="ref" required autocomplete="off" placeholder="e.g., OT-A2B3C4D5"
+              class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500 uppercase"
+              maxlength="20">
+          </div>
+          <div>
+            <label for="email-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="emailLabel">Email Address</label>
+            <input type="email" id="email-input" name="email" required autocomplete="email" placeholder="your@email.com"
+              class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+          </div>
+          <button type="submit" id="submit-btn"
+            class="w-full bg-amber-500 text-black px-6 py-3 rounded-lg font-bold text-lg hover:bg-amber-600 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            data-t="checkStatus">Check Status</button>
+        </form>
+
+        <!-- Error Message -->
+        <div id="error-msg" class="hidden mt-4 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg" role="alert">
+          <p id="error-text" class="text-red-700 dark:text-red-300 text-sm font-medium"></p>
+        </div>
+      </div>
+
+      <!-- Results Card (hidden initially) -->
+      <div id="results-card" class="hidden mt-6 bg-white rounded-xl shadow-lg overflow-hidden fade-in dark:bg-gray-700">
+
+        <!-- Status Header -->
+        <div id="status-header" class="px-6 py-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <p class="text-sm text-gray-500 dark:text-gray-400" data-t="referenceLabel">Reference Number</p>
+              <p id="result-ref" class="text-lg font-bold text-brand dark:text-green-400"></p>
+            </div>
+            <span id="status-badge" class="px-3 py-1 rounded-full text-sm font-semibold"></span>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-100 dark:border-gray-600"></div>
+
+        <!-- Details Grid -->
+        <div class="px-6 py-5 space-y-4">
+          <!-- Customer Name -->
+          <div class="flex items-start gap-3">
+            <span class="text-gray-400 dark:text-gray-500 mt-0.5">&#128100;</span>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide" data-t="customerName">Customer</p>
+              <p id="result-name" class="font-medium text-gray-800 dark:text-gray-100"></p>
+            </div>
+          </div>
+
+          <!-- Service -->
+          <div class="flex items-start gap-3">
+            <span class="text-gray-400 dark:text-gray-500 mt-0.5">&#128295;</span>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide" data-t="serviceLabel">Service</p>
+              <p id="result-service" class="font-medium text-gray-800 dark:text-gray-100"></p>
+            </div>
+          </div>
+
+          <!-- Date & Time -->
+          <div class="flex items-start gap-3">
+            <span class="text-gray-400 dark:text-gray-500 mt-0.5">&#128197;</span>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide" data-t="dateTimeLabel">Date & Time</p>
+              <p id="result-datetime" class="font-medium text-gray-800 dark:text-gray-100"></p>
+            </div>
+          </div>
+
+          <!-- Technician -->
+          <div id="technician-row" class="flex items-start gap-3">
+            <span class="text-gray-400 dark:text-gray-500 mt-0.5">&#128119;</span>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide" data-t="technicianLabel">Assigned Technician</p>
+              <p id="result-technician" class="font-medium text-gray-800 dark:text-gray-100"></p>
+            </div>
+          </div>
+
+          <!-- Vehicle -->
+          <div id="vehicle-row" class="flex items-start gap-3">
+            <span class="text-gray-400 dark:text-gray-500 mt-0.5">&#128663;</span>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide" data-t="vehicleLabel">Vehicle</p>
+              <p id="result-vehicle" class="font-medium text-gray-800 dark:text-gray-100"></p>
+            </div>
+          </div>
+
+          <!-- Booked On -->
+          <div class="flex items-start gap-3">
+            <span class="text-gray-400 dark:text-gray-500 mt-0.5">&#128338;</span>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide" data-t="bookedOnLabel">Booked On</p>
+              <p id="result-booked" class="font-medium text-gray-800 dark:text-gray-100"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="border-t border-gray-100 dark:border-gray-600 px-6 py-4">
+          <div class="flex flex-wrap gap-3 justify-center">
+            <button onclick="resetLookup()" class="border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-5 py-2 rounded-lg font-semibold hover:bg-brand/5 dark:hover:bg-green-400/10 transition text-sm" data-t="lookupAnother">Look Up Another</button>
+            <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition text-sm" data-t="bookNew">Book New Appointment</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="mt-8 bg-white rounded-xl shadow-md p-6 text-center dark:bg-gray-700">
+        <p class="text-gray-600 dark:text-gray-300 mb-2" data-t="needHelp">Need help? Give us a call!</p>
+        <a href="tel:5033679714" class="text-2xl font-bold text-brand dark:text-green-400 hover:opacity-80 transition">&#128222; (503) 367-9714</a>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2" data-t="monSat">Mon-Sat 7AM-7PM</p>
+      </div>
+
+    </div>
+  </section>
+
+  </main>
+
+  <!-- Sticky Mobile CTA Bar -->
+  <div id="mobile-cta" class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-brand shadow-[0_-4px_12px_rgba(0,0,0,0.15)] border-t border-green-700 safe-area-bottom">
+    <div class="flex">
+      <a href="tel:5033679714" class="flex-1 flex items-center justify-center gap-2 py-3.5 text-white font-semibold text-sm border-r border-green-700 active:bg-green-900 transition">
+        <span>&#128222;</span> <span data-t="callNow">Call Now</span>
+      </a>
+      <a href="/" class="flex-1 flex items-center justify-center gap-2 py-3.5 bg-amber-500 text-black font-semibold text-sm active:bg-amber-600 transition">
+        <span>&#127968;</span> <span data-t="backToHome">Back to Home</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-brand text-white py-12 pb-24 md:pb-12">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4" data-t="contactInfo">Contact Information</h3>
+          <div class="space-y-2 text-gray-200">
+            <p>&#128222; <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></p>
+            <p>&#9993;&#65039; <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></p>
+            <p>&#128205; 8536 SE 82nd Ave, Portland, OR 97266</p>
+            <p>&#128336; <span data-t="monSat">Mon-Sat 7AM-7PM</span></p>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4" data-t="services">Services</h3>
+          <ul class="space-y-1 text-gray-200">
+            <li data-t="tireInstallation">Tire Installation</li>
+            <li data-t="tireRepair">Tire Repair</li>
+            <li data-t="wheelAlignment">Wheel Alignment</li>
+            <li data-t="brakeService">Brake Service</li>
+            <li data-t="oilChange">Oil Change</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4" data-t="followUs">Follow Us</h3>
+          <div class="space-y-2">
+            <a href="https://www.facebook.com/61571913202998/" target="_blank" class="block text-gray-200 hover:text-amber-300">Facebook</a>
+            <a href="https://www.instagram.com/oregontires" target="_blank" class="block text-gray-200 hover:text-amber-300">Instagram</a>
+          </div>
+          <div class="mt-4">
+            <button onclick="toggleLanguage()" class="text-gray-200 hover:text-amber-300" id="footer-lang-toggle" aria-label="Switch language" data-t="langToggleFooter">English | Espa&#241;ol</button>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-green-600 dark:border-green-500 mt-8 pt-8 text-center text-gray-300 dark:text-gray-200">
+        <p>&copy; <span data-t="copyright">2026 Oregon Tires Auto Care. All rights reserved.</span></p>
+        <p class="mt-3 text-xs text-gray-300"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-amber-200 hover:text-amber-100 transition-colors">1vsM.com</a></p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+// ===== PHP API =====
+var API_BASE = '/api';
+
+// ===== TRANSLATIONS =====
+var currentLang = (function() {
+  var urlLang = new URLSearchParams(window.location.search).get('lang');
+  if (urlLang === 'es' || urlLang === 'en') { localStorage.setItem('oregontires_lang', urlLang); return urlLang; }
+  var saved = localStorage.getItem('oregontires_lang');
+  if (saved === 'es' || saved === 'en') return saved;
+  if (navigator.language && navigator.language.startsWith('es')) return 'es';
+  return 'en';
+})();
+
+var t = {
+  en: {
+    // Nav
+    home: 'Home',
+    services: 'Services',
+    about: 'About',
+    testimonials: 'Reviews',
+    gallery: 'Promotions',
+    contact: 'Contact',
+    scheduleService: 'Schedule Service',
+    // Page
+    pageTitle: 'Appointment Status',
+    pageSubtitle: 'Look up the status of your scheduled service appointment.',
+    lookupTitle: 'Find Your Appointment',
+    lookupSubtitle: 'Enter the reference number from your confirmation email and the email address you used when booking.',
+    referenceLabel: 'Reference Number',
+    emailLabel: 'Email Address',
+    checkStatus: 'Check Status',
+    checking: 'Checking...',
+    // Results
+    customerName: 'Customer',
+    serviceLabel: 'Service',
+    dateTimeLabel: 'Date & Time',
+    technicianLabel: 'Assigned Technician',
+    vehicleLabel: 'Vehicle',
+    bookedOnLabel: 'Booked On',
+    pendingAssignment: 'Pending Assignment',
+    lookupAnother: 'Look Up Another',
+    bookNew: 'Book New Appointment',
+    // Status badges
+    statusNew: 'New',
+    statusConfirmed: 'Confirmed',
+    statusPending: 'Pending',
+    statusCompleted: 'Completed',
+    statusCancelled: 'Cancelled',
+    statusInProgress: 'In Progress',
+    statusNoShow: 'No Show',
+    // Errors
+    errorNotFound: 'No appointment found. Please check your reference number and email address.',
+    errorRequired: 'Please enter both your reference number and email address.',
+    errorInvalidEmail: 'Please enter a valid email address.',
+    errorServer: 'Something went wrong. Please try again or call us.',
+    errorRateLimit: 'Too many attempts. Please try again in an hour.',
+    // Common
+    needHelp: 'Need help? Give us a call!',
+    monSat: 'Mon-Sat 7AM-7PM',
+    contactInfo: 'Contact Information',
+    followUs: 'Follow Us',
+    copyright: '2026 Oregon Tires Auto Care. All rights reserved.',
+    poweredBy: 'Powered by',
+    langToggleFooter: 'English | Espa\u00f1ol',
+    callNow: 'Call Now',
+    backToHome: 'Back to Home',
+    // Service names
+    tireInstallation: 'Tire Installation',
+    tireRepair: 'Tire Repair',
+    wheelAlignment: 'Wheel Alignment',
+    oilChange: 'Oil Change',
+    brakeService: 'Brake Service',
+    tuneup: 'Tuneup',
+    mechanicalInspection: 'Mechanical Inspection',
+    mobileService: 'Mobile Service',
+    otherService: 'Other',
+    // Placeholders
+    refPlaceholder: 'e.g., OT-A2B3C4D5',
+    emailPlaceholder: 'your@email.com'
+  },
+  es: {
+    // Nav
+    home: 'Inicio',
+    services: 'Servicios',
+    about: 'Acerca de',
+    testimonials: 'Rese\u00f1as',
+    gallery: 'Promociones',
+    contact: 'Contacto',
+    scheduleService: 'Programar Servicio',
+    // Page
+    pageTitle: 'Estado de la Cita',
+    pageSubtitle: 'Consulte el estado de su cita de servicio programada.',
+    lookupTitle: 'Buscar Su Cita',
+    lookupSubtitle: 'Ingrese el n\u00famero de referencia de su correo de confirmaci\u00f3n y el correo electr\u00f3nico que us\u00f3 al reservar.',
+    referenceLabel: 'N\u00famero de Referencia',
+    emailLabel: 'Correo Electr\u00f3nico',
+    checkStatus: 'Verificar Estado',
+    checking: 'Verificando...',
+    // Results
+    customerName: 'Cliente',
+    serviceLabel: 'Servicio',
+    dateTimeLabel: 'Fecha y Hora',
+    technicianLabel: 'T\u00e9cnico Asignado',
+    vehicleLabel: 'Veh\u00edculo',
+    bookedOnLabel: 'Reservado El',
+    pendingAssignment: 'Asignaci\u00f3n Pendiente',
+    lookupAnother: 'Buscar Otra',
+    bookNew: 'Reservar Nueva Cita',
+    // Status badges
+    statusNew: 'Nueva',
+    statusConfirmed: 'Confirmada',
+    statusPending: 'Pendiente',
+    statusCompleted: 'Completada',
+    statusCancelled: 'Cancelada',
+    statusInProgress: 'En Progreso',
+    statusNoShow: 'No Asisti\u00f3',
+    // Errors
+    errorNotFound: 'No se encontr\u00f3 ninguna cita. Verifique su n\u00famero de referencia y correo electr\u00f3nico.',
+    errorRequired: 'Ingrese su n\u00famero de referencia y correo electr\u00f3nico.',
+    errorInvalidEmail: 'Ingrese un correo electr\u00f3nico v\u00e1lido.',
+    errorServer: 'Algo sali\u00f3 mal. Int\u00e9ntelo de nuevo o ll\u00e1menos.',
+    errorRateLimit: 'Demasiados intentos. Int\u00e9ntelo de nuevo en una hora.',
+    // Common
+    needHelp: '\u00bfNecesita ayuda? \u00a1Ll\u00e1menos!',
+    monSat: 'Lun-S\u00e1b 7AM-7PM',
+    contactInfo: 'Informaci\u00f3n de Contacto',
+    followUs: 'S\u00edguenos',
+    copyright: '2026 Oregon Tires Auto Care. Todos los derechos reservados.',
+    poweredBy: 'Desarrollado por',
+    langToggleFooter: 'English | Espa\u00f1ol',
+    callNow: 'Llamar',
+    backToHome: 'Ir al Inicio',
+    // Service names
+    tireInstallation: 'Instalaci\u00f3n de Llantas',
+    tireRepair: 'Reparaci\u00f3n de Llantas',
+    wheelAlignment: 'Alineaci\u00f3n de Ruedas',
+    oilChange: 'Cambio de Aceite',
+    brakeService: 'Servicio de Frenos',
+    tuneup: 'Afinaci\u00f3n',
+    mechanicalInspection: 'Inspecci\u00f3n Mec\u00e1nica',
+    mobileService: 'Servicio M\u00f3vil',
+    otherService: 'Otro',
+    // Placeholders
+    refPlaceholder: 'ej., OT-A2B3C4D5',
+    emailPlaceholder: 'tu@correo.com'
+  }
+};
+
+// ===== SERVICE DISPLAY LABELS =====
+var serviceLabels = {
+  en: {
+    'tire-installation': 'Tire Installation',
+    'tire-repair': 'Tire Repair',
+    'wheel-alignment': 'Wheel Alignment',
+    'oil-change': 'Oil Change',
+    'brake-service': 'Brake Service',
+    'tuneup': 'Tuneup',
+    'mechanical-inspection': 'Mechanical Inspection',
+    'mobile-service': 'Mobile Service',
+    'other': 'Other'
+  },
+  es: {
+    'tire-installation': 'Instalaci\u00f3n de Llantas',
+    'tire-repair': 'Reparaci\u00f3n de Llantas',
+    'wheel-alignment': 'Alineaci\u00f3n de Ruedas',
+    'oil-change': 'Cambio de Aceite',
+    'brake-service': 'Servicio de Frenos',
+    'tuneup': 'Afinaci\u00f3n',
+    'mechanical-inspection': 'Inspecci\u00f3n Mec\u00e1nica',
+    'mobile-service': 'Servicio M\u00f3vil',
+    'other': 'Otro'
+  }
+};
+
+// ===== STATUS CONFIG (badge color mapping) =====
+var statusConfig = {
+  'new':         { en: 'New',         es: 'Nueva',       bg: 'bg-blue-100 dark:bg-blue-900/40',   text: 'text-blue-700 dark:text-blue-300' },
+  'confirmed':   { en: 'Confirmed',   es: 'Confirmada',  bg: 'bg-green-100 dark:bg-green-900/40',  text: 'text-green-700 dark:text-green-300' },
+  'pending':     { en: 'Pending',     es: 'Pendiente',   bg: 'bg-amber-100 dark:bg-amber-900/40',  text: 'text-amber-700 dark:text-amber-300' },
+  'completed':   { en: 'Completed',   es: 'Completada',  bg: 'bg-gray-100 dark:bg-gray-600',       text: 'text-gray-700 dark:text-gray-300' },
+  'cancelled':   { en: 'Cancelled',   es: 'Cancelada',   bg: 'bg-red-100 dark:bg-red-900/40',      text: 'text-red-700 dark:text-red-300' },
+  'in-progress': { en: 'In Progress', es: 'En Progreso', bg: 'bg-purple-100 dark:bg-purple-900/40', text: 'text-purple-700 dark:text-purple-300' },
+  'no-show':     { en: 'No Show',     es: 'No Asisti\u00f3', bg: 'bg-red-100 dark:bg-red-900/40',  text: 'text-red-700 dark:text-red-300' }
+};
+
+// ===== FORMAT TIME =====
+function formatTimeDisplay(timeStr) {
+  if (!timeStr) return '';
+  var parts = timeStr.split(':');
+  var hour = parseInt(parts[0], 10);
+  var min = parts[1] || '00';
+  var suffix = hour >= 12 ? 'PM' : 'AM';
+  var displayHour = hour > 12 ? hour - 12 : hour;
+  if (displayHour === 0) displayHour = 12;
+  return displayHour + ':' + min + ' ' + suffix;
+}
+
+// ===== FORMAT DATE =====
+function formatDateDisplay(dateStr) {
+  if (!dateStr) return '';
+  var parts = dateStr.split('-');
+  var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  var locale = currentLang === 'es' ? 'es-MX' : 'en-US';
+  return d.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+// ===== FORMAT BOOKED DATE =====
+function formatBookedDate(dateStr) {
+  if (!dateStr) return '';
+  var d = new Date(dateStr);
+  var locale = currentLang === 'es' ? 'es-MX' : 'en-US';
+  return d.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+// ===== FORMAT SERVICE NAME =====
+function formatService(slug) {
+  var labels = serviceLabels[currentLang] || serviceLabels.en;
+  if (labels[slug]) return labels[slug];
+  // Fallback: turn slug into title case
+  return slug.replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+}
+
+// ===== SHOW ERROR =====
+function showError(message) {
+  var errorDiv = document.getElementById('error-msg');
+  var errorText = document.getElementById('error-text');
+  errorText.textContent = message;
+  errorDiv.classList.remove('hidden');
+}
+
+function hideError() {
+  document.getElementById('error-msg').classList.add('hidden');
+}
+
+// ===== SHOW RESULTS =====
+function showResults(data) {
+  // Reference
+  document.getElementById('result-ref').textContent = data.reference;
+
+  // Status badge
+  var badge = document.getElementById('status-badge');
+  var statusKey = (data.status || 'new').toLowerCase().replace(/_/g, '-');
+  var config = statusConfig[statusKey] || statusConfig['new'];
+  badge.textContent = config[currentLang] || config.en;
+  badge.className = 'px-3 py-1 rounded-full text-sm font-semibold ' + config.bg + ' ' + config.text;
+
+  // Status header background tint
+  var header = document.getElementById('status-header');
+  header.className = 'px-6 py-4';
+  if (statusKey === 'confirmed') header.className += ' bg-green-50 dark:bg-green-900/10';
+  else if (statusKey === 'cancelled') header.className += ' bg-red-50 dark:bg-red-900/10';
+  else if (statusKey === 'completed') header.className += ' bg-gray-50 dark:bg-gray-800/50';
+
+  // Customer name
+  document.getElementById('result-name').textContent = data.name;
+
+  // Service
+  document.getElementById('result-service').textContent = formatService(data.service);
+
+  // Date & Time
+  document.getElementById('result-datetime').textContent = formatDateDisplay(data.date) + '  \u2022  ' + formatTimeDisplay(data.time);
+
+  // Technician
+  var techRow = document.getElementById('technician-row');
+  var techText = document.getElementById('result-technician');
+  if (data.technician) {
+    techText.textContent = data.technician;
+    techRow.classList.remove('hidden');
+  } else {
+    techText.textContent = t[currentLang].pendingAssignment;
+    techRow.classList.remove('hidden');
+  }
+
+  // Vehicle
+  var vehicleRow = document.getElementById('vehicle-row');
+  var vehicleText = document.getElementById('result-vehicle');
+  if (data.vehicle && data.vehicle.trim()) {
+    vehicleText.textContent = data.vehicle;
+    vehicleRow.classList.remove('hidden');
+  } else {
+    vehicleRow.classList.add('hidden');
+  }
+
+  // Booked on
+  document.getElementById('result-booked').textContent = formatBookedDate(data.booked_on);
+
+  // Show card, hide form
+  document.getElementById('results-card').classList.remove('hidden');
+  document.getElementById('lookup-form-card').classList.add('hidden');
+  hideError();
+
+  // Track GA event
+  if (typeof gtag === 'function') {
+    gtag('event', 'appointment_status_lookup', {
+      event_category: 'engagement',
+      event_label: statusKey
+    });
+  }
+}
+
+// ===== RESET LOOKUP =====
+function resetLookup() {
+  document.getElementById('results-card').classList.add('hidden');
+  document.getElementById('lookup-form-card').classList.remove('hidden');
+  document.getElementById('status-form').reset();
+  hideError();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== FORM SUBMISSION =====
+document.getElementById('status-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  hideError();
+
+  var refInput = document.getElementById('ref-input');
+  var emailInput = document.getElementById('email-input');
+  var submitBtn = document.getElementById('submit-btn');
+
+  var ref = refInput.value.trim().toUpperCase();
+  var email = emailInput.value.trim().toLowerCase();
+
+  // Client-side validation
+  if (!ref || !email) {
+    showError(t[currentLang].errorRequired);
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showError(t[currentLang].errorInvalidEmail);
+    return;
+  }
+
+  // Disable button, show loading
+  submitBtn.disabled = true;
+  submitBtn.textContent = t[currentLang].checking;
+
+  try {
+    var url = API_BASE + '/appointment-status.php?ref=' + encodeURIComponent(ref) + '&email=' + encodeURIComponent(email);
+    var res = await fetch(url, { credentials: 'include' });
+    var json = await res.json();
+
+    if (!res.ok || !json.success) {
+      if (res.status === 404) {
+        showError(t[currentLang].errorNotFound);
+      } else if (res.status === 429) {
+        showError(t[currentLang].errorRateLimit);
+      } else {
+        showError(json.error || t[currentLang].errorServer);
+      }
+      return;
+    }
+
+    showResults(json.data);
+
+  } catch (err) {
+    console.error('Status lookup error:', err);
+    showError(t[currentLang].errorServer);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = t[currentLang].checkStatus;
+  }
+});
+
+// ===== AUTO-FILL FROM URL PARAMS =====
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var ref = params.get('ref');
+  var email = params.get('email');
+  if (ref) document.getElementById('ref-input').value = ref;
+  if (email) document.getElementById('email-input').value = email;
+  // Auto-submit if both provided
+  if (ref && email) {
+    document.getElementById('status-form').dispatchEvent(new Event('submit'));
+  }
+})();
+
+// ===== LANGUAGE TOGGLE =====
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'es' : 'en';
+  localStorage.setItem('oregontires_lang', currentLang);
+  document.documentElement.lang = currentLang;
+  if (typeof gtag === 'function') gtag('event', 'language_switch', { event_category: 'engagement', event_label: currentLang });
+  document.getElementById('lang-toggle').textContent = currentLang === 'en' ? '\uD83C\uDF10 ES' : '\uD83C\uDF10 EN';
+  document.getElementById('top-hours').textContent = '\uD83D\uDD50 ' + t[currentLang].monSat;
+  document.querySelectorAll('[data-t]').forEach(function(el) {
+    var key = el.getAttribute('data-t');
+    if (t[currentLang][key]) el.textContent = t[currentLang][key];
+  });
+  // Update placeholders
+  document.getElementById('ref-input').placeholder = t[currentLang].refPlaceholder;
+  document.getElementById('email-input').placeholder = t[currentLang].emailPlaceholder;
+  // Update results card if visible
+  var resultsCard = document.getElementById('results-card');
+  if (!resultsCard.classList.contains('hidden')) {
+    // Re-render the status badge label in the new language
+    var badge = document.getElementById('status-badge');
+    var currentClasses = badge.className;
+    for (var key in statusConfig) {
+      if (currentClasses.indexOf(statusConfig[key].bg) !== -1) {
+        badge.textContent = statusConfig[key][currentLang] || statusConfig[key].en;
+        break;
+      }
+    }
+    // Re-render technician pending text if applicable
+    var techText = document.getElementById('result-technician');
+    if (techText.textContent === t[currentLang === 'en' ? 'es' : 'en'].pendingAssignment) {
+      techText.textContent = t[currentLang].pendingAssignment;
+    }
+  }
+}
+
+// Apply saved language preference on page load
+if (currentLang !== 'en') {
+  document.documentElement.lang = currentLang;
+  document.getElementById('lang-toggle').textContent = '\uD83C\uDF10 EN';
+  document.getElementById('top-hours').textContent = '\uD83D\uDD50 ' + t[currentLang].monSat;
+  document.querySelectorAll('[data-t]').forEach(function(el) {
+    var key = el.getAttribute('data-t');
+    if (t[currentLang][key]) el.textContent = t[currentLang][key];
+  });
+  document.getElementById('ref-input').placeholder = t[currentLang].refPlaceholder;
+  document.getElementById('email-input').placeholder = t[currentLang].emailPlaceholder;
+}
+
+// ===== MOBILE MENU =====
+function toggleMobileMenu() {
+  var menu = document.getElementById('mobile-menu');
+  var btn = document.getElementById('mobile-menu-btn');
+  menu.classList.toggle('hidden');
+  var isExpanded = !menu.classList.contains('hidden');
+  btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+}
+
+document.querySelectorAll('#mobile-menu a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    document.getElementById('mobile-menu').classList.add('hidden');
+    document.getElementById('mobile-menu-btn').setAttribute('aria-expanded', 'false');
+  });
+});
+
+// ===== DARK MODE =====
+function toggleDarkMode() {
+  var html = document.documentElement;
+  var isDark = html.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  var btn = document.getElementById('dark-mode-toggle');
+  if (btn) btn.textContent = isDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+}
+
+(function() {
+  var saved = localStorage.getItem('theme');
+  var shouldBeDark = saved === 'dark';
+  if (shouldBeDark) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+  var btn = document.getElementById('dark-mode-toggle');
+  if (btn) btn.textContent = shouldBeDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+})();
+
+// ===== PHONE CLICK TRACKING =====
+document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
+  link.addEventListener('click', function() {
+    if (typeof gtag === 'function') gtag('event', 'phone_call', {
+      event_category: 'contact', event_label: this.href
+    });
+  });
+});
+
+// ===== UPDATE GA ID FROM SETTINGS =====
+fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json){
+  var data = json.data || [];
+  for (var i = 0; i < data.length; i++) {
+    if (data[i].setting_key === 'google_analytics_id' && data[i].value_en) {
+      if (typeof window.__updateGaId === 'function') window.__updateGaId(data[i].value_en);
+      break;
+    }
+  }
+}).catch(function(){});
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(function(){});
+}
+</script>
+</body>
+</html>

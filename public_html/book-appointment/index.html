@@ -163,57 +163,67 @@
                 <input type="radio" name="service" value="tire-installation" id="svc-tire-installation" required class="sr-only">
                 <label for="svc-tire-installation" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="tireInstallation">Tire Installation</span>
+                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tire-installation"></span>
                 </label>
               </div>
               <div class="service-card">
                 <input type="radio" name="service" value="tire-repair" id="svc-tire-repair" required class="sr-only">
                 <label for="svc-tire-repair" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="tireRepair">Tire Repair</span>
+                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tire-repair"></span>
                 </label>
               </div>
               <div class="service-card">
                 <input type="radio" name="service" value="wheel-alignment" id="svc-wheel-alignment" required class="sr-only">
                 <label for="svc-wheel-alignment" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="wheelAlignment">Wheel Alignment</span>
+                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="wheel-alignment"></span>
                 </label>
               </div>
               <div class="service-card">
                 <input type="radio" name="service" value="oil-change" id="svc-oil-change" required class="sr-only">
                 <label for="svc-oil-change" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="oilChange">Oil Change</span>
+                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="oil-change"></span>
                 </label>
               </div>
               <div class="service-card">
                 <input type="radio" name="service" value="brake-service" id="svc-brake-service" required class="sr-only">
                 <label for="svc-brake-service" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="brakeService">Brake Service</span>
+                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="brake-service"></span>
                 </label>
               </div>
               <div class="service-card">
                 <input type="radio" name="service" value="tuneup" id="svc-tuneup" required class="sr-only">
                 <label for="svc-tuneup" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="tuneup">Tuneup</span>
+                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tuneup"></span>
                 </label>
               </div>
               <div class="service-card">
                 <input type="radio" name="service" value="mechanical-inspection" id="svc-mechanical-inspection" required class="sr-only">
                 <label for="svc-mechanical-inspection" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="mechanicalInspection">Mechanical Inspection</span>
+                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="mechanical-inspection"></span>
                 </label>
               </div>
               <div class="service-card">
                 <input type="radio" name="service" value="mobile-service" id="svc-mobile-service" required class="sr-only">
                 <label for="svc-mobile-service" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="mobileService">Mobile Service</span>
+                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="mobile-service"></span>
                 </label>
               </div>
               <div class="service-card">
                 <input type="radio" name="service" value="other" id="svc-other" required class="sr-only">
                 <label for="svc-other" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="otherService">Other</span>
+                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="other"></span>
                 </label>
               </div>
             </div>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-3 text-center" data-t="pricingDisclaimer">Prices are estimates and may vary. Final pricing confirmed at appointment.</p>
           </fieldset>
         </div>
 
@@ -495,7 +505,10 @@ const t = {
     phonePlaceholder: '(503) 123-4567',
     emailPlaceholder: 'your@email.com',
     callNow: 'Call Now',
-    privacyConsent: 'I agree to the collection and use of my personal information to process this appointment request.'
+    privacyConsent: 'I agree to the collection and use of my personal information to process this appointment request.',
+    fromPrice: 'From',
+    callForQuote: 'Call for quote',
+    pricingDisclaimer: 'Prices are estimates and may vary. Final pricing confirmed at appointment.'
   },
   es: {
     home: 'Inicio',
@@ -565,7 +578,10 @@ const t = {
     emailPlaceholder: 'tu@correo.com',
     callNow: 'Llamar',
     backToHome: 'Ir al Inicio',
-    privacyConsent: 'Acepto la recopilacion y el uso de mi informacion personal para procesar esta solicitud de cita.'
+    privacyConsent: 'Acepto la recopilacion y el uso de mi informacion personal para procesar esta solicitud de cita.',
+    fromPrice: 'Desde',
+    callForQuote: 'Llame para cotizar',
+    pricingDisclaimer: 'Los precios son estimados y pueden variar. Precio final confirmado en la cita.'
   }
 };
 
@@ -594,6 +610,34 @@ const serviceLabels = {
     'other': 'Otro'
   }
 };
+
+// ===== SERVICE PRICING & DURATION =====
+var serviceInfo = {
+  'tire-installation': { duration: '45-90', priceMin: 25, priceMax: 80 },
+  'tire-repair':       { duration: '20-40', priceMin: 15, priceMax: 35 },
+  'wheel-alignment':   { duration: '45-60', priceMin: 50, priceMax: 100 },
+  'oil-change':        { duration: '20-30', priceMin: 35, priceMax: 75 },
+  'brake-service':     { duration: '60-120', priceMin: 100, priceMax: 400 },
+  'tuneup':            { duration: '30-60', priceMin: 50, priceMax: 150 },
+  'mechanical-inspection': { duration: '30-60', priceMin: 50, priceMax: 100 },
+  'mobile-service':    { duration: '60-120', priceMin: 0, priceMax: 0 },
+  'other':             { duration: '', priceMin: 0, priceMax: 0 }
+};
+function updateServiceMeta() {
+  document.querySelectorAll('.service-meta').forEach(function(el) {
+    var svc = el.getAttribute('data-service');
+    var info = serviceInfo[svc];
+    if (!info) { el.textContent = ''; return; }
+    var parts = [];
+    if (info.duration) parts.push(info.duration + ' min');
+    if (info.priceMin > 0) {
+      parts.push(t[currentLang].fromPrice + ' $' + info.priceMin);
+    } else if (svc !== 'other') {
+      parts.push(t[currentLang].callForQuote);
+    }
+    el.textContent = parts.length ? parts.join('  \u2022  ') : '';
+  });
+}
 
 // ===== DATE CONSTRAINTS =====
 function setupDateInput() {
@@ -906,6 +950,7 @@ function toggleLanguage() {
   if (makeInput) makeInput.placeholder = t[currentLang].vehicleMakePlaceholder;
   var modelInput = document.querySelector('input[name="vehicleModel"]');
   if (modelInput) modelInput.placeholder = t[currentLang].vehicleModelPlaceholder;
+  updateServiceMeta();
 }
 
 // Apply saved language preference on page load
@@ -1079,6 +1124,7 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
 populateYearDropdown();
 setupDateInput();
 setupTimeSlots();
+updateServiceMeta();
 
 // ===== PROGRESS BAR =====
 (function() {

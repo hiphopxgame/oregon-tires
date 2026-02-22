@@ -270,7 +270,10 @@
     <div id="tab-appointments" class="tab-content hidden fade-in">
       <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
         <div><h2 class="text-2xl font-bold">📅 <span data-t="appointmentsHeading">Appointments</span></h2><p class="text-green-100" data-t="calendarSubtitle">Calendar view with employee assignment</p></div>
-        <button onclick="loadAppointments()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30">↻ Refresh</button>
+        <div class="flex gap-2">
+          <button onclick="showNewApptModal()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-50 transition">+ <span data-t="newAppointment">New Appointment</span></button>
+          <button onclick="loadAppointments()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30">↻ Refresh</button>
+        </div>
       </div>
       <div class="bg-white rounded-b-xl shadow dark:bg-gray-800">
         <!-- Sub-tabs: Calendar vs List view -->
@@ -5222,6 +5225,110 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   </div>
 </div>
 
+<!-- New Appointment Modal -->
+<div id="new-appt-modal" role="dialog" aria-modal="true" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.5)">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200" data-t="newAppointment">New Appointment</h3>
+      <button onclick="closeModal('new-appt-modal')" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+    </div>
+    <form id="new-appt-form" onsubmit="createAppointment(event)">
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Source</span>
+          <div class="flex gap-4 mt-1">
+            <label class="flex items-center gap-1"><input type="radio" name="appt-source" value="walk-in" checked class="text-brand"> Walk-in</label>
+            <label class="flex items-center gap-1"><input type="radio" name="appt-source" value="phone" class="text-brand"> Phone</label>
+          </div>
+        </label>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">First Name *</span>
+          <input type="text" name="appt-first-name" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </label>
+        <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Last Name *</span>
+          <input type="text" name="appt-last-name" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </label>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Email *</span>
+          <input type="email" name="appt-email" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </label>
+        <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Phone *</span>
+          <input type="tel" name="appt-phone" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </label>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Service *</span>
+          <select name="appt-service" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            <option value="">Select...</option>
+            <option value="tire-installation">Tire Installation</option>
+            <option value="tire-repair">Tire Repair</option>
+            <option value="wheel-alignment">Wheel Alignment</option>
+            <option value="oil-change">Oil Change</option>
+            <option value="brake-service">Brake Service</option>
+            <option value="tuneup">Tuneup</option>
+            <option value="mechanical-inspection">Mechanical Inspection</option>
+            <option value="mobile-service">Mobile Service</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Date *</span>
+            <input type="date" name="appt-date" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          </label>
+          <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Time *</span>
+            <select name="appt-time" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="">Select...</option>
+              <option value="07:00">7:00 AM</option>
+              <option value="08:00">8:00 AM</option>
+              <option value="09:00">9:00 AM</option>
+              <option value="10:00">10:00 AM</option>
+              <option value="11:00">11:00 AM</option>
+              <option value="12:00">12:00 PM</option>
+              <option value="13:00">1:00 PM</option>
+              <option value="14:00">2:00 PM</option>
+              <option value="15:00">3:00 PM</option>
+              <option value="16:00">4:00 PM</option>
+              <option value="17:00">5:00 PM</option>
+              <option value="18:00">6:00 PM</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <label class="block"><span class="text-xs text-gray-500 dark:text-gray-400">Year</span>
+          <input type="text" name="appt-vehicle-year" maxlength="4" placeholder="2024" class="mt-1 w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </label>
+        <label class="block"><span class="text-xs text-gray-500 dark:text-gray-400">Make</span>
+          <input type="text" name="appt-vehicle-make" placeholder="Toyota" class="mt-1 w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </label>
+        <label class="block"><span class="text-xs text-gray-500 dark:text-gray-400">Model</span>
+          <input type="text" name="appt-vehicle-model" placeholder="Camry" class="mt-1 w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </label>
+      </div>
+      <div class="mb-4">
+        <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Assign Employee</span>
+          <select id="new-appt-employee" class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"></select>
+        </label>
+      </div>
+      <div class="mb-4">
+        <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Notes</span>
+          <textarea name="appt-notes" rows="2" class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
+        </label>
+      </div>
+      <div class="mb-4 flex gap-4">
+        <label class="flex items-center gap-1"><input type="radio" name="appt-language" value="english" checked class="text-brand"> English</label>
+        <label class="flex items-center gap-1"><input type="radio" name="appt-language" value="spanish" class="text-brand"> Español</label>
+      </div>
+      <div id="new-appt-error" class="hidden text-red-600 text-sm mb-3"></div>
+      <div class="flex justify-end gap-3">
+        <button type="button" onclick="closeModal('new-appt-modal')" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400">Cancel</button>
+        <button type="submit" id="new-appt-submit" class="bg-brand text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition" data-t="createAppointment">Create Appointment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast" role="alert" aria-live="polite" class="hidden fixed bottom-4 right-4 z-50 bg-brand text-white px-6 py-3 rounded-lg shadow-lg transition-all"></div>
 
@@ -5474,6 +5581,10 @@ const adminT = {
     mustContainUppercase: 'Must contain an uppercase letter',
     mustContainLowercase: 'Must contain a lowercase letter',
     mustContainNumber: 'Must contain a number',
+    newAppointment: 'New Appointment',
+    createAppointment: 'Create Appointment',
+    appointmentCreated: 'Appointment created!',
+    creating: 'Creating...',
   },
   es: {
     // Login
@@ -5719,6 +5830,10 @@ const adminT = {
     mustContainUppercase: 'Debe contener una letra may\u00FAscula',
     mustContainLowercase: 'Debe contener una letra min\u00FAscula',
     mustContainNumber: 'Debe contener un n\u00FAmero',
+    newAppointment: 'Nueva Cita',
+    createAppointment: 'Crear Cita',
+    appointmentCreated: '\u00A1Cita creada!',
+    creating: 'Creando...',
   }
 };
 
@@ -7689,6 +7804,74 @@ applyAdminTranslations();
 
 // Initialize drag-and-drop zones for gallery upload
 initDragAndDrop();
+
+// ===== NEW APPOINTMENT =====
+function showNewApptModal() {
+  var empSelect = document.getElementById('new-appt-employee');
+  empSelect.innerHTML = '';
+  var defOpt = document.createElement('option');
+  defOpt.value = '';
+  defOpt.textContent = '\u2014 Unassigned \u2014';
+  empSelect.appendChild(defOpt);
+  employees.filter(function(e) { return e.is_active; }).forEach(function(e) {
+    var opt = document.createElement('option');
+    opt.value = e.id;
+    opt.textContent = e.name;
+    empSelect.appendChild(opt);
+  });
+  var today = new Date().toISOString().split('T')[0];
+  var dateInput = document.querySelector('#new-appt-form [name="appt-date"]');
+  dateInput.setAttribute('min', today);
+  dateInput.value = today;
+  document.getElementById('new-appt-form').reset();
+  dateInput.value = today;
+  document.getElementById('new-appt-error').classList.add('hidden');
+  document.getElementById('new-appt-modal').classList.remove('hidden');
+}
+
+async function createAppointment(e) {
+  e.preventDefault();
+  var form = document.getElementById('new-appt-form');
+  var errorEl = document.getElementById('new-appt-error');
+  var btn = document.getElementById('new-appt-submit');
+  errorEl.classList.add('hidden');
+  var data = {
+    action: 'create',
+    source: (form.querySelector('input[name="appt-source"]:checked') || {}).value || 'walk-in',
+    first_name: form.querySelector('[name="appt-first-name"]').value.trim(),
+    last_name: form.querySelector('[name="appt-last-name"]').value.trim(),
+    email: form.querySelector('[name="appt-email"]').value.trim(),
+    phone: form.querySelector('[name="appt-phone"]').value.trim(),
+    service: form.querySelector('[name="appt-service"]').value,
+    preferred_date: form.querySelector('[name="appt-date"]').value,
+    preferred_time: form.querySelector('[name="appt-time"]').value,
+    vehicle_year: form.querySelector('[name="appt-vehicle-year"]').value || '',
+    vehicle_make: form.querySelector('[name="appt-vehicle-make"]').value.trim() || '',
+    vehicle_model: form.querySelector('[name="appt-vehicle-model"]').value.trim() || '',
+    assigned_employee_id: document.getElementById('new-appt-employee').value || null,
+    notes: form.querySelector('[name="appt-notes"]').value.trim() || '',
+    language: (form.querySelector('input[name="appt-language"]:checked') || {}).value || 'english'
+  };
+  if (!data.first_name || !data.last_name) { errorEl.textContent = 'Name is required'; errorEl.classList.remove('hidden'); return; }
+  if (!data.email) { errorEl.textContent = 'Email is required'; errorEl.classList.remove('hidden'); return; }
+  if (!data.phone) { errorEl.textContent = 'Phone is required'; errorEl.classList.remove('hidden'); return; }
+  if (!data.service) { errorEl.textContent = 'Service is required'; errorEl.classList.remove('hidden'); return; }
+  if (!data.preferred_date) { errorEl.textContent = 'Date is required'; errorEl.classList.remove('hidden'); return; }
+  if (!data.preferred_time) { errorEl.textContent = 'Time is required'; errorEl.classList.remove('hidden'); return; }
+  btn.disabled = true;
+  btn.textContent = adminT[currentLang].creating || 'Creating...';
+  try {
+    var json = await api('appointments.php', { method: 'POST', body: data });
+    showToast((adminT[currentLang].appointmentCreated || 'Appointment created!') + ' \u2014 ' + json.data.reference_number);
+    document.getElementById('new-appt-modal').classList.add('hidden');
+    loadAppointments();
+  } catch (err) {
+    errorEl.textContent = err.message || 'Error creating appointment';
+    errorEl.classList.remove('hidden');
+  }
+  btn.disabled = false;
+  btn.textContent = adminT[currentLang].createAppointment || 'Create Appointment';
+}
 </script>
 </body>
 </html>
