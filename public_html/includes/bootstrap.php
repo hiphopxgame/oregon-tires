@@ -60,12 +60,13 @@ function startSecureSession(): void
     session_start();
 }
 
-// ─── CORS (same-origin only, or allow APP_URL) ─────────────────────────────
+// ─── CORS (allow APP_URL and HipHop World network) ──────────────────────────
 $appUrl = $_ENV['APP_URL'] ?? '';
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$allowedOrigins = array_filter([$appUrl, 'https://hiphop.world', 'https://www.hiphop.world']);
 
-if ($appUrl && $origin === $appUrl) {
-    header("Access-Control-Allow-Origin: {$appUrl}");
+if ($origin && in_array($origin, $allowedOrigins, true)) {
+    header("Access-Control-Allow-Origin: {$origin}");
     header('Access-Control-Allow-Credentials: true');
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, X-CSRF-Token');
@@ -80,3 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // ─── Content Type ───────────────────────────────────────────────────────────
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
+
+// ─── Engine Kit (optional, for network integration) ─────────────────────────
+$engineKitPath = $_ENV['ENGINE_KIT_PATH'] ?? null;
+if ($engineKitPath && file_exists($engineKitPath . '/loader.php')) {
+    require_once $engineKitPath . '/loader.php';
+}
