@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share Your Feedback — Oregon Tires</title>
+  <meta name="description" content="Share your feedback with Oregon Tires Auto Care in Portland, OR. We want to make it right.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#15803d">
+  <meta name="msapplication-TileColor" content="#15803d">
+
+  <!-- Tailwind CSS (built) -->
+  <link rel="stylesheet" href="/assets/styles.css">
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .fade-in { animation: fadeIn 0.6s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .star { color: #d1d5db; font-size: 1.5rem; line-height: 1; }
+    .star.filled { color: #f59e0b; }
+  </style>
+
+  <!-- Google Analytics 4 -->
+  <script>
+  (function(){
+    var DEFAULT_GA = 'G-CHYMTNB6LH';
+    var cached = null;
+    try { cached = localStorage.getItem('oregontires_ga_id'); } catch(e){}
+    var id = cached || DEFAULT_GA;
+    var s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', id);
+    window.__gaId = id;
+    window.__updateGaId = function(newId) {
+      if (!newId || newId === window.__gaId) return;
+      if (!/^G-[A-Z0-9]{6,12}$/.test(newId)) return;
+      window.__gaId = newId;
+      try { localStorage.setItem('oregontires_ga_id', newId); } catch(e){}
+      gtag('config', newId, { send_page_view: false });
+    };
+  })();
+  </script>
+  <!-- Dark mode init (prevent FOUC) -->
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
+</head>
+<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
+
+  <!-- Top Bar -->
+  <div class="bg-brand text-white text-sm py-2">
+    <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
+      <div class="flex flex-wrap items-center gap-4">
+        <span>&#128222; <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></span>
+        <span>&#9993;&#65039; <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></span>
+        <span class="hidden md:inline">&#128205; 8536 SE 82nd Ave, Portland, OR 97266</span>
+        <span class="hidden lg:inline" id="top-hours">&#128336; Mon-Sat 7AM-7PM</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="https://www.instagram.com/oregontires" target="_blank" class="hover:text-amber-300">Instagram</a>
+        <a href="https://www.facebook.com/61571913202998/" target="_blank" class="hover:text-amber-300">Facebook</a>
+        <button id="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode" class="text-sm text-white hover:text-amber-300 transition-colors">&#127769;</button>
+        <button onclick="toggleLanguage()" class="hover:text-amber-300 font-medium" id="lang-toggle" aria-label="Switch language">&#127760; ES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-white shadow-md sticky top-0 z-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/">
+        <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="/assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" width="781" height="275" loading="eager" fetchpriority="high"></picture>
+      </a>
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="/" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="home">Home</a>
+        <a href="/#services" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="services">Services</a>
+        <a href="/#about" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="about">About</a>
+        <a href="/#reviews" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="testimonials">Reviews</a>
+        <a href="/#gallery" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="gallery">Promotions</a>
+        <a href="/#contact" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="contact">Contact</a>
+        <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="scheduleService">Schedule Service</a>
+      </nav>
+      <button onclick="toggleMobileMenu()" class="md:hidden text-brand dark:text-green-400 text-2xl" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">&#9776;</button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t px-4 pb-4 dark:bg-gray-800 dark:border-gray-700">
+      <a href="/" class="block py-2 text-brand dark:text-green-400" data-t="home">Home</a>
+      <a href="/#services" class="block py-2 text-brand dark:text-green-400" data-t="services">Services</a>
+      <a href="/#about" class="block py-2 text-brand dark:text-green-400" data-t="about">About</a>
+      <a href="/#reviews" class="block py-2 text-brand dark:text-green-400" data-t="testimonials">Reviews</a>
+      <a href="/#gallery" class="block py-2 text-brand dark:text-green-400" data-t="gallery">Promotions</a>
+      <a href="/#contact" class="block py-2 text-brand dark:text-green-400" data-t="contact">Contact</a>
+      <a href="/book-appointment" class="block py-2 text-brand dark:text-green-400 font-semibold" data-t="scheduleService">Schedule Service</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content">
+
+  <!-- Hero Banner -->
+  <section class="bg-brand text-white py-12">
+    <div class="container mx-auto px-4 text-center">
+      <div class="text-5xl mb-4">&#128533;</div>
+      <h1 class="text-3xl md:text-4xl font-bold mb-3" data-t="heading">We want to make it right</h1>
+      <p class="text-lg opacity-90 max-w-2xl mx-auto" data-t="subheading">Thank you for being honest with us. Please share what happened so we can improve.</p>
+    </div>
+  </section>
+
+  <!-- Feedback Form Section -->
+  <section class="py-12 bg-gray-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4 max-w-lg">
+
+      <!-- Feedback Form Card -->
+      <div id="feedback-form-card" class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-700">
+
+        <!-- Star Rating Display -->
+        <div class="mb-6">
+          <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" data-t="yourRating">Your rating:</p>
+          <div id="star-display" class="flex gap-1" role="img" aria-label="Rating"></div>
+        </div>
+
+        <!-- Pre-filled customer info (display only) -->
+        <div id="customer-info" class="mb-6 p-4 bg-gray-50 dark:bg-gray-600 rounded-lg border border-gray-200 dark:border-gray-500 hidden">
+          <p id="customer-name-display" class="font-medium text-gray-800 dark:text-gray-100 text-sm"></p>
+          <p id="customer-email-display" class="text-gray-500 dark:text-gray-400 text-sm"></p>
+        </div>
+
+        <!-- Feedback Form -->
+        <form id="feedback-form" class="space-y-4" novalidate>
+          <!-- Hidden fields (set by JS from URL params) -->
+          <input type="hidden" id="field-ref"    name="ref"    value="">
+          <input type="hidden" id="field-email"  name="email"  value="">
+          <input type="hidden" id="field-name"   name="name"   value="">
+          <input type="hidden" id="field-rating" name="rating" value="">
+
+          <!-- Message Textarea -->
+          <div>
+            <label for="feedback-message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="yourMessage">Your feedback:</label>
+            <textarea id="feedback-message" name="message" rows="5" required
+              class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500 resize-y"
+              maxlength="2000"
+              placeholder="Tell us what went wrong and how we can improve..."></textarea>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="submit-btn"
+            class="w-full bg-brand text-white px-6 py-3 rounded-lg font-bold text-lg hover:bg-green-700 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            data-t="submit">Send Feedback</button>
+        </form>
+
+        <!-- Error Message -->
+        <div id="error-msg" class="hidden mt-4 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg" role="alert">
+          <p id="error-text" class="text-red-700 dark:text-red-300 text-sm font-medium"></p>
+        </div>
+      </div>
+
+      <!-- Success Card (hidden initially) -->
+      <div id="success-card" class="hidden bg-white rounded-xl shadow-md p-8 text-center fade-in dark:bg-gray-700">
+        <div class="text-5xl mb-4">&#10003;</div>
+        <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-3" data-t="successMsg">Thank you. Our team will follow up within 24 hours.</h2>
+        <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm">&#128222; (503) 367-9714</p>
+        <a href="/" class="inline-block bg-amber-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="backHome">&#8592; Back to Oregon Tires</a>
+      </div>
+
+      <!-- Back Link (shown below form card) -->
+      <div class="mt-6 text-center">
+        <a href="/" class="text-brand dark:text-green-400 hover:opacity-70 text-sm font-medium" data-t="backHome">&#8592; Back to Oregon Tires</a>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="mt-6 bg-white rounded-xl shadow-md p-6 text-center dark:bg-gray-700">
+        <p class="text-gray-600 dark:text-gray-300 mb-2" data-t="needHelp">Need help? Give us a call!</p>
+        <a href="tel:5033679714" class="text-2xl font-bold text-brand dark:text-green-400 hover:opacity-80 transition">&#128222; (503) 367-9714</a>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2" data-t="monSat">Mon-Sat 7AM-7PM</p>
+      </div>
+
+    </div>
+  </section>
+
+  </main>
+
+  <!-- Sticky Mobile CTA Bar -->
+  <div id="mobile-cta" class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-brand shadow-[0_-4px_12px_rgba(0,0,0,0.15)] border-t border-green-700 safe-area-bottom">
+    <div class="flex">
+      <a href="tel:5033679714" class="flex-1 flex items-center justify-center gap-2 py-3.5 text-white font-semibold text-sm border-r border-green-700 active:bg-green-900 transition">
+        <span>&#128222;</span> <span data-t="callNow">Call Now</span>
+      </a>
+      <a href="/" class="flex-1 flex items-center justify-center gap-2 py-3.5 bg-amber-500 text-black font-semibold text-sm active:bg-amber-600 transition">
+        <span>&#127968;</span> <span data-t="backToHome">Back to Home</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-brand text-white py-12 pb-24 md:pb-12">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4" data-t="contactInfo">Contact Information</h3>
+          <div class="space-y-2 text-gray-200">
+            <p>&#128222; <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></p>
+            <p>&#9993;&#65039; <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></p>
+            <p>&#128205; 8536 SE 82nd Ave, Portland, OR 97266</p>
+            <p>&#128336; <span data-t="monSat">Mon-Sat 7AM-7PM</span></p>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4" data-t="services">Services</h3>
+          <ul class="space-y-1 text-gray-200">
+            <li data-t="tireInstallation">Tire Installation</li>
+            <li data-t="tireRepair">Tire Repair</li>
+            <li data-t="wheelAlignment">Wheel Alignment</li>
+            <li data-t="brakeService">Brake Service</li>
+            <li data-t="oilChange">Oil Change</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4" data-t="followUs">Follow Us</h3>
+          <div class="space-y-2">
+            <a href="https://www.facebook.com/61571913202998/" target="_blank" class="block text-gray-200 hover:text-amber-300">Facebook</a>
+            <a href="https://www.instagram.com/oregontires" target="_blank" class="block text-gray-200 hover:text-amber-300">Instagram</a>
+          </div>
+          <div class="mt-4">
+            <button onclick="toggleLanguage()" class="text-gray-200 hover:text-amber-300" id="footer-lang-toggle" aria-label="Switch language" data-t="langToggleFooter">English | Espa&#241;ol</button>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-green-600 dark:border-green-500 mt-8 pt-8 text-center text-gray-300 dark:text-gray-200">
+        <p>&copy; <span data-t="copyright">2026 Oregon Tires Auto Care. All rights reserved.</span></p>
+        <p class="mt-3 text-xs text-gray-300"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-amber-200 hover:text-amber-100 transition-colors">1vsM.com</a></p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+// ===== PHP API =====
+var API_BASE = '/api';
+
+// ===== TRANSLATIONS =====
+var currentLang = (function() {
+  var urlLang = new URLSearchParams(window.location.search).get('lang');
+  if (urlLang === 'es' || urlLang === 'en') { localStorage.setItem('oregontires_lang', urlLang); return urlLang; }
+  var saved = localStorage.getItem('oregontires_lang');
+  if (saved === 'es' || saved === 'en') return saved;
+  if (navigator.language && navigator.language.startsWith('es')) return 'es';
+  return 'en';
+})();
+
+var t = {
+  en: {
+    // Nav
+    home: 'Home',
+    services: 'Services',
+    about: 'About',
+    testimonials: 'Reviews',
+    gallery: 'Promotions',
+    contact: 'Contact',
+    scheduleService: 'Schedule Service',
+    // Page
+    pageTitle: 'Share Your Feedback \u2014 Oregon Tires',
+    heading: 'We want to make it right',
+    subheading: 'Thank you for being honest with us. Please share what happened so we can improve.',
+    yourRating: 'Your rating:',
+    yourMessage: 'Your feedback:',
+    messagePlaceholder: 'Tell us what went wrong and how we can improve...',
+    submit: 'Send Feedback',
+    submitting: 'Sending...',
+    successMsg: 'Thank you. Our team will follow up within 24 hours.',
+    errorMsg: 'Something went wrong. Please call us at (503) 367-9714.',
+    backHome: '\u2190 Back to Oregon Tires',
+    needHelp: 'Need help? Give us a call!',
+    // Common
+    monSat: 'Mon-Sat 7AM-7PM',
+    contactInfo: 'Contact Information',
+    followUs: 'Follow Us',
+    copyright: '2026 Oregon Tires Auto Care. All rights reserved.',
+    poweredBy: 'Powered by',
+    langToggleFooter: 'English | Espa\u00f1ol',
+    callNow: 'Call Now',
+    backToHome: 'Back to Home',
+    // Service names
+    tireInstallation: 'Tire Installation',
+    tireRepair: 'Tire Repair',
+    wheelAlignment: 'Wheel Alignment',
+    brakeService: 'Brake Service',
+    oilChange: 'Oil Change'
+  },
+  es: {
+    // Nav
+    home: 'Inicio',
+    services: 'Servicios',
+    about: 'Acerca de',
+    testimonials: 'Rese\u00f1as',
+    gallery: 'Promociones',
+    contact: 'Contacto',
+    scheduleService: 'Programar Servicio',
+    // Page
+    pageTitle: 'Comparte tu Opini\u00f3n \u2014 Oregon Tires',
+    heading: 'Queremos mejorar',
+    subheading: 'Gracias por tu honestidad. Cu\u00e9ntanos qu\u00e9 pas\u00f3 para poder mejorar.',
+    yourRating: 'Tu calificaci\u00f3n:',
+    yourMessage: 'Tu comentario:',
+    messagePlaceholder: 'Cu\u00e9ntanos qu\u00e9 sali\u00f3 mal y c\u00f3mo podemos mejorar...',
+    submit: 'Enviar Comentario',
+    submitting: 'Enviando...',
+    successMsg: 'Gracias. Nuestro equipo se comunicar\u00e1 en 24 horas.',
+    errorMsg: 'Algo sali\u00f3 mal. Por favor ll\u00e1menos al (503) 367-9714.',
+    backHome: '\u2190 Volver a Oregon Tires',
+    needHelp: '\u00bfNecesita ayuda? \u00a1Ll\u00e1menos!',
+    // Common
+    monSat: 'Lun-S\u00e1b 7AM-7PM',
+    contactInfo: 'Informaci\u00f3n de Contacto',
+    followUs: 'S\u00edguenos',
+    copyright: '2026 Oregon Tires Auto Care. Todos los derechos reservados.',
+    poweredBy: 'Desarrollado por',
+    langToggleFooter: 'English | Espa\u00f1ol',
+    callNow: 'Llamar',
+    backToHome: 'Ir al Inicio',
+    // Service names
+    tireInstallation: 'Instalaci\u00f3n de Llantas',
+    tireRepair: 'Reparaci\u00f3n de Llantas',
+    wheelAlignment: 'Alineaci\u00f3n de Ruedas',
+    brakeService: 'Servicio de Frenos',
+    oilChange: 'Cambio de Aceite'
+  }
+};
+
+// ===== PAGE STATE (populated from URL params) =====
+var pageRef    = '';
+var pageEmail  = '';
+var pageName   = '';
+var pageRating = 0;
+
+// ===== RENDER STARS (DOM only, no innerHTML) =====
+function renderStars(rating) {
+  var container = document.getElementById('star-display');
+  // Remove existing children
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+  container.setAttribute('aria-label', rating + ' out of 5 stars');
+  for (var i = 1; i <= 5; i++) {
+    var span = document.createElement('span');
+    span.className = i <= rating ? 'star filled' : 'star';
+    span.textContent = '\u2605';
+    container.appendChild(span);
+  }
+}
+
+// ===== SHOW ERROR =====
+function showError(message) {
+  var errorDiv  = document.getElementById('error-msg');
+  var errorText = document.getElementById('error-text');
+  errorText.textContent = message;
+  errorDiv.classList.remove('hidden');
+  errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideError() {
+  document.getElementById('error-msg').classList.add('hidden');
+}
+
+// ===== SHOW SUCCESS =====
+function showSuccess() {
+  document.getElementById('feedback-form-card').classList.add('hidden');
+  document.getElementById('success-card').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (typeof gtag === 'function') {
+    gtag('event', 'feedback_submitted', {
+      event_category: 'engagement',
+      event_label: 'rating_' + pageRating
+    });
+  }
+}
+
+// ===== FORM SUBMISSION =====
+document.getElementById('feedback-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  hideError();
+
+  var messageEl = document.getElementById('feedback-message');
+  var submitBtn = document.getElementById('submit-btn');
+  var message   = messageEl.value.trim();
+
+  // Client-side validation — require at least 5 chars
+  if (message.length < 5) {
+    showError(t[currentLang].errorMsg);
+    messageEl.focus();
+    return;
+  }
+
+  // Disable button, show loading state
+  submitBtn.disabled = true;
+  submitBtn.textContent = t[currentLang].submitting;
+
+  try {
+    var payload = {
+      ref:     pageRef,
+      email:   pageEmail,
+      name:    pageName,
+      rating:  pageRating,
+      message: message
+    };
+
+    var res = await fetch(API_BASE + '/feedback.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    });
+
+    var json = await res.json();
+
+    if (!res.ok || !json.success) {
+      showError(json.error || t[currentLang].errorMsg);
+      return;
+    }
+
+    showSuccess();
+
+  } catch (err) {
+    console.error('Feedback submit error:', err);
+    showError(t[currentLang].errorMsg);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = t[currentLang].submit;
+  }
+});
+
+// ===== READ URL PARAMS & POPULATE PAGE =====
+(function() {
+  var params = new URLSearchParams(window.location.search);
+
+  pageRef    = params.get('ref')   || '';
+  pageEmail  = params.get('email') || '';
+  pageName   = params.get('name')  || '';
+  pageRating = parseInt(params.get('rating') || '1', 10);
+
+  // Clamp rating to 1-5
+  if (isNaN(pageRating) || pageRating < 1) pageRating = 1;
+  if (pageRating > 5) pageRating = 5;
+
+  // Populate hidden form fields
+  document.getElementById('field-ref').value    = pageRef;
+  document.getElementById('field-email').value  = pageEmail;
+  document.getElementById('field-name').value   = pageName;
+  document.getElementById('field-rating').value = String(pageRating);
+
+  // Render star display
+  renderStars(pageRating);
+
+  // Show customer info box if we have identifying info (using safe textContent)
+  if (pageEmail || pageName) {
+    var infoBox  = document.getElementById('customer-info');
+    var nameEl   = document.getElementById('customer-name-display');
+    var emailEl  = document.getElementById('customer-email-display');
+    nameEl.textContent  = pageName  || '';
+    emailEl.textContent = pageEmail || '';
+    infoBox.classList.remove('hidden');
+  }
+})();
+
+// ===== LANGUAGE TOGGLE =====
+function applyLanguage() {
+  document.documentElement.lang = currentLang;
+  document.getElementById('lang-toggle').textContent = currentLang === 'en' ? '\uD83C\uDF10 ES' : '\uD83C\uDF10 EN';
+  document.getElementById('top-hours').textContent = '\uD83D\uDD50 ' + t[currentLang].monSat;
+  document.querySelectorAll('[data-t]').forEach(function(el) {
+    var key = el.getAttribute('data-t');
+    if (t[currentLang][key]) el.textContent = t[currentLang][key];
+  });
+  document.title = t[currentLang].pageTitle;
+  document.getElementById('feedback-message').placeholder = t[currentLang].messagePlaceholder;
+  var submitBtn = document.getElementById('submit-btn');
+  if (!submitBtn.disabled) {
+    submitBtn.textContent = t[currentLang].submit;
+  }
+}
+
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'es' : 'en';
+  localStorage.setItem('oregontires_lang', currentLang);
+  if (typeof gtag === 'function') gtag('event', 'language_switch', { event_category: 'engagement', event_label: currentLang });
+  applyLanguage();
+}
+
+// Apply saved language on page load
+if (currentLang !== 'en') {
+  applyLanguage();
+} else {
+  document.getElementById('top-hours').textContent = '\uD83D\uDD50 ' + t.en.monSat;
+}
+
+// ===== MOBILE MENU =====
+function toggleMobileMenu() {
+  var menu = document.getElementById('mobile-menu');
+  var btn  = document.getElementById('mobile-menu-btn');
+  menu.classList.toggle('hidden');
+  var isExpanded = !menu.classList.contains('hidden');
+  btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+}
+
+document.querySelectorAll('#mobile-menu a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    document.getElementById('mobile-menu').classList.add('hidden');
+    document.getElementById('mobile-menu-btn').setAttribute('aria-expanded', 'false');
+  });
+});
+
+// ===== DARK MODE =====
+function toggleDarkMode() {
+  var html   = document.documentElement;
+  var isDark = html.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  var btn = document.getElementById('dark-mode-toggle');
+  if (btn) btn.textContent = isDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+}
+
+(function() {
+  var saved        = localStorage.getItem('theme');
+  var shouldBeDark = saved === 'dark';
+  if (shouldBeDark) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+  var btn = document.getElementById('dark-mode-toggle');
+  if (btn) btn.textContent = shouldBeDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+})();
+
+// ===== PHONE CLICK TRACKING =====
+document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
+  link.addEventListener('click', function() {
+    if (typeof gtag === 'function') gtag('event', 'phone_call', {
+      event_category: 'contact', event_label: this.href
+    });
+  });
+});
+
+// ===== UPDATE GA ID FROM SETTINGS =====
+fetch('/api/settings.php').then(function(r){ return r.json(); }).then(function(json){
+  var data = json.data || [];
+  for (var i = 0; i < data.length; i++) {
+    if (data[i].setting_key === 'google_analytics_id' && data[i].value_en) {
+      if (typeof window.__updateGaId === 'function') window.__updateGaId(data[i].value_en);
+      break;
+    }
+  }
+}).catch(function(){});
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(function(){});
+}
+</script>
+</body>
+</html>
