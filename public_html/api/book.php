@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/mail.php';
+require_once __DIR__ . '/../includes/vin-decode.php';
 
 try {
     requireMethod('POST');
@@ -42,6 +43,7 @@ try {
     $vehicleYear  = sanitize((string) ($data['vehicle_year'] ?? ''), 4);
     $vehicleMake  = sanitize((string) ($data['vehicle_make'] ?? ''), 50);
     $vehicleModel = sanitize((string) ($data['vehicle_model'] ?? ''), 50);
+    $vehicleVin   = sanitize((string) ($data['vehicle_vin'] ?? ''), 17);
     $notes        = sanitize((string) ($data['notes'] ?? ''), 2000);
     $language     = sanitize((string) ($data['language'] ?? 'english'), 20);
 
@@ -146,10 +148,10 @@ try {
     // ─── Insert into database ───────────────────────────────────────────────
     $stmt = $db->prepare(
         'INSERT INTO oretir_appointments
-            (reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model,
+            (reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, vehicle_vin,
              first_name, last_name, phone, email, notes, status, language, created_at, updated_at)
          VALUES
-            (:reference_number, :service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model,
+            (:reference_number, :service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model, :vehicle_vin,
              :first_name, :last_name, :phone, :email, :notes, :status, :language, NOW(), NOW())'
     );
     $stmt->execute([
@@ -160,6 +162,7 @@ try {
         ':vehicle_year'     => $vehicleYear ?: null,
         ':vehicle_make'     => $vehicleMake ?: null,
         ':vehicle_model'    => $vehicleModel ?: null,
+        ':vehicle_vin'      => $vehicleVin ?: null,
         ':first_name'       => $firstName,
         ':last_name'        => $lastName,
         ':phone'            => $phone,
@@ -171,11 +174,53 @@ try {
 
     $appointmentId = (int) $db->lastInsertId();
 
+    // ─── Link booking to customer account if logged in ──────────────────────
+    startSecureSession();
+    if (!empty($_SESSION['member_id'])) {
+        $db->prepare('UPDATE oretir_appointments SET member_id = ? WHERE id = ?')
+           ->execute([(int) $_SESSION['member_id'], $appointmentId]);
+
+        // Cross-site activity reporting (fire-and-forget)
+        $memberStmt = $db->prepare('SELECT hw_user_id FROM members WHERE id = ? LIMIT 1');
+        $memberStmt->execute([(int) $_SESSION['member_id']]);
+        $memberRow = $memberStmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!empty($memberRow['hw_user_id']) && class_exists('MemberSync')) {
+            MemberSync::reportActivity(
+                (int) $memberRow['hw_user_id'],
+                'oregon.tires',
+                'appointment_booked',
+                ['reference' => $referenceNumber, 'service' => $service]
+            );
+        }
+    }
+
     // ─── Generate cancel/reschedule token ─────────────────────────────────
     $cancelToken = bin2hex(random_bytes(32));
     $cancelExpires = date('Y-m-d H:i:s', strtotime('+30 days'));
     $db->prepare('UPDATE oretir_appointments SET cancel_token = ?, cancel_token_expires = ? WHERE id = ?')
        ->execute([$cancelToken, $cancelExpires, $appointmentId]);
+
+    // ─── Auto-create Customer & Vehicle records (graceful — failure doesn't break booking) ──
+    $bookingCustomerId = null;
+    $bookingVehicleId  = null;
+    try {
+        $bookingCustomerId = findOrCreateCustomer($email, $firstName, $lastName, $phone, $language, $db);
+        if ($bookingCustomerId) {
+            $bookingVehicleId = findOrCreateVehicle(
+                $bookingCustomerId,
+                $vehicleYear ?: null,
+                $vehicleMake ?: null,
+                $vehicleModel ?: null,
+                $vehicleVin ?: null,
+                $db
+            );
+            $db->prepare('UPDATE oretir_appointments SET customer_id = ?, vehicle_id = ? WHERE id = ?')
+               ->execute([$bookingCustomerId, $bookingVehicleId, $appointmentId]);
+        }
+    } catch (\Throwable $custErr) {
+        error_log("Oregon Tires book.php: customer/vehicle auto-create failed for appointment #{$appointmentId}: " . $custErr->getMessage());
+    }
 
     // ─── Optional Payment Integration ─────────────────────────────────────
     $paymentResponse = null;
