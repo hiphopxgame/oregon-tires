@@ -19,7 +19,7 @@ function initMemberKit(PDO $pdo): void
         'mode'           => 'independent',
         'members_table'  => 'members',
         'session_key'    => 'member_id',
-        'login_url'      => '/customer/login',
+        'login_url'      => '/members',
         'site_name'      => 'Oregon Tires Auto Care',
         'session_name'   => 'oregon_session',
     ]);
