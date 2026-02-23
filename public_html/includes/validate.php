@@ -154,3 +154,12 @@ function validateImageUpload(array $file, int $maxSizeMB = 5): string|true
 
     return true;
 }
+
+/**
+ * Validate a VIN (Vehicle Identification Number).
+ * 17 alphanumeric characters, no I, O, or Q.
+ */
+function isValidVin(string $vin): bool
+{
+    return (bool) preg_match('/^[A-HJ-NPR-Z0-9]{17}$/i', $vin);
+}

@@ -25,9 +25,9 @@ if (ob_get_level() === 0) {
   <meta name="description" content="Professional tire sales, installation, brakes & auto care in Portland, OR. Bilingual English & Spanish service. Call (503) 367-9714">
   <meta name="author" content="Oregon Tires Auto Care">
   <meta name="keywords" content="tires, auto care, brake service, oil change, Portland Oregon, bilingual service, Spanish English speaking">
-  <link rel="icon" href="/assets/favicon.ico" sizes="any">
-  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#15803d">
   <meta name="msapplication-TileColor" content="#15803d">
@@ -84,7 +84,7 @@ if (ob_get_level() === 0) {
   </script>
 
   <!-- Tailwind CSS (built) -->
-  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="assets/styles.css">
 
   <style>
     html { scroll-behavior: smooth; }

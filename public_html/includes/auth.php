@@ -129,3 +129,33 @@ function hashPassword(string $password): string
 {
     return password_hash($password, PASSWORD_BCRYPT, ['cost' => BCRYPT_COST]);
 }
+
+// ─── Customer Auth Helpers ──────────────────────────────────────────────────
+
+/**
+ * Check if a customer is logged in via Member Kit.
+ */
+function isCustomerLoggedIn(): bool
+{
+    return !empty($_SESSION['member_id']);
+}
+
+/**
+ * Guard: require customer auth or return 401.
+ */
+function requireCustomerAuth(): void
+{
+    if (!isCustomerLoggedIn()) {
+        jsonError('Authentication required', 401);
+    }
+}
+
+/**
+ * Get the current user type (admin or customer).
+ */
+function getCurrentUserType(): ?string
+{
+    if (!empty($_SESSION['admin_id'])) return 'admin';
+    if (!empty($_SESSION['member_id'])) return 'customer';
+    return null;
+}

@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reschedule Appointment - Oregon Tires Auto Care</title>
     <meta name="robots" content="noindex, nofollow">
-    <link rel="icon" href="/assets/favicon.ico" sizes="any">
-    <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
-    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="icon" href="assets/favicon.ico" sizes="any">
+    <link rel="icon" href="assets/favicon.png" type="image/png" sizes="32x32">
+    <link rel="stylesheet" href="assets/styles.css">
     <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
 </head>
 <body class="bg-white dark:bg-[#0A0A0A] min-h-screen flex flex-col">
@@ -16,7 +16,7 @@
 <header class="sticky top-0 z-50 bg-white/90 dark:bg-[#111827]/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
         <a href="/" class="flex items-center gap-3">
-            <img src="/assets/logo.webp" alt="Oregon Tires" class="h-10 w-10 rounded-lg" width="40" height="40">
+            <img src="assets/logo.webp" alt="Oregon Tires" class="h-10 w-10 rounded-lg" width="40" height="40">
             <span class="text-lg font-bold text-gray-900 dark:text-white">Oregon Tires</span>
         </a>
         <nav class="flex items-center gap-4">

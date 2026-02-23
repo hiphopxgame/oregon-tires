@@ -122,7 +122,7 @@ Google Maps iframe loads immediately (~500KB), even for users who never scroll t
 ### 16. Add Loading Skeletons for Gallery
 **Confidence:** 80%
 
-Gallery shows plain "Loading gallery..." text during Supabase fetch. No visual feedback.
+Gallery shows plain "Loading gallery..." text during API fetch. No visual feedback.
 
 **Fix:** Replace with animated skeleton cards (`animate-pulse bg-gray-200 rounded-xl h-64`) that disappear when images load.
 

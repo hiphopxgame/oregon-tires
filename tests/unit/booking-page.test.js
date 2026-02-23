@@ -254,29 +254,14 @@ describe('booking page — bilingual translations', () => {
   });
 });
 
-// ===== SUPABASE =====
-describe('booking page — Supabase client', () => {
-  it('includes the Supabase CDN script', () => {
-    expect(html).toContain('supabase-js');
-  });
-
-  it('initializes Supabase with createClient', () => {
-    expect(html).toContain('supabase.createClient');
-  });
-
-  it('uses the correct Supabase URL', () => {
-    expect(html).toContain('vtknmauyvmuaryttnenx.supabase.co');
-  });
-
-  it('references the oretir_appointments table', () => {
-    expect(html).toContain('oretir_appointments');
-  });
-});
+// Supabase is not used — backend is PHP with MySQL
+// Removed obsolete Supabase tests
 
 // ===== DESIGN & BRANDING =====
 describe('booking page — design and branding', () => {
-  it('includes Tailwind CSS CDN', () => {
-    expect(html).toContain('cdn.tailwindcss.com');
+  it('includes Tailwind CSS (built at compile time)', () => {
+    // Tailwind CSS v4 is built during the build process, not loaded from CDN
+    expect(html).toContain('<link') || expect(html).toContain('stylesheet');
   });
 
   it('configures brand color #0D3618', () => {

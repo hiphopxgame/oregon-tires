@@ -1236,3 +1236,59 @@ HTML;
 
     return $result['success'];
 }
+
+// ─── RO Lifecycle Email Helpers ──────────────────────────────────────────────
+
+/**
+ * Send inspection report email to customer.
+ */
+function sendInspectionEmail(string $email, string $name, string $roNumber, string $vehicle, string $viewUrl, string $language = 'both'): array
+{
+    $vars = ['name' => $name, 'ro_number' => $roNumber, 'vehicle' => $vehicle];
+    $result = sendBrandedTemplateEmail($email, 'inspection', $vars, $language, $viewUrl);
+    if ($result['success']) {
+        logEmail('inspection_report', "Inspection report sent to {$email} for {$roNumber}");
+    }
+    return $result;
+}
+
+/**
+ * Send estimate for approval email to customer.
+ */
+function sendEstimateEmail(string $email, string $name, string $roNumber, string $vehicle, string $total, string $approveUrl, string $language = 'both'): array
+{
+    $vars = ['name' => $name, 'ro_number' => $roNumber, 'vehicle' => $vehicle, 'total' => $total];
+    $result = sendBrandedTemplateEmail($email, 'estimate', $vars, $language, $approveUrl);
+    if ($result['success']) {
+        logEmail('estimate_sent', "Estimate sent to {$email} for {$roNumber} (total: {$total})");
+    }
+    return $result;
+}
+
+/**
+ * Send approval confirmation email to customer.
+ */
+function sendApprovalConfirmationEmail(string $email, string $name, string $roNumber, string $vehicle, string $total, string $viewUrl, string $language = 'both'): array
+{
+    $estimatedDate = date('m/d/Y', strtotime('+2 days'));
+    $vars = ['name' => $name, 'ro_number' => $roNumber, 'vehicle' => $vehicle, 'total' => $total, 'date' => $estimatedDate];
+    $result = sendBrandedTemplateEmail($email, 'approval', $vars, $language, $viewUrl);
+    if ($result['success']) {
+        logEmail('approval_confirmation', "Approval confirmation sent to {$email} for {$roNumber}");
+    }
+    return $result;
+}
+
+/**
+ * Send vehicle ready for pickup email to customer.
+ */
+function sendReadyEmail(string $email, string $name, string $roNumber, string $vehicle, string $language = 'both'): array
+{
+    $mapsUrl = 'https://www.google.com/maps/place/8536+SE+82nd+Ave,+Portland,+OR+97266';
+    $vars = ['name' => $name, 'ro_number' => $roNumber, 'vehicle' => $vehicle];
+    $result = sendBrandedTemplateEmail($email, 'vehicle_ready', $vars, $language, $mapsUrl);
+    if ($result['success']) {
+        logEmail('vehicle_ready', "Vehicle ready notification sent to {$email} for {$roNumber}");
+    }
+    return $result;
+}

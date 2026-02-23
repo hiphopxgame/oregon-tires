@@ -40,26 +40,12 @@ describe('#5 image lazy loading', () => {
   });
 });
 
-// ===== #6 CDN Scripts Loaded =====
-describe('#6 CDN scripts loaded correctly', () => {
-  it('Tailwind CSS script tag is present in head', () => {
-    const scripts = doc.querySelectorAll('head script[src*="tailwindcss"]');
-    expect(scripts.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('Supabase SDK script tag is present in head', () => {
-    const scripts = doc.querySelectorAll('head script[src*="supabase"]');
-    expect(scripts.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('Tailwind CDN does NOT have defer (breaks inline tailwind.config)', () => {
-    const script = doc.querySelector('head script[src*="tailwindcss"]');
-    expect(script.hasAttribute('defer')).toBe(false);
-  });
-
-  it('Supabase SDK does NOT have defer (breaks inline supabase.createClient)', () => {
-    const script = doc.querySelector('head script[src*="supabase"]');
-    expect(script.hasAttribute('defer')).toBe(false);
+// ===== #6 CSS Loaded =====
+describe('#6 CSS loaded correctly', () => {
+  it('Tailwind CSS stylesheet is loaded (built at compile time)', () => {
+    // Tailwind CSS v4 is built during the build process, not loaded from CDN
+    const stylesheets = doc.querySelectorAll('head link[rel="stylesheet"]');
+    expect(stylesheets.length).toBeGreaterThan(0);
   });
 });
 

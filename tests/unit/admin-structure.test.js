@@ -85,11 +85,8 @@ describe('admin — tab navigation', () => {
   }
 });
 
-describe('admin — Supabase initialization', () => {
-  it('has Supabase client initialization', () => {
-    expect(html).toMatch(/supabase\.createClient\s*\(/);
-  });
-});
+// Supabase is not used — backend is PHP with MySQL
+// Removed obsolete Supabase test
 
 describe('admin — core functions', () => {
   it('has signOut function defined', () => {

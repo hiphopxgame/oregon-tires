@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Appointment Status - Oregon Tires Auto Care Portland, OR</title>
   <meta name="description" content="Check your appointment status at Oregon Tires Auto Care in Portland, OR. Enter your reference number and email to view details.">
-  <link rel="icon" href="/assets/favicon.ico" sizes="any">
-  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <meta name="theme-color" content="#15803d">
   <meta name="msapplication-TileColor" content="#15803d">
   <link rel="canonical" href="https://oregon.tires/status/">
@@ -26,7 +26,7 @@
   <meta name="twitter:image" content="https://oregon.tires/assets/og-image.jpg">
 
   <!-- Tailwind CSS (built) -->
-  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="assets/styles.css">
 
   <style>
     html { scroll-behavior: smooth; }
@@ -63,6 +63,7 @@
   </script>
   <!-- Dark mode init (prevent FOUC) -->
   <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
+  <script src="https://hiphop.world/sdk/hiphopworld.js" data-site-key="oregontires" data-auto></script>
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
@@ -89,7 +90,7 @@
   <header class="bg-white shadow-md sticky top-0 z-50 dark:bg-gray-800">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
       <a href="/">
-        <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="/assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" width="781" height="275" loading="eager" fetchpriority="high"></picture>
+        <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" width="781" height="275" loading="eager" fetchpriority="high"></picture>
       </a>
       <nav class="hidden md:flex items-center gap-6">
         <a href="/" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="home">Home</a>
@@ -300,6 +301,7 @@
       <div class="border-t border-green-600 dark:border-green-500 mt-8 pt-8 text-center text-gray-300 dark:text-gray-200">
         <p>&copy; <span data-t="copyright">2026 Oregon Tires Auto Care. All rights reserved.</span></p>
         <p class="mt-3 text-xs text-gray-300"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-amber-200 hover:text-amber-100 transition-colors">1vsM.com</a></p>
+        <p class="text-xs text-gray-600 mt-1"><a href="https://1vsm.com" class="hover:text-green-400 transition-colors">Part of the 1vsM Network</a></p>
       </div>
     </div>
   </footer>

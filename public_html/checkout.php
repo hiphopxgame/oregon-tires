@@ -10,9 +10,9 @@ $paypalClientId = $_ENV['PAYPAL_CLIENT_ID'] ?? '';
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checkout - Oregon Tires Auto Care Portland, OR</title>
   <meta name="description" content="Complete your payment for Oregon Tires Auto Care services. Pay with card, PayPal, or cryptocurrency.">
-  <link rel="icon" href="/assets/favicon.ico" sizes="any">
-  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <meta name="theme-color" content="#15803d">
   <meta name="msapplication-TileColor" content="#15803d">
   <link rel="canonical" href="<?= htmlspecialchars($appUrl) ?>/checkout">
@@ -26,7 +26,7 @@ $paypalClientId = $_ENV['PAYPAL_CLIENT_ID'] ?? '';
   <meta property="og:image" content="<?= htmlspecialchars($appUrl) ?>/assets/og-image.jpg">
 
   <!-- Tailwind CSS (built) -->
-  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="assets/styles.css">
 
   <style>
     html { scroll-behavior: smooth; }
@@ -54,7 +54,7 @@ $paypalClientId = $_ENV['PAYPAL_CLIENT_ID'] ?? '';
   <header class="bg-[#111827] border-b border-gray-800 sticky top-0 z-50">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
       <a href="/" class="flex items-center gap-3">
-        <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="/assets/logo.png" alt="Oregon Tires Auto Care" class="h-10 w-auto" width="781" height="275" loading="eager"></picture>
+        <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="assets/logo.png" alt="Oregon Tires Auto Care" class="h-10 w-auto" width="781" height="275" loading="eager"></picture>
       </a>
       <div class="flex items-center gap-3">
         <button onclick="toggleLanguage()" class="text-gray-400 hover:text-white font-medium text-sm transition-colors" id="lang-toggle" aria-label="Switch language">🌐 ES</button>

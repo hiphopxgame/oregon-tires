@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oregon Tires Admin Dashboard</title>
   <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" href="/assets/favicon.ico" sizes="any">
-  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <!-- Tailwind CSS (built) -->
-  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="assets/styles.css">
   <style>
     .tab-active { background-color: white; color: #007030; }
     .dark .tab-active { background-color: #1f2937; color: #4ade80; }
@@ -303,7 +303,7 @@
     });
   </script>
   <!-- Chart utilities (token-based, from Agentic UI Studio) -->
-  <script src="/js/ot-charts.js"></script>
+  <script src="js/ot-charts.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen dark:bg-gray-900 dark:text-gray-100">
 <div id="toast-container" class="toast-container"></div>
@@ -312,6 +312,7 @@
 <div id="login-screen" class="min-h-screen flex items-center justify-center bg-brand">
   <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md dark:bg-gray-800 dark:border-gray-700 border-t-4 border-brand-light">
     <div class="text-center mb-6">
+      <a href="/" class="block text-center" data-t="backToWebsite">← Back to website</a>
       <a href="/"><img src="../assets/logo.png" alt="Oregon Tires" class="h-16 mx-auto mb-4"></a>
       <h1 class="text-2xl font-bold text-brand dark:text-green-400" data-t="adminDashboard">Admin Dashboard</h1>
       <p class="text-gray-500 mt-1 dark:text-gray-400" data-t="signInSubtitle">Sign in to manage your business</p>
@@ -404,6 +405,7 @@
         <button onclick="switchTab('overview')" data-tab="overview" role="tab" aria-selected="true" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition">📊 <span data-t="tabOverview">Overview</span></button>
         <button onclick="switchTab('appointments')" data-tab="appointments" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📅 <span data-t="tabAppointments">Appointments</span></button>
         <button onclick="switchTab('customers')" data-tab="customers" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👤 <span data-t="tabCustomers">Customers</span></button>
+        <button onclick="switchTab('repairorders')" data-tab="repairorders" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🔧 <span data-t="tabRepairOrders">Repair Orders</span></button>
         <button onclick="switchTab('messages')" data-tab="messages" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">💬 <span data-t="tabMessages">Messages</span></button>
         <button onclick="switchTab('employees')" data-tab="employees" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👥 <span data-t="tabEmployees">Employees</span></button>
         <button onclick="switchTab('gallery')" data-tab="gallery" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 <span data-t="tabGallery">Gallery</span></button>
@@ -586,6 +588,52 @@
       </div>
     </div>
 
+    <!-- REPAIR ORDERS TAB -->
+    <div id="tab-repairorders" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div><h2 class="text-2xl font-bold">🔧 <span data-t="repairOrders">Repair Orders</span></h2><p class="text-green-100" data-t="roSubtitle">Manage repair orders, inspections, and estimates</p></div>
+        <div class="flex items-center gap-3">
+          <button onclick="roShowCreateModal()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30">+ New RO</button>
+          <button onclick="loadRepairOrders()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-3 mb-4">
+          <input type="text" id="ro-search" oninput="loadRepairOrders()" class="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" placeholder="Search RO#, customer, VIN...">
+          <select id="ro-status-filter" onchange="loadRepairOrders()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+            <option value="">All Statuses</option>
+            <option value="intake">Intake</option>
+            <option value="diagnosis">Diagnosis</option>
+            <option value="estimate_pending">Estimate Pending</option>
+            <option value="pending_approval">Pending Approval</option>
+            <option value="approved">Approved</option>
+            <option value="in_progress">In Progress</option>
+            <option value="waiting_parts">Waiting Parts</option>
+            <option value="ready">Ready</option>
+            <option value="completed">Completed</option>
+            <option value="invoiced">Invoiced</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <!-- RO Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="bg-amber-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
+              <th class="p-3">RO #</th>
+              <th class="p-3">Customer</th>
+              <th class="p-3">Vehicle</th>
+              <th class="p-3">Status</th>
+              <th class="p-3">Created</th>
+              <th class="p-3">Actions</th>
+            </tr></thead>
+            <tbody id="ro-table"></tbody>
+          </table>
+        </div>
+        <div id="ro-pagination" class="flex justify-center gap-2 mt-4"></div>
+      </div>
+    </div>
+
     <!-- EMPLOYEES TAB -->
     <div id="tab-employees" class="tab-content hidden fade-in" role="tabpanel">
       <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
@@ -739,12 +787,14 @@
   <a class="text-green-600 hover:text-green-800 underline" href="mailto:growwithmagi@gmail.com">growwithmagi@gmail.com</a>
 </p>
 
+<p class="text-sm text-gray-500 italic">Getting Started • Bilingual Manual • Español / English</p>
+
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">Tabla de Contenidos</h2>
 
 <ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
-  <li>Primeros Pasos</li>
+  <li><a class="text-green-600 hover:text-green-800 underline" href="#getting-started">Primeros Pasos</a></li>
   <li>Gesti&oacute;n de Citas</li>
   <li>Gesti&oacute;n de Mensajes de Contacto</li>
   <li>Gesti&oacute;n de Empleados</li>
@@ -754,11 +804,17 @@
   <li>Configuraci&oacute;n de Cuenta</li>
   <li>Funciones del Sitio P&uacute;blico (Lo que ven sus clientes)</li>
   <li>Soluci&oacute;n de Problemas</li>
+  <li>Pesta&ntilde;a de Clientes</li>
+  <li>Pesta&ntilde;a de &Oacute;rdenes de Reparaci&oacute;n</li>
+  <li>Inspecci&oacute;n Digital del Veh&iacute;culo (IDV)</li>
+  <li>Presupuestos</li>
+  <li>Decodificaci&oacute;n VIN</li>
 </ol>
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
-<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">1. Primeros Pasos</h2>
+<!-- Section 1 -->
+<h2 id="getting-started" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">1. Primeros Pasos</h2>
 
 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">C&oacute;mo Acceder al Panel de Administraci&oacute;n</h3>
 <ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
@@ -854,6 +910,46 @@
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">11. Pesta&ntilde;a de Clientes</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">La pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Clientes</strong> le permite ver y buscar registros de clientes por nombre, correo electr&oacute;nico o tel&eacute;fono. Los clientes se crean autom&aacute;ticamente cuando se reservan citas. Cada registro de cliente muestra sus veh&iacute;culos y el historial de citas.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">12. Pesta&ntilde;a de &Oacute;rdenes de Reparaci&oacute;n</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Cree &oacute;rdenes de reparaci&oacute;n desde citas existentes o para clientes sin cita previa. Siga el trabajo a trav&eacute;s del ciclo completo de servicio:</p>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Recepci&oacute;n</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Diagn&oacute;stico</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Presupuesto</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Aprobaci&oacute;n</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">En Progreso</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Listo</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Completado</strong></p>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Use la <strong class="font-semibold text-gray-800 dark:text-gray-200">Vista de Tabla</strong> para buscar y filtrar &oacute;rdenes, o el <strong class="font-semibold text-gray-800 dark:text-gray-200">Tablero Kanban</strong> para arrastrar y soltar &oacute;rdenes entre estados.</p>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Crear una Orden de Reparaci&oacute;n</h3>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Desde la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Citas</strong>, haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Crear OR&rdquo;</strong> en cualquier cita.</li>
+  <li>O desde la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">&Oacute;rdenes de Reparaci&oacute;n</strong>, haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Nueva OR&rdquo;</strong> e ingrese un ID de cita o un ID de cliente para clientes sin cita.</li>
+</ol>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">13. Inspecci&oacute;n Digital del Veh&iacute;culo (IDV)</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Desde la vista de detalle de una orden de reparaci&oacute;n, haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Crear Inspecci&oacute;n&rdquo;</strong> para iniciar una inspecci&oacute;n de 35 puntos con calificaciones de sem&aacute;foro:</p>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200" style="color: #16a34a;">Verde</strong> = Bien, sin acci&oacute;n necesaria</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200" style="color: #eab308;">Amarillo</strong> = Atenci&oacute;n pronto, monitorear</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200" style="color: #dc2626;">Rojo</strong> = Urgente, necesita reparaci&oacute;n inmediata</li>
+</ul>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Suba fotos para cada elemento de inspecci&oacute;n. Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Completar&rdquo;</strong> y luego en <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Enviar al Cliente&rdquo;</strong> para enviar el reporte por correo electr&oacute;nico.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">14. Presupuestos</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Crear Presupuesto&rdquo;</strong> en una orden de reparaci&oacute;n para auto-generar art&iacute;culos de l&iacute;nea desde los hallazgos de la inspecci&oacute;n (elementos rojos y amarillos). Agregue art&iacute;culos de mano de obra, piezas, llantas, tarifas o descuentos.</p>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Enviar al Cliente&rdquo;</strong> para enviar un enlace de aprobaci&oacute;n por correo electr&oacute;nico. El cliente puede aprobar o rechazar art&iacute;culos individuales desde el enlace biling&uuml;e.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">15. Decodificaci&oacute;n VIN</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Al crear una orden de reparaci&oacute;n o en el formulario de reservaci&oacute;n, ingrese un <strong class="font-semibold text-gray-800 dark:text-gray-200">VIN de 17 caracteres</strong> para autocompletar autom&aacute;ticamente el a&ntilde;o, marca y modelo del veh&iacute;culo desde la base de datos NHTSA.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">Flujos de Estado de las Citas</h2>
 <ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
   <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Nueva</strong>: Acaba de llegar. Necesita revisi&oacute;n.</li>
@@ -862,6 +958,7 @@
   <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Completada</strong>: El servicio est&aacute; terminado.</li>
   <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Cancelada</strong>: La cita fue cancelada.</li>
 </ul>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Desde cualquier cita, puede crear una <strong class="font-semibold text-gray-800 dark:text-gray-200">Orden de Reparaci&oacute;n (OR)</strong> para seguir el ciclo completo de servicio incluyendo inspecci&oacute;n, presupuesto y aprobaci&oacute;n del cliente.</p>
 
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed italic">Este manual fue escrito para el equipo de administraci&oacute;n de Oregon Tires Auto Care. Para soporte t&eacute;cnico, contacte a Tyrone Norris en <a class="text-green-600 hover:text-green-800 underline" href="mailto:tyronenorris@gmail.com">tyronenorris@gmail.com</a> o (774) 277-9202. Para soporte en espa&ntilde;ol, contacte a Margarita Escalante en <a class="text-green-600 hover:text-green-800 underline" href="mailto:growwithmagi@gmail.com">growwithmagi@gmail.com</a> o (541) 936-1884.</p>
 </div>
@@ -904,6 +1001,11 @@
   <li><a class="text-green-600 hover:text-green-800 underline" href="#account-settings">Account Settings</a></li>
   <li><a class="text-green-600 hover:text-green-800 underline" href="#public-website-features">Public Website Features (What Your Customers See)</a></li>
   <li><a class="text-green-600 hover:text-green-800 underline" href="#troubleshooting">Troubleshooting</a></li>
+  <li><a class="text-green-600 hover:text-green-800 underline" href="#customers-tab">Customers Tab</a></li>
+  <li><a class="text-green-600 hover:text-green-800 underline" href="#repair-orders-tab">Repair Orders Tab</a></li>
+  <li><a class="text-green-600 hover:text-green-800 underline" href="#digital-vehicle-inspection">Digital Vehicle Inspection (DVI)</a></li>
+  <li><a class="text-green-600 hover:text-green-800 underline" href="#estimates">Estimates</a></li>
+  <li><a class="text-green-600 hover:text-green-800 underline" href="#vin-decode">VIN Decode</a></li>
 </ol>
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
@@ -1494,6 +1596,62 @@
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
+<!-- Section 11 -->
+<h2 id="customers-tab" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">11. Customers Tab</h2>
+
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">The <strong class="font-semibold text-gray-800 dark:text-gray-200">Customers</strong> tab lets you view and search customer records by name, email, or phone number. Customers are automatically created when appointments are booked. Each customer record shows their vehicles and full appointment history.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 12 -->
+<h2 id="repair-orders-tab" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">12. Repair Orders Tab</h2>
+
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Create repair orders from existing appointments or for walk-in customers. Track work through the full service lifecycle:</p>
+
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Intake</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Diagnosis</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Estimate</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Approval</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">In Progress</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Ready</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Completed</strong></p>
+
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Use the <strong class="font-semibold text-gray-800 dark:text-gray-200">Table View</strong> for searching and filtering orders, or the <strong class="font-semibold text-gray-800 dark:text-gray-200">Kanban Board</strong> for drag-and-drop status management.</p>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Creating a Repair Order</h3>
+
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>From the <strong class="font-semibold text-gray-800 dark:text-gray-200">Appointments</strong> tab, click <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Create RO&rdquo;</strong> on any appointment.</li>
+  <li>Or from the <strong class="font-semibold text-gray-800 dark:text-gray-200">Repair Orders</strong> tab, click <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;New RO&rdquo;</strong> and enter an appointment ID or customer ID for walk-ins.</li>
+</ol>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 13 -->
+<h2 id="digital-vehicle-inspection" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">13. Digital Vehicle Inspection (DVI)</h2>
+
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">From an RO detail view, click <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Create Inspection&rdquo;</strong> to start a 35-point inspection with traffic light ratings:</p>
+
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200" style="color: #16a34a;">Green</strong> = Good, no action needed</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200" style="color: #eab308;">Yellow</strong> = Attention Soon, monitor</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200" style="color: #dc2626;">Red</strong> = Urgent, needs immediate repair</li>
+</ul>
+
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Upload photos for each inspection item. Click <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Complete&rdquo;</strong> then <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Send to Customer&rdquo;</strong> to email the report.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 14 -->
+<h2 id="estimates" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">14. Estimates</h2>
+
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Click <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Create Estimate&rdquo;</strong> on an RO to auto-generate line items from inspection findings (red and yellow items). Add labor, parts, tire, fee, or discount line items as needed.</p>
+
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Click <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;Send to Customer&rdquo;</strong> to email a bilingual approval link. Customers can approve or decline individual items from the link.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 15 -->
+<h2 id="vin-decode" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">15. VIN Decode</h2>
+
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">When creating a repair order or on the booking form, enter a <strong class="font-semibold text-gray-800 dark:text-gray-200">17-character VIN</strong> to auto-fill the vehicle's year, make, and model from the NHTSA database.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
 <!-- Quick Reference: Admin Dashboard Tabs -->
 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">Quick Reference: Admin Dashboard Tabs</h2>
 
@@ -1533,6 +1691,14 @@
       <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Settings</strong></td>
       <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Update your profile, email, and password</td>
     </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Customers</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Search and view customer records, vehicles, and appointment history</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Repair Orders</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Create and manage repair orders, inspections, estimates, and customer approvals</td>
+    </tr>
   </tbody>
 </table>
 
@@ -1551,6 +1717,8 @@
   <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Cancelled</strong>: The appointment was cancelled and will not be serviced.</li>
 </ul>
 
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">From any appointment, you can create a <strong class="font-semibold text-gray-800 dark:text-gray-200">Repair Order (RO)</strong> to track the full service lifecycle including inspection, estimate, and customer approval.</p>
+
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed italic">This manual was written for the Oregon Tires Auto Care admin team. For technical support, contact Tyrone Norris at <a class="text-green-600 hover:text-green-800 underline" href="mailto:tyronenorris@gmail.com">tyronenorris@gmail.com</a> or (774) 277-9202. For Spanish support, contact Margarita Escalante at <a class="text-green-600 hover:text-green-800 underline" href="mailto:growwithmagi@gmail.com">growwithmagi@gmail.com</a> or (541) 936-1884.</p>
@@ -1562,7 +1730,7 @@
 <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 pb-3 border-b-2 border-gray-300 dark:border-gray-600">Oregon Tires Auto Care &mdash; Lista de Caracter&iacute;sticas</h1>
 
 <blockquote class="border-l-4 border-green-500 pl-4 py-2 mb-4 bg-green-50 dark:bg-green-900/30 rounded-r-lg text-gray-600 dark:text-gray-400">
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">&Uacute;ltima actualizaci&oacute;n:</strong> 2026-02-15<br>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">&Uacute;ltima actualizaci&oacute;n:</strong> 2026-02-19<br>
 <strong class="font-semibold text-gray-800 dark:text-gray-200">Stack:</strong> HTML/CSS/JS Est&aacute;tico | PHP API + MySQL + PHPMailer | cPanel/Apache</p>
 </blockquote>
 
@@ -1636,7 +1804,33 @@
 <ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
   <li>Total de citas, por estado, clientes recurrentes</li>
   <li>Estad&iacute;sticas por empleado</li>
-  <li>Servicios m&aacute;s populares y distribución horaria</li>
+  <li>Servicios m&aacute;s populares y distribuci&oacute;n horaria</li>
+</ul>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">Sistema de Gesti&oacute;n del Taller (Fase 1) &#10004;</h2>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Clientes y Veh&iacute;culos</h3>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>&#10004; Gesti&oacute;n de Clientes y Veh&iacute;culos (registros persistentes, decodificaci&oacute;n VIN)</li>
+  <li>&#10004; Decodificaci&oacute;n VIN (API NHTSA vPIC, autocompletar informaci&oacute;n del veh&iacute;culo)</li>
+  <li>&#10004; B&uacute;squeda de Ajuste de Llantas (sugerencia autom&aacute;tica de tama&ntilde;os de llantas)</li>
+</ul>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">&Oacute;rdenes de Reparaci&oacute;n</h3>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>&#10004; Ciclo de Vida de &Oacute;rdenes de Reparaci&oacute;n (10 estados, conversi&oacute;n desde citas)</li>
+  <li>&#10004; Tablero Kanban (arrastrar y soltar para gesti&oacute;n de OR)</li>
+</ul>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Inspecciones y Presupuestos</h3>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>&#10004; Inspecci&oacute;n Digital del Veh&iacute;culo (35 puntos, sem&aacute;foro, fotos)</li>
+  <li>&#10004; Constructor de Presupuestos (auto-generar desde inspecci&oacute;n, aprobaci&oacute;n por art&iacute;culo)</li>
+  <li>&#10004; Portal de Aprobaci&oacute;n del Cliente (biling&uuml;e, basado en token, aprobar/rechazar por art&iacute;culo)</li>
+  <li>&#10004; Soporte de Impresi&oacute;n (reportes de inspecci&oacute;n + presupuestos)</li>
+  <li>&#10004; Recordatorios de Vencimiento de Presupuestos (cron diario automatizado)</li>
 </ul>
 
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><em>Documento generado del an&aacute;lisis del c&oacute;digo fuente de Oregon Tires Auto Care.</em></p>
@@ -1644,7 +1838,7 @@
 <div class="doc-lang-en">
 <h1>Oregon Tires Auto Care -- Feature List</h1>
 <blockquote class="border-l-4 border-green-500 pl-4 py-2 mb-4 bg-green-50 dark:bg-green-900/30 rounded-r-lg text-gray-600 dark:text-gray-400">
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Last updated:</strong> 2026-02-15
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Last updated:</strong> 2026-02-19
 <strong class="font-semibold text-gray-800 dark:text-gray-200">Stack:</strong> Static HTML/CSS/JS | PHP API + MySQL + PHPMailer | cPanel/Apache Hosting
 <strong class="font-semibold text-gray-800 dark:text-gray-200">URL structure:</strong> <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-gray-700 dark:text-gray-300">index.html</code> (public site), <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-gray-700 dark:text-gray-300">admin/index.html</code> (dashboard), <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-gray-700 dark:text-gray-300">book-appointment/index.html</code> (redirect stub)</p>
 </blockquote>
@@ -3023,6 +3217,32 @@
 </tbody>
 </table>
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">Shop Management System (Phase 1) &#10004;</h2>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Customers &amp; Vehicles</h3>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>&#10004; Customer &amp; Vehicle Management (persistent records, VIN decode)</li>
+  <li>&#10004; VIN Decode (NHTSA vPIC API, auto-fill vehicle info)</li>
+  <li>&#10004; Tire Fitment Lookup (auto-suggest tire sizes)</li>
+</ul>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Repair Orders</h3>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>&#10004; Repair Order Lifecycle (10 statuses, appointment conversion)</li>
+  <li>&#10004; Kanban Board (drag-and-drop RO management)</li>
+</ul>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Inspections &amp; Estimates</h3>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>&#10004; Digital Vehicle Inspection (35-point, traffic light, photos)</li>
+  <li>&#10004; Estimate Builder (auto-generate from inspection, per-item approval)</li>
+  <li>&#10004; Customer Approval Portal (bilingual, token-based, per-item approve/decline)</li>
+  <li>&#10004; Print Support (inspection reports + estimates)</li>
+  <li>&#10004; Estimate Expiry Reminders (automated daily cron)</li>
+</ul>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><em>Document generated from source code analysis of the Oregon Tires Auto Care codebase.</em></p>
 </div>
         </div>
@@ -3518,6 +3738,43 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PHASE 1 COMPLETE: SHOP MANAGEMENT SYSTEM -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<div class="mb-10">
+  <div class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl p-6 mb-6 shadow-lg dark:from-green-700 dark:to-green-800">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="bg-white text-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Phase 1 Complete</span>
+      <span class="text-green-200 text-sm ml-auto">Delivered February 2026</span>
+    </div>
+    <h3 class="text-2xl font-bold mb-2">Shop Management System</h3>
+    <p class="text-green-100 leading-relaxed mb-4">The foundational shop management infrastructure is now live. Oregon Tires can track the full service lifecycle from appointment to invoice with digital inspections, estimates, and customer approval workflows.</p>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+      <div class="bg-white/10 rounded-lg px-3 py-2 text-center">
+        <div class="text-sm font-bold">&#10004; Customers</div>
+        <div class="text-xs text-green-200">Vehicle records</div>
+      </div>
+      <div class="bg-white/10 rounded-lg px-3 py-2 text-center">
+        <div class="text-sm font-bold">&#10004; Repair Orders</div>
+        <div class="text-xs text-green-200">10-status lifecycle</div>
+      </div>
+      <div class="bg-white/10 rounded-lg px-3 py-2 text-center">
+        <div class="text-sm font-bold">&#10004; DVI</div>
+        <div class="text-xs text-green-200">35-point inspection</div>
+      </div>
+      <div class="bg-white/10 rounded-lg px-3 py-2 text-center">
+        <div class="text-sm font-bold">&#10004; Estimates</div>
+        <div class="text-xs text-green-200">Per-item approval</div>
+      </div>
+      <div class="bg-white/10 rounded-lg px-3 py-2 text-center">
+        <div class="text-sm font-bold">&#10004; Kanban</div>
+        <div class="text-xs text-green-200">Drag-and-drop</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- TIER 1: REVENUE ENGINE -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 
@@ -3635,7 +3892,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <div class="border border-gray-200 rounded-lg mb-4 dark:border-gray-700">
     <div class="bg-gray-50 px-5 py-3 rounded-t-lg flex items-center justify-between dark:bg-gray-700">
       <h4 class="font-bold text-gray-800 dark:text-white">📸 Digital Vehicle Inspections (DVI)</h4>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium dark:bg-blue-900 dark:text-blue-300">Trust</span>
+      <span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-medium">&#10004; COMPLETE</span>
     </div>
     <div class="px-5 py-4">
       <p class="text-gray-600 mb-3 dark:text-gray-300">Technicians use a tablet/phone to photograph or video worn parts, tread depth measurements, fluid conditions, and brake wear. A digital inspection report with color-coded severity (green/yellow/red) is automatically sent to the customer via SMS/email with photos. Customers can approve recommended repairs with one tap.</p>
@@ -3677,7 +3934,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <div class="border border-gray-200 rounded-lg mb-4 dark:border-gray-700">
     <div class="bg-gray-50 px-5 py-3 rounded-t-lg flex items-center justify-between dark:bg-gray-700">
       <h4 class="font-bold text-gray-800 dark:text-white">📍 Real-Time Service Tracker</h4>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium dark:bg-blue-900 dark:text-blue-300">Experience</span>
+      <span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-medium">&#10004; COMPLETE</span>
     </div>
     <div class="px-5 py-4">
       <p class="text-gray-600 mb-3 dark:text-gray-300">Like tracking a food delivery &mdash; customers get a live status page showing where their vehicle is in the service process: Checked In → Inspection → Waiting for Parts → In Service → Quality Check → Ready for Pickup. Updated by technicians with one tap. Shareable link so family members can track too.</p>
@@ -3745,7 +4002,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <div class="border border-gray-200 rounded-lg mb-4 dark:border-gray-700">
     <div class="bg-gray-50 px-5 py-3 rounded-t-lg flex items-center justify-between dark:bg-gray-700">
       <h4 class="font-bold text-gray-800 dark:text-white">🔧 Digital Work Orders &amp; Job Cards</h4>
-      <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium dark:bg-purple-900 dark:text-purple-300">Operations</span>
+      <span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-medium">&#10004; COMPLETE</span>
     </div>
     <div class="px-5 py-4">
       <p class="text-gray-600 mb-3 dark:text-gray-300">Replace paper job cards with a digital system. Each vehicle gets a work order showing: customer info, vehicle details, requested services, assigned technician, parts needed, labor estimate, and status. Technicians update progress from their phone. Parts are auto-deducted from inventory when used. Job history is permanently stored for warranty reference.</p>
@@ -4366,6 +4623,43 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- FASE 1 COMPLETADA: SISTEMA DE GESTI&Oacute;N DEL TALLER -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<div class="mb-10">
+  <div class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl p-6 mb-6 shadow-lg dark:from-green-700 dark:to-green-800">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="bg-white text-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Fase 1 Completada</span>
+      <span class="text-green-200 text-sm ml-auto">Entregado en febrero de 2026</span>
+    </div>
+    <h3 class="text-2xl font-bold mb-2">Sistema de Gesti&oacute;n del Taller</h3>
+    <p class="text-green-100 leading-relaxed mb-4">La infraestructura fundamental de gesti&oacute;n del taller ya est&aacute; en funcionamiento. Oregon Tires puede rastrear el ciclo completo de servicio desde la cita hasta la factura con inspecciones digitales, presupuestos y flujos de aprobaci&oacute;n del cliente.</p>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+      <div class="bg-white/10 rounded-lg px-3 py-2 text-center">
+        <div class="text-sm font-bold">&#10004; Clientes</div>
+        <div class="text-xs text-green-200">Registros de veh&iacute;culos</div>
+      </div>
+      <div class="bg-white/10 rounded-lg px-3 py-2 text-center">
+        <div class="text-sm font-bold">&#10004; &Oacute;rdenes</div>
+        <div class="text-xs text-green-200">10 estados de ciclo</div>
+      </div>
+      <div class="bg-white/10 rounded-lg px-3 py-2 text-center">
+        <div class="text-sm font-bold">&#10004; IDV</div>
+        <div class="text-xs text-green-200">Inspecci&oacute;n 35 puntos</div>
+      </div>
+      <div class="bg-white/10 rounded-lg px-3 py-2 text-center">
+        <div class="text-sm font-bold">&#10004; Presupuestos</div>
+        <div class="text-xs text-green-200">Aprobaci&oacute;n por art&iacute;culo</div>
+      </div>
+      <div class="bg-white/10 rounded-lg px-3 py-2 text-center">
+        <div class="text-sm font-bold">&#10004; Kanban</div>
+        <div class="text-xs text-green-200">Arrastrar y soltar</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- NIVEL 1: MOTOR DE INGRESOS -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 
@@ -4483,7 +4777,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <div class="border border-gray-200 rounded-lg mb-4 dark:border-gray-700">
     <div class="bg-gray-50 px-5 py-3 rounded-t-lg flex items-center justify-between dark:bg-gray-700">
       <h4 class="font-bold text-gray-800 dark:text-white">&#128248; Inspecciones Digitales de Veh&iacute;culos (IDV)</h4>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium dark:bg-blue-900 dark:text-blue-300">Confianza</span>
+      <span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-medium">&#10004; COMPLETADO</span>
     </div>
     <div class="px-5 py-4">
       <p class="text-gray-600 mb-3 dark:text-gray-300">Los t&eacute;cnicos usan una tableta/tel&eacute;fono para fotografiar o grabar piezas desgastadas, mediciones de profundidad de banda de rodadura, condiciones de fluidos y desgaste de frenos. Un reporte de inspecci&oacute;n digital con severidad codificada por colores (verde/amarillo/rojo) se env&iacute;a autom&aacute;ticamente al cliente por SMS/correo con fotos. Los clientes pueden aprobar reparaciones recomendadas con un toque.</p>
@@ -4525,7 +4819,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <div class="border border-gray-200 rounded-lg mb-4 dark:border-gray-700">
     <div class="bg-gray-50 px-5 py-3 rounded-t-lg flex items-center justify-between dark:bg-gray-700">
       <h4 class="font-bold text-gray-800 dark:text-white">&#128205; Rastreador de Servicio en Tiempo Real</h4>
-      <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium dark:bg-blue-900 dark:text-blue-300">Experiencia</span>
+      <span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-medium">&#10004; COMPLETADO</span>
     </div>
     <div class="px-5 py-4">
       <p class="text-gray-600 mb-3 dark:text-gray-300">Como rastrear una entrega de comida &mdash; los clientes obtienen una p&aacute;gina de estado en vivo que muestra d&oacute;nde est&aacute; su veh&iacute;culo en el proceso de servicio: Registrado &rarr; Inspecci&oacute;n &rarr; Esperando Piezas &rarr; En Servicio &rarr; Control de Calidad &rarr; Listo para Recoger. Actualizado por t&eacute;cnicos con un toque. Enlace compartible para que familiares tambi&eacute;n puedan rastrear.</p>
@@ -4593,7 +4887,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
   <div class="border border-gray-200 rounded-lg mb-4 dark:border-gray-700">
     <div class="bg-gray-50 px-5 py-3 rounded-t-lg flex items-center justify-between dark:bg-gray-700">
       <h4 class="font-bold text-gray-800 dark:text-white">&#128295; &Oacute;rdenes de Trabajo Digitales</h4>
-      <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium dark:bg-purple-900 dark:text-purple-300">Operaciones</span>
+      <span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-medium">&#10004; COMPLETADO</span>
     </div>
     <div class="px-5 py-4">
       <p class="text-gray-600 mb-3 dark:text-gray-300">Reemplaza las tarjetas de trabajo en papel con un sistema digital. Cada veh&iacute;culo obtiene una orden de trabajo mostrando: informaci&oacute;n del cliente, detalles del veh&iacute;culo, servicios solicitados, t&eacute;cnico asignado, piezas necesarias, estimaci&oacute;n de mano de obra y estado. Los t&eacute;cnicos actualizan el progreso desde su tel&eacute;fono. Las piezas se deducen autom&aacute;ticamente del inventario al usarse. El historial de trabajos se almacena permanentemente para referencia de garant&iacute;a.</p>
@@ -5651,11 +5945,14 @@ const adminT = {
     // Nav Tabs
     tabOverview: 'Overview',
     tabAppointments: 'Appointments',
+    tabCustomers: 'Customers',
+    tabRepairOrders: 'Repair Orders',
     tabMessages: 'Messages',
     tabEmployees: 'Employees',
     tabGallery: 'Promotions',
     tabAnalytics: 'Analytics',
     tabDocs: 'Docs',
+    tabSiteContent: 'Site Content',
     // Overview
     dashboardOverview: 'Dashboard Overview',
     totalAppointments: 'Total Appointments',
@@ -5693,6 +5990,20 @@ const adminT = {
     websiteChanges: 'Website Changes',
     thMessage: 'Message',
     thDate: 'Date',
+    // Customers
+    customerDirectory: 'Customer Directory',
+    customerSubtitle: 'View customer history and returning visitors',
+    searchCustomers: 'Search by name, email, phone...',
+    totalVisits: 'Visits',
+    lastVisit: 'Last Visit',
+    firstVisit: 'First Visit',
+    customerHistory: 'Customer History',
+    returningCustomers: 'Returning',
+    noCustomers: 'No customers found',
+    viewHistory: 'View History',
+    // Repair Orders
+    repairOrders: 'Repair Orders',
+    roSubtitle: 'Manage repair orders, inspections, and estimates',
     // Employees
     employeeAdminMgmt: 'Employee & Admin Management',
     employeesSubtitle: 'Manage team members and admin access',
@@ -5920,11 +6231,14 @@ const adminT = {
     // Nav Tabs
     tabOverview: 'Resumen',
     tabAppointments: 'Citas',
+    tabCustomers: 'Clientes',
+    tabRepairOrders: '\u00D3rdenes de Reparaci\u00F3n',
     tabMessages: 'Mensajes',
     tabEmployees: 'Empleados',
     tabGallery: 'Promociones',
     tabAnalytics: 'Anal\u00EDticas',
     tabDocs: 'Documentos',
+    tabSiteContent: 'Contenido del Sitio',
     // Overview
     dashboardOverview: 'Resumen del Panel',
     totalAppointments: 'Total de Citas',
@@ -5962,6 +6276,20 @@ const adminT = {
     websiteChanges: 'Cambios del Sitio',
     thMessage: 'Mensaje',
     thDate: 'Fecha',
+    // Customers
+    customerDirectory: 'Directorio de Clientes',
+    customerSubtitle: 'Ver historial de clientes y visitantes recurrentes',
+    searchCustomers: 'Buscar por nombre, correo, tel\u00E9fono...',
+    totalVisits: 'Visitas',
+    lastVisit: '\u00DAltima Visita',
+    firstVisit: 'Primera Visita',
+    customerHistory: 'Historial del Cliente',
+    returningCustomers: 'Recurrentes',
+    noCustomers: 'No se encontraron clientes',
+    viewHistory: 'Ver Historial',
+    // Repair Orders
+    repairOrders: '\u00D3rdenes de Reparaci\u00F3n',
+    roSubtitle: 'Administrar \u00F3rdenes de reparaci\u00F3n, inspecciones y estimados',
     // Employees
     employeeAdminMgmt: 'Gesti\u00F3n de Empleados y Administradores',
     employeesSubtitle: 'Administrar miembros del equipo y acceso de admin',
@@ -6819,6 +7147,7 @@ function renderAppointments() {
           <option value="">${adminT[currentLang].unassignedLabel}</option>${employees.filter(e=>e.is_active).map(e=>`<option value="${e.id}" ${a.assigned_employee_id===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}
         </select>
         <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100">📝 Notes</button>
+        ${a.status!=='cancelled'?`<button onclick="roShowCreateModal('${a.id}')" class="border border-green-500 text-green-700 rounded px-2 py-1 text-xs hover:bg-green-50 font-medium">🔧 Create RO</button>`:''}
       </div></td>
     </tr>
   `).join('') : '<tr><td colspan="8" class="p-6 text-center text-gray-500">No appointments found</td></tr>';
@@ -8084,6 +8413,7 @@ function switchTab(tab) {
   if(tab==='appointments') renderCalendar();
   if(tab==='customers') loadCustomers();
   if(tab==='sitecontent') { loadSiteSettings(); loadEmailTemplates(); }
+  if(tab==='repairorders' && typeof loadRepairOrders === 'function') loadRepairOrders();
 }
 
 // Sub-tab switching for Appointments (Calendar vs List)
@@ -8597,6 +8927,19 @@ loadMessages = async function() {
   await _origLoadMsgs();
   checkForNewItems();
 };
+</script>
+<script src="/admin/js/repair-orders.js"></script>
+<script src="/admin/js/kanban.js"></script>
+<script type="module">
+  import { showToast as brandShowToast } from '/shared/ui/components/brand-toast.js';
+  // Override global showToast — handles legacy (msg, isError: bool) and new (msg, type: string)
+  window.showToast = function(msg, typeOrError) {
+    const type = typeOrError === true ? 'error'
+               : typeOrError === false || typeOrError == null ? 'success'
+               : String(typeOrError);
+    brandShowToast(msg, type);
+  };
+  window.showToastNew = window.showToast;
 </script>
 </body>
 </html>

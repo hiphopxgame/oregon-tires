@@ -233,7 +233,7 @@
 ### 1.11 Asset Management
 
 **`normalizeAssetPath()` function:**
-- Converts Lovable platform `/lovable-uploads/` UUID paths to clean `/assets/` paths
+- Converts legacy `/lovable-uploads/` UUID paths to clean `/assets/` paths
 - Used for backward compatibility with migrated assets
 
 **ASSET_PATH_MAP (3 core assets):**
@@ -477,7 +477,6 @@
 |---------|---------|
 | Manual refresh | Refresh buttons on each tab reload data from PHP API endpoints |
 | Periodic polling | Dashboard periodically fetches updated data from API |
-| Legacy note | Supabase Realtime was removed during migration; data updates are now pull-based |
 
 ### 2.9 Account Settings
 

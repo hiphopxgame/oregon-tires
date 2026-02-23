@@ -41,4 +41,28 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://oregon.tires/#services</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/?lang=en#services"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://oregon.tires/?lang=es#services"/>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/#about</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/?lang=en#about"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://oregon.tires/?lang=es#about"/>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/#contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/?lang=en#contact"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://oregon.tires/?lang=es#contact"/>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

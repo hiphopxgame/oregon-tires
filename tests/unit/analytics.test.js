@@ -19,28 +19,33 @@ beforeAll(async () => {
 // ─── Public Site — GA4 Setup ────────────────────────────────────────────────
 
 describe('public site — GA4 analytics setup', () => {
-  it('has async gtag.js script tag in <head>', () => {
-    const script = publicDoc.querySelector('head script[src*="googletagmanager.com/gtag/js"]');
-    expect(script).not.toBeNull();
-    expect(script.hasAttribute('async')).toBe(true);
+  it('creates gtag.js script dynamically via document.createElement', () => {
+    expect(publicHtml).toContain("document.createElement('script')");
+    expect(publicHtml).toContain("'https://www.googletagmanager.com/gtag/js?id='");
   });
 
-  it('has GA4 configuration snippet with gtag("config", ...)', () => {
-    const scripts = publicDoc.querySelectorAll('head script:not([src])');
-    const configScript = Array.from(scripts).find(s => s.textContent.includes("gtag('config'"));
-    expect(configScript).toBeDefined();
+  it('has dataLayer initialization in IIFE', () => {
+    expect(publicHtml).toContain('window.dataLayer = window.dataLayer || []');
+  });
+
+  it('defines the gtag function that pushes to dataLayer', () => {
+    expect(publicHtml).toContain('function gtag(){dataLayer.push(arguments);}');
+  });
+
+  it('assigns gtag to window.gtag', () => {
+    expect(publicHtml).toContain('window.gtag = gtag');
+  });
+
+  it('calls gtag("config", id) with measurement ID', () => {
+    expect(publicHtml).toContain("gtag('config', id)");
   });
 
   it('has GA4 measurement ID configured', () => {
     expect(publicHtml).toContain('G-CHYMTNB6LH');
   });
 
-  it('has dataLayer initialization', () => {
-    expect(publicHtml).toContain('window.dataLayer = window.dataLayer || []');
-  });
-
-  it('defines the gtag function', () => {
-    expect(publicHtml).toContain('function gtag(){dataLayer.push(arguments);}');
+  it('has IIFE wrapper for GA initialization', () => {
+    expect(publicHtml).toContain('(function()');
   });
 });
 
@@ -69,16 +74,21 @@ describe('public site — custom event tracking', () => {
 // ─── Admin Site — GA4 Setup ─────────────────────────────────────────────────
 
 describe('admin site — GA4 analytics setup', () => {
-  it('has async gtag.js script tag in <head>', () => {
-    const script = adminDoc.querySelector('head script[src*="googletagmanager.com/gtag/js"]');
-    expect(script).not.toBeNull();
-    expect(script.hasAttribute('async')).toBe(true);
+  it('creates gtag.js script dynamically via document.createElement', () => {
+    expect(adminHtml).toContain("document.createElement('script')");
+    expect(adminHtml).toContain("'https://www.googletagmanager.com/gtag/js?id='");
   });
 
-  it('has GA4 configuration snippet with gtag("config", ...)', () => {
-    const scripts = adminDoc.querySelectorAll('head script:not([src])');
-    const configScript = Array.from(scripts).find(s => s.textContent.includes("gtag('config'"));
-    expect(configScript).toBeDefined();
+  it('defines the gtag function that pushes to dataLayer', () => {
+    expect(adminHtml).toContain('function gtag(){dataLayer.push(arguments);}');
+  });
+
+  it('has dataLayer initialization in IIFE', () => {
+    expect(adminHtml).toContain('window.dataLayer = window.dataLayer || []');
+  });
+
+  it('calls gtag("config", id) with measurement ID', () => {
+    expect(adminHtml).toContain("gtag('config', id)");
   });
 
   it('has GA4 measurement ID configured', () => {

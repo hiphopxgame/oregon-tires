@@ -14,14 +14,10 @@ beforeAll(async () => {
 });
 
 describe('external dependencies — CDN scripts', () => {
-  it('Tailwind CSS CDN script tag exists', () => {
-    const scripts = doc.querySelectorAll('script[src*="cdn.tailwindcss.com"]');
-    expect(scripts.length).toBeGreaterThan(0);
-  });
-
-  it('Supabase JS SDK script tag exists', () => {
-    const scripts = doc.querySelectorAll('script[src*="supabase"]');
-    expect(scripts.length).toBeGreaterThan(0);
+  it('Tailwind CSS is built at compile time (no CDN script tag expected)', () => {
+    // Tailwind CSS v4 is built during the build process, not loaded from CDN
+    const cdnScripts = doc.querySelectorAll('script[src*="cdn.tailwindcss.com"]');
+    expect(cdnScripts.length).toBe(0);
   });
 
   it('no broken CDN references (all external scripts have https:// URLs)', () => {
