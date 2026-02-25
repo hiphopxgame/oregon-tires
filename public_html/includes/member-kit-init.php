@@ -13,6 +13,12 @@ function initMemberKit(PDO $pdo): void
 
     $path = $_ENV['MEMBER_KIT_PATH'] ?? null;
     if (!$path || !file_exists($path . '/loader.php')) return;
+
+    // Stub translation function expected by member-kit templates
+    if (!function_exists('t')) {
+        function t(string $key): ?string { return null; }
+    }
+
     require_once $path . '/loader.php';
 
     MemberAuth::init($pdo, [
@@ -22,6 +28,7 @@ function initMemberKit(PDO $pdo): void
         'login_url'      => '/members',
         'site_name'      => 'Oregon Tires Auto Care',
         'session_name'   => 'oregon_session',
+        'site_key'       => 'oregon_tires',
     ]);
 
     MemberAuth::onLogin(function (array $member): void {

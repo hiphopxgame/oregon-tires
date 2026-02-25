@@ -1,5 +1,11 @@
 <?php
 declare(strict_types=1);
+
+/**
+ * POST /api/member/login.php — Oregon Tires
+ * Thin wrapper that delegates to the shared member-kit login endpoint.
+ */
+
 require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/member-kit-init.php';
 
@@ -7,29 +13,11 @@ startSecureSession();
 $pdo = getDB();
 initMemberKit($pdo);
 
-try {
-    requireMethod('POST');
-    $data = getJsonBody();
-
-    $email = sanitize((string) ($data['email'] ?? ''), 254);
-    $password = (string) ($data['password'] ?? '');
-
-    if (!$email || !$password) {
-        jsonError('Email and password are required.');
-    }
-
-    $result = MemberAuth::login($email, $password);
-
-    if (!$result['success']) {
-        jsonError($result['error'] ?? 'Invalid credentials.', 401);
-    }
-
-    jsonSuccess([
-        'member_id' => $result['member']['id'] ?? null,
-        'email'     => $result['member']['email'] ?? '',
-        'name'      => $result['member']['display_name'] ?? '',
-    ]);
-} catch (\Throwable $e) {
-    error_log("Oregon Tires customer/login error: " . $e->getMessage());
-    jsonError('Server error', 500);
+// Provide getDatabase() alias so the member-kit endpoint
+// reuses the same PDO instead of opening a second connection.
+if (!function_exists('getDatabase')) {
+    function getDatabase(): PDO { return getDB(); }
 }
+
+// Delegate to shared member-kit endpoint
+require MEMBER_KIT_PATH . '/api/member/login.php';

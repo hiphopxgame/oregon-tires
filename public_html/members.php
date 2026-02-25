@@ -19,6 +19,11 @@ $pdo = getDB();
 initMemberKit($pdo);
 initEngineKit();
 
+// Web URL for member-kit CSS/JS assets
+if (!defined('MEMBER_KIT_URL')) {
+    define('MEMBER_KIT_URL', '/shared/member-kit');
+}
+
 // Site key for branding
 $siteKey = 'oregontires';
 
