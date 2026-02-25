@@ -25,7 +25,7 @@ if (!defined('MEMBER_KIT_URL')) {
 }
 
 // Site key for branding
-$siteKey = 'oregontires';
+$siteKey = 'oregon_tires';
 
 // Define Oregon Tires custom dashboard tabs
 $memberDashboardTabs = [

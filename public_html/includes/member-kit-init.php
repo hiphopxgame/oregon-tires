@@ -12,7 +12,18 @@ function initMemberKit(PDO $pdo): void
     if ($initialized) return;
 
     $path = $_ENV['MEMBER_KIT_PATH'] ?? null;
-    if (!$path || !file_exists($path . '/loader.php')) return;
+    if (!$path || !file_exists($path . '/loader.php')) {
+        // Define constant even when path is invalid so downstream code
+        // can check it rather than fatal on an undefined constant.
+        if (!defined('MEMBER_KIT_PATH')) {
+            define('MEMBER_KIT_PATH', $path ?? '');
+        }
+        return;
+    }
+
+    if (!defined('MEMBER_KIT_PATH')) {
+        define('MEMBER_KIT_PATH', $path);
+    }
 
     // Stub translation function expected by member-kit templates
     if (!function_exists('t')) {
