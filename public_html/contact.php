@@ -197,9 +197,26 @@ $appUrl = htmlspecialchars($_ENV['APP_URL'] ?? 'https://oregon.tires', ENT_QUOTE
 </main>
 
 <!-- Footer -->
-<footer class="bg-gray-100 dark:bg-[#111827] border-t border-gray-200 dark:border-gray-800 py-6">
-    <div class="container mx-auto px-4 text-center text-sm text-gray-500 dark:text-gray-500">
-        &copy; <?= date('Y') ?> Oregon Tires Auto Care. All rights reserved.
+<footer class="bg-brand text-white py-8">
+    <div class="container mx-auto px-4">
+      <div class="grid sm:grid-cols-3 gap-6 text-sm text-gray-200 mb-6">
+        <div>
+          <p class="font-semibold text-white mb-1">Oregon Tires Auto Care</p>
+          <p>📍 8536 SE 82nd Ave, Portland, OR 97266</p>
+        </div>
+        <div>
+          <p>📞 <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></p>
+          <p>✉️ <a href="mailto:oregontirespdx@gmail.com" class="hover:text-amber-300">oregontirespdx@gmail.com</a></p>
+        </div>
+        <div class="flex items-center gap-4 sm:justify-end">
+          <a href="https://www.facebook.com/61571913202998/" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300">Facebook</a>
+          <a href="https://www.instagram.com/oregontires" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300">Instagram</a>
+        </div>
+      </div>
+      <div class="border-t border-green-600 pt-4 text-center text-xs text-gray-300">
+        <p>&copy; <?= date('Y') ?> Oregon Tires Auto Care. All rights reserved.</p>
+        <p class="mt-1">Powered by <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-amber-200 hover:text-amber-100">1vsM.com</a></p>
+      </div>
     </div>
 </footer>
 

@@ -4,5 +4,8 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /cli/
 Disallow: /includes/
+Disallow: /uploads/
+Disallow: /vendor/
+Disallow: /sql/
 
 Sitemap: https://oregon.tires/sitemap.xml

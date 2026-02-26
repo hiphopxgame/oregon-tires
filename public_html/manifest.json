@@ -4,9 +4,10 @@
   "description": "Professional tire & auto services in Portland, OR. Bilingual - English & Spanish.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#0D3618",
   "theme_color": "#15803d",
   "lang": "en",
+  "categories": ["automotive", "business"],
   "icons": [
     {
       "src": "/assets/favicon.png",
@@ -29,6 +30,21 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book Appointment",
+      "short_name": "Book",
+      "url": "/book-appointment/",
+      "description": "Schedule a tire or auto service appointment",
+      "icons": [{ "src": "/assets/favicon.png", "sizes": "32x32" }]
+    },
+    {
+      "name": "Check Status",
+      "short_name": "Status",
+      "url": "/status/",
+      "description": "Check your appointment status"
     }
   ]
 }

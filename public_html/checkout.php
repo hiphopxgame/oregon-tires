@@ -273,10 +273,26 @@ $paypalClientId = $_ENV['PAYPAL_CLIENT_ID'] ?? '';
   </main>
 
   <!-- Footer -->
-  <footer class="bg-[#111827] border-t border-gray-800 text-gray-400 py-8">
-    <div class="container mx-auto px-4 text-center">
-      <p class="text-sm">&copy; <span data-t="copyright">2026 Oregon Tires Auto Care. All rights reserved.</span></p>
-      <p class="mt-2 text-xs text-gray-600"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:text-emerald-500 transition-colors">1vsM.com</a></p>
+  <footer class="bg-brand text-white py-8">
+    <div class="container mx-auto px-4">
+      <div class="grid sm:grid-cols-3 gap-6 text-sm text-gray-200 mb-6">
+        <div>
+          <p class="font-semibold text-white mb-1">Oregon Tires Auto Care</p>
+          <p>📍 8536 SE 82nd Ave, Portland, OR 97266</p>
+        </div>
+        <div>
+          <p>📞 <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></p>
+          <p>✉️ <a href="mailto:oregontirespdx@gmail.com" class="hover:text-amber-300">oregontirespdx@gmail.com</a></p>
+        </div>
+        <div class="flex items-center gap-4 sm:justify-end">
+          <a href="https://www.facebook.com/61571913202998/" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300">Facebook</a>
+          <a href="https://www.instagram.com/oregontires" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300">Instagram</a>
+        </div>
+      </div>
+      <div class="border-t border-green-600 pt-4 text-center text-xs text-gray-300">
+        <p>&copy; <span data-t="copyright">2026 Oregon Tires Auto Care. All rights reserved.</span></p>
+        <p class="mt-1"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-amber-200 hover:text-amber-100">1vsM.com</a></p>
+      </div>
     </div>
   </footer>
 
