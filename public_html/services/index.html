@@ -296,6 +296,7 @@
         <span>✉️ <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></span>
         <span class="hidden md:inline">📍 8536 SE 82nd Ave, Portland, OR 97266</span>
         <span class="hidden lg:inline" id="top-hours">🕐 Mon-Sat 7AM-7PM</span>
+        <span id="open-status" class="hidden sm:inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full"></span>
       </div>
       <div class="flex items-center gap-3">
         <a href="https://www.instagram.com/oregontires" target="_blank" class="hover:text-amber-300">Instagram</a>
@@ -777,6 +778,24 @@ function toggleMobileMenu() {
   var isExpanded = !menu.classList.contains('hidden');
   btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
 }
+
+// ===== OPEN/CLOSED STATUS BADGE =====
+(function updateOpenStatus() {
+  var el = document.getElementById('open-status');
+  if (!el) return;
+  var now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+  var day = now.getDay();
+  var h = now.getHours();
+  var isOpen = day >= 1 && day <= 6 && h >= 7 && h < 19;
+  if (isOpen) {
+    el.textContent = currentLang === 'es' ? 'Abierto' : 'Open';
+    el.className = 'hidden sm:inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-green-500/20 text-green-200';
+  } else {
+    el.textContent = currentLang === 'es' ? 'Cerrado' : 'Closed';
+    el.className = 'hidden sm:inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500/20 text-red-200';
+  }
+  setTimeout(updateOpenStatus, 60000);
+})();
 
 // ===== DARK MODE =====
 function toggleDarkMode() {
