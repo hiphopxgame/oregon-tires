@@ -309,7 +309,7 @@ try {
 
                 if ($roData) {
                     $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
-                    $viewUrl = $baseUrl . '/inspection.php?token=' . urlencode($insp['customer_view_token']);
+                    $viewUrl = $baseUrl . '/inspection/' . urlencode($insp['customer_view_token']);
                     $vehicleStr = trim(($roData['year'] ?? '') . ' ' . ($roData['make'] ?? '') . ' ' . ($roData['model'] ?? ''));
                     $custName = trim($roData['first_name'] . ' ' . $roData['last_name']);
                     $lang = ($roData['language'] === 'spanish') ? 'es' : 'en';

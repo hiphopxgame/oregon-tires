@@ -573,8 +573,8 @@ HTML;
     // Build cancel/reschedule links (only if token provided)
     $cancelRescheduleHtml = '';
     if ($cancelToken !== '') {
-        $cancelUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/cancel.php?token=' . urlencode($cancelToken);
-        $rescheduleUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/reschedule.php?token=' . urlencode($cancelToken);
+        $cancelUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/cancel/' . urlencode($cancelToken);
+        $rescheduleUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/reschedule/' . urlencode($cancelToken);
         $cancelUrlSafe = htmlspecialchars($cancelUrl, ENT_QUOTES, 'UTF-8');
         $rescheduleUrlSafe = htmlspecialchars($rescheduleUrl, ENT_QUOTES, 'UTF-8');
 
@@ -710,8 +710,8 @@ HTML;
 
     // Add cancel/reschedule links to plain text
     if ($cancelToken !== '') {
-        $cancelUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/cancel.php?token=' . urlencode($cancelToken);
-        $rescheduleUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/reschedule.php?token=' . urlencode($cancelToken);
+        $cancelUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/cancel/' . urlencode($cancelToken);
+        $rescheduleUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/') . '/reschedule/' . urlencode($cancelToken);
         $textBody .= "\n\nNeed to change your plans? / Necesita cambiar sus planes?\n";
         $textBody .= "Reschedule / Reprogramar: {$rescheduleUrl}\n";
         $textBody .= "Cancel / Cancelar: {$cancelUrl}\n";

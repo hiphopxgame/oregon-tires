@@ -7,10 +7,50 @@
     # --- Redirect www to non-www ---
     RewriteCond %{HTTP_HOST} ^www\.oregon\.tires$ [NC]
     RewriteRule ^(.*)$ https://oregon.tires/$1 [L,R=301]
+
+    # CLEAN URLs: token-based customer pages
+    # 301 redirect old ?token= format
+    RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
+    RewriteRule ^inspection$ /inspection/%1? [R=301,L]
+    RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
+    RewriteRule ^inspection\.php$ /inspection/%1? [R=301,L]
+
+    RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
+    RewriteRule ^approve$ /approve/%1? [R=301,L]
+    RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
+    RewriteRule ^approve\.php$ /approve/%1? [R=301,L]
+
+    RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
+    RewriteRule ^cancel$ /cancel/%1? [R=301,L]
+    RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
+    RewriteRule ^cancel\.php$ /cancel/%1? [R=301,L]
+
+    RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
+    RewriteRule ^reschedule$ /reschedule/%1? [R=301,L]
+    RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
+    RewriteRule ^reschedule\.php$ /reschedule/%1? [R=301,L]
+
+    # Internal rewrites: /page/TOKEN → page.php?token=TOKEN
+    RewriteRule ^inspection/([a-f0-9]+)/?$ inspection.php?token=$1 [L,QSA]
+    RewriteRule ^approve/([a-f0-9]+)/?$ approve.php?token=$1 [L,QSA]
+    RewriteRule ^cancel/([a-f0-9]+)/?$ cancel.php?token=$1 [L,QSA]
+    RewriteRule ^reschedule/([a-f0-9]+)/?$ reschedule.php?token=$1 [L,QSA]
+
+    # --- Clean URLs: strip .php extension ---
+    # 301 redirect /page.php → /page (SEO + UX)
+    RewriteCond %{THE_REQUEST} \s/+(.+)\.php[\s?] [NC]
+    RewriteCond %{THE_REQUEST} !/api/ [NC]
+    RewriteRule ^ /%1 [R=301,L]
+
+    # Internal rewrite /page → page.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME}\.php -f
+    RewriteRule ^(.+)$ $1.php [L,QSA]
 </IfModule>
 
 # --- Directory Index ---
-DirectoryIndex index.html
+DirectoryIndex index.html index.php
 
 # --- Error Pages ---
 ErrorDocument 404 /404.html

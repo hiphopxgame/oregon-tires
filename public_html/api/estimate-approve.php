@@ -164,7 +164,7 @@ try {
         $custName = trim($est['first_name'] . ' ' . $est['last_name']);
         $lang = ($est['language'] === 'spanish') ? 'es' : 'en';
         $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
-        $viewUrl = $baseUrl . '/approve.php?token=' . urlencode($token);
+        $viewUrl = $baseUrl . '/approve/' . urlencode($token);
 
         require_once __DIR__ . '/../includes/mail.php';
         sendBrandedTemplateEmail(

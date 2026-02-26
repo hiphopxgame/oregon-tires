@@ -315,7 +315,7 @@ try {
 
             if ($roData) {
                 $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
-                $approveUrl = $baseUrl . '/approve.php?token=' . urlencode($est['approval_token']);
+                $approveUrl = $baseUrl . '/approve/' . urlencode($est['approval_token']);
                 $vehicleStr = trim(($roData['year'] ?? '') . ' ' . ($roData['make'] ?? '') . ' ' . ($roData['model'] ?? ''));
                 $custName = trim($roData['first_name'] . ' ' . $roData['last_name']);
                 $lang = ($roData['language'] === 'spanish') ? 'es' : 'en';

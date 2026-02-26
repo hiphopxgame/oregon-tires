@@ -433,7 +433,7 @@ async function loadInspection() {
 
         // Estimate CTA
         if (data.estimate_token) {
-            document.getElementById('estimate-link').href = '/approve.php?token=' + encodeURIComponent(data.estimate_token);
+            document.getElementById('estimate-link').href = '/approve/' + encodeURIComponent(data.estimate_token);
             document.getElementById('estimate-cta').classList.remove('hidden');
         }
 
