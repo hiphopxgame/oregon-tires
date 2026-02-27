@@ -42,6 +42,11 @@ function initMemberKit(PDO $pdo): void
         'site_key'       => 'oregon_tires',
     ]);
 
+    // Ensure CSRF token exists (session may already be started by startSecureSession())
+    if (session_status() === PHP_SESSION_ACTIVE && empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+
     MemberAuth::onLogin(function (array $member): void {
         $_SESSION['member_email'] = $member['email'] ?? '';
         $_SESSION['is_customer']  = true;

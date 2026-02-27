@@ -13,6 +13,11 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/member-kit-init.php';
 require_once __DIR__ . '/includes/engine-kit-init.php';
 
+// Web URL for member-kit CSS/JS assets (must be before initMemberKit → loader.php)
+if (!defined('MEMBER_KIT_URL')) {
+    define('MEMBER_KIT_URL', '/shared/member-kit');
+}
+
 // Start session and init member-kit
 startSecureSession();
 $pdo = getDB();
@@ -22,11 +27,6 @@ initEngineKit();
 // Set default return URL for login form
 if (!MemberAuth::isMemberLoggedIn() && !isset($_GET['return'])) {
     $_GET['return'] = '/members';
-}
-
-// Web URL for member-kit CSS/JS assets
-if (!defined('MEMBER_KIT_URL')) {
-    define('MEMBER_KIT_URL', '/shared/member-kit');
 }
 
 // Site key for branding
