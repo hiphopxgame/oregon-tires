@@ -14,6 +14,12 @@
   <meta name="theme-color" content="#15803d">
   <meta name="msapplication-TileColor" content="#15803d">
 
+  <!-- Performance: Preconnect & Preload -->
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+  <link rel="preconnect" href="https://hiphop.world" crossorigin>
+  <link rel="preload" href="assets/styles.css" as="style">
+  <link rel="preload" href="assets/logo.webp" as="image" type="image/webp">
+
   <!-- SEO Meta Tags -->
   <link rel="canonical" href="https://oregon.tires/">
   <meta name="robots" content="index, follow">
@@ -270,6 +276,128 @@
       });
     });
   </script>
+  <!-- GA4 Enhanced Event Tracking -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof gtag !== 'function') return;
+
+    // Scroll depth tracking
+    var scrollMarks = {25: false, 50: false, 75: false, 100: false};
+    window.addEventListener('scroll', function() {
+      var scrollPct = Math.round((window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+      [25, 50, 75, 100].forEach(function(mark) {
+        if (scrollPct >= mark && !scrollMarks[mark]) {
+          scrollMarks[mark] = true;
+          gtag('event', 'scroll_depth', { percent: mark });
+        }
+      });
+    }, { passive: true });
+
+    // CTA click tracking
+    document.addEventListener('click', function(e) {
+      var link = e.target.closest('a[href*="book-appointment"], a[href^="tel:"]');
+      if (link) {
+        var label = link.href.includes('tel:') ? 'phone_call' : 'booking_click';
+        var ctx = link.closest('section');
+        gtag('event', 'cta_click', {
+          cta_type: label,
+          cta_text: link.textContent.trim().substring(0, 50),
+          section: ctx ? ctx.id || 'unknown' : 'floating'
+        });
+      }
+    });
+
+    // FAQ accordion tracking
+    document.querySelectorAll('.faq-item').forEach(function(item) {
+      item.addEventListener('toggle', function() {
+        if (item.open) {
+          var q = item.querySelector('summary span[data-t]');
+          gtag('event', 'faq_expand', { question: q ? q.textContent.trim() : 'unknown' });
+        }
+      });
+    });
+
+    // Contact form tracking
+    var contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+      var formStarted = false;
+      contactForm.addEventListener('focusin', function() {
+        if (!formStarted) { formStarted = true; gtag('event', 'form_start', { form: 'contact' }); }
+      });
+      contactForm.addEventListener('submit', function() { gtag('event', 'form_submit', { form: 'contact' }); });
+    }
+
+    // Subscribe form tracking
+    var subForm = document.getElementById('subscribe-form');
+    if (subForm) {
+      subForm.addEventListener('submit', function() { gtag('event', 'form_submit', { form: 'subscribe' }); });
+    }
+
+    // Language toggle tracking
+    var langToggles = document.querySelectorAll('#lang-toggle, #footer-lang-toggle');
+    langToggles.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        gtag('event', 'language_switch', { from: currentLang, to: currentLang === 'en' ? 'es' : 'en' });
+      });
+    });
+
+    // Map interaction tracking
+    var mapPlaceholder = document.getElementById('map-placeholder');
+    if (mapPlaceholder) {
+      mapPlaceholder.addEventListener('click', function() { gtag('event', 'map_interact'); }, { once: true });
+    }
+
+    // Floating CTA visibility on scroll
+    var floatingCta = document.getElementById('floating-cta');
+    if (floatingCta) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 600) {
+          floatingCta.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+          floatingCta.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+        } else {
+          floatingCta.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+          floatingCta.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+        }
+      }, { passive: true });
+    }
+
+    // Subscribe form handler
+    var subscribeForm = document.getElementById('subscribe-form');
+    if (subscribeForm) {
+      subscribeForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = document.getElementById('subscribe-email').value;
+        var status = document.getElementById('subscribe-status');
+        var lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
+        fetch('/api/subscribe.php', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, language: lang, source: 'footer_bar' })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          status.classList.remove('hidden');
+          if (data.success) {
+            status.className = 'mt-3 text-sm text-green-400';
+            status.textContent = lang === 'es' ? '\u00a1Gracias! Te mantendremos informado.' : 'Thanks! We\'ll keep you posted.';
+            subscribeForm.reset();
+            gtag('event', 'subscribe', { method: 'email' });
+          } else {
+            status.className = 'mt-3 text-sm text-red-400';
+            status.textContent = data.error || (lang === 'es' ? 'Error. Intenta de nuevo.' : 'Error. Please try again.');
+          }
+        })
+        .catch(function() {
+          status.classList.remove('hidden');
+          status.className = 'mt-3 text-sm text-red-400';
+          status.textContent = lang === 'es' ? 'Error de conexi\u00f3n.' : 'Connection error.';
+        });
+      });
+    }
+  });
+  </script>
+
   <!-- Dark mode init (prevent FOUC) -->
   <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
   <script src="https://hiphop.world/sdk/hiphopworld.js" data-site-key="oregontires" data-auto></script>
@@ -310,7 +438,7 @@
         <a href="#gallery" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="gallery">Promotions</a>
         <a href="#faq" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="faqNav">FAQ</a>
         <a href="#contact" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="contact">Contact</a>
-        <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="scheduleService">Schedule Service</a>
+        <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="getFreeEstimate">Free Estimate</a>
       </nav>
       <!-- Mobile menu button -->
       <button onclick="toggleMobileMenu()" class="md:hidden text-brand dark:text-green-400 text-2xl" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
@@ -323,7 +451,7 @@
       <a href="#gallery" class="block py-2 text-brand dark:text-green-400" data-t="gallery">Promotions</a>
       <a href="#faq" class="block py-2 text-brand dark:text-green-400" data-t="faqNav">FAQ</a>
       <a href="#contact" class="block py-2 text-brand dark:text-green-400" data-t="contact">Contact</a>
-      <a href="/book-appointment" class="block py-2 text-brand dark:text-green-400 font-semibold" data-t="scheduleService">Schedule Service</a>
+      <a href="/book-appointment" class="block py-2 text-brand dark:text-green-400 font-semibold" data-t="getFreeEstimate">Free Estimate</a>
     </div>
   </header>
 
@@ -337,12 +465,30 @@
       <h1 class="text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg" data-t="heroTitle">Your Trusted Auto Care Experts in Portland</h1>
       <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90" data-t="heroSubtitle">Professional tire installation, repair, and complete automotive services. We speak Spanish and English!</p>
       <div class="flex justify-center gap-3 flex-wrap">
-        <a href="/book-appointment/" class="bg-amber-500 text-black px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-lg" data-t="scheduleService">Schedule Service</a>
+        <a href="/book-appointment/" class="bg-amber-500 text-black px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-lg" data-t="getFreeEstimate">Get Your Free Estimate</a>
         <a href="#services" class="bg-white/90 text-brand px-8 py-3 rounded-lg font-semibold hover:bg-white transition" data-t="viewPricing">View Services & Pricing</a>
-        <a href="tel:5033679714" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition" data-t="callNow">📞 Call Now</a>
+        <a href="tel:5033679714" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition" data-t="callSameDay">📞 Call for Same-Day Service</a>
+      </div>
+      <!-- Trust Bar -->
+      <div class="mt-8 flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-sm text-white/90">
+        <span class="flex items-center gap-1"><svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg> <span data-t="trustRating">4.8 Stars · 150+ Reviews</span></span>
+        <span class="hidden sm:inline text-white/40">|</span>
+        <span data-t="trustSince">Since 2008</span>
+        <span class="hidden sm:inline text-white/40">|</span>
+        <span data-t="trustFreeEstimates">Free Estimates</span>
+        <span class="hidden sm:inline text-white/40">|</span>
+        <span data-t="trustBilingual">Se Habla Español</span>
       </div>
     </div>
   </section>
+
+  <!-- New Customer Tripwire Offer -->
+  <div class="bg-amber-50 dark:bg-amber-900/20 border-b-2 border-amber-200 dark:border-amber-800 py-4">
+    <div class="container mx-auto px-4 text-center">
+      <p class="text-amber-800 dark:text-amber-300 font-bold text-lg" data-t="newCustomerSpecial">🎉 New Customer Special: $29 Oil Change + FREE Multi-Point Inspection</p>
+      <a href="/book-appointment/?promo=new-customer" class="inline-block mt-2 bg-amber-500 text-black px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition text-sm" data-t="claimOffer">Claim This Offer →</a>
+    </div>
+  </div>
 
   <!-- Services -->
   <section id="services" class="py-16 bg-gray-50 scroll-mt-24 dark:bg-gray-800">
@@ -446,41 +592,49 @@
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tireInstallation">Tire Installation</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$20<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
             <a href="/book-appointment/?service=tire-installation" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tireRepair">Tire Repair</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$15<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
             <a href="/book-appointment/?service=tire-repair" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="oilChange">Oil Change</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$35<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
             <a href="/book-appointment/?service=oil-change" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="brakeService">Brake Service</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$100<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
             <a href="/book-appointment/?service=brake-service" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="wheelAlignment">Wheel Alignment</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$75<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
             <a href="/book-appointment/?service=wheel-alignment" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tuneup">Tuneup</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$80<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
             <a href="/book-appointment/?service=tuneup" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="mechanicalInspection">Mechanical Inspection</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400">$50<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
             <a href="/book-appointment/?service=mechanical-inspection" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
           </div>
           <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="homeService">Mobile Service</div>
             <div class="text-2xl font-bold text-brand dark:text-green-400" data-t="callForQuote">Call for Quote</div>
             <a href="/book-appointment/?service=mobile-service" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
           </div>
         </div>
         <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-3" data-t="pricingDisclaimer">Prices vary by vehicle. Call for an exact quote.</p>
@@ -494,6 +648,28 @@
           <div><span class="text-2xl font-bold text-brand dark:text-green-400">✓</span><div class="font-semibold mt-1" data-t="qualityGuarantee">Quality Guarantee</div></div>
           <div><span class="text-2xl font-bold text-brand dark:text-green-400">✓</span><div class="font-semibold mt-1" data-t="fairPricing">Fair Pricing</div></div>
           <div><span class="text-2xl font-bold text-brand dark:text-green-400">✓</span><div class="font-semibold mt-1" data-t="expertServicePromise">Expert Service</div></div>
+        </div>
+      </div>
+
+      <!-- Guarantee Badges -->
+      <div class="mt-10 max-w-4xl mx-auto">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center border-2 border-green-100 dark:border-green-900 shadow-sm">
+            <div class="text-3xl mb-2">🛡️</div>
+            <div class="font-bold text-sm text-brand dark:text-green-400" data-t="warranty12Mo">12-Month / 12K-Mile Warranty</div>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center border-2 border-green-100 dark:border-green-900 shadow-sm">
+            <div class="text-3xl mb-2">💰</div>
+            <div class="font-bold text-sm text-brand dark:text-green-400" data-t="priceMatch">Price Match Guarantee</div>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center border-2 border-green-100 dark:border-green-900 shadow-sm">
+            <div class="text-3xl mb-2">🔍</div>
+            <div class="font-bold text-sm text-brand dark:text-green-400" data-t="freeInspection">Free Multi-Point Inspection</div>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center border-2 border-green-100 dark:border-green-900 shadow-sm">
+            <div class="text-3xl mb-2">✅</div>
+            <div class="font-bold text-sm text-brand dark:text-green-400" data-t="noSurprise">No Surprise Pricing</div>
+          </div>
         </div>
       </div>
     </div>
@@ -531,6 +707,51 @@
         <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-8">
           <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-4" data-t="servingPortland">Serving Portland Since 2008</h3>
           <p class="text-gray-700 dark:text-gray-300" data-t="servingPortlandText">With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.</p>
+          <div class="grid grid-cols-2 gap-4 mt-4">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-brand dark:text-green-400">17+</div>
+              <div class="text-sm text-gray-600 dark:text-gray-300" data-t="yearsExperience">Years Experience</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-brand dark:text-green-400">12,000+</div>
+              <div class="text-sm text-gray-600 dark:text-gray-300" data-t="vehiclesServiced">Vehicles Serviced</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-brand dark:text-green-400">4.8 ★</div>
+              <div class="text-sm text-gray-600 dark:text-gray-300" data-t="googleRating">Google Rating</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-brand dark:text-green-400">100%</div>
+              <div class="text-sm text-gray-600 dark:text-gray-300" data-t="bilingualTeam">Bilingual Team</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Why Oregon Tires vs Chain Stores -->
+      <div class="mt-10 max-w-5xl mx-auto">
+        <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-6 text-center" data-t="whyVsChains">Why Oregon Tires vs. Chain Stores?</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
+            <h4 class="font-bold text-brand dark:text-green-400 mb-3 text-lg" data-t="oregonTiresWay">The Oregon Tires Way</h4>
+            <ul class="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+              <li class="flex items-start gap-2"><span class="text-green-600 font-bold">✓</span> <span data-t="vsHonest">Honest pricing — no hidden fees or upsells</span></li>
+              <li class="flex items-start gap-2"><span class="text-green-600 font-bold">✓</span> <span data-t="vsBilingual">100% bilingual team (English &amp; Spanish)</span></li>
+              <li class="flex items-start gap-2"><span class="text-green-600 font-bold">✓</span> <span data-t="vsLocal">Locally owned since 2008 — we know Portland</span></li>
+              <li class="flex items-start gap-2"><span class="text-green-600 font-bold">✓</span> <span data-t="vsPersonal">Personal service — we remember your name</span></li>
+              <li class="flex items-start gap-2"><span class="text-green-600 font-bold">✓</span> <span data-t="vsMobile">Mobile service at your home or office</span></li>
+            </ul>
+          </div>
+          <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <h4 class="font-bold text-gray-500 dark:text-gray-400 mb-3 text-lg" data-t="chainStoreWay">The Chain Store Way</h4>
+            <ul class="space-y-2 text-gray-500 dark:text-gray-400 text-sm">
+              <li class="flex items-start gap-2"><span class="text-red-400">✗</span> <span data-t="chainUpsells">Aggressive upselling and hidden costs</span></li>
+              <li class="flex items-start gap-2"><span class="text-red-400">✗</span> <span data-t="chainNoSpanish">Limited or no Spanish support</span></li>
+              <li class="flex items-start gap-2"><span class="text-red-400">✗</span> <span data-t="chainCorporate">Corporate-owned, no community ties</span></li>
+              <li class="flex items-start gap-2"><span class="text-red-400">✗</span> <span data-t="chainImpersonal">Impersonal, rotating staff</span></li>
+              <li class="flex items-start gap-2"><span class="text-red-400">✗</span> <span data-t="chainNoMobile">No mobile service option</span></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -563,6 +784,19 @@
     </div>
   </section>
 
+  <!-- CTA after Reviews -->
+  <div class="bg-brand text-white py-10">
+    <div class="container mx-auto px-4 text-center">
+      <h3 class="text-2xl font-bold mb-3" data-t="readyToExperience">Ready to Experience the Difference?</h3>
+      <p class="text-green-100 mb-6 max-w-2xl mx-auto" data-t="joinThousands">Join thousands of Portland drivers who trust Oregon Tires for honest, affordable auto care.</p>
+      <div class="flex justify-center gap-3 flex-wrap">
+        <a href="/book-appointment/" class="bg-amber-500 text-black px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-lg" data-t="getFreeEstimate">Get Your Free Estimate</a>
+        <a href="tel:5033679714" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition" data-t="callSameDay">📞 Call for Same-Day Service</a>
+      </div>
+      <p class="text-xs text-green-200 mt-3" data-t="noObligationWalkins">No obligation · Free estimates · Walk-ins welcome</p>
+    </div>
+  </div>
+
   <!-- Gallery -->
   <section id="gallery" class="py-16 bg-white scroll-mt-24 dark:bg-gray-900">
     <div class="container mx-auto px-4">
@@ -583,7 +817,7 @@
   </section>
 
   <!-- FAQ -->
-  <section id="faq" class="scroll-mt-24 py-16 bg-gray-50 dark:bg-gray-800">
+  <section id="faq" class="scroll-mt-24 py-16 bg-gray-50 dark:bg-gray-800" aria-label="Frequently Asked Questions">
     <div class="max-w-3xl mx-auto px-4">
       <h2 class="text-3xl font-bold text-center text-brand dark:text-green-400 mb-8" data-t="faqTitle">Frequently Asked Questions</h2>
       <div class="space-y-3">
@@ -644,6 +878,18 @@
       </div>
     </div>
   </section>
+
+  <!-- CTA after FAQ -->
+  <div class="bg-amber-500 text-black py-8">
+    <div class="container mx-auto px-4 text-center">
+      <h3 class="text-xl font-bold mb-2" data-t="stillHaveQuestions">Still Have Questions? We're Here to Help.</h3>
+      <p class="mb-4" data-t="callOrBook">Call us or book online — we'll take care of the rest.</p>
+      <div class="flex justify-center gap-3 flex-wrap">
+        <a href="/book-appointment/" class="bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition" data-t="bookFreeEstimate">Book Free Estimate</a>
+        <a href="tel:5033679714" class="border-2 border-black text-black px-6 py-3 rounded-lg font-semibold hover:bg-black/10 transition" data-t="callNow">📞 Call Now</a>
+      </div>
+    </div>
+  </div>
 
   <!-- Contact -->
   <section id="contact" class="py-16 bg-white scroll-mt-24 dark:bg-gray-900">
@@ -769,6 +1015,14 @@
 
   </main>
 
+  <!-- Floating Desktop CTA -->
+  <div id="floating-cta" class="hidden md:block fixed bottom-6 right-6 z-40 opacity-0 translate-y-4 transition-all duration-300 pointer-events-none">
+    <a href="/book-appointment/" class="flex items-center gap-2 bg-amber-500 text-black px-5 py-3 rounded-full font-semibold shadow-lg hover:bg-amber-600 hover:shadow-xl transition-all">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span data-t="getFreeEstimate">Get Your Free Estimate</span>
+    </a>
+  </div>
+
   <!-- Sticky Mobile CTA Bar -->
   <div id="mobile-cta" class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-brand shadow-[0_-4px_12px_rgba(0,0,0,0.15)] border-t border-green-700 safe-area-bottom">
     <div class="flex">
@@ -778,6 +1032,20 @@
       <a href="/book-appointment" class="flex-1 flex items-center justify-center gap-2 py-3.5 bg-amber-500 text-black font-semibold text-sm active:bg-amber-600 transition">
         <span>📅</span> <span data-t="bookNow">Book Now</span>
       </a>
+    </div>
+  </div>
+
+  <!-- Email Capture Bar -->
+  <div class="bg-gray-900 text-white py-10" id="email-capture">
+    <div class="container mx-auto px-4 text-center max-w-2xl">
+      <h3 class="text-2xl font-bold mb-2" data-t="getDeals">Get Portland Tire Deals &amp; Seasonal Alerts</h3>
+      <p class="text-gray-300 mb-6" data-t="joinDrivers">Join 500+ Portland drivers. Seasonal deals, maintenance reminders, exclusive offers.</p>
+      <form id="subscribe-form" class="flex flex-col sm:flex-row gap-3 justify-center">
+        <input type="email" id="subscribe-email" name="email" required placeholder="your@email.com" class="flex-1 max-w-sm px-4 py-3 rounded-lg text-gray-900 border-0 focus:ring-2 focus:ring-green-500" aria-label="Email address">
+        <button type="submit" class="bg-amber-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 transition whitespace-nowrap" data-t="signUpFree">Sign Up Free</button>
+      </form>
+      <p class="text-xs text-gray-500 mt-3" data-t="noSpam">No spam. Unsubscribe anytime.</p>
+      <div id="subscribe-status" role="alert" aria-live="polite" class="mt-3 text-sm hidden"></div>
     </div>
   </div>
 
@@ -903,8 +1171,8 @@ let currentLang = (function() {
 const t = {
   en: {
     home: 'Home', services: 'Services', about: 'About', testimonials: 'Reviews', contact: 'Contact',
-    scheduleService: 'Schedule Service', viewPricing: 'View Services & Pricing', heroTitle: 'Your Trusted Auto Care Experts in Portland',
-    heroSubtitle: 'Professional tire installation, repair, and complete automotive services. We speak Spanish and English!',
+    scheduleService: 'Schedule Service', viewPricing: 'View Services & Pricing', heroTitle: 'Portland\'s Most Trusted Bilingual Auto Shop',
+    heroSubtitle: 'Honest prices. Expert care. Your language. Tires, brakes & peace of mind \u2014 since 2008.',
     servicesSubtitle: 'Comprehensive automotive services you can trust',
     expertService: 'Expert Technicians', expertServiceDesc: 'Our certified mechanics have years of experience with all vehicle makes and models.',
     quickService: 'Fast Service', quickServiceDesc: 'Most services completed while you wait. We value your time and get you back on the road quickly.',
@@ -984,12 +1252,53 @@ const t = {
     faqQ5: 'Do I need an appointment?',
     faqA5: 'Appointments are recommended to ensure we can serve you promptly, but walk-ins are always welcome! You can book online or call us at (503) 367-9714.',
     faqQ6: 'Do you offer mobile service?',
-    faqA6: 'Yes! We offer mobile service and can come to your home, office, or any location. Whether you need tire installation, repair, or roadside assistance, we will come to you. Call (503) 367-9714 to schedule.'
+    faqA6: 'Yes! We offer mobile service and can come to your home, office, or any location. Whether you need tire installation, repair, or roadside assistance, we will come to you. Call (503) 367-9714 to schedule.',
+    // CRO trust
+    trustRating: '4.8 Stars \u00b7 150+ Reviews',
+    trustSince: 'Since 2008',
+    trustFreeEstimates: 'Free Estimates',
+    trustBilingual: 'Se Habla Espa\u00f1ol',
+    getFreeEstimate: 'Get Your Free Estimate',
+    callSameDay: '\ud83d\udcde Call for Same-Day Service',
+    noObligation: 'No obligation \u00b7 Free estimates',
+    noObligationWalkins: 'No obligation \u00b7 Free estimates \u00b7 Walk-ins welcome',
+    warranty12Mo: '12-Month / 12K-Mile Warranty',
+    priceMatch: 'Price Match Guarantee',
+    freeInspection: 'Free Multi-Point Inspection',
+    noSurprise: 'No Surprise Pricing',
+    readyToExperience: 'Ready to Experience the Difference?',
+    joinThousands: 'Join thousands of Portland drivers who trust Oregon Tires for honest, affordable auto care.',
+    stillHaveQuestions: 'Still Have Questions? We\'re Here to Help.',
+    callOrBook: 'Call us or book online \u2014 we\'ll take care of the rest.',
+    bookFreeEstimate: 'Book Free Estimate',
+    whyVsChains: 'Why Oregon Tires vs. Chain Stores?',
+    oregonTiresWay: 'The Oregon Tires Way',
+    vsHonest: 'Honest pricing \u2014 no hidden fees or upsells',
+    vsBilingual: '100% bilingual team (English & Spanish)',
+    vsLocal: 'Locally owned since 2008 \u2014 we know Portland',
+    vsPersonal: 'Personal service \u2014 we remember your name',
+    vsMobile: 'Mobile service at your home or office',
+    chainStoreWay: 'The Chain Store Way',
+    chainUpsells: 'Aggressive upselling and hidden costs',
+    chainNoSpanish: 'Limited or no Spanish support',
+    chainCorporate: 'Corporate-owned, no community ties',
+    chainImpersonal: 'Impersonal, rotating staff',
+    chainNoMobile: 'No mobile service option',
+    yearsExperience: 'Years Experience',
+    vehiclesServiced: 'Vehicles Serviced',
+    googleRating: 'Google Rating',
+    bilingualTeam: 'Bilingual Team',
+    getDeals: 'Get Portland Tire Deals & Seasonal Alerts',
+    joinDrivers: 'Join 500+ Portland drivers. Seasonal deals, maintenance reminders, exclusive offers.',
+    signUpFree: 'Sign Up Free',
+    noSpam: 'No spam. Unsubscribe anytime.',
+    newCustomerSpecial: '\ud83c\udf89 New Customer Special: $29 Oil Change + FREE Multi-Point Inspection',
+    claimOffer: 'Claim This Offer \u2192'
   },
   es: {
     home: 'Inicio', services: 'Servicios', about: 'Acerca de', testimonials: 'Reseñas', contact: 'Contacto',
-    scheduleService: 'Programar Servicio', viewPricing: 'Ver Servicios y Precios', heroTitle: 'Sus Expertos de Confianza en Cuidado Automotriz en Portland',
-    heroSubtitle: 'Instalación profesional de llantas, reparación y servicios automotrices completos. ¡Hablamos español e inglés!',
+    scheduleService: 'Programar Servicio', viewPricing: 'Ver Servicios y Precios', heroTitle: 'El Taller Automotriz Biling\u00fce M\u00e1s Confiable de Portland',
+    heroSubtitle: 'Precios honestos. Servicio experto. Tu idioma. Llantas, frenos y tranquilidad \u2014 desde 2008.',
     servicesSubtitle: 'Servicios automotrices integrales en los que puedes confiar',
     expertService: 'Técnicos Expertos', expertServiceDesc: 'Nuestros mecánicos certificados tienen años de experiencia con todas las marcas y modelos.',
     quickService: 'Servicio Rápido', quickServiceDesc: 'La mayoría de servicios se completan mientras esperas. Valoramos tu tiempo.',
@@ -1069,7 +1378,47 @@ const t = {
     faqQ5: '¿Necesito una cita?',
     faqA5: 'Se recomienda hacer cita para asegurar que podamos atenderlo rápidamente, ¡pero los clientes sin cita siempre son bienvenidos! Puede reservar en línea o llamarnos al (503) 367-9714.',
     faqQ6: '¿Ofrecen servicio móvil?',
-    faqA6: '¡Sí! Ofrecemos servicio móvil y podemos ir a su casa, oficina o cualquier ubicación. Ya sea que necesite instalación de llantas, reparación o asistencia en carretera, iremos a usted. Llame al (503) 367-9714 para programar.'
+    faqA6: '¡Sí! Ofrecemos servicio móvil y podemos ir a su casa, oficina o cualquier ubicación. Ya sea que necesite instalación de llantas, reparación o asistencia en carretera, iremos a usted. Llame al (503) 367-9714 para programar.',
+    trustRating: '4.8 Estrellas \u00b7 150+ Rese\u00f1as',
+    trustSince: 'Desde 2008',
+    trustFreeEstimates: 'Estimados Gratis',
+    trustBilingual: 'Hablamos Espa\u00f1ol',
+    getFreeEstimate: 'Obtenga Su Estimado Gratis',
+    callSameDay: '\ud83d\udcde Llame para Servicio el Mismo D\u00eda',
+    noObligation: 'Sin compromiso \u00b7 Estimados gratis',
+    noObligationWalkins: 'Sin compromiso \u00b7 Estimados gratis \u00b7 Sin cita previa',
+    warranty12Mo: 'Garant\u00eda de 12 Meses / 12K Millas',
+    priceMatch: 'Igualamos Precios',
+    freeInspection: 'Inspecci\u00f3n Multi-Punto Gratis',
+    noSurprise: 'Precios Sin Sorpresas',
+    readyToExperience: '\u00bfListo para Experimentar la Diferencia?',
+    joinThousands: '\u00danete a miles de conductores de Portland que conf\u00edan en Oregon Tires.',
+    stillHaveQuestions: '\u00bfA\u00fan Tiene Preguntas? Estamos Para Ayudarle.',
+    callOrBook: 'Ll\u00e1menos o reserve en l\u00ednea \u2014 nosotros nos encargamos del resto.',
+    bookFreeEstimate: 'Reserve Estimado Gratis',
+    whyVsChains: '\u00bfPor Qu\u00e9 Oregon Tires vs. Cadenas?',
+    oregonTiresWay: 'La Forma de Oregon Tires',
+    vsHonest: 'Precios honestos \u2014 sin cargos ocultos',
+    vsBilingual: 'Equipo 100% biling\u00fce (ingl\u00e9s y espa\u00f1ol)',
+    vsLocal: 'Negocio local desde 2008 \u2014 conocemos Portland',
+    vsPersonal: 'Servicio personal \u2014 recordamos tu nombre',
+    vsMobile: 'Servicio m\u00f3vil en tu hogar u oficina',
+    chainStoreWay: 'La Forma de las Cadenas',
+    chainUpsells: 'Ventas agresivas y costos ocultos',
+    chainNoSpanish: 'Soporte limitado o nulo en espa\u00f1ol',
+    chainCorporate: 'Propiedad corporativa, sin lazos comunitarios',
+    chainImpersonal: 'Servicio impersonal, personal rotativo',
+    chainNoMobile: 'Sin opci\u00f3n de servicio m\u00f3vil',
+    yearsExperience: 'A\u00f1os de Experiencia',
+    vehiclesServiced: 'Veh\u00edculos Atendidos',
+    googleRating: 'Calificaci\u00f3n Google',
+    bilingualTeam: 'Equipo Biling\u00fce',
+    getDeals: 'Ofertas de Llantas y Alertas de Temporada',
+    joinDrivers: '\u00danete a 500+ conductores. Ofertas de temporada, recordatorios, ofertas exclusivas.',
+    signUpFree: 'Reg\u00edstrate Gratis',
+    noSpam: 'Sin spam. Cancela cuando quieras.',
+    newCustomerSpecial: '\ud83c\udf89 Especial: Cambio de Aceite $29 + Inspecci\u00f3n GRATIS',
+    claimOffer: 'Reclamar Esta Oferta \u2192'
   }
 };
 
@@ -1429,10 +1778,10 @@ function toggleLanguage() {
   applySiteSettings();
 }
 
-// Track Schedule Service CTA clicks
-document.querySelectorAll('[data-t="scheduleService"]').forEach(function(el) {
+// Track Free Estimate CTA clicks
+document.querySelectorAll('[data-t="getFreeEstimate"]').forEach(function(el) {
   el.addEventListener('click', function() {
-    if (typeof gtag === 'function') gtag('event', 'cta_click', { event_category: 'conversion', event_label: 'schedule_service' });
+    if (typeof gtag === 'function') gtag('event', 'cta_click', { event_category: 'conversion', event_label: 'free_estimate' });
   });
 });
 
@@ -1597,5 +1946,6 @@ if ('PerformanceObserver' in window) {
   obs.observe(contact);
 })();
 </script>
+  <script src="/assets/js/exit-intent.js" defer></script>
 </body>
 </html>
