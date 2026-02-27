@@ -36,6 +36,9 @@
     RewriteRule ^cancel/([a-f0-9]+)/?$ cancel.php?token=$1 [L,QSA]
     RewriteRule ^reschedule/([a-f0-9]+)/?$ reschedule.php?token=$1 [L,QSA]
 
+    # 301 redirect old root js/ → admin/js/ (ot-charts.js moved)
+    RewriteRule ^js/(.+)$ /admin/js/$1 [R=301,L]
+
     # --- Clean URLs: strip .php extension ---
     # 301 redirect /page.php → /page (SEO + UX)
     RewriteCond %{THE_REQUEST} \s/+(.+)\.php[\s?] [NC]
