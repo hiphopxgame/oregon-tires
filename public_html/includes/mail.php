@@ -1378,3 +1378,64 @@ HTML;
 
     return $result['success'] ?? false;
 }
+
+/**
+ * Send subscriber welcome email with free inspection coupon.
+ *
+ * Uses the DB-driven branded bilingual template system (email_tpl_subscriber_welcome_*).
+ * Falls back to a simple inline email if the template is missing from the database.
+ *
+ * @param string $email Subscriber email address
+ * @param string $lang  'en' or 'es'
+ * @return array ['success' => bool, 'error' => string|null]
+ */
+function sendSubscriberWelcomeEmail(string $email, string $lang = 'en'): array
+{
+    $appUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $bookingUrl = $appUrl . '/book-appointment/';
+    $language = $lang === 'es' ? 'es' : 'en';
+
+    // Try the branded template system first (same as sendInspectionEmail, sendEstimateEmail, etc.)
+    $result = sendBrandedTemplateEmail($email, 'subscriber_welcome', [], $language, $bookingUrl, false);
+
+    // If the template is missing from DB, send a simple inline fallback
+    if (!$result['success'] && str_contains(($result['error'] ?? ''), 'not found')) {
+        $baseUrl = $appUrl;
+
+        if ($language === 'es') {
+            $subject = 'Bienvenido a Oregon Tires! Aqui esta su cupon de inspeccion gratuita';
+            $greeting = '!Bienvenido a Oregon Tires Auto Care!';
+            $body = 'Gracias por suscribirse a nuestro boletin. Como agradecimiento, aqui tiene su cupon exclusivo para una inspeccion vehicular GRATUITA de 21 puntos:<br><br><strong>Use el codigo: FREEINSPECT</strong><br><br>Esta inspeccion cubre frenos, llantas, fluidos, correas, bateria y mas. Solo mencione este codigo al reservar su cita o muestre este correo al dejar su vehiculo.';
+            $buttonText = 'Reserve su inspeccion gratuita';
+            $footer = 'Oregon Tires Auto Care | 8536 SE 82nd Ave, Portland, OR 97266 | (503) 367-9714';
+        } else {
+            $subject = 'Welcome to Oregon Tires! Here\'s Your Free Inspection Coupon';
+            $greeting = 'Welcome to Oregon Tires Auto Care!';
+            $body = 'Thank you for subscribing to our newsletter! As a thank you, here\'s your exclusive coupon for a FREE 21-point vehicle inspection:<br><br><strong>Use code: FREEINSPECT</strong><br><br>This inspection covers brakes, tires, fluids, belts, battery, and more. Just mention this code when you book your appointment or show this email at drop-off.';
+            $buttonText = 'Book Your Free Inspection';
+            $footer = 'Oregon Tires Auto Care | 8536 SE 82nd Ave, Portland, OR 97266 | (503) 367-9714';
+        }
+
+        $section = buildLanguageSection(
+            $language === 'es' ? '&#x1F1F2;&#x1F1FD;' : '&#x1F1FA;&#x1F1F8;',
+            $language === 'es' ? 'Espanol' : 'English',
+            $greeting,
+            $body,
+            $buttonText,
+            $bookingUrl,
+            $footer,
+            'h1'
+        );
+
+        $htmlBody = wrapBrandedEmail($section, $baseUrl, $bookingUrl, false);
+        $result = sendMail($email, $subject, $htmlBody);
+    }
+
+    if ($result['success']) {
+        logEmail('subscriber_welcome', "Subscriber welcome email sent to {$email} (lang: {$language})");
+    } else {
+        logEmail('subscriber_welcome_failed', "Subscriber welcome email FAILED for {$email}: " . ($result['error'] ?? 'unknown'));
+    }
+
+    return $result;
+}

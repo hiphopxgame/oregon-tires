@@ -32,11 +32,10 @@ try {
 
     // Rate limiting (5 subscribe attempts per hour per IP)
     if (function_exists('checkRateLimit')) {
-        $allowed = checkRateLimit('subscribe', $_SERVER['REMOTE_ADDR'] ?? 'unknown', 5, 3600);
-        if (!$allowed) {
-            jsonError('Too many attempts. Please try again later.', 429);
-        }
+        checkRateLimit('subscribe', 5, 3600);
     }
+
+    $pdo = getDB();
 
     // Check if already subscribed
     $stmt = $pdo->prepare('SELECT id, unsubscribed_at FROM oretir_subscribers WHERE email = ?');
@@ -56,6 +55,16 @@ try {
         // New subscriber
         $stmt = $pdo->prepare('INSERT INTO oretir_subscribers (email, language, source, subscribed_at) VALUES (?, ?, ?, NOW())');
         $stmt->execute([$email, $language, $source]);
+
+        // Send welcome email with coupon (new subscribers only)
+        try {
+            require_once __DIR__ . '/../includes/mail.php';
+            sendSubscriberWelcomeEmail($email, $language);
+        } catch (\Throwable $mailErr) {
+            error_log('subscribe.php: welcome email failed for ' . $email . ': ' . $mailErr->getMessage());
+            // Don't fail the subscription if email fails
+        }
+
         echo json_encode(['success' => true, 'message' => 'Successfully subscribed!']);
     }
 
