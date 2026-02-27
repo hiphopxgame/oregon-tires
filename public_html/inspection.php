@@ -17,6 +17,32 @@
     .score-ring-circle {
         transition: stroke-dashoffset 1.2s ease-out;
     }
+    /* Scorecard row staggered reveal */
+    .scorecard-row {
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }
+    .scorecard-row.revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .scorecard-row:hover {
+        background: rgba(0,0,0,0.02);
+        cursor: pointer;
+    }
+    .dark .scorecard-row:hover {
+        background: rgba(255,255,255,0.03);
+    }
+    /* SVG dark mode via CSS custom properties */
+    .score-ring-bg { stroke: #e5e7eb; }
+    .dark .score-ring-bg { stroke: #374151; }
+    .score-ring-pct { fill: #6b7280; }
+    .dark .score-ring-pct { fill: #9ca3af; }
+    /* Mobile: show full description */
+    @media (max-width: 639px) {
+        .scorecard-desc { white-space: normal; overflow: visible; text-overflow: unset; }
+    }
 
     @media print {
         html, body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -176,11 +202,15 @@
             <!-- Priority Sections -->
             <div id="priority-sections" class="space-y-4 mb-6"></div>
 
-            <!-- Print Button -->
-            <div class="mb-6 text-center" id="print-report-btn">
+            <!-- Action Buttons (Print + Share) -->
+            <div class="mb-6 flex justify-center gap-3 flex-wrap" id="print-report-btn">
                 <button onclick="window.print()" class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                     <span data-t="printReport">Print Report</span>
+                </button>
+                <button id="share-btn" onclick="shareReport()" class="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                    <span data-t="shareReport">Share</span>
                 </button>
             </div>
 
@@ -194,9 +224,10 @@
             </details>
 
             <!-- Estimate CTA -->
-            <div id="estimate-cta" class="hidden">
+            <div id="estimate-cta" class="hidden mb-6">
                 <a id="estimate-link" href="#" class="block w-full text-center px-6 py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition text-lg shadow-lg">
                     <span data-t="viewEstimate">Review & Approve Estimate</span>
+                    <span id="estimate-urgency" class="hidden block text-sm font-normal mt-1 opacity-90"></span>
                 </a>
             </div>
 
@@ -274,6 +305,9 @@ const t = {
         detailedFindings: 'Detailed Findings',
         showItems: 'Show items',
         hideItems: 'Hide items',
+        shareReport: 'Share',
+        shareCopied: 'Link copied!',
+        safetyItemsWarning: ' safety item(s) need attention',
     },
     es: {
         backToHome: 'Volver al Inicio',
@@ -296,6 +330,9 @@ const t = {
         detailedFindings: 'Hallazgos Detallados',
         showItems: 'Mostrar elementos',
         hideItems: 'Ocultar elementos',
+        shareReport: 'Compartir',
+        shareCopied: 'Enlace copiado!',
+        safetyItemsWarning: ' elemento(s) de seguridad necesitan atencion',
     }
 };
 
@@ -633,8 +670,8 @@ function buildHealthScoreRing(score) {
     bgCircle.setAttribute('cy', '80');
     bgCircle.setAttribute('r', '65');
     bgCircle.setAttribute('fill', 'none');
-    bgCircle.setAttribute('stroke', document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb');
     bgCircle.setAttribute('stroke-width', '12');
+    bgCircle.classList.add('score-ring-bg');
     svg.appendChild(bgCircle);
 
     var scoreCircle = document.createElementNS(svgNS, 'circle');
@@ -666,7 +703,7 @@ function buildHealthScoreRing(score) {
     pctText.setAttribute('y', '98');
     pctText.setAttribute('text-anchor', 'middle');
     pctText.setAttribute('font-size', '14');
-    pctText.setAttribute('fill', document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280');
+    pctText.classList.add('score-ring-pct');
     pctText.textContent = score + '%';
     svg.appendChild(pctText);
 
@@ -703,7 +740,15 @@ function buildScorecardTable(catScores) {
         var desc = ((gradeDescriptions[currentLang] || gradeDescriptions.en)[cat] || {})[tier] || '';
 
         var row = document.createElement('div');
-        row.className = 'px-5 py-3 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800 last:border-b-0';
+        row.className = 'px-5 py-3 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800 last:border-b-0 scorecard-row';
+        row.dataset.category = cat;
+        row.setAttribute('role', 'button');
+        row.setAttribute('tabindex', '0');
+        row.setAttribute('aria-label', catLabel + ' — ' + grade + ' (' + data.score + '%)');
+
+        // Click-to-scroll: find matching priority section item
+        row.addEventListener('click', function() { scrollToCategory(cat); });
+        row.addEventListener('keydown', function(e) { if (e.key === 'Enter') scrollToCategory(cat); });
 
         var gradeBadge = document.createElement('span');
         gradeBadge.className = 'w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm ' + colors.bg + ' ' + colors.text;
@@ -719,7 +764,7 @@ function buildScorecardTable(catScores) {
         middle.appendChild(nameEl);
 
         var descEl = document.createElement('p');
-        descEl.className = 'text-xs text-gray-500 dark:text-gray-400 truncate';
+        descEl.className = 'text-xs text-gray-500 dark:text-gray-400 truncate scorecard-desc';
         descEl.textContent = desc;
         descEl.title = desc;
         middle.appendChild(descEl);
@@ -747,6 +792,50 @@ function buildScorecardTable(catScores) {
     });
 
     document.getElementById('scorecard-table').classList.remove('hidden');
+
+    // Staggered reveal animation
+    var rows = body.querySelectorAll('.scorecard-row');
+    rows.forEach(function(row, i) {
+        setTimeout(function() { row.classList.add('revealed'); }, 80 * (i + 1));
+    });
+}
+
+function scrollToCategory(cat) {
+    // Find matching items in priority sections
+    var prioritySections = document.getElementById('priority-sections');
+    var allItems = prioritySections.querySelectorAll('[data-category="' + cat + '"]');
+
+    if (allItems.length > 0) {
+        // Expand green section if target is there
+        var greenItems = document.getElementById('priority-green-items');
+        if (greenItems && greenItems.style.display === 'none') {
+            var parent = allItems[0].closest('#priority-green-items');
+            if (parent) {
+                greenItems.style.display = '';
+                var toggleBtn = document.getElementById('priority-green-toggle');
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('aria-expanded', 'true');
+                    toggleBtn.textContent = t[currentLang].hideItems + ' (' + greenItems.children.length + ')';
+                }
+            }
+        }
+        allItems[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        allItems[0].style.outline = '2px solid #22c55e';
+        allItems[0].style.outlineOffset = '2px';
+        allItems[0].style.borderRadius = '8px';
+        setTimeout(function() {
+            allItems[0].style.outline = '';
+            allItems[0].style.outlineOffset = '';
+        }, 2000);
+        return;
+    }
+
+    // Fallback: scroll to detailed findings
+    var details = document.getElementById('detailed-findings');
+    if (details) {
+        details.open = true;
+        details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 function buildPrioritySections(items) {
@@ -784,6 +873,8 @@ function buildPrioritySections(items) {
         var section = document.createElement('div');
         section.className = sec.bg + ' border ' + sec.border + ' rounded-2xl overflow-hidden priority-section';
         section.id = sec.id + '-section';
+        section.setAttribute('role', 'region');
+        section.setAttribute('aria-label', t[currentLang][sec.key]);
 
         var header = document.createElement('div');
         header.className = 'px-5 py-3 flex items-center justify-between ' + sec.headerBg;
@@ -819,10 +910,13 @@ function buildPrioritySections(items) {
             var toggleBtn = document.createElement('button');
             toggleBtn.className = 'w-full px-5 py-2 text-xs font-medium ' + sec.headerText + ' hover:bg-white/30 dark:hover:bg-black/10 transition';
             toggleBtn.id = sec.id + '-toggle';
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            toggleBtn.setAttribute('aria-controls', sec.id + '-items');
             toggleBtn.textContent = t[currentLang].showItems + ' (' + sec.items.length + ')';
             toggleBtn.addEventListener('click', function() {
                 var isHidden = itemsList.style.display === 'none';
                 itemsList.style.display = isHidden ? '' : 'none';
+                toggleBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
                 toggleBtn.textContent = (isHidden ? t[currentLang].hideItems : t[currentLang].showItems) + ' (' + sec.items.length + ')';
             });
             section.appendChild(toggleBtn);
@@ -846,6 +940,37 @@ function renderReportCard(data) {
     buildHealthScoreRing(scores.overall);
     buildScorecardTable(scores.categories);
     buildPrioritySections(items);
+
+    // Estimate CTA urgency
+    var redCount = items.filter(function(i) { return i.condition_rating === 'red'; }).length;
+    if (redCount > 0 && data.estimate_token) {
+        var urgencyEl = document.getElementById('estimate-urgency');
+        if (urgencyEl) {
+            urgencyEl.textContent = redCount + (t[currentLang].safetyItemsWarning || ' safety item(s) need attention');
+            urgencyEl.classList.remove('hidden');
+            // Make CTA red when safety items exist
+            var ctaLink = document.getElementById('estimate-link');
+            if (ctaLink) {
+                ctaLink.className = 'block w-full text-center px-6 py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 transition text-lg shadow-lg animate-pulse';
+            }
+        }
+    }
+}
+
+function shareReport() {
+    var url = window.location.href;
+    var title = t[currentLang].inspTitle || 'Vehicle Inspection Report';
+
+    if (navigator.share) {
+        navigator.share({ title: title, url: url }).catch(function() {});
+    } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(function() {
+            var btn = document.getElementById('share-btn');
+            var origText = btn.querySelector('span').textContent;
+            btn.querySelector('span').textContent = t[currentLang].shareCopied || 'Link copied!';
+            setTimeout(function() { btn.querySelector('span').textContent = origText; }, 2000);
+        });
+    }
 }
 
 function showPhoto(url, caption) {
@@ -873,6 +998,7 @@ function buildItemRow(item) {
     var ic = ratingStyles[item.condition_rating] || ratingStyles.green;
     var row = document.createElement('div');
     row.className = 'px-5 py-3';
+    if (item.category) row.dataset.category = item.category;
 
     var topRow = document.createElement('div');
     topRow.className = 'flex items-center justify-between';

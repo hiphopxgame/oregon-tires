@@ -134,7 +134,7 @@
             </div>
 
             <!-- Priority Cost Summary -->
-            <div id="priority-summary" class="hidden grid grid-cols-3 gap-3 mb-6"></div>
+            <div id="priority-summary" class="hidden grid grid-cols-3 gap-3 mb-6" role="region" aria-label="Cost breakdown by priority"></div>
 
             <!-- Line Items -->
             <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden mb-6 shadow-sm">
@@ -505,19 +505,37 @@ function buildPrioritySummary() {
 
 function updatePrioritySummary() {
     var safetyTotal = 0, recommendedTotal = 0, preventiveTotal = 0;
+    var safetyHas = false, recHas = false, prevHas = false;
 
     estimateItems.forEach(function(item) {
-        if (!itemApprovals[item.id]) return;
         var priority = getPriority(item);
+        if (priority === 'safety') safetyHas = true;
+        else if (priority === 'recommended') recHas = true;
+        else prevHas = true;
+
+        if (!itemApprovals[item.id]) return;
         var amount = parseFloat(item.total || 0);
         if (priority === 'safety') safetyTotal += amount;
         else if (priority === 'recommended') recommendedTotal += amount;
         else preventiveTotal += amount;
     });
 
-    var safetyEl = document.getElementById('priority-safety-amount');
-    var recEl = document.getElementById('priority-recommended-amount');
-    var prevEl = document.getElementById('priority-preventive-amount');
+    // Hide boxes for priority levels with zero items (not just zero approved)
+    var safetyBox = document.getElementById('priority-safety-amount');
+    var recBox = document.getElementById('priority-recommended-amount');
+    var prevBox = document.getElementById('priority-preventive-amount');
+    if (safetyBox) safetyBox.parentElement.style.display = safetyHas ? '' : 'none';
+    if (recBox) recBox.parentElement.style.display = recHas ? '' : 'none';
+    if (prevBox) prevBox.parentElement.style.display = prevHas ? '' : 'none';
+
+    // Adjust grid to match visible count
+    var visibleCount = (safetyHas ? 1 : 0) + (recHas ? 1 : 0) + (prevHas ? 1 : 0);
+    var container = document.getElementById('priority-summary');
+    container.className = container.className.replace(/grid-cols-\d/, 'grid-cols-' + visibleCount);
+
+    var safetyEl = safetyBox;
+    var recEl = recBox;
+    var prevEl = prevBox;
 
     if (safetyEl) safetyEl.textContent = formatMoney(safetyTotal);
     if (recEl) recEl.textContent = formatMoney(recommendedTotal);

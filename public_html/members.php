@@ -19,6 +19,11 @@ $pdo = getDB();
 initMemberKit($pdo);
 initEngineKit();
 
+// Set default return URL for login form
+if (!MemberAuth::isMemberLoggedIn() && !isset($_GET['return'])) {
+    $_GET['return'] = '/members';
+}
+
 // Web URL for member-kit CSS/JS assets
 if (!defined('MEMBER_KIT_URL')) {
     define('MEMBER_KIT_URL', '/shared/member-kit');

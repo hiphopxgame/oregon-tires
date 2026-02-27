@@ -67,9 +67,13 @@ $tokenResponse = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 if (curl_errno($ch) || $httpCode !== 200) {
+    $curlErrno = curl_errno($ch);
     error_log("Google OAuth token exchange failed: HTTP {$httpCode}, curl error: " . curl_error($ch) . ", response: {$tokenResponse}");
     curl_close($ch);
-    header('Location: /members?error=' . urlencode('Google sign-in failed. Please try again.'));
+    $msg = in_array($curlErrno, [CURLE_OPERATION_TIMEDOUT, CURLE_COULDNT_CONNECT, CURLE_COULDNT_RESOLVE_HOST])
+        ? 'Google is temporarily unavailable. Please sign in with email/password.'
+        : 'Google sign-in failed. Please try again.';
+    header('Location: /members?error=' . urlencode($msg));
     exit;
 }
 curl_close($ch);
@@ -93,9 +97,13 @@ $profileResponse = curl_exec($ch);
 $profileHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 if (curl_errno($ch) || $profileHttpCode !== 200) {
+    $curlErrno = curl_errno($ch);
     error_log("Google OAuth userinfo failed: HTTP {$profileHttpCode}, response: {$profileResponse}");
     curl_close($ch);
-    header('Location: /members?error=' . urlencode('Could not retrieve your Google profile. Please try again.'));
+    $msg = in_array($curlErrno, [CURLE_OPERATION_TIMEDOUT, CURLE_COULDNT_CONNECT, CURLE_COULDNT_RESOLVE_HOST])
+        ? 'Google is temporarily unavailable. Please sign in with email/password.'
+        : 'Could not retrieve your Google profile. Please try again.';
+    header('Location: /members?error=' . urlencode($msg));
     exit;
 }
 curl_close($ch);
@@ -126,6 +134,12 @@ if (class_exists('MemberAuth')) {
     MemberAuth::startAuthenticatedSession($user);
 }
 
+// Track login method (graceful — column may not exist)
+try {
+    $pdo->prepare('UPDATE members SET last_login_method = ? WHERE id = ?')
+        ->execute(['google', $user['id']]);
+} catch (\Throwable $_) {}
+
 // ── Redirect ────────────────────────────────────────────────────────────────
 $returnUrl = $_SESSION['google_return_url'] ?? '/members';
 unset($_SESSION['google_return_url']);
@@ -150,14 +164,27 @@ function findOrCreateGoogleCustomer(PDO $pdo, array $profile): array
     try {
         $pdo->query('SELECT google_id FROM members LIMIT 0');
         $hasGoogleId = true;
-    } catch (\Throwable $e) {
-        // Column doesn't exist yet — add it
+    } catch (\Throwable $_) {
         try {
             $pdo->exec('ALTER TABLE members ADD COLUMN google_id VARCHAR(255) DEFAULT NULL AFTER email');
             $pdo->exec('ALTER TABLE members ADD INDEX idx_google_id (google_id)');
             $hasGoogleId = true;
         } catch (\Throwable $e2) {
             error_log('Could not add google_id column: ' . $e2->getMessage());
+        }
+    }
+
+    // Check if avatar_url column exists (graceful migration)
+    $hasAvatar = false;
+    try {
+        $pdo->query('SELECT avatar_url FROM members LIMIT 0');
+        $hasAvatar = true;
+    } catch (\Throwable $_) {
+        try {
+            $pdo->exec('ALTER TABLE members ADD COLUMN avatar_url VARCHAR(512) DEFAULT NULL AFTER display_name');
+            $hasAvatar = true;
+        } catch (\Throwable $e2) {
+            error_log('Could not add avatar_url column: ' . $e2->getMessage());
         }
     }
 
@@ -168,8 +195,15 @@ function findOrCreateGoogleCustomer(PDO $pdo, array $profile): array
         $user = $stmt->fetch();
 
         if ($user) {
-            $pdo->prepare('UPDATE members SET avatar_url = COALESCE(?, avatar_url), last_login_at = NOW() WHERE id = ?')
-                ->execute([$avatarUrl ?: null, $user['id']]);
+            $sql = 'UPDATE members SET last_login_at = NOW()';
+            $params = [];
+            if ($hasAvatar && !empty($avatarUrl)) {
+                $sql .= ', avatar_url = COALESCE(?, avatar_url)';
+                $params[] = $avatarUrl;
+            }
+            $sql .= ' WHERE id = ?';
+            $params[] = $user['id'];
+            $pdo->prepare($sql)->execute($params);
             return $user;
         }
     }
@@ -191,7 +225,7 @@ function findOrCreateGoogleCustomer(PDO $pdo, array $profile): array
             $updates[] = 'display_name = COALESCE(display_name, ?)';
             $params[] = $displayName;
         }
-        if (!empty($avatarUrl)) {
+        if ($hasAvatar && !empty($avatarUrl)) {
             $updates[] = 'avatar_url = COALESCE(avatar_url, ?)';
             $params[] = $avatarUrl;
         }
@@ -232,7 +266,7 @@ function findOrCreateGoogleCustomer(PDO $pdo, array $profile): array
         $params[] = $googleId;
     }
 
-    if (!empty($avatarUrl)) {
+    if ($hasAvatar && !empty($avatarUrl)) {
         $cols .= ', avatar_url';
         $vals .= ', ?';
         $params[] = $avatarUrl;
