@@ -256,9 +256,9 @@ function findOrCreateGoogleCustomer(PDO $pdo, array $profile): array
         throw new \RuntimeException('Could not generate unique username');
     }
 
-    $cols = 'email, username, display_name, status, email_verified_at, created_at, last_login_at';
+    $cols = 'email, username, display_name, is_active, email_verified_at, created_at, last_login_at';
     $vals = '?, ?, ?, ?, NOW(), NOW(), NOW()';
-    $params = [$email, $username, $displayName, 'active'];
+    $params = [$email, $username, $displayName, 1];
 
     if ($hasGoogleId) {
         $cols .= ', google_id';

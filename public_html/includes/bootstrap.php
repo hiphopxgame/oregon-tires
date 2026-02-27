@@ -60,6 +60,11 @@ function startSecureSession(): void
     session_start();
 }
 
+// Alias expected by shared member-kit endpoints
+if (!function_exists('initSession')) {
+    function initSession(): void { startSecureSession(); }
+}
+
 // ─── CORS (allow APP_URL and HipHop World network) ──────────────────────────
 $appUrl = $_ENV['APP_URL'] ?? '';
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
