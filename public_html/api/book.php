@@ -459,11 +459,7 @@ try {
         ? $dateObj->format('d/m/Y')
         : $dateObj->format('m/d/Y');
 
-    $timeParts = explode(':', $preferredTime);
-    $hour = (int) $timeParts[0];
-    $suffix = $hour >= 12 ? 'PM' : 'AM';
-    $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-    $displayTime = $displayHour . ':00 ' . $suffix;
+    $displayTime = formatTimeDisplay($preferredTime);
 
     try {
         sendBookingConfirmationEmail(

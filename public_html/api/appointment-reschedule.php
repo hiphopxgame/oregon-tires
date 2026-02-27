@@ -49,11 +49,7 @@ try {
         $dateObj = new \DateTime($appointment['preferred_date']);
         $displayDate = $dateObj->format('m/d/Y');
 
-        $timeParts = explode(':', $appointment['preferred_time']);
-        $hour = (int) $timeParts[0];
-        $suffix = $hour >= 12 ? 'PM' : 'AM';
-        $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-        $displayTime = $displayHour . ':00 ' . $suffix;
+        $displayTime = formatTimeDisplay($appointment['preferred_time']);
 
         jsonSuccess([
             'reference_number' => $appointment['reference_number'],
@@ -189,11 +185,7 @@ try {
         $newDateObj = new \DateTime($newDate);
         $displayNewDate = $customerLang === 'es' ? $newDateObj->format('d/m/Y') : $newDateObj->format('m/d/Y');
 
-        $timeParts = explode(':', $newTime);
-        $hour = (int) $timeParts[0];
-        $suffix = $hour >= 12 ? 'PM' : 'AM';
-        $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-        $displayNewTime = $displayHour . ':00 ' . $suffix;
+        $displayNewTime = formatTimeDisplay($newTime);
 
         $vehicleParts = array_filter([$appointment['vehicle_year'], $appointment['vehicle_make'], $appointment['vehicle_model']]);
         $vehicleInfo = implode(' ', $vehicleParts);
@@ -227,20 +219,12 @@ try {
         // Format previous date/time
         $prevDateObj = new \DateTime($appointment['preferred_date']);
         $prevDisplayDate = $prevDateObj->format('m/d/Y');
-        $prevTimeParts = explode(':', $appointment['preferred_time']);
-        $prevHour = (int) $prevTimeParts[0];
-        $prevSuffix = $prevHour >= 12 ? 'PM' : 'AM';
-        $prevDisplayHour = $prevHour > 12 ? $prevHour - 12 : ($prevHour === 0 ? 12 : $prevHour);
-        $prevDisplayTime = $prevDisplayHour . ':00 ' . $prevSuffix;
+        $prevDisplayTime = formatTimeDisplay($appointment['preferred_time']);
 
         // Format new date/time for owner
         $ownerNewDateObj = new \DateTime($newDate);
         $ownerNewDisplayDate = $ownerNewDateObj->format('m/d/Y');
-        $ownerTimeParts = explode(':', $newTime);
-        $ownerHour = (int) $ownerTimeParts[0];
-        $ownerSuffix = $ownerHour >= 12 ? 'PM' : 'AM';
-        $ownerDisplayHour = $ownerHour > 12 ? $ownerHour - 12 : ($ownerHour === 0 ? 12 : $ownerHour);
-        $ownerNewDisplayTime = $ownerDisplayHour . ':00 ' . $ownerSuffix;
+        $ownerNewDisplayTime = formatTimeDisplay($newTime);
 
         $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 
@@ -277,11 +261,7 @@ HTML;
     // Format response
     $newDateObj = new \DateTime($newDate);
     $responseDateDisplay = $newDateObj->format('m/d/Y');
-    $timeParts = explode(':', $newTime);
-    $hour = (int) $timeParts[0];
-    $suffix = $hour >= 12 ? 'PM' : 'AM';
-    $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-    $responseTimeDisplay = $displayHour . ':00 ' . $suffix;
+    $responseTimeDisplay = formatTimeDisplay($newTime);
 
     jsonSuccess([
         'message'          => 'Appointment rescheduled successfully.',

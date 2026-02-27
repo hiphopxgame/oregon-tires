@@ -108,9 +108,13 @@ try {
                     $empOverrides[(int) $ov['employee_id']] = $ov;
                 }
 
-                // 4) Calculate capacity per hourly slot
+                // 4) Calculate capacity per 15-min slot
                 for ($h = $shopStart; $h <= $shopEnd; $h++) {
-                    $slotCapacity[$h] = 0;
+                    foreach ([0, 15, 30, 45] as $m) {
+                        if ($h === $shopEnd && $m > 0) break;
+                        $key = sprintf('%02d:%02d', $h, $m);
+                        $slotCapacity[$key] = 0;
+                    }
                 }
 
                 foreach ($schedules as $sched) {
@@ -129,10 +133,14 @@ try {
                         $empEnd   = (int) substr($ov['end_time'], 0, 2);
                     }
 
-                    // Add this employee's availability to each hourly slot
+                    // Add this employee's availability to each 15-min slot
                     for ($h = $shopStart; $h <= $shopEnd; $h++) {
-                        if ($h >= $empStart && $h < $empEnd) {
-                            $slotCapacity[$h]++;
+                        foreach ([0, 15, 30, 45] as $m) {
+                            if ($h === $shopEnd && $m > 0) break;
+                            $key = sprintf('%02d:%02d', $h, $m);
+                            if ($h >= $empStart && $h < $empEnd) {
+                                $slotCapacity[$key]++;
+                            }
                         }
                     }
                 }
@@ -150,13 +158,17 @@ try {
         // Return all slots as unavailable
         $allSlots = [];
         for ($h = 7; $h <= 18; $h++) {
-            $time = sprintf('%02d:00', $h);
-            $count = $slotCounts[$time] ?? 0;
-            $allSlots[$time] = [
-                'booked'    => $count,
-                'capacity'  => 0,
-                'available' => false,
-            ];
+            foreach ([0, 15, 30, 45] as $m) {
+                if ($h === 18 && $m > 0) break;
+                $time = sprintf('%02d:%02d', $h, $m);
+                $count = $slotCounts[$time] ?? 0;
+                $allSlots[$time] = [
+                    'booked'    => $count,
+                    'capacity'  => 0,
+                    'available' => false,
+                    'reason'    => 'closed',
+                ];
+            }
         }
 
         jsonSuccess([
@@ -168,15 +180,20 @@ try {
 
     $allSlots = [];
     for ($h = $shopStart; $h <= $shopEnd; $h++) {
-        $time     = sprintf('%02d:00', $h);
-        $count    = $slotCounts[$time] ?? 0;
-        $capacity = $useSchedules ? ($slotCapacity[$h] ?? 0) : $legacyCapacity;
+        foreach ([0, 15, 30, 45] as $m) {
+            if ($h === $shopEnd && $m > 0) break;
+            $time     = sprintf('%02d:%02d', $h, $m);
+            $count    = $slotCounts[$time] ?? 0;
+            $capacity = $useSchedules ? ($slotCapacity[$time] ?? 0) : $legacyCapacity;
+            $available = $capacity > 0 && $count < $capacity;
 
-        $allSlots[$time] = [
-            'booked'    => $count,
-            'capacity'  => $capacity,
-            'available' => $capacity > 0 && $count < $capacity,
-        ];
+            $allSlots[$time] = [
+                'booked'    => $count,
+                'capacity'  => $capacity,
+                'available' => $available,
+                'reason'    => $available ? null : ($capacity === 0 && !$useSchedules ? null : 'full'),
+            ];
+        }
     }
 
     jsonSuccess([

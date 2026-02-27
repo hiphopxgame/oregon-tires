@@ -234,20 +234,15 @@ function buildTimeSlots() {
     for (var h = 7; h <= 18; h++) {
         var ampm = h >= 12 ? 'PM' : 'AM';
         var hour12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
-        var value = (h < 10 ? '0' : '') + h + ':00';
-        var label = hour12 + ':00 ' + ampm;
-        var opt = document.createElement('option');
-        opt.value = value;
-        opt.textContent = label;
-        select.appendChild(opt);
-
-        if (h < 18) {
-            var value30 = (h < 10 ? '0' : '') + h + ':30';
-            var label30 = hour12 + ':30 ' + ampm;
-            var opt30 = document.createElement('option');
-            opt30.value = value30;
-            opt30.textContent = label30;
-            select.appendChild(opt30);
+        var mins = (h === 18) ? [0] : [0, 15, 30, 45];
+        for (var mi = 0; mi < mins.length; mi++) {
+            var m = mins[mi];
+            var value = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+            var label = hour12 + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+            var opt = document.createElement('option');
+            opt.value = value;
+            opt.textContent = label;
+            select.appendChild(opt);
         }
     }
 }

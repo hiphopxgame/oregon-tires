@@ -50,6 +50,7 @@
   background-color: #1A2E1F !important;
   color: #DCE8DD !important;
   border-color: #2D4A33 !important;
+  color-scheme: dark;
 }
 .dark input::placeholder, .dark textarea::placeholder {
   color: #8FAF92 !important;

@@ -77,10 +77,14 @@ function isValidAppointmentDate(string $date): bool
  */
 function isValidTimeSlot(string $time): bool
 {
-    // Accept 24-hour format (HH:MM) from frontend
-    if (preg_match('/^(\d{1,2}):([03]0)$/', $time, $m)) {
+    // Accept 24-hour format (HH:MM) — 15-minute intervals
+    if (preg_match('/^(\d{1,2}):(\d{2})$/', $time, $m)) {
         $h = (int) $m[1];
-        return $h >= 7 && $h <= 18 && !($h === 18 && $m[2] === '30');
+        $min = (int) $m[2];
+        if ($min % 15 !== 0) return false;
+        if ($h < 7 || $h > 18) return false;
+        if ($h === 18 && $min > 0) return false;
+        return true;
     }
 
     // Also accept 12-hour format (H:MM AM/PM) for backwards compatibility
@@ -88,12 +92,25 @@ function isValidTimeSlot(string $time): bool
     for ($h = 7; $h <= 18; $h++) {
         $ampm = $h >= 12 ? 'PM' : 'AM';
         $hour12 = $h > 12 ? $h - 12 : ($h === 0 ? 12 : $h);
-        $validSlots[] = "{$hour12}:00 {$ampm}";
-        if ($h < 18) {
-            $validSlots[] = "{$hour12}:30 {$ampm}";
+        foreach ([0, 15, 30, 45] as $min) {
+            if ($h === 18 && $min > 0) break;
+            $validSlots[] = "{$hour12}:" . str_pad((string) $min, 2, '0', STR_PAD_LEFT) . " {$ampm}";
         }
     }
     return in_array($time, $validSlots, true);
+}
+
+/**
+ * Format a 24-hour time string (HH:MM) for display as 12-hour with AM/PM.
+ */
+function formatTimeDisplay(string $time): string
+{
+    $parts = explode(':', $time);
+    $hour = (int) ($parts[0] ?? 0);
+    $min = $parts[1] ?? '00';
+    $suffix = $hour >= 12 ? 'PM' : 'AM';
+    $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
+    return $displayHour . ':' . $min . ' ' . $suffix;
 }
 
 /**

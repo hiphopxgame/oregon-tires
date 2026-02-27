@@ -51,11 +51,7 @@ try {
         $displayDate = $dateObj->format('m/d/Y');
 
         // Format time
-        $timeParts = explode(':', $appointment['preferred_time']);
-        $hour = (int) $timeParts[0];
-        $suffix = $hour >= 12 ? 'PM' : 'AM';
-        $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-        $displayTime = $displayHour . ':00 ' . $suffix;
+        $displayTime = formatTimeDisplay($appointment['preferred_time']);
 
         jsonSuccess([
             'reference_number' => $appointment['reference_number'],
@@ -137,11 +133,7 @@ try {
         $customerLang = ($appointment['language'] ?? 'english') === 'spanish' ? 'es' : 'en';
         $displayDate = $customerLang === 'es' ? $dateObj->format('d/m/Y') : $dateObj->format('m/d/Y');
 
-        $timeParts = explode(':', $appointment['preferred_time']);
-        $hour = (int) $timeParts[0];
-        $suffix = $hour >= 12 ? 'PM' : 'AM';
-        $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-        $displayTime = $displayHour . ':00 ' . $suffix;
+        $displayTime = formatTimeDisplay($appointment['preferred_time']);
 
         $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
 
@@ -200,11 +192,7 @@ HTML;
         $dateObj = new \DateTime($appointment['preferred_date']);
         $displayDate = $dateObj->format('m/d/Y');
 
-        $timeParts = explode(':', $appointment['preferred_time']);
-        $hour = (int) $timeParts[0];
-        $suffix = $hour >= 12 ? 'PM' : 'AM';
-        $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-        $displayTime = $displayHour . ':00 ' . $suffix;
+        $displayTime = formatTimeDisplay($appointment['preferred_time']);
 
         $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 

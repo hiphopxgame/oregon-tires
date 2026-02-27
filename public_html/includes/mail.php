@@ -753,11 +753,7 @@ function sendAppointmentReminderEmail(array $appointment): bool
         : $dateObj->format('m/d/Y');
 
     // Format time for display
-    $timeParts = explode(':', $appointment['preferred_time']);
-    $hour = (int) $timeParts[0];
-    $suffix = $hour >= 12 ? 'PM' : 'AM';
-    $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-    $displayTime = $displayHour . ':00 ' . $suffix;
+    $displayTime = formatTimeDisplay($appointment['preferred_time']);
 
     // Reference number = appointment ID zero-padded
     $referenceNumber = str_pad((string) $appointment['id'], 5, '0', STR_PAD_LEFT);
@@ -858,11 +854,7 @@ function sendBookingOwnerNotification(
     $serviceDisplay = ucwords(str_replace('-', ' ', $service));
 
     // Format time for display
-    $timeParts = explode(':', $preferredTime);
-    $hour = (int) $timeParts[0];
-    $suffix = $hour >= 12 ? 'PM' : 'AM';
-    $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-    $displayTime = $displayHour . ':00 ' . $suffix;
+    $displayTime = formatTimeDisplay($preferredTime);
 
     $vars = [
         'appointment_id'   => $appointmentId,
@@ -994,11 +986,7 @@ function sendReviewRequestEmail(array $appt): bool
         : $dateObj->format('m/d/Y');
 
     // Format time for display
-    $timeParts   = explode(':', $appt['preferred_time']);
-    $hour        = (int) $timeParts[0];
-    $suffix      = $hour >= 12 ? 'PM' : 'AM';
-    $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-    $displayTime = $displayHour . ':00 ' . $suffix;
+    $displayTime = formatTimeDisplay($appt['preferred_time']);
 
     $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 

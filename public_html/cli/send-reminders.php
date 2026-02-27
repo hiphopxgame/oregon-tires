@@ -86,11 +86,7 @@ try {
                 $serviceDisplay = ucwords(str_replace('-', ' ', $appt['service']));
 
                 // Format time for SMS
-                $timeParts = explode(':', $appt['preferred_time']);
-                $hour = (int) $timeParts[0];
-                $suffix = $hour >= 12 ? 'PM' : 'AM';
-                $displayHour = $hour > 12 ? $hour - 12 : ($hour === 0 ? 12 : $hour);
-                $smsTime = $displayHour . ':00 ' . $suffix;
+                $smsTime = formatTimeDisplay($appt['preferred_time']);
 
                 $apptLang = ($appt['language'] ?? 'english') === 'spanish' ? 'es' : 'en';
 
