@@ -47,9 +47,37 @@ function initMemberKit(PDO $pdo): void
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
 
-    MemberAuth::onLogin(function (array $member): void {
+    MemberAuth::onLogin(function (array $member) use ($pdo): void {
         $_SESSION['member_email'] = $member['email'] ?? '';
         $_SESSION['is_customer']  = true;
+
+        // Cross-DB: check if this user is a HW super admin
+        $email = $member['email'] ?? '';
+        if ($email !== '') {
+            try {
+                $hwDb = $_ENV['HW_DB_NAME'] ?? 'hiphopwo_rld_system';
+                $stmt = $pdo->prepare("SELECT 1 FROM {$hwDb}.users WHERE email = ? AND is_admin = 1 AND disabled_at IS NULL LIMIT 1");
+                $stmt->execute([$email]);
+                if ($stmt->fetch()) {
+                    // Sync is_admin flag to local members table
+                    $pdo->prepare('UPDATE members SET is_admin = 1 WHERE id = ?')
+                        ->execute([$member['id']]);
+
+                    // Set member-kit super admin session
+                    $_SESSION['is_super_admin'] = true;
+
+                    // Bridge: set Oregon Tires admin session keys so /admin/ works
+                    $_SESSION['admin_id']       = (int) $member['id'];
+                    $_SESSION['admin_email']    = $email;
+                    $_SESSION['admin_role']     = 'super_admin';
+                    $_SESSION['admin_name']     = $member['display_name'] ?? $member['username'] ?? $email;
+                    $_SESSION['admin_language'] = 'both';
+                    $_SESSION['login_time']     = time();
+                }
+            } catch (\Throwable $e) {
+                error_log('HW super admin check failed: ' . $e->getMessage());
+            }
+        }
 
         // Cross-site activity reporting (fire-and-forget)
         if (!empty($member['hw_user_id']) && class_exists('MemberSync')) {
