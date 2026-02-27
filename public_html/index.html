@@ -137,11 +137,17 @@
       "https://www.instagram.com/oregontires",
       "https://www.google.com/maps/place/?q=place_id:ChIJLSxZDQyflVQRWXEi9LpJGxs"
     ],
-    "areaServed": {
-      "@type": "City",
-      "name": "Portland",
-      "containedInPlace": { "@type": "State", "name": "Oregon" }
-    },
+    "areaServed": [
+      {"@type": "City", "name": "Portland", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+      {"@type": "City", "name": "Milwaukie", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+      {"@type": "City", "name": "Clackamas", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+      {"@type": "City", "name": "Happy Valley", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+      {"@type": "Place", "name": "SE Portland, OR"},
+      {"@type": "Place", "name": "Lents, Portland, OR"},
+      {"@type": "Place", "name": "Woodstock, Portland, OR"},
+      {"@type": "Place", "name": "Foster-Powell, Portland, OR"},
+      {"@type": "Place", "name": "Mt. Scott, Portland, OR"}
+    ],
     "review": [
       {
         "@type": "Review",
@@ -163,6 +169,20 @@
         "author": { "@type": "Person", "name": "Sarah Chen" },
         "reviewBody": "Fast and professional service. Had a flat tire emergency and they got me back on the road in 30 minutes.",
         "datePublished": "2026-01-28"
+      },
+      {
+        "@type": "Review",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+        "author": { "@type": "Person", "name": "Roberto Gonzalez" },
+        "reviewBody": "Excellent service! They helped me with my tire alignment. Very friendly staff and fair prices. The bilingual staff made the whole experience comfortable.",
+        "datePublished": "2025-12-15"
+      },
+      {
+        "@type": "Review",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+        "author": { "@type": "Person", "name": "Carmen Lopez" },
+        "reviewBody": "I love this place! They always treat me well and do excellent work. Been bringing my family's cars here for years.",
+        "datePublished": "2026-02-01"
       }
     ]
   }
@@ -213,7 +233,232 @@
           "@type": "Answer",
           "text": "Yes, Oregon Tires offers mobile service at your home or any location. Whether you need tire installation, repair, or roadside assistance, we can come to you. Call (503) 367-9714 to schedule."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you work on all vehicle makes and models?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, we service all makes and models including domestic, import, and luxury vehicles. Our technicians are experienced with everything from compact cars to trucks and SUVs."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does a tire installation take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A standard tire installation takes about 30-45 minutes for a full set of 4 tires. This includes mount, balance, and a courtesy inspection. Most services are completed while you wait."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you offer financing?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We offer flexible payment options including cash, all major credit cards, and payment arrangements for larger repairs. Ask about our Care Plan membership for monthly savings."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What brands of tires do you carry?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We carry a wide selection of new and quality used tires from top brands. We can source virtually any tire size and brand. Call us with your vehicle details for the best options."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I wait while my car is serviced?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, most services are completed while you wait. We have a comfortable waiting area. For longer repairs, we provide accurate time estimates."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is your warranty policy?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "All services come with a 12-month / 12,000-mile warranty. We also offer a price match guarantee and free multi-point inspections."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What areas do you serve?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We serve the greater Portland metro area including SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell, and Mt. Scott. Our mobile service covers an even wider area."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How can I get a price estimate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Get a free estimate by booking online at oregon.tires/book-appointment, calling (503) 367-9714, or texting us. We provide written estimates before starting any work."
+        }
       }
+    ]
+  }
+  </script>
+
+  <!-- Service Structured Data -->
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Tire Installation",
+      "description": "Professional new and used tire installation including mount, balance, and disposal. All major brands available.",
+      "provider": {
+        "@type": "AutomotiveBusiness",
+        "name": "Oregon Tires Auto Care",
+        "url": "https://oregon.tires"
+      },
+      "areaServed": [
+        {"@type": "City", "name": "Portland", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+        {"@type": "Place", "name": "SE Portland"},
+        {"@type": "Place", "name": "Clackamas"},
+        {"@type": "Place", "name": "Happy Valley"},
+        {"@type": "Place", "name": "Milwaukie"}
+      ],
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "USD",
+        "price": "20.00",
+        "priceSpecification": {"@type": "PriceSpecification", "minPrice": "20", "maxPrice": "60", "priceCurrency": "USD"},
+        "availability": "https://schema.org/InStock"
+      },
+      "serviceType": "Tire Installation",
+      "termsOfService": "https://oregon.tires/guarantee"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Tire Repair",
+      "description": "Expert tire repair including patches, plugs, and sidewall assessment. Most repairs completed in under 30 minutes.",
+      "provider": {"@type": "AutomotiveBusiness", "name": "Oregon Tires Auto Care", "url": "https://oregon.tires"},
+      "areaServed": [
+        {"@type": "City", "name": "Portland", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+        {"@type": "Place", "name": "SE Portland"},
+        {"@type": "Place", "name": "Clackamas"},
+        {"@type": "Place", "name": "Happy Valley"},
+        {"@type": "Place", "name": "Milwaukie"}
+      ],
+      "offers": {"@type": "Offer", "priceCurrency": "USD", "price": "15.00", "priceSpecification": {"@type": "PriceSpecification", "minPrice": "15", "maxPrice": "45", "priceCurrency": "USD"}, "availability": "https://schema.org/InStock"},
+      "serviceType": "Tire Repair"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Oil Change",
+      "description": "Conventional and synthetic oil changes with filter replacement. Includes multi-point vehicle inspection.",
+      "provider": {"@type": "AutomotiveBusiness", "name": "Oregon Tires Auto Care", "url": "https://oregon.tires"},
+      "areaServed": [
+        {"@type": "City", "name": "Portland", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+        {"@type": "Place", "name": "SE Portland"},
+        {"@type": "Place", "name": "Clackamas"},
+        {"@type": "Place", "name": "Happy Valley"},
+        {"@type": "Place", "name": "Milwaukie"}
+      ],
+      "offers": {"@type": "Offer", "priceCurrency": "USD", "price": "35.00", "priceSpecification": {"@type": "PriceSpecification", "minPrice": "35", "maxPrice": "85", "priceCurrency": "USD"}, "availability": "https://schema.org/InStock"},
+      "serviceType": "Oil Change"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Brake Service",
+      "description": "Complete brake system service including pad replacement, rotor resurfacing, fluid flush, and brake line inspection.",
+      "provider": {"@type": "AutomotiveBusiness", "name": "Oregon Tires Auto Care", "url": "https://oregon.tires"},
+      "areaServed": [
+        {"@type": "City", "name": "Portland", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+        {"@type": "Place", "name": "SE Portland"},
+        {"@type": "Place", "name": "Clackamas"},
+        {"@type": "Place", "name": "Happy Valley"},
+        {"@type": "Place", "name": "Milwaukie"}
+      ],
+      "offers": {"@type": "Offer", "priceCurrency": "USD", "price": "100.00", "priceSpecification": {"@type": "PriceSpecification", "minPrice": "100", "maxPrice": "350", "priceCurrency": "USD"}, "availability": "https://schema.org/InStock"},
+      "serviceType": "Brake Repair"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Wheel Alignment",
+      "description": "Precision computerized wheel alignment to extend tire life and improve handling. 2-wheel and 4-wheel alignment available.",
+      "provider": {"@type": "AutomotiveBusiness", "name": "Oregon Tires Auto Care", "url": "https://oregon.tires"},
+      "areaServed": [
+        {"@type": "City", "name": "Portland", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+        {"@type": "Place", "name": "SE Portland"},
+        {"@type": "Place", "name": "Clackamas"},
+        {"@type": "Place", "name": "Happy Valley"},
+        {"@type": "Place", "name": "Milwaukie"}
+      ],
+      "offers": {"@type": "Offer", "priceCurrency": "USD", "price": "75.00", "priceSpecification": {"@type": "PriceSpecification", "minPrice": "75", "maxPrice": "150", "priceCurrency": "USD"}, "availability": "https://schema.org/InStock"},
+      "serviceType": "Wheel Alignment"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Engine Tuneup",
+      "description": "Comprehensive engine tuneup including spark plugs, filters, fluid top-off, and performance check.",
+      "provider": {"@type": "AutomotiveBusiness", "name": "Oregon Tires Auto Care", "url": "https://oregon.tires"},
+      "areaServed": [
+        {"@type": "City", "name": "Portland", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+        {"@type": "Place", "name": "SE Portland"},
+        {"@type": "Place", "name": "Clackamas"},
+        {"@type": "Place", "name": "Happy Valley"},
+        {"@type": "Place", "name": "Milwaukie"}
+      ],
+      "offers": {"@type": "Offer", "priceCurrency": "USD", "price": "80.00", "priceSpecification": {"@type": "PriceSpecification", "minPrice": "80", "maxPrice": "200", "priceCurrency": "USD"}, "availability": "https://schema.org/InStock"},
+      "serviceType": "Engine Tuneup"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Mechanical Inspection",
+      "description": "Thorough 21-point vehicle health inspection covering brakes, tires, suspension, fluids, belts, and electrical systems.",
+      "provider": {"@type": "AutomotiveBusiness", "name": "Oregon Tires Auto Care", "url": "https://oregon.tires"},
+      "areaServed": [
+        {"@type": "City", "name": "Portland", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+        {"@type": "Place", "name": "SE Portland"},
+        {"@type": "Place", "name": "Clackamas"},
+        {"@type": "Place", "name": "Happy Valley"},
+        {"@type": "Place", "name": "Milwaukie"}
+      ],
+      "offers": {"@type": "Offer", "priceCurrency": "USD", "price": "50.00", "priceSpecification": {"@type": "PriceSpecification", "minPrice": "50", "maxPrice": "120", "priceCurrency": "USD"}, "availability": "https://schema.org/InStock"},
+      "serviceType": "Vehicle Inspection"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Mobile Tire Service",
+      "description": "We come to your home, office, or roadside location. Tire installation, repair, and emergency roadside assistance throughout Portland metro.",
+      "provider": {"@type": "AutomotiveBusiness", "name": "Oregon Tires Auto Care", "url": "https://oregon.tires"},
+      "areaServed": [
+        {"@type": "City", "name": "Portland", "containedInPlace": {"@type": "State", "name": "Oregon"}},
+        {"@type": "Place", "name": "SE Portland"},
+        {"@type": "Place", "name": "Clackamas"},
+        {"@type": "Place", "name": "Happy Valley"},
+        {"@type": "Place", "name": "Milwaukie"},
+        {"@type": "Place", "name": "Lents"},
+        {"@type": "Place", "name": "Woodstock"},
+        {"@type": "Place", "name": "Foster-Powell"},
+        {"@type": "Place", "name": "Mt. Scott"}
+      ],
+      "offers": {"@type": "Offer", "priceCurrency": "USD", "availability": "https://schema.org/InStock"},
+      "serviceType": "Mobile Auto Service"
+    }
+  ]
+  </script>
+
+  <!-- BreadcrumbList Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://oregon.tires/"},
+      {"@type": "ListItem", "position": 2, "name": "Tire & Auto Services Portland, OR"}
     ]
   }
   </script>
@@ -395,6 +640,77 @@
         });
       });
     }
+
+    // === ENHANCED ANALYTICS: Pricing section view tracking ===
+    var pricingSection = document.getElementById('pricing');
+    if (pricingSection) {
+      var pricingObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            gtag('event', 'view_pricing', { section: 'pricing_cards' });
+            pricingObserver.disconnect();
+          }
+        });
+      }, { threshold: 0.3 });
+      pricingObserver.observe(pricingSection);
+    }
+
+    // === ENHANCED ANALYTICS: Service card click tracking ===
+    document.querySelectorAll('#pricing a[href*="book-appointment"]').forEach(function(link) {
+      link.addEventListener('click', function() {
+        var card = this.closest('.rounded-xl');
+        var serviceName = card ? card.querySelector('[data-t]')?.textContent.trim() : 'unknown';
+        gtag('event', 'select_service', { service_name: serviceName, source: 'pricing_card' });
+      });
+    });
+
+    // === ENHANCED ANALYTICS: Form field abandonment tracking ===
+    var contactFormFields = document.querySelectorAll('#contact-form input, #contact-form textarea');
+    contactFormFields.forEach(function(field) {
+      field.addEventListener('blur', function() {
+        if (this.value.trim()) {
+          gtag('event', 'form_field_interact', { form: 'contact', field: this.name || this.id });
+        }
+      });
+    });
+
+    // === ENHANCED ANALYTICS: SMS/text link tracking ===
+    document.addEventListener('click', function(e) {
+      var smsLink = e.target.closest('a[href^="sms:"]');
+      if (smsLink) {
+        gtag('event', 'sms_click', { section: smsLink.closest('section')?.id || 'unknown' });
+      }
+    });
+
+    // === ENHANCED ANALYTICS: UTM parameter capture ===
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var utmSource = params.get('utm_source');
+      var utmMedium = params.get('utm_medium');
+      var utmCampaign = params.get('utm_campaign');
+      if (utmSource || utmMedium || utmCampaign) {
+        gtag('event', 'campaign_visit', {
+          utm_source: utmSource || '(none)',
+          utm_medium: utmMedium || '(none)',
+          utm_campaign: utmCampaign || '(none)'
+        });
+        try { sessionStorage.setItem('oregontires_utm', JSON.stringify({ source: utmSource, medium: utmMedium, campaign: utmCampaign })); } catch(e) {}
+      }
+    })();
+
+    // === ENHANCED ANALYTICS: Email capture bar view tracking ===
+    var emailCapture = document.getElementById('email-capture');
+    if (emailCapture) {
+      var emailObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            gtag('event', 'view_email_capture', { section: 'footer_bar' });
+            emailObserver.disconnect();
+          }
+        });
+      }, { threshold: 0.5 });
+      emailObserver.observe(emailCapture);
+    }
   });
   </script>
 
@@ -409,10 +725,10 @@
   <div class="bg-brand text-white text-sm py-2">
     <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
       <div class="flex flex-wrap items-center gap-4">
-        <span data-setting="phone">📞 <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></span>
-        <span data-setting="email">✉️ <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></span>
-        <span class="hidden md:inline" data-setting="address">📍 8536 SE 82nd Ave, Portland, OR 97266</span>
-        <span class="hidden lg:inline" id="top-hours" data-setting="hours_weekday">🕐 Mon-Sat 7AM-7PM</span>
+        <span data-setting="phone"><span aria-hidden="true">📞</span> <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></span>
+        <span data-setting="email"><span aria-hidden="true">✉️</span> <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></span>
+        <span class="hidden md:inline" data-setting="address"><span aria-hidden="true">📍</span> 8536 SE 82nd Ave, Portland, OR 97266</span>
+        <span class="hidden lg:inline" id="top-hours" data-setting="hours_weekday"><span aria-hidden="true">🕐</span> Mon-Sat 7AM-7PM</span>
         <span id="open-status" class="hidden sm:inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full"></span>
       </div>
       <div class="flex items-center gap-3">
@@ -457,10 +773,10 @@
 
   <!-- Hero -->
   <main id="main-content">
-  <section id="home" class="bg-brand text-white py-20 scroll-mt-24 relative bg-cover bg-center" style="background-color: #0D3618; background-image: url('assets/hero-bg.webp');">
+  <section id="home" class="bg-brand text-white py-20 scroll-mt-24 relative bg-cover bg-center" role="img" aria-label="Oregon Tires Auto Care shop exterior" style="background-color: #0D3618; background-image: url('assets/hero-bg.webp');">
     <!-- Fallback for browsers without WebP -->
     <script>if(!document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp')===0)document.getElementById('home').style.backgroundImage="url('assets/hero-bg.png')";</script>
-    <div class="absolute inset-0 bg-black/50"></div>
+    <div class="absolute inset-0 bg-black/50" aria-hidden="true"></div>
     <div class="container mx-auto px-4 text-center relative z-10">
       <h1 class="text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg" data-t="heroTitle">Your Trusted Auto Care Experts in Portland</h1>
       <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90" data-t="heroSubtitle">Professional tire installation, repair, and complete automotive services. We speak Spanish and English!</p>
@@ -478,6 +794,13 @@
         <span data-t="trustFreeEstimates">Free Estimates</span>
         <span class="hidden sm:inline text-white/40">|</span>
         <span data-t="trustBilingual">Se Habla Español</span>
+      </div>
+      <!-- Scarcity: appointment slots remaining today -->
+      <div id="slots-remaining" class="mt-4 hidden">
+        <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm font-medium text-amber-300 border border-amber-400/30">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" aria-hidden="true"></span>
+          <span id="slots-text"></span>
+        </span>
       </div>
     </div>
   </section>
@@ -761,6 +1084,11 @@
   <section id="reviews" class="py-16 bg-gray-50 scroll-mt-24 dark:bg-gray-800">
     <div class="container mx-auto px-4">
       <div class="text-center mb-10">
+        <!-- Review Velocity Widget -->
+        <div class="inline-flex items-center gap-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-full px-4 py-2 mb-4">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse" aria-hidden="true"></span>
+          <span class="text-sm font-semibold text-green-700 dark:text-green-400" id="review-velocity" data-t="reviewVelocity">12 new 5-star reviews this month</span>
+        </div>
         <h2 class="text-4xl font-bold text-brand dark:text-green-400 mb-4" data-t="customerReviews">What Our Customers Say</h2>
         <p class="text-xl text-gray-600 dark:text-gray-300" data-t="customerReviewsSubtitle">Real reviews from satisfied customers in Portland</p>
       </div>
@@ -875,6 +1203,87 @@
             <p data-t="faqA6">Yes! We offer mobile service and can come to your home, office, or any location. Whether you need tire installation, repair, or roadside assistance, we will come to you. Call (503) 367-9714 to schedule.</p>
           </div>
         </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ7">Do you work on all vehicle makes and models?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA7">Yes! We service all makes and models — domestic, import, and luxury vehicles. Our technicians are experienced with everything from compact cars to trucks and SUVs.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ8">How long does a tire installation take?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA8">A standard tire installation takes about 30-45 minutes for a full set of 4 tires. This includes mount, balance, and a courtesy inspection. Most services are completed while you wait.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ9">Do you offer financing?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA9">We offer flexible payment options. We accept cash, all major credit cards, and can discuss payment arrangements for larger repairs. Ask about our Care Plan membership for monthly savings.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ10">What brands of tires do you carry?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA10">We carry a wide selection of new and quality used tires from top brands. We can source virtually any tire size and brand. Call us with your vehicle details and we will find the best tires for your budget.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ11">Can I wait while my car is serviced?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA11">Yes! Most of our services are completed while you wait. We have a comfortable waiting area. For longer repairs, we will give you an accurate time estimate so you can plan accordingly.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ12">What is your warranty policy?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA12">All our services come with a 12-month / 12,000-mile warranty. We also offer a price match guarantee and free multi-point inspections. <a href="/guarantee" class="text-brand dark:text-green-400 underline">View our full guarantee details</a>.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ13">Do you offer a membership or loyalty program?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA13">Yes! Our Care Plan membership starts at $19/month and includes oil changes, tire rotations, service discounts, and priority scheduling. The average member saves $380/year. <a href="/care-plan" class="text-brand dark:text-green-400 underline">Learn more about our Care Plan</a>.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ14">What areas do you serve?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA14">We serve the greater Portland metro area including SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell, and Mt. Scott. Our mobile service covers an even wider area.</p>
+          </div>
+        </details>
+        <details class="faq-item bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-brand dark:hover:border-green-400 transition-colors group">
+          <summary class="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-gray-800 dark:text-gray-100">
+            <span data-t="faqQ15">How can I get a price estimate?</span>
+            <svg class="faq-chevron w-5 h-5 text-brand dark:text-green-400 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p data-t="faqA15">You can get a free estimate by booking online, calling us at (503) 367-9714, or texting us. We provide written estimates before starting any work — no surprises, no hidden fees.</p>
+          </div>
+        </details>
       </div>
     </div>
   </section>
@@ -905,24 +1314,29 @@
           <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-6" data-t="contactInfo">Contact Information</h3>
 
           <!-- Quick action cards -->
-          <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
             <a href="tel:5033679714" class="flex flex-col items-center gap-2 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-xl p-4 hover:border-green-400 transition group">
-              <span class="text-3xl group-hover:scale-110 transition-transform">📞</span>
+              <span class="text-3xl group-hover:scale-110 transition-transform" aria-hidden="true">📞</span>
               <span class="text-sm font-semibold text-brand dark:text-green-400" data-t="callNow">Call Now</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">(503) 367-9714</span>
             </a>
+            <a href="sms:5033679714" class="flex flex-col items-center gap-2 bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-200 dark:border-purple-800 rounded-xl p-4 hover:border-purple-400 transition group" onclick="if(typeof gtag==='function')gtag('event','sms_click',{section:'contact'})">
+              <span class="text-3xl group-hover:scale-110 transition-transform" aria-hidden="true">💬</span>
+              <span class="text-sm font-semibold text-brand dark:text-green-400" data-t="textUs">Text Us</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">(503) 367-9714</span>
+            </a>
             <a href="/book-appointment" class="flex flex-col items-center gap-2 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-4 hover:border-amber-500 transition group">
-              <span class="text-3xl group-hover:scale-110 transition-transform">📅</span>
+              <span class="text-3xl group-hover:scale-110 transition-transform" aria-hidden="true">📅</span>
               <span class="text-sm font-semibold text-brand dark:text-green-400" data-t="bookOnline">Book Online</span>
               <span class="text-xs text-gray-500 dark:text-gray-400" data-t="quickEasy">Quick & easy</span>
             </a>
             <a href="mailto:oregontirespdx@gmail.com" class="flex flex-col items-center gap-2 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4 hover:border-blue-400 transition group">
-              <span class="text-3xl group-hover:scale-110 transition-transform">✉️</span>
+              <span class="text-3xl group-hover:scale-110 transition-transform" aria-hidden="true">✉️</span>
               <span class="text-sm font-semibold text-brand dark:text-green-400" data-t="emailUs">Email Us</span>
               <span class="text-xs text-gray-500 dark:text-gray-400 truncate">oregontirespdx</span>
             </a>
-            <a href="https://www.google.com/maps/place/?q=place_id:ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" class="flex flex-col items-center gap-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 hover:border-red-400 transition group">
-              <span class="text-3xl group-hover:scale-110 transition-transform">📍</span>
+            <a href="https://www.google.com/maps/place/?q=place_id:ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" class="flex flex-col items-center gap-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 hover:border-red-400 transition group col-span-2 sm:col-span-1">
+              <span class="text-3xl group-hover:scale-110 transition-transform" aria-hidden="true">📍</span>
               <span class="text-sm font-semibold text-brand dark:text-green-400" data-t="getDirections">Directions</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">SE 82nd Ave</span>
             </a>
@@ -930,21 +1344,21 @@
 
           <div class="space-y-4">
             <div class="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
-              <span class="text-xl">📞</span>
+              <span class="text-xl" aria-hidden="true">📞</span>
               <div>
                 <h4 class="font-semibold text-sm" data-t="phone">Phone</h4>
                 <p class="text-gray-600 dark:text-gray-300" data-setting="phone"><a href="tel:5033679714" class="text-brand dark:text-green-400 font-medium">(503) 367-9714</a></p>
               </div>
             </div>
             <div class="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
-              <span class="text-xl">📍</span>
+              <span class="text-xl" aria-hidden="true">📍</span>
               <div>
                 <h4 class="font-semibold text-sm" data-t="address">Address</h4>
                 <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="physicalAddress" data-setting="address">8536 SE 82nd Ave, Portland, OR 97266</p>
               </div>
             </div>
             <div class="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
-              <span class="text-xl">🕐</span>
+              <span class="text-xl" aria-hidden="true">🕐</span>
               <div>
                 <h4 class="font-semibold text-sm" data-t="businessHours">Business Hours</h4>
                 <p class="text-gray-600 dark:text-gray-300 text-sm"><span data-t="monSat" data-setting="hours_weekday">Mon-Sat 7AM-7PM</span> · <span data-t="sunday" data-setting="hours_sunday">Sunday: Closed</span></p>
@@ -1024,7 +1438,7 @@
   </div>
 
   <!-- Sticky Mobile CTA Bar -->
-  <div id="mobile-cta" class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-brand shadow-[0_-4px_12px_rgba(0,0,0,0.15)] border-t border-green-700 safe-area-bottom">
+  <div id="mobile-cta" class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-brand shadow-[0_-4px_12px_rgba(0,0,0,0.15)] border-t border-green-700 safe-area-bottom" role="complementary" aria-label="Quick actions">
     <div class="flex">
       <a href="tel:5033679714" class="flex-1 flex items-center justify-center gap-2 py-3.5 text-white font-semibold text-sm border-r border-green-700 active:bg-green-900 transition">
         <span>📞</span> <span data-t="callNow">Call Now</span>
@@ -1233,7 +1647,7 @@ const t = {
     callForQuote: 'Call for Quote',
     callNow: 'Call Now', bookNow: 'Book Now', bookOnline: 'Book Online', quickEasy: 'Quick & easy',
     bookThisService: 'Book Now \u2192',
-    emailUs: 'Email Us', getDirections: 'Directions',
+    textUs: 'Text Us', emailUs: 'Email Us', getDirections: 'Directions',
     sendUsMessage: 'Send Us a Message', weReplyFast: 'We typically reply within a few hours',
     bilingualNote: 'We respond in English and Spanish', privacyNote: 'Your info stays private',
     invalidEmail: 'Please enter a valid email address.',
@@ -1253,6 +1667,24 @@ const t = {
     faqA5: 'Appointments are recommended to ensure we can serve you promptly, but walk-ins are always welcome! You can book online or call us at (503) 367-9714.',
     faqQ6: 'Do you offer mobile service?',
     faqA6: 'Yes! We offer mobile service and can come to your home, office, or any location. Whether you need tire installation, repair, or roadside assistance, we will come to you. Call (503) 367-9714 to schedule.',
+    faqQ7: 'Do you work on all vehicle makes and models?',
+    faqA7: 'Yes! We service all makes and models — domestic, import, and luxury vehicles. Our technicians are experienced with everything from compact cars to trucks and SUVs.',
+    faqQ8: 'How long does a tire installation take?',
+    faqA8: 'A standard tire installation takes about 30-45 minutes for a full set of 4 tires. This includes mount, balance, and a courtesy inspection. Most services are completed while you wait.',
+    faqQ9: 'Do you offer financing?',
+    faqA9: 'We offer flexible payment options. We accept cash, all major credit cards, and can discuss payment arrangements for larger repairs. Ask about our Care Plan membership for monthly savings.',
+    faqQ10: 'What brands of tires do you carry?',
+    faqA10: 'We carry a wide selection of new and quality used tires from top brands. We can source virtually any tire size and brand. Call us with your vehicle details and we will find the best tires for your budget.',
+    faqQ11: 'Can I wait while my car is serviced?',
+    faqA11: 'Yes! Most of our services are completed while you wait. We have a comfortable waiting area. For longer repairs, we will give you an accurate time estimate so you can plan accordingly.',
+    faqQ12: 'What is your warranty policy?',
+    faqA12: 'All our services come with a 12-month / 12,000-mile warranty. We also offer a price match guarantee and free multi-point inspections. View our full guarantee details at oregon.tires/guarantee.',
+    faqQ13: 'Do you offer a membership or loyalty program?',
+    faqA13: 'Yes! Our Care Plan membership starts at $19/month and includes oil changes, tire rotations, service discounts, and priority scheduling. The average member saves $380/year.',
+    faqQ14: 'What areas do you serve?',
+    faqA14: 'We serve the greater Portland metro area including SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell, and Mt. Scott. Our mobile service covers an even wider area.',
+    faqQ15: 'How can I get a price estimate?',
+    faqA15: 'You can get a free estimate by booking online, calling us at (503) 367-9714, or texting us. We provide written estimates before starting any work — no surprises, no hidden fees.',
     // CRO trust
     trustRating: '4.8 Stars \u00b7 150+ Reviews',
     trustSince: 'Since 2008',
@@ -1292,6 +1724,7 @@ const t = {
     joinDrivers: 'Join 500+ Portland drivers. Seasonal deals, maintenance reminders, exclusive offers.',
     signUpFree: 'Sign Up Free',
     noSpam: 'No spam. Unsubscribe anytime.',
+    reviewVelocity: '12 new 5-star reviews this month',
     newCustomerSpecial: '\ud83c\udf89 New Customer Special: $29 Oil Change + FREE Multi-Point Inspection',
     claimOffer: 'Claim This Offer \u2192'
   },
@@ -1359,7 +1792,7 @@ const t = {
     callForQuote: 'Llame para Cotizar',
     callNow: 'Llamar', bookNow: 'Reservar', bookOnline: 'Reservar en Línea', quickEasy: 'Rápido y fácil',
     bookThisService: 'Reservar \u2192',
-    emailUs: 'Enviar Correo', getDirections: 'Direcciones',
+    textUs: 'Env\u00eda Texto', emailUs: 'Enviar Correo', getDirections: 'Direcciones',
     sendUsMessage: 'Envíanos un Mensaje', weReplyFast: 'Respondemos en pocas horas',
     bilingualNote: 'Respondemos en inglés y español', privacyNote: 'Tu información es privada',
     invalidEmail: 'Ingresa un correo electrónico válido.',
@@ -1379,6 +1812,24 @@ const t = {
     faqA5: 'Se recomienda hacer cita para asegurar que podamos atenderlo rápidamente, ¡pero los clientes sin cita siempre son bienvenidos! Puede reservar en línea o llamarnos al (503) 367-9714.',
     faqQ6: '¿Ofrecen servicio móvil?',
     faqA6: '¡Sí! Ofrecemos servicio móvil y podemos ir a su casa, oficina o cualquier ubicación. Ya sea que necesite instalación de llantas, reparación o asistencia en carretera, iremos a usted. Llame al (503) 367-9714 para programar.',
+    faqQ7: '\u00bfTrabajan con todas las marcas y modelos?',
+    faqA7: '\u00a1S\u00ed! Damos servicio a todas las marcas y modelos \u2014 dom\u00e9sticos, importados y de lujo. Nuestros t\u00e9cnicos tienen experiencia con todo tipo de veh\u00edculos.',
+    faqQ8: '\u00bfCu\u00e1nto tiempo toma instalar llantas?',
+    faqA8: 'Una instalaci\u00f3n est\u00e1ndar de 4 llantas toma aproximadamente 30-45 minutos. Incluye montaje, balanceo e inspecci\u00f3n de cortes\u00eda.',
+    faqQ9: '\u00bfOfrecen financiamiento?',
+    faqA9: 'Ofrecemos opciones de pago flexibles. Aceptamos efectivo, todas las tarjetas principales y podemos discutir arreglos de pago para reparaciones mayores.',
+    faqQ10: '\u00bfQu\u00e9 marcas de llantas tienen?',
+    faqA10: 'Tenemos una amplia selecci\u00f3n de llantas nuevas y usadas de calidad. Podemos conseguir pr\u00e1cticamente cualquier tama\u00f1o y marca.',
+    faqQ11: '\u00bfPuedo esperar mientras dan servicio a mi auto?',
+    faqA11: '\u00a1S\u00ed! La mayor\u00eda de nuestros servicios se completan mientras espera. Tenemos un \u00e1rea de espera c\u00f3moda.',
+    faqQ12: '\u00bfCu\u00e1l es su pol\u00edtica de garant\u00eda?',
+    faqA12: 'Todos nuestros servicios incluyen garant\u00eda de 12 meses / 12,000 millas. Tambi\u00e9n ofrecemos igualaci\u00f3n de precios e inspecciones gratis.',
+    faqQ13: '\u00bfTienen programa de membres\u00eda?',
+    faqA13: '\u00a1S\u00ed! Nuestro Plan de Cuidado comienza en $19/mes e incluye cambios de aceite, rotaci\u00f3n de llantas, descuentos y programaci\u00f3n prioritaria.',
+    faqQ14: '\u00bfQu\u00e9 \u00e1reas atienden?',
+    faqA14: 'Atendemos el \u00e1rea metropolitana de Portland incluyendo SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell y Mt. Scott.',
+    faqQ15: '\u00bfC\u00f3mo puedo obtener un estimado?',
+    faqA15: 'Puede obtener un estimado gratis reservando en l\u00ednea, llam\u00e1ndonos al (503) 367-9714 o envi\u00e1ndonos un mensaje. Proporcionamos estimados escritos antes de comenzar cualquier trabajo.',
     trustRating: '4.8 Estrellas \u00b7 150+ Rese\u00f1as',
     trustSince: 'Desde 2008',
     trustFreeEstimates: 'Estimados Gratis',
@@ -1417,6 +1868,7 @@ const t = {
     joinDrivers: '\u00danete a 500+ conductores. Ofertas de temporada, recordatorios, ofertas exclusivas.',
     signUpFree: 'Reg\u00edstrate Gratis',
     noSpam: 'Sin spam. Cancela cuando quieras.',
+    reviewVelocity: '12 nuevas rese\u00f1as de 5 estrellas este mes',
     newCustomerSpecial: '\ud83c\udf89 Especial: Cambio de Aceite $29 + Inspecci\u00f3n GRATIS',
     claimOffer: 'Reclamar Esta Oferta \u2192'
   }
@@ -1730,6 +2182,24 @@ function toggleMobileMenu() {
   menu.classList.toggle('hidden');
   const isExpanded = !menu.classList.contains('hidden');
   btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+  if (isExpanded) {
+    menu.querySelector('a')?.focus();
+    document.addEventListener('keydown', mobileMenuKeyHandler);
+  } else {
+    document.removeEventListener('keydown', mobileMenuKeyHandler);
+    btn.focus();
+  }
+}
+function mobileMenuKeyHandler(e) {
+  if (e.key === 'Escape') { toggleMobileMenu(); return; }
+  if (e.key !== 'Tab') return;
+  var menu = document.getElementById('mobile-menu');
+  var links = menu.querySelectorAll('a');
+  var btn = document.getElementById('mobile-menu-btn');
+  var first = links[0], last = links[links.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); btn.focus(); }
+  else if (!e.shiftKey && document.activeElement === btn) { e.preventDefault(); first.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); btn.focus(); }
 }
 
 // Close mobile menu on nav link click
@@ -1815,6 +2285,29 @@ loadServiceImagesForSite();
 loadGalleryForSite();
 loadSiteSettings();
 
+// ===== SCARCITY: Fetch today's remaining appointment slots =====
+(function() {
+  var today = new Date().toISOString().split('T')[0];
+  fetch('/api/available-times.php?date=' + today, { credentials: 'include' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.success || !data.data) return;
+      var slots = data.data.filter(function(s) { return s.available; }).length;
+      if (slots > 0 && slots <= 6) {
+        var container = document.getElementById('slots-remaining');
+        var text = document.getElementById('slots-text');
+        if (container && text) {
+          text.textContent = currentLang === 'es'
+            ? 'Solo ' + slots + ' citas disponibles hoy'
+            : 'Only ' + slots + ' appointment slots left today';
+          container.classList.remove('hidden');
+          if (typeof gtag === 'function') gtag('event', 'scarcity_shown', { slots_remaining: slots });
+        }
+      }
+    })
+    .catch(function() {});
+})();
+
 // ===== OPEN/CLOSED STATUS BADGE =====
 (function updateOpenStatus() {
   var el = document.getElementById('open-status');
@@ -1824,10 +2317,10 @@ loadSiteSettings();
   var h = now.getHours();
   var isOpen = day >= 1 && day <= 6 && h >= 7 && h < 19;
   if (isOpen) {
-    el.textContent = currentLang === 'es' ? 'Abierto' : 'Open';
+    el.innerHTML = '<span aria-hidden="true" class="w-2 h-2 rounded-full bg-green-400 inline-block"></span> ' + (currentLang === 'es' ? 'Abierto' : 'Open Now');
     el.className = 'hidden sm:inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-green-500/20 text-green-200';
   } else {
-    el.textContent = currentLang === 'es' ? 'Cerrado' : 'Closed';
+    el.innerHTML = '<span aria-hidden="true" class="w-2 h-2 rounded-full bg-red-400 inline-block"></span> ' + (currentLang === 'es' ? 'Cerrado' : 'Closed');
     el.className = 'hidden sm:inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500/20 text-red-200';
   }
   setTimeout(updateOpenStatus, 60000);

@@ -1,0 +1,225 @@
+<?php
+/**
+ * Oregon Tires — Our Guarantee
+ */
+$canonicalUrl = 'https://oregon.tires/guarantee';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Guarantee | Oregon Tires Auto Care</title>
+  <meta name="description" content="Oregon Tires backs every service with a 12-month/12,000-mile warranty, price match guarantee, free inspections, and no-surprise pricing. Your satisfaction is guaranteed.">
+  <link rel="canonical" href="<?= $canonicalUrl ?>">
+  <link rel="alternate" hreflang="en" href="<?= $canonicalUrl ?>?lang=en">
+  <link rel="alternate" hreflang="es" href="<?= $canonicalUrl ?>?lang=es">
+  <link rel="alternate" hreflang="x-default" href="<?= $canonicalUrl ?>">
+  <meta property="og:title" content="Our Guarantee | Oregon Tires Auto Care">
+  <meta property="og:description" content="12-month warranty, price match, free inspections & no-surprise pricing. Every service backed by our guarantee.">
+  <meta property="og:url" content="<?= $canonicalUrl ?>">
+  <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
+  <meta name="theme-color" content="#15803d">
+  <style>html { scroll-behavior: smooth; } :root { --brand-primary: #15803d; --brand-dark: #0D3618; }</style>
+  <!-- GA4 -->
+  <script>
+  (function(){
+    var id = 'G-CHYMTNB6LH';
+    try { var c = localStorage.getItem('oregontires_ga_id'); if (c) id = c; } catch(e){}
+    var s = document.createElement('script'); s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} window.gtag = gtag;
+    gtag('js', new Date()); gtag('config', id);
+  })();
+  </script>
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
+
+  <!-- JSON-LD: Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://oregon.tires/"},
+      {"@type": "ListItem", "position": 2, "name": "Our Guarantee"}
+    ]
+  }
+  </script>
+</head>
+<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
+
+  <?php include __DIR__ . '/templates/header.php'; ?>
+
+  <main id="main-content">
+    <!-- Hero -->
+    <section class="bg-brand text-white py-16 relative">
+      <div class="absolute inset-0 bg-gradient-to-br from-green-900/90 to-brand/95" aria-hidden="true"></div>
+      <div class="container mx-auto px-4 relative z-10 text-center max-w-3xl">
+        <nav aria-label="Breadcrumb" class="mb-6 text-sm text-white/70 flex justify-center">
+          <ol class="flex items-center gap-2">
+            <li><a href="/" class="hover:text-amber-300">Home</a></li>
+            <li aria-hidden="true">/</li>
+            <li class="text-white font-medium">Our Guarantee</li>
+          </ol>
+        </nav>
+        <h1 class="text-3xl md:text-5xl font-bold mb-4">Our Guarantee to You</h1>
+        <p class="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">We stand behind every service with warranties, price matching, and total transparency. No surprises, no shortcuts.</p>
+      </div>
+    </section>
+
+    <!-- 12-Month / 12,000-Mile Warranty -->
+    <section class="py-16 bg-white dark:bg-gray-900">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="flex flex-col md:flex-row items-start gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+            <svg class="w-8 h-8 text-brand dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-3">12-Month / 12,000-Mile Warranty</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">Every repair and service we perform is backed by our 12-month or 12,000-mile warranty, whichever comes first. If something we fixed does not hold up, bring it back and we will make it right at no additional charge.</p>
+            <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Covers parts and labor on all completed repairs</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> 12 months or 12,000 miles, whichever comes first</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> No deductibles or hidden conditions</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Applies to all services including brakes, alignment, engine work</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Price Match Guarantee -->
+    <section class="py-16 bg-gray-50 dark:bg-gray-800">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="flex flex-col md:flex-row items-start gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+            <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-3">Price Match Guarantee</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-2 text-lg font-medium">Found a lower price? We will match it.</p>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">Bring us a written estimate from any local competitor for the same service and we will match their price. We believe in earning your business on value, not inflated pricing.</p>
+            <div class="bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 p-4">
+              <p class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Conditions:</p>
+              <ul class="space-y-1.5 text-sm text-gray-600 dark:text-gray-300">
+                <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">&#8226;</span> Must be for the same service on the same vehicle</li>
+                <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">&#8226;</span> Written estimate required (printed or digital)</li>
+                <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">&#8226;</span> Competitor must be a local Portland-area shop</li>
+                <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">&#8226;</span> Estimate must be dated within the last 30 days</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Satisfaction Guarantee -->
+    <section class="py-16 bg-white dark:bg-gray-900">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="flex flex-col md:flex-row items-start gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+            <svg class="w-8 h-8 text-brand dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-3">Satisfaction Guarantee</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">If you are not completely satisfied with our work, we will make it right. Here is our simple resolution process:</p>
+            <div class="grid sm:grid-cols-3 gap-4">
+              <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-full bg-brand text-white flex items-center justify-center mx-auto mb-2 text-sm font-bold">1</div>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Contact Us</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Call or visit within 30 days of service</p>
+              </div>
+              <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-full bg-brand text-white flex items-center justify-center mx-auto mb-2 text-sm font-bold">2</div>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white mb-1">We Inspect</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Free re-inspection of the concern</p>
+              </div>
+              <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-full bg-brand text-white flex items-center justify-center mx-auto mb-2 text-sm font-bold">3</div>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white mb-1">We Fix It</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Corrected at no extra charge</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Free Multi-Point Inspection -->
+    <section class="py-16 bg-gray-50 dark:bg-gray-800">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="flex flex-col md:flex-row items-start gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+            <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-3">Free Multi-Point Inspection</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">Every vehicle that comes through our shop receives a complimentary digital vehicle inspection. We check the critical systems so you know exactly where your car stands -- no cost, no obligation.</p>
+            <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Brakes, tires, suspension, fluids, belts, and battery</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Color-coded report (green / yellow / red) with photos</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Digital report sent to your phone or email</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> No pressure -- review on your own time and decide</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- No Surprise Pricing -->
+    <section class="py-16 bg-white dark:bg-gray-900">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="flex flex-col md:flex-row items-start gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+            <svg class="w-8 h-8 text-brand dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-3">No Surprise Pricing</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">You will always know the cost before we start any work. Our transparent pricing policy means:</p>
+            <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Written estimate provided before any work begins</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> No hidden fees, shop supplies charges, or surprise add-ons</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Your approval required before any additional work</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Itemized invoice with parts and labor breakdown</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Approve or decline individual items on your estimate</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="bg-amber-500 text-black py-10">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-2xl font-bold mb-3">Questions About Our Guarantees?</h2>
+        <p class="mb-6 max-w-lg mx-auto">We are happy to explain any of our policies in detail. Call us or book a visit -- we will take care of you.</p>
+        <div class="flex justify-center gap-3 flex-wrap">
+          <a href="/book-appointment/" class="bg-brand text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800 transition shadow-lg">Book Free Estimate</a>
+          <a href="tel:5033679714" class="border-2 border-black text-black px-8 py-3 rounded-lg font-semibold hover:bg-black/10 transition">Call (503) 367-9714</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <?php include __DIR__ . '/templates/footer.php'; ?>
+
+  <!-- Sticky Mobile CTA -->
+  <div class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-brand shadow-[0_-4px_12px_rgba(0,0,0,0.15)] border-t border-green-700" role="complementary" aria-label="Quick actions">
+    <div class="flex">
+      <a href="tel:5033679714" class="flex-1 flex items-center justify-center gap-2 py-3.5 text-white font-semibold text-sm border-r border-green-700">
+        <span aria-hidden="true">&#x1F4DE;</span> Call Now
+      </a>
+      <a href="/book-appointment/" class="flex-1 flex items-center justify-center gap-2 py-3.5 bg-amber-500 text-black font-semibold text-sm">
+        <span aria-hidden="true">&#x1F4C5;</span> Book Now
+      </a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1377,6 +1377,147 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
     event_category: 'booking_funnel', service: serviceSlug
   });
 })();
+
+// ===== ABANDONED BOOKING RECOVERY =====
+(function() {
+  var STORAGE_KEY = 'oregontires_booking_draft';
+  var form = document.getElementById('booking-form');
+  if (!form) return;
+
+  // Save partial form state on each meaningful change
+  function saveDraft() {
+    var serviceEl = form.querySelector('input[name="service"]:checked');
+    var draft = {
+      service: serviceEl ? serviceEl.value : '',
+      date: (document.getElementById('booking-date') || {}).value || '',
+      time: (document.getElementById('booking-time') || {}).value || '',
+      firstName: (document.getElementById('booking-first-name') || {}).value || '',
+      lastName: (document.getElementById('booking-last-name') || {}).value || '',
+      phone: (document.getElementById('booking-phone') || {}).value || '',
+      email: (document.getElementById('booking-email') || {}).value || '',
+      vehicleYear: (document.getElementById('vehicle-year') || {}).value || '',
+      vehicleMake: (document.getElementById('vehicle-make') || {}).value || '',
+      vehicleModel: (document.getElementById('vehicle-model') || {}).value || '',
+      savedAt: Date.now()
+    };
+    if (draft.service) {
+      try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft)); } catch(e) {}
+    }
+  }
+
+  form.addEventListener('change', saveDraft);
+  form.addEventListener('input', saveDraft);
+
+  // Clear draft on successful submission
+  var origShowConfirmation = window.showConfirmation;
+  if (typeof origShowConfirmation === 'function') {
+    window.showConfirmation = function() {
+      try { sessionStorage.removeItem(STORAGE_KEY); } catch(e) {}
+      var banner = document.getElementById('booking-recovery-banner');
+      if (banner) banner.remove();
+      return origShowConfirmation.apply(this, arguments);
+    };
+  }
+
+  // On page load, check for saved draft and show recovery banner
+  try {
+    var saved = sessionStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    var draft = JSON.parse(saved);
+    if (!draft.service || (Date.now() - draft.savedAt) > 86400000) {
+      sessionStorage.removeItem(STORAGE_KEY);
+      return;
+    }
+    // Deeplink takes priority
+    if (new URLSearchParams(window.location.search).get('service')) return;
+
+    var lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
+    var msgs = {
+      en: { title: 'Pick up where you left off?', desc: 'You started booking \u2014 we saved your progress.', restore: 'Restore', dismiss: 'Start Fresh' },
+      es: { title: '\u00bfContinuar donde lo dej\u00f3?', desc: 'Empez\u00f3 una reserva \u2014 guardamos su progreso.', restore: 'Restaurar', dismiss: 'Empezar de Nuevo' }
+    };
+    var m = msgs[lang] || msgs.en;
+
+    // Build banner using safe DOM methods
+    var banner = document.createElement('div');
+    banner.id = 'booking-recovery-banner';
+    banner.className = 'bg-amber-50 dark:bg-amber-900/30 border-2 border-amber-300 dark:border-amber-700 rounded-xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3 fade-in';
+
+    var textWrap = document.createElement('div');
+    textWrap.className = 'flex-1';
+    var titleEl = document.createElement('p');
+    titleEl.className = 'font-semibold text-amber-800 dark:text-amber-200';
+    titleEl.textContent = m.title;
+    var descEl = document.createElement('p');
+    descEl.className = 'text-sm text-amber-700 dark:text-amber-300';
+    descEl.textContent = m.desc;
+    textWrap.appendChild(titleEl);
+    textWrap.appendChild(descEl);
+
+    var btnWrap = document.createElement('div');
+    btnWrap.className = 'flex gap-2';
+    var restoreBtn = document.createElement('button');
+    restoreBtn.type = 'button';
+    restoreBtn.className = 'bg-brand text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-800 transition';
+    restoreBtn.textContent = m.restore;
+    var dismissBtn = document.createElement('button');
+    dismissBtn.type = 'button';
+    dismissBtn.className = 'border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition';
+    dismissBtn.textContent = m.dismiss;
+    btnWrap.appendChild(restoreBtn);
+    btnWrap.appendChild(dismissBtn);
+
+    banner.appendChild(textWrap);
+    banner.appendChild(btnWrap);
+    form.parentNode.insertBefore(banner, form);
+
+    // Restore button handler
+    restoreBtn.addEventListener('click', function() {
+      if (draft.service) {
+        var radio = document.getElementById('svc-' + draft.service);
+        if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
+      }
+      if (draft.date) {
+        var dateInput = document.getElementById('booking-date');
+        if (dateInput) { dateInput.value = draft.date; dateInput.dispatchEvent(new Event('change', { bubbles: true })); }
+      }
+      if (draft.time) {
+        var timeHidden = document.getElementById('booking-time');
+        if (timeHidden) timeHidden.value = draft.time;
+        var timeSlot = document.querySelector('[data-time="' + draft.time + '"]');
+        if (timeSlot && !timeSlot.disabled) {
+          document.querySelectorAll('[data-time]').forEach(function(s) { s.classList.remove('selected'); });
+          timeSlot.classList.add('selected');
+        }
+      }
+      if (draft.firstName) { var el = document.getElementById('booking-first-name'); if (el) el.value = draft.firstName; }
+      if (draft.lastName) { var el = document.getElementById('booking-last-name'); if (el) el.value = draft.lastName; }
+      if (draft.phone) { var el = document.getElementById('booking-phone'); if (el) el.value = draft.phone; }
+      if (draft.email) { var el = document.getElementById('booking-email'); if (el) el.value = draft.email; }
+      if (draft.vehicleYear) { var el = document.getElementById('vehicle-year'); if (el) el.value = draft.vehicleYear; }
+      if (draft.vehicleMake) { var el = document.getElementById('vehicle-make'); if (el) el.value = draft.vehicleMake; }
+      if (draft.vehicleModel) { var el = document.getElementById('vehicle-model'); if (el) el.value = draft.vehicleModel; }
+      form.dispatchEvent(new Event('change', { bubbles: true }));
+      banner.remove();
+      if (typeof gtag === 'function') gtag('event', 'booking_recovered', {
+        event_category: 'booking_funnel', service: draft.service
+      });
+    });
+
+    // Dismiss button handler
+    dismissBtn.addEventListener('click', function() {
+      try { sessionStorage.removeItem(STORAGE_KEY); } catch(e) {}
+      banner.remove();
+      if (typeof gtag === 'function') gtag('event', 'booking_recovery_dismissed', {
+        event_category: 'booking_funnel'
+      });
+    });
+
+    if (typeof gtag === 'function') gtag('event', 'booking_recovery_shown', {
+      event_category: 'booking_funnel', service: draft.service
+    });
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>

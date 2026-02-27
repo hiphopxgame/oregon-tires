@@ -7,5 +7,8 @@ Disallow: /includes/
 Disallow: /uploads/
 Disallow: /vendor/
 Disallow: /sql/
+Disallow: /templates/
+Disallow: /tests/
+Disallow: /_uploads/
 
 Sitemap: https://oregon.tires/sitemap.xml
