@@ -46,10 +46,15 @@ try {
             $db->prepare("UPDATE oretir_estimates SET customer_viewed_at = NOW(), status = 'viewed', updated_at = NOW() WHERE id = ? AND status = 'sent'")->execute([$est['id']]);
         }
 
-        // Get items
+        // Get items (LEFT JOIN inspection items for priority data)
         $itemStmt = $db->prepare(
-            'SELECT id, item_type, description, quantity, unit_price, total, is_approved, sort_order
-             FROM oretir_estimate_items WHERE estimate_id = ? ORDER BY sort_order ASC, id ASC'
+            'SELECT ei.id, ei.item_type, ei.description, ei.quantity, ei.unit_price,
+                    ei.total, ei.is_approved, ei.sort_order,
+                    ii.condition_rating AS inspection_rating,
+                    ii.category AS inspection_category
+             FROM oretir_estimate_items ei
+             LEFT JOIN oretir_inspection_items ii ON ii.id = ei.inspection_item_id
+             WHERE ei.estimate_id = ? ORDER BY ei.sort_order ASC, ei.id ASC'
         );
         $itemStmt->execute([$est['id']]);
 

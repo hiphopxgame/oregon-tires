@@ -10,33 +10,30 @@
     <link rel="stylesheet" href="assets/styles.css">
     <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
     <style>
+    /* Score ring animation */
+    @keyframes scoreRingFill {
+        from { stroke-dashoffset: 408; }
+    }
+    .score-ring-circle {
+        transition: stroke-dashoffset 1.2s ease-out;
+    }
+
     @media print {
-        /* Force light background and black text */
         html, body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .dark { color-scheme: light !important; }
 
-        /* Hide non-content elements */
         header, footer, #lang-toggle, #photo-overlay, #estimate-cta, #print-report-btn { display: none !important; }
 
-        /* Remove dark mode overrides for print */
         .dark\:bg-\[#0A0A0A\], .dark\:bg-gray-900, .dark\:bg-gray-800\/50, .dark\:bg-\[#111827\]\/90 { background: white !important; }
         .dark\:text-white, .dark\:text-gray-300, .dark\:text-gray-400 { color: #111 !important; }
         .dark\:border-gray-800, .dark\:border-gray-700, .dark\:border-gray-700\/50 { border-color: #e5e7eb !important; }
 
-        /* Print header */
         #report-state::before {
             content: "Oregon Tires Auto Care \2014  Digital Vehicle Inspection";
-            display: block;
-            text-align: center;
-            font-size: 11pt;
-            font-weight: bold;
-            color: #333;
-            border-bottom: 2px solid #16a34a;
-            padding-bottom: 8pt;
-            margin-bottom: 16pt;
+            display: block; text-align: center; font-size: 11pt; font-weight: bold; color: #333;
+            border-bottom: 2px solid #16a34a; padding-bottom: 8pt; margin-bottom: 16pt;
         }
 
-        /* Clean layout */
         body { min-height: auto !important; }
         main { padding: 0 !important; }
         .container { max-width: 100% !important; padding: 0 !important; }
@@ -53,7 +50,6 @@
         .text-yellow-600, .text-yellow-700 { color: #ca8a04 !important; }
         .text-red-600, .text-red-700 { color: #dc2626 !important; }
 
-        /* Dark mode traffic light overrides */
         .dark\:bg-green-900\/20 { background-color: #dcfce7 !important; }
         .dark\:bg-yellow-900\/20 { background-color: #fef9c3 !important; }
         .dark\:bg-red-900\/20 { background-color: #fee2e2 !important; }
@@ -64,13 +60,26 @@
         .dark\:text-yellow-400 { color: #ca8a04 !important; }
         .dark\:text-red-400 { color: #dc2626 !important; }
 
-        /* Photos at reasonable size */
+        /* Score ring print */
+        #health-score-ring svg { width: 100px !important; height: 100px !important; }
+        #health-score-ring { break-inside: avoid; }
+
+        /* Scorecard print */
+        #scorecard-table { break-inside: avoid; }
+        .scorecard-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+        /* Priority sections print — expand green items */
+        #priority-sections .priority-section { break-inside: avoid; page-break-inside: avoid; margin-bottom: 12pt; }
+        #priority-green-toggle { display: none !important; }
+        #priority-green-items { display: block !important; }
+
+        /* Detailed findings — auto expand for print */
+        #detailed-findings[open] { display: block; }
+        #detailed-findings summary { display: none !important; }
+        #items-container { display: block !important; }
+
         #items-container img { width: 60px !important; height: 60px !important; break-inside: avoid; }
-
-        /* Avoid breaking inside category sections */
         #items-container > div { break-inside: avoid; page-break-inside: avoid; margin-bottom: 12pt; }
-
-        /* Overall badge */
         #overall-badge { border: 1px solid currentColor !important; }
     }
     </style>
@@ -153,6 +162,20 @@
                 </div>
             </div>
 
+            <!-- Overall Health Score Ring -->
+            <div id="health-score-ring" class="hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-6 shadow-sm text-center"></div>
+
+            <!-- Scorecard Table -->
+            <div id="scorecard-table" class="hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden mb-6 shadow-sm">
+                <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="font-bold text-gray-900 dark:text-white" data-t="scorecard">Vehicle Scorecard</h2>
+                </div>
+                <div id="scorecard-body"></div>
+            </div>
+
+            <!-- Priority Sections -->
+            <div id="priority-sections" class="space-y-4 mb-6"></div>
+
             <!-- Print Button -->
             <div class="mb-6 text-center" id="print-report-btn">
                 <button onclick="window.print()" class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition shadow-sm">
@@ -161,8 +184,14 @@
                 </button>
             </div>
 
-            <!-- Inspection Items by Category -->
-            <div id="items-container" class="space-y-4 mb-6"></div>
+            <!-- Detailed Findings (existing category view, wrapped in details) -->
+            <details id="detailed-findings" class="mb-6">
+                <summary class="cursor-pointer font-bold text-gray-900 dark:text-white text-lg mb-4 flex items-center gap-2 select-none">
+                    <svg class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <span data-t="detailedFindings">Detailed Findings</span>
+                </summary>
+                <div id="items-container" class="space-y-4"></div>
+            </details>
 
             <!-- Estimate CTA -->
             <div id="estimate-cta" class="hidden">
@@ -203,11 +232,11 @@
       <div class="grid sm:grid-cols-3 gap-6 text-sm text-gray-200 mb-6">
         <div>
           <p class="font-semibold text-white mb-1">Oregon Tires Auto Care</p>
-          <p>📍 8536 SE 82nd Ave, Portland, OR 97266</p>
+          <p>8536 SE 82nd Ave, Portland, OR 97266</p>
         </div>
         <div>
-          <p>📞 <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></p>
-          <p>✉️ <a href="mailto:oregontirespdx@gmail.com" class="hover:text-amber-300">oregontirespdx@gmail.com</a></p>
+          <p><a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></p>
+          <p><a href="mailto:oregontirespdx@gmail.com" class="hover:text-amber-300">oregontirespdx@gmail.com</a></p>
         </div>
         <div class="flex items-center gap-4 sm:justify-end">
           <a href="https://www.facebook.com/61571913202998/" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300">Facebook</a>
@@ -237,6 +266,14 @@ const t = {
         viewEstimate: 'Review & Approve Estimate',
         techNotes: 'Technician Notes',
         printReport: 'Print Report',
+        overallHealth: 'Overall Vehicle Health',
+        scorecard: 'Vehicle Scorecard',
+        needsAttentionNow: 'Needs Attention Now',
+        watchList: 'Watch List',
+        lookingGreat: 'Looking Great',
+        detailedFindings: 'Detailed Findings',
+        showItems: 'Show items',
+        hideItems: 'Hide items',
     },
     es: {
         backToHome: 'Volver al Inicio',
@@ -251,14 +288,199 @@ const t = {
         viewEstimate: 'Revisar y Aprobar Presupuesto',
         techNotes: 'Notas del Tecnico',
         printReport: 'Imprimir Reporte',
+        overallHealth: 'Salud General del Vehiculo',
+        scorecard: 'Tarjeta de Calificacion',
+        needsAttentionNow: 'Necesita Atencion Ahora',
+        watchList: 'Lista de Seguimiento',
+        lookingGreat: 'En Buen Estado',
+        detailedFindings: 'Hallazgos Detallados',
+        showItems: 'Mostrar elementos',
+        hideItems: 'Ocultar elementos',
     }
 };
 
 const overallLabels = { en: { green: 'GOOD', yellow: 'ATTENTION', red: 'URGENT' }, es: { green: 'BUENO', yellow: 'ATENCION', red: 'URGENTE' } };
 
+// Friendly language descriptions: category x tier x lang (12 categories x 5 tiers x 2 langs)
+var gradeDescriptions = {
+    en: {
+        tires: {
+            excellent: 'Your tires are in excellent condition with plenty of tread life remaining.',
+            good: 'Tires are in good shape. Keep monitoring tread depth at your next service.',
+            fair: 'Some tire wear detected. Consider replacement planning in the near future.',
+            poor: 'Significant tire wear found. Replacement recommended soon for safety.',
+            critical: 'Tires need immediate replacement. This is a safety concern.'
+        },
+        brakes: {
+            excellent: 'Brake system is performing at peak condition.',
+            good: 'Brakes are in good working order with adequate pad life.',
+            fair: 'Brake wear is progressing. Plan for service within the next few months.',
+            poor: 'Brake pads are wearing thin. Service recommended before they become unsafe.',
+            critical: 'Brake system needs immediate service. This is a safety concern.'
+        },
+        suspension: {
+            excellent: 'Suspension components are all in excellent condition.',
+            good: 'Suspension is performing well with no immediate concerns.',
+            fair: 'Some suspension wear detected. Monitor for changes in ride quality.',
+            poor: 'Suspension issues found that affect ride quality and handling.',
+            critical: 'Suspension problems need immediate attention for safe driving.'
+        },
+        fluids: {
+            excellent: 'All fluid levels and conditions are excellent.',
+            good: 'Fluids are at proper levels and in good condition.',
+            fair: 'Some fluids may need attention at your next service.',
+            poor: 'Fluid levels or conditions need attention soon.',
+            critical: 'Critical fluid issues found. Service needed immediately.'
+        },
+        lights: {
+            excellent: 'All lights are functioning perfectly.',
+            good: 'Lighting system is in good working order.',
+            fair: 'Some lights may need attention soon.',
+            poor: 'Multiple lighting issues found. Repair recommended.',
+            critical: 'Critical lighting failures. Immediate repair needed for safety.'
+        },
+        engine: {
+            excellent: 'Engine is running smoothly with no concerns.',
+            good: 'Engine performance is good with minor items to watch.',
+            fair: 'Engine has items that should be addressed at next service.',
+            poor: 'Engine issues detected that need attention soon.',
+            critical: 'Engine problems need immediate diagnosis and repair.'
+        },
+        exhaust: {
+            excellent: 'Exhaust system is in excellent condition.',
+            good: 'Exhaust system is functioning properly.',
+            fair: 'Minor exhaust wear detected. Monitor at next visit.',
+            poor: 'Exhaust issues found that need repair.',
+            critical: 'Exhaust system failure. Immediate repair recommended.'
+        },
+        hoses: {
+            excellent: 'All hoses are in excellent condition.',
+            good: 'Hoses are in good shape with no visible wear.',
+            fair: 'Some hose wear detected. Plan for replacement.',
+            poor: 'Hoses showing significant wear. Replace soon to prevent leaks.',
+            critical: 'Hose failure risk is high. Immediate replacement needed.'
+        },
+        belts: {
+            excellent: 'All belts are in excellent condition.',
+            good: 'Belts are in good condition with normal wear.',
+            fair: 'Belt wear is progressing. Plan for replacement.',
+            poor: 'Belts are worn and should be replaced soon.',
+            critical: 'Belt failure is imminent. Replace immediately.'
+        },
+        battery: {
+            excellent: 'Battery is in excellent condition with strong charge.',
+            good: 'Battery is performing well.',
+            fair: 'Battery showing some age. Consider testing at next service.',
+            poor: 'Battery is weak. Replacement recommended to avoid breakdowns.',
+            critical: 'Battery is failing. Replace immediately to prevent being stranded.'
+        },
+        wipers: {
+            excellent: 'Wiper blades are in excellent condition.',
+            good: 'Wipers are working properly.',
+            fair: 'Wiper blades showing some wear. Replace before rainy season.',
+            poor: 'Wiper blades are worn. Replace for clear visibility.',
+            critical: 'Wipers are not clearing properly. Replace for safe driving.'
+        },
+        other: {
+            excellent: 'All other inspected items are in excellent condition.',
+            good: 'Other components are in good working order.',
+            fair: 'Some items need attention at your next visit.',
+            poor: 'Several items need attention soon.',
+            critical: 'Critical issues found that need immediate attention.'
+        }
+    },
+    es: {
+        tires: {
+            excellent: 'Sus neumaticos estan en excelente condicion con suficiente vida de rodadura.',
+            good: 'Los neumaticos estan en buen estado. Siga monitoreando la profundidad del dibujo.',
+            fair: 'Se detecto algun desgaste en los neumaticos. Considere un reemplazo proximo.',
+            poor: 'Desgaste significativo encontrado. Se recomienda reemplazo pronto por seguridad.',
+            critical: 'Los neumaticos necesitan reemplazo inmediato. Es un tema de seguridad.'
+        },
+        brakes: {
+            excellent: 'El sistema de frenos esta funcionando en condicion optima.',
+            good: 'Los frenos estan en buen estado con vida util adecuada.',
+            fair: 'El desgaste de frenos esta avanzando. Planifique servicio en los proximos meses.',
+            poor: 'Las pastillas de freno se estan desgastando. Servicio recomendado pronto.',
+            critical: 'El sistema de frenos necesita servicio inmediato. Es un tema de seguridad.'
+        },
+        suspension: {
+            excellent: 'Todos los componentes de suspension estan en excelente condicion.',
+            good: 'La suspension funciona bien sin preocupaciones inmediatas.',
+            fair: 'Se detecto algun desgaste en la suspension. Monitoree cambios en la conduccion.',
+            poor: 'Problemas de suspension encontrados que afectan la calidad de manejo.',
+            critical: 'Problemas de suspension necesitan atencion inmediata para conducir seguro.'
+        },
+        fluids: {
+            excellent: 'Todos los niveles y condiciones de fluidos son excelentes.',
+            good: 'Los fluidos estan en niveles adecuados y en buena condicion.',
+            fair: 'Algunos fluidos pueden necesitar atencion en su proximo servicio.',
+            poor: 'Los niveles o condiciones de fluidos necesitan atencion pronto.',
+            critical: 'Problemas criticos de fluidos encontrados. Servicio necesario de inmediato.'
+        },
+        lights: {
+            excellent: 'Todas las luces funcionan perfectamente.',
+            good: 'El sistema de iluminacion esta en buen estado.',
+            fair: 'Algunas luces pueden necesitar atencion pronto.',
+            poor: 'Multiples problemas de iluminacion encontrados. Reparacion recomendada.',
+            critical: 'Fallas criticas de iluminacion. Reparacion inmediata necesaria por seguridad.'
+        },
+        engine: {
+            excellent: 'El motor funciona suavemente sin preocupaciones.',
+            good: 'El rendimiento del motor es bueno con elementos menores a vigilar.',
+            fair: 'El motor tiene elementos que deben atenderse en el proximo servicio.',
+            poor: 'Problemas del motor detectados que necesitan atencion pronto.',
+            critical: 'Problemas del motor necesitan diagnostico y reparacion inmediata.'
+        },
+        exhaust: {
+            excellent: 'El sistema de escape esta en excelente condicion.',
+            good: 'El sistema de escape funciona correctamente.',
+            fair: 'Desgaste menor del escape detectado. Monitorear en la proxima visita.',
+            poor: 'Problemas de escape encontrados que necesitan reparacion.',
+            critical: 'Falla del sistema de escape. Reparacion inmediata recomendada.'
+        },
+        hoses: {
+            excellent: 'Todas las mangueras estan en excelente condicion.',
+            good: 'Las mangueras estan en buen estado sin desgaste visible.',
+            fair: 'Se detecto algun desgaste en mangueras. Planifique reemplazo.',
+            poor: 'Mangueras con desgaste significativo. Reemplace pronto para evitar fugas.',
+            critical: 'Riesgo alto de falla de mangueras. Reemplazo inmediato necesario.'
+        },
+        belts: {
+            excellent: 'Todas las correas estan en excelente condicion.',
+            good: 'Las correas estan en buena condicion con desgaste normal.',
+            fair: 'El desgaste de correas esta avanzando. Planifique reemplazo.',
+            poor: 'Las correas estan desgastadas y deben reemplazarse pronto.',
+            critical: 'Falla de correa es inminente. Reemplace inmediatamente.'
+        },
+        battery: {
+            excellent: 'La bateria esta en excelente condicion con carga fuerte.',
+            good: 'La bateria funciona bien.',
+            fair: 'La bateria muestra algo de edad. Considere pruebas en el proximo servicio.',
+            poor: 'La bateria esta debil. Reemplazo recomendado para evitar fallas.',
+            critical: 'La bateria esta fallando. Reemplace inmediatamente.'
+        },
+        wipers: {
+            excellent: 'Las plumas limpiaparabrisas estan en excelente condicion.',
+            good: 'Los limpiaparabrisas funcionan correctamente.',
+            fair: 'Las plumas muestran algo de desgaste. Reemplace antes de la temporada de lluvias.',
+            poor: 'Las plumas estan desgastadas. Reemplace para visibilidad clara.',
+            critical: 'Los limpiaparabrisas no limpian correctamente. Reemplace para conducir seguro.'
+        },
+        other: {
+            excellent: 'Todos los demas elementos inspeccionados estan en excelente condicion.',
+            good: 'Otros componentes estan en buen estado.',
+            fair: 'Algunos elementos necesitan atencion en su proxima visita.',
+            poor: 'Varios elementos necesitan atencion pronto.',
+            critical: 'Problemas criticos encontrados que necesitan atencion inmediata.'
+        }
+    }
+};
+
 function toggleLanguage() {
     currentLang = currentLang === 'en' ? 'es' : 'en';
     applyTranslations();
+    if (window._inspectionData) renderReportCard(window._inspectionData);
 }
 
 function applyTranslations() {
@@ -280,6 +502,351 @@ var ratingStyles = {
     yellow: { bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-200 dark:border-yellow-800', dot: 'bg-yellow-500', text: 'text-yellow-700 dark:text-yellow-400' },
     red:    { bg: 'bg-red-50 dark:bg-red-900/20', border: 'border-red-200 dark:border-red-800', dot: 'bg-red-500', text: 'text-red-700 dark:text-red-400' },
 };
+
+// ─── Scoring Algorithm ────────────────────────────────────────────────────
+var categoryWeights = {
+    tires: 15, brakes: 15, suspension: 10, lights: 10,
+    fluids: 8, engine: 8, exhaust: 6, hoses: 6,
+    belts: 6, battery: 6, wipers: 5, other: 5
+};
+
+function ratingToPoints(rating) {
+    if (rating === 'green') return 100;
+    if (rating === 'yellow') return 50;
+    return 0;
+}
+
+function computeScores(items) {
+    var grouped = {};
+    items.forEach(function(item) {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+    });
+
+    var catScores = {};
+    var totalWeight = 0;
+    var weightedSum = 0;
+
+    Object.keys(grouped).forEach(function(cat) {
+        var catItems = grouped[cat];
+        var sum = 0;
+        catItems.forEach(function(i) { sum += ratingToPoints(i.condition_rating); });
+        var avg = sum / catItems.length;
+        catScores[cat] = { score: Math.round(avg), items: catItems };
+
+        var weight = categoryWeights[cat] || 5;
+        totalWeight += weight;
+        weightedSum += avg * weight;
+    });
+
+    var overall = totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 100;
+    return { overall: overall, categories: catScores };
+}
+
+function scoreToGrade(score) {
+    if (score >= 97) return 'A+';
+    if (score >= 93) return 'A';
+    if (score >= 90) return 'A-';
+    if (score >= 87) return 'B+';
+    if (score >= 83) return 'B';
+    if (score >= 80) return 'B-';
+    if (score >= 70) return 'C';
+    if (score >= 60) return 'D';
+    return 'F';
+}
+
+function scoreToTier(score) {
+    if (score >= 90) return 'excellent';
+    if (score >= 75) return 'good';
+    if (score >= 50) return 'fair';
+    if (score >= 25) return 'poor';
+    return 'critical';
+}
+
+function tierColor(tier) {
+    if (tier === 'excellent' || tier === 'good') return { stroke: '#22c55e', text: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30', barBg: 'bg-green-500' };
+    if (tier === 'fair') return { stroke: '#eab308', text: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/30', barBg: 'bg-yellow-500' };
+    if (tier === 'poor') return { stroke: '#f97316', text: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30', barBg: 'bg-orange-500' };
+    return { stroke: '#ef4444', text: 'text-red-600', bg: 'bg-red-100 dark:bg-red-900/30', barBg: 'bg-red-500' };
+}
+
+// ─── SVG Icon Builders (safe DOM, no innerHTML) ───────────────────────────
+function createSvgIcon(pathData, className) {
+    var svgNS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', className || 'w-5 h-5');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    pathData.forEach(function(d) {
+        var path = document.createElementNS(svgNS, 'path');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('d', d);
+        svg.appendChild(path);
+    });
+    return svg;
+}
+
+var priorityIcons = {
+    red: ['M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z'],
+    yellow: ['M15 12a3 3 0 11-6 0 3 3 0 016 0z', 'M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'],
+    green: ['M5 13l4 4L19 7']
+};
+
+// ─── UI Builders ──────────────────────────────────────────────────────────
+function clearElement(el) {
+    while (el.firstChild) el.removeChild(el.firstChild);
+}
+
+function buildHealthScoreRing(score) {
+    var grade = scoreToGrade(score);
+    var tier = scoreToTier(score);
+    var colors = tierColor(tier);
+    var circumference = 408;
+    var offset = circumference - (score / 100) * circumference;
+
+    var tierLabels = {
+        en: { excellent: 'Excellent', good: 'Good', fair: 'Fair', poor: 'Poor', critical: 'Critical' },
+        es: { excellent: 'Excelente', good: 'Bueno', fair: 'Regular', poor: 'Deficiente', critical: 'Critico' }
+    };
+
+    var container = document.getElementById('health-score-ring');
+    clearElement(container);
+
+    var title = document.createElement('h2');
+    title.className = 'font-bold text-gray-900 dark:text-white text-lg mb-4';
+    title.setAttribute('data-t', 'overallHealth');
+    title.textContent = t[currentLang].overallHealth;
+    container.appendChild(title);
+
+    var svgNS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', '160');
+    svg.setAttribute('height', '160');
+    svg.setAttribute('viewBox', '0 0 160 160');
+    svg.className.baseVal = 'mx-auto';
+
+    var bgCircle = document.createElementNS(svgNS, 'circle');
+    bgCircle.setAttribute('cx', '80');
+    bgCircle.setAttribute('cy', '80');
+    bgCircle.setAttribute('r', '65');
+    bgCircle.setAttribute('fill', 'none');
+    bgCircle.setAttribute('stroke', document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb');
+    bgCircle.setAttribute('stroke-width', '12');
+    svg.appendChild(bgCircle);
+
+    var scoreCircle = document.createElementNS(svgNS, 'circle');
+    scoreCircle.setAttribute('cx', '80');
+    scoreCircle.setAttribute('cy', '80');
+    scoreCircle.setAttribute('r', '65');
+    scoreCircle.setAttribute('fill', 'none');
+    scoreCircle.setAttribute('stroke', colors.stroke);
+    scoreCircle.setAttribute('stroke-width', '12');
+    scoreCircle.setAttribute('stroke-linecap', 'round');
+    scoreCircle.setAttribute('stroke-dasharray', String(circumference));
+    scoreCircle.setAttribute('stroke-dashoffset', String(circumference));
+    scoreCircle.setAttribute('transform', 'rotate(-90 80 80)');
+    scoreCircle.classList.add('score-ring-circle');
+    svg.appendChild(scoreCircle);
+
+    var gradeText = document.createElementNS(svgNS, 'text');
+    gradeText.setAttribute('x', '80');
+    gradeText.setAttribute('y', '72');
+    gradeText.setAttribute('text-anchor', 'middle');
+    gradeText.setAttribute('font-size', '32');
+    gradeText.setAttribute('font-weight', 'bold');
+    gradeText.setAttribute('fill', colors.stroke);
+    gradeText.textContent = grade;
+    svg.appendChild(gradeText);
+
+    var pctText = document.createElementNS(svgNS, 'text');
+    pctText.setAttribute('x', '80');
+    pctText.setAttribute('y', '98');
+    pctText.setAttribute('text-anchor', 'middle');
+    pctText.setAttribute('font-size', '14');
+    pctText.setAttribute('fill', document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280');
+    pctText.textContent = score + '%';
+    svg.appendChild(pctText);
+
+    container.appendChild(svg);
+
+    var tierLabel = document.createElement('p');
+    tierLabel.className = 'mt-3 text-sm font-semibold ' + colors.text;
+    tierLabel.textContent = (tierLabels[currentLang] || tierLabels.en)[tier];
+    container.appendChild(tierLabel);
+
+    container.classList.remove('hidden');
+
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            scoreCircle.setAttribute('stroke-dashoffset', String(offset));
+        });
+    });
+}
+
+function buildScorecardTable(catScores) {
+    var body = document.getElementById('scorecard-body');
+    clearElement(body);
+
+    var cats = Object.keys(catScores).sort(function(a, b) {
+        return catScores[a].score - catScores[b].score;
+    });
+
+    cats.forEach(function(cat) {
+        var data = catScores[cat];
+        var grade = scoreToGrade(data.score);
+        var tier = scoreToTier(data.score);
+        var colors = tierColor(tier);
+        var catLabel = (categoryLabels[currentLang] || categoryLabels.en)[cat] || cat;
+        var desc = ((gradeDescriptions[currentLang] || gradeDescriptions.en)[cat] || {})[tier] || '';
+
+        var row = document.createElement('div');
+        row.className = 'px-5 py-3 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800 last:border-b-0';
+
+        var gradeBadge = document.createElement('span');
+        gradeBadge.className = 'w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm ' + colors.bg + ' ' + colors.text;
+        gradeBadge.textContent = grade;
+        row.appendChild(gradeBadge);
+
+        var middle = document.createElement('div');
+        middle.className = 'flex-1 min-w-0';
+
+        var nameEl = document.createElement('p');
+        nameEl.className = 'font-semibold text-gray-900 dark:text-white text-sm';
+        nameEl.textContent = catLabel;
+        middle.appendChild(nameEl);
+
+        var descEl = document.createElement('p');
+        descEl.className = 'text-xs text-gray-500 dark:text-gray-400 truncate';
+        descEl.textContent = desc;
+        descEl.title = desc;
+        middle.appendChild(descEl);
+
+        row.appendChild(middle);
+
+        var rightSide = document.createElement('div');
+        rightSide.className = 'flex items-center gap-2 flex-shrink-0';
+
+        var barWrap = document.createElement('div');
+        barWrap.className = 'w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden';
+        var barFill = document.createElement('div');
+        barFill.className = 'h-full rounded-full scorecard-bar ' + colors.barBg;
+        barFill.style.width = data.score + '%';
+        barWrap.appendChild(barFill);
+        rightSide.appendChild(barWrap);
+
+        var pctEl = document.createElement('span');
+        pctEl.className = 'text-xs font-mono w-8 text-right ' + colors.text;
+        pctEl.textContent = data.score + '%';
+        rightSide.appendChild(pctEl);
+
+        row.appendChild(rightSide);
+        body.appendChild(row);
+    });
+
+    document.getElementById('scorecard-table').classList.remove('hidden');
+}
+
+function buildPrioritySections(items) {
+    var container = document.getElementById('priority-sections');
+    clearElement(container);
+
+    var redItems = items.filter(function(i) { return i.condition_rating === 'red'; });
+    var yellowItems = items.filter(function(i) { return i.condition_rating === 'yellow'; });
+    var greenItems = items.filter(function(i) { return i.condition_rating === 'green'; });
+
+    var sections = [
+        {
+            items: redItems, key: 'needsAttentionNow',
+            bg: 'bg-red-50 dark:bg-red-900/20', border: 'border-red-200 dark:border-red-800',
+            headerBg: 'bg-red-100 dark:bg-red-900/40', headerText: 'text-red-800 dark:text-red-300',
+            iconKey: 'red', collapsed: false, id: 'priority-red'
+        },
+        {
+            items: yellowItems, key: 'watchList',
+            bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-200 dark:border-yellow-800',
+            headerBg: 'bg-yellow-100 dark:bg-yellow-900/40', headerText: 'text-yellow-800 dark:text-yellow-300',
+            iconKey: 'yellow', collapsed: false, id: 'priority-yellow'
+        },
+        {
+            items: greenItems, key: 'lookingGreat',
+            bg: 'bg-green-50 dark:bg-green-900/20', border: 'border-green-200 dark:border-green-800',
+            headerBg: 'bg-green-100 dark:bg-green-900/40', headerText: 'text-green-800 dark:text-green-300',
+            iconKey: 'green', collapsed: true, id: 'priority-green'
+        }
+    ];
+
+    sections.forEach(function(sec) {
+        if (sec.items.length === 0) return;
+
+        var section = document.createElement('div');
+        section.className = sec.bg + ' border ' + sec.border + ' rounded-2xl overflow-hidden priority-section';
+        section.id = sec.id + '-section';
+
+        var header = document.createElement('div');
+        header.className = 'px-5 py-3 flex items-center justify-between ' + sec.headerBg;
+
+        var headerLeft = document.createElement('div');
+        headerLeft.className = 'flex items-center gap-2 ' + sec.headerText;
+        headerLeft.appendChild(createSvgIcon(priorityIcons[sec.iconKey], 'w-5 h-5'));
+        var headerLabel = document.createElement('span');
+        headerLabel.className = 'font-bold text-sm';
+        headerLabel.setAttribute('data-t', sec.key);
+        headerLabel.textContent = t[currentLang][sec.key];
+        headerLeft.appendChild(headerLabel);
+        header.appendChild(headerLeft);
+
+        var countBadge = document.createElement('span');
+        countBadge.className = 'text-xs font-bold px-2 py-0.5 rounded-full ' + sec.headerText + ' bg-white/50 dark:bg-black/20';
+        countBadge.textContent = sec.items.length;
+        header.appendChild(countBadge);
+
+        section.appendChild(header);
+
+        var itemsList = document.createElement('div');
+        itemsList.className = 'divide-y divide-gray-200 dark:divide-gray-700/50';
+        itemsList.id = sec.id + '-items';
+
+        sec.items.forEach(function(item) {
+            itemsList.appendChild(buildItemRow(item));
+        });
+
+        if (sec.collapsed) {
+            itemsList.style.display = 'none';
+
+            var toggleBtn = document.createElement('button');
+            toggleBtn.className = 'w-full px-5 py-2 text-xs font-medium ' + sec.headerText + ' hover:bg-white/30 dark:hover:bg-black/10 transition';
+            toggleBtn.id = sec.id + '-toggle';
+            toggleBtn.textContent = t[currentLang].showItems + ' (' + sec.items.length + ')';
+            toggleBtn.addEventListener('click', function() {
+                var isHidden = itemsList.style.display === 'none';
+                itemsList.style.display = isHidden ? '' : 'none';
+                toggleBtn.textContent = (isHidden ? t[currentLang].hideItems : t[currentLang].showItems) + ' (' + sec.items.length + ')';
+            });
+            section.appendChild(toggleBtn);
+        }
+
+        section.appendChild(itemsList);
+        container.appendChild(section);
+    });
+}
+
+function renderReportCard(data) {
+    var items = data.items || [];
+    if (items.length === 0) return;
+
+    var scores = computeScores(items);
+
+    // Update overall badge to show letter grade
+    var badge = document.getElementById('overall-badge');
+    badge.textContent = scoreToGrade(scores.overall);
+
+    buildHealthScoreRing(scores.overall);
+    buildScorecardTable(scores.categories);
+    buildPrioritySections(items);
+}
 
 function showPhoto(url, caption) {
     var overlay = document.getElementById('photo-overlay');
@@ -362,6 +929,7 @@ async function loadInspection() {
         if (!json.success) return showError(json.error || 'Inspection not found.');
 
         var data = json.data;
+        window._inspectionData = data;
 
         if (data.customer_language === 'spanish') {
             currentLang = 'es';
@@ -375,7 +943,7 @@ async function loadInspection() {
         if (data.vehicle_color) { var el2 = document.getElementById('vehicle-color'); el2.textContent = data.vehicle_color; el2.classList.remove('hidden'); }
         if (data.license_plate) { var el3 = document.getElementById('vehicle-plate'); el3.textContent = data.license_plate; el3.classList.remove('hidden'); }
 
-        // Overall badge
+        // Overall badge (letter grade replaces text after scoring)
         var badge = document.getElementById('overall-badge');
         var oc = data.overall_condition || 'green';
         badge.textContent = (overallLabels[currentLang] || overallLabels.en)[oc] || oc.toUpperCase();
@@ -388,7 +956,10 @@ async function loadInspection() {
         document.getElementById('yellow-count').textContent = data.yellow_count;
         document.getElementById('red-count').textContent = data.red_count;
 
-        // Group items by category
+        // Build report card (score ring, scorecard, priority sections)
+        renderReportCard(data);
+
+        // Group items by category for detailed findings
         var grouped = {};
         (data.items || []).forEach(function(item) {
             if (!grouped[item.category]) grouped[item.category] = [];
@@ -411,7 +982,6 @@ async function loadInspection() {
             var section = document.createElement('div');
             section.className = colors.bg + ' border ' + colors.border + ' rounded-2xl overflow-hidden';
 
-            // Category header
             var header = document.createElement('div');
             header.className = 'px-5 py-3 flex items-center justify-between border-b ' + colors.border;
             header.appendChild(createTextEl('h2', catLabel, 'font-bold text-gray-900 dark:text-white text-lg'));
@@ -420,7 +990,6 @@ async function loadInspection() {
             header.appendChild(headerDot);
             section.appendChild(header);
 
-            // Items
             var itemsList = document.createElement('div');
             itemsList.className = 'divide-y divide-gray-200 dark:divide-gray-700/50';
             items.forEach(function(item) {

@@ -11,35 +11,23 @@
     <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
     <style>
     @media print {
-        /* Force light background and black text */
         html, body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .dark { color-scheme: light !important; }
 
-        /* Hide non-content elements */
         header, footer, #lang-toggle, #print-estimate-btn, #action-buttons { display: none !important; }
 
-        /* Hide checkboxes in print */
         #items-list input[type="checkbox"] { display: none !important; }
 
-        /* Remove dark mode overrides for print */
         .dark\:bg-\[#0A0A0A\], .dark\:bg-gray-900, .dark\:bg-gray-800\/50, .dark\:bg-\[#111827\]\/90 { background: white !important; }
         .dark\:text-white, .dark\:text-gray-300, .dark\:text-gray-400 { color: #111 !important; }
         .dark\:border-gray-800, .dark\:border-gray-700 { border-color: #e5e7eb !important; }
 
-        /* Print header */
         #estimate-state::before {
             content: "Oregon Tires Auto Care \2014  Estimate";
-            display: block;
-            text-align: center;
-            font-size: 11pt;
-            font-weight: bold;
-            color: #333;
-            border-bottom: 2px solid #16a34a;
-            padding-bottom: 8pt;
-            margin-bottom: 16pt;
+            display: block; text-align: center; font-size: 11pt; font-weight: bold; color: #333;
+            border-bottom: 2px solid #16a34a; padding-bottom: 8pt; margin-bottom: 16pt;
         }
 
-        /* Clean layout */
         body { min-height: auto !important; }
         main { padding: 0 !important; }
         .container { max-width: 100% !important; padding: 0 !important; }
@@ -58,10 +46,19 @@
         .bg-yellow-100 { background-color: #fef9c3 !important; }
         .text-yellow-700 { color: #a16207 !important; }
 
-        /* Totals section — keep visible */
+        /* Priority badge print colors */
+        .bg-red-100 { background-color: #fee2e2 !important; }
+        .text-red-700 { color: #b91c1c !important; }
+
+        /* Priority summary print */
+        #priority-summary { -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid; }
+        #priority-summary .priority-box { border: 1px solid #e5e7eb !important; }
+
+        /* Why it matters — show in print */
+        .why-it-matters { display: block !important; }
+
         #display-total { color: #16a34a !important; font-weight: bold; }
 
-        /* Responded state — keep visible and styled when shown */
         #responded-state:not(.hidden) { display: block !important; }
         .bg-green-50 { background-color: #f0fdf4 !important; }
         .text-green-800 { color: #166534 !important; }
@@ -70,10 +67,7 @@
         .dark\:bg-green-900\/20 { background-color: #f0fdf4 !important; }
         .dark\:bg-green-900\/40 { background-color: #dcfce7 !important; }
 
-        /* Avoid page breaks inside sections */
         #estimate-state > div { break-inside: avoid; page-break-inside: avoid; margin-bottom: 12pt; }
-
-        /* Overall badge */
         .rounded-2xl { break-inside: avoid; page-break-inside: avoid; }
     }
     </style>
@@ -138,6 +132,9 @@
                     <span data-t="printEstimate">Print Estimate</span>
                 </button>
             </div>
+
+            <!-- Priority Cost Summary -->
+            <div id="priority-summary" class="hidden grid grid-cols-3 gap-3 mb-6"></div>
 
             <!-- Line Items -->
             <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden mb-6 shadow-sm">
@@ -220,11 +217,11 @@
       <div class="grid sm:grid-cols-3 gap-6 text-sm text-gray-200 mb-6">
         <div>
           <p class="font-semibold text-white mb-1">Oregon Tires Auto Care</p>
-          <p>📍 8536 SE 82nd Ave, Portland, OR 97266</p>
+          <p>8536 SE 82nd Ave, Portland, OR 97266</p>
         </div>
         <div>
-          <p>📞 <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></p>
-          <p>✉️ <a href="mailto:oregontirespdx@gmail.com" class="hover:text-amber-300">oregontirespdx@gmail.com</a></p>
+          <p><a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></p>
+          <p><a href="mailto:oregontirespdx@gmail.com" class="hover:text-amber-300">oregontirespdx@gmail.com</a></p>
         </div>
         <div class="flex items-center gap-4 sm:justify-end">
           <a href="https://www.facebook.com/61571913202998/" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300">Facebook</a>
@@ -274,6 +271,9 @@ var t = {
         declined: 'Declined',
         submitting: 'Submitting...',
         printEstimate: 'Print Estimate',
+        safetyCritical: 'Safety-Critical',
+        recommended: 'Recommended',
+        preventive: 'Preventive',
     },
     es: {
         backToHome: 'Volver al Inicio',
@@ -303,12 +303,48 @@ var t = {
         declined: 'Rechazado',
         submitting: 'Enviando...',
         printEstimate: 'Imprimir Presupuesto',
+        safetyCritical: 'Seguridad Critica',
+        recommended: 'Recomendado',
+        preventive: 'Preventivo',
+    }
+};
+
+// "Why it matters" descriptions keyed by category + priority level
+var whyItMatters = {
+    en: {
+        tires:      { safety: 'Tire failure can cause loss of vehicle control.',         recommended: 'Tire wear affects handling, fuel efficiency, and ride quality.',        preventive: 'Regular tire maintenance extends tire life and saves money.' },
+        brakes:     { safety: 'Brake failure can cause accidents. This is a critical safety item.', recommended: 'Brake wear reduces stopping power over time.',                  preventive: 'Routine brake service prevents costly emergency repairs.' },
+        suspension: { safety: 'Suspension failure affects steering control and stability.', recommended: 'Worn suspension impacts ride comfort and tire wear.',              preventive: 'Maintaining suspension prevents premature tire and steering wear.' },
+        fluids:     { safety: 'Low or contaminated fluids can cause engine or brake failure.', recommended: 'Fluid condition affects component longevity and performance.',   preventive: 'Regular fluid changes protect your engine and transmission.' },
+        lights:     { safety: 'Non-functioning lights are a safety hazard and legal issue.',   recommended: 'Dim or flickering lights reduce nighttime visibility.',          preventive: 'Keeping all lights working ensures safe visibility.' },
+        engine:     { safety: 'Engine problems can cause breakdowns or further damage.',       recommended: 'Addressing engine issues early prevents expensive repairs.',      preventive: 'Routine engine maintenance extends vehicle life.' },
+        exhaust:    { safety: 'Exhaust leaks can allow harmful gases into the cabin.',         recommended: 'Exhaust wear affects emissions and fuel efficiency.',             preventive: 'Maintaining the exhaust system protects air quality.' },
+        hoses:      { safety: 'Hose failure can cause overheating or loss of power steering.',  recommended: 'Aging hoses are prone to leaks and can fail unexpectedly.',      preventive: 'Replacing hoses on schedule prevents roadside breakdowns.' },
+        belts:      { safety: 'A broken belt can disable power steering or cooling.',           recommended: 'Worn belts can slip, causing reduced performance.',             preventive: 'Belt replacement on schedule avoids unexpected breakdowns.' },
+        battery:    { safety: 'A failing battery can leave you stranded.',                      recommended: 'Weak batteries struggle in cold weather and extreme heat.',      preventive: 'Battery testing catches problems before they leave you stranded.' },
+        wipers:     { safety: 'Poor wipers severely reduce visibility in rain.',                recommended: 'Worn wipers leave streaks that impair vision.',                 preventive: 'Fresh wiper blades ensure clear visibility year-round.' },
+        other:      { safety: 'This item needs immediate attention for safety.',                recommended: 'Addressing this item will improve vehicle reliability.',         preventive: 'Preventive care keeps your vehicle running smoothly.' }
+    },
+    es: {
+        tires:      { safety: 'La falla de neumaticos puede causar perdida de control del vehiculo.',   recommended: 'El desgaste de neumaticos afecta el manejo y la eficiencia.',        preventive: 'El mantenimiento regular extiende la vida de los neumaticos.' },
+        brakes:     { safety: 'La falla de frenos puede causar accidentes. Es un item critico.',        recommended: 'El desgaste de frenos reduce la potencia de frenado.',                preventive: 'El servicio de frenos previene reparaciones de emergencia costosas.' },
+        suspension: { safety: 'La falla de suspension afecta el control de direccion.',                 recommended: 'La suspension desgastada impacta la comodidad y desgaste de neumaticos.', preventive: 'Mantener la suspension previene desgaste prematuro.' },
+        fluids:     { safety: 'Fluidos bajos o contaminados pueden causar fallas del motor o frenos.',  recommended: 'La condicion de fluidos afecta la longevidad de componentes.',       preventive: 'Los cambios regulares protegen su motor y transmision.' },
+        lights:     { safety: 'Las luces que no funcionan son un peligro y problema legal.',             recommended: 'Las luces tenues reducen la visibilidad nocturna.',                  preventive: 'Mantener todas las luces asegura visibilidad segura.' },
+        engine:     { safety: 'Los problemas del motor pueden causar averias o mas dano.',              recommended: 'Atender problemas del motor temprano previene reparaciones caras.',   preventive: 'El mantenimiento rutinario extiende la vida del vehiculo.' },
+        exhaust:    { safety: 'Las fugas de escape pueden permitir gases daninos en la cabina.',         recommended: 'El desgaste del escape afecta emisiones y eficiencia.',              preventive: 'Mantener el escape protege la calidad del aire.' },
+        hoses:      { safety: 'La falla de mangueras puede causar sobrecalentamiento.',                 recommended: 'Las mangueras envejecidas son propensas a fugas.',                   preventive: 'Reemplazar mangueras previene averias en la carretera.' },
+        belts:      { safety: 'Una correa rota puede desactivar la direccion o enfriamiento.',           recommended: 'Las correas desgastadas pueden patinar reduciendo rendimiento.',     preventive: 'El reemplazo de correas evita averias inesperadas.' },
+        battery:    { safety: 'Una bateria fallando puede dejarlo varado.',                             recommended: 'Las baterias debiles tienen problemas en clima extremo.',             preventive: 'Las pruebas de bateria detectan problemas a tiempo.' },
+        wipers:     { safety: 'Limpiaparabrisas deficientes reducen severamente la visibilidad.',        recommended: 'Las plumas desgastadas dejan rayas que afectan la vision.',          preventive: 'Plumas nuevas aseguran visibilidad clara todo el ano.' },
+        other:      { safety: 'Este item necesita atencion inmediata por seguridad.',                   recommended: 'Atender este item mejorara la confiabilidad del vehiculo.',          preventive: 'El cuidado preventivo mantiene su vehiculo funcionando bien.' }
     }
 };
 
 function toggleLanguage() {
     currentLang = currentLang === 'en' ? 'es' : 'en';
     applyTranslations();
+    updatePrioritySummary();
 }
 
 function applyTranslations() {
@@ -324,9 +360,31 @@ function formatMoney(amount) {
     return '$' + parseFloat(amount || 0).toFixed(2);
 }
 
+// Map inspection_rating to priority level
+function getPriority(item) {
+    if (item.inspection_rating === 'red') return 'safety';
+    if (item.inspection_rating === 'yellow') return 'recommended';
+    return 'preventive';
+}
+
+function getPriorityLabel(priority) {
+    if (priority === 'safety') return t[currentLang].safetyCritical;
+    if (priority === 'recommended') return t[currentLang].recommended;
+    return t[currentLang].preventive;
+}
+
+function getPriorityBadgeClass(priority) {
+    if (priority === 'safety') return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+    if (priority === 'recommended') return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+    return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+}
+
 function buildItemRow(item) {
     var row = document.createElement('div');
-    row.className = 'px-6 py-4 flex items-center gap-4';
+    row.className = 'px-6 py-4';
+
+    var mainRow = document.createElement('div');
+    mainRow.className = 'flex items-center gap-4';
 
     // Toggle checkbox
     var label = document.createElement('label');
@@ -348,8 +406,16 @@ function buildItemRow(item) {
     textWrap.className = 'flex-1 min-w-0';
 
     var descLine = document.createElement('div');
-    descLine.className = 'flex items-center gap-2';
+    descLine.className = 'flex items-center gap-2 flex-wrap';
 
+    // Priority badge (before type badge)
+    var priority = getPriority(item);
+    var priorityBadge = document.createElement('span');
+    priorityBadge.className = 'text-xs font-bold px-2 py-0.5 rounded ' + getPriorityBadgeClass(priority);
+    priorityBadge.textContent = getPriorityLabel(priority);
+    descLine.appendChild(priorityBadge);
+
+    // Type badge
     var typeColors = {
         labor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
         parts: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
@@ -378,17 +444,84 @@ function buildItemRow(item) {
         textWrap.appendChild(qtyLine);
     }
 
+    // "Why it matters" description
+    if (item.inspection_category) {
+        var catDescs = (whyItMatters[currentLang] || whyItMatters.en)[item.inspection_category];
+        if (catDescs) {
+            var whyText = catDescs[priority] || '';
+            if (whyText) {
+                var whyEl = document.createElement('p');
+                whyEl.className = 'text-xs italic text-gray-400 dark:text-gray-500 mt-1 why-it-matters';
+                whyEl.textContent = whyText;
+                textWrap.appendChild(whyEl);
+            }
+        }
+    }
+
     label.appendChild(checkbox);
     label.appendChild(textWrap);
-    row.appendChild(label);
+    mainRow.appendChild(label);
 
     // Price
     var price = document.createElement('span');
     price.className = 'font-semibold text-gray-900 dark:text-white text-sm flex-shrink-0';
     price.textContent = formatMoney(item.total);
-    row.appendChild(price);
+    mainRow.appendChild(price);
 
+    row.appendChild(mainRow);
     return row;
+}
+
+function buildPrioritySummary() {
+    var container = document.getElementById('priority-summary');
+    while (container.firstChild) container.removeChild(container.firstChild);
+
+    var priorities = [
+        { key: 'safety', label: t[currentLang].safetyCritical, bg: 'bg-red-50 dark:bg-red-900/20', border: 'border-red-200 dark:border-red-800', text: 'text-red-700 dark:text-red-400', amountId: 'priority-safety-amount' },
+        { key: 'recommended', label: t[currentLang].recommended, bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-200 dark:border-yellow-800', text: 'text-yellow-700 dark:text-yellow-400', amountId: 'priority-recommended-amount' },
+        { key: 'preventive', label: t[currentLang].preventive, bg: 'bg-blue-50 dark:bg-blue-900/20', border: 'border-blue-200 dark:border-blue-800', text: 'text-blue-700 dark:text-blue-400', amountId: 'priority-preventive-amount' }
+    ];
+
+    priorities.forEach(function(p) {
+        var box = document.createElement('div');
+        box.className = 'text-center p-3 rounded-xl border priority-box ' + p.bg + ' ' + p.border;
+
+        var amountEl = document.createElement('div');
+        amountEl.className = 'text-lg font-bold ' + p.text;
+        amountEl.id = p.amountId;
+        amountEl.textContent = '$0.00';
+        box.appendChild(amountEl);
+
+        var labelEl = document.createElement('div');
+        labelEl.className = 'text-xs font-medium ' + p.text;
+        labelEl.textContent = p.label;
+        box.appendChild(labelEl);
+
+        container.appendChild(box);
+    });
+
+    container.classList.remove('hidden');
+}
+
+function updatePrioritySummary() {
+    var safetyTotal = 0, recommendedTotal = 0, preventiveTotal = 0;
+
+    estimateItems.forEach(function(item) {
+        if (!itemApprovals[item.id]) return;
+        var priority = getPriority(item);
+        var amount = parseFloat(item.total || 0);
+        if (priority === 'safety') safetyTotal += amount;
+        else if (priority === 'recommended') recommendedTotal += amount;
+        else preventiveTotal += amount;
+    });
+
+    var safetyEl = document.getElementById('priority-safety-amount');
+    var recEl = document.getElementById('priority-recommended-amount');
+    var prevEl = document.getElementById('priority-preventive-amount');
+
+    if (safetyEl) safetyEl.textContent = formatMoney(safetyTotal);
+    if (recEl) recEl.textContent = formatMoney(recommendedTotal);
+    if (prevEl) prevEl.textContent = formatMoney(preventiveTotal);
 }
 
 function recalculateTotals() {
@@ -404,6 +537,8 @@ function recalculateTotals() {
     document.getElementById('display-subtotal').textContent = formatMoney(subtotal);
     document.getElementById('display-tax').textContent = formatMoney(taxAmount);
     document.getElementById('display-total').textContent = formatMoney(total);
+
+    updatePrioritySummary();
 }
 
 async function loadEstimate() {
@@ -431,6 +566,9 @@ async function loadEstimate() {
         taxRate = parseFloat(data.tax_rate || 0);
         estimateItems = data.items || [];
 
+        // Build priority cost summary
+        buildPrioritySummary();
+
         // Build items list
         var container = document.getElementById('items-list');
         estimateItems.forEach(function(item) {
@@ -441,6 +579,9 @@ async function loadEstimate() {
         document.getElementById('display-subtotal').textContent = formatMoney(data.subtotal);
         document.getElementById('display-tax').textContent = formatMoney(data.tax_amount);
         document.getElementById('display-total').textContent = formatMoney(data.total);
+
+        // Update priority summary with initial totals
+        updatePrioritySummary();
 
         if (data.valid_until) {
             var vu = document.getElementById('valid-until');
