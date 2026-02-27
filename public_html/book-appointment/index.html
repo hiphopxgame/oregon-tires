@@ -73,6 +73,17 @@
   <!-- Dark mode init (prevent FOUC) -->
   <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
   <script src="https://hiphop.world/sdk/hiphopworld.js" data-site-key="oregontires" data-auto></script>
+  <!-- BreadcrumbList Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://oregon.tires/"},
+      {"@type": "ListItem", "position": 2, "name": "Book Appointment"}
+    ]
+  }
+  </script>
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
@@ -448,6 +459,15 @@
 // ===== PHP API =====
 const API_BASE = '/api';
 
+// ===== UTM CAPTURE =====
+(function captureUtm() {
+  var params = new URLSearchParams(window.location.search);
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function(key) {
+    var val = params.get(key);
+    if (val) sessionStorage.setItem(key, val);
+  });
+})();
+
 // ===== TRANSLATIONS =====
 // Detect language: URL param > localStorage > browser > default English
 let currentLang = (function() {
@@ -771,6 +791,21 @@ function showConfirmation(data, response) {
   var details = document.getElementById('confirmation-details');
 
   form.classList.add('hidden');
+
+  // GA4 conversion event
+  if (typeof gtag === 'function') {
+    gtag('event', 'booking_complete', {
+      event_category: 'conversion',
+      service_type: data.service,
+      preferred_date: data.preferred_date,
+      preferred_time: data.preferred_time,
+      has_vehicle: !!(data.vehicle_year || data.vehicle_make || data.vehicle_model),
+      language: currentLang,
+      value: 1,
+      currency: 'USD'
+    });
+  }
+
   hideStatus();
 
   // Build confirmation details using createElement/textContent (no innerHTML with user data)
@@ -946,7 +981,11 @@ document.getElementById('booking-form').addEventListener('submit', async functio
     email: email,
     notes: form.notes.value.trim() || null,
     sms_opt_in: document.getElementById('sms-opt-in').checked ? 1 : 0,
-    language: currentLang === 'en' ? 'english' : 'spanish'
+    language: currentLang === 'en' ? 'english' : 'spanish',
+    utm_source: sessionStorage.getItem('utm_source') || '',
+    utm_medium: sessionStorage.getItem('utm_medium') || '',
+    utm_campaign: sessionStorage.getItem('utm_campaign') || '',
+    utm_content: sessionStorage.getItem('utm_content') || ''
   };
 
   try {
@@ -1535,5 +1574,6 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
   } catch(e) {}
 })();
 </script>
+<script src="/assets/js/cookie-consent.js" defer></script>
 </body>
 </html>

@@ -72,6 +72,35 @@ $canonicalUrl = 'https://oregon.tires/care-plan';
   <?php include __DIR__ . '/templates/header.php'; ?>
 
   <main id="main-content">
+    <!-- Status Banners (shown via JS based on query params) -->
+    <div id="cp-enrolled-banner" class="hidden bg-green-600 text-white py-4 px-4 text-center">
+      <div class="container mx-auto max-w-3xl flex items-center justify-center gap-3">
+        <span class="text-2xl" aria-hidden="true">&#10003;</span>
+        <div>
+          <p class="font-bold text-lg">Welcome to the Oregon Tires Care Plan!</p>
+          <p class="text-sm opacity-90">Your enrollment is confirmed. Your benefits are active immediately.</p>
+        </div>
+      </div>
+    </div>
+    <div id="cp-cancelled-banner" class="hidden bg-amber-500 text-black py-4 px-4 text-center">
+      <div class="container mx-auto max-w-3xl flex items-center justify-center gap-3">
+        <span class="text-2xl" aria-hidden="true">&#9888;</span>
+        <div>
+          <p class="font-bold">Enrollment not completed</p>
+          <p class="text-sm">Payment was cancelled. You can enroll anytime below.</p>
+        </div>
+      </div>
+    </div>
+    <div id="cp-pending-banner" class="hidden bg-blue-600 text-white py-4 px-4 text-center">
+      <div class="container mx-auto max-w-3xl flex items-center justify-center gap-3">
+        <span class="text-2xl" aria-hidden="true">&#9993;</span>
+        <div>
+          <p class="font-bold">Enrollment Received!</p>
+          <p class="text-sm opacity-90" id="cp-pending-message">We will contact you to complete payment setup.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Hero -->
     <section class="bg-brand text-white py-16 relative">
       <div class="absolute inset-0 bg-gradient-to-br from-green-900/90 to-brand/95" aria-hidden="true"></div>
@@ -105,7 +134,7 @@ $canonicalUrl = 'https://oregon.tires/care-plan';
               <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Free tire rotations</li>
               <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Priority scheduling</li>
             </ul>
-            <a href="/book-appointment/?plan=basic" class="block text-center bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition">Get Started</a>
+            <button type="button" data-plan="basic" data-plan-name="Basic Care Plan" data-plan-price="19" class="cp-enroll-btn block w-full text-center bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition cursor-pointer">Enroll Now</button>
           </div>
 
           <!-- Standard (Popular) -->
@@ -120,7 +149,7 @@ $canonicalUrl = 'https://oregon.tires/care-plan';
               <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Priority scheduling</li>
               <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Free multi-point inspections</li>
             </ul>
-            <a href="/book-appointment/?plan=standard" class="block text-center bg-amber-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-md">Get Started</a>
+            <button type="button" data-plan="standard" data-plan-name="Standard Care Plan" data-plan-price="29" class="cp-enroll-btn block w-full text-center bg-amber-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-md cursor-pointer">Enroll Now</button>
           </div>
 
           <!-- Premium -->
@@ -136,7 +165,7 @@ $canonicalUrl = 'https://oregon.tires/care-plan';
               <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Roadside assistance</li>
               <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> Free alignment check</li>
             </ul>
-            <a href="/book-appointment/?plan=premium" class="block text-center bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition">Get Started</a>
+            <button type="button" data-plan="premium" data-plan-name="Premium Care Plan" data-plan-price="49" class="cp-enroll-btn block w-full text-center bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition cursor-pointer">Enroll Now</button>
           </div>
         </div>
       </div>
@@ -203,7 +232,7 @@ $canonicalUrl = 'https://oregon.tires/care-plan';
         <h2 class="text-2xl font-bold mb-3">Ready to Start Saving?</h2>
         <p class="mb-6 max-w-lg mx-auto">Join hundreds of Portland drivers who save money and skip the line with an Oregon Tires Care Plan.</p>
         <div class="flex justify-center gap-3 flex-wrap">
-          <a href="/book-appointment/?plan=standard" class="bg-brand text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800 transition shadow-lg">Enroll Now</a>
+          <button type="button" data-plan="standard" data-plan-name="Standard Care Plan" data-plan-price="29" class="cp-enroll-btn bg-brand text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800 transition shadow-lg cursor-pointer">Enroll Now</button>
           <a href="tel:5033679714" class="border-2 border-black text-black px-8 py-3 rounded-lg font-semibold hover:bg-black/10 transition">Call (503) 367-9714</a>
         </div>
       </div>
@@ -212,16 +241,252 @@ $canonicalUrl = 'https://oregon.tires/care-plan';
 
   <?php include __DIR__ . '/templates/footer.php'; ?>
 
+  <!-- Enrollment Modal -->
+  <div id="cp-modal-overlay" class="hidden fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="cp-modal-title">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 id="cp-modal-title" class="text-xl font-bold text-gray-900 dark:text-white">Enroll in <span id="cp-modal-plan-name">Care Plan</span></h2>
+          <button type="button" id="cp-modal-close" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl leading-none" aria-label="Close">&times;</button>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mb-1">Monthly subscription: <strong id="cp-modal-price" class="text-brand dark:text-green-400">$29/mo</strong></p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">Cancel anytime. No contracts or hidden fees.</p>
+
+        <form id="cp-enroll-form" novalidate>
+          <input type="hidden" id="cp-plan-type" name="plan_type" value="">
+          <div class="space-y-4">
+            <div>
+              <label for="cp-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name <span class="text-red-500">*</span></label>
+              <input type="text" id="cp-name" name="name" required autocomplete="name" maxlength="200"
+                     class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition">
+            </div>
+            <div>
+              <label for="cp-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email <span class="text-red-500">*</span></label>
+              <input type="email" id="cp-email" name="email" required autocomplete="email" maxlength="254"
+                     class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition">
+            </div>
+            <div>
+              <label for="cp-phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone <span class="text-gray-400 text-xs">(optional)</span></label>
+              <input type="tel" id="cp-phone" name="phone" autocomplete="tel" maxlength="30"
+                     class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition">
+            </div>
+          </div>
+
+          <div id="cp-form-error" class="hidden mt-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300"></div>
+
+          <button type="submit" id="cp-submit-btn" class="mt-6 w-full bg-brand text-white py-3 rounded-lg font-semibold hover:bg-green-800 transition flex items-center justify-center gap-2">
+            <span id="cp-submit-text">Continue to Payment</span>
+            <span id="cp-submit-spinner" class="hidden">
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+            </span>
+          </button>
+
+          <p class="mt-3 text-xs text-center text-gray-500 dark:text-gray-400">Secure payment processed by PayPal. You will be redirected to complete payment.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Sticky Mobile CTA -->
   <div class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-brand shadow-[0_-4px_12px_rgba(0,0,0,0.15)] border-t border-green-700" role="complementary" aria-label="Quick actions">
     <div class="flex">
       <a href="tel:5033679714" class="flex-1 flex items-center justify-center gap-2 py-3.5 text-white font-semibold text-sm border-r border-green-700">
         <span aria-hidden="true">&#x1F4DE;</span> Call Now
       </a>
-      <a href="/book-appointment/?plan=standard" class="flex-1 flex items-center justify-center gap-2 py-3.5 bg-amber-500 text-black font-semibold text-sm">
+      <button type="button" data-plan="standard" data-plan-name="Standard Care Plan" data-plan-price="29" class="cp-enroll-btn flex-1 flex items-center justify-center gap-2 py-3.5 bg-amber-500 text-black font-semibold text-sm cursor-pointer border-0">
         <span aria-hidden="true">&#x1F4C5;</span> Enroll Now
-      </a>
+      </button>
     </div>
   </div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    // ─── Query param banners ──────────────────────────────────────────
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('enrolled') === 'true') {
+      var enrolledBanner = document.getElementById('cp-enrolled-banner');
+      if (enrolledBanner) enrolledBanner.classList.remove('hidden');
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+      // GA4 event
+      if (typeof gtag === 'function') {
+        gtag('event', 'care_plan_enrolled', {
+          plan_type: params.get('plan') || 'unknown'
+        });
+      }
+    }
+    if (params.get('cancelled') === 'true') {
+      var cancelledBanner = document.getElementById('cp-cancelled-banner');
+      if (cancelledBanner) cancelledBanner.classList.remove('hidden');
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+
+    // ─── Modal controls ───────────────────────────────────────────────
+    var overlay = document.getElementById('cp-modal-overlay');
+    var closeBtn = document.getElementById('cp-modal-close');
+    var form = document.getElementById('cp-enroll-form');
+    var planTypeInput = document.getElementById('cp-plan-type');
+    var planNameEl = document.getElementById('cp-modal-plan-name');
+    var priceEl = document.getElementById('cp-modal-price');
+    var errorEl = document.getElementById('cp-form-error');
+    var submitBtn = document.getElementById('cp-submit-btn');
+    var submitText = document.getElementById('cp-submit-text');
+    var submitSpinner = document.getElementById('cp-submit-spinner');
+
+    function openModal(planType, planName, planPrice) {
+      planTypeInput.value = planType;
+      planNameEl.textContent = planName;
+      priceEl.textContent = '$' + planPrice + '/mo';
+      errorEl.classList.add('hidden');
+      errorEl.textContent = '';
+      form.reset();
+      planTypeInput.value = planType;
+      overlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      // Focus first input
+      var nameInput = document.getElementById('cp-name');
+      if (nameInput) {
+        setTimeout(function() { nameInput.focus(); }, 100);
+      }
+    }
+
+    function closeModal() {
+      overlay.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // Attach click handlers to all enroll buttons
+    var enrollBtns = document.querySelectorAll('.cp-enroll-btn');
+    for (var i = 0; i < enrollBtns.length; i++) {
+      enrollBtns[i].addEventListener('click', function() {
+        var plan = this.getAttribute('data-plan');
+        var name = this.getAttribute('data-plan-name');
+        var price = this.getAttribute('data-plan-price');
+        openModal(plan, name, price);
+      });
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeModal);
+    }
+
+    // Close on overlay click (not on modal content)
+    if (overlay) {
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeModal();
+      });
+    }
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !overlay.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+
+    // ─── Form submission ──────────────────────────────────────────────
+    function setLoading(loading) {
+      submitBtn.disabled = loading;
+      submitText.textContent = loading ? 'Processing...' : 'Continue to Payment';
+      if (loading) {
+        submitSpinner.classList.remove('hidden');
+      } else {
+        submitSpinner.classList.add('hidden');
+      }
+    }
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+    }
+
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        errorEl.classList.add('hidden');
+
+        var nameVal = document.getElementById('cp-name').value.trim();
+        var emailVal = document.getElementById('cp-email').value.trim();
+        var phoneVal = document.getElementById('cp-phone').value.trim();
+        var planVal = planTypeInput.value;
+
+        // Client-side validation
+        if (!nameVal) {
+          showError('Please enter your full name.');
+          return;
+        }
+        if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+          showError('Please enter a valid email address.');
+          return;
+        }
+
+        setLoading(true);
+
+        fetch('/api/care-plan-enroll.php', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            plan_type: planVal,
+            name: nameVal,
+            email: emailVal,
+            phone: phoneVal
+          })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(json) {
+          setLoading(false);
+
+          if (!json.success) {
+            showError(json.error || 'Something went wrong. Please try again.');
+            return;
+          }
+
+          var data = json.data || {};
+
+          // If PayPal approval URL is available, redirect there
+          if (data.approval_url) {
+            window.location.href = data.approval_url;
+            return;
+          }
+
+          // Otherwise, show pending confirmation
+          closeModal();
+          var pendingBanner = document.getElementById('cp-pending-banner');
+          var pendingMsg = document.getElementById('cp-pending-message');
+          if (pendingBanner) {
+            if (data.message) pendingMsg.textContent = data.message;
+            pendingBanner.classList.remove('hidden');
+            pendingBanner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+
+          // GA4 event
+          if (typeof gtag === 'function') {
+            gtag('event', 'care_plan_enroll_submitted', {
+              plan_type: planVal,
+              enrollment_id: data.enrollment_id
+            });
+          }
+        })
+        .catch(function(err) {
+          setLoading(false);
+          showError('Network error. Please check your connection and try again.');
+        });
+      });
+    }
+
+    // ─── Auto-open modal from URL hash ────────────────────────────────
+    if (window.location.hash) {
+      var hashPlan = window.location.hash.replace('#enroll-', '');
+      if (['basic', 'standard', 'premium'].indexOf(hashPlan) !== -1) {
+        var planNames = { basic: 'Basic Care Plan', standard: 'Standard Care Plan', premium: 'Premium Care Plan' };
+        var planPrices = { basic: '19', standard: '29', premium: '49' };
+        openModal(hashPlan, planNames[hashPlan], planPrices[hashPlan]);
+      }
+    }
+  })();
+  </script>
 </body>
 </html>

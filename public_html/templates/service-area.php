@@ -166,9 +166,14 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
             ['name' => 'Inspection', 'price' => '$50+', 'slug' => 'inspection'],
             ['name' => 'Mobile Service', 'price' => 'Call', 'slug' => 'mobile-service'],
           ];
-          foreach ($services as $svc): ?>
-          <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-5 text-center border border-gray-200 dark:border-gray-700 hover:border-brand dark:hover:border-green-400 transition">
+          $servicePages = ['tire-installation', 'tire-repair', 'oil-change', 'brake-service', 'wheel-alignment', 'engine-diagnostics', 'suspension-repair'];
+          foreach ($services as $i => $svc): ?>
+          <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-5 text-center border border-gray-200 dark:border-gray-700 hover:border-brand dark:hover:border-green-400 transition" data-reveal data-reveal-delay="<?= $i * 100 ?>">
+            <?php if (in_array($svc['slug'], $servicePages)): ?>
+            <a href="/<?= $svc['slug'] ?>" class="text-sm text-gray-500 dark:text-gray-400 mb-1 hover:text-brand dark:hover:text-green-400 transition block"><?= $svc['name'] ?></a>
+            <?php else: ?>
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1"><?= $svc['name'] ?></div>
+            <?php endif; ?>
             <div class="text-2xl font-bold text-brand dark:text-green-400"><?= $svc['price'] ?></div>
             <a href="/book-appointment/?service=<?= $svc['slug'] ?>" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition">Book Now &rarr;</a>
           </div>
@@ -182,7 +187,7 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
     <section class="py-12 bg-gray-50 dark:bg-gray-800">
       <div class="container mx-auto px-4 max-w-2xl text-center">
         <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-6">What <?= htmlspecialchars($areaName) ?> Customers Say</h2>
-        <blockquote class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-8">
+        <blockquote class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-8" data-reveal="fade">
           <div class="flex justify-center mb-3">
             <span class="text-yellow-400 text-xl" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
           </div>
@@ -197,19 +202,19 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
       <div class="container mx-auto px-4 max-w-4xl">
         <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-6 text-center">Why <?= htmlspecialchars($areaName) ?> Drivers Choose Oregon Tires</h2>
         <div class="grid md:grid-cols-2 gap-6">
-          <div class="flex items-start gap-3">
+          <div class="flex items-start gap-3" data-reveal data-reveal-delay="0">
             <span class="text-brand dark:text-green-400 text-xl" aria-hidden="true">&#10003;</span>
             <div><strong class="text-brand dark:text-green-400">100% Bilingual</strong><p class="text-gray-600 dark:text-gray-300 text-sm">Full service in English and Spanish</p></div>
           </div>
-          <div class="flex items-start gap-3">
+          <div class="flex items-start gap-3" data-reveal data-reveal-delay="100">
             <span class="text-brand dark:text-green-400 text-xl" aria-hidden="true">&#10003;</span>
             <div><strong class="text-brand dark:text-green-400">Honest Pricing</strong><p class="text-gray-600 dark:text-gray-300 text-sm">No hidden fees or upselling</p></div>
           </div>
-          <div class="flex items-start gap-3">
+          <div class="flex items-start gap-3" data-reveal data-reveal-delay="200">
             <span class="text-brand dark:text-green-400 text-xl" aria-hidden="true">&#10003;</span>
             <div><strong class="text-brand dark:text-green-400">12-Month Warranty</strong><p class="text-gray-600 dark:text-gray-300 text-sm">12,000-mile warranty on all services</p></div>
           </div>
-          <div class="flex items-start gap-3">
+          <div class="flex items-start gap-3" data-reveal data-reveal-delay="300">
             <span class="text-brand dark:text-green-400 text-xl" aria-hidden="true">&#10003;</span>
             <div><strong class="text-brand dark:text-green-400">Mobile Service</strong><p class="text-gray-600 dark:text-gray-300 text-sm">We come to your <?= htmlspecialchars($areaName) ?> location</p></div>
           </div>
@@ -258,5 +263,6 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
       </a>
     </div>
   </div>
+<script src="/assets/js/scroll-reveal.js" defer></script>
 </body>
 </html>

@@ -436,9 +436,12 @@
         <button onclick="switchTab('messages')" data-tab="messages" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">💬 <span data-t="tabMessages">Messages</span></button>
         <button onclick="switchTab('employees')" data-tab="employees" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👥 <span data-t="tabEmployees">Employees</span></button>
         <button onclick="switchTab('gallery')" data-tab="gallery" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 <span data-t="tabGallery">Gallery</span></button>
+        <button onclick="switchTab('blog')" data-tab="blog" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📝 <span data-t="tabBlog">Blog</span></button>
+        <button onclick="switchTab('promotions')" data-tab="promotions" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🏷 <span data-t="tabPromotions">Promotions</span></button>
         <button onclick="switchTab('analytics')" data-tab="analytics" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📈 <span data-t="tabAnalytics">Analytics</span></button>
         <button onclick="switchTab('docs')" data-tab="docs" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📖 <span data-t="tabDocs">Docs</span></button>
         <button onclick="switchTab('sitecontent')" data-tab="sitecontent" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📝 <span data-t="tabSiteContent">Site Content</span></button>
+        <button onclick="switchTab('subscribers')" data-tab="subscribers" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📧 <span data-t="tabSubscribers">Subscribers</span> <span id="subscribers-badge" class="ml-1 bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full"></span></button>
       </nav>
       <select id="mobile-tab-select" onchange="switchTab(this.value)" class="hidden w-full mt-2 bg-white/20 text-white border border-white/30 rounded-lg px-4 py-3 text-sm font-medium appearance-none cursor-pointer" style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22white%22 d=%22M2 4l4 4 4-4%22/></svg>');background-repeat:no-repeat;background-position:right 12px center;">
         <option value="overview">Overview</option>
@@ -448,9 +451,12 @@
         <option value="messages">Messages</option>
         <option value="employees">Employees</option>
         <option value="gallery">Gallery</option>
+        <option value="blog">Blog</option>
+        <option value="promotions">Promotions</option>
         <option value="analytics">Analytics</option>
         <option value="docs">Docs</option>
         <option value="sitecontent">Site Content</option>
+        <option value="subscribers">Subscribers</option>
       </select>
     </div>
   </header>
@@ -763,6 +769,233 @@
         <div id="gal-subtab-serviceimgs" class="hidden">
           <div class="flex justify-between items-center mb-4"><div><h2 class="text-2xl font-bold text-brand dark:text-green-400">Service Images Manager</h2><p class="text-gray-600 dark:text-gray-400 mt-1">Manage the hero background and 7 service images displayed on the home page</p></div></div>
           <div id="service-images-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOG TAB -->
+    <div id="tab-blog" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div><h2 class="text-2xl font-bold" data-t="blogManagement">Blog Management</h2><p class="text-green-100" data-t="blogManagementDesc">Create and manage blog posts</p></div>
+        <button onclick="openBlogEditor()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition">+ New Post</button>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-3 mb-4 items-center">
+          <input type="text" id="blog-search" placeholder="Search posts..." oninput="blogSearchDebounce()" class="px-3 py-2 border rounded-lg text-sm w-64 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+          <select id="blog-status-filter" onchange="loadBlogPosts(1)" class="px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+            <option value="">All Statuses</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+          </select>
+        </div>
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300">Title</th>
+                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300">Status</th>
+                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300">Date</th>
+                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300">Author</th>
+                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="blog-table-body"></tbody>
+          </table>
+        </div>
+        <!-- Pagination -->
+        <div id="blog-pagination-admin" class="flex items-center justify-center gap-3 mt-4"></div>
+      </div>
+
+      <!-- Blog Editor Modal -->
+      <div id="blog-editor-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-8 overflow-y-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl mx-4 mb-8">
+          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+            <h3 id="blog-form-title" class="text-lg font-bold">New Blog Post</h3>
+            <button onclick="closeBlogEditor()" class="text-white/70 hover:text-white text-2xl leading-none">&times;</button>
+          </div>
+          <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <!-- Title EN -->
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Title (English) *</label>
+              <input id="blog-title-en" oninput="blogAutoSlug()" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Article title in English">
+            </div>
+            <!-- Title ES -->
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Title (Spanish)</label>
+              <input id="blog-title-es" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Titulo del articulo en Espanol">
+            </div>
+            <!-- Slug -->
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Slug (URL)</label>
+              <input id="blog-slug" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="auto-generated-from-title">
+            </div>
+            <!-- Excerpt EN / ES -->
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Excerpt (EN)</label>
+                <textarea id="blog-excerpt-en" rows="2" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Short description for cards"></textarea>
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Excerpt (ES)</label>
+                <textarea id="blog-excerpt-es" rows="2" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Descripcion corta"></textarea>
+              </div>
+            </div>
+            <!-- Body EN -->
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Body (English) * <span class="text-xs text-gray-400">HTML supported</span></label>
+              <textarea id="blog-body-en" rows="10" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="<h2>Title</h2><p>Content...</p>"></textarea>
+            </div>
+            <!-- Body ES -->
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Body (Spanish) <span class="text-xs text-gray-400">HTML supported</span></label>
+              <textarea id="blog-body-es" rows="8" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="<h2>Titulo</h2><p>Contenido...</p>"></textarea>
+            </div>
+            <!-- Featured Image + Author + Status -->
+            <div class="grid md:grid-cols-3 gap-4">
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Featured Image URL</label>
+                <input id="blog-image" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="/uploads/blog/image.jpg">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Author</label>
+                <input id="blog-author" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" value="Oregon Tires">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Status</label>
+                <select id="blog-status" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600">
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
+            </div>
+            <!-- Categories -->
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Categories</label>
+              <div id="blog-categories-list" class="flex flex-wrap gap-4 mt-2"></div>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t dark:border-gray-700 flex justify-end gap-3">
+            <button onclick="closeBlogEditor()" class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+            <button onclick="saveBlogPost()" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-800 transition">Save Post</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROMOTIONS TAB -->
+    <div id="tab-promotions" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🏷 <span data-t="promotionsHeading">Seasonal Promotions</span></h2>
+          <p class="text-green-100" data-t="promotionsSubtitle">Manage homepage banner promotions with date scheduling</p>
+        </div>
+        <button onclick="togglePromotionForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ New Promotion</button>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+
+        <!-- Inline form (hidden by default) -->
+        <div id="promotion-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+          <h4 id="promo-form-title" class="font-bold text-lg mb-4 dark:text-gray-200">New Promotion</h4>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Title (EN) *</label>
+              <input id="promo-title-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Spring Tire Sale..." oninput="updatePromoPreview()">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Title (ES)</label>
+              <input id="promo-title-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Venta de Llantas...">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Body (EN)</label>
+              <textarea id="promo-body-en" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Promotion details in English..."></textarea>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Body (ES)</label>
+              <textarea id="promo-body-es" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Detalles de la promocion..."></textarea>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">CTA Text (EN)</label>
+              <input id="promo-cta-text-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" value="Book Now" oninput="updatePromoPreview()">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">CTA Text (ES)</label>
+              <input id="promo-cta-text-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" value="Reserve Ahora">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">CTA URL</label>
+              <input id="promo-cta-url" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" value="/book-appointment/">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Badge Text</label>
+              <input id="promo-badge" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="SPRING SALE" oninput="updatePromoPreview()">
+            </div>
+            <div class="flex gap-4">
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">BG Color</label>
+                <div class="flex items-center gap-2 mt-1">
+                  <input id="promo-bg-color" type="color" value="#f59e0b" class="w-10 h-10 rounded cursor-pointer" oninput="updatePromoPreview()">
+                  <span class="text-xs text-gray-400 dark:text-gray-500">#f59e0b</span>
+                </div>
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Text Color</label>
+                <div class="flex items-center gap-2 mt-1">
+                  <input id="promo-text-color" type="color" value="#000000" class="w-10 h-10 rounded cursor-pointer" oninput="updatePromoPreview()">
+                  <span class="text-xs text-gray-400 dark:text-gray-500">#000000</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-6">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="promo-active" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
+                <span class="text-sm font-medium dark:text-gray-300">Active</span>
+              </label>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Sort Order</label>
+                <input id="promo-sort" type="number" value="0" min="0" class="w-20 p-2 border rounded mt-1 ml-2 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Starts At</label>
+              <input id="promo-starts" type="datetime-local" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Ends At</label>
+              <input id="promo-ends" type="datetime-local" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+            </div>
+          </div>
+          <div class="mt-4">
+            <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Banner Preview</label>
+            <div id="promo-live-preview" class="mt-1 px-4 py-3 rounded-lg text-sm" style="background-color: #f59e0b; color: #000;">
+              <span class="font-semibold">Your Promotion Title</span>
+              <span class="ml-3 underline font-bold">Book Now →</span>
+            </div>
+          </div>
+          <div class="flex gap-2 mt-4">
+            <button onclick="savePromotion()" id="promo-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">Create Promotion</button>
+            <button onclick="togglePromotionForm()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Promotions table -->
+        <div class="overflow-x-auto">
+          <table class="w-full responsive-table">
+            <thead>
+              <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                <th class="px-4 py-3 font-medium">Title</th>
+                <th class="px-4 py-3 font-medium">Status</th>
+                <th class="px-4 py-3 font-medium">Date Range</th>
+                <th class="px-4 py-3 font-medium text-center">Order</th>
+                <th class="px-4 py-3 font-medium">Color</th>
+                <th class="px-4 py-3 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="promotions-table-body">
+              <tr><td colspan="6" class="text-center py-8 text-gray-400">Loading...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -4547,6 +4780,28 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
       </div>
     </div>
 
+    <!-- SUBSCRIBERS TAB -->
+    <div id="tab-subscribers" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">📧 <span data-t="subscribersHeading">Subscribers</span></h2>
+          <p class="text-green-100" data-t="subscribersSubtitle">Manage newsletter and notification subscribers</p>
+        </div>
+        <button onclick="exportSubscribersCsv()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition">📥 Export CSV</button>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
+          <div class="flex-1 relative">
+            <input type="text" id="subscriber-search" placeholder="Search by email..." class="w-full p-2.5 pl-10 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" onkeyup="if(event.key==='Enter')searchSubscribers()">
+            <svg class="absolute left-3 top-3 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <button onclick="searchSubscribers()" class="bg-brand text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition">Search</button>
+          <button onclick="loadSubscribers(1, '')" class="border px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition">Reset</button>
+        </div>
+        <div id="subscribers-grid"></div>
+      </div>
+    </div>
+
   </div>
 
 <!-- NOTES MODAL -->
@@ -7306,7 +7561,9 @@ function switchTab(tab) {
   if(tab==='appointments') renderCalendar();
   if(tab==='customers') loadCustomers();
   if(tab==='sitecontent') { loadSiteSettings(); loadEmailTemplates(); }
+  if(tab==='subscribers' && typeof loadSubscribers === 'function') loadSubscribers();
   if(tab==='repairorders' && typeof loadRepairOrders === 'function') loadRepairOrders();
+  if(tab==='promotions' && typeof loadPromotions === 'function') loadPromotions();
 }
 
 // Sub-tab switching for Appointments (Calendar vs List)
@@ -8097,6 +8354,9 @@ loadMessages = async function() {
 </script>
 <script src="/admin/js/repair-orders.js"></script>
 <script src="/admin/js/kanban.js"></script>
+<script src="/admin/js/blog.js" defer></script>
+<script src="/admin/js/subscribers.js"></script>
+<script src="/admin/js/promotions.js"></script>
 <script type="module">
   import { showToast as brandShowToast } from '/shared/ui/components/brand-toast.js';
   // Override global showToast — handles legacy (msg, isError: bool) and new (msg, type: string)

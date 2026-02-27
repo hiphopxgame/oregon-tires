@@ -771,6 +771,9 @@
     </div>
   </header>
 
+  <!-- Promotion Banner (dynamically loaded) -->
+  <div id="promo-banner" class="hidden"></div>
+
   <!-- Hero -->
   <main id="main-content">
   <section id="home" class="bg-brand text-white py-20 scroll-mt-24 relative bg-cover bg-center" role="img" aria-label="Oregon Tires Auto Care shop exterior" style="background-color: #0D3618; background-image: url('assets/hero-bg.webp');">
@@ -823,49 +826,49 @@
 
       <!-- Feature cards with dynamic images -->
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="service-feature-cards">
-        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="0">
           <div id="svc-img-expert-technicians" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/expert-technicians.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="expertService">Expert Technicians</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="expertServiceDesc">Our certified mechanics have years of experience with all vehicle makes and models.</p>
           </div>
         </div>
-        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="100">
           <div id="svc-img-fast-cars" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/fast-cars.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="quickService">Fast Service</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="quickServiceDesc">Most services completed while you wait. We value your time and get you back on the road quickly.</p>
           </div>
         </div>
-        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="200">
           <div id="svc-img-quality-car-parts" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/quality-parts.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="qualityParts">Quality Parts</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="qualityPartsDesc">We use only premium parts and materials to ensure lasting repairs and optimal performance.</p>
           </div>
         </div>
-        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="300">
           <div id="svc-img-bilingual-support" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/bilingual-service.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="bilingualService">Bilingual Support</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="bilingualServiceDesc">Fluent in both English and Spanish to serve our diverse Portland community.</p>
           </div>
         </div>
-        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="0">
           <div id="svc-img-tire-shop" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/tire-services.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="tireServices">Tire Services</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="tireServicesDesc">New and used tires, mount and balance, repair — everything your tires need.</p>
           </div>
         </div>
-        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="100">
           <div id="svc-img-auto-repair" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/auto-maintenance.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="autoMaintenance">Auto Maintenance</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="autoMaintenanceDesc">Oil changes, brake services, tuneups and more to keep your vehicle running smoothly.</p>
           </div>
         </div>
-        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="200">
           <div id="svc-img-specialized-tools" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/specialized-services.webp');"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="specializedServices">Specialized Services</h3>
@@ -876,7 +879,7 @@
 
       <!-- Service categories -->
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-6">
+        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-6" data-reveal data-reveal-delay="0">
           <h3 class="text-xl font-bold text-brand dark:text-green-400 mb-4" data-t="tireServices">Tire Services</h3>
           <ul class="space-y-2 text-gray-600 dark:text-gray-300">
             <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">✓</span> <span data-t="newOrUsedTires">New or Used Tires</span></li>
@@ -884,7 +887,7 @@
             <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">✓</span> <span data-t="tireRepairService">Tire Repair</span></li>
           </ul>
         </div>
-        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-6">
+        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-6" data-reveal data-reveal-delay="100">
           <h3 class="text-xl font-bold text-brand dark:text-green-400 mb-4" data-t="autoMaintenance">Auto Maintenance</h3>
           <ul class="space-y-2 text-gray-600 dark:text-gray-300">
             <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">✓</span> <span data-t="oilChangeService">Oil Change</span></li>
@@ -892,7 +895,7 @@
             <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">✓</span> <span data-t="tuneup">Tuneup</span></li>
           </ul>
         </div>
-        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-6">
+        <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-6" data-reveal data-reveal-delay="200">
           <h3 class="text-xl font-bold text-brand dark:text-green-400 mb-4" data-t="specializedServices">Specialized Services</h3>
           <ul class="space-y-2 text-gray-600 dark:text-gray-300">
             <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">✓</span> <span data-t="alignment">Alignment</span></li>
@@ -1095,7 +1098,7 @@
       <div class="grid md:grid-cols-3 gap-6 mb-10" id="reviews-grid">
         <!-- Populated by JS -->
       </div>
-      <div class="text-center">
+      <div class="text-center" data-reveal="scale">
         <div class="inline-block bg-white dark:bg-gray-700 p-8 rounded-xl shadow-lg">
           <div class="text-5xl font-bold text-brand dark:text-green-400 mb-2" data-setting="rating_value">4.8</div>
           <div class="text-gray-600 dark:text-gray-300 mb-3" data-t="outOfStars">out of 5 stars</div>
@@ -2285,6 +2288,114 @@ loadServiceImagesForSite();
 loadGalleryForSite();
 loadSiteSettings();
 
+// ===== PROMOTION BANNER =====
+(function() {
+  var PROMO_DISMISS_KEY = 'oregontires_promo_dismissed';
+
+  function loadPromoBanner() {
+    // Check if already dismissed this session
+    var dismissed = sessionStorage.getItem(PROMO_DISMISS_KEY);
+    if (dismissed) return;
+
+    fetch(API_BASE + '/promotions.php', { credentials: 'include' })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.success || !data.data || !data.data.length) return;
+        renderPromoBanner(data.data[0]);
+      })
+      .catch(function() {});
+  }
+
+  function renderPromoBanner(promo) {
+    var banner = document.getElementById('promo-banner');
+    if (!banner) return;
+
+    var lang = currentLang || 'en';
+    var title = lang === 'es' ? (promo.title_es || promo.title_en) : promo.title_en;
+    var body = lang === 'es' ? (promo.body_es || promo.body_en) : promo.body_en;
+    var ctaText = lang === 'es' ? (promo.cta_text_es || promo.cta_text_en) : promo.cta_text_en;
+    var ctaUrl = promo.cta_url || '/book-appointment/';
+    var bgColor = promo.bg_color || '#f59e0b';
+    var textColor = promo.text_color || '#000000';
+    var badgeText = promo.badge_text || '';
+
+    banner.style.backgroundColor = bgColor;
+    banner.style.color = textColor;
+    banner.className = 'relative';
+
+    // Inner container
+    var inner = document.createElement('div');
+    inner.className = 'container mx-auto px-4 py-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center md:text-left';
+
+    // Badge (if set)
+    if (badgeText) {
+      var badge = document.createElement('span');
+      badge.className = 'inline-block px-2 py-0.5 rounded-full text-xs font-bold border whitespace-nowrap';
+      badge.style.borderColor = textColor;
+      badge.textContent = badgeText;
+      inner.appendChild(badge);
+    }
+
+    // Title
+    var titleEl = document.createElement('span');
+    titleEl.className = 'font-semibold text-sm md:text-base';
+    titleEl.textContent = title;
+    inner.appendChild(titleEl);
+
+    // Body text (if present and different from title)
+    if (body && body !== title) {
+      var bodyEl = document.createElement('span');
+      bodyEl.className = 'text-sm opacity-90 hidden md:inline';
+      bodyEl.textContent = ' — ' + body;
+      inner.appendChild(bodyEl);
+    }
+
+    // CTA button
+    var cta = document.createElement('a');
+    cta.href = ctaUrl;
+    cta.className = 'inline-block px-4 py-1.5 rounded-lg text-sm font-bold transition whitespace-nowrap';
+    cta.style.backgroundColor = textColor;
+    cta.style.color = bgColor;
+    cta.textContent = ctaText + ' \u2192';
+    cta.addEventListener('click', function() {
+      if (typeof gtag === 'function') gtag('event', 'promo_cta_click', { event_category: 'conversion', event_label: title });
+    });
+    inner.appendChild(cta);
+
+    banner.appendChild(inner);
+
+    // Dismiss button
+    var dismissBtn = document.createElement('button');
+    dismissBtn.className = 'absolute top-1 right-2 text-lg leading-none opacity-70 hover:opacity-100 transition';
+    dismissBtn.style.color = textColor;
+    dismissBtn.setAttribute('aria-label', 'Dismiss promotion');
+    dismissBtn.textContent = '\u00d7';
+    dismissBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      banner.classList.add('hidden');
+      sessionStorage.setItem(PROMO_DISMISS_KEY, '1');
+    });
+    banner.appendChild(dismissBtn);
+
+    banner.classList.remove('hidden');
+  }
+
+  loadPromoBanner();
+
+  // Re-render on language toggle
+  var origToggleLang = window.toggleLanguage;
+  if (typeof origToggleLang === 'function') {
+    window.toggleLanguage = function() {
+      origToggleLang();
+      // Clear and reload banner with new language
+      var banner = document.getElementById('promo-banner');
+      if (banner) { banner.textContent = ''; banner.className = 'hidden'; }
+      sessionStorage.removeItem(PROMO_DISMISS_KEY);
+      loadPromoBanner();
+    };
+  }
+})();
+
 // ===== SCARCITY: Fetch today's remaining appointment slots =====
 (function() {
   var today = new Date().toISOString().split('T')[0];
@@ -2439,6 +2550,8 @@ if ('PerformanceObserver' in window) {
   obs.observe(contact);
 })();
 </script>
+  <script src="/assets/js/scroll-reveal.js" defer></script>
   <script src="/assets/js/exit-intent.js" defer></script>
+  <script src="/assets/js/cookie-consent.js" defer></script>
 </body>
 </html>

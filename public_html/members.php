@@ -72,6 +72,12 @@ $memberDashboardTabs = [
         'icon'         => '💬',
         'api_endpoint' => '/api/member/my-messages.php',
     ],
+    [
+        'id'           => 'care-plan',
+        'label'        => 'Care Plan',
+        'icon'         => '🛡️',
+        'api_endpoint' => '/api/member/my-care-plan.php',
+    ],
 ];
 
 // Load universal dashboard template

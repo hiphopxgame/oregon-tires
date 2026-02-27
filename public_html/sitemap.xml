@@ -117,7 +117,55 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Blog -->
+  <url>
+    <loc>https://oregon.tires/blog</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/blog?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://oregon.tires/blog?lang=es"/>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/blog/5-signs-your-tires-need-replacing</loc>
+    <lastmod>2026-02-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/blog/why-wheel-alignment-matters</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/blog/best-tires-portland-wet-weather</loc>
+    <lastmod>2026-02-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/blog/how-often-change-oil</loc>
+    <lastmod>2026-01-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/blog/brake-warning-signs</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- Business Pages -->
+  <url>
+    <loc>https://oregon.tires/why-us</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/why-us?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://oregon.tires/why-us?lang=es"/>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
   <url>
     <loc>https://oregon.tires/care-plan</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/care-plan?lang=en"/>
@@ -164,6 +212,38 @@
     <loc>https://oregon.tires/brake-service</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/brake-service?lang=en"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://oregon.tires/brake-service?lang=es"/>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/wheel-alignment</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/wheel-alignment?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://oregon.tires/wheel-alignment?lang=es"/>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/engine-diagnostics</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/engine-diagnostics?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://oregon.tires/engine-diagnostics?lang=es"/>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/suspension-repair</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/suspension-repair?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://oregon.tires/suspension-repair?lang=es"/>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://oregon.tires/tire-repair</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://oregon.tires/tire-repair?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://oregon.tires/tire-repair?lang=es"/>
     <lastmod>2026-02-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

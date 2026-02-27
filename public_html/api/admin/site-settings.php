@@ -41,6 +41,9 @@ try {
         // Email templates — contact notification
         'email_tpl_contact_subject', 'email_tpl_contact_greeting',
         'email_tpl_contact_body', 'email_tpl_contact_button', 'email_tpl_contact_footer',
+        // Email templates — subscriber welcome
+        'email_tpl_subscriber_welcome_subject', 'email_tpl_subscriber_welcome_greeting',
+        'email_tpl_subscriber_welcome_body', 'email_tpl_subscriber_welcome_button', 'email_tpl_subscriber_welcome_footer',
     ];
 
     $stmt = $db->prepare(

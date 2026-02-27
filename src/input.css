@@ -54,3 +54,43 @@
 .dark input::placeholder, .dark textarea::placeholder {
   color: #8FAF92 !important;
 }
+
+/* Scroll reveal animations */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+[data-reveal].revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="fade"] {
+  transform: none;
+}
+
+[data-reveal="slide-left"] {
+  transform: translateX(-20px);
+}
+
+[data-reveal="slide-left"].revealed {
+  transform: translateX(0);
+}
+
+[data-reveal="slide-right"] {
+  transform: translateX(20px);
+}
+
+[data-reveal="slide-right"].revealed {
+  transform: translateX(0);
+}
+
+[data-reveal="scale"] {
+  transform: scale(0.95);
+}
+
+[data-reveal="scale"].revealed {
+  transform: scale(1);
+}

@@ -19,11 +19,11 @@
       <div>
         <h3 class="text-xl font-bold mb-4">Services</h3>
         <ul class="space-y-1 text-gray-200">
-          <li>Tire Installation</li>
-          <li>Tire Repair</li>
-          <li>Wheel Alignment</li>
-          <li>Brake Service</li>
-          <li>Oil Change</li>
+          <li><a href="/tire-installation" class="hover:text-amber-300 transition">Tire Installation</a></li>
+          <li><a href="/tire-repair" class="hover:text-amber-300 transition">Tire Repair</a></li>
+          <li><a href="/wheel-alignment" class="hover:text-amber-300 transition">Wheel Alignment</a></li>
+          <li><a href="/brake-service" class="hover:text-amber-300 transition">Brake Service</a></li>
+          <li><a href="/oil-change" class="hover:text-amber-300 transition">Oil Change</a></li>
         </ul>
       </div>
       <div>
@@ -40,3 +40,5 @@
     </div>
   </div>
 </footer>
+<script src="/assets/js/scroll-reveal.js" defer></script>
+<script src="/assets/js/cookie-consent.js" defer></script>

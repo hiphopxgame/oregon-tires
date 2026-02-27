@@ -46,6 +46,13 @@ try {
     $vehicleVin   = sanitize((string) ($data['vehicle_vin'] ?? ''), 17);
     $notes        = sanitize((string) ($data['notes'] ?? ''), 2000);
     $language     = sanitize((string) ($data['language'] ?? 'english'), 20);
+    $smsOptIn     = !empty($data['sms_opt_in']) ? 1 : 0;
+
+    // UTM tracking fields
+    $utmSource   = sanitize((string) ($data['utm_source'] ?? ''), 100);
+    $utmMedium   = sanitize((string) ($data['utm_medium'] ?? ''), 100);
+    $utmCampaign = sanitize((string) ($data['utm_campaign'] ?? ''), 100);
+    $utmContent  = sanitize((string) ($data['utm_content'] ?? ''), 100);
 
     // ─── Validate ───────────────────────────────────────────────────────────
 
@@ -149,10 +156,10 @@ try {
     $stmt = $db->prepare(
         'INSERT INTO oretir_appointments
             (reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, vehicle_vin,
-             first_name, last_name, phone, email, notes, status, language, created_at, updated_at)
+             first_name, last_name, phone, email, notes, sms_opt_in, utm_source, utm_medium, utm_campaign, utm_content, status, language, created_at, updated_at)
          VALUES
             (:reference_number, :service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model, :vehicle_vin,
-             :first_name, :last_name, :phone, :email, :notes, :status, :language, NOW(), NOW())'
+             :first_name, :last_name, :phone, :email, :notes, :sms_opt_in, :utm_source, :utm_medium, :utm_campaign, :utm_content, :status, :language, NOW(), NOW())'
     );
     $stmt->execute([
         ':reference_number' => $referenceNumber,
@@ -168,6 +175,11 @@ try {
         ':phone'            => $phone,
         ':email'            => $email,
         ':notes'            => $notes ?: null,
+        ':sms_opt_in'       => $smsOptIn,
+        ':utm_source'       => $utmSource ?: null,
+        ':utm_medium'       => $utmMedium ?: null,
+        ':utm_campaign'     => $utmCampaign ?: null,
+        ':utm_content'      => $utmContent ?: null,
         ':status'           => 'new',
         ':language'         => $language,
     ]);
