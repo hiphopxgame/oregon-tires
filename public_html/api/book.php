@@ -222,6 +222,21 @@ try {
         error_log("Oregon Tires book.php: customer/vehicle auto-create failed for appointment #{$appointmentId}: " . $custErr->getMessage());
     }
 
+    // ─── Smart Account Creation for guests ──────────────────────────────────
+    $newMemberId = null;
+    if (empty($_SESSION['member_id'])) {
+        try {
+            require_once __DIR__ . '/../includes/smart-account.php';
+            $newMemberId = findOrCreateMemberAccount($email, $firstName, $lastName, $db, $language);
+            if ($newMemberId) {
+                $db->prepare('UPDATE oretir_appointments SET member_id = ? WHERE id = ?')
+                   ->execute([$newMemberId, $appointmentId]);
+            }
+        } catch (\Throwable $smartErr) {
+            error_log("Oregon Tires book.php: smart account creation failed for appointment #{$appointmentId}: " . $smartErr->getMessage());
+        }
+    }
+
     // ─── Optional Payment Integration ─────────────────────────────────────
     $paymentResponse = null;
     $paymentMethod = sanitize((string) ($data['payment_method'] ?? ''), 20);
@@ -461,6 +476,7 @@ try {
     $response = [
         'appointment_id'   => $appointmentId,
         'reference_number' => $referenceNumber,
+        'account_created'  => empty($_SESSION['member_id']) && isset($newMemberId) && $newMemberId > 0,
     ];
 
     if ($paymentResponse !== null) {

@@ -1292,3 +1292,89 @@ function sendReadyEmail(string $email, string $name, string $roNumber, string $v
     }
     return $result;
 }
+
+/**
+ * Send account claim email to a customer whose account was auto-created.
+ * Uses the Oregon Tires branded email wrapper with bilingual content.
+ *
+ * @param string $email     Recipient email
+ * @param string $firstName Customer first name
+ * @param string $token     Raw verification token (unhashed)
+ * @param string $language  'english' or 'spanish'
+ * @return bool True if sent successfully
+ */
+function sendAccountClaimEmail(string $email, string $firstName, string $token, string $language = 'english'): bool
+{
+    $lang = $language === 'spanish' ? 'es' : 'en';
+    $appUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $verifyUrl = $appUrl . '/api/member/verify-email.php?token=' . urlencode($token);
+    $verifyUrlSafe = htmlspecialchars($verifyUrl, ENT_QUOTES, 'UTF-8');
+
+    // Build bilingual body sections using the same pattern as booking confirmation
+    $esSection = <<<HTML
+  <tr>
+    <td style="padding:28px 36px 0;">
+      <div style="height:3px;background:linear-gradient(90deg,#c60b1e 0%,#c60b1e 33%,#ffc400 33%,#ffc400 66%,#c60b1e 66%,#c60b1e 100%);border-radius:2px;margin-bottom:20px;"></div>
+      <h2 style="color:#15803d;font-size:20px;margin:0 0 16px;">Bienvenido a Oregon Tires</h2>
+      <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 12px;">Hola {$firstName},</p>
+      <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 12px;">Hemos creado una cuenta para usted para que pueda ver sus citas, mensajes e historial de servicio en linea.</p>
+      <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 20px;">Haga clic en el boton de abajo para verificar su correo y establecer una contrasena:</p>
+      <div style="text-align:center;margin:0 0 20px;">
+        <a href="{$verifyUrlSafe}"
+           style="display:inline-block;padding:14px 36px;background:#2d6a2e;color:#fff;
+                  text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">
+          Configurar Mi Cuenta
+        </a>
+      </div>
+      <p style="color:#9ca3af;font-size:12px;line-height:1.5;margin:0;">Este enlace expira en 7 dias. Si no esperaba este correo, puede ignorarlo.</p>
+    </td>
+  </tr>
+HTML;
+
+    $enSection = <<<HTML
+  <tr>
+    <td style="padding:28px 36px 0;">
+      <div style="height:3px;background:linear-gradient(90deg,#002868 0%,#002868 33%,#bf0a30 33%,#bf0a30 66%,#002868 66%,#002868 100%);border-radius:2px;margin-bottom:20px;"></div>
+      <h2 style="color:#15803d;font-size:20px;margin:0 0 16px;">Welcome to Oregon Tires</h2>
+      <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 12px;">Hi {$firstName},</p>
+      <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 12px;">We've created an account for you so you can view your appointments, messages, and service history online.</p>
+      <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 20px;">Click the button below to verify your email and set a password:</p>
+      <div style="text-align:center;margin:0 0 20px;">
+        <a href="{$verifyUrlSafe}"
+           style="display:inline-block;padding:14px 36px;background:#2d6a2e;color:#fff;
+                  text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">
+          Set Up My Account
+        </a>
+      </div>
+      <p style="color:#9ca3af;font-size:12px;line-height:1.5;margin:0;">This link expires in 7 days. If you did not expect this email, you can safely ignore it.</p>
+    </td>
+  </tr>
+HTML;
+
+    $divider = <<<HTML
+  <tr>
+    <td style="padding:0 36px;">
+      <div style="height:1px;background:linear-gradient(90deg,transparent,#d1d5db,transparent);margin:8px 0;"></div>
+    </td>
+  </tr>
+HTML;
+
+    // Order: primary language first
+    if ($lang === 'en') {
+        $bodySections = $enSection . $divider . $esSection;
+        $subject = 'Your Oregon Tires Auto Care Account | Su Cuenta de Oregon Tires';
+    } else {
+        $bodySections = $esSection . $divider . $enSection;
+        $subject = 'Su Cuenta de Oregon Tires Auto Care | Your Oregon Tires Account';
+    }
+
+    $htmlBody = wrapBrandedEmail($bodySections, $appUrl, $verifyUrl, false);
+
+    $result = sendMail($email, $subject, $htmlBody);
+
+    if ($result['success'] ?? false) {
+        logEmail('smart_account_claim', "Account claim email sent to {$email}", null);
+    }
+
+    return $result['success'] ?? false;
+}

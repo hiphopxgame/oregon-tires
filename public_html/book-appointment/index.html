@@ -765,7 +765,7 @@ function formatDateDisplay(dateStr) {
 }
 
 // ===== SHOW CONFIRMATION =====
-function showConfirmation(data) {
+function showConfirmation(data, response) {
   var form = document.getElementById('booking-form');
   var confirmation = document.getElementById('booking-confirmation');
   var details = document.getElementById('confirmation-details');
@@ -805,6 +805,22 @@ function showConfirmation(data) {
   });
 
   confirmation.classList.remove('hidden');
+
+  // Show account creation notice if applicable
+  if (response && response.data && response.data.account_created) {
+    var notice = document.createElement('div');
+    notice.className = 'mt-4 p-4 rounded-lg border';
+    notice.style.cssText = 'background:#f0fdf4;border-color:#86efac;';
+    var noticeText = document.createElement('p');
+    noticeText.className = 'text-sm';
+    noticeText.style.cssText = 'margin:0;color:#166534;';
+    noticeText.textContent = currentLang === 'es'
+      ? 'Hemos creado una cuenta para usted. Revise su correo para establecer su contrasena y ver sus citas en linea.'
+      : "We've created an account for you! Check your email to set a password and track your appointments online.";
+    notice.appendChild(noticeText);
+    details.parentNode.insertBefore(notice, details.nextSibling);
+  }
+
   confirmation.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -953,7 +969,7 @@ document.getElementById('booking-form').addEventListener('submit', async functio
     }
 
     lastBookingSubmitTime = Date.now();
-    showConfirmation(data);
+    showConfirmation(data, json);
 
     if (typeof gtag === 'function') {
       gtag('event', 'form_submit', {

@@ -27,23 +27,53 @@ try {
     $memberId = (int) $_SESSION['member_id'];
     $status = sanitize((string) ($_GET['status'] ?? ''), 20);
 
-    $sql = 'SELECT id, reference_number, service, preferred_date, preferred_time,
-                   vehicle_year, vehicle_make, vehicle_model, status, language,
-                   created_at
-            FROM oretir_appointments
-            WHERE member_id = ?';
-    $params = [$memberId];
+    // Fetch member email for matching guest bookings
+    $memberStmt = $pdo->prepare('SELECT email FROM members WHERE id = ? LIMIT 1');
+    $memberStmt->execute([$memberId]);
+    $memberEmail = $memberStmt->fetchColumn();
 
-    if ($status && in_array($status, ['new', 'confirmed', 'completed', 'cancelled'], true)) {
-        $sql .= ' AND status = ?';
-        $params[] = $status;
+    // Enhanced query: match by member_id OR by email on orphaned appointments
+    $sql = 'SELECT DISTINCT a.id, a.reference_number, a.service, a.preferred_date, a.preferred_time,
+                   a.vehicle_year, a.vehicle_make, a.vehicle_model, a.status, a.language,
+                   a.created_at
+            FROM oretir_appointments a
+            LEFT JOIN oretir_customers c ON a.customer_id = c.id
+            WHERE (a.member_id = :mid';
+
+    $params = [':mid' => $memberId];
+
+    if ($memberEmail) {
+        $sql .= ' OR (c.email = :email AND a.member_id IS NULL)';
+        $params[':email'] = $memberEmail;
     }
 
-    $sql .= ' ORDER BY preferred_date DESC, preferred_time DESC';
+    $sql .= ')';
+
+    if ($status && in_array($status, ['new', 'confirmed', 'completed', 'cancelled'], true)) {
+        $sql .= ' AND a.status = :status';
+        $params[':status'] = $status;
+    }
+
+    $sql .= ' ORDER BY a.preferred_date DESC, a.preferred_time DESC';
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Backfill: claim orphaned appointments so future queries are fast (direct member_id match)
+    if ($memberEmail) {
+        try {
+            $backfill = $pdo->prepare(
+                'UPDATE oretir_appointments a
+                 JOIN oretir_customers c ON a.customer_id = c.id
+                 SET a.member_id = :mid
+                 WHERE c.email = :email AND a.member_id IS NULL'
+            );
+            $backfill->execute([':mid' => $memberId, ':email' => $memberEmail]);
+        } catch (\Throwable $e) {
+            error_log("Oregon Tires backfill orphaned appointments error: " . $e->getMessage());
+        }
+    }
 
     ?>
     <div class="member-page">

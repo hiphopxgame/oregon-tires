@@ -83,6 +83,27 @@ try {
 
     $messageId = (int) $db->lastInsertId();
 
+    // ─── Auto-create customer record for contact submissions ────────────────
+    try {
+        require_once __DIR__ . '/../includes/vin-decode.php';
+        findOrCreateCustomer($email, $firstName, $lastName, $phone, $language, $db);
+    } catch (\Throwable $custErr) {
+        error_log("Oregon Tires contact.php: customer auto-create failed: " . $custErr->getMessage());
+    }
+
+    // ─── Smart Account Creation for guests ──────────────────────────────────
+    $contactAccountCreated = false;
+    startSecureSession();
+    if (empty($_SESSION['member_id'] ?? null)) {
+        try {
+            require_once __DIR__ . '/../includes/smart-account.php';
+            $contactMemberId = findOrCreateMemberAccount($email, $firstName, $lastName, $db, $language);
+            $contactAccountCreated = $contactMemberId !== null && $contactMemberId > 0;
+        } catch (\Throwable $smartErr) {
+            error_log("Oregon Tires contact.php: smart account creation failed: " . $smartErr->getMessage());
+        }
+    }
+
     // ─── Email notification to shop owner (branded template) ────────────────
     $mailResult = sendContactNotificationEmail(
         "{$firstName} {$lastName}",
@@ -90,7 +111,10 @@ try {
         $message
     );
 
-    jsonSuccess(['message_id' => $messageId]);
+    jsonSuccess([
+        'message_id'      => $messageId,
+        'account_created' => $contactAccountCreated,
+    ]);
 
 } catch (\Throwable $e) {
     error_log("Oregon Tires contact.php error: " . $e->getMessage());
