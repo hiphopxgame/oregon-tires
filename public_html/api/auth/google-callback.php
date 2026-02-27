@@ -16,6 +16,36 @@ startSecureSession();
 $pdo = getDB();
 initMemberKit($pdo);
 
+// ── Handle connect mode (linking Google to existing account) ────────────────
+if (($_SESSION['google_oauth_mode'] ?? '') === 'connect') {
+    if (!empty($_GET['error'])) {
+        header('Location: /members?tab=settings&error=' . urlencode('Google sign-in was cancelled or denied.'));
+        exit;
+    }
+    if (empty($_GET['code']) || empty($_GET['state'])) {
+        header('Location: /members?tab=settings&error=' . urlencode('Invalid response from Google.'));
+        exit;
+    }
+    try {
+        $result = MemberGoogle::exchangeCodeForProfile($_GET['code'], $_GET['state']);
+        if (empty($_SESSION['member_id'])) {
+            header('Location: /members?error=' . urlencode('Session expired. Please sign in and try again.'));
+            exit;
+        }
+        $memberId = (int) $_SESSION['member_id'];
+        MemberGoogle::linkAccount($memberId, $result['profile']['sub'], $result['profile']['email'] ?? null);
+        $redirect = $result['return_url'] ?? '/members?tab=settings';
+        $sep = str_contains($redirect, '?') ? '&' : '?';
+        header('Location: ' . $redirect . $sep . 'success=' . urlencode('Google account connected!'));
+        exit;
+    } catch (\Throwable $e) {
+        error_log('Google connect error: ' . $e->getMessage());
+        $msg = str_contains($e->getMessage(), 'already linked') ? $e->getMessage() : 'Failed to connect Google. Please try again.';
+        header('Location: /members?tab=settings&error=' . urlencode($msg));
+        exit;
+    }
+}
+
 // ── Check for errors from Google ────────────────────────────────────────────
 if (!empty($_GET['error'])) {
     error_log('Google OAuth error: ' . ($_GET['error_description'] ?? $_GET['error']));
