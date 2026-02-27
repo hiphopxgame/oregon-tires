@@ -4,6 +4,32 @@
  * Extracted from index.html for use on PHP pages (members, approve, inspection, etc.)
  */
 ?>
+<style>
+  :root {
+    --member-bg: #f8fafc;
+    --member-surface: #ffffff;
+    --member-surface-hover: #f1f5f9;
+    --member-border: #e2e8f0;
+    --member-text: #1e293b;
+    --member-text-muted: #64748b;
+    --member-accent: #15803d;
+    --member-accent-hover: #0D3618;
+    --member-accent-text: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --member-bg: #0C1A10;
+      --member-surface: #132319;
+      --member-surface-hover: #1E3325;
+      --member-border: #2D4A33;
+      --member-text: #DCE8DD;
+      --member-text-muted: #8FAF92;
+      --member-accent: #15803d;
+      --member-accent-hover: #007030;
+    }
+  }
+  .member-page { padding-top: 1rem; }
+</style>
 <header class="bg-white shadow-md sticky top-0 z-50 dark:bg-gray-800">
   <div class="container mx-auto px-4 py-3 flex justify-between items-center">
     <a href="/">

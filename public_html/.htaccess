@@ -39,6 +39,12 @@
     # 301 redirect old root js/ → admin/js/ (ot-charts.js moved)
     RewriteRule ^js/(.+)$ /admin/js/$1 [R=301,L]
 
+    # Dashboard: /admin → redirect to /members
+    RewriteRule ^admin/?$ /members [R=301,L]
+
+    # Dashboard: /members → serve admin dashboard
+    RewriteRule ^members/?$ admin/index.html [L]
+
     # --- Clean URLs: strip .php extension ---
     # 301 redirect /page.php → /page (SEO + UX)
     RewriteCond %{THE_REQUEST} \s/+(.+)\.php[\s?] [NC]

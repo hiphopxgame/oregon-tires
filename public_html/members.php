@@ -13,6 +13,9 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/member-kit-init.php';
 require_once __DIR__ . '/includes/engine-kit-init.php';
 
+// Override bootstrap's application/json — this is an HTML page
+header('Content-Type: text/html; charset=utf-8');
+
 // Web URL for member-kit CSS/JS assets (must be before initMemberKit → loader.php)
 if (!defined('MEMBER_KIT_URL')) {
     define('MEMBER_KIT_URL', '/shared/member-kit');
@@ -31,6 +34,17 @@ if (!MemberAuth::isMemberLoggedIn() && !isset($_GET['return'])) {
 
 // Site key for branding
 $siteKey = 'oregon_tires';
+
+// Oregon Tires branding config for member-kit dashboard
+$memberDashboardConfig = [
+    'name'           => 'Oregon Tires Auto Care',
+    'logo'           => '/assets/logo.png',
+    'favicon'        => '/assets/favicon.ico',
+    'stylesheets'    => ['/assets/styles.css'],
+    'scripts'        => [],
+    'nav_include'    => __DIR__ . '/templates/header.php',
+    'footer_include' => __DIR__ . '/templates/footer.php',
+];
 
 // Define Oregon Tires custom dashboard tabs
 $memberDashboardTabs = [
