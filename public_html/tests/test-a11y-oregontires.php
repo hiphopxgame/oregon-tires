@@ -121,12 +121,12 @@ $test->test('<html> tag has lang attribute', function () use ($allContent) {
 // ─────────────────────────────────────────────────────────────────────
 
 $test->test('Booking status messages have aria-live', function () use ($allContent) {
-    if (!preg_match(/(status|confirmation|error|success)/i, $allContent)) {
+    if (!preg_match('/(status|confirmation|error|success)/i', $allContent)) {
         // No obvious status elements - skip
         return;
     }
 
-    if (!preg_match(/aria-live\s*=\s*["\']?(polite|assertive)/i, $allContent)) {
+    if (!preg_match('/aria-live\s*=\s*["\']?(polite|assertive)/i', $allContent)) {
         // Might use JS-based updates - just warn
         throw new Exception('No aria-live attributes found for status updates (check JS updates)');
     }
@@ -137,12 +137,12 @@ $test->test('Booking status messages have aria-live', function () use ($allConte
 // ─────────────────────────────────────────────────────────────────────
 
 $test->test('Phone numbers use tel: links', function () use ($allContent) {
-    if (!preg_match(/phone|call|\(\d{3}\)/i, $allContent)) {
+    if (!preg_match('/phone|call|\(\d{3}\)/i', $allContent)) {
         // No phone numbers visible - skip
         return;
     }
 
-    if (!preg_match(/href="tel:/i, $allContent)) {
+    if (!preg_match('/href="tel:/i', $allContent)) {
         throw new Exception('Phone number exists but not clickable via tel: link');
     }
 });

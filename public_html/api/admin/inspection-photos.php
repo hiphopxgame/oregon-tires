@@ -106,9 +106,10 @@ try {
         $photo = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$photo) jsonError('Photo not found.', 404);
 
-        // Delete physical file (safety check)
+        // Delete physical file (safety check — whitelist URL format + path traversal guard)
         $imageUrl = $photo['image_url'];
-        if (strpos($imageUrl, '/uploads/inspections/') === 0) {
+        if (strpos($imageUrl, '/uploads/inspections/') === 0
+            && preg_match('~^/uploads/inspections/[A-Z0-9-]+/[a-f0-9-]+\.(jpg|jpeg|png|webp)$~i', $imageUrl)) {
             $filePath = __DIR__ . '/../../' . ltrim($imageUrl, '/');
             $realBase = realpath(__DIR__ . '/../../uploads');
             $realFile = realpath($filePath);

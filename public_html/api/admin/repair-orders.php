@@ -71,8 +71,11 @@ try {
         $sortBy = sanitize((string) ($_GET['sort_by'] ?? 'created_at'), 30);
         $sortOrder = strtoupper(sanitize((string) ($_GET['sort_order'] ?? 'DESC'), 4));
 
-        $allowedSorts = ['id', 'ro_number', 'status', 'created_at', 'updated_at', 'promised_date'];
-        if (!in_array($sortBy, $allowedSorts, true)) $sortBy = 'created_at';
+        $sortMapping = [
+            'id' => 'r.id', 'ro_number' => 'r.ro_number', 'status' => 'r.status',
+            'created_at' => 'r.created_at', 'updated_at' => 'r.updated_at', 'promised_date' => 'r.promised_date',
+        ];
+        $sortColumn = $sortMapping[$sortBy] ?? 'r.created_at';
         if (!in_array($sortOrder, ['ASC', 'DESC'], true)) $sortOrder = 'DESC';
 
         $allowedStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','waiting_parts','ready','completed','invoiced','cancelled'];
@@ -112,7 +115,7 @@ try {
                 JOIN oretir_customers c ON c.id = r.customer_id
                 LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
                 {$where}
-                ORDER BY r.{$sortBy} {$sortOrder}
+                ORDER BY {$sortColumn} {$sortOrder}
                 LIMIT {$limit} OFFSET {$offset}";
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
