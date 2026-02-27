@@ -22,7 +22,7 @@ try {
         // Single post by slug
         $stmt = $db->prepare(
             'SELECT id, slug, title_en, title_es, excerpt_en, excerpt_es, body_en, body_es,
-                    featured_image, author, status, published_at, created_at
+                    featured_image, author, status, meta_title, meta_description, published_at, created_at
              FROM oretir_blog_posts
              WHERE slug = ? AND status = ?
              LIMIT 1'
@@ -63,7 +63,10 @@ try {
          ORDER BY published_at DESC
          LIMIT ? OFFSET ?'
     );
-    $stmt->execute(['published', $limit, $offset]);
+    $stmt->bindValue(1, 'published', \PDO::PARAM_STR);
+    $stmt->bindValue(2, $limit, \PDO::PARAM_INT);
+    $stmt->bindValue(3, $offset, \PDO::PARAM_INT);
+    $stmt->execute();
     $posts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
     jsonSuccess([
