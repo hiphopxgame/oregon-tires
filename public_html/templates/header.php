@@ -3,6 +3,7 @@
  * Oregon Tires — Site Header (reusable partial)
  * Extracted from index.html for use on PHP pages (members, approve, inspection, etc.)
  */
+
 ?>
 <style>
   :root {
