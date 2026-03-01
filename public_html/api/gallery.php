@@ -14,14 +14,25 @@ require_once __DIR__ . '/../includes/bootstrap.php';
 try {
     requireMethod('GET');
 
-    $db = getDB();
-    $stmt = $db->query(
-        'SELECT id, image_url, title, description, display_order, created_at
-         FROM oretir_gallery_images
-         WHERE is_active = 1
-         ORDER BY display_order ASC'
-    );
-    $images = $stmt->fetchAll();
+    if (function_exists('cachedQuery')) {
+        $images = cachedQuery(
+            getDB(), 'gallery_images', 600,
+            'SELECT id, image_url, title, description, display_order, created_at
+             FROM oretir_gallery_images
+             WHERE is_active = 1
+             ORDER BY display_order ASC',
+            [], 'oregon_tires'
+        );
+    } else {
+        $db = getDB();
+        $stmt = $db->query(
+            'SELECT id, image_url, title, description, display_order, created_at
+             FROM oretir_gallery_images
+             WHERE is_active = 1
+             ORDER BY display_order ASC'
+        );
+        $images = $stmt->fetchAll();
+    }
 
     jsonSuccess($images);
 

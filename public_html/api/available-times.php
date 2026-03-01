@@ -24,6 +24,16 @@ try {
         jsonError('Invalid date. Must be a future weekday (Mon-Sat).');
     }
 
+    // Check cache first (60s TTL, keyed by date)
+    if (function_exists('cacheGet')) {
+        $cacheKey = "available_times:{$date}";
+        $cached = cacheGet($cacheKey, 60, 'oregon_tires');
+        if ($cached !== null) {
+            if (!headers_sent()) { header('X-Cache: HIT'); }
+            jsonSuccess($cached);
+        }
+    }
+
     $db = getDB();
     $legacyCapacity = 2;
 
@@ -214,11 +224,19 @@ try {
         exit;
     }
 
-    jsonSuccess([
+    $responseData = [
         'date'         => $date,
         'max_per_slot' => $useSchedules ? null : $legacyCapacity,
         'slots'        => $allSlots,
-    ]);
+    ];
+
+    // Cache the result (60s TTL)
+    if (function_exists('cacheSet') && isset($cacheKey)) {
+        cacheSet($cacheKey, $responseData, 60, 'oregon_tires');
+        if (!headers_sent()) { header('X-Cache: MISS'); }
+    }
+
+    jsonSuccess($responseData);
 
 } catch (\Throwable $e) {
     error_log("Oregon Tires available-times.php error: " . $e->getMessage());

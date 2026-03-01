@@ -5,6 +5,12 @@
 
 declare(strict_types=1);
 
+// Set standard API headers on every response
+if (!headers_sent()) {
+    header('X-API-Version: v1');
+    header('X-Request-ID: ' . bin2hex(random_bytes(8)));
+}
+
 /**
  * Check if the current request was made by HTMX.
  */

@@ -93,8 +93,15 @@ if ($engineKitPath && file_exists($engineKitPath . '/loader.php')) {
     require_once $engineKitPath . '/loader.php';
 }
 
-// ─── Error Tracking (Sentry + DB) ──────────────────────────────────────────
+// ─── Shared Kit Path ──────────────────────────────────────────────────────
 $etKitPath = $engineKitPath ?? dirname(__DIR__, 3) . '/---engine-kit';
+
+// ─── Cache (APCu + file fallback from engine-kit) ──────────────────────────
+if (file_exists($etKitPath . '/includes/simple-cache.php')) {
+    require_once $etKitPath . '/includes/simple-cache.php';
+}
+
+// ─── Error Tracking (Sentry + DB) ──────────────────────────────────────────
 if (file_exists($f = $etKitPath . '/includes/error-tracking.php')) {
     require_once $f;
     initErrorTracking(getDB(), [

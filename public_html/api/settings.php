@@ -14,9 +14,17 @@ require_once __DIR__ . '/../includes/bootstrap.php';
 try {
     requireMethod('GET');
 
-    $db = getDB();
-    $stmt = $db->query('SELECT setting_key, value_en, value_es FROM oretir_site_settings ORDER BY setting_key ASC');
-    $settings = $stmt->fetchAll();
+    if (function_exists('cachedQuery')) {
+        $settings = cachedQuery(
+            getDB(), 'site_settings', 300,
+            'SELECT setting_key, value_en, value_es FROM oretir_site_settings ORDER BY setting_key ASC',
+            [], 'oregon_tires'
+        );
+    } else {
+        $db = getDB();
+        $stmt = $db->query('SELECT setting_key, value_en, value_es FROM oretir_site_settings ORDER BY setting_key ASC');
+        $settings = $stmt->fetchAll();
+    }
 
     jsonSuccess($settings);
 

@@ -142,6 +142,10 @@ cmd_deploy() {
   # Clean up
   rm -rf "$UPLOADS_DIR"
 
+  # Reset OPcache so new code takes effect immediately
+  log "Resetting OPcache..."
+  ssh "$REMOTE" "cd ${REMOTE_PATH} && php -r \"if(function_exists('opcache_reset')){opcache_reset();echo 'OPcache cleared';}else{echo 'OPcache not available';}\"" 2>/dev/null || warn "OPcache reset skipped"
+
   log "Deploy complete!"
 }
 
