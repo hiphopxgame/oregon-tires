@@ -92,3 +92,14 @@ $engineKitPath = $_ENV['ENGINE_KIT_PATH'] ?? null;
 if ($engineKitPath && file_exists($engineKitPath . '/loader.php')) {
     require_once $engineKitPath . '/loader.php';
 }
+
+// ─── Error Tracking (Sentry + DB) ──────────────────────────────────────────
+$etKitPath = $engineKitPath ?? dirname(__DIR__, 3) . '/---engine-kit';
+if (file_exists($f = $etKitPath . '/includes/error-tracking.php')) {
+    require_once $f;
+    initErrorTracking(getDB(), [
+        'dsn'      => $_ENV['SENTRY_DSN'] ?? '',
+        'site_key' => 'oregon_tires',
+        'env'      => $_ENV['APP_ENV'] ?? 'production',
+    ]);
+}

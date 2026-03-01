@@ -33,6 +33,25 @@ build_css() {
   log "Built styles.css (${size} bytes)"
 }
 
+# ─── Build Images (WebP + AVIF) ────────────────────────────────────────────
+build_images() {
+  local shared_script="${LOCAL_DIR}/../../scripts/optimize-images.sh"
+  if [ ! -f "$shared_script" ]; then
+    warn "Shared image script not found: ${shared_script}"
+    return 0
+  fi
+
+  source "$shared_script"
+
+  local img_dir="${LOCAL_DIR}/public_html/assets/img"
+  if [ -d "$img_dir" ]; then
+    log "Optimizing images (WebP + AVIF)..."
+    optimize_images_in_dir "$img_dir"
+  else
+    log "No image directory found at ${img_dir}"
+  fi
+}
+
 # ─── Diff (dry run) ────────────────────────────────────────────────────────
 cmd_diff() {
   log "Files that would be deployed:"
@@ -68,6 +87,9 @@ cmd_deploy() {
 
   # Build CSS first
   build_css
+
+  # Optimize images (WebP + AVIF)
+  build_images
 
   # Get list of changed files (tracked, modified since last commit)
   local changed_files

@@ -1,6 +1,12 @@
 # --- Force HTTPS ---
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Cloudflare Real IP Restoration
+    <IfModule mod_remoteip.c>
+        RemoteIPHeader CF-Connecting-IP
+    </IfModule>
+
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
@@ -47,6 +53,30 @@
 
     # Dashboard: /members → serve admin dashboard
     RewriteRule ^members/?$ admin/index.html [L]
+
+    # API Versioning: /api/v1/* → /api/* alias
+    RewriteRule ^api/v1/(.+)$ /api/$1 [L,QSA]
+
+    # =============================================
+    # WebP/AVIF Content Negotiation
+    # =============================================
+    # Serve AVIF if browser supports and .avif file exists alongside original
+    RewriteCond %{HTTP_ACCEPT} image/avif [NC]
+    RewriteCond %{REQUEST_FILENAME} (.+)\.(jpe?g|png)$
+    RewriteCond %1.avif -f
+    RewriteRule (.+)\.(jpe?g|png)$ $1.avif [T=image/avif,L]
+
+    # Serve WebP if browser supports and .webp file exists alongside original
+    RewriteCond %{HTTP_ACCEPT} image/webp [NC]
+    RewriteCond %{REQUEST_FILENAME} (.+)\.(jpe?g|png)$
+    RewriteCond %1.webp -f
+    RewriteRule (.+)\.(jpe?g|png)$ $1.webp [T=image/webp,L]
+
+    <IfModule mod_headers.c>
+        <FilesMatch "\.(jpe?g|png)$">
+            Header append Vary Accept
+        </FilesMatch>
+    </IfModule>
 
     # --- Clean URLs: strip .php extension ---
     # 301 redirect /page.php → /page (SEO + UX)
@@ -104,8 +134,13 @@ ServerSignature Off
     ExpiresByType image/jpeg "access plus 1 month"
     ExpiresByType image/png "access plus 1 month"
     ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/avif "access plus 1 month"
     ExpiresByType text/css "access plus 1 week"
     ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header append Vary "Accept-Encoding"
 </IfModule>
 
 # --- Block access to sensitive files ---
