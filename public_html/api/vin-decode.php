@@ -20,6 +20,17 @@ try {
 
     $result = decodeVin($vin);
 
+    if (isHtmxRequest()) {
+        header('Content-Type: text/html; charset=utf-8');
+        header('Vary: HX-Request');
+        $lang = sanitize((string) ($_GET['lang'] ?? 'en'), 2);
+        $vinSuccess = $result['success'];
+        $vinData = $result['data'] ?? null;
+        $vinError = $result['error'] ?? null;
+        require __DIR__ . '/../templates/partials/booking-vin-result.php';
+        exit;
+    }
+
     if ($result['success']) {
         jsonSuccess($result['data']);
     } else {

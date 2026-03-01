@@ -6,6 +6,27 @@
 declare(strict_types=1);
 
 /**
+ * Check if the current request was made by HTMX.
+ */
+function isHtmxRequest(): bool
+{
+    return !empty($_SERVER['HTTP_HX_REQUEST']);
+}
+
+/**
+ * Render an HTMX error alert and exit.
+ */
+function htmxError(string $message, int $code = 400): never
+{
+    http_response_code($code);
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<div role="alert" class="p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">'
+       . htmlspecialchars($message, ENT_QUOTES, 'UTF-8')
+       . '</div>';
+    exit;
+}
+
+/**
  * Send a JSON success response and exit.
  */
 function jsonSuccess(mixed $data = null, int $code = 200): never
@@ -24,6 +45,9 @@ function jsonSuccess(mixed $data = null, int $code = 200): never
  */
 function jsonError(string $message, int $code = 400): never
 {
+    if (isHtmxRequest()) {
+        htmxError($message, $code);
+    }
     http_response_code($code);
     echo json_encode([
         'success' => false,

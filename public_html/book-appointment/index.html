@@ -28,6 +28,10 @@
   <!-- Tailwind CSS (built) -->
   <link rel="stylesheet" href="/assets/styles.css">
 
+  <!-- HTMX -->
+  <script src="/assets/js/htmx.min.js"></script>
+  <script src="/assets/js/json-enc.js"></script>
+
   <style>
     html { scroll-behavior: smooth; }
     .fade-in { animation: fadeIn 0.6s ease-in; }
@@ -38,6 +42,9 @@
     .time-slot.slot-closed { background-color: #e5e7eb; border-color: #d1d5db; color: #9ca3af; cursor: not-allowed; }
     .dark .time-slot.slot-closed { background-color: #1a2e1f; border-color: #2d4a33; color: #4b5563; }
     .time-slot.slot-full { opacity: 0.5; cursor: not-allowed; }
+    .htmx-indicator { display: none; }
+    .htmx-request .htmx-indicator { display: block; }
+    .htmx-request.htmx-indicator { display: block; }
     .hour-label { font-size: 0.75rem; font-weight: 600; color: #6b7280; padding: 4px 0; grid-column: 1 / -1; }
     .dark .hour-label { color: #8FAF92; }
     .service-card input:checked + label {
@@ -166,7 +173,21 @@
         </div>
       </div>
 
-      <form id="booking-form" class="space-y-8">
+      <div id="booking-form-container">
+      <form id="booking-form" class="space-y-8" hx-ext="json-enc"
+            hx-post="/api/book.php"
+            hx-target="#booking-form-container"
+            hx-swap="innerHTML"
+            hx-indicator="#booking-submit"
+            hx-vals='js:{
+              "preferred_time": document.getElementById("booking-time").value,
+              "language": currentLang === "en" ? "english" : "spanish",
+              "sms_opt_in": document.getElementById("sms-opt-in").checked ? 1 : 0,
+              "utm_source": sessionStorage.getItem("utm_source") || "",
+              "utm_medium": sessionStorage.getItem("utm_medium") || "",
+              "utm_campaign": sessionStorage.getItem("utm_campaign") || "",
+              "utm_content": sessionStorage.getItem("utm_content") || ""
+            }'>
 
         <!-- Step 1: Service Selection -->
         <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-700">
@@ -255,7 +276,14 @@
           <!-- Date -->
           <div class="mb-6">
             <label for="booking-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="preferredDate">Preferred Date</label>
-            <input type="date" name="date" id="booking-date" required class="w-full max-w-xs p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+            <input type="date" name="date" id="booking-date" required
+                   hx-get="/api/available-times.php"
+                   hx-trigger="change"
+                   hx-target="#time-slots-grid"
+                   hx-swap="innerHTML"
+                   hx-indicator="#time-loading"
+                   hx-vals='js:{"lang": currentLang}'
+                   class="w-full max-w-xs p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" data-t="dateNote">Monday - Saturday only. No Sundays.</p>
           </div>
 
@@ -264,7 +292,7 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" data-t="preferredTime">Preferred Time</label>
             <input type="hidden" name="time" id="booking-time" required>
             <div class="grid grid-cols-4 gap-2" id="time-slots-grid"></div>
-            <div id="time-loading" class="hidden text-center py-4">
+            <div id="time-loading" class="htmx-indicator text-center py-4">
               <svg class="animate-spin h-6 w-6 mx-auto text-brand" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
@@ -285,10 +313,21 @@
           <div class="mb-4">
             <label for="vehicle-vin" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="vehicleVin">VIN (optional)</label>
             <div class="flex gap-2">
-              <input type="text" name="vehicleVin" id="vehicle-vin" maxlength="17" placeholder="e.g. 1HGCM82633A004352" class="flex-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500 uppercase tracking-wider font-mono text-sm">
-              <button type="button" id="vin-decode-btn" class="bg-brand text-white px-4 py-2 rounded-md font-semibold hover:opacity-90 transition text-sm whitespace-nowrap disabled:opacity-50" data-t="vinDecode">Lookup</button>
+              <input type="text" name="vehicleVin" id="vehicle-vin" maxlength="17" placeholder="e.g. 1HGCM82633A004352"
+                     hx-get="/api/vin-decode.php"
+                     hx-trigger="input changed delay:300ms[this.value.length === 17]"
+                     hx-target="#vin-status"
+                     hx-swap="innerHTML"
+                     hx-vals='js:{"vin": document.getElementById("vehicle-vin").value.toUpperCase(), "lang": currentLang}'
+                     class="flex-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500 uppercase tracking-wider font-mono text-sm">
+              <button type="button" id="vin-decode-btn"
+                      hx-get="/api/vin-decode.php"
+                      hx-target="#vin-status"
+                      hx-swap="innerHTML"
+                      hx-vals='js:{"vin": document.getElementById("vehicle-vin").value.toUpperCase(), "lang": currentLang}'
+                      class="bg-brand text-white px-4 py-2 rounded-md font-semibold hover:opacity-90 transition text-sm whitespace-nowrap disabled:opacity-50" data-t="vinDecode">Lookup</button>
             </div>
-            <p id="vin-status" class="text-xs mt-1 hidden"></p>
+            <div id="vin-status"></div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -369,17 +408,7 @@
       <!-- Status Message -->
       <div id="booking-status" class="mt-6 text-center hidden" role="alert" aria-live="polite"></div>
 
-      <!-- Confirmation Section -->
-      <div id="booking-confirmation" class="hidden mt-8 bg-white rounded-xl shadow-lg p-8 text-center fade-in dark:bg-gray-700" role="alert" aria-live="assertive">
-        <div class="text-5xl mb-4">✅</div>
-        <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-2" data-t="confirmationTitle">Appointment Requested!</h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-6" data-t="confirmationSubtitle">We will call or text you to confirm. Thank you!</p>
-        <div id="confirmation-details" class="text-left max-w-md mx-auto space-y-2 mb-6"></div>
-        <div class="flex justify-center gap-4 flex-wrap">
-          <a href="/" class="bg-brand text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition" data-t="backToHome">Back to Home</a>
-          <button onclick="resetBookingForm()" class="border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-6 py-2 rounded-lg font-semibold hover:bg-brand/5 dark:hover:bg-green-400/10 transition" data-t="bookAnother">Book Another</button>
-        </div>
-      </div>
+      </div><!-- /booking-form-container -->
 
       <!-- Contact info reminder -->
       <div class="mt-8 bg-white rounded-xl shadow-md p-6 text-center dark:bg-gray-700">
@@ -448,9 +477,6 @@
   </footer>
 
 <script>
-// ===== PHP API =====
-const API_BASE = '/api';
-
 // ===== UTM CAPTURE =====
 (function captureUtm() {
   var params = new URLSearchParams(window.location.search);
@@ -692,37 +718,13 @@ function updateServiceMeta() {
 
 // ===== DATE CONSTRAINTS =====
 function setupDateInput() {
-  const dateInput = document.getElementById('booking-date');
-  // Set min to today
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
+  var dateInput = document.getElementById('booking-date');
+  if (!dateInput) return;
+  var today = new Date();
+  var yyyy = today.getFullYear();
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
+  var dd = String(today.getDate()).padStart(2, '0');
   dateInput.setAttribute('min', yyyy + '-' + mm + '-' + dd);
-
-  // Validate on change: no Sundays, no past dates
-  dateInput.addEventListener('change', function() {
-    const val = this.value;
-    if (!val) return;
-    const selected = new Date(val + 'T00:00:00');
-    const dayOfWeek = selected.getDay();
-
-    if (dayOfWeek === 0) {
-      showStatus(t[currentLang].sundayNotAvailable, 'orange');
-      this.value = '';
-      return;
-    }
-
-    const todayDate = new Date();
-    todayDate.setHours(0, 0, 0, 0);
-    if (selected < todayDate) {
-      showStatus(t[currentLang].pastDateNotAllowed, 'orange');
-      this.value = '';
-      return;
-    }
-
-    hideStatus();
-  });
 }
 
 // ===== TIME SLOT SELECTION =====
@@ -766,125 +768,12 @@ function formatTimeDisplay(timeStr) {
   return displayHour + ':' + min + ' ' + suffix;
 }
 
-function buildTimeSlotGrid() {
-  var grid = document.getElementById('time-slots-grid');
-  grid.textContent = '';
-  for (var h = 7; h <= 18; h++) {
-    var mins = (h === 18) ? [0] : [0, 15, 30, 45];
-    var ampm = h >= 12 ? 'PM' : 'AM';
-    var hour12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
-    var label = document.createElement('div');
-    label.className = 'hour-label';
-    label.textContent = hour12 + ' ' + ampm;
-    grid.appendChild(label);
-    mins.forEach(function(m) {
-      var timeVal = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'time-slot min-h-[44px] border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 px-3 text-sm font-medium hover:border-green-400 transition';
-      btn.setAttribute('data-time', timeVal);
-      btn.textContent = hour12 + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
-      grid.appendChild(btn);
-    });
-  }
-}
-
 // ===== FORMAT DATE FOR DISPLAY =====
 function formatDateDisplay(dateStr) {
   var parts = dateStr.split('-');
   var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
   var locale = currentLang === 'es' ? 'es-MX' : 'en-US';
   return d.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-}
-
-// ===== SHOW CONFIRMATION =====
-function showConfirmation(data, response) {
-  var form = document.getElementById('booking-form');
-  var confirmation = document.getElementById('booking-confirmation');
-  var details = document.getElementById('confirmation-details');
-
-  form.classList.add('hidden');
-
-  // GA4 conversion event
-  if (typeof gtag === 'function') {
-    gtag('event', 'booking_complete', {
-      event_category: 'conversion',
-      service_type: data.service,
-      preferred_date: data.preferred_date,
-      preferred_time: data.preferred_time,
-      has_vehicle: !!(data.vehicle_year || data.vehicle_make || data.vehicle_model),
-      language: currentLang,
-      value: 1,
-      currency: 'USD'
-    });
-  }
-
-  hideStatus();
-
-  // Build confirmation details using createElement/textContent (no innerHTML with user data)
-  details.textContent = '';
-
-  var fields = [
-    { label: t[currentLang].confirmService, value: serviceLabels[currentLang][data.service] || data.service },
-    { label: t[currentLang].confirmDate, value: formatDateDisplay(data.preferred_date) },
-    { label: t[currentLang].confirmTime, value: formatTimeDisplay(data.preferred_time) },
-    { label: t[currentLang].confirmName, value: data.first_name + ' ' + data.last_name },
-    { label: t[currentLang].confirmPhone, value: data.phone },
-    { label: t[currentLang].confirmEmail, value: data.email }
-  ];
-
-  if (data.vehicle_year || data.vehicle_make || data.vehicle_model) {
-    var vehicleParts = [data.vehicle_year, data.vehicle_make, data.vehicle_model].filter(Boolean);
-    fields.splice(3, 0, { label: t[currentLang].confirmVehicle, value: vehicleParts.join(' ') });
-  }
-
-  fields.forEach(function(field) {
-    var row = document.createElement('div');
-    row.className = 'flex justify-between py-1 border-b border-gray-100 dark:border-gray-600';
-    var labelEl = document.createElement('span');
-    labelEl.className = 'font-medium text-gray-700 dark:text-gray-300';
-    labelEl.textContent = field.label + ':';
-    var valueEl = document.createElement('span');
-    valueEl.className = 'text-gray-900 dark:text-gray-100';
-    valueEl.textContent = field.value;
-    row.appendChild(labelEl);
-    row.appendChild(valueEl);
-    details.appendChild(row);
-  });
-
-  confirmation.classList.remove('hidden');
-
-  // Show account creation notice if applicable
-  if (response && response.data && response.data.account_created) {
-    var notice = document.createElement('div');
-    notice.className = 'mt-4 p-4 rounded-lg border';
-    notice.style.cssText = 'background:#f0fdf4;border-color:#86efac;';
-    var noticeText = document.createElement('p');
-    noticeText.className = 'text-sm';
-    noticeText.style.cssText = 'margin:0;color:#166534;';
-    noticeText.textContent = currentLang === 'es'
-      ? 'Hemos creado una cuenta para usted. Revise su correo para establecer su contrasena y ver sus citas en linea.'
-      : "We've created an account for you! Check your email to set a password and track your appointments online.";
-    notice.appendChild(noticeText);
-    details.parentNode.insertBefore(notice, details.nextSibling);
-  }
-
-  confirmation.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ===== RESET FORM =====
-function resetBookingForm() {
-  var form = document.getElementById('booking-form');
-  var confirmation = document.getElementById('booking-confirmation');
-  form.reset();
-  form.classList.remove('hidden');
-  confirmation.classList.add('hidden');
-  document.getElementById('booking-time').value = '';
-  buildTimeSlotGrid();
-  clearFieldErrors();
-  hideStatus();
-  setupDateInput();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ===== INLINE FIELD ERRORS =====
@@ -905,11 +794,14 @@ function clearFieldErrors() {
   document.querySelectorAll('.field-error').forEach(function(el) { el.remove(); });
 }
 
-// ===== FORM SUBMISSION =====
+// ===== HTMX FORM VALIDATION (runs before HTMX sends request) =====
 var lastBookingSubmitTime = 0;
 
-document.getElementById('booking-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
+document.body.addEventListener('htmx:beforeRequest', function(e) {
+  var form = document.getElementById('booking-form');
+  // Only intercept the form submission, not date/VIN requests
+  if (!form || e.detail.elt !== form) return;
+
   clearFieldErrors();
   hideStatus();
 
@@ -917,28 +809,29 @@ document.getElementById('booking-form').addEventListener('submit', async functio
   var now = Date.now();
   if (now - lastBookingSubmitTime < 30000) {
     showStatus(t[currentLang].pleaseWait, 'orange');
+    e.preventDefault();
     return;
   }
 
-  var form = e.target;
-  var submitBtn = document.getElementById('booking-submit');
   var hasErrors = false;
 
-  // Get selected service
+  // Service
   var serviceEl = form.querySelector('input[name="service"]:checked');
   if (!serviceEl) {
     showStatus(t[currentLang].pleaseSelectService, 'orange');
+    e.preventDefault();
     return;
   }
 
-  // Get selected time
+  // Time
   var timeVal = document.getElementById('booking-time').value;
   if (!timeVal) {
     showStatus(t[currentLang].pleaseSelectTime, 'orange');
+    e.preventDefault();
     return;
   }
 
-  // Validate required fields with inline errors
+  // Required fields
   var firstName = form.firstName.value.trim();
   if (!firstName) {
     showFieldError('booking-first-name', currentLang === 'es' ? 'El nombre es obligatorio.' : 'First name is required.');
@@ -974,68 +867,97 @@ document.getElementById('booking-form').addEventListener('submit', async functio
     hasErrors = true;
   }
 
-  if (hasErrors) return;
+  // Privacy consent
+  if (!document.getElementById('privacy-consent').checked) {
+    hasErrors = true;
+  }
 
-  // Disable submit
-  submitBtn.disabled = true;
-  submitBtn.textContent = t[currentLang].submitting;
+  if (hasErrors) {
+    e.preventDefault();
+    return;
+  }
 
-  var data = {
-    service: serviceEl.value,
-    preferred_date: form.date.value,
-    preferred_time: timeVal,
-    vehicle_year: form.vehicleYear.value || null,
-    vehicle_make: form.vehicleMake.value.trim() || null,
-    vehicle_model: form.vehicleModel.value.trim() || null,
-    vehicle_vin: form.vehicleVin.value.trim().toUpperCase() || null,
-    first_name: firstName,
-    last_name: lastName,
-    phone: phone,
-    email: email,
-    notes: form.notes.value.trim() || null,
-    sms_opt_in: document.getElementById('sms-opt-in').checked ? 1 : 0,
-    language: currentLang === 'en' ? 'english' : 'spanish',
-    utm_source: sessionStorage.getItem('utm_source') || '',
-    utm_medium: sessionStorage.getItem('utm_medium') || '',
-    utm_campaign: sessionStorage.getItem('utm_campaign') || '',
-    utm_content: sessionStorage.getItem('utm_content') || ''
-  };
+  lastBookingSubmitTime = Date.now();
+});
 
-  try {
-    var res = await fetch(API_BASE + '/book.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(data)
+// ===== HTMX DATE VALIDATION (prevent Sunday/past date requests) =====
+document.body.addEventListener('htmx:beforeRequest', function(e) {
+  var dateInput = document.getElementById('booking-date');
+  if (e.detail.elt !== dateInput) return;
+
+  var val = dateInput.value;
+  if (!val) { e.preventDefault(); return; }
+
+  var selected = new Date(val + 'T00:00:00');
+  if (selected.getDay() === 0) {
+    showStatus(t[currentLang].sundayNotAvailable, 'orange');
+    dateInput.value = '';
+    e.preventDefault();
+    return;
+  }
+
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (selected < today) {
+    showStatus(t[currentLang].pastDateNotAllowed, 'orange');
+    dateInput.value = '';
+    e.preventDefault();
+    return;
+  }
+
+  hideStatus();
+});
+
+// ===== HTMX LIFECYCLE EVENTS — GA4 Analytics =====
+document.body.addEventListener('htmx:afterSwap', function(e) {
+  // Time slots loaded
+  if (e.detail.target.id === 'time-slots-grid') {
+    if (typeof gtag === 'function') gtag('event', 'booking_step', {
+      event_category: 'booking_funnel', step: 'date_selected'
     });
-    var json = await res.json();
-    if (!res.ok || !json.success) {
-      // Handle field-specific errors from backend
-      if (json.errors && typeof json.errors === 'object') {
-        var fieldMap = { first_name: 'booking-first-name', last_name: 'booking-last-name', phone: 'booking-phone', email: 'booking-email', date: 'booking-date' };
-        for (var key in json.errors) {
-          if (fieldMap[key]) showFieldError(fieldMap[key], json.errors[key]);
-        }
-      }
-      throw new Error(json.error || 'Failed');
-    }
-
-    lastBookingSubmitTime = Date.now();
-    showConfirmation(data, json);
-
+  }
+  // VIN decoded
+  if (e.detail.target.id === 'vin-status') {
+    var isSuccess = !!e.detail.target.querySelector('.text-green-600, .dark\\:text-green-400');
+    if (typeof gtag === 'function') gtag('event', 'vin_decode', {
+      event_category: 'booking_funnel', event_label: isSuccess ? 'success' : 'error'
+    });
+  }
+  // Booking confirmation (form was replaced)
+  if (e.detail.target.id === 'booking-form-container' && document.getElementById('booking-confirmation-result')) {
     if (typeof gtag === 'function') {
+      gtag('event', 'booking_complete', {
+        event_category: 'conversion',
+        language: currentLang,
+        value: 1,
+        currency: 'USD'
+      });
       gtag('event', 'form_submit', {
-        event_category: 'booking',
-        event_label: data.service
+        event_category: 'booking'
       });
     }
-  } catch (err) {
-    console.error('Booking error:', err);
-    showStatus(t[currentLang].bookingError, 'red');
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = t[currentLang].bookNow;
+    // Scroll to confirmation
+    var conf = document.getElementById('booking-confirmation-result');
+    if (conf) conf.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+});
+
+// Handle HTMX errors — extract server message or show fallback
+document.body.addEventListener('htmx:responseError', function(e) {
+  var form = document.getElementById('booking-form');
+  if (!form || (e.detail.elt !== form && !form.contains(e.detail.elt))) return;
+  var xhr = e.detail.xhr;
+  if (xhr && xhr.responseText) {
+    try {
+      var doc = new DOMParser().parseFromString(xhr.responseText, 'text/html');
+      var alertEl = doc.querySelector('[role="alert"]');
+      if (alertEl && alertEl.textContent.trim()) {
+        showStatus(alertEl.textContent.trim(), 'red');
+        return;
+      }
+    } catch (parseErr) { /* fallback below */ }
+  }
+  showStatus(t[currentLang].bookingError, 'red');
 });
 
 // ===== LANGUAGE TOGGLE =====
@@ -1062,6 +984,9 @@ function toggleLanguage() {
   var vinInput = document.querySelector('input[name="vehicleVin"]');
   if (vinInput) vinInput.placeholder = t[currentLang].vinPlaceholder;
   updateServiceMeta();
+  // Re-fetch time slots in new language if date is selected
+  var dateInput = document.getElementById('booking-date');
+  if (dateInput && dateInput.value) htmx.trigger(dateInput, 'change');
 }
 
 // Apply saved language preference on page load
@@ -1154,66 +1079,6 @@ document.querySelectorAll('#mobile-menu a').forEach(function(link) {
   });
 });
 
-// ===== AVAILABLE TIMES — GREY OUT FULL SLOTS =====
-async function loadAvailableTimes(date) {
-  if (!date) return;
-  var slots = document.querySelectorAll('[data-time]');
-  var timeLoading = document.getElementById('time-loading');
-  var timeSlotsGrid = document.getElementById('time-slots-grid');
-  // Reset all slots
-  slots.forEach(function(s) {
-    s.disabled = false;
-    s.classList.remove('opacity-40', 'cursor-not-allowed', 'line-through', 'slot-closed', 'slot-full');
-    s.title = '';
-    // Remove any badge spans
-    var badge = s.querySelector('.slot-badge');
-    if (badge) badge.remove();
-  });
-  // Show spinner, hide grid
-  if (timeLoading) timeLoading.classList.remove('hidden');
-  if (timeSlotsGrid) timeSlotsGrid.classList.add('opacity-50', 'pointer-events-none');
-  try {
-    var res = await fetch(API_BASE + '/available-times.php?date=' + encodeURIComponent(date), { credentials: 'include' });
-    var json = await res.json();
-    if (json.success && json.data && json.data.slots) {
-      var slotData = json.data.slots;
-      slots.forEach(function(s) {
-        var time = s.getAttribute('data-time');
-        var info = slotData[time];
-        if (!info || info.available) return;
-        s.disabled = true;
-        if (s.classList.contains('selected')) {
-          s.classList.remove('selected');
-          document.getElementById('booking-time').value = '';
-        }
-        if (info.reason === 'closed') {
-          s.classList.add('slot-closed');
-          s.textContent = currentLang === 'es' ? 'Cerrado' : 'Closed';
-          s.title = currentLang === 'es' ? 'Cerrado' : 'Closed';
-        } else {
-          s.classList.add('slot-full', 'line-through');
-          s.title = currentLang === 'es' ? 'Horario lleno' : 'Time slot full';
-          var badge = document.createElement('span');
-          badge.className = 'slot-badge block text-xs font-normal';
-          badge.textContent = currentLang === 'es' ? 'Lleno' : 'Full';
-          s.appendChild(badge);
-        }
-      });
-    }
-  } catch (e) {
-    console.warn('Could not load available times:', e);
-  } finally {
-    // Hide spinner, restore grid
-    if (timeLoading) timeLoading.classList.add('hidden');
-    if (timeSlotsGrid) timeSlotsGrid.classList.remove('opacity-50', 'pointer-events-none');
-  }
-}
-
-// Hook into date change to load availability
-document.getElementById('booking-date').addEventListener('change', function() {
-  if (this.value) loadAvailableTimes(this.value);
-});
-
 // ===== BOOKING FUNNEL TRACKING (GA4) =====
 // Track service selection
 document.querySelectorAll('input[name="service"]').forEach(function(radio) {
@@ -1221,13 +1086,6 @@ document.querySelectorAll('input[name="service"]').forEach(function(radio) {
     if (typeof gtag === 'function') gtag('event', 'booking_step', {
       event_category: 'booking_funnel', step: 'service_selected', service: this.value
     });
-  });
-});
-
-// Track date selection
-document.getElementById('booking-date').addEventListener('change', function() {
-  if (this.value && typeof gtag === 'function') gtag('event', 'booking_step', {
-    event_category: 'booking_funnel', step: 'date_selected'
   });
 });
 
@@ -1261,106 +1119,21 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
   });
 });
 
-// ===== VIN DECODE =====
-function setupVinDecode() {
+// ===== VIN INPUT — Auto-uppercase =====
+(function() {
   var vinInput = document.getElementById('vehicle-vin');
-  var vinBtn = document.getElementById('vin-decode-btn');
-  var vinStatus = document.getElementById('vin-status');
-  if (!vinInput || !vinBtn) return;
-
-  vinBtn.addEventListener('click', async function() {
-    var vin = vinInput.value.trim().toUpperCase();
-    vinInput.value = vin;
-
-    // Validate: must be exactly 17 chars
-    if (!vin) return;
-    if (vin.length !== 17) {
-      vinStatus.textContent = t[currentLang].vinInvalid;
-      vinStatus.className = 'text-xs mt-1 text-orange-600 dark:text-orange-400';
-      return;
-    }
-
-    // Show loading state
-    vinBtn.disabled = true;
-    vinBtn.textContent = t[currentLang].vinDecoding;
-    vinStatus.textContent = '';
-    vinStatus.className = 'text-xs mt-1 hidden';
-
-    try {
-      var res = await fetch(API_BASE + '/vin-decode.php?vin=' + encodeURIComponent(vin), { credentials: 'include' });
-      var json = await res.json();
-
-      if (!res.ok || !json.success || !json.data) {
-        throw new Error(json.error || 'Decode failed');
-      }
-
-      var d = json.data;
-
-      // Fill year
-      if (d.year) {
-        var yearSelect = document.getElementById('vehicle-year');
-        // Ensure option exists
-        var found = false;
-        for (var i = 0; i < yearSelect.options.length; i++) {
-          if (yearSelect.options[i].value === String(d.year)) { found = true; break; }
-        }
-        if (found) yearSelect.value = String(d.year);
-      }
-
-      // Fill make and model
-      if (d.make) document.getElementById('vehicle-make').value = d.make;
-      if (d.model) document.getElementById('vehicle-model').value = d.model;
-
-      // Trigger change events for progress bar
-      var yearSelect = document.getElementById('vehicle-year');
-      yearSelect.dispatchEvent(new Event('change', { bubbles: true }));
-      document.getElementById('vehicle-make').dispatchEvent(new Event('input', { bubbles: true }));
-
-      vinStatus.textContent = t[currentLang].vinDecoded;
-      vinStatus.className = 'text-xs mt-1 text-green-600 dark:text-green-400 font-medium';
-
-      if (typeof gtag === 'function') gtag('event', 'vin_decode', {
-        event_category: 'booking_funnel', event_label: 'success'
-      });
-    } catch (err) {
-      console.warn('VIN decode error:', err);
-      vinStatus.textContent = t[currentLang].vinError;
-      vinStatus.className = 'text-xs mt-1 text-red-600 dark:text-red-400';
-
-      if (typeof gtag === 'function') gtag('event', 'vin_decode', {
-        event_category: 'booking_funnel', event_label: 'error'
-      });
-    } finally {
-      vinBtn.disabled = false;
-      vinBtn.textContent = t[currentLang].vinDecode;
-    }
-  });
-
-  // Auto-uppercase VIN input
+  if (!vinInput) return;
   vinInput.addEventListener('input', function() {
     var pos = this.selectionStart;
     this.value = this.value.toUpperCase();
     this.setSelectionRange(pos, pos);
   });
-
-  // Auto-decode when 17th character is typed (with 300ms debounce)
-  var vinAutoDecodeTimer = null;
-  vinInput.addEventListener('input', function() {
-    if (vinAutoDecodeTimer) clearTimeout(vinAutoDecodeTimer);
-    if (vinInput.value.length === 17) {
-      vinAutoDecodeTimer = setTimeout(function() {
-        vinBtn.click();
-      }, 300);
-    }
-  });
-}
+})();
 
 // ===== INIT =====
 populateYearDropdown();
 setupDateInput();
-buildTimeSlotGrid();
 setupTimeSlots();
-setupVinDecode();
 updateServiceMeta();
 
 // ===== PROGRESS BAR =====
@@ -1487,16 +1260,14 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
   form.addEventListener('change', saveDraft);
   form.addEventListener('input', saveDraft);
 
-  // Clear draft on successful submission
-  var origShowConfirmation = window.showConfirmation;
-  if (typeof origShowConfirmation === 'function') {
-    window.showConfirmation = function() {
+  // Clear draft on successful HTMX submission (confirmation replaces form)
+  document.body.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'booking-form-container' && document.getElementById('booking-confirmation-result')) {
       try { sessionStorage.removeItem(STORAGE_KEY); } catch(e) {}
       var banner = document.getElementById('booking-recovery-banner');
       if (banner) banner.remove();
-      return origShowConfirmation.apply(this, arguments);
-    };
-  }
+    }
+  });
 
   // On page load, check for saved draft and show recovery banner
   try {

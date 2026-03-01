@@ -171,6 +171,15 @@ try {
             }
         }
 
+        if (isHtmxRequest()) {
+            header('Content-Type: text/html; charset=utf-8');
+            header('Vary: HX-Request');
+            $lang = sanitize((string) ($_GET['lang'] ?? 'en'), 2);
+            $shopClosed = true;
+            require __DIR__ . '/../templates/partials/booking-time-slots.php';
+            exit;
+        }
+
         jsonSuccess([
             'date'   => $date,
             'closed' => true,
@@ -194,6 +203,15 @@ try {
                 'reason'    => $available ? null : ($capacity === 0 && !$useSchedules ? null : 'full'),
             ];
         }
+    }
+
+    if (isHtmxRequest()) {
+        header('Content-Type: text/html; charset=utf-8');
+        header('Vary: HX-Request');
+        $lang = sanitize((string) ($_GET['lang'] ?? 'en'), 2);
+        $shopClosed = false;
+        require __DIR__ . '/../templates/partials/booking-time-slots.php';
+        exit;
     }
 
     jsonSuccess([

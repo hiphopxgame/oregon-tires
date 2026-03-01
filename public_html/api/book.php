@@ -491,6 +491,27 @@ try {
         $response['payment'] = $paymentResponse;
     }
 
+    if (isHtmxRequest()) {
+        header('Content-Type: text/html; charset=utf-8');
+        header('Vary: HX-Request');
+        $lang = ($language === 'spanish') ? 'es' : 'en';
+        $bookingData = [
+            'service' => $service,
+            'preferredDate' => $preferredDate,
+            'preferredTime' => $preferredTime,
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'phone' => $phone,
+            'email' => $email,
+            'vehicleYear' => $vehicleYear,
+            'vehicleMake' => $vehicleMake,
+            'vehicleModel' => $vehicleModel,
+        ];
+        $bookingResponse = $response;
+        require __DIR__ . '/../templates/partials/booking-confirmation.php';
+        exit;
+    }
+
     jsonSuccess($response);
 
 } catch (\Throwable $e) {
