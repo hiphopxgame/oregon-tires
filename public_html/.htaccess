@@ -99,7 +99,7 @@ ErrorDocument 404 /404.html
 ErrorDocument 403 /index.html
 
 # --- Block access to dotfiles (except this .htaccess) ---
-<FilesMatch "^\.ht">
+<FilesMatch "^\.(?!htaccess)">
     Require all denied
 </FilesMatch>
 
@@ -144,7 +144,7 @@ ServerSignature Off
 </IfModule>
 
 # --- Block access to sensitive files ---
-<FilesMatch "(\.sql|\.env|\.git|package\.json|composer\.(json|lock)|\.bak|\.tmp)$">
+<FilesMatch "^\.env|\.sql$|\.git|^package(-lock)?\.json$|^composer\.(json|lock)$|\.bak$|\.tmp$">
     Require all denied
 </FilesMatch>
 

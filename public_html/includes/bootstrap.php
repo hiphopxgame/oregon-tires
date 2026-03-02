@@ -24,9 +24,14 @@ if (!file_exists($vendorAutoload)) {
 require_once $vendorAutoload;
 
 // ─── Environment ────────────────────────────────────────────────────────────
-// Load .env from the project root (one level up from includes/)
-$envDir = __DIR__ . '/..';
-$dotenv = Dotenv\Dotenv::createImmutable($envDir);
+// Load .env — prefer parent of web root (outside public_html), fall back to project root (local dev)
+$envDir = dirname(__DIR__, 3); // Server: /home/hiphopwo/ (above public_html)
+$envFile = '.env.oregon-tires';
+if (!file_exists($envDir . '/' . $envFile)) {
+    $envDir = __DIR__ . '/..'; // Local dev fallback: public_html/
+    $envFile = '.env';
+}
+$dotenv = Dotenv\Dotenv::createImmutable($envDir, $envFile);
 $dotenv->load();
 $dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'])->notEmpty();
 
