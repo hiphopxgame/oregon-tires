@@ -478,6 +478,20 @@
     .faq-item summary::-webkit-details-marker { display: none; }
     .faq-item summary .faq-chevron { transition: transform 0.2s ease; }
     .faq-item[open] summary .faq-chevron { transform: rotate(180deg); }
+    /* Gallery lightbox */
+    .gallery-lightbox { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; flex-direction: column; cursor: zoom-out; }
+    .gallery-lightbox.active { display: flex; }
+    .gallery-lightbox img { max-width: 90vw; max-height: 80vh; object-fit: contain; border-radius: 8px; cursor: default; }
+    .gallery-lightbox-caption { color: #fff; text-align: center; margin-top: 12px; max-width: 90vw; }
+    .gallery-lightbox-caption h4 { font-size: 1.125rem; font-weight: 600; }
+    .gallery-lightbox-caption p { font-size: 0.875rem; color: #d1d5db; margin-top: 4px; }
+    .gallery-lightbox-close { position: absolute; top: 16px; right: 16px; color: #fff; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .gallery-lightbox-close:hover { background: rgba(255,255,255,0.2); }
+    .gallery-lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); color: #fff; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .gallery-lightbox-nav:hover { background: rgba(255,255,255,0.2); }
+    .gallery-lightbox-nav.prev { left: 16px; }
+    .gallery-lightbox-nav.next { right: 16px; }
+    .gallery-card { cursor: pointer; }
   </style>
 
   <!-- Google Analytics 4 — Hybrid loader (configurable via admin panel) -->
@@ -786,7 +800,7 @@
       <div class="flex justify-center gap-3 flex-wrap">
         <a href="/book-appointment/" class="bg-amber-500 text-black px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-lg" data-t="getFreeEstimate">Get Your Free Estimate</a>
         <a href="#services" class="bg-white/90 text-brand px-8 py-3 rounded-lg font-semibold hover:bg-white transition" data-t="viewPricing">View Services & Pricing</a>
-        <a href="tel:5033679714" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition" data-t="callSameDay">📞 Call for Same-Day Service</a>
+        <a href="tel:5033679714" class="bg-white/20 backdrop-blur-sm border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/30 transition" data-t="callSameDay">📞 Call for Same-Day Service</a>
       </div>
       <!-- Trust Bar -->
       <div class="mt-8 flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-sm text-white/90">
@@ -910,62 +924,6 @@
         </div>
       </div>
 
-      <!-- Service Pricing -->
-      <div class="mt-12 max-w-4xl mx-auto" id="pricing">
-        <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-6 text-center" data-t="startingPrices">Starting Prices</h3>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
-            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tireInstallation">Tire Installation</div>
-            <div class="text-2xl font-bold text-brand dark:text-green-400">$20<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
-            <a href="/book-appointment/?service=tire-installation" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
-          </div>
-          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
-            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tireRepair">Tire Repair</div>
-            <div class="text-2xl font-bold text-brand dark:text-green-400">$15<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
-            <a href="/book-appointment/?service=tire-repair" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
-          </div>
-          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
-            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="oilChange">Oil Change</div>
-            <div class="text-2xl font-bold text-brand dark:text-green-400">$35<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
-            <a href="/book-appointment/?service=oil-change" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
-          </div>
-          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
-            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="brakeService">Brake Service</div>
-            <div class="text-2xl font-bold text-brand dark:text-green-400">$100<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
-            <a href="/book-appointment/?service=brake-service" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
-          </div>
-          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
-            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="wheelAlignment">Wheel Alignment</div>
-            <div class="text-2xl font-bold text-brand dark:text-green-400">$75<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
-            <a href="/book-appointment/?service=wheel-alignment" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
-          </div>
-          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
-            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="tuneup">Tuneup</div>
-            <div class="text-2xl font-bold text-brand dark:text-green-400">$80<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
-            <a href="/book-appointment/?service=tuneup" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
-          </div>
-          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
-            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="mechanicalInspection">Mechanical Inspection</div>
-            <div class="text-2xl font-bold text-brand dark:text-green-400">$50<span class="text-sm font-normal text-gray-500 dark:text-gray-400">+</span></div>
-            <a href="/book-appointment/?service=mechanical-inspection" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
-          </div>
-          <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-5 text-center">
-            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1" data-t="homeService">Mobile Service</div>
-            <div class="text-2xl font-bold text-brand dark:text-green-400" data-t="callForQuote">Call for Quote</div>
-            <a href="/book-appointment/?service=mobile-service" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition" data-t="bookThisService">Book Now &rarr;</a>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="noObligation">No obligation · Free estimates</p>
-          </div>
-        </div>
-        <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-3" data-t="pricingDisclaimer">Prices vary by vehicle. Call for an exact quote.</p>
-      </div>
-
       <!-- Service Promise -->
       <div class="mt-12 max-w-4xl mx-auto bg-brand/5 dark:bg-gray-700 rounded-xl p-8 text-center">
         <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-4" data-t="ourServicePromise">Our Service Promise</h3>
@@ -977,27 +935,6 @@
         </div>
       </div>
 
-      <!-- Guarantee Badges -->
-      <div class="mt-10 max-w-4xl mx-auto">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center border-2 border-green-100 dark:border-green-900 shadow-sm">
-            <div class="text-3xl mb-2">🛡️</div>
-            <div class="font-bold text-sm text-brand dark:text-green-400" data-t="warranty12Mo">12-Month / 12K-Mile Warranty</div>
-          </div>
-          <div class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center border-2 border-green-100 dark:border-green-900 shadow-sm">
-            <div class="text-3xl mb-2">💰</div>
-            <div class="font-bold text-sm text-brand dark:text-green-400" data-t="priceMatch">Price Match Guarantee</div>
-          </div>
-          <div class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center border-2 border-green-100 dark:border-green-900 shadow-sm">
-            <div class="text-3xl mb-2">🔍</div>
-            <div class="font-bold text-sm text-brand dark:text-green-400" data-t="freeInspection">Free Multi-Point Inspection</div>
-          </div>
-          <div class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center border-2 border-green-100 dark:border-green-900 shadow-sm">
-            <div class="text-3xl mb-2">✅</div>
-            <div class="font-bold text-sm text-brand dark:text-green-400" data-t="noSurprise">No Surprise Pricing</div>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -1458,7 +1395,7 @@
       <h3 class="text-2xl font-bold mb-2" data-t="getDeals">Get Portland Tire Deals &amp; Seasonal Alerts</h3>
       <p class="text-gray-300 mb-6" data-t="joinDrivers">Join 500+ Portland drivers. Seasonal deals, maintenance reminders, exclusive offers.</p>
       <form id="subscribe-form" class="flex flex-col sm:flex-row gap-3 justify-center">
-        <input type="email" id="subscribe-email" name="email" required placeholder="your@email.com" class="flex-1 max-w-sm px-4 py-3 rounded-lg text-gray-900 border-0 focus:ring-2 focus:ring-green-500" aria-label="Email address">
+        <input type="email" id="subscribe-email" name="email" required placeholder="your@email.com" class="flex-1 max-w-sm px-4 py-3 rounded-lg bg-white text-gray-900 border-0 focus:ring-2 focus:ring-green-500" aria-label="Email address">
         <button type="submit" class="bg-amber-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 transition whitespace-nowrap" data-t="signUpFree">Sign Up Free</button>
       </form>
       <p class="text-xs text-gray-500 mt-3" data-t="noSpam">No spam. Unsubscribe anytime.</p>
@@ -2045,11 +1982,16 @@ async function loadGalleryForSite() {
       return;
     }
     grid.textContent = '';
-    images.forEach(function(img) {
+    window._galleryImages = images;
+    images.forEach(function(img, idx) {
       var card = document.createElement('div');
-      card.className = 'rounded-xl overflow-hidden shadow-md hover:shadow-lg transition group';
+      card.className = 'gallery-card rounded-xl overflow-hidden shadow-md hover:shadow-lg transition group';
+      card.setAttribute('data-gallery-index', idx);
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', (img.title || t[currentLang].galleryImage) + ' — click to enlarge');
       var imgWrap = document.createElement('div');
-      imgWrap.className = 'relative h-56 bg-gray-200 dark:bg-gray-700';
+      imgWrap.className = 'relative h-56 bg-gray-200 dark:bg-gray-700 overflow-hidden';
       var imgEl = document.createElement('img');
       imgEl.src = img.image_url || '';
       imgEl.alt = img.title || t[currentLang].galleryImage;
@@ -2075,6 +2017,7 @@ async function loadGalleryForSite() {
       }
       grid.appendChild(card);
     });
+    initGalleryLightbox();
   } catch (e) {
     console.error('Error loading gallery:', e);
     var errGrid = document.getElementById('gallery-section-grid');
@@ -2084,6 +2027,106 @@ async function loadGalleryForSite() {
     errMsg.textContent = t[currentLang].galleryLoadError;
     errGrid.appendChild(errMsg);
   }
+}
+
+// ===== GALLERY LIGHTBOX =====
+function initGalleryLightbox() {
+  var lightbox = document.getElementById('gallery-lightbox');
+  var lbImg = document.getElementById('gallery-lightbox-img');
+  var lbCaption = document.getElementById('gallery-lightbox-caption');
+  var grid = document.getElementById('gallery-section-grid');
+  var currentIndex = 0;
+  var images = window._galleryImages || [];
+
+  function openLightbox(idx) {
+    if (!images[idx]) return;
+    currentIndex = idx;
+    var img = images[idx];
+    lbImg.src = img.image_url || '';
+    lbImg.alt = img.title || '';
+    lbCaption.textContent = '';
+    if (img.title) {
+      var h4 = document.createElement('h4');
+      h4.textContent = img.title;
+      lbCaption.appendChild(h4);
+      if (img.description) {
+        var p = document.createElement('p');
+        p.textContent = img.description;
+        lbCaption.appendChild(p);
+      }
+    }
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+    lbImg.src = '';
+  }
+
+  function navigate(dir) {
+    var next = currentIndex + dir;
+    if (next < 0) next = images.length - 1;
+    if (next >= images.length) next = 0;
+    openLightbox(next);
+  }
+
+  // Click on gallery card to open
+  grid.addEventListener('click', function(e) {
+    var card = e.target.closest('[data-gallery-index]');
+    if (!card) return;
+    openLightbox(parseInt(card.getAttribute('data-gallery-index'), 10));
+  });
+
+  // Keyboard: Enter on focused card
+  grid.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      var card = e.target.closest('[data-gallery-index]');
+      if (card) openLightbox(parseInt(card.getAttribute('data-gallery-index'), 10));
+    }
+  });
+
+  // Close button
+  lightbox.querySelector('.gallery-lightbox-close').addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeLightbox();
+  });
+
+  // Nav buttons
+  lightbox.querySelector('.prev').addEventListener('click', function(e) {
+    e.stopPropagation();
+    navigate(-1);
+  });
+  lightbox.querySelector('.next').addEventListener('click', function(e) {
+    e.stopPropagation();
+    navigate(1);
+  });
+
+  // Click backdrop to close
+  lightbox.addEventListener('click', function(e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (!lightbox.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navigate(-1);
+    if (e.key === 'ArrowRight') navigate(1);
+  });
+
+  // Touch swipe support
+  var touchStartX = 0;
+  lightbox.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  lightbox.addEventListener('touchend', function(e) {
+    var diff = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(diff) > 50) {
+      navigate(diff > 0 ? -1 : 1);
+    }
+  }, { passive: true });
 }
 
 // Init calls are deferred to after currentLang is defined (see below)
@@ -2550,6 +2593,15 @@ if ('PerformanceObserver' in window) {
   obs.observe(contact);
 })();
 </script>
+  <!-- Gallery Lightbox -->
+  <div class="gallery-lightbox" id="gallery-lightbox" role="dialog" aria-label="Image viewer" aria-modal="true">
+    <button class="gallery-lightbox-close" aria-label="Close">&times;</button>
+    <button class="gallery-lightbox-nav prev" aria-label="Previous image">&#8249;</button>
+    <button class="gallery-lightbox-nav next" aria-label="Next image">&#8250;</button>
+    <img src="" alt="" id="gallery-lightbox-img">
+    <div class="gallery-lightbox-caption" id="gallery-lightbox-caption"></div>
+  </div>
+
   <script src="/assets/js/scroll-reveal.js" defer></script>
   <script src="/assets/js/exit-intent.js" defer></script>
   <script src="/assets/js/cookie-consent.js" defer></script>
