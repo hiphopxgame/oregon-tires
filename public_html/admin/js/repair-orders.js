@@ -611,9 +611,11 @@ function renderRoDetailModal() {
 }
 
 // ─── Create RO Modal ─────────────────────────────────────────────────────────
-window.roShowCreateModal = function() {
+window.roShowCreateModal = function(appointmentId) {
   var existing = document.getElementById('ro-create-modal');
   if (existing) existing.remove();
+
+  var selectedApptId = null;
 
   var modal = document.createElement('div');
   modal.id = 'ro-create-modal';
@@ -638,27 +640,151 @@ window.roShowCreateModal = function() {
   fromApptH.textContent = 'From Appointment';
   fromApptDiv.appendChild(fromApptH);
 
-  var apptIdInput = document.createElement('input');
-  apptIdInput.type = 'number';
-  apptIdInput.id = 'ro-appt-id';
-  apptIdInput.placeholder = 'Appointment ID';
-  apptIdInput.className = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-3 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600';
-  fromApptDiv.appendChild(apptIdInput);
+  // Search input
+  var searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = 'Search by name, phone, service, reference...';
+  searchInput.className = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-2 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600';
+  fromApptDiv.appendChild(searchInput);
+
+  // Scrollable appointment list
+  var listWrap = document.createElement('div');
+  listWrap.style.cssText = 'max-height:250px;overflow-y:auto';
+  listWrap.className = 'border border-gray-200 dark:border-gray-700 rounded-lg mb-3';
+  var listLoading = document.createElement('div');
+  listLoading.className = 'p-4 text-center text-sm text-gray-500 dark:text-gray-400';
+  listLoading.textContent = 'Loading appointments...';
+  listWrap.appendChild(listLoading);
+  fromApptDiv.appendChild(listWrap);
+
+  // Selected appointment confirmation area
+  var confirmArea = document.createElement('div');
+  confirmArea.className = 'hidden bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-lg p-3 mb-3 text-sm text-green-800 dark:text-green-300';
+  fromApptDiv.appendChild(confirmArea);
 
   var apptBtn = document.createElement('button');
-  apptBtn.className = 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 w-full';
+  apptBtn.className = 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 w-full opacity-50 cursor-not-allowed';
   apptBtn.textContent = 'Create from Appointment';
+  apptBtn.disabled = true;
   apptBtn.addEventListener('click', async function() {
-    var apptId = parseInt(document.getElementById('ro-appt-id').value);
-    if (!apptId) { showToast('Enter an appointment ID', true); return; }
+    if (!selectedApptId) { showToast('Select an appointment first', true); return; }
     try {
-      var json = await api('repair-orders.php', { method: 'POST', body: { appointment_id: apptId } });
+      var json = await api('repair-orders.php', { method: 'POST', body: { appointment_id: selectedApptId } });
       showToast('Repair order ' + json.data.ro_number + ' created!');
       modal.remove();
       loadRepairOrders();
     } catch(err) { showToast(err.message, true); }
   });
   fromApptDiv.appendChild(apptBtn);
+
+  // Collect appointment IDs that already have ROs
+  var usedApptIds = {};
+  roList.forEach(function(ro) { if (ro.appointment_id) usedApptIds[ro.appointment_id] = ro.ro_number; });
+
+  // Fetch and render appointments
+  var allAppts = [];
+
+  function clearChildren(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+
+  function renderApptList(filter) {
+    var lc = (filter || '').toLowerCase();
+    var filtered = allAppts.filter(function(a) {
+      if (usedApptIds[a.id]) return false;
+      if (a.status === 'cancelled') return false;
+      if (!lc) return true;
+      var hay = [a.reference_number, a.first_name, a.last_name, a.phone, a.email, a.service,
+                 a.vehicle_year, a.vehicle_make, a.vehicle_model].filter(Boolean).join(' ').toLowerCase();
+      return hay.indexOf(lc) !== -1;
+    });
+    clearChildren(listWrap);
+    if (filtered.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'p-4 text-center text-sm text-gray-500 dark:text-gray-400';
+      empty.textContent = filter ? 'No matching appointments' : 'No available appointments';
+      listWrap.appendChild(empty);
+      return;
+    }
+    filtered.forEach(function(a) {
+      var row = document.createElement('div');
+      row.className = 'flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition';
+      if (selectedApptId === a.id) {
+        row.className += ' bg-green-50 dark:bg-green-900/20 ring-1 ring-green-400';
+      }
+      var info = document.createElement('div');
+      info.className = 'flex-1 min-w-0';
+      var line1 = document.createElement('div');
+      line1.className = 'flex items-center gap-2 text-sm';
+      var ref = document.createElement('span');
+      ref.className = 'font-mono text-xs text-green-700 dark:text-green-400 font-bold';
+      ref.textContent = a.reference_number || '#' + a.id;
+      line1.appendChild(ref);
+      var name = document.createElement('span');
+      name.className = 'font-medium text-gray-900 dark:text-white truncate';
+      name.textContent = (a.first_name || '') + ' ' + (a.last_name || '');
+      line1.appendChild(name);
+      info.appendChild(line1);
+      var line2 = document.createElement('div');
+      line2.className = 'text-xs text-gray-500 dark:text-gray-400 mt-0.5';
+      var parts = [a.service];
+      if (a.preferred_date) parts.push(fmtDate(a.preferred_date));
+      if (a.preferred_time) parts.push(fmtTime(a.preferred_time));
+      var veh = [a.vehicle_year, a.vehicle_make, a.vehicle_model].filter(Boolean).join(' ');
+      if (veh) parts.push(veh);
+      line2.textContent = parts.join(' · ');
+      info.appendChild(line2);
+      row.appendChild(info);
+      var selectBtn = document.createElement('button');
+      selectBtn.className = selectedApptId === a.id
+        ? 'ml-2 px-2 py-1 rounded text-xs font-medium bg-green-600 text-white shrink-0'
+        : 'ml-2 px-2 py-1 rounded text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shrink-0';
+      selectBtn.textContent = selectedApptId === a.id ? 'Selected' : 'Select';
+      row.appendChild(selectBtn);
+      row.addEventListener('click', function() {
+        selectedApptId = a.id;
+        apptBtn.disabled = false;
+        apptBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        confirmArea.classList.remove('hidden');
+        var cName = ((a.first_name || '') + ' ' + (a.last_name || '')).trim();
+        var cVeh = [a.vehicle_year, a.vehicle_make, a.vehicle_model].filter(Boolean).join(' ') || 'No vehicle';
+        var cDate = a.preferred_date ? fmtDate(a.preferred_date) : '';
+        confirmArea.textContent = 'Creating RO for ' + cName + ' \u2014 ' + cVeh + ' \u2014 ' + cDate;
+        renderApptList(searchInput.value);
+      });
+      listWrap.appendChild(row);
+    });
+  }
+
+  searchInput.addEventListener('input', function() { renderApptList(this.value); });
+
+  // Fetch appointments
+  api('appointments.php?limit=50&sort_by=preferred_date&sort_order=DESC').then(function(json) {
+    allAppts = json.data || [];
+    // If pre-filled appointmentId, auto-select it
+    if (appointmentId) {
+      var preId = parseInt(appointmentId);
+      if (preId) {
+        selectedApptId = preId;
+        apptBtn.disabled = false;
+        apptBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        var match = allAppts.find(function(a) { return a.id == preId; });
+        if (match) {
+          var cName = ((match.first_name || '') + ' ' + (match.last_name || '')).trim();
+          var cVeh = [match.vehicle_year, match.vehicle_make, match.vehicle_model].filter(Boolean).join(' ') || 'No vehicle';
+          var cDate = match.preferred_date ? fmtDate(match.preferred_date) : '';
+          confirmArea.classList.remove('hidden');
+          confirmArea.textContent = 'Creating RO for ' + cName + ' \u2014 ' + cVeh + ' \u2014 ' + cDate;
+        }
+      }
+    }
+    renderApptList('');
+  }).catch(function() {
+    clearChildren(listWrap);
+    var errDiv = document.createElement('div');
+    errDiv.className = 'p-4 text-center text-sm text-red-500';
+    errDiv.textContent = 'Failed to load appointments';
+    listWrap.appendChild(errDiv);
+  });
+
   optWrap.appendChild(fromApptDiv);
 
   // Walk-in
