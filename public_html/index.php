@@ -10,6 +10,10 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/engine-kit-init.php';
 
+// Override bootstrap's JSON Content-Type — this is an HTML page, not an API endpoint
+header('Content-Type: text/html; charset=utf-8');
+header_remove('X-API-Version');
+
 initEngineKit();
 
 // Allow outputting HTML

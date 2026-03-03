@@ -5,8 +5,9 @@
 
 declare(strict_types=1);
 
-// Set standard API headers on every response
-if (!headers_sent()) {
+// Set standard API headers on API responses only
+$_scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+if (!headers_sent() && (str_contains($_scriptName, '/api/') || str_contains($_scriptName, '/cli/'))) {
     header('X-API-Version: v1');
     header('X-Request-ID: ' . bin2hex(random_bytes(8)));
 }

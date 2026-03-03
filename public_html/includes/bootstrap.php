@@ -88,8 +88,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
     exit;
 }
 
-// ─── Content Type ───────────────────────────────────────────────────────────
-header('Content-Type: application/json; charset=utf-8');
+// ─── Content Type (API endpoints only) ──────────────────────────────────────
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+if (str_contains($scriptName, '/api/') || str_contains($scriptName, '/cli/')) {
+    header('Content-Type: application/json; charset=utf-8');
+    header('X-API-Version: v1');
+}
 header('X-Content-Type-Options: nosniff');
 
 // ─── Engine Kit (optional, for network integration) ─────────────────────────
