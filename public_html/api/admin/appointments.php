@@ -311,6 +311,27 @@ try {
         $db->prepare('UPDATE oretir_appointments SET cancel_token = ?, cancel_token_expires = ? WHERE id = ?')
            ->execute([$cancelToken, date('Y-m-d H:i:s', strtotime('+30 days')), $appointmentId]);
 
+        // Send confirmation email to customer
+        try {
+            $custName    = "{$firstName} {$lastName}";
+            $svcDisplay  = ucwords(str_replace('-', ' ', $service));
+            $custLang    = $language === 'spanish' ? 'es' : 'en';
+            $dateObj     = new \DateTime($preferredDate);
+            $displayDate = $custLang === 'es' ? $dateObj->format('d/m/Y') : $dateObj->format('m/d/Y');
+            $displayTime = formatTimeDisplay($preferredTime);
+            $vParts      = array_filter([$vehicleYear, $vehicleMake, $vehicleModel]);
+            $vehicleInfo = implode(' ', $vParts);
+
+            sendBookingConfirmationEmail(
+                $email, $custName, $svcDisplay, $displayDate, $displayTime,
+                $vehicleInfo, $custLang, $referenceNumber,
+                $service, $preferredDate, $preferredTime, $cancelToken
+            );
+            logEmail('appointment_confirmed', "Confirmation email sent to {$email} for {$referenceNumber} (admin-created)");
+        } catch (\Throwable $e) {
+            error_log("appointments.php: Confirmation email error for admin-created #{$appointmentId}: " . $e->getMessage());
+        }
+
         jsonSuccess(['appointment_id' => $appointmentId, 'reference_number' => $referenceNumber]);
     }
 

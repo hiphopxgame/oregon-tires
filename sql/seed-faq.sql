@@ -1,0 +1,91 @@
+-- Seed FAQ: 15 existing hardcoded Q&As with EN and ES text
+INSERT INTO oretir_faq (question_en, question_es, answer_en, answer_es, sort_order) VALUES
+('What services do you offer?',
+ '¿Qué servicios ofrecen?',
+ 'We offer a full range of automotive services including tire installation, rotation, and balancing, oil changes, brake services, wheel alignment, engine diagnostics, suspension repair, and mobile service. Whether you need new or used tires or a full vehicle checkup, we have you covered.',
+ 'Ofrecemos una gama completa de servicios automotrices incluyendo instalación, rotación y balanceo de llantas, cambios de aceite, servicios de frenos, alineación de ruedas, diagnóstico de motor, reparación de suspensión y servicio móvil. Ya sea que necesite llantas nuevas o usadas o una revisión completa del vehículo, lo tenemos cubierto.',
+ 1),
+
+('Do you speak Spanish?',
+ '¿Hablan español?',
+ 'Yes! Our entire staff is fully bilingual in English and Spanish. We are proud to serve Portland''s diverse community in the language you are most comfortable with.',
+ '¡Sí! Todo nuestro personal es completamente bilingüe en inglés y español. Estamos orgullosos de servir a la diversa comunidad de Portland en el idioma en que se sienta más cómodo.',
+ 2),
+
+('What are your hours?',
+ '¿Cuál es su horario?',
+ 'We are open Monday through Saturday, 7AM to 7PM. We are closed on Sundays. For emergency roadside assistance, call us anytime at (503) 367-9714.',
+ 'Estamos abiertos de lunes a sábado, de 7AM a 7PM. Los domingos estamos cerrados. Para asistencia de emergencia en carretera, llámenos en cualquier momento al (503) 367-9714.',
+ 3),
+
+('Where are you located?',
+ '¿Dónde están ubicados?',
+ 'We are located at 8536 SE 82nd Ave, Portland, OR 97266. We are conveniently situated on SE 82nd Avenue and serve the greater Portland metro area.',
+ 'Estamos ubicados en 8536 SE 82nd Ave, Portland, OR 97266. Estamos convenientemente situados en la avenida SE 82nd y servimos al área metropolitana de Portland.',
+ 4),
+
+('Do I need an appointment?',
+ '¿Necesito una cita?',
+ 'Appointments are recommended to ensure we can serve you promptly, but walk-ins are always welcome! You can book online or call us at (503) 367-9714.',
+ 'Se recomienda hacer cita para asegurar que podamos atenderlo rápidamente, ¡pero los clientes sin cita siempre son bienvenidos! Puede reservar en línea o llamarnos al (503) 367-9714.',
+ 5),
+
+('Do you offer mobile service?',
+ '¿Ofrecen servicio móvil?',
+ 'Yes! We offer mobile service and can come to your home, office, or any location. Whether you need tire installation, repair, or roadside assistance, we will come to you. Call (503) 367-9714 to schedule.',
+ '¡Sí! Ofrecemos servicio móvil y podemos ir a su casa, oficina o cualquier ubicación. Ya sea que necesite instalación de llantas, reparación o asistencia en carretera, iremos a usted. Llame al (503) 367-9714 para programar.',
+ 6),
+
+('Do you work on all vehicle makes and models?',
+ '¿Trabajan con todas las marcas y modelos?',
+ 'Yes! We service all makes and models — domestic, import, and luxury vehicles. Our technicians are experienced with everything from compact cars to trucks and SUVs.',
+ '¡Sí! Damos servicio a todas las marcas y modelos — domésticos, importados y de lujo. Nuestros técnicos tienen experiencia con todo tipo de vehículos.',
+ 7),
+
+('How long does a tire installation take?',
+ '¿Cuánto tiempo toma instalar llantas?',
+ 'A standard tire installation takes about 30-45 minutes for a full set of 4 tires. This includes mount, balance, and a courtesy inspection. Most services are completed while you wait.',
+ 'Una instalación estándar de 4 llantas toma aproximadamente 30-45 minutos. Incluye montaje, balanceo e inspección de cortesía.',
+ 8),
+
+('Do you offer financing?',
+ '¿Ofrecen financiamiento?',
+ 'We offer flexible payment options. We accept cash, all major credit cards, and can discuss payment arrangements for larger repairs. Ask about our Care Plan membership for monthly savings.',
+ 'Ofrecemos opciones de pago flexibles. Aceptamos efectivo, todas las tarjetas principales y podemos discutir arreglos de pago para reparaciones mayores.',
+ 9),
+
+('What brands of tires do you carry?',
+ '¿Qué marcas de llantas tienen?',
+ 'We carry a wide selection of new and quality used tires from top brands. We can source virtually any tire size and brand. Call us with your vehicle details and we will find the best tires for your budget.',
+ 'Tenemos una amplia selección de llantas nuevas y usadas de calidad. Podemos conseguir prácticamente cualquier tamaño y marca.',
+ 10),
+
+('Can I wait while my car is serviced?',
+ '¿Puedo esperar mientras dan servicio a mi auto?',
+ 'Yes! Most of our services are completed while you wait. We have a comfortable waiting area. For longer repairs, we will give you an accurate time estimate so you can plan accordingly.',
+ '¡Sí! La mayoría de nuestros servicios se completan mientras espera. Tenemos un área de espera cómoda.',
+ 11),
+
+('What is your warranty policy?',
+ '¿Cuál es su política de garantía?',
+ 'All our services come with a 12-month / 12,000-mile warranty. We also offer a price match guarantee and free multi-point inspections. View our full guarantee details at oregon.tires/guarantee.',
+ 'Todos nuestros servicios incluyen garantía de 12 meses / 12,000 millas. También ofrecemos igualación de precios e inspecciones gratis.',
+ 12),
+
+('Do you offer a membership or loyalty program?',
+ '¿Tienen programa de membresía?',
+ 'Yes! Our Care Plan membership starts at $19/month and includes oil changes, tire rotations, service discounts, and priority scheduling. The average member saves $380/year.',
+ '¡Sí! Nuestro Plan de Cuidado comienza en $19/mes e incluye cambios de aceite, rotación de llantas, descuentos y programación prioritaria.',
+ 13),
+
+('What areas do you serve?',
+ '¿Qué áreas atienden?',
+ 'We serve the greater Portland metro area including SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell, and Mt. Scott. Our mobile service covers an even wider area.',
+ 'Atendemos el área metropolitana de Portland incluyendo SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell y Mt. Scott.',
+ 14),
+
+('How can I get a price estimate?',
+ '¿Cómo puedo obtener un estimado?',
+ 'You can get a free estimate by booking online, calling us at (503) 367-9714, or texting us. We provide written estimates before starting any work — no surprises, no hidden fees.',
+ 'Puede obtener un estimado gratis reservando en línea, llamándonos al (503) 367-9714 o enviándonos un mensaje. Proporcionamos estimados escritos antes de comenzar cualquier trabajo.',
+ 15);

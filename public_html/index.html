@@ -740,7 +740,7 @@
     <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
       <div class="flex flex-wrap items-center gap-4">
         <span data-setting="phone"><span aria-hidden="true">📞</span> <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></span>
-        <span data-setting="email"><span aria-hidden="true">✉️</span> <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></span>
+        <span data-setting="email" class="hidden sm:inline"><span aria-hidden="true">✉️</span> <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></span>
         <span class="hidden md:inline" data-setting="address"><span aria-hidden="true">📍</span> 8536 SE 82nd Ave, Portland, OR 97266</span>
         <span class="hidden lg:inline" id="top-hours" data-setting="hours_weekday"><span aria-hidden="true">🕐</span> Mon-Sat 7AM-7PM</span>
         <span id="open-status" class="hidden sm:inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full"></span>
@@ -797,10 +797,10 @@
     <div class="container mx-auto px-4 text-center relative z-10">
       <h1 class="text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg" data-t="heroTitle">Your Trusted Auto Care Experts in Portland</h1>
       <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90" data-t="heroSubtitle">Professional tire installation, repair, and complete automotive services. We speak Spanish and English!</p>
-      <div class="flex justify-center gap-3 flex-wrap">
-        <a href="/book-appointment/" class="bg-amber-500 text-black px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-lg" data-t="getFreeEstimate">Get Your Free Estimate</a>
-        <a href="#services" class="bg-white/90 text-brand px-8 py-3 rounded-lg font-semibold hover:bg-white transition" data-t="viewPricing">View Services & Pricing</a>
-        <a href="tel:5033679714" class="bg-white/20 backdrop-blur-sm border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/30 transition" data-t="callSameDay">📞 Call for Same-Day Service</a>
+      <div class="flex flex-col sm:flex-row justify-center gap-3 flex-wrap">
+        <a href="/book-appointment/" class="bg-amber-500 text-black px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-lg text-center" data-t="getFreeEstimate">Get Your Free Estimate</a>
+        <a href="#services" class="bg-white/90 text-brand px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-white transition text-center" data-t="viewPricing">View Services & Pricing</a>
+        <a href="tel:5033679714" class="bg-white/20 backdrop-blur-sm border-2 border-white text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-white/30 transition text-center" data-t="callSameDay">📞 Call for Same-Day Service</a>
       </div>
       <!-- Trust Bar -->
       <div class="mt-8 flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-sm text-white/90">
@@ -1318,7 +1318,7 @@
           </div>
           <div class="p-5">
           <form id="contact-form" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label for="contact-first-name" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" data-t="firstName">First Name</label>
                 <input type="text" id="contact-first-name" name="firstName" required autocomplete="given-name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
@@ -1354,7 +1354,7 @@
       <div class="mt-12 text-center">
         <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-4" data-t="visitLocation">Visit Our Location</h3>
         <p class="text-gray-600 dark:text-gray-300 mb-4" data-t="physicalAddress">8536 SE 82nd Ave, Portland, OR 97266</p>
-        <div class="bg-gray-200 dark:bg-gray-700 h-96 rounded-xl overflow-hidden">
+        <div class="bg-gray-200 dark:bg-gray-700 h-64 md:h-96 rounded-xl overflow-hidden">
           <div id="map-placeholder" class="bg-gray-100 dark:bg-gray-800 rounded-xl h-full flex items-center justify-center text-gray-500 dark:text-gray-400 cursor-pointer" data-t="clickToLoadMap">Click to load map</div>
           <iframe
             id="map-frame"
@@ -2611,6 +2611,5 @@ if ('PerformanceObserver' in window) {
 
   <script src="/assets/js/scroll-reveal.js" defer></script>
   <script src="/assets/js/exit-intent.js" defer></script>
-  <script src="/assets/js/cookie-consent.js" defer></script>
 </body>
 </html>

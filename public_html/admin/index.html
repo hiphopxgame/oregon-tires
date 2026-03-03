@@ -472,6 +472,25 @@
         <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 dark:border-gray-700"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="confirmed">Confirmed</div><div class="text-3xl font-bold text-green-600" id="stat-confirmed">0</div><div class="text-xs mt-1" id="stat-confirmed-trend"></div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="readyToGo">Ready to go</p></div>
         <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 dark:border-gray-700"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="completed">Completed</div><div class="text-3xl font-bold text-gray-600 dark:text-gray-300" id="stat-completed">0</div><div class="text-xs mt-1" id="stat-completed-trend"></div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="finished">Finished</p></div>
       </div>
+      <!-- Overview Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
+          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="chartWeekBookings">This Week's Bookings</h3>
+          <div id="chart-week-bookings"></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
+          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="chartServiceBreakdown">Service Breakdown</h3>
+          <div id="chart-service-breakdown"></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
+          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="chartBayUtilization">Bay Utilization Today</h3>
+          <div id="chart-bay-utilization"></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
+          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="chartBookingTrend">Booking Trend (30 Days)</h3>
+          <div id="chart-booking-trend"></div>
+        </div>
+      </div>
       <div class="grid lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="upcoming14Days">Upcoming Appointments (14 Days)</h3><div id="overview-upcoming" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div></div>
         <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="employeeSchedule">Employee Schedule</h3><div id="overview-employees" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div></div>
@@ -5337,6 +5356,12 @@ const adminT = {
     newMessage: 'New message',
     justNow: 'Just now',
     minutesAgo: '{n}m ago',
+    // Overview Charts
+    chartWeekBookings: "This Week's Bookings",
+    chartServiceBreakdown: 'Service Breakdown',
+    chartBayUtilization: 'Bay Utilization Today',
+    chartBookingTrend: 'Booking Trend (30 Days)',
+    chartNoData: 'No data yet',
   },
   es: {
     // Login
@@ -5623,6 +5648,12 @@ const adminT = {
     newMessage: 'Nuevo mensaje',
     justNow: 'Ahora',
     minutesAgo: 'hace {n}m',
+    // Overview Charts
+    chartWeekBookings: 'Reservas de la Semana',
+    chartServiceBreakdown: 'Desglose por Servicio',
+    chartBayUtilization: 'Uso de Bah\u00EDas Hoy',
+    chartBookingTrend: 'Tendencia de Reservas (30 D\u00EDas)',
+    chartNoData: 'Sin datos a\u00FAn',
   }
 };
 
@@ -6039,15 +6070,15 @@ async function loadAllData() {
 }
 
 async function loadAppointments() {
-  try { const json = await api('appointments.php'); appointments = json.data || []; } catch(e) { appointments = []; }
+  try { const json = await api('appointments.php'); appointments = json.data || []; } catch(e) { console.error('loadAppointments failed:', e); appointments = []; }
   renderOverview(); renderAppointments(); renderCalendar();
 }
 async function loadMessages() {
-  try { const json = await api('messages.php'); messages = json.data || []; } catch(e) { messages = []; }
+  try { const json = await api('messages.php'); messages = json.data || []; } catch(e) { console.error('loadMessages failed:', e); messages = []; }
   renderMessages(); renderOverview();
 }
 async function loadEmployees() {
-  try { const json = await api('employees.php'); employees = json.data || []; } catch(e) { employees = []; }
+  try { const json = await api('employees.php'); employees = json.data || []; } catch(e) { console.error('loadEmployees failed:', e); employees = []; }
   renderEmployees(); renderOverview();
   // Populate bulk assign employee dropdown
   var bulkEmpSelect = document.getElementById('bulk-employee');
@@ -6060,19 +6091,19 @@ async function loadEmployees() {
   }
 }
 async function loadEmailLogs() {
-  try { const json = await api('email-logs.php'); emailLogs = json.data || []; } catch(e) { emailLogs = []; }
+  try { const json = await api('email-logs.php'); emailLogs = json.data || []; } catch(e) { console.error('loadEmailLogs failed:', e); emailLogs = []; }
   renderEmailLogs();
 }
 async function loadGalleryImages() {
-  try { const json = await api('gallery.php'); galleryImages = json.data || []; } catch(e) { galleryImages = []; }
+  try { const json = await api('gallery.php'); galleryImages = json.data || []; } catch(e) { console.error('loadGalleryImages failed:', e); galleryImages = []; }
   renderGallery();
 }
 async function loadServiceImages() {
-  try { const json = await api('service-images.php'); serviceImages = json.data || []; } catch(e) { serviceImages = []; }
+  try { const json = await api('service-images.php'); serviceImages = json.data || []; } catch(e) { console.error('loadServiceImages failed:', e); serviceImages = []; }
   renderServiceImages();
 }
 async function loadAdminUsers() {
-  try { const json = await api('admins.php'); adminUsers = json.data || []; } catch(e) { adminUsers = []; }
+  try { const json = await api('admins.php'); adminUsers = json.data || []; } catch(e) { console.error('loadAdminUsers failed:', e); adminUsers = []; }
   renderEmployees();
 }
 
@@ -6138,6 +6169,99 @@ function renderOverview() {
       ${empApts.length ? empApts.slice(0,2).map(a=>`<div class="text-sm flex items-center gap-2 bg-gray-50 p-2 rounded mb-1">📅 ${fmtDate(a.preferred_date)} ${fmtTime(a.preferred_time)}</div>`).join('') + (empApts.length>2?`<p class="text-xs text-gray-400">+${empApts.length-2} more</p>`:'') : '<p class="text-sm text-gray-400">No appointments in next 14 days</p>'}
     </div>`;
   }).join('') : '<p class="text-gray-500 text-center py-4">No active employees</p>';
+
+  renderOverviewCharts();
+}
+
+function renderOverviewCharts() {
+  var T = adminT[currentLang];
+
+  function showNoData(container) {
+    while (container.firstChild) container.removeChild(container.firstChild);
+    var p = document.createElement('p');
+    p.className = 'text-sm text-gray-400 dark:text-gray-500 text-center py-8';
+    p.textContent = T.chartNoData || 'No data yet';
+    container.appendChild(p);
+  }
+
+  function clearEl(id) {
+    var el = document.getElementById(id);
+    while (el.firstChild) el.removeChild(el.firstChild);
+    return el;
+  }
+
+  // 1) This Week's Bookings — bar chart (Mon-Sat)
+  var weekEl = clearEl('chart-week-bookings');
+  var today = new Date(); today.setHours(0,0,0,0);
+  var dayOfWeek = today.getDay();
+  var monday = new Date(today);
+  monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+  var dayNames = currentLang === 'es' ? ['Lun','Mar','Mi\u00E9','Jue','Vie','S\u00E1b'] : ['Mon','Tue','Wed','Thu','Fri','Sat'];
+  var weekData = [];
+  for (var d = 0; d < 6; d++) {
+    var dt = new Date(monday); dt.setDate(monday.getDate() + d);
+    var dateStr = dt.toISOString().split('T')[0];
+    var count = appointments.filter(function(a) { return a.preferred_date === dateStr; }).length;
+    weekData.push({ label: dayNames[d], value: count });
+  }
+  if (weekData.some(function(d) { return d.value > 0; })) {
+    OTCharts.barChart(weekEl, weekData, { height: 140, color: OTCharts.TOKENS.colors.brandMid, showLabels: true, labelFormatter: function(d) { return d.label; } });
+  } else {
+    showNoData(weekEl);
+  }
+
+  // 2) Service Breakdown — donut chart
+  var svcEl = clearEl('chart-service-breakdown');
+  var svcMap = {};
+  appointments.forEach(function(a) {
+    var svc = a.service || 'Other';
+    svcMap[svc] = (svcMap[svc] || 0) + 1;
+  });
+  var svcData = Object.keys(svcMap).map(function(k) { return { label: k, value: svcMap[k] }; })
+    .sort(function(a, b) { return b.value - a.value; });
+  if (svcData.length > 0) {
+    OTCharts.pieChart(svcEl, svcData, { donut: true, size: 180, centerLabel: String(appointments.length) });
+  } else {
+    showNoData(svcEl);
+  }
+
+  // 3) Bay Utilization Today — horizontal bars by hour
+  var bayEl = clearEl('chart-bay-utilization');
+  var todayStr = new Date().toISOString().split('T')[0];
+  var todayApts = appointments.filter(function(a) { return a.preferred_date === todayStr && a.status !== 'cancelled'; });
+  var hourMap = {};
+  todayApts.forEach(function(a) {
+    if (a.preferred_time) {
+      var h = parseInt(a.preferred_time.substring(0, 2));
+      hourMap[h] = (hourMap[h] || 0) + 1;
+    }
+  });
+  var bayData = [];
+  for (var h = 8; h <= 17; h++) {
+    var hLabel = (h > 12 ? (h - 12) : h) + (h >= 12 ? 'pm' : 'am');
+    bayData.push({ label: hLabel, value: hourMap[h] || 0 });
+  }
+  if (bayData.some(function(d) { return d.value > 0; })) {
+    OTCharts.horizontalBars(bayEl, bayData, { color: OTCharts.TOKENS.colors.amber, maxValue: 2 });
+  } else {
+    showNoData(bayEl);
+  }
+
+  // 4) Booking Trend (30 Days) — line chart with area fill
+  var trendEl = clearEl('chart-booking-trend');
+  var trendData = [];
+  var now = new Date(); now.setHours(0,0,0,0);
+  for (var i = 29; i >= 0; i--) {
+    var dd = new Date(now); dd.setDate(now.getDate() - i);
+    var ds = dd.toISOString().split('T')[0];
+    var cnt = appointments.filter(function(a) { return (a.created_at || '').substring(0, 10) === ds; }).length;
+    trendData.push({ label: dd.toLocaleDateString(currentLang === 'es' ? 'es' : 'en', { month: 'short', day: 'numeric' }), value: cnt });
+  }
+  if (trendData.some(function(d) { return d.value > 0; })) {
+    OTCharts.lineChart(trendEl, trendData, { height: 140, color: OTCharts.TOKENS.colors.brandMid, fillArea: true, showDots: false });
+  } else {
+    showNoData(trendEl);
+  }
 }
 
 // ===== CALENDAR =====
@@ -8347,7 +8471,7 @@ loadMessages = async function() {
 <script src="/admin/js/subscribers.js"></script>
 <script src="/admin/js/promotions.js"></script>
 <script type="module">
-  import { showToast as brandShowToast } from '/shared/ui/components/brand-toast.js';
+  import { showToast as brandShowToast } from '/admin/js/brand-toast.js';
   // Override global showToast — handles legacy (msg, isError: bool) and new (msg, type: string)
   window.showToast = function(msg, typeOrError) {
     const type = typeOrError === true ? 'error'

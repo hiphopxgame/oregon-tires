@@ -174,27 +174,11 @@
       </div>
 
       <div id="booking-form-container">
-      <form id="booking-form" class="space-y-8" hx-ext="json-enc"
+      <form id="booking-form" class="space-y-8" novalidate hx-ext="json-enc"
             hx-post="/api/book.php"
             hx-target="#booking-form-container"
             hx-swap="innerHTML"
-            hx-indicator="#booking-submit"
-            hx-vals='js:{
-              "preferred_date": document.getElementById("booking-date").value,
-              "preferred_time": document.getElementById("booking-time").value,
-              "first_name": document.getElementById("booking-first-name").value,
-              "last_name": document.getElementById("booking-last-name").value,
-              "vehicle_year": (document.getElementById("vehicle-year") || {}).value || "",
-              "vehicle_make": (document.getElementById("vehicle-make") || {}).value || "",
-              "vehicle_model": (document.getElementById("vehicle-model") || {}).value || "",
-              "vehicle_vin": (document.getElementById("vehicle-vin") || {}).value || "",
-              "language": currentLang === "en" ? "english" : "spanish",
-              "sms_opt_in": document.getElementById("sms-opt-in").checked ? 1 : 0,
-              "utm_source": sessionStorage.getItem("utm_source") || "",
-              "utm_medium": sessionStorage.getItem("utm_medium") || "",
-              "utm_campaign": sessionStorage.getItem("utm_campaign") || "",
-              "utm_content": sessionStorage.getItem("utm_content") || ""
-            }'>
+            hx-indicator="#booking-submit">
 
         <!-- Step 1: Service Selection -->
         <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-700">
@@ -206,63 +190,63 @@
             <legend class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3" data-t="selectService">Select a Service</legend>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div class="service-card">
-                <input type="radio" name="service" value="tire-installation" id="svc-tire-installation" required class="sr-only">
+                <input type="radio" name="service" value="tire-installation" id="svc-tire-installation" aria-required="true" class="sr-only">
                 <label for="svc-tire-installation" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="tireInstallation">Tire Installation</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tire-installation"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="tire-repair" id="svc-tire-repair" required class="sr-only">
+                <input type="radio" name="service" value="tire-repair" id="svc-tire-repair" aria-required="true" class="sr-only">
                 <label for="svc-tire-repair" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="tireRepair">Tire Repair</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tire-repair"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="wheel-alignment" id="svc-wheel-alignment" required class="sr-only">
+                <input type="radio" name="service" value="wheel-alignment" id="svc-wheel-alignment" aria-required="true" class="sr-only">
                 <label for="svc-wheel-alignment" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="wheelAlignment">Wheel Alignment</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="wheel-alignment"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="oil-change" id="svc-oil-change" required class="sr-only">
+                <input type="radio" name="service" value="oil-change" id="svc-oil-change" aria-required="true" class="sr-only">
                 <label for="svc-oil-change" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="oilChange">Oil Change</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="oil-change"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="brake-service" id="svc-brake-service" required class="sr-only">
+                <input type="radio" name="service" value="brake-service" id="svc-brake-service" aria-required="true" class="sr-only">
                 <label for="svc-brake-service" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="brakeService">Brake Service</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="brake-service"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="tuneup" id="svc-tuneup" required class="sr-only">
+                <input type="radio" name="service" value="tuneup" id="svc-tuneup" aria-required="true" class="sr-only">
                 <label for="svc-tuneup" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="tuneup">Tuneup</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tuneup"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="mechanical-inspection" id="svc-mechanical-inspection" required class="sr-only">
+                <input type="radio" name="service" value="mechanical-inspection" id="svc-mechanical-inspection" aria-required="true" class="sr-only">
                 <label for="svc-mechanical-inspection" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="mechanicalInspection">Mechanical Inspection</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="mechanical-inspection"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="mobile-service" id="svc-mobile-service" required class="sr-only">
+                <input type="radio" name="service" value="mobile-service" id="svc-mobile-service" aria-required="true" class="sr-only">
                 <label for="svc-mobile-service" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="mobileService">Mobile Service</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="mobile-service"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="other" id="svc-other" required class="sr-only">
+                <input type="radio" name="service" value="other" id="svc-other" aria-required="true" class="sr-only">
                 <label for="svc-other" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="otherService">Other</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="other"></span>
@@ -285,13 +269,12 @@
             <label for="booking-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               <span data-t="preferredDate">Preferred Date</span>
             </label>
-            <input type="date" name="date" id="booking-date" required
+            <input type="date" name="preferred_date" id="booking-date" aria-required="true"
                    hx-get="/api/available-times.php"
                    hx-trigger="change, input changed delay:300ms"
                    hx-target="#time-slots-grid"
                    hx-swap="innerHTML"
                    hx-indicator="#time-loading"
-                   hx-vals='js:{"lang": currentLang}'
                    class="w-full max-w-xs p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" data-t="dateNote">Monday - Saturday only. No Sundays.</p>
           </div>
@@ -304,7 +287,7 @@
 
           <!-- Time Slots -->
           <div>
-            <input type="hidden" name="time" id="booking-time" required>
+            <input type="hidden" name="preferred_time" id="booking-time">
             <div id="time-slots-container" class="border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-lg p-4 transition-all" style="min-height: 80px;">
               <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2" id="time-slots-grid">
                 <div class="col-span-full flex flex-col items-center justify-center py-6 text-center" id="time-placeholder">
@@ -337,18 +320,16 @@
           <div class="mb-4">
             <label for="vehicle-vin" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="vehicleVin">VIN (optional)</label>
             <div class="flex gap-2">
-              <input type="text" name="vehicleVin" id="vehicle-vin" maxlength="17" placeholder="e.g. 1HGCM82633A004352"
+              <input type="text" name="vehicle_vin" id="vehicle-vin" maxlength="17" placeholder="e.g. 1HGCM82633A004352"
                      hx-get="/api/vin-decode.php"
                      hx-trigger="input changed delay:300ms[this.value.length === 17]"
                      hx-target="#vin-status"
                      hx-swap="innerHTML"
-                     hx-vals='js:{"vin": document.getElementById("vehicle-vin").value.toUpperCase(), "lang": currentLang}'
                      class="flex-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500 uppercase tracking-wider font-mono text-sm">
               <button type="button" id="vin-decode-btn"
                       hx-get="/api/vin-decode.php"
                       hx-target="#vin-status"
                       hx-swap="innerHTML"
-                      hx-vals='js:{"vin": document.getElementById("vehicle-vin").value.toUpperCase(), "lang": currentLang}'
                       class="bg-brand text-white px-4 py-2 rounded-md font-semibold hover:opacity-90 transition text-sm whitespace-nowrap disabled:opacity-50" data-t="vinDecode">Lookup</button>
             </div>
             <div id="vin-status"></div>
@@ -357,17 +338,17 @@
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label for="vehicle-year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="vehicleYear">Year</label>
-              <select name="vehicleYear" id="vehicle-year" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <select name="vehicle_year" id="vehicle-year" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
                 <option value="">--</option>
               </select>
             </div>
             <div>
               <label for="vehicle-make" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="vehicleMake">Make</label>
-              <input type="text" name="vehicleMake" id="vehicle-make" placeholder="e.g. Toyota" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="text" name="vehicle_make" id="vehicle-make" placeholder="e.g. Toyota" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
             <div>
               <label for="vehicle-model" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="vehicleModel">Model</label>
-              <input type="text" name="vehicleModel" id="vehicle-model" placeholder="e.g. Camry" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="text" name="vehicle_model" id="vehicle-model" placeholder="e.g. Camry" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
           </div>
         </div>
@@ -382,21 +363,21 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <label for="booking-first-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="firstName">First Name</label>
-              <input type="text" name="firstName" id="booking-first-name" required autocomplete="given-name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="text" name="first_name" id="booking-first-name" aria-required="true" autocomplete="given-name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
             <div>
               <label for="booking-last-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="lastName">Last Name</label>
-              <input type="text" name="lastName" id="booking-last-name" required autocomplete="family-name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="text" name="last_name" id="booking-last-name" aria-required="true" autocomplete="family-name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <label for="booking-phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="phone">Phone</label>
-              <input type="tel" name="phone" id="booking-phone" required autocomplete="tel" placeholder="(503) 123-4567" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="tel" name="phone" id="booking-phone" aria-required="true" autocomplete="tel" placeholder="(503) 123-4567" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
             <div>
               <label for="booking-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="email">Email</label>
-              <input type="email" name="email" id="booking-email" required autocomplete="email" placeholder="your@email.com" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="email" name="email" id="booking-email" aria-required="true" autocomplete="email" placeholder="your@email.com" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
           </div>
 
@@ -407,9 +388,16 @@
           </div>
         </div>
 
+        <!-- Hidden fields for API compatibility -->
+        <input type="hidden" name="language" id="booking-language" value="english">
+        <input type="hidden" name="utm_source" id="booking-utm-source" value="">
+        <input type="hidden" name="utm_medium" id="booking-utm-medium" value="">
+        <input type="hidden" name="utm_campaign" id="booking-utm-campaign" value="">
+        <input type="hidden" name="utm_content" id="booking-utm-content" value="">
+
         <!-- SMS Opt-in -->
         <div class="flex items-start gap-3 mb-3">
-          <input type="checkbox" id="sms-opt-in" name="smsOptIn" class="mt-1 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand">
+          <input type="checkbox" id="sms-opt-in" name="sms_opt_in" class="mt-1 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand">
           <label for="sms-opt-in" class="text-sm text-gray-600 dark:text-gray-400" data-t="smsOptIn">
             Text me updates about my service (appointment reminders, vehicle ready notifications)
           </label>
@@ -417,7 +405,7 @@
 
         <!-- Privacy Consent -->
         <div class="flex items-start gap-3 mb-6">
-          <input type="checkbox" id="privacy-consent" required class="mt-1 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand">
+          <input type="checkbox" id="privacy-consent" aria-required="true" class="mt-1 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand">
           <label for="privacy-consent" class="text-sm text-gray-600 dark:text-gray-400" data-t="privacyConsent">
             I agree to the collection and use of my personal information to process this appointment request.
           </label>
@@ -791,6 +779,27 @@ function setupDateInput() {
         if (display) display.textContent = '';
         var hint = document.getElementById('time-hint');
         if (hint) { hint.style.display = ''; hint.textContent = t[currentLang].tapToSelect; }
+        // Restore pending time selection from session recovery (JS fallback path)
+        if (typeof pendingTimeRestore !== 'undefined' && pendingTimeRestore) {
+          var timeToRestore = pendingTimeRestore;
+          pendingTimeRestore = null;
+          var hiddenInput = document.getElementById('booking-time');
+          var timeSlot = document.querySelector('[data-time="' + timeToRestore + '"]');
+          if (timeSlot && !timeSlot.disabled) {
+            document.querySelectorAll('[data-time]').forEach(function(s) { s.classList.remove('selected'); });
+            timeSlot.classList.add('selected');
+            hiddenInput.value = timeToRestore;
+            if (display) {
+              display.textContent = t[currentLang].timeSelected + ' ' + formatTimeDisplay(timeToRestore);
+              display.className = 'text-sm font-semibold text-brand dark:text-green-400 mt-2';
+            }
+            if (container) {
+              container.classList.remove('border-dashed', 'border-gray-200', 'dark:border-gray-600');
+              container.classList.add('border-solid', 'border-green-500', 'dark:border-green-600');
+            }
+            if (hint) hint.style.display = 'none';
+          }
+        }
       })
       .catch(function() {
         if (loading) loading.style.display = 'none';
@@ -886,6 +895,66 @@ function clearFieldErrors() {
   document.querySelectorAll('.field-error').forEach(function(el) { el.remove(); });
 }
 
+// ===== HTMX CONFIG — set dynamic values before request (no eval needed) =====
+document.body.addEventListener('htmx:configRequest', function(e) {
+  var elt = e.detail.elt;
+  // VIN decode requests — add vin (uppercased) and lang
+  if (elt && (elt.id === 'vehicle-vin' || elt.id === 'vin-decode-btn')) {
+    var vinVal = document.getElementById('vehicle-vin').value.toUpperCase();
+    if (e.detail.parameters instanceof FormData) {
+      e.detail.parameters.set('vin', vinVal);
+      e.detail.parameters.delete('vehicle_vin');
+      e.detail.parameters.set('lang', currentLang);
+    } else {
+      e.detail.parameters.vin = vinVal;
+      e.detail.parameters.lang = currentLang;
+    }
+    return;
+  }
+  // Date picker — rename preferred_date→date for API, add lang
+  if (elt && elt.id === 'booking-date') {
+    if (e.detail.parameters instanceof FormData) {
+      e.detail.parameters.set('date', e.detail.parameters.get('preferred_date') || '');
+      e.detail.parameters.delete('preferred_date');
+      e.detail.parameters.set('lang', currentLang);
+    } else {
+      e.detail.parameters.date = e.detail.parameters.preferred_date || '';
+      delete e.detail.parameters.preferred_date;
+      e.detail.parameters.lang = currentLang;
+    }
+    return;
+  }
+  // Booking form submission
+  var form = document.getElementById('booking-form');
+  if (!form || elt !== form) return;
+  // Update language hidden field to current selection
+  var langInput = document.getElementById('booking-language');
+  if (langInput) langInput.value = currentLang === 'en' ? 'english' : 'spanish';
+  // Populate UTM hidden fields from sessionStorage
+  try {
+    var utmFields = {'utm_source': 'booking-utm-source', 'utm_medium': 'booking-utm-medium', 'utm_campaign': 'booking-utm-campaign', 'utm_content': 'booking-utm-content'};
+    for (var key in utmFields) {
+      var el = document.getElementById(utmFields[key]);
+      if (el) el.value = sessionStorage.getItem(key) || '';
+    }
+  } catch(err) {}
+  // Convert sms_opt_in from checkbox 'on' to API-compatible 1/0
+  if (e.detail.parameters instanceof FormData) {
+    var smsVal = e.detail.parameters.get('sms_opt_in');
+    e.detail.parameters.set('sms_opt_in', smsVal === 'on' ? '1' : '0');
+  }
+});
+
+// ===== HTMX VALIDATION HALTED — show feedback for any silent validation failures =====
+document.body.addEventListener('htmx:validation:halted', function(e) {
+  var form = document.getElementById('booking-form');
+  if (!form || e.detail.elt !== form) return;
+  var errors = e.detail.errors || [];
+  if (errors.length > 0) {
+    showStatus(errors[0].message || (currentLang === 'es' ? 'Por favor complete todos los campos.' : 'Please fill in all required fields.'), 'orange');
+  }
+});
+
 // ===== HTMX FORM VALIDATION (runs before HTMX sends request) =====
 var lastBookingSubmitTime = 0;
 
@@ -924,13 +993,13 @@ document.body.addEventListener('htmx:beforeRequest', function(e) {
   }
 
   // Required fields
-  var firstName = form.firstName.value.trim();
+  var firstName = form.first_name.value.trim();
   if (!firstName) {
     showFieldError('booking-first-name', currentLang === 'es' ? 'El nombre es obligatorio.' : 'First name is required.');
     hasErrors = true;
   }
 
-  var lastName = form.lastName.value.trim();
+  var lastName = form.last_name.value.trim();
   if (!lastName) {
     showFieldError('booking-last-name', currentLang === 'es' ? 'El apellido es obligatorio.' : 'Last name is required.');
     hasErrors = true;
@@ -954,7 +1023,7 @@ document.body.addEventListener('htmx:beforeRequest', function(e) {
     hasErrors = true;
   }
 
-  if (!form.date.value) {
+  if (!form.preferred_date.value) {
     showFieldError('booking-date', currentLang === 'es' ? 'La fecha es obligatoria.' : 'Date is required.');
     hasErrors = true;
   }
@@ -1001,6 +1070,9 @@ document.body.addEventListener('htmx:beforeRequest', function(e) {
   hideStatus();
 });
 
+// Pending time slot to restore after HTMX loads time slots
+var pendingTimeRestore = null;
+
 // ===== HTMX LIFECYCLE EVENTS — GA4 Analytics =====
 document.body.addEventListener('htmx:afterSwap', function(e) {
   // Time slots loaded — clear stale time selection, update container
@@ -1018,6 +1090,29 @@ document.body.addEventListener('htmx:afterSwap', function(e) {
     // Show hint text
     var hint = document.getElementById('time-hint');
     if (hint) { hint.style.display = ''; hint.textContent = t[currentLang].tapToSelect; }
+
+    // Restore pending time selection from session recovery
+    if (pendingTimeRestore) {
+      var timeToRestore = pendingTimeRestore;
+      pendingTimeRestore = null;
+      var hiddenInput = document.getElementById('booking-time');
+      var timeSlot = document.querySelector('[data-time="' + timeToRestore + '"]');
+      if (timeSlot && !timeSlot.disabled) {
+        document.querySelectorAll('[data-time]').forEach(function(s) { s.classList.remove('selected'); });
+        timeSlot.classList.add('selected');
+        hiddenInput.value = timeToRestore;
+        if (display) {
+          display.textContent = t[currentLang].timeSelected + ' ' + formatTimeDisplay(timeToRestore);
+          display.className = 'text-sm font-semibold text-brand dark:text-green-400 mt-2';
+        }
+        if (container) {
+          container.classList.remove('border-dashed', 'border-gray-200', 'dark:border-gray-600');
+          container.classList.add('border-solid', 'border-green-500', 'dark:border-green-600');
+        }
+        if (hint) hint.style.display = 'none';
+      }
+    }
+
     if (typeof gtag === 'function') gtag('event', 'booking_step', {
       event_category: 'booking_funnel', step: 'date_selected'
     });
@@ -1075,6 +1170,8 @@ function toggleLanguage() {
   currentLang = currentLang === 'en' ? 'es' : 'en';
   localStorage.setItem('oregontires_lang', currentLang);
   document.documentElement.lang = currentLang;
+  var langInput = document.getElementById('booking-language');
+  if (langInput) langInput.value = currentLang === 'es' ? 'spanish' : 'english';
   if (typeof gtag === 'function') gtag('event', 'language_switch', { event_category: 'engagement', event_label: currentLang });
   document.getElementById('lang-toggle').textContent = currentLang === 'en' ? '🌐 ES' : '🌐 EN';
   document.getElementById('top-hours').textContent = '🕐 ' + t[currentLang].monSat;
@@ -1087,11 +1184,11 @@ function toggleLanguage() {
   if (phoneInput) phoneInput.placeholder = t[currentLang].phonePlaceholder;
   var emailInput = document.querySelector('input[name="email"]');
   if (emailInput) emailInput.placeholder = t[currentLang].emailPlaceholder;
-  var makeInput = document.querySelector('input[name="vehicleMake"]');
+  var makeInput = document.querySelector('input[name="vehicle_make"]');
   if (makeInput) makeInput.placeholder = t[currentLang].vehicleMakePlaceholder;
-  var modelInput = document.querySelector('input[name="vehicleModel"]');
+  var modelInput = document.querySelector('input[name="vehicle_model"]');
   if (modelInput) modelInput.placeholder = t[currentLang].vehicleModelPlaceholder;
-  var vinInput = document.querySelector('input[name="vehicleVin"]');
+  var vinInput = document.querySelector('input[name="vehicle_vin"]');
   if (vinInput) vinInput.placeholder = t[currentLang].vinPlaceholder;
   updateServiceMeta();
   // Re-fetch time slots in new language if date is selected
@@ -1105,6 +1202,8 @@ function toggleLanguage() {
 // Apply saved language preference on page load
 if (currentLang !== 'en') {
   document.documentElement.lang = currentLang;
+  var langInput = document.getElementById('booking-language');
+  if (langInput) langInput.value = 'spanish';
   document.getElementById('lang-toggle').textContent = currentLang === 'en' ? '🌐 ES' : '🌐 EN';
   document.getElementById('top-hours').textContent = '🕐 ' + t[currentLang].monSat;
   document.querySelectorAll('[data-t]').forEach(function(el) {
@@ -1116,11 +1215,11 @@ if (currentLang !== 'en') {
   if (phoneInput) phoneInput.placeholder = t[currentLang].phonePlaceholder;
   var emailInput = document.querySelector('input[name="email"]');
   if (emailInput) emailInput.placeholder = t[currentLang].emailPlaceholder;
-  var makeInput = document.querySelector('input[name="vehicleMake"]');
+  var makeInput = document.querySelector('input[name="vehicle_make"]');
   if (makeInput) makeInput.placeholder = t[currentLang].vehicleMakePlaceholder;
-  var modelInput = document.querySelector('input[name="vehicleModel"]');
+  var modelInput = document.querySelector('input[name="vehicle_model"]');
   if (modelInput) modelInput.placeholder = t[currentLang].vehicleModelPlaceholder;
-  var vinInput = document.querySelector('input[name="vehicleVin"]');
+  var vinInput = document.querySelector('input[name="vehicle_vin"]');
   if (vinInput) vinInput.placeholder = t[currentLang].vinPlaceholder;
 }
 
@@ -1327,10 +1426,10 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
     if (!serviceEl) { showStatus(t[currentLang].pleaseSelectService, 'orange'); return; }
     var timeVal = document.getElementById('booking-time').value;
     if (!timeVal) { showStatus(t[currentLang].pleaseSelectTime, 'orange'); return; }
-    if (!form.date.value) { showFieldError('booking-date', 'Required'); return; }
-    var firstName = form.firstName.value.trim();
+    if (!form.preferred_date.value) { showFieldError('booking-date', 'Required'); return; }
+    var firstName = form.first_name.value.trim();
     if (!firstName) { showFieldError('booking-first-name', 'Required'); return; }
-    var lastName = form.lastName.value.trim();
+    var lastName = form.last_name.value.trim();
     if (!lastName) { showFieldError('booking-last-name', 'Required'); return; }
     var phone = form.phone.value.trim();
     if (!phone) { showFieldError('booking-phone', 'Required'); return; }
@@ -1340,7 +1439,7 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
 
     var body = {
       service: serviceEl.value,
-      preferred_date: form.date.value,
+      preferred_date: form.preferred_date.value,
       preferred_time: timeVal,
       first_name: firstName,
       last_name: lastName,
@@ -1427,7 +1526,7 @@ updateServiceMeta();
     var form = document.getElementById('booking-form');
     if (!form) return;
     var serviceSelected = form.querySelector('input[name="service"]:checked');
-    var dateSelected = form.querySelector('input[name="date"]') && form.querySelector('input[name="date"]').value;
+    var dateSelected = form.querySelector('input[name="preferred_date"]') && form.querySelector('input[name="preferred_date"]').value;
     var nameField = document.getElementById('booking-first-name');
     var nameFilled = nameField && nameField.value.trim().length > 0;
     if (serviceSelected) currentStep = 2;
@@ -1608,13 +1707,8 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
         if (dateInput) { dateInput.value = draft.date; dateInput.dispatchEvent(new Event('change', { bubbles: true })); }
       }
       if (draft.time) {
-        var timeHidden = document.getElementById('booking-time');
-        if (timeHidden) timeHidden.value = draft.time;
-        var timeSlot = document.querySelector('[data-time="' + draft.time + '"]');
-        if (timeSlot && !timeSlot.disabled) {
-          document.querySelectorAll('[data-time]').forEach(function(s) { s.classList.remove('selected'); });
-          timeSlot.classList.add('selected');
-        }
+        // Defer time restoration — time slots load async after date change
+        pendingTimeRestore = draft.time;
       }
       if (draft.firstName) { var el = document.getElementById('booking-first-name'); if (el) el.value = draft.firstName; }
       if (draft.lastName) { var el = document.getElementById('booking-last-name'); if (el) el.value = draft.lastName; }

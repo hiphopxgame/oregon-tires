@@ -35,7 +35,8 @@ try {
     }
 
     $db = getDB();
-    $legacyCapacity = 2;
+    $maxBays = 2;
+    $legacyCapacity = $maxBays;
 
     // Count active bookings per time slot for this date
     $stmt = $db->prepare(
@@ -204,6 +205,7 @@ try {
             $time     = sprintf('%02d:%02d', $h, $m);
             $count    = $slotCounts[$time] ?? 0;
             $capacity = $useSchedules ? ($slotCapacity[$time] ?? 0) : $legacyCapacity;
+            $capacity = min($capacity, $maxBays);
             $available = $capacity > 0 && $count < $capacity;
 
             $allSlots[$time] = [
@@ -226,7 +228,7 @@ try {
 
     $responseData = [
         'date'         => $date,
-        'max_per_slot' => $useSchedules ? null : $legacyCapacity,
+        'max_per_slot' => $maxBays,
         'slots'        => $allSlots,
     ];
 
