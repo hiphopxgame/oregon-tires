@@ -32,8 +32,16 @@ if (!$authorized) {
 }
 
 if (!$authorized) {
-    http_response_code(403);
-    echo json_encode(['error' => 'Unauthorized']);
+    // Basic health check for unauthenticated monitoring (uptime, load balancers)
+    try {
+        $pdo = getDB();
+        $pdo->query('SELECT 1');
+        http_response_code(200);
+        echo json_encode(['status' => 'healthy', 'timestamp' => gmdate('Y-m-d\TH:i:s\Z')]);
+    } catch (\Throwable $e) {
+        http_response_code(503);
+        echo json_encode(['status' => 'unhealthy', 'timestamp' => gmdate('Y-m-d\TH:i:s\Z')]);
+    }
     exit;
 }
 
