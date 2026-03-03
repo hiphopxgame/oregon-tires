@@ -395,14 +395,6 @@
         <input type="hidden" name="utm_campaign" id="booking-utm-campaign" value="">
         <input type="hidden" name="utm_content" id="booking-utm-content" value="">
 
-        <!-- SMS Opt-in -->
-        <div class="flex items-start gap-3 mb-3">
-          <input type="checkbox" id="sms-opt-in" name="sms_opt_in" class="mt-1 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand">
-          <label for="sms-opt-in" class="text-sm text-gray-600 dark:text-gray-400" data-t="smsOptIn">
-            Text me updates about my service (appointment reminders, vehicle ready notifications)
-          </label>
-        </div>
-
         <!-- Privacy Consent -->
         <div class="flex items-start gap-3 mb-6">
           <input type="checkbox" id="privacy-consent" aria-required="true" class="mt-1 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand">
@@ -553,7 +545,7 @@ const t = {
     notes: 'Notes',
     bookNow: 'Book Appointment',
     confirmationTitle: 'Appointment Requested!',
-    confirmationSubtitle: 'We will call or text you to confirm. A confirmation email has been sent to your inbox. Thank you!',
+    confirmationSubtitle: 'We will contact you to confirm your appointment. A confirmation email has been sent to your inbox. Thank you!',
     backToHome: 'Back to Home',
     bookAnother: 'Book Another',
     preferCall: 'Prefer to call? We are happy to help!',
@@ -636,7 +628,7 @@ const t = {
     notes: 'Notas',
     bookNow: 'Programar Cita',
     confirmationTitle: '¡Cita Solicitada!',
-    confirmationSubtitle: 'Le llamaremos o enviaremos un mensaje para confirmar. Se ha enviado un correo de confirmacion a su bandeja de entrada. ¡Gracias!',
+    confirmationSubtitle: 'Nos comunicaremos con usted para confirmar su cita. Se ha enviado un correo de confirmación a su bandeja de entrada. ¡Gracias!',
     backToHome: 'Volver al Inicio',
     bookAnother: 'Programar Otra',
     preferCall: '¿Prefiere llamar? ¡Con gusto le ayudamos!',
@@ -1739,6 +1731,5 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
   } catch(e) {}
 })();
 </script>
-<script src="/assets/js/cookie-consent.js" defer></script>
 </body>
 </html>

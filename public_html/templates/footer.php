@@ -41,4 +41,3 @@
   </div>
 </footer>
 <script src="/assets/js/scroll-reveal.js" defer></script>
-<script src="/assets/js/cookie-consent.js" defer></script>
