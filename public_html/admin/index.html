@@ -438,6 +438,8 @@
         <button onclick="switchTab('gallery')" data-tab="gallery" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 <span data-t="tabGallery">Gallery</span></button>
         <button onclick="switchTab('blog')" data-tab="blog" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📝 <span data-t="tabBlog">Blog</span></button>
         <button onclick="switchTab('promotions')" data-tab="promotions" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🏷 <span data-t="tabPromotions">Promotions</span></button>
+        <button onclick="switchTab('faq')" data-tab="faq" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">❓ FAQ</button>
+        <button onclick="switchTab('reviews')" data-tab="reviews" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">⭐ Reviews</button>
         <button onclick="switchTab('analytics')" data-tab="analytics" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📈 <span data-t="tabAnalytics">Analytics</span></button>
         <button onclick="switchTab('docs')" data-tab="docs" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📖 <span data-t="tabDocs">Docs</span></button>
         <button onclick="switchTab('sitecontent')" data-tab="sitecontent" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📝 <span data-t="tabSiteContent">Site Content</span></button>
@@ -453,6 +455,8 @@
         <option value="gallery">Gallery</option>
         <option value="blog">Blog</option>
         <option value="promotions">Promotions</option>
+        <option value="faq">FAQ</option>
+        <option value="reviews">Reviews</option>
         <option value="analytics">Analytics</option>
         <option value="docs">Docs</option>
         <option value="sitecontent">Site Content</option>
@@ -466,12 +470,14 @@
     <!-- OVERVIEW TAB -->
     <div id="tab-overview" class="tab-content fade-in" role="tabpanel">
       <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-6" data-t="dashboardOverview">Dashboard Overview</h2>
-      <div class="grid md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 dark:border-gray-700"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="totalAppointments">Total Appointments</div><div class="text-3xl font-bold text-brand dark:text-green-400" id="stat-total">0</div><div class="text-xs mt-1" id="stat-total-trend"></div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="next14Days">Next 14 days</p></div>
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 dark:border-gray-700"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="pending">Pending</div><div class="text-3xl font-bold text-blue-600" id="stat-pending">0</div><div class="text-xs mt-1" id="stat-pending-trend"></div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="awaitingConfirmation">Awaiting confirmation</p></div>
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 dark:border-gray-700"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="confirmed">Confirmed</div><div class="text-3xl font-bold text-green-600" id="stat-confirmed">0</div><div class="text-xs mt-1" id="stat-confirmed-trend"></div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="readyToGo">Ready to go</p></div>
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 dark:border-gray-700"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="completed">Completed</div><div class="text-3xl font-bold text-gray-600 dark:text-gray-300" id="stat-completed">0</div><div class="text-xs mt-1" id="stat-completed-trend"></div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="finished">Finished</p></div>
+      <div class="grid md:grid-cols-5 gap-4 mb-4">
+        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-red-500 dark:bg-gray-800 dark:border-l-red-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="actionRequired">Action Required</div><div class="text-3xl font-bold text-red-600 dark:text-red-400" id="stat-action">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-action-detail" data-t="awaitingConfirmation">Needs attention</p></div>
+        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-amber-500 dark:bg-gray-800 dark:border-l-amber-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="todaySchedule">Today</div><div class="text-3xl font-bold text-amber-600 dark:text-amber-400" id="stat-today">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-today-detail"></p></div>
+        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-500 dark:bg-gray-800 dark:border-l-blue-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="thisWeek">This Week</div><div class="text-3xl font-bold text-blue-600 dark:text-blue-400" id="stat-week">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-week-detail"></p></div>
+        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-green-500 dark:bg-gray-800 dark:border-l-green-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="upcoming">Upcoming</div><div class="text-3xl font-bold text-green-600 dark:text-green-400" id="stat-upcoming">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-upcoming-detail"></p></div>
+        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-gray-400 dark:bg-gray-800 dark:border-l-gray-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="completedLabel">Completed</div><div class="text-3xl font-bold text-gray-600 dark:text-gray-300" id="stat-completed">0</div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="allTime">All time</p></div>
       </div>
+      <div id="overview-alerts" class="mb-8 space-y-3"></div>
       <!-- Overview Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
@@ -492,7 +498,7 @@
         </div>
       </div>
       <div class="grid lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="upcoming14Days">Upcoming Appointments (14 Days)</h3><div id="overview-upcoming" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div></div>
+        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="upcomingSchedule">Upcoming Schedule</h3><div id="overview-upcoming" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div></div>
         <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="employeeSchedule">Employee Schedule</h3><div id="overview-employees" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div></div>
       </div>
     </div>
@@ -772,10 +778,13 @@
               </div>
               <div id="gallery-compression-info" class="text-xs text-gray-500 dark:text-gray-400 hidden"><span id="compression-details"></span></div>
               <div class="grid md:grid-cols-2 gap-3">
-                <div><label class="text-sm font-medium dark:text-gray-300" data-t="titleRequired">Title *</label><input id="gallery-title" class="w-full p-2 border rounded mt-1" placeholder="Image title (used for single upload)"></div>
-                <div><label class="text-sm font-medium dark:text-gray-300" data-t="language">Language</label><select id="gallery-lang" class="w-full p-2 border rounded mt-1"><option value="english">English</option><option value="spanish">Spanish</option></select></div>
+                <div><label class="text-sm font-medium dark:text-gray-300">Title (EN)</label><input id="gallery-title-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Image title in English"></div>
+                <div><label class="text-sm font-medium dark:text-gray-300">Title (ES)</label><input id="gallery-title-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Titulo de la imagen en Español"></div>
               </div>
-              <div><label class="text-sm font-medium dark:text-gray-300" data-t="description">Description</label><textarea id="gallery-desc" rows="2" class="w-full p-2 border rounded mt-1" placeholder="Image description"></textarea></div>
+              <div class="grid md:grid-cols-2 gap-3">
+                <div><label class="text-sm font-medium dark:text-gray-300">Description (EN)</label><textarea id="gallery-desc-en" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Image description"></textarea></div>
+                <div><label class="text-sm font-medium dark:text-gray-300">Description (ES)</label><textarea id="gallery-desc-es" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Descripcion de la imagen"></textarea></div>
+              </div>
               <div id="gallery-upload-progress" class="hidden space-y-2"></div>
               <div class="flex gap-2">
                 <button onclick="uploadGalleryImages()" id="gallery-upload-btn" class="bg-brand text-white px-4 py-2 rounded-lg text-sm" data-t="uploadAndSave">💾 Upload & Save</button>
@@ -950,6 +959,18 @@
               <label class="text-sm font-medium dark:text-gray-300">Badge Text</label>
               <input id="promo-badge" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="SPRING SALE" oninput="updatePromoPreview()">
             </div>
+            <div class="md:col-span-2">
+              <label class="text-sm font-medium dark:text-gray-300">Banner Image (optional)</label>
+              <input id="promo-image-file" type="file" accept="image/*" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100 text-sm">
+              <div id="promo-image-preview" class="hidden mt-2">
+                <img src="" alt="Preview" class="h-16 w-auto rounded border dark:border-gray-600">
+                <span class="text-xs text-gray-500 ml-2">New image preview</span>
+              </div>
+              <div id="promo-existing-image" class="hidden mt-2 flex items-center gap-2">
+                <img src="" alt="Current" class="h-16 w-auto rounded border dark:border-gray-600">
+                <button type="button" onclick="removePromoImage()" class="text-red-500 hover:text-red-700 text-xs underline">Remove image</button>
+              </div>
+            </div>
             <div class="flex gap-4">
               <div>
                 <label class="text-sm font-medium dark:text-gray-300">BG Color</label>
@@ -1004,6 +1025,7 @@
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
                 <th class="px-4 py-3 font-medium">Title</th>
+                <th class="px-4 py-3 font-medium">Image</th>
                 <th class="px-4 py-3 font-medium">Status</th>
                 <th class="px-4 py-3 font-medium">Date Range</th>
                 <th class="px-4 py-3 font-medium text-center">Order</th>
@@ -1013,6 +1035,147 @@
             </thead>
             <tbody id="promotions-table-body">
               <tr><td colspan="6" class="text-center py-8 text-gray-400">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ TAB -->
+    <div id="tab-faq" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">❓ Frequently Asked Questions</h2>
+          <p class="text-green-100">Manage FAQ items displayed on the homepage</p>
+        </div>
+        <button onclick="toggleFaqForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ New FAQ</button>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+
+        <!-- Inline form (hidden by default) -->
+        <div id="faq-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+          <h4 id="faq-form-title" class="font-bold text-lg mb-4 dark:text-gray-200">New FAQ</h4>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Question (EN) *</label>
+              <input id="faq-question-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Question in English">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Question (ES)</label>
+              <input id="faq-question-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Pregunta en Español">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Answer (EN) *</label>
+              <textarea id="faq-answer-en" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Answer in English"></textarea>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Answer (ES)</label>
+              <textarea id="faq-answer-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Respuesta en Español"></textarea>
+            </div>
+            <div class="flex items-center gap-6">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="faq-active" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
+                <span class="text-sm font-medium dark:text-gray-300">Active</span>
+              </label>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Sort Order</label>
+                <input id="faq-sort" type="number" value="0" min="0" class="w-20 p-2 border rounded mt-1 ml-2 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2 mt-4">
+            <button onclick="saveFaq()" id="faq-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">Create FAQ</button>
+            <button onclick="toggleFaqForm()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300">Cancel</button>
+          </div>
+        </div>
+
+        <!-- FAQ table -->
+        <div class="overflow-x-auto">
+          <table class="w-full responsive-table">
+            <thead>
+              <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                <th class="px-4 py-3 font-medium">Question</th>
+                <th class="px-4 py-3 font-medium">Status</th>
+                <th class="px-4 py-3 font-medium text-center">Order</th>
+                <th class="px-4 py-3 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="faq-table-body">
+              <tr><td colspan="4" class="text-center py-8 text-gray-400">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEWS TAB -->
+    <div id="tab-reviews" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">⭐ Customer Reviews</h2>
+          <p class="text-green-100">Manage testimonials displayed on the homepage</p>
+        </div>
+        <button onclick="toggleReviewForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ New Review</button>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+
+        <!-- Inline form (hidden by default) -->
+        <div id="review-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+          <h4 id="review-form-title" class="font-bold text-lg mb-4 dark:text-gray-200">New Review</h4>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Customer Name *</label>
+              <input id="review-name" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Customer name">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Rating</label>
+              <select id="review-rating" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+                <option value="5">★★★★★ (5)</option>
+                <option value="4">★★★★☆ (4)</option>
+                <option value="3">★★★☆☆ (3)</option>
+                <option value="2">★★☆☆☆ (2)</option>
+                <option value="1">★☆☆☆☆ (1)</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Review Text (EN) *</label>
+              <textarea id="review-text-en" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Review text in English"></textarea>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300">Review Text (ES)</label>
+              <textarea id="review-text-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Texto de la reseña en Español"></textarea>
+            </div>
+            <div class="flex items-center gap-6">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="review-active" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
+                <span class="text-sm font-medium dark:text-gray-300">Active</span>
+              </label>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Sort Order</label>
+                <input id="review-sort" type="number" value="0" min="0" class="w-20 p-2 border rounded mt-1 ml-2 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2 mt-4">
+            <button onclick="saveReview()" id="review-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">Create Review</button>
+            <button onclick="toggleReviewForm()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Reviews table -->
+        <div class="overflow-x-auto">
+          <table class="w-full responsive-table">
+            <thead>
+              <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                <th class="px-4 py-3 font-medium">Name</th>
+                <th class="px-4 py-3 font-medium">Rating</th>
+                <th class="px-4 py-3 font-medium">Preview</th>
+                <th class="px-4 py-3 font-medium">Status</th>
+                <th class="px-4 py-3 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="testimonials-table-body">
+              <tr><td colspan="5" class="text-center py-8 text-gray-400">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -5110,12 +5273,30 @@ const adminT = {
     pending: 'Pending',
     confirmed: 'Confirmed',
     completed: 'Completed',
-    upcoming14Days: 'Upcoming Appointments (14 Days)',
+    upcoming14Days: 'Upcoming Schedule',
+    upcomingSchedule: 'Upcoming Schedule',
     employeeSchedule: 'Employee Schedule',
     next14Days: 'Next 14 days',
-    awaitingConfirmation: 'Awaiting confirmation',
+    awaitingConfirmation: 'Needs attention',
     readyToGo: 'Ready to go',
     finished: 'Finished',
+    actionRequired: 'Action Required',
+    todaySchedule: 'Today',
+    thisWeek: 'This Week',
+    upcoming: 'Upcoming',
+    overdue: 'Overdue',
+    overdueAppts: 'Overdue Appointments',
+    unassignedUpcoming: 'Unassigned Upcoming',
+    noUpcomingAppts: 'No upcoming appointments',
+    showMore: 'Show more',
+    moreDays: 'more days',
+    allTime: 'All time',
+    completedLabel: 'Completed',
+    viewSchedule: 'View Schedule',
+    noActiveEmployees: 'No active employees',
+    todayLabel: 'Today',
+    nUnassigned: 'unassigned',
+    nOverdue: 'overdue',
     // Appointments
     appointmentsHeading: 'Appointments',
     calendarSubtitle: 'Calendar view with employee assignment',
@@ -5402,12 +5583,30 @@ const adminT = {
     pending: 'Pendientes',
     confirmed: 'Confirmadas',
     completed: 'Completadas',
-    upcoming14Days: 'Pr\u00F3ximas Citas (14 D\u00EDas)',
+    upcoming14Days: 'Pr\u00F3ximas Citas',
+    upcomingSchedule: 'Pr\u00F3ximas Citas',
     employeeSchedule: 'Horario de Empleados',
     next14Days: 'Pr\u00F3ximos 14 d\u00EDas',
-    awaitingConfirmation: 'Esperando confirmaci\u00F3n',
+    awaitingConfirmation: 'Necesita atenci\u00F3n',
     readyToGo: 'Listas para atender',
     finished: 'Finalizadas',
+    actionRequired: 'Acci\u00F3n Requerida',
+    todaySchedule: 'Hoy',
+    thisWeek: 'Esta Semana',
+    upcoming: 'Pr\u00F3ximas',
+    overdue: 'Vencidas',
+    overdueAppts: 'Citas Vencidas',
+    unassignedUpcoming: 'Pr\u00F3ximas Sin Asignar',
+    noUpcomingAppts: 'No hay citas pr\u00F3ximas',
+    showMore: 'Ver m\u00E1s',
+    moreDays: 'm\u00E1s d\u00EDas',
+    allTime: 'Todo el tiempo',
+    completedLabel: 'Completadas',
+    viewSchedule: 'Ver Horario',
+    noActiveEmployees: 'No hay empleados activos',
+    todayLabel: 'Hoy',
+    nUnassigned: 'sin asignar',
+    nOverdue: 'vencidas',
     // Appointments
     appointmentsHeading: 'Citas',
     calendarSubtitle: 'Vista de calendario con asignaci\u00F3n de empleados',
@@ -5918,7 +6117,7 @@ function calSyncBadge(a) {
     return `<span class="cal-sync-badge cal-sync-success" title="Synced to Google Calendar${syncDate ? ' on ' + syncDate : ''}">&#x1F4C5; Synced</span>`;
   }
   if (a.calendar_sync_status === 'failed') {
-    return `<span class="cal-sync-badge cal-sync-failed" title="${esc(a.calendar_sync_error || 'Sync failed')}">&#x1F4C5; Failed</span>`;
+    return `<span class="cal-sync-badge cal-sync-failed" title="${esc(a.calendar_sync_error || 'Sync failed')}">&#x1F4C5; Failed <button onclick="retryCalendarSync(${a.id});event.stopPropagation();" class="ml-1 text-blue-500 underline text-xs">Retry</button></span>`;
   }
   if (a.calendar_sync_status === 'pending') {
     return `<span class="cal-sync-badge cal-sync-pending" title="Calendar sync pending">&#x1F4C5; Syncing...</span>`;
@@ -6070,7 +6269,7 @@ async function loadAllData() {
 }
 
 async function loadAppointments() {
-  try { const json = await api('appointments.php'); appointments = json.data || []; } catch(e) { console.error('loadAppointments failed:', e); appointments = []; }
+  try { const json = await api('appointments.php?limit=500&sort_by=preferred_date&sort_order=asc'); appointments = json.data || []; } catch(e) { console.error('loadAppointments failed:', e); appointments = []; }
   renderOverview(); renderAppointments(); renderCalendar();
 }
 async function loadMessages() {
@@ -6127,49 +6326,164 @@ function populateMonthFilter() {
 }
 
 // ===== OVERVIEW =====
-function renderOverview() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const in14 = new Date(today); in14.setDate(in14.getDate()+14);
-  const upcoming = appointments.filter(a => { const d = new Date(a.preferred_date+'T00:00:00'); return d >= today && d < in14; });
-  
-  document.getElementById('stat-total').textContent = upcoming.length;
-  document.getElementById('stat-pending').textContent = upcoming.filter(a=>a.status==='new').length;
-  document.getElementById('stat-confirmed').textContent = upcoming.filter(a=>a.status==='confirmed').length;
-  document.getElementById('stat-completed').textContent = upcoming.filter(a=>a.status==='completed').length;
+function getOverviewStats() {
+  var T = adminT[currentLang];
+  var todayStr = new Date().toISOString().split('T')[0];
+  var today = new Date(todayStr + 'T00:00:00');
+  var weekEnd = new Date(today); weekEnd.setDate(weekEnd.getDate() + (7 - weekEnd.getDay()));
 
-  // Upcoming by date
-  const container = document.getElementById('overview-upcoming');
-  const byDate = {};
-  for (let i=0; i<14; i++) { const d = new Date(today); d.setDate(d.getDate()+i); byDate[d.toISOString().split('T')[0]] = []; }
-  upcoming.forEach(a => { if(byDate[a.preferred_date]) byDate[a.preferred_date].push(a); });
-  
-  container.innerHTML = Object.entries(byDate).map(([date, apts]) => {
-    const d = new Date(date+'T00:00:00');
-    const dayLabel = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    const isToday = date === new Date().toISOString().split('T')[0];
-    return `<div class="border-l-4 ${apts.length ? 'border-green-600 bg-green-50' : 'border-gray-300'} pl-4 py-2 rounded-r-lg ${isToday ? 'ring-2 ring-amber-500 bg-amber-50' : ''}">
-      <div class="flex justify-between items-center mb-1">
-        <h4 class="font-semibold text-sm ${isToday ? 'text-amber-800' : ''}">${isToday ? '⭐ Today — ' : ''}${dayLabel}</h4>
-        ${apts.length ? `<span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-bold">${apts.length} appt${apts.length>1?'s':''}</span>` : '<span class="text-xs text-gray-400 italic">Open</span>'}
-      </div>
-      ${apts.length ? apts.slice(0,3).map(a => `<div class="text-sm flex justify-between items-center bg-white p-2 rounded mb-1 border">
-        <span><strong>${fmtTime(a.preferred_time)}</strong> — ${esc(a.first_name)} ${esc(a.last_name)} <span class="text-gray-500 text-xs">(${esc(a.service)})</span></span>${statusBadge(a.status)}${calSyncBadge(a)}
-      </div>`).join('') + (apts.length>3 ? `<p class="text-xs text-gray-400">+${apts.length-3} more</p>` : '') : ''}
-    </div>`;
+  var todayAppts = [], weekAppts = [], upcomingAppts = [], completedAppts = [], overdueAppts = [], unassignedAppts = [];
+  appointments.forEach(function(a) {
+    var d = new Date(a.preferred_date + 'T00:00:00');
+    if (a.status === 'completed') { completedAppts.push(a); return; }
+    if (a.status === 'cancelled') return;
+    if (d < today && a.status !== 'completed' && a.status !== 'cancelled') { overdueAppts.push(a); return; }
+    if (a.preferred_date === todayStr) todayAppts.push(a);
+    if (d >= today && d < weekEnd) weekAppts.push(a);
+    if (d >= today) {
+      upcomingAppts.push(a);
+      if (!a.assigned_employee_id) unassignedAppts.push(a);
+    }
+  });
+  return { today: todayAppts, week: weekAppts, upcoming: upcomingAppts, completed: completedAppts, overdue: overdueAppts, unassigned: unassignedAppts, todayStr: todayStr, todayDate: today };
+}
+
+function renderOverviewAlerts(stats) {
+  var T = adminT[currentLang];
+  var container = document.getElementById('overview-alerts');
+  // Note: all values are escaped via esc() — this is admin-only authenticated content
+  var parts = [];
+  if (stats.overdue.length) {
+    var items = [];
+    stats.overdue.slice(0, 5).forEach(function(a) {
+      items.push('<div class="text-sm text-red-800 dark:text-red-300 flex items-center gap-2"><span>' + esc(a.first_name) + ' ' + esc(a.last_name) + '</span><span class="text-red-500 text-xs">' + fmtDate(a.preferred_date) + ' — ' + esc(a.service) + '</span></div>');
+    });
+    var extra = stats.overdue.length > 5 ? '<p class="text-xs text-red-500 mt-1">+' + (stats.overdue.length - 5) + ' ' + (T.showMore || 'more') + '</p>' : '';
+    parts.push('<div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4"><div class="flex items-center gap-2 mb-2"><span class="text-red-600 dark:text-red-400 font-semibold">' + (T.overdueAppts || 'Overdue Appointments') + ' (' + stats.overdue.length + ')</span></div><div class="space-y-1">' + items.join('') + extra + '</div></div>');
+  }
+  if (stats.unassigned.length) {
+    var uItems = [];
+    stats.unassigned.slice(0, 5).forEach(function(a) {
+      uItems.push('<div class="text-sm text-amber-800 dark:text-amber-300 flex items-center gap-2"><span>' + esc(a.first_name) + ' ' + esc(a.last_name) + '</span><span class="text-amber-500 text-xs">' + fmtDate(a.preferred_date) + ' ' + fmtTime(a.preferred_time) + ' — ' + esc(a.service) + '</span></div>');
+    });
+    var uExtra = stats.unassigned.length > 5 ? '<p class="text-xs text-amber-500 mt-1">+' + (stats.unassigned.length - 5) + ' ' + (T.showMore || 'more') + '</p>' : '';
+    parts.push('<div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4"><div class="flex items-center gap-2 mb-2"><span class="text-amber-600 dark:text-amber-400 font-semibold">' + (T.unassignedUpcoming || 'Unassigned Upcoming') + ' (' + stats.unassigned.length + ')</span></div><div class="space-y-1">' + uItems.join('') + uExtra + '</div></div>');
+  }
+  container.innerHTML = parts.join('');
+}
+
+function renderUpcomingSchedule(stats) {
+  var T = adminT[currentLang];
+  var container = document.getElementById('overview-upcoming');
+  if (!stats.upcoming.length) { container.innerHTML = '<p class="text-gray-400 dark:text-gray-500 text-center py-4">' + (T.noUpcomingAppts || 'No upcoming appointments') + '</p>'; return; }
+
+  // Note: all appointment values are escaped via esc() — admin-only authenticated content
+  var byDate = {};
+  stats.upcoming.forEach(function(a) {
+    if (!byDate[a.preferred_date]) byDate[a.preferred_date] = [];
+    byDate[a.preferred_date].push(a);
+  });
+  var dates = Object.keys(byDate).sort();
+  var pieces = [];
+  dates.forEach(function(date, idx) {
+    var apts = byDate[date];
+    var d = new Date(date + 'T00:00:00');
+    var dayLabel = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    var isToday = date === stats.todayStr;
+    if (idx === 14) pieces.push('<div id="overview-more-days" class="hidden">');
+    var chunk = '<div class="border-l-4 ' + (apts.length ? 'border-green-600 bg-green-50 dark:bg-green-900/20' : 'border-gray-300') + ' pl-4 py-2 rounded-r-lg ' + (isToday ? 'ring-2 ring-amber-500 bg-amber-50 dark:bg-amber-900/20' : '') + '">';
+    chunk += '<div class="flex justify-between items-center mb-1"><h4 class="font-semibold text-sm ' + (isToday ? 'text-amber-800 dark:text-amber-300' : 'dark:text-gray-200') + '">' + (isToday ? (T.todayLabel || 'Today') + ' — ' : '') + dayLabel + '</h4>';
+    chunk += apts.length ? '<span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-bold">' + apts.length + ' appt' + (apts.length > 1 ? 's' : '') + '</span>' : '<span class="text-xs text-gray-400 italic">Open</span>';
+    chunk += '</div>';
+    if (apts.length) {
+      apts.slice(0, 3).forEach(function(a) {
+        chunk += '<div class="text-sm flex justify-between items-center bg-white dark:bg-gray-700 p-2 rounded mb-1 border dark:border-gray-600"><span><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(a.service) + ')</span></span>' + statusBadge(a.status) + (typeof calSyncBadge === 'function' ? calSyncBadge(a) : '') + '</div>';
+      });
+      if (apts.length > 3) chunk += '<p class="text-xs text-gray-400">+' + (apts.length - 3) + ' more</p>';
+    }
+    chunk += '</div>';
+    pieces.push(chunk);
+  });
+  if (dates.length > 14) {
+    pieces.push('</div>');
+    pieces.push('<button onclick="var el=document.getElementById(\'overview-more-days\');el.classList.toggle(\'hidden\');" class="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-2">+' + (dates.length - 14) + ' ' + (T.moreDays || 'more days') + '</button>');
+  }
+  container.innerHTML = pieces.join('');
+}
+
+function renderEmployeeSchedule(stats) {
+  var T = adminT[currentLang];
+  var empContainer = document.getElementById('overview-employees');
+  var activeEmps = employees.filter(function(e) { return e.is_active; });
+  if (!activeEmps.length) { empContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">' + (T.noActiveEmployees || 'No active employees') + '</p>'; return; }
+
+  // Note: employee + appointment values are escaped via esc() — admin-only authenticated content
+  empContainer.innerHTML = activeEmps.map(function(emp) {
+    var empToday = stats.today.filter(function(a) { return a.assigned_employee_id === emp.id; });
+    var empUpcoming = stats.upcoming.filter(function(a) { return a.assigned_employee_id === emp.id; });
+    var empCompleted = appointments.filter(function(a) { return a.assigned_employee_id === emp.id && a.status === 'completed'; });
+
+    var h = '<div class="border rounded-lg p-4 dark:border-gray-600 dark:bg-gray-800">';
+    h += '<div class="flex justify-between items-center mb-2"><div><h4 class="font-medium dark:text-gray-200">' + esc(emp.name) + '</h4><p class="text-sm text-gray-500 dark:text-gray-400">' + esc(emp.email || '') + '</p></div>';
+    h += '<div class="flex gap-2 flex-wrap justify-end">';
+    if (empToday.length) h += '<span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 font-medium">' + empToday.length + ' ' + (T.todayLabel || 'today') + '</span>';
+    h += '<span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 font-medium">' + empUpcoming.length + ' ' + (T.upcoming || 'upcoming') + '</span>';
+    h += '<span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">' + empCompleted.length + ' ' + (T.completedLabel || 'completed') + '</span>';
+    h += '</div></div>';
+    if (empToday.length) {
+      h += '<div class="mt-2 space-y-1">';
+      empToday.forEach(function(a) {
+        h += '<div class="text-sm flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 p-2 rounded border border-amber-200 dark:border-amber-800"><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(a.service) + ')</span></div>';
+      });
+      h += '</div>';
+    }
+    var nextUp = empUpcoming.filter(function(a) { return a.preferred_date !== stats.todayStr; });
+    if (nextUp.length) {
+      nextUp.slice(0, 2).forEach(function(a) {
+        h += '<div class="text-sm flex items-center gap-2 bg-gray-50 dark:bg-gray-700 p-2 rounded mb-1 mt-1">' + fmtDate(a.preferred_date) + ' ' + fmtTime(a.preferred_time) + ' — ' + esc(a.first_name) + ' ' + esc(a.last_name) + '</div>';
+      });
+      if (nextUp.length > 2) h += '<p class="text-xs text-gray-400">+' + (nextUp.length - 2) + ' more</p>';
+    }
+    if (!empToday.length && !nextUp.length) h += '<p class="text-sm text-gray-400 dark:text-gray-500 mt-2">' + (T.noUpcomingAppts || 'No upcoming appointments') + '</p>';
+    h += '</div>';
+    return h;
   }).join('');
+}
 
-  // Employee schedule
-  const empContainer = document.getElementById('overview-employees');
-  const activeEmps = employees.filter(e=>e.is_active);
-  empContainer.innerHTML = activeEmps.length ? activeEmps.map(emp => {
-    const empApts = upcoming.filter(a=>a.assigned_employee_id===emp.id);
-    return `<div class="border rounded-lg p-4">
-      <div class="flex justify-between items-center mb-2"><div><h4 class="font-medium">${esc(emp.name)}</h4><p class="text-sm text-gray-500">${esc(emp.email||'')}</p></div>
-      <div class="text-right"><p class="text-sm font-medium">${empApts.length} appointments</p><p class="text-xs text-gray-500">~${(empApts.length*1.5).toFixed(1)} hours</p></div></div>
-      ${empApts.length ? empApts.slice(0,2).map(a=>`<div class="text-sm flex items-center gap-2 bg-gray-50 p-2 rounded mb-1">📅 ${fmtDate(a.preferred_date)} ${fmtTime(a.preferred_time)}</div>`).join('') + (empApts.length>2?`<p class="text-xs text-gray-400">+${empApts.length-2} more</p>`:'') : '<p class="text-sm text-gray-400">No appointments in next 14 days</p>'}
-    </div>`;
-  }).join('') : '<p class="text-gray-500 text-center py-4">No active employees</p>';
+function renderOverview() {
+  var T = adminT[currentLang];
+  var stats = getOverviewStats();
 
+  // Stat cards
+  var actionCount = stats.unassigned.length + stats.overdue.length;
+  document.getElementById('stat-action').textContent = actionCount;
+  var actionEl = document.getElementById('stat-action-detail');
+  if (actionEl) actionEl.textContent = stats.unassigned.length + ' ' + (T.nUnassigned || 'unassigned') + ', ' + stats.overdue.length + ' ' + (T.nOverdue || 'overdue');
+
+  document.getElementById('stat-today').textContent = stats.today.length;
+  var todayDetail = document.getElementById('stat-today-detail');
+  if (todayDetail) {
+    var tNew = stats.today.filter(function(a){return a.status==='new';}).length;
+    var tConf = stats.today.filter(function(a){return a.status==='confirmed';}).length;
+    todayDetail.textContent = tConf + ' confirmed, ' + tNew + ' new';
+  }
+
+  document.getElementById('stat-week').textContent = stats.week.length;
+  var weekDetail = document.getElementById('stat-week-detail');
+  if (weekDetail) {
+    var assigned = stats.week.filter(function(a){return a.assigned_employee_id;}).length;
+    weekDetail.textContent = assigned + '/' + stats.week.length + ' assigned';
+  }
+
+  document.getElementById('stat-upcoming').textContent = stats.upcoming.length;
+  var upDetail = document.getElementById('stat-upcoming-detail');
+  if (upDetail) upDetail.textContent = (T.upcoming || 'Future') + ' (non-cancelled)';
+
+  document.getElementById('stat-completed').textContent = stats.completed.length;
+
+  renderOverviewAlerts(stats);
+  renderUpcomingSchedule(stats);
+  renderEmployeeSchedule(stats);
   renderOverviewCharts();
 }
 
@@ -6563,62 +6877,90 @@ function renderEmployees() {
 }
 
 function renderEmployeeCard(emp, inactive) {
-  const upcoming = appointments.filter(a => a.assigned_employee_id===emp.id && new Date(a.preferred_date+'T00:00:00') >= new Date(new Date().toISOString().split('T')[0]+'T00:00:00'));
+  var T = adminT[currentLang];
+  var todayStr = new Date().toISOString().split('T')[0];
+  var todayDate = new Date(todayStr + 'T00:00:00');
+  const empUpcoming = appointments.filter(a => a.assigned_employee_id===emp.id && new Date(a.preferred_date+'T00:00:00') >= todayDate && a.status !== 'completed' && a.status !== 'cancelled');
+  const empToday = empUpcoming.filter(a => a.preferred_date === todayStr);
+  const empCompleted = appointments.filter(a => a.assigned_employee_id===emp.id && a.status === 'completed');
   const isEmpAdmin = adminUsers.some(u => u.email && emp.email && u.email.toLowerCase() === emp.email.toLowerCase());
-  return `<div class="border rounded-lg p-4 ${inactive?'bg-gray-50':isEmpAdmin?'bg-green-50 border-green-200':'bg-white'}" id="emp-card-${emp.id}">
+  return `<div class="border rounded-lg p-4 ${inactive?'bg-gray-50 dark:bg-gray-900':isEmpAdmin?'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800':'bg-white dark:bg-gray-800 dark:border-gray-600'}" id="emp-card-${emp.id}">
     <div id="emp-view-${emp.id}">
       <div class="flex items-center justify-between">
         <div class="flex-1">
-          <div class="flex items-center gap-2">
-            <span class="font-medium">${esc(emp.name)}</span>
-            <span class="text-xs px-2 py-1 rounded-full ${emp.role==='Manager'?'bg-blue-100 text-blue-800':'bg-gray-100 text-gray-800'}">${emp.role||'Employee'}</span>
-            ${isEmpAdmin?'<span class="text-xs px-2 py-1 rounded-full bg-green-600 text-white">🛡 Admin</span>':''}
-            ${inactive?'<span class="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600">Inactive</span>':''}
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-medium dark:text-gray-200">${esc(emp.name)}</span>
+            <span class="text-xs px-2 py-1 rounded-full ${emp.role==='Manager'?'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300':'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}">${emp.role||'Employee'}</span>
+            ${isEmpAdmin?'<span class="text-xs px-2 py-1 rounded-full bg-green-600 text-white">Admin</span>':''}
+            ${inactive?'<span class="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400">Inactive</span>':''}
           </div>
-          <div class="text-sm text-gray-600">${emp.email?esc(emp.email):''}${emp.email&&emp.phone?' • ':''}${emp.phone?esc(emp.phone):''}</div>
-          ${!inactive && upcoming.length ? `<div class="mt-2 p-2 bg-blue-50 rounded text-sm">📅 <span class="text-blue-800 font-medium">${upcoming.length} upcoming</span>
-            ${upcoming[0]?` • Next: ${fmtDate(upcoming[0].preferred_date)}`:''}</div>` : ''}
+          <div class="text-sm text-gray-600 dark:text-gray-400">${emp.email?esc(emp.email):''}${emp.email&&emp.phone?' • ':''}${emp.phone?esc(emp.phone):''}</div>
+          ${!inactive ? `<div class="mt-2 flex gap-2 flex-wrap">
+            ${empToday.length ? '<span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 font-medium">' + empToday.length + ' ' + (T.todayLabel || 'today') + '</span>' : ''}
+            <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 font-medium">${empUpcoming.length} ${T.upcoming || 'upcoming'}</span>
+            <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">${empCompleted.length} ${T.completedLabel || 'completed'}</span>
+            ${empUpcoming.length ? `<button onclick="toggleEmpAppts('${emp.id}')" class="text-xs px-2 py-1 rounded-full bg-brand/10 text-brand dark:bg-green-900/30 dark:text-green-400 hover:bg-brand/20 cursor-pointer">${T.viewSchedule || 'View Schedule'}</button>` : ''}
+          </div>` : ''}
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="startEditEmployee('${emp.id}')" class="border rounded px-3 py-1 text-xs text-gray-600 hover:bg-gray-100">✏️ Edit</button>
-          <button onclick="toggleEmployeeStatus('${emp.id}',${!emp.is_active})" class="border rounded px-3 py-1 text-xs ${inactive?'text-green-600 hover:bg-green-50':'text-red-600 hover:bg-red-50'}">${inactive?'⚡ Activate':'⏻ Deactivate'}</button>
-          ${!inactive && emp.email && !isEmpAdmin ? `<button onclick="makeAdmin('${esc(emp.email)}','${esc(emp.name)}')" class="border rounded px-3 py-1 text-xs text-blue-600 hover:bg-blue-50">🛡 Make Admin</button>` : ''}
-          ${isEmpAdmin ? `<button onclick="revokeAdminByEmail('${esc(emp.email)}')" class="border rounded px-3 py-1 text-xs text-red-600 hover:bg-red-50">🛡 Revoke Admin</button>` : ''}
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="startEditEmployee('${emp.id}')" class="border rounded px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700">Edit</button>
+          <button onclick="toggleEmployeeStatus('${emp.id}',${!emp.is_active})" class="border rounded px-3 py-1 text-xs ${inactive?'text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900':'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900'}">${inactive?'Activate':'Deactivate'}</button>
+          ${!inactive && emp.email && !isEmpAdmin ? `<button onclick="makeAdmin('${esc(emp.email)}','${esc(emp.name)}')" class="border rounded px-3 py-1 text-xs text-blue-600 hover:bg-blue-50 dark:border-gray-600 dark:text-blue-400 dark:hover:bg-blue-900">Make Admin</button>` : ''}
+          ${isEmpAdmin ? `<button onclick="revokeAdminByEmail('${esc(emp.email)}')" class="border rounded px-3 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-gray-600 dark:text-red-400 dark:hover:bg-red-900">Revoke Admin</button>` : ''}
         </div>
+      </div>
+      <div id="emp-appts-${emp.id}" class="hidden mt-3 space-y-1 border-t pt-3 dark:border-gray-600">
+        ${empToday.length ? '<p class="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">' + (T.todayLabel || 'Today') + '</p>' + empToday.map(a => '<div class="text-sm flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 p-2 rounded border border-amber-200 dark:border-amber-800"><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(a.service) + ')</span>' + statusBadge(a.status) + '</div>').join('') : ''}
+        ${empUpcoming.filter(a => a.preferred_date !== todayStr).length ? '<p class="text-xs font-semibold text-blue-700 dark:text-blue-400 mb-1 mt-2">' + (T.upcoming || 'Upcoming') + '</p>' + empUpcoming.filter(a => a.preferred_date !== todayStr).slice(0, 8).map(a => '<div class="text-sm flex items-center gap-2 bg-gray-50 dark:bg-gray-700 p-2 rounded border dark:border-gray-600"><span class="text-gray-500 dark:text-gray-400 text-xs w-24">' + fmtDate(a.preferred_date) + '</span><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(a.service) + ')</span>' + statusBadge(a.status) + '</div>').join('') + (empUpcoming.filter(a => a.preferred_date !== todayStr).length > 8 ? '<p class="text-xs text-gray-400 mt-1">+' + (empUpcoming.filter(a => a.preferred_date !== todayStr).length - 8) + ' more</p>' : '') : ''}
+        ${!empToday.length && !empUpcoming.filter(a => a.preferred_date !== todayStr).length ? '<p class="text-sm text-gray-400 dark:text-gray-500">' + (T.noUpcomingAppts || 'No upcoming appointments') + '</p>' : ''}
       </div>
     </div>
     <div id="emp-edit-${emp.id}" class="hidden">
       <div class="grid md:grid-cols-4 gap-3 items-end">
-        <div><label class="text-xs font-medium">Name *</label><input id="edit-emp-name-${emp.id}" value="${esc(emp.name)}" class="w-full p-2 border rounded mt-1 text-sm"></div>
-        <div><label class="text-xs font-medium">Email</label><input id="edit-emp-email-${emp.id}" value="${esc(emp.email||'')}" class="w-full p-2 border rounded mt-1 text-sm"></div>
-        <div><label class="text-xs font-medium">Phone</label><input id="edit-emp-phone-${emp.id}" value="${esc(emp.phone||'')}" class="w-full p-2 border rounded mt-1 text-sm"></div>
-        <div><label class="text-xs font-medium">Role</label><select id="edit-emp-role-${emp.id}" class="w-full p-2 border rounded mt-1 text-sm"><option value="Employee" ${emp.role==='Employee'?'selected':''}>Employee</option><option value="Manager" ${emp.role==='Manager'?'selected':''}>Manager</option></select></div>
+        <div><label class="text-xs font-medium dark:text-gray-300">Name *</label><input id="edit-emp-name-${emp.id}" value="${esc(emp.name)}" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>
+        <div><label class="text-xs font-medium dark:text-gray-300">Email</label><input id="edit-emp-email-${emp.id}" value="${esc(emp.email||'')}" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>
+        <div><label class="text-xs font-medium dark:text-gray-300">Phone</label><input id="edit-emp-phone-${emp.id}" value="${esc(emp.phone||'')}" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>
+        <div><label class="text-xs font-medium dark:text-gray-300">Role</label><select id="edit-emp-role-${emp.id}" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"><option value="Employee" ${emp.role==='Employee'?'selected':''}>Employee</option><option value="Manager" ${emp.role==='Manager'?'selected':''}>Manager</option></select></div>
       </div>
       <div class="flex gap-2 mt-3">
-        <button onclick="saveEditEmployee('${emp.id}')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">💾 Save</button>
-        <button onclick="cancelEditEmployee('${emp.id}')" class="border px-4 py-2 rounded-lg text-sm">Cancel</button>
+        <button onclick="saveEditEmployee('${emp.id}')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">Save</button>
+        <button onclick="cancelEditEmployee('${emp.id}')" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-600 dark:text-gray-300">Cancel</button>
       </div>
     </div>
   </div>`;
 }
 
+function toggleEmpAppts(empId) {
+  var el = document.getElementById('emp-appts-' + empId);
+  if (el) el.classList.toggle('hidden');
+}
+
 // ===== GALLERY =====
-function toggleAddGalleryForm() { document.getElementById('add-gallery-form').classList.toggle('hidden'); }
+function toggleAddGalleryForm() {
+  document.getElementById('add-gallery-form').classList.toggle('hidden');
+  // Reset edit mode when toggling
+  var btn = document.getElementById('gallery-upload-btn');
+  if (btn) { btn.removeAttribute('data-editing-id'); btn.textContent = '💾 Upload & Save'; }
+}
 
 function renderGallery() {
   const container = document.getElementById('gallery-grid');
-  container.innerHTML = galleryImages.length ? galleryImages.map(img => `
-    <div class="border rounded-lg bg-white p-3 flex items-start gap-4">
-      <img src="${esc(img.image_url)}" alt="${esc(img.title)}" class="w-20 h-20 object-cover rounded">
-      <div class="flex-1">
-        <div class="flex justify-between items-start">
-          <div><h4 class="font-medium">${esc(img.title)}</h4><p class="text-sm text-gray-600 capitalize">${img.language||'english'} • Order: ${img.display_order||0} • ${img.is_active!==false?'Active':'Inactive'}</p>
-          ${img.description?`<p class="text-sm text-gray-500 mt-1">${esc(img.description)}</p>`:''}</div>
-          <button onclick="deleteGalleryImage('${img.id}','${esc(img.image_url)}')" class="text-red-600 border border-red-200 px-2 py-1 rounded text-xs hover:bg-red-50">🗑</button>
-        </div>
-      </div>
-    </div>
-  `).join('') : '<div class="text-center py-8 text-gray-500">No gallery images found. Add your first image above.</div>';
+  // Note: all values are escaped via esc() before insertion — this is safe admin-only content
+  container.innerHTML = galleryImages.length ? galleryImages.map(function(img) {
+    var titleDisplay = esc(img.title_en || '(untitled)');
+    var esLine = img.title_es ? '<p class="text-xs text-gray-500 dark:text-gray-400">ES: ' + esc(img.title_es) + '</p>' : '';
+    var descLine = img.description_en ? '<p class="text-sm text-gray-500 mt-1">' + esc(img.description_en) + '</p>' : '';
+    return '<div class="border rounded-lg bg-white dark:bg-gray-700 p-3 flex items-start gap-4">'
+      + '<img src="' + esc(img.image_url) + '" alt="' + esc(img.title_en || '') + '" class="w-20 h-20 object-cover rounded">'
+      + '<div class="flex-1"><div class="flex justify-between items-start">'
+      + '<div><h4 class="font-medium dark:text-gray-200">' + titleDisplay + '</h4>' + esLine
+      + '<p class="text-sm text-gray-600 dark:text-gray-400">Order: ' + (img.display_order || 0) + ' &bull; ' + (img.is_active !== false ? 'Active' : 'Inactive') + '</p>'
+      + descLine + '</div>'
+      + '<div class="flex gap-1">'
+      + '<button onclick="editGalleryImage(' + img.id + ')" class="text-blue-600 border border-blue-200 px-2 py-1 rounded text-xs hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700">&#9998;</button>'
+      + '<button onclick="deleteGalleryImage(\'' + img.id + '\',\'' + esc(img.image_url) + '\')" class="text-red-600 border border-red-200 px-2 py-1 rounded text-xs hover:bg-red-50 dark:text-red-400 dark:border-red-700">&#128465;</button>'
+      + '</div></div></div></div>';
+  }).join('') : '<div class="text-center py-8 text-gray-500">No gallery images found. Add your first image above.</div>';
 }
 
 // ===== IMAGE COMPRESSION =====
@@ -6713,12 +7055,20 @@ function setupDropZone(zone, fileInput) {
 
 // ===== BULK GALLERY UPLOAD =====
 async function uploadGalleryImages() {
+  // Check if in edit mode
+  var uploadBtn = document.getElementById('gallery-upload-btn');
+  var editingId = uploadBtn.getAttribute('data-editing-id');
+  if (editingId) {
+    await updateGalleryImage(editingId);
+    uploadBtn.removeAttribute('data-editing-id');
+    uploadBtn.textContent = '💾 Upload & Save';
+    return;
+  }
   const fileInput = document.getElementById('gallery-file');
   const files = Array.from(fileInput.files);
-  const title = document.getElementById('gallery-title').value;
+  const titleEn = document.getElementById('gallery-title-en').value;
+  const titleEs = document.getElementById('gallery-title-es').value;
   if (!files.length) { showToast(adminT[currentLang].selectAtLeastOneFile, true); return; }
-  // Single file mode requires title
-  if (files.length === 1 && !title) { showToast(adminT[currentLang].enterTitle, true); return; }
   const btn = document.getElementById('gallery-upload-btn');
   btn.textContent = 'Uploading...'; btn.disabled = true;
   const progressContainer = document.getElementById('gallery-upload-progress');
@@ -6727,7 +7077,8 @@ async function uploadGalleryImages() {
   let successCount = 0;
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
-    const fileTitle = files.length === 1 ? title : (title || file.name.replace(/\.[^.]+$/, ''));
+    const fileTitleEn = files.length === 1 ? titleEn : (titleEn || file.name.replace(/\.[^.]+$/, ''));
+    const fileTitleEs = files.length === 1 ? titleEs : titleEs;
     // Create progress element
     const progEl = document.createElement('div');
     progEl.id = 'upload-progress-' + i;
@@ -6744,8 +7095,10 @@ async function uploadGalleryImages() {
       statusEl.textContent = 'Uploading...';
       const fd = new FormData();
       fd.append('image', compressed);
-      fd.append('title', fileTitle);
-      fd.append('description', document.getElementById('gallery-desc').value);
+      fd.append('title_en', fileTitleEn);
+      fd.append('title_es', fileTitleEs);
+      fd.append('description_en', document.getElementById('gallery-desc-en').value);
+      fd.append('description_es', document.getElementById('gallery-desc-es').value);
       const json = await api('gallery.php', { method: 'POST', body: fd, headers: { 'X-CSRF-Token': csrfToken } });
       statusEl.textContent = 'Done';
       statusEl.className = 'file-progress text-green-600 font-medium';
@@ -6760,8 +7113,10 @@ async function uploadGalleryImages() {
   if (successCount > 0) loadGalleryImages();
   btn.textContent = '💾 Upload & Save'; btn.disabled = false;
   fileInput.value = '';
-  document.getElementById('gallery-title').value = '';
-  document.getElementById('gallery-desc').value = '';
+  document.getElementById('gallery-title-en').value = '';
+  document.getElementById('gallery-title-es').value = '';
+  document.getElementById('gallery-desc-en').value = '';
+  document.getElementById('gallery-desc-es').value = '';
   const infoEl = document.getElementById('gallery-compression-info');
   if (infoEl) infoEl.classList.add('hidden');
   setTimeout(function() { progressContainer.classList.add('hidden'); progressContainer.innerHTML = ''; }, 3000);
@@ -6770,6 +7125,58 @@ async function uploadGalleryImages() {
 // Keep single-file function for backward compat
 async function uploadGalleryImage() {
   return uploadGalleryImages();
+}
+
+// Edit gallery image — populate form and switch to update mode
+function editGalleryImage(id) {
+  var img = galleryImages.find(function(g) { return Number(g.id) === Number(id); });
+  if (!img) return;
+  document.getElementById('gallery-title-en').value = img.title_en || '';
+  document.getElementById('gallery-title-es').value = img.title_es || '';
+  document.getElementById('gallery-desc-en').value = img.description_en || '';
+  document.getElementById('gallery-desc-es').value = img.description_es || '';
+  // Show the form
+  var formPanel = document.getElementById('add-gallery-form');
+  formPanel.classList.remove('hidden');
+  // Change button to update mode
+  var uploadBtn = document.getElementById('gallery-upload-btn');
+  uploadBtn.textContent = 'Update Image';
+  uploadBtn.setAttribute('data-editing-id', id);
+  formPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Update gallery image via PUT
+async function updateGalleryImage(id) {
+  var fd = new FormData();
+  fd.append('_method', 'PUT');
+  fd.append('id', id);
+  fd.append('title_en', document.getElementById('gallery-title-en').value);
+  fd.append('title_es', document.getElementById('gallery-title-es').value);
+  fd.append('description_en', document.getElementById('gallery-desc-en').value);
+  fd.append('description_es', document.getElementById('gallery-desc-es').value);
+  var fileInput = document.getElementById('gallery-file');
+  if (fileInput.files.length > 0) {
+    var compressed = await compressImage(fileInput.files[0], 1920, 0.85);
+    fd.append('image', compressed);
+  }
+  try {
+    var res = await fetch('/api/admin/gallery.php', {
+      method: 'POST',
+      headers: { 'X-CSRF-Token': csrfToken },
+      credentials: 'include',
+      body: fd
+    });
+    var json = await res.json();
+    if (json.success) {
+      showToast('Image updated');
+      loadGalleryImages();
+      toggleAddGalleryForm();
+    } else {
+      showToast(json.error || 'Update failed', true);
+    }
+  } catch(e) {
+    showToast('Network error', true);
+  }
 }
 
 async function deleteGalleryImage(id, url) {
@@ -7677,6 +8084,8 @@ function switchTab(tab) {
   if(tab==='subscribers' && typeof loadSubscribers === 'function') loadSubscribers();
   if(tab==='repairorders' && typeof loadRepairOrders === 'function') loadRepairOrders();
   if(tab==='promotions' && typeof loadPromotions === 'function') loadPromotions();
+  if(tab==='faq' && typeof loadFaqs === 'function') loadFaqs();
+  if(tab==='reviews' && typeof loadTestimonials === 'function') loadTestimonials();
 }
 
 // Sub-tab switching for Appointments (Calendar vs List)
@@ -8470,6 +8879,31 @@ loadMessages = async function() {
 <script src="/admin/js/blog.js" defer></script>
 <script src="/admin/js/subscribers.js"></script>
 <script src="/admin/js/promotions.js"></script>
+<script src="/admin/js/faq.js"></script>
+<script src="/admin/js/testimonials.js"></script>
+<script>
+// Calendar sync retry
+async function retryCalendarSync(appointmentId) {
+  try {
+    var res = await fetch('/api/admin/calendar-retry-sync.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' },
+      credentials: 'include',
+      body: JSON.stringify({ appointment_id: appointmentId })
+    });
+    var json = await res.json();
+    if (json.success) {
+      showToast('Calendar sync retried successfully');
+      loadAppointments();
+    } else {
+      showToast(json.error || 'Retry failed', true);
+    }
+  } catch (err) {
+    console.error('retryCalendarSync error:', err);
+    showToast('Network error', true);
+  }
+}
+</script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';
   // Override global showToast — handles legacy (msg, isError: bool) and new (msg, type: string)
