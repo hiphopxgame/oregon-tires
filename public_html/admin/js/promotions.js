@@ -15,12 +15,6 @@
     return meta ? meta.getAttribute('content') : '';
   }
 
-  function getHeaders(isJson) {
-    const h = { 'X-CSRF-Token': getCsrf() };
-    if (isJson) h['Content-Type'] = 'application/json';
-    return h;
-  }
-
   // ─── Load promotions ──────────────────────────────────────────
   async function loadPromotions() {
     try {
@@ -48,7 +42,7 @@
     if (!promotions.length) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
-      td.colSpan = 6;
+      td.colSpan = 7;
       td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
       td.textContent = 'No promotions yet. Click "New Promotion" to create one.';
       tr.appendChild(td);
@@ -76,6 +70,23 @@
         tdTitle.appendChild(badge);
       }
       tr.appendChild(tdTitle);
+
+      // Image cell
+      const tdImg = document.createElement('td');
+      tdImg.className = 'px-4 py-3';
+      if (promo.image_url) {
+        const thumb = document.createElement('img');
+        thumb.src = promo.image_url;
+        thumb.alt = 'Promo image';
+        thumb.className = 'h-10 w-auto rounded object-cover';
+        tdImg.appendChild(thumb);
+      } else {
+        const noImg = document.createElement('span');
+        noImg.className = 'text-xs text-gray-400';
+        noImg.textContent = '—';
+        tdImg.appendChild(noImg);
+      }
+      tr.appendChild(tdImg);
 
       // Status cell
       const tdStatus = document.createElement('td');
@@ -195,6 +206,13 @@
     document.getElementById('promo-sort').value = '0';
     document.getElementById('promo-form-title').textContent = 'New Promotion';
     document.getElementById('promo-save-btn').textContent = 'Create Promotion';
+    // Reset image
+    var imgInput = document.getElementById('promo-image-file');
+    if (imgInput) imgInput.value = '';
+    var preview = document.getElementById('promo-image-preview');
+    if (preview) preview.classList.add('hidden');
+    var existing = document.getElementById('promo-existing-image');
+    if (existing) existing.classList.add('hidden');
   }
 
   // ─── Open form for editing ────────────────────────────────────
@@ -211,16 +229,57 @@
     document.getElementById('promo-text-color').value = promo.text_color || '#000000';
     document.getElementById('promo-badge').value = promo.badge_text || '';
     document.getElementById('promo-active').checked = Number(promo.is_active) === 1;
-    // Format datetime-local values (strip seconds if present)
     document.getElementById('promo-starts').value = promo.starts_at ? promo.starts_at.replace(' ', 'T').slice(0, 16) : '';
     document.getElementById('promo-ends').value = promo.ends_at ? promo.ends_at.replace(' ', 'T').slice(0, 16) : '';
     document.getElementById('promo-sort').value = promo.sort_order || '0';
     document.getElementById('promo-form-title').textContent = 'Edit Promotion';
     document.getElementById('promo-save-btn').textContent = 'Update Promotion';
+    // Image
+    var imgInput = document.getElementById('promo-image-file');
+    if (imgInput) imgInput.value = '';
+    var preview = document.getElementById('promo-image-preview');
+    if (preview) preview.classList.add('hidden');
+    var existing = document.getElementById('promo-existing-image');
+    if (existing) {
+      if (promo.image_url) {
+        existing.classList.remove('hidden');
+        var img = existing.querySelector('img');
+        if (img) img.src = promo.image_url;
+      } else {
+        existing.classList.add('hidden');
+      }
+    }
 
     const form = document.getElementById('promotion-form-panel');
     form.classList.remove('hidden');
     form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ─── Build FormData from form ─────────────────────────────────
+  function buildFormData() {
+    const fd = new FormData();
+    fd.append('title_en', document.getElementById('promo-title-en').value.trim());
+    fd.append('title_es', document.getElementById('promo-title-es').value.trim());
+    fd.append('body_en', document.getElementById('promo-body-en').value.trim());
+    fd.append('body_es', document.getElementById('promo-body-es').value.trim());
+    fd.append('cta_text_en', document.getElementById('promo-cta-text-en').value.trim() || 'Book Now');
+    fd.append('cta_text_es', document.getElementById('promo-cta-text-es').value.trim() || 'Reserve Ahora');
+    fd.append('cta_url', document.getElementById('promo-cta-url').value.trim() || '/book-appointment/');
+    fd.append('bg_color', document.getElementById('promo-bg-color').value);
+    fd.append('text_color', document.getElementById('promo-text-color').value);
+    fd.append('badge_text', document.getElementById('promo-badge').value.trim());
+    fd.append('is_active', document.getElementById('promo-active').checked ? '1' : '0');
+    var starts = document.getElementById('promo-starts').value;
+    fd.append('starts_at', starts ? starts.replace('T', ' ') + ':00' : '');
+    var ends = document.getElementById('promo-ends').value;
+    fd.append('ends_at', ends ? ends.replace('T', ' ') + ':00' : '');
+    fd.append('sort_order', document.getElementById('promo-sort').value || '0');
+    // Image file
+    var imgInput = document.getElementById('promo-image-file');
+    if (imgInput && imgInput.files.length > 0) {
+      fd.append('image', imgInput.files[0]);
+    }
+    return fd;
   }
 
   // ─── Save (create or update) ──────────────────────────────────
@@ -231,32 +290,19 @@
       return;
     }
 
-    const payload = {
-      title_en: titleEn,
-      title_es: document.getElementById('promo-title-es').value.trim(),
-      body_en: document.getElementById('promo-body-en').value.trim(),
-      body_es: document.getElementById('promo-body-es').value.trim(),
-      cta_text_en: document.getElementById('promo-cta-text-en').value.trim() || 'Book Now',
-      cta_text_es: document.getElementById('promo-cta-text-es').value.trim() || 'Reserve Ahora',
-      cta_url: document.getElementById('promo-cta-url').value.trim() || '/book-appointment/',
-      bg_color: document.getElementById('promo-bg-color').value,
-      text_color: document.getElementById('promo-text-color').value,
-      badge_text: document.getElementById('promo-badge').value.trim(),
-      is_active: document.getElementById('promo-active').checked ? 1 : 0,
-      starts_at: document.getElementById('promo-starts').value ? document.getElementById('promo-starts').value.replace('T', ' ') + ':00' : null,
-      ends_at: document.getElementById('promo-ends').value ? document.getElementById('promo-ends').value.replace('T', ' ') + ':00' : null,
-      sort_order: parseInt(document.getElementById('promo-sort').value, 10) || 0,
-    };
+    const fd = buildFormData();
 
-    const method = editingId ? 'PUT' : 'POST';
-    if (editingId) payload.id = editingId;
+    if (editingId) {
+      fd.append('_method', 'PUT');
+      fd.append('id', String(editingId));
+    }
 
     try {
       const res = await fetch(API, {
-        method: method,
-        headers: getHeaders(true),
+        method: 'POST',
+        headers: { 'X-CSRF-Token': getCsrf() },
         credentials: 'include',
-        body: JSON.stringify(payload),
+        body: fd,
       });
       const json = await res.json();
       if (json.success) {
@@ -275,19 +321,34 @@
 
   // ─── Toggle active status ─────────────────────────────────────
   async function toggleActive(promo) {
-    const payload = Object.assign({}, promo, {
-      is_active: Number(promo.is_active) === 1 ? 0 : 1,
-    });
+    const fd = new FormData();
+    fd.append('_method', 'PUT');
+    fd.append('id', String(promo.id));
+    fd.append('title_en', promo.title_en || '');
+    fd.append('title_es', promo.title_es || '');
+    fd.append('body_en', promo.body_en || '');
+    fd.append('body_es', promo.body_es || '');
+    fd.append('cta_text_en', promo.cta_text_en || 'Book Now');
+    fd.append('cta_text_es', promo.cta_text_es || 'Reserve Ahora');
+    fd.append('cta_url', promo.cta_url || '/book-appointment/');
+    fd.append('bg_color', promo.bg_color || '#f59e0b');
+    fd.append('text_color', promo.text_color || '#000000');
+    fd.append('badge_text', promo.badge_text || '');
+    fd.append('is_active', Number(promo.is_active) === 1 ? '0' : '1');
+    fd.append('starts_at', promo.starts_at || '');
+    fd.append('ends_at', promo.ends_at || '');
+    fd.append('sort_order', String(promo.sort_order || 0));
+
     try {
       const res = await fetch(API, {
-        method: 'PUT',
-        headers: getHeaders(true),
+        method: 'POST',
+        headers: { 'X-CSRF-Token': getCsrf() },
         credentials: 'include',
-        body: JSON.stringify(payload),
+        body: fd,
       });
       const json = await res.json();
       if (json.success) {
-        if (typeof showToast === 'function') showToast(payload.is_active ? 'Promotion activated' : 'Promotion deactivated');
+        if (typeof showToast === 'function') showToast(Number(promo.is_active) === 1 ? 'Promotion deactivated' : 'Promotion activated');
         loadPromotions();
       }
     } catch (err) {
@@ -300,11 +361,10 @@
     if (!confirm('Delete this promotion? This cannot be undone.')) return;
 
     try {
-      const res = await fetch(API, {
+      const res = await fetch(API + '?id=' + id, {
         method: 'DELETE',
-        headers: getHeaders(true),
+        headers: { 'X-CSRF-Token': getCsrf() },
         credentials: 'include',
-        body: JSON.stringify({ id: id }),
       });
       const json = await res.json();
       if (json.success) {
@@ -314,6 +374,21 @@
     } catch (err) {
       console.error('deletePromotion error:', err);
     }
+  }
+
+  // ─── Remove promo image ───────────────────────────────────────
+  function removePromoImage() {
+    var existing = document.getElementById('promo-existing-image');
+    if (existing) existing.classList.add('hidden');
+    // Mark for removal on next save
+    var removeFlag = document.getElementById('promo-remove-image-flag');
+    if (!removeFlag) {
+      removeFlag = document.createElement('input');
+      removeFlag.type = 'hidden';
+      removeFlag.id = 'promo-remove-image-flag';
+      document.getElementById('promotion-form-panel').appendChild(removeFlag);
+    }
+    removeFlag.value = '1';
   }
 
   // ─── Live preview ─────────────────────────────────────────────
@@ -351,9 +426,48 @@
     preview.appendChild(ctaSpan);
   }
 
+  // Override buildFormData to include remove_image flag
+  var _origBuildFormData = buildFormData;
+  function buildFormDataWithRemove() {
+    var fd = _origBuildFormData();
+    var removeFlag = document.getElementById('promo-remove-image-flag');
+    if (removeFlag && removeFlag.value === '1') {
+      fd.append('remove_image', '1');
+    }
+    return fd;
+  }
+  // Patch
+  buildFormData = buildFormDataWithRemove;
+
+  // ─── Image file input preview ─────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function() {
+    var imgInput = document.getElementById('promo-image-file');
+    if (imgInput) {
+      imgInput.addEventListener('change', function() {
+        var preview = document.getElementById('promo-image-preview');
+        if (!preview) return;
+        if (this.files && this.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var img = preview.querySelector('img');
+            if (img) img.src = e.target.result;
+            preview.classList.remove('hidden');
+          };
+          reader.readAsDataURL(this.files[0]);
+          // Clear remove flag
+          var removeFlag = document.getElementById('promo-remove-image-flag');
+          if (removeFlag) removeFlag.value = '';
+        } else {
+          preview.classList.add('hidden');
+        }
+      });
+    }
+  });
+
   // ─── Expose to global scope ───────────────────────────────────
   window.loadPromotions = loadPromotions;
   window.togglePromotionForm = togglePromotionForm;
   window.savePromotion = savePromotion;
   window.updatePromoPreview = updatePreview;
+  window.removePromoImage = removePromoImage;
 })();

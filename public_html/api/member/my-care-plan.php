@@ -3,6 +3,7 @@
  * GET /api/member/my-care-plan.php
  *
  * Returns care plan status as HTML for the member dashboard tab.
+ * Bilingual EN/ES support via member-translations.php.
  */
 
 declare(strict_types=1);
@@ -10,17 +11,20 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/member-kit-init.php';
+require_once __DIR__ . '/../../includes/member-translations.php';
 
 startSecureSession();
 $pdo = getDB();
 initMemberKit($pdo);
+
+$lang = getMemberLang();
 
 try {
     requireMethod('GET');
 
     if (!MemberAuth::isMemberLoggedIn()) {
         http_response_code(401);
-        echo '<div class="member-alert member-alert--error">Please sign in to view your care plan.</div>';
+        echo '<div class="member-alert member-alert--error">' . htmlspecialchars(memberT('sign_in_required', $lang)) . '</div>';
         exit;
     }
 
@@ -45,22 +49,41 @@ try {
         $plan = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Plan display names and features
+    // Plan display names and features (bilingual)
     $planFeatures = [
         'basic' => [
             'name' => 'Basic',
             'price' => '$19/mo',
-            'features' => ['1 oil change per year', '5% off all services', 'Free tire rotations', 'Priority scheduling'],
+            'features' => [
+                memberT('oil_change_1', $lang),
+                memberT('discount_5', $lang),
+                memberT('free_tire_rotation', $lang),
+                memberT('priority_sched', $lang),
+            ],
         ],
         'standard' => [
             'name' => 'Standard',
             'price' => '$29/mo',
-            'features' => ['2 oil changes per year', '10% off all services', 'Free tire rotations', 'Priority scheduling', 'Free multi-point inspections'],
+            'features' => [
+                memberT('oil_change_2', $lang),
+                memberT('discount_10', $lang),
+                memberT('free_tire_rotation', $lang),
+                memberT('priority_sched', $lang),
+                memberT('free_inspections', $lang),
+            ],
         ],
         'premium' => [
             'name' => 'Premium',
             'price' => '$49/mo',
-            'features' => ['Unlimited oil changes', '15% off all services', 'Free tire rotations', 'Priority scheduling', 'Free multi-point inspections', 'Roadside assistance', 'Free alignment check'],
+            'features' => [
+                memberT('oil_change_unlim', $lang),
+                memberT('discount_15', $lang),
+                memberT('free_tire_rotation', $lang),
+                memberT('priority_sched', $lang),
+                memberT('free_inspections', $lang),
+                memberT('roadside_assist', $lang),
+                memberT('free_alignment', $lang),
+            ],
         ],
     ];
 
@@ -68,16 +91,16 @@ try {
     <div class="member-page">
         <div class="member-card member-card--wide">
             <div class="member-header">
-                <h1>Care Plan</h1>
-                <p>Your monthly auto care membership</p>
+                <h1><?= htmlspecialchars(memberT('care_plan', $lang)) ?></h1>
+                <p><?= htmlspecialchars(memberT('care_subtitle', $lang)) ?></p>
             </div>
 
             <?php if (!$plan): ?>
                 <div style="text-align: center; padding: 2rem 0;">
-                    <p style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--member-text);">You do not have an active Care Plan</p>
-                    <p class="member-text-muted" style="margin-bottom: 1.5rem;">Save on oil changes, tire rotations, and all services with a monthly plan.</p>
+                    <p style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--member-text);"><?= htmlspecialchars(memberT('no_plan', $lang)) ?></p>
+                    <p class="member-text-muted" style="margin-bottom: 1.5rem;"><?= htmlspecialchars(memberT('plan_cta', $lang)) ?></p>
                     <a href="/care-plan" style="display: inline-block; padding: 0.75rem 2rem; background: var(--member-accent); color: var(--member-accent-text); border-radius: 0.5rem; text-decoration: none; font-weight: 600;">
-                        View Plans &amp; Enroll
+                        <?= htmlspecialchars(memberT('view_plans', $lang)) ?>
                     </a>
                 </div>
             <?php else:
@@ -94,7 +117,7 @@ try {
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
                         <div>
                             <h3 style="margin: 0 0 0.25rem; font-size: 1.1rem;">
-                                <?= htmlspecialchars($info['name']) ?> Care Plan
+                                <?= htmlspecialchars($info['name']) ?> <?= htmlspecialchars(memberT('care_plan', $lang)) ?>
                             </h3>
                             <p style="margin: 0; color: var(--member-text-muted); font-size: 0.875rem;">
                                 <?= htmlspecialchars($info['price']) ?>
@@ -108,14 +131,14 @@ try {
                     <?php if ($plan['period_start'] && $plan['period_end']): ?>
                     <div style="margin-bottom: 1rem; font-size: 0.875rem;">
                         <p style="margin: 0;">
-                            Current period: <strong><?= htmlspecialchars(date('M d, Y', strtotime($plan['period_start']))) ?></strong>
+                            <?= htmlspecialchars(memberT('current_period', $lang)) ?>: <strong><?= htmlspecialchars(date('M d, Y', strtotime($plan['period_start']))) ?></strong>
                             &mdash; <strong><?= htmlspecialchars(date('M d, Y', strtotime($plan['period_end']))) ?></strong>
                         </p>
                     </div>
                     <?php endif; ?>
 
                     <div style="margin-top: 1rem;">
-                        <p style="font-weight: 600; margin: 0 0 0.5rem; font-size: 0.875rem;">Your Benefits:</p>
+                        <p style="font-weight: 600; margin: 0 0 0.5rem; font-size: 0.875rem;"><?= htmlspecialchars(memberT('your_benefits', $lang)) ?>:</p>
                         <ul style="list-style: none; padding: 0; margin: 0;">
                             <?php foreach ($info['features'] as $feature): ?>
                             <li style="padding: 0.25rem 0; font-size: 0.875rem; color: var(--member-text-muted);">
@@ -129,12 +152,12 @@ try {
                     <?php if ($plan['status'] === 'active'): ?>
                     <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--member-border);">
                         <a href="/book-appointment/" style="display: inline-block; padding: 0.5rem 1.5rem; background: var(--member-accent); color: var(--member-accent-text); border-radius: 0.375rem; text-decoration: none; font-weight: 600; font-size: 0.875rem;">
-                            Book an Appointment
+                            <?= htmlspecialchars(memberT('book_appointment', $lang)) ?>
                         </a>
                     </div>
                     <?php elseif ($plan['status'] === 'pending'): ?>
                     <div style="margin-top: 1rem; padding: 0.75rem; background: #fef3c7; border-radius: 0.375rem; font-size: 0.875rem; color: #92400e;">
-                        Your enrollment is being processed. We will contact you to complete payment setup.
+                        <?= htmlspecialchars(memberT('enrollment_pending', $lang)) ?>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -146,5 +169,5 @@ try {
 } catch (\Throwable $e) {
     error_log("Oregon Tires member/my-care-plan error: " . $e->getMessage());
     http_response_code(500);
-    echo '<div class="member-alert member-alert--error">Error loading care plan. Please try again.</div>';
+    echo '<div class="member-alert member-alert--error">' . htmlspecialchars(memberT('error_loading', $lang)) . '</div>';
 }

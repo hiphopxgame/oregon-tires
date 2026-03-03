@@ -639,7 +639,7 @@ HTML;
         // Fallback: send a simple confirmation with calendar links
         $refText = $referenceNumber ? " (Ref: {$referenceNumber})" : '';
         $subject = "Appointment Requested{$refText} — Oregon Tires Auto Care";
-        $htmlBody = "<p>Thank you, {$name}! Your appointment for {$service} on {$date} at {$time} has been received.{$refText} We will call you to confirm.</p>";
+        $htmlBody = "<p>Thank you, {$name}! Your appointment for {$service} on {$date} at {$time} has been received.{$refText} We will contact you to confirm.</p>";
         if ($calendarHtml) {
             $htmlBody .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' . $calendarHtml . '</table>';
         }

@@ -1,6 +1,6 @@
 # Oregon Tires Auto Care -- Feature List
 
-> **Last updated:** 2026-02-22
+> **Last updated:** 2026-03-03
 > **Stack:** Static HTML/CSS/JS | PHP API + MySQL + PHPMailer | cPanel/Apache Hosting
 > **URL structure:** `index.html` (public site), `admin/index.html` (dashboard), `book-appointment/index.html` (redirect stub), `contact.php`, `cancel.php`, `reschedule.php`, `checkout.php`, `blog.html`, `blog-post.html`, `privacy.html`, `feedback.html`
 
@@ -32,6 +32,10 @@
    - [Account Settings](#29-account-settings)
    - [Utility Functions](#210-utility-functions)
    - [Documentation Tab](#211-documentation-tab)
+   - [Promotions Tab](#212-promotions-tab)
+   - [FAQ Tab](#213-faq-tab)
+   - [Reviews Tab](#214-reviews-tab)
+   - [Subscribers Tab](#215-subscribers-tab)
 3. [Book Appointment Page](#3-book-appointment-page)
 4. [Customer Self-Service](#4-customer-self-service)
 5. [NEW Features (Pending Client Approval)](#5-new-features-pending-client-approval)
@@ -278,26 +282,36 @@
 
 ### 2.2 Overview Tab
 
-**14-Day Appointment Statistics (4 stat cards):**
+**5 Intelligent Stat Cards:**
 
 | Metric | Color | Description |
 |--------|-------|-------------|
-| Total Appointments | Brand green | Count of all appointments in the next 14 days |
-| Pending | Blue | Appointments with status `new` |
-| Confirmed | Green | Appointments with status `confirmed` |
-| Completed | Gray | Appointments with status `completed` |
+| Action Required | Red (`border-l-red-500`) | Unassigned + overdue appointments needing attention |
+| Today | Amber (`border-l-amber-500`) | Today's scheduled appointments |
+| This Week | Blue (`border-l-blue-500`) | Current week's appointment count |
+| Upcoming | Green (`border-l-green-500`) | All future appointments |
+| Completed | Gray (`border-l-gray-400`) | All-time completed appointments |
 
-**Upcoming Appointments Panel:**
-- Groups appointments by date for the next 14 days
-- Each date shows day label, appointment count badge, and up to 3 appointment previews
-- Today's date highlighted with yellow ring and star icon
-- Dates with appointments have green left border; empty dates show "Open"
-- Shows customer name, time, service, and status badge per appointment
+**Alert Banners** (`#overview-alerts`):
+- Overdue appointments banner (red) — shows up to 5 overdue items with details
+- Unassigned upcoming banner (orange) — shows up to 5 unassigned appointments
+- Auto-hidden when no alerts apply
+
+**Overview Charts** (2-column grid):
+- This Week's Bookings — bar/line chart of current week
+- Service Breakdown — pie/donut chart of services
+
+**Upcoming Schedule Panel:**
+- All future dates grouped by day
+- First 14 days expanded, remaining collapsed via "+N more days" toggle
+- Today's date highlighted with amber ring and star icon
+- Dates with appointments show green left border; empty dates show "Open"
+- Each appointment shows customer name, time, service, and status badge
 
 **Employee Schedule Panel:**
-- Lists all active employees with their 14-day appointment counts
-- Shows estimated hours (appointments x 1.5 hours)
-- Displays next upcoming appointment date for each employee
+- Per-employee stat badges: today count, upcoming count, completed count
+- Today's appointments highlighted in amber
+- Next 2 upcoming appointments shown per employee
 
 ### 2.3 Appointments Tab
 
@@ -377,6 +391,8 @@
 | Toggle active/inactive | Activate or deactivate employees (soft delete) |
 | Upcoming appointments | Badge showing count and next appointment date per active employee |
 | Role display | Badge showing Employee or Manager role |
+| Stats badges | Per-employee counts: today (amber), upcoming (blue), completed (gray) |
+| View Schedule | Expandable section per employee showing grouped appointment list by date |
 
 **Admin Privilege Management:**
 
@@ -517,6 +533,64 @@ Accessible via clicking the admin email/role display in the header. Opens a moda
 - Manual sub-tab visible by default; Features, Improvements, and Roadmap start hidden
 - Scrollable content areas with `max-h-[75vh] overflow-y-auto`
 - All documentation rendered as styled HTML with Tailwind CSS classes
+
+### 2.12 Promotions Tab
+
+**Seasonal Promotion Manager** (`admin/js/promotions.js`, API: `/api/admin/promotions.php`):
+
+| Feature | Details |
+|---------|---------|
+| Promotion list | Table with title, image thumbnail, status badge, date range, sort order, color preview, actions |
+| Status badges | Live (green), Scheduled (blue), Expired (red), Inactive (gray) — computed from `is_active` + `starts_at`/`ends_at` |
+| Create/Edit form | Title EN/ES, body EN/ES, CTA text EN/ES, CTA URL, badge text, background color, text color, image upload, active toggle, start/end datetime, sort order |
+| Image upload | File picker with live preview; existing image display with remove button |
+| Live preview | Real-time banner preview showing colors, badge, title, and CTA styling |
+| Color pickers | Background color and text color with native color inputs |
+| Toggle active | Quick activate/deactivate without opening edit form |
+| Delete | Confirmation dialog, permanent removal |
+| FormData upload | Uses `multipart/form-data` for image support; `_method=PUT` for updates |
+
+### 2.13 FAQ Tab
+
+**FAQ Manager** (`admin/js/faq.js`, API: `/api/admin/faq.php`):
+
+| Feature | Details |
+|---------|---------|
+| FAQ list | Table with question preview (80 char truncation), status badge, sort order, actions |
+| Create/Edit form | Question EN/ES, Answer EN/ES, active toggle, sort order |
+| Status badges | Active (green), Inactive (gray) |
+| Toggle active | Quick activate/deactivate |
+| Delete | Confirmation dialog, permanent removal |
+| JSON API | Full CRUD via `GET`/`POST`/`PUT`/`DELETE` with JSON payloads |
+
+### 2.14 Reviews Tab
+
+**Testimonials Manager** (`admin/js/testimonials.js`, API: `/api/admin/testimonials.php`):
+
+| Feature | Details |
+|---------|---------|
+| Review list | Table with customer name, star rating (1-5 filled/empty stars), review preview (60 char), status badge, actions |
+| Create/Edit form | Customer name (required), rating (1-5 select), review text EN/ES, active toggle, sort order |
+| Star display | Unicode filled star (★) and empty star (☆) rendering |
+| Status badges | Active (green), Inactive (gray) |
+| Toggle active | Quick activate/deactivate |
+| Delete | Confirmation dialog, permanent removal |
+| Homepage integration | Active reviews displayed in the public site Reviews section |
+
+### 2.15 Subscribers Tab
+
+**Email Subscriber Manager** (`admin/js/subscribers.js`, API: `/api/admin/subscribers.php`):
+
+| Feature | Details |
+|---------|---------|
+| Subscriber list | Table with email, language (EN/ES), source, subscribed date, status, actions |
+| Stats bar | Active count (green badge) and total count (gray badge) at top |
+| Search | Text search across subscriber emails |
+| Pagination | 20 per page, Previous/Next buttons, "Page X of Y" display |
+| CSV export | Downloads filtered subscriber list as CSV file |
+| Unsubscribe | Per-subscriber unsubscribe button with confirmation dialog |
+| Nav badge | Subscriber count badge on tab button (hidden when 0) |
+| Status badges | Active (green), Unsubscribed (gray) with unsubscribe date |
 
 ---
 

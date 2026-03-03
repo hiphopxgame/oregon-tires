@@ -11,7 +11,7 @@
 $labels = [
     'en' => [
         'title' => 'Appointment Requested!',
-        'subtitle' => 'We will call or text you to confirm. A confirmation email has been sent to your inbox. Thank you!',
+        'subtitle' => 'We will contact you to confirm your appointment. A confirmation email has been sent to your inbox. Thank you!',
         'service' => 'Service',
         'date' => 'Date',
         'time' => 'Time',
@@ -26,7 +26,7 @@ $labels = [
     ],
     'es' => [
         'title' => '¡Cita Solicitada!',
-        'subtitle' => 'Le llamaremos o enviaremos un mensaje para confirmar. Se ha enviado un correo de confirmacion a su bandeja de entrada. ¡Gracias!',
+        'subtitle' => 'Nos comunicaremos con usted para confirmar su cita. Se ha enviado un correo de confirmación a su bandeja de entrada. ¡Gracias!',
         'service' => 'Servicio',
         'date' => 'Fecha',
         'time' => 'Hora',

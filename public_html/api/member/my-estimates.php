@@ -3,6 +3,7 @@
  * GET /api/member/my-estimates.php
  *
  * Returns estimates and inspection reports for dashboard tab.
+ * Bilingual EN/ES support via member-translations.php.
  */
 
 declare(strict_types=1);
@@ -10,17 +11,20 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/member-kit-init.php';
+require_once __DIR__ . '/../../includes/member-translations.php';
 
 startSecureSession();
 $pdo = getDB();
 initMemberKit($pdo);
+
+$lang = getMemberLang();
 
 try {
     requireMethod('GET');
 
     if (!MemberAuth::isMemberLoggedIn()) {
         http_response_code(401);
-        echo '<div class="member-alert member-alert--error">Please sign in to view estimates.</div>';
+        echo '<div class="member-alert member-alert--error">' . htmlspecialchars(memberT('sign_in_required', $lang)) . '</div>';
         exit;
     }
 
@@ -42,13 +46,13 @@ try {
     <div class="member-page">
         <div class="member-card member-card--wide">
             <div class="member-header">
-                <h1>Estimates & Reports</h1>
-                <p>Your inspection reports and service estimates</p>
+                <h1><?= htmlspecialchars(memberT('estimates_reports', $lang)) ?></h1>
+                <p><?= htmlspecialchars(memberT('estimates_subtitle', $lang)) ?></p>
             </div>
 
             <?php if (empty($estimates)): ?>
                 <p class="member-text-muted" style="text-align: center; padding: 2rem 0;">
-                    No estimates or reports yet. They'll appear here once we inspect your vehicle.
+                    <?= htmlspecialchars(memberT('no_estimates', $lang)) ?>
                 </p>
             <?php else: ?>
                 <div style="display: flex; flex-direction: column; gap: 1rem;">
@@ -57,7 +61,7 @@ try {
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
                                 <div>
                                     <h3 style="margin: 0 0 0.25rem; font-size: 0.95rem;">
-                                        Estimate <?= htmlspecialchars($est['estimate_number']) ?>
+                                        <?= htmlspecialchars(memberT('estimate', $lang)) ?> <?= htmlspecialchars($est['estimate_number']) ?>
                                     </h3>
                                     <p style="margin: 0; color: var(--member-text-muted); font-size: 0.875rem;">
                                         RO: <?= htmlspecialchars($est['ro_number']) ?>
@@ -69,7 +73,7 @@ try {
                             </div>
                             <div style="margin-top: 0.5rem;">
                                 <p style="margin: 0; font-size: 0.875rem;">
-                                    Total: <strong>$<?= number_format((float) ($est['total'] ?? 0), 2) ?></strong>
+                                    <?= htmlspecialchars(memberT('total', $lang)) ?>: <strong>$<?= number_format((float) ($est['total'] ?? 0), 2) ?></strong>
                                 </p>
                                 <p style="margin: 0.25rem 0 0; font-size: 0.75rem; color: var(--member-text-muted);">
                                     <?= htmlspecialchars(date('M d, Y', strtotime($est['created_at']))) ?>
@@ -86,5 +90,5 @@ try {
 } catch (\Throwable $e) {
     error_log("Oregon Tires customer/my-estimates error: " . $e->getMessage());
     http_response_code(500);
-    echo '<div class="member-alert member-alert--error">Error loading estimates. Please try again.</div>';
+    echo '<div class="member-alert member-alert--error">' . htmlspecialchars(memberT('error_loading', $lang)) . '</div>';
 }

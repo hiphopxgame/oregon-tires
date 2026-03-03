@@ -3,6 +3,7 @@
  * GET /api/member/my-bookings-ui.php
  *
  * Returns appointment list as HTML for dashboard tab.
+ * Bilingual EN/ES support via member-translations.php.
  */
 
 declare(strict_types=1);
@@ -10,17 +11,20 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/member-kit-init.php';
+require_once __DIR__ . '/../../includes/member-translations.php';
 
 startSecureSession();
 $pdo = getDB();
 initMemberKit($pdo);
+
+$lang = getMemberLang();
 
 try {
     requireMethod('GET');
 
     if (!MemberAuth::isMemberLoggedIn()) {
         http_response_code(401);
-        echo '<div class="member-alert member-alert--error">Please sign in to view appointments.</div>';
+        echo '<div class="member-alert member-alert--error">' . htmlspecialchars(memberT('sign_in_required', $lang)) . '</div>';
         exit;
     }
 
@@ -79,15 +83,15 @@ try {
     <div class="member-page">
         <div class="member-card member-card--wide">
             <div class="member-header">
-                <h1>My Appointments</h1>
-                <p>View and manage your service appointments</p>
+                <h1><?= htmlspecialchars(memberT('my_appointments', $lang)) ?></h1>
+                <p><?= htmlspecialchars(memberT('appt_subtitle', $lang)) ?></p>
             </div>
 
             <?php if (empty($bookings)): ?>
                 <p class="member-text-muted" style="text-align: center; padding: 2rem 0;">
-                    No appointments scheduled yet.
+                    <?= htmlspecialchars(memberT('no_appointments', $lang)) ?>
                     <a href="/book-appointment/" style="color: var(--member-accent); text-decoration: none;">
-                        Book one now →
+                        <?= htmlspecialchars(memberT('book_now', $lang)) ?>
                     </a>
                 </p>
             <?php else: ?>
@@ -100,7 +104,7 @@ try {
                                         <?= htmlspecialchars($booking['vehicle_year'] . ' ' . $booking['vehicle_make'] . ' ' . $booking['vehicle_model']) ?>
                                     </h3>
                                     <p style="margin: 0; color: var(--member-text-muted); font-size: 0.875rem;">
-                                        Ref: <?= htmlspecialchars($booking['reference_number']) ?>
+                                        <?= htmlspecialchars(memberT('ref', $lang)) ?>: <?= htmlspecialchars($booking['reference_number']) ?>
                                     </p>
                                 </div>
                                 <span style="padding: 0.25rem 0.75rem; background: var(--member-accent); color: var(--member-accent-text); border-radius: 0.25rem; font-size: 0.75rem;">
@@ -109,10 +113,10 @@ try {
                             </div>
                             <div style="margin-top: 0.5rem; font-size: 0.875rem;">
                                 <p style="margin: 0;">
-                                    Service: <strong><?= htmlspecialchars($booking['service']) ?></strong>
+                                    <?= htmlspecialchars(memberT('service', $lang)) ?>: <strong><?= htmlspecialchars($booking['service']) ?></strong>
                                 </p>
                                 <p style="margin: 0.25rem 0 0;">
-                                    Date & Time: <?= htmlspecialchars(date('M d, Y g:i A', strtotime($booking['preferred_date'] . ' ' . $booking['preferred_time']))) ?>
+                                    <?= htmlspecialchars(memberT('date_time', $lang)) ?>: <?= htmlspecialchars(date('M d, Y g:i A', strtotime($booking['preferred_date'] . ' ' . $booking['preferred_time']))) ?>
                                 </p>
                             </div>
                         </div>
@@ -126,5 +130,5 @@ try {
 } catch (\Throwable $e) {
     error_log("Oregon Tires customer/my-bookings-ui error: " . $e->getMessage());
     http_response_code(500);
-    echo '<div class="member-alert member-alert--error">Error loading appointments. Please try again.</div>';
+    echo '<div class="member-alert member-alert--error">' . htmlspecialchars(memberT('error_loading', $lang)) . '</div>';
 }

@@ -9,13 +9,9 @@
             </div>
             <div>
                 <p class="font-bold text-gray-900 dark:text-white text-lg tracking-tight">DPI Improvement Roadmap</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">4-Phase Plan &middot; 3 Months &middot; 56.84 &rarr; 95+ &middot; <a href="https://1vsm.com/scan" target="_blank" class="text-green-600 dark:text-green-400 hover:underline">View Scan</a></p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">4-Phase Plan &middot; 3 Months &middot; 56.84 &rarr; 95+</p>
             </div>
         </div>
-        <a href="https://1vsm.com/scan" target="_blank" class="px-4 py-2 bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/30 rounded-xl text-xs font-semibold hover:bg-green-500/20 transition-all inline-flex items-center gap-2 whitespace-nowrap">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            Re-Scan
-        </a>
     </div>
 
     <!-- ===== COVER / TITLE BLOCK ===== -->

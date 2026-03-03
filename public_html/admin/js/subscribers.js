@@ -264,7 +264,11 @@
   // ─── Update Badge ─────────────────────────────────────────────
   function updateSubscriberBadge(count) {
     var badge = document.getElementById('subscribers-badge');
-    if (badge) badge.textContent = count;
+    if (badge) {
+      badge.textContent = count;
+      if (count > 0) badge.classList.remove('hidden');
+      else badge.classList.add('hidden');
+    }
   }
 
   // ─── Helpers ──────────────────────────────────────────────────

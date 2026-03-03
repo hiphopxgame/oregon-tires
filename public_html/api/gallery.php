@@ -17,7 +17,7 @@ try {
     if (function_exists('cachedQuery')) {
         $images = cachedQuery(
             getDB(), 'gallery_images', 600,
-            'SELECT id, image_url, title, description, display_order, created_at
+            'SELECT id, image_url, title_en, title_es, description_en, description_es, display_order, created_at
              FROM oretir_gallery_images
              WHERE is_active = 1
              ORDER BY display_order ASC',
@@ -26,7 +26,7 @@ try {
     } else {
         $db = getDB();
         $stmt = $db->query(
-            'SELECT id, image_url, title, description, display_order, created_at
+            'SELECT id, image_url, title_en, title_es, description_en, description_es, display_order, created_at
              FROM oretir_gallery_images
              WHERE is_active = 1
              ORDER BY display_order ASC'

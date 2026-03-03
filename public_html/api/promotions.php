@@ -19,7 +19,7 @@ try {
     $now = date('Y-m-d H:i:s');
     $stmt = $db->prepare(
         'SELECT id, title_en, title_es, body_en, body_es, cta_text_en, cta_text_es,
-                cta_url, bg_color, text_color, badge_text, starts_at, ends_at
+                cta_url, bg_color, text_color, badge_text, image_url, starts_at, ends_at
          FROM oretir_promotions
          WHERE is_active = 1
            AND (starts_at IS NULL OR starts_at <= ?)

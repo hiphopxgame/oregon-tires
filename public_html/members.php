@@ -12,6 +12,7 @@ require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/member-kit-init.php';
 require_once __DIR__ . '/includes/engine-kit-init.php';
+require_once __DIR__ . '/includes/member-translations.php';
 
 // Override bootstrap's application/json — this is an HTML page
 header('Content-Type: text/html; charset=utf-8');
@@ -26,6 +27,8 @@ startSecureSession();
 $pdo = getDB();
 initMemberKit($pdo);
 initEngineKit();
+
+$lang = getMemberLang();
 
 // Set default return URL for login form
 if (!MemberAuth::isMemberLoggedIn() && !isset($_GET['return'])) {
@@ -46,39 +49,57 @@ $memberDashboardConfig = [
     'footer_include' => __DIR__ . '/templates/footer.php',
 ];
 
-// Define Oregon Tires custom dashboard tabs
+// Define Oregon Tires custom dashboard tabs (bilingual)
 $memberDashboardTabs = [
     [
         'id'           => 'appointments',
-        'label'        => 'My Appointments',
+        'label'        => memberT('my_appointments', $lang),
         'icon'         => '📅',
         'api_endpoint' => '/api/member/my-bookings-ui.php',
     ],
     [
         'id'           => 'vehicles',
-        'label'        => 'My Vehicles',
+        'label'        => memberT('my_vehicles', $lang),
         'icon'         => '🚗',
         'api_endpoint' => '/api/member/my-vehicles.php',
     ],
     [
         'id'           => 'estimates',
-        'label'        => 'Estimates & Reports',
+        'label'        => memberT('estimates_reports', $lang),
         'icon'         => '📋',
         'api_endpoint' => '/api/member/my-estimates.php',
     ],
     [
         'id'           => 'messages',
-        'label'        => 'Messages',
+        'label'        => memberT('messages', $lang),
         'icon'         => '💬',
         'api_endpoint' => '/api/member/my-messages.php',
     ],
     [
         'id'           => 'care-plan',
-        'label'        => 'Care Plan',
+        'label'        => memberT('care_plan', $lang),
         'icon'         => '🛡️',
         'api_endpoint' => '/api/member/my-care-plan.php',
     ],
 ];
+
+// Admin-only tab: Customer Directory
+$isShopAdmin = false;
+if (MemberAuth::isMemberLoggedIn()) {
+    $member = MemberAuth::getCurrentMember();
+    $adminCheck = $pdo->prepare('SELECT id FROM oretir_admin_users WHERE email = ? AND role IN (?, ?) LIMIT 1');
+    $adminCheck->execute([$member['email'] ?? '', 'admin', 'superadmin']);
+    $isShopAdmin = (bool) $adminCheck->fetch();
+}
+
+if ($isShopAdmin) {
+    $memberDashboardTabs[] = [
+        'id'           => 'customers',
+        'label'        => memberT('customer_directory', $lang),
+        'icon'         => '👥',
+        'api_endpoint' => '/api/member/my-customers.php',
+    ];
+}
 
 // Load universal dashboard template
 require MEMBER_KIT_PATH . '/templates/member/dashboard.php';
