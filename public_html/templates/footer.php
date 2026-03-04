@@ -24,6 +24,9 @@
           <li><a href="/wheel-alignment" class="hover:text-amber-300 transition">Wheel Alignment</a></li>
           <li><a href="/brake-service" class="hover:text-amber-300 transition">Brake Service</a></li>
           <li><a href="/oil-change" class="hover:text-amber-300 transition">Oil Change</a></li>
+          <li><a href="/engine-diagnostics" class="hover:text-amber-300 transition">Engine Diagnostics</a></li>
+          <li><a href="/suspension-repair" class="hover:text-amber-300 transition">Suspension Repair</a></li>
+          <li><a href="/fleet-services" class="hover:text-amber-300 transition">Fleet Services</a></li>
         </ul>
       </div>
       <div>
