@@ -169,6 +169,9 @@
                         <span id="vehicle-color" class="hidden"></span>
                         <span id="vehicle-plate" class="hidden"></span>
                     </div>
+                    <p id="inspection-date" class="hidden text-sm text-gray-500 dark:text-gray-400 mt-2">
+                        <span data-t="inspDate">Inspection Date</span>: <strong id="inspection-date-value"></strong>
+                    </p>
                 </div>
 
                 <!-- Summary Counts -->
@@ -251,7 +254,8 @@
 
 <!-- Photo Overlay -->
 <div id="photo-overlay" class="fixed inset-0 z-50 bg-black/80 hidden items-center justify-center p-4" onclick="closePhoto()">
-    <div class="max-w-3xl w-full">
+    <button onclick="closePhoto()" class="fixed top-4 right-4 z-50 text-white text-4xl leading-none font-light w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition" aria-label="Close">&times;</button>
+    <div class="max-w-3xl w-full" onclick="event.stopPropagation()">
         <img id="photo-overlay-img" src="" class="w-full rounded-xl" alt="">
         <p id="photo-overlay-caption" class="text-white text-center mt-3 text-sm"></p>
     </div>
@@ -296,6 +300,7 @@ const t = {
         urgent: 'Urgent / Safety',
         viewEstimate: 'Review & Approve Estimate',
         techNotes: 'Technician Notes',
+        inspDate: 'Inspection Date',
         printReport: 'Print Report',
         overallHealth: 'Overall Vehicle Health',
         scorecard: 'Vehicle Scorecard',
@@ -311,20 +316,21 @@ const t = {
     },
     es: {
         backToHome: 'Volver al Inicio',
-        loading: 'Cargando reporte de inspeccion...',
-        errorTitle: 'Enlace Invalido',
+        loading: 'Cargando reporte de inspección...',
+        errorTitle: 'Enlace Inválido',
         goHome: 'Ir al Inicio',
-        inspTitle: 'Reporte de Inspeccion del Vehiculo',
+        inspTitle: 'Reporte de Inspección del Vehículo',
+        inspDate: 'Fecha de Inspección',
         roLabel: 'OT:',
         good: 'Bueno',
-        attention: 'Atencion Pronto',
+        attention: 'Atención Pronto',
         urgent: 'Urgente / Seguridad',
         viewEstimate: 'Revisar y Aprobar Presupuesto',
-        techNotes: 'Notas del Tecnico',
+        techNotes: 'Notas del Técnico',
         printReport: 'Imprimir Reporte',
-        overallHealth: 'Salud General del Vehiculo',
-        scorecard: 'Tarjeta de Calificacion',
-        needsAttentionNow: 'Necesita Atencion Ahora',
+        overallHealth: 'Salud General del Vehículo',
+        scorecard: 'Tarjeta de Calificación',
+        needsAttentionNow: 'Necesita Atención Ahora',
         watchList: 'Lista de Seguimiento',
         lookingGreat: 'En Buen Estado',
         detailedFindings: 'Hallazgos Detallados',
@@ -332,11 +338,11 @@ const t = {
         hideItems: 'Ocultar elementos',
         shareReport: 'Compartir',
         shareCopied: 'Enlace copiado!',
-        safetyItemsWarning: ' elemento(s) de seguridad necesitan atencion',
+        safetyItemsWarning: ' elemento(s) de seguridad necesitan atención',
     }
 };
 
-const overallLabels = { en: { green: 'GOOD', yellow: 'ATTENTION', red: 'URGENT' }, es: { green: 'BUENO', yellow: 'ATENCION', red: 'URGENTE' } };
+const overallLabels = { en: { green: 'GOOD', yellow: 'ATTENTION', red: 'URGENT' }, es: { green: 'BUENO', yellow: 'ATENCIÓN', red: 'URGENTE' } };
 
 // Friendly language descriptions: category x tier x lang (12 categories x 5 tiers x 2 langs)
 var gradeDescriptions = {
@@ -428,88 +434,88 @@ var gradeDescriptions = {
     },
     es: {
         tires: {
-            excellent: 'Sus neumaticos estan en excelente condicion con suficiente vida de rodadura.',
-            good: 'Los neumaticos estan en buen estado. Siga monitoreando la profundidad del dibujo.',
-            fair: 'Se detecto algun desgaste en los neumaticos. Considere un reemplazo proximo.',
+            excellent: 'Sus neumáticos están en excelente condición con suficiente vida de rodadura.',
+            good: 'Los neumáticos están en buen estado. Siga monitoreando la profundidad del dibujo.',
+            fair: 'Se detectó algún desgaste en los neumáticos. Considere un reemplazo próximo.',
             poor: 'Desgaste significativo encontrado. Se recomienda reemplazo pronto por seguridad.',
-            critical: 'Los neumaticos necesitan reemplazo inmediato. Es un tema de seguridad.'
+            critical: 'Los neumáticos necesitan reemplazo inmediato. Es un tema de seguridad.'
         },
         brakes: {
-            excellent: 'El sistema de frenos esta funcionando en condicion optima.',
-            good: 'Los frenos estan en buen estado con vida util adecuada.',
-            fair: 'El desgaste de frenos esta avanzando. Planifique servicio en los proximos meses.',
-            poor: 'Las pastillas de freno se estan desgastando. Servicio recomendado pronto.',
+            excellent: 'El sistema de frenos está funcionando en condición óptima.',
+            good: 'Los frenos están en buen estado con vida útil adecuada.',
+            fair: 'El desgaste de frenos está avanzando. Planifique servicio en los próximos meses.',
+            poor: 'Las pastillas de freno se están desgastando. Servicio recomendado pronto.',
             critical: 'El sistema de frenos necesita servicio inmediato. Es un tema de seguridad.'
         },
         suspension: {
-            excellent: 'Todos los componentes de suspension estan en excelente condicion.',
-            good: 'La suspension funciona bien sin preocupaciones inmediatas.',
-            fair: 'Se detecto algun desgaste en la suspension. Monitoree cambios en la conduccion.',
-            poor: 'Problemas de suspension encontrados que afectan la calidad de manejo.',
-            critical: 'Problemas de suspension necesitan atencion inmediata para conducir seguro.'
+            excellent: 'Todos los componentes de suspensión están en excelente condición.',
+            good: 'La suspensión funciona bien sin preocupaciones inmediatas.',
+            fair: 'Se detectó algún desgaste en la suspensión. Monitoree cambios en la conducción.',
+            poor: 'Problemas de suspensión encontrados que afectan la calidad de manejo.',
+            critical: 'Problemas de suspensión necesitan atención inmediata para conducir seguro.'
         },
         fluids: {
             excellent: 'Todos los niveles y condiciones de fluidos son excelentes.',
-            good: 'Los fluidos estan en niveles adecuados y en buena condicion.',
-            fair: 'Algunos fluidos pueden necesitar atencion en su proximo servicio.',
-            poor: 'Los niveles o condiciones de fluidos necesitan atencion pronto.',
-            critical: 'Problemas criticos de fluidos encontrados. Servicio necesario de inmediato.'
+            good: 'Los fluidos están en niveles adecuados y en buena condición.',
+            fair: 'Algunos fluidos pueden necesitar atención en su próximo servicio.',
+            poor: 'Los niveles o condiciones de fluidos necesitan atención pronto.',
+            critical: 'Problemas críticos de fluidos encontrados. Servicio necesario de inmediato.'
         },
         lights: {
             excellent: 'Todas las luces funcionan perfectamente.',
-            good: 'El sistema de iluminacion esta en buen estado.',
-            fair: 'Algunas luces pueden necesitar atencion pronto.',
-            poor: 'Multiples problemas de iluminacion encontrados. Reparacion recomendada.',
-            critical: 'Fallas criticas de iluminacion. Reparacion inmediata necesaria por seguridad.'
+            good: 'El sistema de iluminación está en buen estado.',
+            fair: 'Algunas luces pueden necesitar atención pronto.',
+            poor: 'Múltiples problemas de iluminación encontrados. Reparación recomendada.',
+            critical: 'Fallas críticas de iluminación. Reparación inmediata necesaria por seguridad.'
         },
         engine: {
             excellent: 'El motor funciona suavemente sin preocupaciones.',
             good: 'El rendimiento del motor es bueno con elementos menores a vigilar.',
-            fair: 'El motor tiene elementos que deben atenderse en el proximo servicio.',
-            poor: 'Problemas del motor detectados que necesitan atencion pronto.',
-            critical: 'Problemas del motor necesitan diagnostico y reparacion inmediata.'
+            fair: 'El motor tiene elementos que deben atenderse en el próximo servicio.',
+            poor: 'Problemas del motor detectados que necesitan atención pronto.',
+            critical: 'Problemas del motor necesitan diagnóstico y reparación inmediata.'
         },
         exhaust: {
-            excellent: 'El sistema de escape esta en excelente condicion.',
+            excellent: 'El sistema de escape está en excelente condición.',
             good: 'El sistema de escape funciona correctamente.',
-            fair: 'Desgaste menor del escape detectado. Monitorear en la proxima visita.',
-            poor: 'Problemas de escape encontrados que necesitan reparacion.',
-            critical: 'Falla del sistema de escape. Reparacion inmediata recomendada.'
+            fair: 'Desgaste menor del escape detectado. Monitorear en la próxima visita.',
+            poor: 'Problemas de escape encontrados que necesitan reparación.',
+            critical: 'Falla del sistema de escape. Reparación inmediata recomendada.'
         },
         hoses: {
-            excellent: 'Todas las mangueras estan en excelente condicion.',
-            good: 'Las mangueras estan en buen estado sin desgaste visible.',
-            fair: 'Se detecto algun desgaste en mangueras. Planifique reemplazo.',
+            excellent: 'Todas las mangueras están en excelente condición.',
+            good: 'Las mangueras están en buen estado sin desgaste visible.',
+            fair: 'Se detectó algún desgaste en mangueras. Planifique reemplazo.',
             poor: 'Mangueras con desgaste significativo. Reemplace pronto para evitar fugas.',
             critical: 'Riesgo alto de falla de mangueras. Reemplazo inmediato necesario.'
         },
         belts: {
-            excellent: 'Todas las correas estan en excelente condicion.',
-            good: 'Las correas estan en buena condicion con desgaste normal.',
-            fair: 'El desgaste de correas esta avanzando. Planifique reemplazo.',
-            poor: 'Las correas estan desgastadas y deben reemplazarse pronto.',
+            excellent: 'Todas las correas están en excelente condición.',
+            good: 'Las correas están en buena condición con desgaste normal.',
+            fair: 'El desgaste de correas está avanzando. Planifique reemplazo.',
+            poor: 'Las correas están desgastadas y deben reemplazarse pronto.',
             critical: 'Falla de correa es inminente. Reemplace inmediatamente.'
         },
         battery: {
-            excellent: 'La bateria esta en excelente condicion con carga fuerte.',
-            good: 'La bateria funciona bien.',
-            fair: 'La bateria muestra algo de edad. Considere pruebas en el proximo servicio.',
-            poor: 'La bateria esta debil. Reemplazo recomendado para evitar fallas.',
-            critical: 'La bateria esta fallando. Reemplace inmediatamente.'
+            excellent: 'La batería está en excelente condición con carga fuerte.',
+            good: 'La batería funciona bien.',
+            fair: 'La batería muestra algo de edad. Considere pruebas en el próximo servicio.',
+            poor: 'La batería está débil. Reemplazo recomendado para evitar fallas.',
+            critical: 'La batería está fallando. Reemplace inmediatamente.'
         },
         wipers: {
-            excellent: 'Las plumas limpiaparabrisas estan en excelente condicion.',
+            excellent: 'Las plumas limpiaparabrisas están en excelente condición.',
             good: 'Los limpiaparabrisas funcionan correctamente.',
             fair: 'Las plumas muestran algo de desgaste. Reemplace antes de la temporada de lluvias.',
-            poor: 'Las plumas estan desgastadas. Reemplace para visibilidad clara.',
+            poor: 'Las plumas están desgastadas. Reemplace para visibilidad clara.',
             critical: 'Los limpiaparabrisas no limpian correctamente. Reemplace para conducir seguro.'
         },
         other: {
-            excellent: 'Todos los demas elementos inspeccionados estan en excelente condicion.',
-            good: 'Otros componentes estan en buen estado.',
-            fair: 'Algunos elementos necesitan atencion en su proxima visita.',
-            poor: 'Varios elementos necesitan atencion pronto.',
-            critical: 'Problemas criticos encontrados que necesitan atencion inmediata.'
+            excellent: 'Todos los demás elementos inspeccionados están en excelente condición.',
+            good: 'Otros componentes están en buen estado.',
+            fair: 'Algunos elementos necesitan atención en su próxima visita.',
+            poor: 'Varios elementos necesitan atención pronto.',
+            critical: 'Problemas críticos encontrados que necesitan atención inmediata.'
         }
     }
 };
@@ -531,7 +537,7 @@ function applyTranslations() {
 
 var categoryLabels = {
     en: {tires:'Tires',brakes:'Brakes',suspension:'Suspension',fluids:'Fluids',lights:'Lights',engine:'Engine',exhaust:'Exhaust',hoses:'Hoses',belts:'Belts',battery:'Battery',wipers:'Wipers',other:'Other'},
-    es: {tires:'Neumaticos',brakes:'Frenos',suspension:'Suspension',fluids:'Fluidos',lights:'Luces',engine:'Motor',exhaust:'Escape',hoses:'Mangueras',belts:'Correas',battery:'Bateria',wipers:'Limpiaparabrisas',other:'Otro'}
+    es: {tires:'Neumáticos',brakes:'Frenos',suspension:'Suspensión',fluids:'Fluidos',lights:'Luces',engine:'Motor',exhaust:'Escape',hoses:'Mangueras',belts:'Correas',battery:'Batería',wipers:'Limpiaparabrisas',other:'Otro'}
 };
 
 var ratingStyles = {
@@ -646,7 +652,7 @@ function buildHealthScoreRing(score) {
 
     var tierLabels = {
         en: { excellent: 'Excellent', good: 'Good', fair: 'Fair', poor: 'Poor', critical: 'Critical' },
-        es: { excellent: 'Excelente', good: 'Bueno', fair: 'Regular', poor: 'Deficiente', critical: 'Critico' }
+        es: { excellent: 'Excelente', good: 'Bueno', fair: 'Regular', poor: 'Deficiente', critical: 'Crítico' }
     };
 
     var container = document.getElementById('health-score-ring');
@@ -1068,6 +1074,16 @@ async function loadInspection() {
         if (data.vin) { var el = document.getElementById('vehicle-vin'); el.textContent = 'VIN: ' + data.vin; el.classList.remove('hidden'); }
         if (data.vehicle_color) { var el2 = document.getElementById('vehicle-color'); el2.textContent = data.vehicle_color; el2.classList.remove('hidden'); }
         if (data.license_plate) { var el3 = document.getElementById('vehicle-plate'); el3.textContent = data.license_plate; el3.classList.remove('hidden'); }
+
+        if (data.created_at) {
+            var dateObj = new Date(data.created_at);
+            var opts = currentLang === 'es'
+                ? { year: 'numeric', month: 'long', day: 'numeric' }
+                : { year: 'numeric', month: 'long', day: 'numeric' };
+            var locale = currentLang === 'es' ? 'es-MX' : 'en-US';
+            document.getElementById('inspection-date-value').textContent = dateObj.toLocaleDateString(locale, opts);
+            document.getElementById('inspection-date').classList.remove('hidden');
+        }
 
         // Overall badge (letter grade replaces text after scoring)
         var badge = document.getElementById('overall-badge');
