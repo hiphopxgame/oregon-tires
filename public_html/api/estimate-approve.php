@@ -58,6 +58,13 @@ try {
         );
         $itemStmt->execute([$est['id']]);
 
+        // Get linked inspection token for "View Full Inspection" link
+        $inspTokenStmt = $db->prepare(
+            'SELECT i.customer_view_token FROM oretir_inspections i WHERE i.repair_order_id = ? AND i.customer_view_token IS NOT NULL ORDER BY i.id DESC LIMIT 1'
+        );
+        $inspTokenStmt->execute([$est['repair_order_id']]);
+        $inspectionToken = $inspTokenStmt->fetchColumn() ?: null;
+
         $result = [
             'customer_name'    => trim($est['first_name'] . ' ' . $est['last_name']),
             'customer_language' => $est['language'],
@@ -75,6 +82,7 @@ try {
             'created_at'       => $est['created_at'],
             'items'            => $itemStmt->fetchAll(PDO::FETCH_ASSOC),
             'can_respond'      => in_array($est['status'], ['sent', 'viewed'], true),
+            'inspection_token' => $inspectionToken,
         ];
 
         jsonSuccess($result);

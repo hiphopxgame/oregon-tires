@@ -14,7 +14,7 @@
         html, body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .dark { color-scheme: light !important; }
 
-        header, footer, #lang-toggle, #print-estimate-btn, #action-buttons { display: none !important; }
+        header, footer, #lang-toggle, #print-estimate-btn, #action-buttons, #inspection-link-wrap { display: none !important; }
 
         #items-list input[type="checkbox"] { display: none !important; }
 
@@ -113,6 +113,7 @@
 
             <!-- Header Card -->
             <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-6 shadow-sm">
+                <p id="customer-greeting" class="text-sm text-gray-500 dark:text-gray-400 mb-2"></p>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1" data-t="estTitle">Service Estimate</h1>
                 <div class="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
                     <span><span data-t="roLabel">RO:</span> <strong id="ro-number"></strong></span>
@@ -123,6 +124,14 @@
                 <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 mt-4">
                     <p class="font-semibold text-gray-900 dark:text-white" id="vehicle-name"></p>
                 </div>
+            </div>
+
+            <!-- View Inspection Link -->
+            <div id="inspection-link-wrap" class="hidden mb-4">
+                <a id="inspection-link" href="#" class="inline-flex items-center gap-2 text-sm text-green-600 dark:text-green-400 hover:underline font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <span data-t="viewInspection">View Full Inspection</span>
+                </a>
             </div>
 
             <!-- Print Button -->
@@ -284,6 +293,11 @@ var t = {
         typeSubletLabel: 'SUBLET',
         submitError: 'Failed to submit. Please try again.',
         networkError: 'Network error. Please try again.',
+        greeting: 'Hello',
+        viewInspection: 'View Full Inspection',
+        approveXofY: 'Approve {x} of {y} Services',
+        declineAll: 'Decline All',
+        approveAll: 'Approve All Services',
     },
     es: {
         backToHome: 'Volver al Inicio',
@@ -325,6 +339,11 @@ var t = {
         typeSubletLabel: 'SUBCONTRATO',
         submitError: 'Error al enviar. Por favor intente de nuevo.',
         networkError: 'Error de red. Por favor intente de nuevo.',
+        greeting: 'Hola',
+        viewInspection: 'Ver Inspección Completa',
+        approveXofY: 'Aprobar {x} de {y} Servicios',
+        declineAll: 'Rechazar Todos',
+        approveAll: 'Aprobar Todos los Servicios',
     }
 };
 
@@ -383,6 +402,12 @@ function toggleLanguage() {
     applyTranslations();
     updateItemTranslations();
     updatePrioritySummary();
+    updateButtonLabel();
+    // Refresh greeting with new language
+    var greetEl = document.getElementById('customer-greeting');
+    if (greetEl && greetEl._customerName) {
+        greetEl.textContent = (t[currentLang].greeting || 'Hello') + ', ' + greetEl._customerName;
+    }
 }
 
 function applyTranslations() {
@@ -438,6 +463,7 @@ function buildItemRow(item) {
     checkbox.addEventListener('change', function() {
         itemApprovals[item.id] = this.checked;
         recalculateTotals();
+        updateButtonLabel();
     });
 
     var textWrap = document.createElement('div');
@@ -601,6 +627,22 @@ function recalculateTotals() {
     updatePrioritySummary();
 }
 
+function updateButtonLabel() {
+    var total = Object.keys(itemApprovals).length;
+    var approved = 0;
+    for (var id in itemApprovals) { if (itemApprovals[id]) approved++; }
+    var btn = document.getElementById('approve-btn');
+    if (!btn) return;
+    var span = btn.querySelector('span');
+    if (approved === 0) {
+        span.textContent = t[currentLang].declineAll;
+    } else if (approved === total) {
+        span.textContent = t[currentLang].approveAll;
+    } else {
+        span.textContent = (t[currentLang].approveXofY || 'Approve {x} of {y} Services').replace('{x}', approved).replace('{y}', total);
+    }
+}
+
 async function loadEstimate() {
     var params = new URLSearchParams(window.location.search);
     estimateToken = params.get('token');
@@ -617,6 +659,19 @@ async function loadEstimate() {
         if (data.customer_language === 'spanish') {
             currentLang = 'es';
             applyTranslations();
+        }
+
+        // #13: Customer greeting
+        if (data.customer_name) {
+            var greetEl = document.getElementById('customer-greeting');
+            greetEl.textContent = (t[currentLang].greeting || 'Hello') + ', ' + data.customer_name;
+            greetEl._customerName = data.customer_name;
+        }
+
+        // #14: Inspection link
+        if (data.inspection_token) {
+            document.getElementById('inspection-link').href = '/inspection/' + encodeURIComponent(data.inspection_token);
+            document.getElementById('inspection-link-wrap').classList.remove('hidden');
         }
 
         document.getElementById('ro-number').textContent = data.ro_number;
@@ -642,10 +697,13 @@ async function loadEstimate() {
 
         // Update priority summary with initial totals
         updatePrioritySummary();
+        updateButtonLabel();
 
         if (data.valid_until) {
             var vu = document.getElementById('valid-until');
-            vu.textContent = (t[currentLang].validUntil || 'Valid until') + ': ' + data.valid_until;
+            var locale = currentLang === 'es' ? 'es-MX' : 'en-US';
+            var formattedDate = new Date(data.valid_until).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
+            vu.textContent = (t[currentLang].validUntil || 'Valid until') + ': ' + formattedDate;
         }
 
         // Notes
