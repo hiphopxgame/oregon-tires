@@ -969,7 +969,7 @@ function shareReport() {
             var origText = btn.querySelector('span').textContent;
             btn.querySelector('span').textContent = t[currentLang].shareCopied || 'Link copied!';
             setTimeout(function() { btn.querySelector('span').textContent = origText; }, 2000);
-        });
+        }).catch(function() {});
     }
 }
 

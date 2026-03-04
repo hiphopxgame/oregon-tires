@@ -268,6 +268,7 @@ var t = {
         msgDeclined: 'No services were approved. Please contact us if you change your mind or have questions.',
         validUntil: 'Valid until',
         approved: 'Approved',
+        partiallyApproved: 'Partially Approved',
         declined: 'Declined',
         submitting: 'Submitting...',
         printEstimate: 'Print Estimate',
@@ -300,6 +301,7 @@ var t = {
         msgDeclined: 'Ningun servicio fue aprobado. Contactenos si cambia de opinion o tiene preguntas.',
         validUntil: 'Valido hasta',
         approved: 'Aprobado',
+        partiallyApproved: 'Parcialmente Aprobado',
         declined: 'Rechazado',
         submitting: 'Enviando...',
         printEstimate: 'Imprimir Presupuesto',
@@ -565,7 +567,7 @@ async function loadEstimate() {
     if (!estimateToken) return showError('No estimate token provided.');
 
     try {
-        var res = await fetch('/api/estimate-approve.php?token=' + encodeURIComponent(estimateToken));
+        var res = await fetch('/api/estimate-approve.php?token=' + encodeURIComponent(estimateToken), { credentials: 'include' });
         var json = await res.json();
 
         if (!json.success) return showError(json.error || 'Estimate not found.');
@@ -616,7 +618,7 @@ async function loadEstimate() {
         if (!data.can_respond) {
             document.getElementById('action-buttons').classList.add('hidden');
             var statusLabel = data.status === 'approved' ? (t[currentLang].approved || 'Approved') :
-                             data.status === 'partial' ? (t[currentLang].approved || 'Partially Approved') :
+                             data.status === 'partial' ? (t[currentLang].partiallyApproved || 'Partially Approved') :
                              (t[currentLang].declined || 'Declined');
             document.getElementById('responded-status').textContent = statusLabel;
             document.getElementById('responded-state').classList.remove('hidden');
@@ -647,6 +649,7 @@ async function submitApproval() {
         var res = await fetch('/api/estimate-approve.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
                 token: estimateToken,
                 approvals: itemApprovals
