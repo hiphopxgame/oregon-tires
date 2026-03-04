@@ -39,11 +39,20 @@
     .dark .score-ring-bg { stroke: #374151; }
     .score-ring-pct { fill: #6b7280; }
     .dark .score-ring-pct { fill: #9ca3af; }
+    /* Details chevron rotation */
+    details[open] > summary svg { transform: rotate(90deg); }
+    /* Respect reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+        .animate-pulse { animation: none !important; }
+        .score-ring-circle { transition: none !important; }
+        .scorecard-row { transition: none !important; }
+    }
     /* Mobile: show full description */
     @media (max-width: 639px) {
         .scorecard-desc { white-space: normal; overflow: visible; text-overflow: unset; }
     }
 
+    @page { margin: 0.75in; size: letter portrait; }
     @media print {
         html, body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .dark { color-scheme: light !important; }
@@ -255,9 +264,12 @@
 <!-- Photo Overlay -->
 <div id="photo-overlay" class="fixed inset-0 z-50 bg-black/80 hidden items-center justify-center p-4" onclick="closePhoto()">
     <button onclick="closePhoto()" class="fixed top-4 right-4 z-50 text-white text-4xl leading-none font-light w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition" aria-label="Close">&times;</button>
+    <button id="photo-prev" onclick="event.stopPropagation(); navigatePhoto(-1)" class="fixed left-3 top-1/2 -translate-y-1/2 z-50 text-white text-3xl w-11 h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition" aria-label="Previous">&#8249;</button>
+    <button id="photo-next" onclick="event.stopPropagation(); navigatePhoto(1)" class="fixed right-3 top-1/2 -translate-y-1/2 z-50 text-white text-3xl w-11 h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition" aria-label="Next">&#8250;</button>
     <div class="max-w-3xl w-full" onclick="event.stopPropagation()">
         <img id="photo-overlay-img" src="" class="w-full rounded-xl" alt="">
         <p id="photo-overlay-caption" class="text-white text-center mt-3 text-sm"></p>
+        <p id="photo-overlay-counter" class="text-white/60 text-center mt-1 text-xs"></p>
     </div>
 </div>
 
@@ -313,6 +325,8 @@ const t = {
         shareReport: 'Share',
         shareCopied: 'Link copied!',
         safetyItemsWarning: ' safety item(s) need attention',
+        scheduleRepair: 'Schedule a Repair',
+        photoOf: 'of',
     },
     es: {
         backToHome: 'Volver al Inicio',
@@ -339,6 +353,8 @@ const t = {
         shareReport: 'Compartir',
         shareCopied: 'Enlace copiado!',
         safetyItemsWarning: ' elemento(s) de seguridad necesitan atención',
+        scheduleRepair: 'Agendar una Reparación',
+        photoOf: 'de',
     }
 };
 
@@ -979,12 +995,45 @@ function shareReport() {
     }
 }
 
+var allPhotos = [];
+var currentPhotoIndex = 0;
+var touchStartX = 0;
+
+function collectAllPhotos(data) {
+    allPhotos = [];
+    (data.items || []).forEach(function(item) {
+        if (item.photos && item.photos.length > 0) {
+            item.photos.forEach(function(p) {
+                allPhotos.push({ url: p.image_url, caption: p.caption || '' });
+            });
+        }
+    });
+}
+
 function showPhoto(url, caption) {
+    // Find index in allPhotos
+    currentPhotoIndex = allPhotos.findIndex(function(p) { return p.url === url; });
+    if (currentPhotoIndex === -1) currentPhotoIndex = 0;
+    renderOverlayPhoto();
     var overlay = document.getElementById('photo-overlay');
-    document.getElementById('photo-overlay-img').src = url;
-    document.getElementById('photo-overlay-caption').textContent = caption || '';
     overlay.classList.remove('hidden');
     overlay.classList.add('flex');
+}
+
+function renderOverlayPhoto() {
+    var photo = allPhotos[currentPhotoIndex];
+    if (!photo) return;
+    document.getElementById('photo-overlay-img').src = photo.url;
+    document.getElementById('photo-overlay-caption').textContent = photo.caption;
+    document.getElementById('photo-overlay-counter').textContent = (currentPhotoIndex + 1) + ' ' + (t[currentLang].photoOf || 'of') + ' ' + allPhotos.length;
+    // Show/hide arrows
+    document.getElementById('photo-prev').style.display = allPhotos.length > 1 ? '' : 'none';
+    document.getElementById('photo-next').style.display = allPhotos.length > 1 ? '' : 'none';
+}
+
+function navigatePhoto(dir) {
+    currentPhotoIndex = (currentPhotoIndex + dir + allPhotos.length) % allPhotos.length;
+    renderOverlayPhoto();
 }
 
 function closePhoto() {
@@ -992,6 +1041,27 @@ function closePhoto() {
     overlay.classList.add('hidden');
     overlay.classList.remove('flex');
 }
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+    var overlay = document.getElementById('photo-overlay');
+    if (overlay.classList.contains('hidden')) return;
+    if (e.key === 'ArrowLeft') { navigatePhoto(-1); e.preventDefault(); }
+    else if (e.key === 'ArrowRight') { navigatePhoto(1); e.preventDefault(); }
+    else if (e.key === 'Escape') { closePhoto(); e.preventDefault(); }
+});
+
+// Touch swipe
+document.getElementById('photo-overlay').addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+document.getElementById('photo-overlay').addEventListener('touchend', function(e) {
+    var delta = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(delta) > 50) {
+        navigatePhoto(delta < 0 ? 1 : -1);
+        e.preventDefault();
+    }
+});
 
 function createTextEl(tag, text, className) {
     var el = document.createElement(tag);
@@ -1034,12 +1104,17 @@ function buildItemRow(item) {
 
     if (item.photos && item.photos.length > 0) {
         var photoWrap = document.createElement('div');
-        photoWrap.className = 'flex gap-2 mt-2 ml-6 overflow-x-auto';
+        photoWrap.className = 'flex gap-2 mt-2 ml-6 overflow-x-auto scroll-snap-x';
+        photoWrap.style.scrollSnapType = 'x mandatory';
         item.photos.forEach(function(p) {
             var img = document.createElement('img');
             img.src = p.image_url;
-            img.alt = p.caption || '';
+            img.alt = p.caption || 'Inspection photo';
+            img.loading = 'lazy';
+            img.decoding = 'async';
             img.className = 'w-20 h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer flex-shrink-0';
+            img.style.scrollSnapAlign = 'start';
+            img.onerror = function() { this.style.display = 'none'; };
             img.addEventListener('click', function(e) { e.stopPropagation(); showPhoto(p.image_url, p.caption || ''); });
             photoWrap.appendChild(img);
         });
@@ -1098,6 +1173,9 @@ async function loadInspection() {
         document.getElementById('yellow-count').textContent = data.yellow_count;
         document.getElementById('red-count').textContent = data.red_count;
 
+        // Collect all photos for overlay navigation
+        collectAllPhotos(data);
+
         // Build report card (score ring, scorecard, priority sections)
         renderReportCard(data);
 
@@ -1142,10 +1220,17 @@ async function loadInspection() {
             container.appendChild(section);
         });
 
-        // Estimate CTA
+        // Estimate CTA or Booking CTA
         if (data.estimate_token) {
             document.getElementById('estimate-link').href = '/approve/' + encodeURIComponent(data.estimate_token);
             document.getElementById('estimate-cta').classList.remove('hidden');
+        } else if (data.red_count > 0 || data.yellow_count > 0) {
+            var ctaDiv = document.getElementById('estimate-cta');
+            var ctaLink = document.getElementById('estimate-link');
+            ctaLink.href = '/book-appointment/';
+            ctaLink.querySelector('[data-t="viewEstimate"]').setAttribute('data-t', 'scheduleRepair');
+            ctaLink.querySelector('[data-t="scheduleRepair"]').textContent = t[currentLang].scheduleRepair;
+            ctaDiv.classList.remove('hidden');
         }
 
         // Notes

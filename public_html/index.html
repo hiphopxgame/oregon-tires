@@ -48,7 +48,7 @@
   <meta name="twitter:description" content="Professional tire sales, installation, brakes & auto care in Portland, OR. Bilingual English & Spanish service.">
   <meta name="twitter:image" content="https://oregon.tires/assets/og-image.jpg">
 
-  <!-- Structured Data -->
+  <!-- Structured Data — TODO: server-render aggregateRating values from DB settings -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -255,7 +255,7 @@
         "name": "Do you offer financing?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "We offer flexible payment options including cash, all major credit cards, and payment arrangements for larger repairs. Ask about our Care Plan membership for monthly savings."
+          "text": "We offer flexible payment options including cash, all major credit cards, and payment arrangements for larger repairs."
         }
       },
       {
@@ -781,7 +781,7 @@
       <a href="#gallery" class="block py-2 text-brand dark:text-green-400" data-t="gallery">Promotions</a>
       <a href="#faq" class="block py-2 text-brand dark:text-green-400" data-t="faqNav">FAQ</a>
       <a href="#contact" class="block py-2 text-brand dark:text-green-400" data-t="contact">Contact</a>
-      <a href="/book-appointment" class="block py-2 text-brand dark:text-green-400 font-semibold" data-t="getFreeEstimate">Free Estimate</a>
+      <a href="/book-appointment" class="block bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold text-center hover:bg-amber-600 transition mt-2" data-t="getFreeEstimate">Free Estimate</a>
     </div>
   </header>
 
@@ -799,7 +799,7 @@
       <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90" data-t="heroSubtitle">Professional tire installation, repair, and complete automotive services. We speak Spanish and English!</p>
       <div class="flex flex-col sm:flex-row justify-center gap-3 flex-wrap">
         <a href="/book-appointment/" class="bg-amber-500 text-black px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-lg text-center" data-t="getFreeEstimate">Get Your Free Estimate</a>
-        <a href="#services" class="bg-white/90 text-brand px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-white transition text-center" data-t="viewPricing">View Services & Pricing</a>
+        <a href="#pricing" class="bg-white/90 text-brand px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-white transition text-center" data-t="viewPricing">View Services & Pricing</a>
         <a href="tel:5033679714" class="bg-white/20 backdrop-blur-sm border-2 border-white text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-white/30 transition text-center" data-t="callSameDay">📞 Call for Same-Day Service</a>
       </div>
       <!-- Trust Bar -->
@@ -841,49 +841,49 @@
       <!-- Feature cards with dynamic images -->
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="service-feature-cards">
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="0">
-          <div id="svc-img-expert-technicians" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/expert-technicians.webp');"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-expert-technicians" src="images/expert-technicians.webp" alt="Expert Technicians" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="expertService">Expert Technicians</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="expertServiceDesc">Our certified mechanics have years of experience with all vehicle makes and models.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="100">
-          <div id="svc-img-fast-cars" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/fast-cars.webp');"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-fast-cars" src="images/fast-cars.webp" alt="Fast Service" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="quickService">Fast Service</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="quickServiceDesc">Most services completed while you wait. We value your time and get you back on the road quickly.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="200">
-          <div id="svc-img-quality-car-parts" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/quality-parts.webp');"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-quality-car-parts" src="images/quality-parts.webp" alt="Quality Parts" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="qualityParts">Quality Parts</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="qualityPartsDesc">We use only premium parts and materials to ensure lasting repairs and optimal performance.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="300">
-          <div id="svc-img-bilingual-support" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/bilingual-service.webp');"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-bilingual-support" src="images/bilingual-service.webp" alt="Bilingual Support" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="bilingualService">Bilingual Support</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="bilingualServiceDesc">Fluent in both English and Spanish to serve our diverse Portland community.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="0">
-          <div id="svc-img-tire-shop" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/tire-services.webp');"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-tire-shop" src="images/tire-services.webp" alt="Tire Services" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="tireServices">Tire Services</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="tireServicesDesc">New and used tires, mount and balance, repair — everything your tires need.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="100">
-          <div id="svc-img-auto-repair" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/auto-maintenance.webp');"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-auto-repair" src="images/auto-maintenance.webp" alt="Auto Maintenance" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="autoMaintenance">Auto Maintenance</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="autoMaintenanceDesc">Oil changes, brake services, tuneups and more to keep your vehicle running smoothly.</p>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="200">
-          <div id="svc-img-specialized-tools" class="h-32 bg-gray-200 bg-cover bg-center overflow-hidden" style="background-image: url('images/specialized-services.webp');"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-specialized-tools" src="images/specialized-services.webp" alt="Specialized Services" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="specializedServices">Specialized Services</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="specializedServicesDesc">Alignment, mechanical inspection, mobile service, and roadside assistance.</p>
@@ -938,6 +938,70 @@
     </div>
   </section>
 
+  <!-- Pricing -->
+  <section id="pricing" class="py-16 bg-gray-50 scroll-mt-24 dark:bg-gray-800">
+    <div class="container mx-auto px-4 max-w-5xl">
+      <div class="text-center mb-10">
+        <h2 class="text-4xl font-bold text-brand dark:text-green-400 mb-4" data-t="startingPrices">Starting Prices</h2>
+        <p class="text-lg text-gray-600 dark:text-gray-300" data-t="pricingDisclaimer">Prices vary by vehicle. Call for an exact quote.</p>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Tire Installation -->
+        <div class="bg-white dark:bg-gray-700 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition">
+          <div class="text-3xl mb-2" aria-hidden="true">&#x1F6DE;</div>
+          <h3 class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1" data-t="priceTireInstall">Tire Installation</h3>
+          <div class="text-xl font-bold text-brand dark:text-green-400 mb-2" data-setting="price_tire_install">From $20</div>
+          <a href="tel:5033679714" class="text-xs text-brand dark:text-green-400 font-medium hover:underline" data-t="getQuote">Get Quote</a>
+        </div>
+        <!-- Tire Repair -->
+        <div class="bg-white dark:bg-gray-700 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition">
+          <div class="text-3xl mb-2" aria-hidden="true">&#x1F527;</div>
+          <h3 class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1" data-t="priceTireRepair">Tire Repair</h3>
+          <div class="text-xl font-bold text-brand dark:text-green-400 mb-2" data-setting="price_tire_repair">From $15</div>
+          <a href="tel:5033679714" class="text-xs text-brand dark:text-green-400 font-medium hover:underline" data-t="getQuote">Get Quote</a>
+        </div>
+        <!-- Oil Change -->
+        <div class="bg-white dark:bg-gray-700 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition">
+          <div class="text-3xl mb-2" aria-hidden="true">&#x1F6E2;</div>
+          <h3 class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1" data-t="priceOilChange">Oil Change</h3>
+          <div class="text-xl font-bold text-brand dark:text-green-400 mb-2" data-setting="price_oil_change">From $35</div>
+          <a href="tel:5033679714" class="text-xs text-brand dark:text-green-400 font-medium hover:underline" data-t="getQuote">Get Quote</a>
+        </div>
+        <!-- Brake Service -->
+        <div class="bg-white dark:bg-gray-700 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition">
+          <div class="text-3xl mb-2" aria-hidden="true">&#x1F6D1;</div>
+          <h3 class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1" data-t="priceBrakeService">Brake Service</h3>
+          <div class="text-xl font-bold text-brand dark:text-green-400 mb-2" data-setting="price_brake_service">From $100</div>
+          <a href="tel:5033679714" class="text-xs text-brand dark:text-green-400 font-medium hover:underline" data-t="getQuote">Get Quote</a>
+        </div>
+        <!-- Alignment -->
+        <div class="bg-white dark:bg-gray-700 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition">
+          <div class="text-3xl mb-2" aria-hidden="true">&#x2699;</div>
+          <h3 class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1" data-t="priceAlignment">Wheel Alignment</h3>
+          <div class="text-xl font-bold text-brand dark:text-green-400 mb-2" data-setting="price_alignment">From $75</div>
+          <a href="tel:5033679714" class="text-xs text-brand dark:text-green-400 font-medium hover:underline" data-t="getQuote">Get Quote</a>
+        </div>
+        <!-- Tuneup -->
+        <div class="bg-white dark:bg-gray-700 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition">
+          <div class="text-3xl mb-2" aria-hidden="true">&#x1F50D;</div>
+          <h3 class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1" data-t="priceTuneup">Tuneup</h3>
+          <div class="text-xl font-bold text-brand dark:text-green-400 mb-2" data-setting="price_tuneup">From $80</div>
+          <a href="tel:5033679714" class="text-xs text-brand dark:text-green-400 font-medium hover:underline" data-t="getQuote">Get Quote</a>
+        </div>
+        <!-- Inspection -->
+        <div class="bg-white dark:bg-gray-700 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition">
+          <div class="text-3xl mb-2" aria-hidden="true">&#x1F4CB;</div>
+          <h3 class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1" data-t="priceInspection">Inspection</h3>
+          <div class="text-xl font-bold text-brand dark:text-green-400 mb-2" data-setting="price_inspection">From $50</div>
+          <a href="tel:5033679714" class="text-xs text-brand dark:text-green-400 font-medium hover:underline" data-t="getQuote">Get Quote</a>
+        </div>
+      </div>
+      <div class="text-center mt-8">
+        <a href="/book-appointment/" class="inline-block bg-brand text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition shadow-lg" data-t="bookAppointment">Book Appointment</a>
+      </div>
+    </div>
+  </section>
+
   <!-- About -->
   <section id="about" class="py-16 bg-white scroll-mt-24 dark:bg-gray-900">
     <div class="container mx-auto px-4 max-w-5xl">
@@ -968,11 +1032,11 @@
           </ul>
         </div>
         <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-8">
-          <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-4" data-t="servingPortland">Serving Portland Since 2008</h3>
-          <p class="text-gray-700 dark:text-gray-300" data-t="servingPortlandText">With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.</p>
+          <h3 class="text-2xl font-bold text-brand dark:text-green-400 mb-4" id="serving-since-heading" data-t="servingPortland">Serving Portland Since 2008</h3>
+          <p class="text-gray-700 dark:text-gray-300" id="serving-since-text" data-t="servingPortlandText">With over 18 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.</p>
           <div class="grid grid-cols-2 gap-4 mt-4">
             <div class="text-center">
-              <div class="text-2xl font-bold text-brand dark:text-green-400">17+</div>
+              <div class="text-2xl font-bold text-brand dark:text-green-400" id="years-counter">18+</div>
               <div class="text-sm text-gray-600 dark:text-gray-300" data-t="yearsExperience">Years Experience</div>
             </div>
             <div class="text-center">
@@ -1051,6 +1115,30 @@
       </div>
     </div>
   </section>
+
+  <!-- Trust Badges -->
+  <div class="bg-white dark:bg-gray-900 py-8 border-y border-gray-100 dark:border-gray-700">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="flex flex-col items-center gap-2">
+          <svg class="w-8 h-8 text-brand dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <span class="text-sm font-semibold text-gray-700 dark:text-gray-200" data-t="warranty12Mo">12-Month / 12K-Mile Warranty</span>
+        </div>
+        <div class="flex flex-col items-center gap-2">
+          <svg class="w-8 h-8 text-brand dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="text-sm font-semibold text-gray-700 dark:text-gray-200" data-t="priceMatch">Price Match Guarantee</span>
+        </div>
+        <div class="flex flex-col items-center gap-2">
+          <svg class="w-8 h-8 text-brand dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <span class="text-sm font-semibold text-gray-700 dark:text-gray-200" data-t="freeInspection">Free Multi-Point Inspection</span>
+        </div>
+        <div class="flex flex-col items-center gap-2">
+          <svg class="w-8 h-8 text-brand dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+          <span class="text-sm font-semibold text-gray-700 dark:text-gray-200" data-t="noSurprise">No Surprise Pricing</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- CTA after Reviews -->
   <div class="bg-brand text-white py-10">
@@ -1323,7 +1411,8 @@ const SITE_SETTINGS_DEFAULTS = {
   hours_weekday: { en: 'Mon-Sat 7AM-7PM', es: 'Lun-S\u00E1b 7AM-7PM' },
   hours_sunday: { en: 'Sunday: Closed', es: 'Domingo: Cerrado' },
   rating_value: { en: '4.8', es: '4.8' },
-  review_count: { en: '150+', es: '150+' }
+  review_count: { en: '150+', es: '150+' },
+  founding_year: { en: '2008', es: '2008' }
 };
 let siteSettingsCache = null;
 
@@ -1373,6 +1462,36 @@ function applySiteSettings() {
   // Update GA tracking ID from settings
   var ga = settings.google_analytics_id;
   if (ga && typeof window.__updateGaId === 'function') window.__updateGaId(ga.en || ga.es);
+  // Update founding year / years of experience
+  var fy = settings.founding_year;
+  if (fy) {
+    var year = parseInt(fy.en || fy.es, 10) || 2008;
+    var years = new Date().getFullYear() - year;
+    var counter = document.getElementById('years-counter');
+    if (counter) counter.textContent = years + '+';
+    var heading = document.getElementById('serving-since-heading');
+    if (heading) heading.textContent = (lang === 'es' ? 'Sirviendo a Portland Desde ' : 'Serving Portland Since ') + year;
+    var text = document.getElementById('serving-since-text');
+    if (text) text.textContent = lang === 'es'
+      ? 'Con m\u00e1s de ' + years + ' a\u00f1os de experiencia sirviendo a la comunidad de Portland, hemos construido nuestra reputaci\u00f3n en servicio honesto y trabajo de calidad.'
+      : 'With over ' + years + ' years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.';
+  }
+  // Update trust bar + review section with dynamic rating/review count
+  var rv = settings.rating_value;
+  var rc = settings.review_count;
+  if (rv || rc) {
+    var rating = (rv ? (lang === 'es' ? (rv.es || rv.en) : (rv.en || rv.es)) : '4.8') || '4.8';
+    var count = (rc ? (lang === 'es' ? (rc.es || rc.en) : (rc.en || rc.es)) : '150+') || '150+';
+    // Trust bar text
+    var trustEl = document.querySelector('[data-t="trustRating"]');
+    if (trustEl) trustEl.textContent = rating + (lang === 'es' ? ' Estrellas \u00b7 ' : ' Stars \u00b7 ') + count + (lang === 'es' ? ' Rese\u00f1as' : ' Reviews');
+    // Reviews section "Based on X Google Reviews"
+    var basedEl = document.querySelector('[data-t="basedOnReviews"]');
+    if (basedEl) basedEl.textContent = lang === 'es' ? 'Basado en m\u00e1s de ' + count + ' rese\u00f1as de Google' : 'Based on ' + count + ' Google Reviews';
+    // Stats card rating
+    var statsRating = document.querySelector('.text-5xl[data-setting="rating_value"]');
+    if (statsRating) statsRating.textContent = rating;
+  }
 }
 
 // ===== HTML ESCAPE HELPER =====
@@ -1413,7 +1532,7 @@ const t = {
     vision: 'Vision', visionText: 'To be the most trusted tire shop in Portland, Oregon. We aim to be recognized for our quality, honesty, and prompt service.',
     mission: 'Mission', missionText: 'At Oregon Tires, we are dedicated to offering high-quality new and used tires, reliable mechanical services, and personalized attention.',
     whyChooseUs: 'Why Choose Us', servingPortland: 'Serving Portland Since 2008',
-    servingPortlandText: 'With over 15 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.',
+    servingPortlandText: 'With over 18 years of experience serving the Portland community, we have built our reputation on honest service, quality workmanship, and treating every customer like family.',
     bilingualStaff: 'Bilingual staff (English & Spanish)', honestPricing: 'Honest, transparent pricing',
     qualityWorkmanship: 'Quality workmanship guaranteed', fastReliableService: 'Fast and reliable service',
     customerReviews: 'What Our Customers Say', customerReviewsSubtitle: 'Real reviews from satisfied customers in Portland',
@@ -1478,15 +1597,15 @@ const t = {
     faqQ8: 'How long does a tire installation take?',
     faqA8: 'A standard tire installation takes about 30-45 minutes for a full set of 4 tires. This includes mount, balance, and a courtesy inspection. Most services are completed while you wait.',
     faqQ9: 'Do you offer financing?',
-    faqA9: 'We offer flexible payment options. We accept cash, all major credit cards, and can discuss payment arrangements for larger repairs. Ask about our Care Plan membership for monthly savings.',
+    faqA9: 'We offer flexible payment options. We accept cash, all major credit cards, and can discuss payment arrangements for larger repairs.',
     faqQ10: 'What brands of tires do you carry?',
     faqA10: 'We carry a wide selection of new and quality used tires from top brands. We can source virtually any tire size and brand. Call us with your vehicle details and we will find the best tires for your budget.',
     faqQ11: 'Can I wait while my car is serviced?',
     faqA11: 'Yes! Most of our services are completed while you wait. We have a comfortable waiting area. For longer repairs, we will give you an accurate time estimate so you can plan accordingly.',
     faqQ12: 'What is your warranty policy?',
     faqA12: 'All our services come with a 12-month / 12,000-mile warranty. We also offer a price match guarantee and free multi-point inspections. View our full guarantee details at oregon.tires/guarantee.',
-    faqQ13: 'Do you offer a membership or loyalty program?',
-    faqA13: 'Yes! Our Care Plan membership starts at $19/month and includes oil changes, tire rotations, service discounts, and priority scheduling. The average member saves $380/year.',
+    faqQ13: 'Do you offer a loyalty program?',
+    faqA13: 'Yes! We offer loyalty rewards for returning customers. Ask us about current promotions and savings programs when you visit.',
     faqQ14: 'What areas do you serve?',
     faqA14: 'We serve the greater Portland metro area including SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell, and Mt. Scott. Our mobile service covers an even wider area.',
     faqQ15: 'How can I get a price estimate?',
@@ -1532,7 +1651,17 @@ const t = {
     noSpam: 'No spam. Unsubscribe anytime.',
     reviewVelocity: '12 new 5-star reviews this month',
     newCustomerSpecial: '\ud83c\udf89 New Customer Special: $29 Oil Change + FREE Multi-Point Inspection',
-    claimOffer: 'Claim This Offer \u2192'
+    claimOffer: 'Claim This Offer \u2192',
+    // Pricing section
+    priceTireInstall: 'Tire Installation',
+    priceTireRepair: 'Tire Repair',
+    priceOilChange: 'Oil Change',
+    priceBrakeService: 'Brake Service',
+    priceAlignment: 'Wheel Alignment',
+    priceTuneup: 'Tuneup',
+    priceInspection: 'Inspection',
+    getQuote: 'Get Quote',
+    bookAppointment: 'Book Appointment'
   },
   es: {
     home: 'Inicio', services: 'Servicios', about: 'Acerca de', testimonials: 'Reseñas', contact: 'Contacto',
@@ -1558,7 +1687,7 @@ const t = {
     vision: 'Visión', visionText: 'Ser la tienda de llantas más confiable en Portland, Oregon.',
     mission: 'Misión', missionText: 'En Oregon Tires, nos dedicamos a ofrecer llantas nuevas y usadas de alta calidad, servicios mecánicos confiables y atención personalizada.',
     whyChooseUs: 'Por Qué Elegirnos', servingPortland: 'Sirviendo a Portland Desde 2008',
-    servingPortlandText: 'Con más de 15 años de experiencia sirviendo a la comunidad de Portland, hemos construido nuestra reputación en servicio honesto y trabajo de calidad.',
+    servingPortlandText: 'Con m\u00e1s de 18 a\u00f1os de experiencia sirviendo a la comunidad de Portland, hemos construido nuestra reputaci\u00f3n en servicio honesto y trabajo de calidad.',
     bilingualStaff: 'Personal bilingüe (inglés y español)', honestPricing: 'Precios honestos y transparentes',
     qualityWorkmanship: 'Trabajo de calidad garantizado', fastReliableService: 'Servicio rápido y confiable',
     customerReviews: 'Lo Que Dicen Nuestros Clientes', customerReviewsSubtitle: 'Reseñas reales de clientes satisfechos en Portland',
@@ -1630,8 +1759,8 @@ const t = {
     faqA11: '\u00a1S\u00ed! La mayor\u00eda de nuestros servicios se completan mientras espera. Tenemos un \u00e1rea de espera c\u00f3moda.',
     faqQ12: '\u00bfCu\u00e1l es su pol\u00edtica de garant\u00eda?',
     faqA12: 'Todos nuestros servicios incluyen garant\u00eda de 12 meses / 12,000 millas. Tambi\u00e9n ofrecemos igualaci\u00f3n de precios e inspecciones gratis.',
-    faqQ13: '\u00bfTienen programa de membres\u00eda?',
-    faqA13: '\u00a1S\u00ed! Nuestro Plan de Cuidado comienza en $19/mes e incluye cambios de aceite, rotaci\u00f3n de llantas, descuentos y programaci\u00f3n prioritaria.',
+    faqQ13: '\u00bfTienen programa de lealtad?',
+    faqA13: '\u00a1S\u00ed! Ofrecemos recompensas de lealtad para clientes frecuentes. Preg\u00fantenos sobre promociones actuales y programas de ahorro cuando nos visite.',
     faqQ14: '\u00bfQu\u00e9 \u00e1reas atienden?',
     faqA14: 'Atendemos el \u00e1rea metropolitana de Portland incluyendo SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell y Mt. Scott.',
     faqQ15: '\u00bfC\u00f3mo puedo obtener un estimado?',
@@ -1676,7 +1805,17 @@ const t = {
     noSpam: 'Sin spam. Cancela cuando quieras.',
     reviewVelocity: '12 nuevas rese\u00f1as de 5 estrellas este mes',
     newCustomerSpecial: '\ud83c\udf89 Especial: Cambio de Aceite $29 + Inspecci\u00f3n GRATIS',
-    claimOffer: 'Reclamar Esta Oferta \u2192'
+    claimOffer: 'Reclamar Esta Oferta \u2192',
+    // Pricing section
+    priceTireInstall: 'Instalaci\u00f3n de Llantas',
+    priceTireRepair: 'Reparaci\u00f3n de Llantas',
+    priceOilChange: 'Cambio de Aceite',
+    priceBrakeService: 'Servicio de Frenos',
+    priceAlignment: 'Alineaci\u00f3n',
+    priceTuneup: 'Afinaci\u00f3n',
+    priceInspection: 'Inspecci\u00f3n',
+    getQuote: 'Cotizar',
+    bookAppointment: 'Hacer Cita'
   }
 };
 
@@ -1873,9 +2012,19 @@ async function loadServiceImagesForSite() {
     const pos = img ? `${img.position_x||50}% ${img.position_y||50}%` : 'center';
     const scale = img?.scale || 1;
     try {
-      if (url) { await tryLoadImage(url); applyBg(el, url, pos, scale); }
+      if (url) {
+        await tryLoadImage(url);
+        if (el.tagName === 'IMG') {
+          el.src = url;
+          el.style.objectPosition = pos;
+          if (scale && scale !== 1) { el.style.transform = `scale(${scale})`; }
+        } else { applyBg(el, url, pos, scale); }
+      }
       else throw 'no db url';
-    } catch { applyBg(el, fallbackImages[key], 'center'); }
+    } catch {
+      const fb = fallbackImages[key];
+      if (el.tagName === 'IMG') { el.src = fb; } else { applyBg(el, fb, 'center'); }
+    }
   });
 }
 
@@ -2514,6 +2663,35 @@ if ('PerformanceObserver' in window) {
     });
   }, { threshold: 0.1 });
   obs.observe(contact);
+})();
+
+// ===== SCROLL-SPY: highlight active nav link =====
+(function() {
+  var sections = document.querySelectorAll('section[id]');
+  var navLinks = document.querySelectorAll('header nav a[href^="#"], #mobile-menu a[href^="#"]');
+  if (!sections.length || !navLinks.length) return;
+
+  var activeClass = 'underline underline-offset-4 decoration-2';
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var id = entry.target.id;
+        navLinks.forEach(function(link) {
+          var href = link.getAttribute('href');
+          if (href === '#' + id) {
+            activeClass.split(' ').forEach(function(c) { link.classList.add(c); });
+            link.setAttribute('aria-current', 'true');
+          } else {
+            activeClass.split(' ').forEach(function(c) { link.classList.remove(c); });
+            link.removeAttribute('aria-current');
+          }
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px', threshold: 0 });
+
+  sections.forEach(function(s) { observer.observe(s); });
 })();
 </script>
   <!-- Gallery Lightbox -->
