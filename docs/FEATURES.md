@@ -349,18 +349,31 @@ Local SEO targeting for Portland neighborhoods.
 ### Homepage
 
 - Hero section with dynamic background image from API
-- 7 service feature cards with dynamic images
+- **7 service feature cards** — each card links to its service detail page:
+
+| Card | Links To |
+|------|----------|
+| Expert Technicians | `/engine-diagnostics` |
+| Fast Service | `/tire-repair` |
+| Quality Parts | `/brake-service` |
+| Bilingual Support | `/book-appointment` |
+| Tire Services | `/tire-installation` |
+| Auto Maintenance | `/oil-change` |
+| Specialized Services | `/wheel-alignment` |
+
+- **Service category lists** — individual list items link to their respective service pages (tire installation, tire repair, oil change, brake service, alignment, etc.)
 - About section with shop story
 - Reviews section (3 random reviews per load)
 - Gallery section (language-filtered)
 - Contact section with form + Google Maps embed
 - Sticky header with smooth scroll navigation
+- **Footer** links to all 8 service pages
 
 ### Site-Wide Features
 
 - **Bilingual system:** EN/ES toggle via globe icon, `data-t` attribute translations, `currentLang` JS variable, language persisted across pages
 - **Dark mode:** System preference detection + manual toggle, Tailwind v4 `@variant dark` strategy
-- **PWA:** Service worker (`sw.js`) with versioned caching, offline fallback, network-first HTML, cache-first images
+- **PWA:** Service worker (`sw.js` v16) with versioned caching, offline fallback, network-first HTML, cache-first images, all 8 service pages precached
 - **Responsive:** Mobile-first design with Tailwind breakpoints (320px+)
 - **Accessibility:** ARIA labels, focus management, skip-to-content link, WCAG AA contrast
 - **SEO:** OG tags, Twitter Cards, canonical URLs, hreflang (en/es), JSON-LD AutomotiveBusiness schema, robots.txt, sitemap.xml
