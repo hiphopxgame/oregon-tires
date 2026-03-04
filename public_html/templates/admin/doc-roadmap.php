@@ -9,7 +9,7 @@
             </div>
             <div>
                 <p class="font-bold text-gray-900 dark:text-white text-lg tracking-tight">DPI Improvement Roadmap</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">4-Phase Plan &middot; 3 Months &middot; 56.84 &rarr; 95+</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">4-Phase Plan &middot; 3 Months &middot; 73.2 &rarr; 95+</p>
             </div>
         </div>
     </div>
@@ -28,7 +28,7 @@
                 DPI Score Improvement Plan
             </h1>
             <div class="h-1 w-20 bg-green-500/40 rounded mx-auto mb-6"></div>
-            <p class="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 font-semibold mb-2">56.84 &rarr; 95+</p>
+            <p class="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 font-semibold mb-2">73.2 &rarr; 95+</p>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">4-Phase Timeline &middot; 3-Month Plan &middot; February 2026</p>
             <p class="text-xs text-gray-400 dark:text-gray-500 mt-4 font-mono">oregon.tires</p>
         </div>
@@ -51,10 +51,10 @@
             <!-- Current vs Target Score Blocks -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <!-- Current Score -->
-                <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
-                    <p class="text-xs uppercase tracking-wider text-red-500 dark:text-red-400 font-semibold mb-2">Current Score</p>
-                    <p class="text-5xl font-extrabold text-red-600 dark:text-red-400 mb-1">56.84</p>
-                    <span class="inline-block bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold px-3 py-1 rounded-full">Weak</span>
+                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-6 text-center">
+                    <p class="text-xs uppercase tracking-wider text-amber-500 dark:text-amber-400 font-semibold mb-2">Current Score</p>
+                    <p class="text-5xl font-extrabold text-amber-600 dark:text-amber-400 mb-1">73.2</p>
+                    <span class="inline-block bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold px-3 py-1 rounded-full">Competitive</span>
                 </div>
                 <!-- Target Score -->
                 <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6 text-center">
@@ -82,118 +82,118 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">CRO</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">15%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-yellow-600 dark:text-yellow-400">55</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">80</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">92</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-37</td>
-                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 1+4</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-12</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 4</td>
                         </tr>
                         <!-- Market Intelligence -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Market Intelligence</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">11%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">72</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="italic text-gray-400 dark:text-gray-500">n/a</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">88</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-16</td>
+                            <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500 italic">&mdash;</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 3</td>
                         </tr>
                         <!-- Business Model -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Business Model</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">9%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-yellow-600 dark:text-yellow-400">65</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">70</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">83</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-18</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-13</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 2</td>
                         </tr>
                         <!-- Messaging -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Messaging</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">9%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-yellow-600 dark:text-yellow-400">55</span></td>
-                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">75</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-20</td>
-                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 1</td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">75</span></td>
+                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">85</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-10</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 2</td>
                         </tr>
                         <!-- UX -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">UX</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">9%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">72</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">75</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">86</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-14</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-11</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 2</td>
                         </tr>
                         <!-- Local SEO -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Local SEO</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">9%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-yellow-600 dark:text-yellow-400">65</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">75</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">85</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-20</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-10</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 2</td>
                         </tr>
                         <!-- Funnel -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Funnel</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">9%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-red-600 dark:text-red-400">35</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-yellow-600 dark:text-yellow-400">65</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">83</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-48</td>
-                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 1+3</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-18</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 2+3</td>
                         </tr>
                         <!-- Technical SEO -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Technical SEO</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">9%</td>
-                            <td class="px-4 py-3 text-sm"><span class="italic text-gray-400 dark:text-gray-500">null</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">75</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">85</td>
-                            <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500 italic">&mdash;</td>
-                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 4</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-10</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 2</td>
                         </tr>
                         <!-- Visual -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Visual</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">4%</td>
-                            <td class="px-4 py-3 text-sm"><span class="italic text-gray-400 dark:text-gray-500">null</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">70</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">82</td>
-                            <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500 italic">&mdash;</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-12</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 4</td>
                         </tr>
                         <!-- Content -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Content</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">4%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-red-600 dark:text-red-400">25</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-yellow-600 dark:text-yellow-400">55</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">78</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-53</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-23</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 3</td>
                         </tr>
                         <!-- Analytics -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Analytics</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">4%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-red-600 dark:text-red-400">35</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">70</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">85</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-50</td>
-                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 1+2</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-15</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 2</td>
                         </tr>
                         <!-- Performance -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Performance</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">4%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-yellow-600 dark:text-yellow-400">60</span></td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">70</span></td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">78</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-18</td>
-                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 1</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-8</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 3</td>
                         </tr>
                         <!-- Infrastructure -->
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Infrastructure</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">4%</td>
-                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-yellow-600 dark:text-yellow-400">55</span></td>
-                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">75</td>
-                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-20</td>
-                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 1</td>
+                            <td class="px-4 py-3 text-sm"><span class="font-semibold text-green-600 dark:text-green-400">85</span></td>
+                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">90</td>
+                            <td class="px-4 py-3 text-sm text-red-500 font-medium">-5</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Phase 4</td>
                         </tr>
                     </tbody>
                 </table>
@@ -232,8 +232,8 @@
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Phase 1: Quick Wins</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Weeks 1&ndash;2</td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">CRO, Analytics, Messaging, Infrastructure, Funnel</td>
-                            <td class="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">~72</td>
-                            <td class="px-4 py-3 text-sm"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-600 dark:text-yellow-400">In Progress</span></td>
+                            <td class="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">~73</td>
+                            <td class="px-4 py-3 text-sm"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-600 dark:text-green-400">Complete (73.2)</span></td>
                         </tr>
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">Phase 2: Structure</td>
@@ -292,12 +292,12 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">Current</td>
+                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">Initial Scan</td>
                             <td class="px-4 py-3 text-sm font-semibold text-red-600 dark:text-red-400">56.84</td>
                         </tr>
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">After Phase 1</td>
-                            <td class="px-4 py-3 text-sm font-semibold text-yellow-600 dark:text-yellow-400">~72</td>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 bg-green-50 dark:bg-green-900/10">
+                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-semibold">Current (Phase 1 Complete)</td>
+                            <td class="px-4 py-3 text-sm font-bold text-amber-600 dark:text-amber-400">73.2</td>
                         </tr>
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">After Phase 2</td>
