@@ -92,32 +92,62 @@ try {
     if ($method === 'POST') {
         $imageUrl = handlePromoImage();
 
+        $placement = in_array($_POST['placement'] ?? 'banner', ['banner', 'exit_intent'], true)
+            ? $_POST['placement'] : 'banner';
+        $isActive = (int)($_POST['is_active'] ?? 1);
+
         $stmt = $db->prepare(
             'INSERT INTO oretir_promotions
-                (title_en, title_es, body_en, body_es, cta_text_en, cta_text_es,
-                 cta_url, bg_color, text_color, badge_text, image_url, is_active,
+                (placement, title_en, title_es, body_en, body_es,
+                 subtitle_en, subtitle_es,
+                 cta_text_en, cta_text_es, cta_url,
+                 placeholder_en, placeholder_es,
+                 success_msg_en, success_msg_es,
+                 error_msg_en, error_msg_es,
+                 nospam_en, nospam_es, popup_icon,
+                 bg_color, text_color, badge_text, image_url, is_active,
                  starts_at, ends_at, sort_order)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
+            $placement,
             sanitize((string)($_POST['title_en'] ?? ''), 255),
             sanitize((string)($_POST['title_es'] ?? ''), 255),
             $_POST['body_en'] ?? '',
             $_POST['body_es'] ?? '',
+            sanitize((string)($_POST['subtitle_en'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['subtitle_es'] ?? ''), 255) ?: null,
             sanitize((string)($_POST['cta_text_en'] ?? 'Book Now'), 100),
             sanitize((string)($_POST['cta_text_es'] ?? 'Reserve Ahora'), 100),
             sanitize((string)($_POST['cta_url'] ?? '/book-appointment/'), 500),
+            sanitize((string)($_POST['placeholder_en'] ?? ''), 100) ?: null,
+            sanitize((string)($_POST['placeholder_es'] ?? ''), 100) ?: null,
+            sanitize((string)($_POST['success_msg_en'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['success_msg_es'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['error_msg_en'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['error_msg_es'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['nospam_en'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['nospam_es'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['popup_icon'] ?? ''), 20) ?: null,
             sanitize((string)($_POST['bg_color'] ?? '#f59e0b'), 20),
             sanitize((string)($_POST['text_color'] ?? '#000000'), 20),
             sanitize((string)($_POST['badge_text'] ?? ''), 50) ?: null,
             $imageUrl,
-            (int)($_POST['is_active'] ?? 1),
+            $isActive,
             $_POST['starts_at'] ?? null,
             $_POST['ends_at'] ?? null,
             (int)($_POST['sort_order'] ?? 0),
         ]);
 
-        jsonSuccess(['id' => (int)$db->lastInsertId()]);
+        $newId = (int)$db->lastInsertId();
+
+        // Enforce single active exit-intent: deactivate others
+        if ($placement === 'exit_intent' && $isActive === 1) {
+            $db->prepare('UPDATE oretir_promotions SET is_active = 0 WHERE placement = ? AND is_active = 1 AND id != ?')
+               ->execute(['exit_intent', $newId]);
+        }
+
+        jsonSuccess(['id' => $newId]);
     }
 
     // ─── PUT: Update existing promotion ───────────────────────────
@@ -146,33 +176,60 @@ try {
             $imageUrl = null;
         }
 
+        $placement = in_array($_POST['placement'] ?? 'banner', ['banner', 'exit_intent'], true)
+            ? $_POST['placement'] : 'banner';
+        $isActive = (int)($_POST['is_active'] ?? 1);
+
         $stmt = $db->prepare(
             'UPDATE oretir_promotions SET
-                title_en = ?, title_es = ?, body_en = ?, body_es = ?,
+                placement = ?, title_en = ?, title_es = ?, body_en = ?, body_es = ?,
+                subtitle_en = ?, subtitle_es = ?,
                 cta_text_en = ?, cta_text_es = ?, cta_url = ?,
+                placeholder_en = ?, placeholder_es = ?,
+                success_msg_en = ?, success_msg_es = ?,
+                error_msg_en = ?, error_msg_es = ?,
+                nospam_en = ?, nospam_es = ?, popup_icon = ?,
                 bg_color = ?, text_color = ?, badge_text = ?, image_url = ?,
                 is_active = ?, starts_at = ?, ends_at = ?, sort_order = ?,
                 updated_at = NOW()
              WHERE id = ?'
         );
         $stmt->execute([
+            $placement,
             sanitize((string)($_POST['title_en'] ?? ''), 255),
             sanitize((string)($_POST['title_es'] ?? ''), 255),
             $_POST['body_en'] ?? '',
             $_POST['body_es'] ?? '',
+            sanitize((string)($_POST['subtitle_en'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['subtitle_es'] ?? ''), 255) ?: null,
             sanitize((string)($_POST['cta_text_en'] ?? 'Book Now'), 100),
             sanitize((string)($_POST['cta_text_es'] ?? 'Reserve Ahora'), 100),
             sanitize((string)($_POST['cta_url'] ?? '/book-appointment/'), 500),
+            sanitize((string)($_POST['placeholder_en'] ?? ''), 100) ?: null,
+            sanitize((string)($_POST['placeholder_es'] ?? ''), 100) ?: null,
+            sanitize((string)($_POST['success_msg_en'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['success_msg_es'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['error_msg_en'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['error_msg_es'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['nospam_en'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['nospam_es'] ?? ''), 255) ?: null,
+            sanitize((string)($_POST['popup_icon'] ?? ''), 20) ?: null,
             sanitize((string)($_POST['bg_color'] ?? '#f59e0b'), 20),
             sanitize((string)($_POST['text_color'] ?? '#000000'), 20),
             sanitize((string)($_POST['badge_text'] ?? ''), 50) ?: null,
             $imageUrl,
-            (int)($_POST['is_active'] ?? 1),
+            $isActive,
             $_POST['starts_at'] ?? null,
             $_POST['ends_at'] ?? null,
             (int)($_POST['sort_order'] ?? 0),
             $id,
         ]);
+
+        // Enforce single active exit-intent: deactivate others
+        if ($placement === 'exit_intent' && $isActive === 1) {
+            $db->prepare('UPDATE oretir_promotions SET is_active = 0 WHERE placement = ? AND is_active = 1 AND id != ?')
+               ->execute(['exit_intent', $id]);
+        }
 
         jsonSuccess(['updated' => $stmt->rowCount()]);
     }

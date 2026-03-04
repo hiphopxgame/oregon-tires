@@ -1,6 +1,6 @@
 /**
  * Oregon Tires — Admin Promotions Manager
- * Handles CRUD for seasonal promotions displayed on the homepage banner.
+ * Handles CRUD for promotions (homepage banners + exit-intent popup).
  */
 
 (function() {
@@ -13,6 +13,21 @@
   function getCsrf() {
     const meta = document.querySelector('meta[name="csrf-token"]');
     return meta ? meta.getAttribute('content') : '';
+  }
+
+  // ─── Toggle exit-intent vs banner fields ────────────────────
+  function toggleExitIntentFields() {
+    var placement = document.getElementById('promo-placement').value;
+    var isExit = placement === 'exit_intent';
+    var exitFields = document.getElementById('exit-intent-fields');
+    var bannerFields = document.querySelectorAll('.banner-only-field');
+
+    if (exitFields) {
+      exitFields.classList.toggle('hidden', !isExit);
+    }
+    bannerFields.forEach(function(el) {
+      el.classList.toggle('hidden', isExit);
+    });
   }
 
   // ─── Load promotions ──────────────────────────────────────────
@@ -42,7 +57,7 @@
     if (!promotions.length) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
-      td.colSpan = 7;
+      td.colSpan = 8;
       td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
       td.textContent = 'No promotions yet. Click "New Promotion" to create one.';
       tr.appendChild(td);
@@ -70,6 +85,20 @@
         tdTitle.appendChild(badge);
       }
       tr.appendChild(tdTitle);
+
+      // Type cell
+      const tdType = document.createElement('td');
+      tdType.className = 'px-4 py-3';
+      const typeBadge = document.createElement('span');
+      if (promo.placement === 'exit_intent') {
+        typeBadge.className = 'text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 font-medium';
+        typeBadge.textContent = 'Exit Popup';
+      } else {
+        typeBadge.className = 'text-xs px-2 py-1 rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 font-medium';
+        typeBadge.textContent = 'Banner';
+      }
+      tdType.appendChild(typeBadge);
+      tr.appendChild(tdType);
 
       // Image cell
       const tdImg = document.createElement('td');
@@ -190,6 +219,7 @@
   // ─── Reset form fields ────────────────────────────────────────
   function resetForm() {
     editingId = null;
+    document.getElementById('promo-placement').value = 'banner';
     document.getElementById('promo-title-en').value = '';
     document.getElementById('promo-title-es').value = '';
     document.getElementById('promo-body-en').value = '';
@@ -206,6 +236,18 @@
     document.getElementById('promo-sort').value = '0';
     document.getElementById('promo-form-title').textContent = 'New Promotion';
     document.getElementById('promo-save-btn').textContent = 'Create Promotion';
+    // Reset exit-intent fields
+    document.getElementById('promo-subtitle-en').value = '';
+    document.getElementById('promo-subtitle-es').value = '';
+    document.getElementById('promo-placeholder-en').value = '';
+    document.getElementById('promo-placeholder-es').value = '';
+    document.getElementById('promo-success-en').value = '';
+    document.getElementById('promo-success-es').value = '';
+    document.getElementById('promo-error-en').value = '';
+    document.getElementById('promo-error-es').value = '';
+    document.getElementById('promo-nospam-en').value = '';
+    document.getElementById('promo-nospam-es').value = '';
+    document.getElementById('promo-popup-icon').value = '';
     // Reset image
     var imgInput = document.getElementById('promo-image-file');
     if (imgInput) imgInput.value = '';
@@ -213,11 +255,14 @@
     if (preview) preview.classList.add('hidden');
     var existing = document.getElementById('promo-existing-image');
     if (existing) existing.classList.add('hidden');
+    // Show/hide correct field sections
+    toggleExitIntentFields();
   }
 
   // ─── Open form for editing ────────────────────────────────────
   function openEditForm(promo) {
     editingId = promo.id;
+    document.getElementById('promo-placement').value = promo.placement || 'banner';
     document.getElementById('promo-title-en').value = promo.title_en || '';
     document.getElementById('promo-title-es').value = promo.title_es || '';
     document.getElementById('promo-body-en').value = promo.body_en || '';
@@ -232,6 +277,18 @@
     document.getElementById('promo-starts').value = promo.starts_at ? promo.starts_at.replace(' ', 'T').slice(0, 16) : '';
     document.getElementById('promo-ends').value = promo.ends_at ? promo.ends_at.replace(' ', 'T').slice(0, 16) : '';
     document.getElementById('promo-sort').value = promo.sort_order || '0';
+    // Exit-intent fields
+    document.getElementById('promo-subtitle-en').value = promo.subtitle_en || '';
+    document.getElementById('promo-subtitle-es').value = promo.subtitle_es || '';
+    document.getElementById('promo-placeholder-en').value = promo.placeholder_en || '';
+    document.getElementById('promo-placeholder-es').value = promo.placeholder_es || '';
+    document.getElementById('promo-success-en').value = promo.success_msg_en || '';
+    document.getElementById('promo-success-es').value = promo.success_msg_es || '';
+    document.getElementById('promo-error-en').value = promo.error_msg_en || '';
+    document.getElementById('promo-error-es').value = promo.error_msg_es || '';
+    document.getElementById('promo-nospam-en').value = promo.nospam_en || '';
+    document.getElementById('promo-nospam-es').value = promo.nospam_es || '';
+    document.getElementById('promo-popup-icon').value = promo.popup_icon || '';
     document.getElementById('promo-form-title').textContent = 'Edit Promotion';
     document.getElementById('promo-save-btn').textContent = 'Update Promotion';
     // Image
@@ -249,6 +306,8 @@
         existing.classList.add('hidden');
       }
     }
+    // Show/hide correct field sections
+    toggleExitIntentFields();
 
     const form = document.getElementById('promotion-form-panel');
     form.classList.remove('hidden');
@@ -258,6 +317,7 @@
   // ─── Build FormData from form ─────────────────────────────────
   function buildFormData() {
     const fd = new FormData();
+    fd.append('placement', document.getElementById('promo-placement').value);
     fd.append('title_en', document.getElementById('promo-title-en').value.trim());
     fd.append('title_es', document.getElementById('promo-title-es').value.trim());
     fd.append('body_en', document.getElementById('promo-body-en').value.trim());
@@ -274,6 +334,18 @@
     var ends = document.getElementById('promo-ends').value;
     fd.append('ends_at', ends ? ends.replace('T', ' ') + ':00' : '');
     fd.append('sort_order', document.getElementById('promo-sort').value || '0');
+    // Exit-intent fields
+    fd.append('subtitle_en', document.getElementById('promo-subtitle-en').value.trim());
+    fd.append('subtitle_es', document.getElementById('promo-subtitle-es').value.trim());
+    fd.append('placeholder_en', document.getElementById('promo-placeholder-en').value.trim());
+    fd.append('placeholder_es', document.getElementById('promo-placeholder-es').value.trim());
+    fd.append('success_msg_en', document.getElementById('promo-success-en').value.trim());
+    fd.append('success_msg_es', document.getElementById('promo-success-es').value.trim());
+    fd.append('error_msg_en', document.getElementById('promo-error-en').value.trim());
+    fd.append('error_msg_es', document.getElementById('promo-error-es').value.trim());
+    fd.append('nospam_en', document.getElementById('promo-nospam-en').value.trim());
+    fd.append('nospam_es', document.getElementById('promo-nospam-es').value.trim());
+    fd.append('popup_icon', document.getElementById('promo-popup-icon').value.trim());
     // Image file
     var imgInput = document.getElementById('promo-image-file');
     if (imgInput && imgInput.files.length > 0) {
@@ -324,13 +396,25 @@
     const fd = new FormData();
     fd.append('_method', 'PUT');
     fd.append('id', String(promo.id));
+    fd.append('placement', promo.placement || 'banner');
     fd.append('title_en', promo.title_en || '');
     fd.append('title_es', promo.title_es || '');
     fd.append('body_en', promo.body_en || '');
     fd.append('body_es', promo.body_es || '');
+    fd.append('subtitle_en', promo.subtitle_en || '');
+    fd.append('subtitle_es', promo.subtitle_es || '');
     fd.append('cta_text_en', promo.cta_text_en || 'Book Now');
     fd.append('cta_text_es', promo.cta_text_es || 'Reserve Ahora');
     fd.append('cta_url', promo.cta_url || '/book-appointment/');
+    fd.append('placeholder_en', promo.placeholder_en || '');
+    fd.append('placeholder_es', promo.placeholder_es || '');
+    fd.append('success_msg_en', promo.success_msg_en || '');
+    fd.append('success_msg_es', promo.success_msg_es || '');
+    fd.append('error_msg_en', promo.error_msg_en || '');
+    fd.append('error_msg_es', promo.error_msg_es || '');
+    fd.append('nospam_en', promo.nospam_en || '');
+    fd.append('nospam_es', promo.nospam_es || '');
+    fd.append('popup_icon', promo.popup_icon || '');
     fd.append('bg_color', promo.bg_color || '#f59e0b');
     fd.append('text_color', promo.text_color || '#000000');
     fd.append('badge_text', promo.badge_text || '');
@@ -470,4 +554,5 @@
   window.savePromotion = savePromotion;
   window.updatePromoPreview = updatePreview;
   window.removePromoImage = removePromoImage;
+  window.toggleExitIntentFields = toggleExitIntentFields;
 })();

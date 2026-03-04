@@ -1,6 +1,7 @@
 /**
  * Oregon Tires — Exit Intent Popup (Desktop Only)
- * Shows a free vehicle health check offer when user moves mouse toward browser chrome.
+ * Shows a promotional offer when user moves mouse toward browser chrome.
+ * Content is fetched from admin-managed promotions API.
  * Only shows once per session (uses sessionStorage).
  */
 (function() {
@@ -13,36 +14,35 @@
   if (sessionStorage.getItem('ot_exit_shown')) return;
 
   var shown = false;
+  var promoData = null;
+
+  // Fetch exit-intent promotion from API on page load
+  fetch('/api/promotions.php?placement=exit_intent', { credentials: 'include' })
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      if (json.success && json.data) {
+        promoData = json.data;
+      }
+    })
+    .catch(function() { /* silently skip — popup won't show */ });
 
   function showPopup() {
-    if (shown) return;
+    if (shown || !promoData) return;
     shown = true;
     sessionStorage.setItem('ot_exit_shown', '1');
 
     var lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
-    var copy = {
-      en: {
-        title: 'Before You Go\u2026',
-        subtitle: 'Get a FREE 21-Point Vehicle Health Check',
-        desc: 'Enter your email and we\'ll send you a coupon for a complimentary inspection on your next visit.',
-        placeholder: 'your@email.com',
-        cta: 'Send My Free Coupon',
-        noSpam: 'No spam. Unsubscribe anytime.',
-        thanks: 'Check your email! Your coupon is on its way.',
-        error: 'Something went wrong. Please try again.'
-      },
-      es: {
-        title: 'Antes de Irte\u2026',
-        subtitle: 'Obt\u00e9n una Inspecci\u00f3n de 21 Puntos GRATIS',
-        desc: 'Ingresa tu correo y te enviaremos un cup\u00f3n para una inspecci\u00f3n gratuita en tu pr\u00f3xima visita.',
-        placeholder: 'tu@correo.com',
-        cta: 'Enviar Mi Cup\u00f3n Gratis',
-        noSpam: 'Sin spam. Cancela cuando quieras.',
-        thanks: '\u00a1Revisa tu correo! Tu cup\u00f3n est\u00e1 en camino.',
-        error: 'Algo sali\u00f3 mal. Intenta de nuevo.'
-      }
-    };
-    var c = copy[lang] || copy.en;
+    var d = promoData;
+
+    var title     = (lang === 'es' ? d.title_es : d.title_en) || d.title_en || '';
+    var subtitle  = (lang === 'es' ? d.subtitle_es : d.subtitle_en) || d.subtitle_en || '';
+    var desc      = (lang === 'es' ? d.body_es : d.body_en) || d.body_en || '';
+    var cta       = (lang === 'es' ? d.cta_text_es : d.cta_text_en) || d.cta_text_en || 'Subscribe';
+    var placeholder = (lang === 'es' ? d.placeholder_es : d.placeholder_en) || d.placeholder_en || 'your@email.com';
+    var noSpam    = (lang === 'es' ? d.nospam_es : d.nospam_en) || d.nospam_en || '';
+    var thanks    = (lang === 'es' ? d.success_msg_es : d.success_msg_en) || d.success_msg_en || 'Thank you!';
+    var errorMsg  = (lang === 'es' ? d.error_msg_es : d.error_msg_en) || d.error_msg_en || 'Something went wrong.';
+    var icon      = d.popup_icon || '';
 
     // Create overlay
     var overlay = document.createElement('div');
@@ -52,24 +52,85 @@
     var popup = document.createElement('div');
     popup.style.cssText = 'background:white;border-radius:1rem;max-width:28rem;width:100%;padding:2rem;position:relative;box-shadow:0 25px 50px rgba(0,0,0,0.25);animation:otSlideUp 0.3s ease;';
 
-    // Build popup content using safe DOM methods for all user-visible text
-    // Note: All content is hardcoded copy (no user input), so innerHTML is safe here.
-    // Using innerHTML for layout efficiency with static, trusted content only.
-    popup.innerHTML =
-      '<button id="exit-popup-close" style="position:absolute;top:0.75rem;right:0.75rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;line-height:1;" aria-label="Close">\u00d7</button>' +
-      '<div style="text-align:center;">' +
-        '<div style="font-size:2.5rem;margin-bottom:0.5rem;">\ud83d\udd0d</div>' +
-        '<h3 style="font-size:1.25rem;font-weight:bold;color:#111;margin-bottom:0.25rem;">' + c.title + '</h3>' +
-        '<p style="font-size:1.1rem;font-weight:600;color:#15803d;margin-bottom:0.5rem;">' + c.subtitle + '</p>' +
-        '<p style="font-size:0.875rem;color:#666;margin-bottom:1rem;">' + c.desc + '</p>' +
-        '<form id="exit-popup-form" style="display:flex;gap:0.5rem;">' +
-          '<input type="email" id="exit-popup-email" required placeholder="' + c.placeholder + '" style="flex:1;padding:0.75rem;border:1px solid #ddd;border-radius:0.5rem;font-size:0.875rem;" aria-label="Email">' +
-          '<button type="submit" style="background:#f59e0b;color:#000;padding:0.75rem 1rem;border:none;border-radius:0.5rem;font-weight:600;cursor:pointer;font-size:0.875rem;white-space:nowrap;">' + c.cta + '</button>' +
-        '</form>' +
-        '<p style="font-size:0.75rem;color:#999;margin-top:0.5rem;">' + c.noSpam + '</p>' +
-        '<div id="exit-popup-status" style="margin-top:0.5rem;font-size:0.875rem;display:none;"></div>' +
-      '</div>';
+    // Close button
+    var closeBtn = document.createElement('button');
+    closeBtn.id = 'exit-popup-close';
+    closeBtn.style.cssText = 'position:absolute;top:0.75rem;right:0.75rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;line-height:1;';
+    closeBtn.setAttribute('aria-label', 'Close');
+    closeBtn.textContent = '\u00d7';
+    popup.appendChild(closeBtn);
 
+    // Content wrapper
+    var content = document.createElement('div');
+    content.style.textAlign = 'center';
+
+    // Icon
+    if (icon) {
+      var iconDiv = document.createElement('div');
+      iconDiv.style.cssText = 'font-size:2.5rem;margin-bottom:0.5rem;';
+      iconDiv.textContent = icon;
+      content.appendChild(iconDiv);
+    }
+
+    // Title
+    var h3 = document.createElement('h3');
+    h3.style.cssText = 'font-size:1.25rem;font-weight:bold;color:#111;margin-bottom:0.25rem;';
+    h3.textContent = title;
+    content.appendChild(h3);
+
+    // Subtitle
+    if (subtitle) {
+      var subtitleP = document.createElement('p');
+      subtitleP.style.cssText = 'font-size:1.1rem;font-weight:600;color:#15803d;margin-bottom:0.5rem;';
+      subtitleP.textContent = subtitle;
+      content.appendChild(subtitleP);
+    }
+
+    // Description
+    if (desc) {
+      var descP = document.createElement('p');
+      descP.style.cssText = 'font-size:0.875rem;color:#666;margin-bottom:1rem;';
+      descP.textContent = desc;
+      content.appendChild(descP);
+    }
+
+    // Form
+    var form = document.createElement('form');
+    form.id = 'exit-popup-form';
+    form.style.cssText = 'display:flex;gap:0.5rem;';
+
+    var emailInput = document.createElement('input');
+    emailInput.type = 'email';
+    emailInput.id = 'exit-popup-email';
+    emailInput.required = true;
+    emailInput.placeholder = placeholder;
+    emailInput.style.cssText = 'flex:1;padding:0.75rem;border:1px solid #ddd;border-radius:0.5rem;font-size:0.875rem;';
+    emailInput.setAttribute('aria-label', 'Email');
+    form.appendChild(emailInput);
+
+    var submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.style.cssText = 'background:#f59e0b;color:#000;padding:0.75rem 1rem;border:none;border-radius:0.5rem;font-weight:600;cursor:pointer;font-size:0.875rem;white-space:nowrap;';
+    submitBtn.textContent = cta;
+    form.appendChild(submitBtn);
+
+    content.appendChild(form);
+
+    // No spam text
+    if (noSpam) {
+      var noSpamP = document.createElement('p');
+      noSpamP.style.cssText = 'font-size:0.75rem;color:#999;margin-top:0.5rem;';
+      noSpamP.textContent = noSpam;
+      content.appendChild(noSpamP);
+    }
+
+    // Status div
+    var statusEl = document.createElement('div');
+    statusEl.id = 'exit-popup-status';
+    statusEl.style.cssText = 'margin-top:0.5rem;font-size:0.875rem;display:none;';
+    content.appendChild(statusEl);
+
+    popup.appendChild(content);
     overlay.appendChild(popup);
     document.body.appendChild(overlay);
 
@@ -79,7 +140,7 @@
     document.head.appendChild(style);
 
     // Close handlers
-    document.getElementById('exit-popup-close').addEventListener('click', function() {
+    closeBtn.addEventListener('click', function() {
       overlay.remove();
     });
     overlay.addEventListener('click', function(e) {
@@ -90,10 +151,9 @@
     });
 
     // Form submit
-    document.getElementById('exit-popup-form').addEventListener('submit', function(e) {
+    form.addEventListener('submit', function(e) {
       e.preventDefault();
-      var email = document.getElementById('exit-popup-email').value;
-      var statusEl = document.getElementById('exit-popup-status');
+      var email = emailInput.value;
 
       fetch('/api/subscribe.php', {
         method: 'POST',
@@ -106,18 +166,18 @@
         statusEl.style.display = 'block';
         if (data.success) {
           statusEl.style.color = '#15803d';
-          statusEl.textContent = c.thanks;
+          statusEl.textContent = thanks;
           if (typeof gtag === 'function') gtag('event', 'subscribe', { method: 'exit_intent' });
           setTimeout(function() { overlay.remove(); }, 3000);
         } else {
           statusEl.style.color = '#dc2626';
-          statusEl.textContent = data.error || c.error;
+          statusEl.textContent = data.error || errorMsg;
         }
       })
       .catch(function() {
         statusEl.style.display = 'block';
         statusEl.style.color = '#dc2626';
-        statusEl.textContent = c.error;
+        statusEl.textContent = errorMsg;
       });
     });
   }

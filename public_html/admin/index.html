@@ -951,15 +951,72 @@
               <label class="text-sm font-medium dark:text-gray-300">CTA Text (ES)</label>
               <input id="promo-cta-text-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" value="Reserve Ahora">
             </div>
-            <div>
+            <div class="banner-only-field">
               <label class="text-sm font-medium dark:text-gray-300">CTA URL</label>
               <input id="promo-cta-url" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" value="/book-appointment/">
             </div>
             <div>
+              <label class="text-sm font-medium dark:text-gray-300">Placement</label>
+              <select id="promo-placement" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" onchange="toggleExitIntentFields()">
+                <option value="banner">Banner</option>
+                <option value="exit_intent">Exit-Intent Popup</option>
+              </select>
+            </div>
+            <div class="banner-only-field">
               <label class="text-sm font-medium dark:text-gray-300">Badge Text</label>
               <input id="promo-badge" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="SPRING SALE" oninput="updatePromoPreview()">
             </div>
-            <div class="md:col-span-2">
+            <!-- Exit-Intent Popup Fields (hidden by default) -->
+            <div id="exit-intent-fields" class="hidden md:col-span-2 grid md:grid-cols-2 gap-4 p-4 border rounded-lg bg-amber-50 dark:bg-gray-600 dark:border-gray-500">
+              <div class="md:col-span-2">
+                <span class="text-xs font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wide">Exit-Intent Popup Fields</span>
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Subtitle (EN)</label>
+                <input id="promo-subtitle-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Get a FREE 21-Point Health Check">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Subtitle (ES)</label>
+                <input id="promo-subtitle-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Obtén una Inspección GRATIS">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Email Placeholder (EN)</label>
+                <input id="promo-placeholder-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="your@email.com">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Email Placeholder (ES)</label>
+                <input id="promo-placeholder-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="tu@correo.com">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Success Message (EN)</label>
+                <input id="promo-success-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Check your email! Your coupon is on its way.">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Success Message (ES)</label>
+                <input id="promo-success-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="¡Revisa tu correo! Tu cupón está en camino.">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Error Message (EN)</label>
+                <input id="promo-error-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Something went wrong. Please try again.">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Error Message (ES)</label>
+                <input id="promo-error-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Algo salió mal. Intenta de nuevo.">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">No-Spam Text (EN)</label>
+                <input id="promo-nospam-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="No spam. Unsubscribe anytime.">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">No-Spam Text (ES)</label>
+                <input id="promo-nospam-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Sin spam. Cancela cuando quieras.">
+              </div>
+              <div>
+                <label class="text-sm font-medium dark:text-gray-300">Icon (emoji)</label>
+                <input id="promo-popup-icon" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="🔍" maxlength="10">
+              </div>
+            </div>
+            <div class="md:col-span-2 banner-only-field">
               <label class="text-sm font-medium dark:text-gray-300">Banner Image (optional)</label>
               <input id="promo-image-file" type="file" accept="image/*" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100 text-sm">
               <div id="promo-image-preview" class="hidden mt-2">
@@ -971,7 +1028,7 @@
                 <button type="button" onclick="removePromoImage()" class="text-red-500 hover:text-red-700 text-xs underline">Remove image</button>
               </div>
             </div>
-            <div class="flex gap-4">
+            <div class="flex gap-4 banner-only-field">
               <div>
                 <label class="text-sm font-medium dark:text-gray-300">BG Color</label>
                 <div class="flex items-center gap-2 mt-1">
@@ -992,7 +1049,7 @@
                 <input id="promo-active" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
                 <span class="text-sm font-medium dark:text-gray-300">Active</span>
               </label>
-              <div>
+              <div class="banner-only-field">
                 <label class="text-sm font-medium dark:text-gray-300">Sort Order</label>
                 <input id="promo-sort" type="number" value="0" min="0" class="w-20 p-2 border rounded mt-1 ml-2 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
               </div>
@@ -1006,7 +1063,7 @@
               <input id="promo-ends" type="datetime-local" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
             </div>
           </div>
-          <div class="mt-4">
+          <div class="mt-4 banner-only-field">
             <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Banner Preview</label>
             <div id="promo-live-preview" class="mt-1 px-4 py-3 rounded-lg text-sm" style="background-color: #f59e0b; color: #000;">
               <span class="font-semibold">Your Promotion Title</span>
@@ -1025,6 +1082,7 @@
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
                 <th class="px-4 py-3 font-medium">Title</th>
+                <th class="px-4 py-3 font-medium">Type</th>
                 <th class="px-4 py-3 font-medium">Image</th>
                 <th class="px-4 py-3 font-medium">Status</th>
                 <th class="px-4 py-3 font-medium">Date Range</th>
@@ -1034,7 +1092,7 @@
               </tr>
             </thead>
             <tbody id="promotions-table-body">
-              <tr><td colspan="6" class="text-center py-8 text-gray-400">Loading...</td></tr>
+              <tr><td colspan="8" class="text-center py-8 text-gray-400">Loading...</td></tr>
             </tbody>
           </table>
         </div>

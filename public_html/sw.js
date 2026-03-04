@@ -1,5 +1,5 @@
 // Bump version on each deploy to bust stale caches
-const CACHE_VERSION = '14';
+const CACHE_VERSION = '16';
 const CACHE_NAME = 'oregon-tires-v' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -16,6 +16,14 @@ const PRECACHE_URLS = [
   '/images/specialized-services.webp',
   '/images/auto-maintenance.webp',
   '/images/bilingual-service.webp',
+  '/tire-installation',
+  '/tire-repair',
+  '/oil-change',
+  '/brake-service',
+  '/wheel-alignment',
+  '/engine-diagnostics',
+  '/suspension-repair',
+  '/fleet-services',
 ];
 
 // ─── Install — Pre-cache critical assets ────────────────────────────────────
