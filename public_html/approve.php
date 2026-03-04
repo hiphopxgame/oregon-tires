@@ -14,7 +14,8 @@
         html, body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .dark { color-scheme: light !important; }
 
-        header, footer, #lang-toggle, #print-estimate-btn, #action-buttons, #inspection-link-wrap { display: none !important; }
+        header, footer, #lang-toggle, #print-estimate-btn, #action-buttons, #inspection-link-wrap, #decline-reason-wrap { display: none !important; }
+        footer { background: transparent !important; }
 
         #items-list input[type="checkbox"] { display: none !important; }
 

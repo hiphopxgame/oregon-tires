@@ -19,6 +19,7 @@
   <link rel="preconnect" href="https://hiphop.world" crossorigin>
   <link rel="preload" href="assets/styles.css" as="style">
   <link rel="preload" href="assets/logo.webp" as="image" type="image/webp">
+  <link rel="preload" href="assets/hero-bg.webp" as="image" type="image/webp">
 
   <!-- SEO Meta Tags -->
   <link rel="canonical" href="https://oregon.tires/">
@@ -730,7 +731,7 @@
 
   <!-- Dark mode init (prevent FOUC) -->
   <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
-  <script src="https://hiphop.world/sdk/hiphopworld.js" data-site-key="oregontires" data-auto></script>
+  <script defer src="https://hiphop.world/sdk/hiphopworld.js" data-site-key="oregontires" data-auto></script>
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
@@ -1096,7 +1097,7 @@
         <h2 class="text-4xl font-bold text-brand dark:text-green-400 mb-4" data-t="customerReviews">What Our Customers Say</h2>
         <p class="text-xl text-gray-600 dark:text-gray-300" data-t="customerReviewsSubtitle">Real reviews from satisfied customers in Portland</p>
       </div>
-      <div class="grid md:grid-cols-3 gap-6 mb-10" id="reviews-grid">
+      <div class="grid md:grid-cols-3 gap-6 mb-10" id="reviews-grid" aria-live="polite">
         <!-- Populated by JS -->
       </div>
       <div class="text-center" data-reveal="scale">
@@ -1176,7 +1177,7 @@
   <section id="faq" class="scroll-mt-24 py-16 bg-gray-50 dark:bg-gray-800" aria-label="Frequently Asked Questions">
     <div class="max-w-3xl mx-auto px-4">
       <h2 class="text-3xl font-bold text-center text-brand dark:text-green-400 mb-8" data-t="faqTitle">Frequently Asked Questions</h2>
-      <div id="faq-container" class="space-y-3">
+      <div id="faq-container" class="space-y-3" aria-live="polite">
         <!-- FAQ items loaded dynamically from /api/faq.php -->
       </div>
     </div>
@@ -1859,10 +1860,13 @@ function formatReviewDate(createdAt) {
 }
 
 function renderReviews(allReviews) {
-  var shuffled = (allReviews || []).slice().sort(function() { return 0.5 - Math.random(); }).slice(0, 3);
+  var sorted = (allReviews || []).slice().sort(function(a, b) {
+    if (b.rating !== a.rating) return b.rating - a.rating;
+    return new Date(b.date || 0) - new Date(a.date || 0);
+  }).slice(0, 3);
   var grid = document.getElementById('reviews-grid');
   grid.textContent = '';
-  shuffled.forEach(function(r) {
+  sorted.forEach(function(r) {
     var lang = currentLang || 'en';
     var reviewText = lang === 'es' ? (r.review_text_es || r.review_text_en) : r.review_text_en;
     var rating = Number(r.rating) || 5;

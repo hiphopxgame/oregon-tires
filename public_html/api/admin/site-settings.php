@@ -32,6 +32,12 @@ try {
         'phone', 'email', 'address',
         'hours_weekday', 'hours_sunday',
         'rating_value', 'review_count', 'google_analytics_id',
+        // Pricing
+        'price_tire_install', 'price_tire_repair', 'price_oil_change',
+        'price_brake_service', 'price_alignment', 'price_tuneup',
+        'price_inspection', 'price_care_plan',
+        // Business info
+        'founding_year',
         // Email templates — welcome
         'email_tpl_welcome_subject', 'email_tpl_welcome_greeting',
         'email_tpl_welcome_body', 'email_tpl_welcome_button', 'email_tpl_welcome_footer',

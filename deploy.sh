@@ -67,7 +67,7 @@ changed_files() {
         git -C "$LOCAL_ROOT" ls-files "public_html/" 2>/dev/null || find "$SOURCE_DIR" -type f | sed "s|^${LOCAL_ROOT}/||"
     else
         # Files changed since last deploy
-        git -C "$LOCAL_ROOT" diff --name-only "$last_sha" HEAD -- "public_html/" 2>/dev/null || true
+        git -C "$LOCAL_ROOT" diff --diff-filter=ACMRT --name-only "$last_sha" HEAD -- "public_html/" 2>/dev/null || true
         # Include untracked files
         git -C "$LOCAL_ROOT" ls-files --others --exclude-standard "public_html/" 2>/dev/null || true
     fi
@@ -150,8 +150,16 @@ sync_files() {
     tmpfile=$(mktemp)
     echo "$files" | sed 's|^public_html/||' > "$tmpfile"
 
-    rsync -avz --files-from="$tmpfile" "$SOURCE_DIR/" "${SSH_HOST}:~/${REMOTE_ROOT}/"
+    local rsync_exit=0
+    rsync -avz --files-from="$tmpfile" "$SOURCE_DIR/" "${SSH_HOST}:~/${REMOTE_ROOT}/" || rsync_exit=$?
     rm -f "$tmpfile"
+    if [ "$rsync_exit" -ne 0 ] && [ "$rsync_exit" -ne 23 ]; then
+        fail "rsync failed (exit $rsync_exit)"
+        exit 1
+    fi
+    if [ "$rsync_exit" -eq 23 ]; then
+        warn "Some files could not be transferred (rsync partial)"
+    fi
 
     # Handle deletions
     local deleted
