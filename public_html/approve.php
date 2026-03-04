@@ -174,6 +174,7 @@
 
             <!-- Submit Buttons -->
             <div id="action-buttons">
+                <div id="submit-error" class="hidden mb-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-700 dark:text-red-400"></div>
                 <button id="approve-btn" onclick="submitApproval()" class="w-full px-6 py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition text-lg shadow-lg mb-3">
                     <span data-t="approveSelected">Approve Selected Services</span>
                 </button>
@@ -275,6 +276,14 @@ var t = {
         safetyCritical: 'Safety-Critical',
         recommended: 'Recommended',
         preventive: 'Preventive',
+        typeLaborLabel: 'LABOR',
+        typePartsLabel: 'PARTS',
+        typeTireLabel: 'TIRE',
+        typeFeeLabel: 'FEE',
+        typeDiscountLabel: 'DISCOUNT',
+        typeSubletLabel: 'SUBLET',
+        submitError: 'Failed to submit. Please try again.',
+        networkError: 'Network error. Please try again.',
     },
     es: {
         backToHome: 'Volver al Inicio',
@@ -308,6 +317,14 @@ var t = {
         safetyCritical: 'Seguridad Critica',
         recommended: 'Recomendado',
         preventive: 'Preventivo',
+        typeLaborLabel: 'MANO DE OBRA',
+        typePartsLabel: 'REPUESTOS',
+        typeTireLabel: 'NEUMATICO',
+        typeFeeLabel: 'CARGO',
+        typeDiscountLabel: 'DESCUENTO',
+        typeSubletLabel: 'SUBCONTRATO',
+        submitError: 'Error al enviar. Por favor intente de nuevo.',
+        networkError: 'Error de red. Por favor intente de nuevo.',
     }
 };
 
@@ -343,9 +360,28 @@ var whyItMatters = {
     }
 };
 
+function getTypeLabel(itemType) {
+    var typeKeys = { labor: 'typeLaborLabel', parts: 'typePartsLabel', tire: 'typeTireLabel', fee: 'typeFeeLabel', discount: 'typeDiscountLabel', sublet: 'typeSubletLabel' };
+    return t[currentLang][typeKeys[itemType]] || itemType.toUpperCase();
+}
+
+function updateItemTranslations() {
+    document.querySelectorAll('.priority-badge').forEach(function(el) {
+        el.textContent = getPriorityLabel(el.dataset.priority);
+    });
+    document.querySelectorAll('.type-badge').forEach(function(el) {
+        el.textContent = getTypeLabel(el.dataset.itemType);
+    });
+    document.querySelectorAll('.why-it-matters').forEach(function(el) {
+        var catDescs = (whyItMatters[currentLang] || whyItMatters.en)[el.dataset.category];
+        if (catDescs) el.textContent = catDescs[el.dataset.priority] || '';
+    });
+}
+
 function toggleLanguage() {
     currentLang = currentLang === 'en' ? 'es' : 'en';
     applyTranslations();
+    updateItemTranslations();
     updatePrioritySummary();
 }
 
@@ -413,7 +449,8 @@ function buildItemRow(item) {
     // Priority badge (before type badge)
     var priority = getPriority(item);
     var priorityBadge = document.createElement('span');
-    priorityBadge.className = 'text-xs font-bold px-2 py-0.5 rounded ' + getPriorityBadgeClass(priority);
+    priorityBadge.className = 'text-xs font-bold px-2 py-0.5 rounded priority-badge ' + getPriorityBadgeClass(priority);
+    priorityBadge.dataset.priority = priority;
     priorityBadge.textContent = getPriorityLabel(priority);
     descLine.appendChild(priorityBadge);
 
@@ -428,8 +465,9 @@ function buildItemRow(item) {
     };
 
     var badge = document.createElement('span');
-    badge.className = 'text-xs font-bold px-2 py-0.5 rounded ' + (typeColors[item.item_type] || typeColors.labor);
-    badge.textContent = item.item_type.toUpperCase();
+    badge.className = 'text-xs font-bold px-2 py-0.5 rounded type-badge ' + (typeColors[item.item_type] || typeColors.labor);
+    badge.dataset.itemType = item.item_type;
+    badge.textContent = getTypeLabel(item.item_type);
     descLine.appendChild(badge);
 
     var desc = document.createElement('span');
@@ -454,6 +492,8 @@ function buildItemRow(item) {
             if (whyText) {
                 var whyEl = document.createElement('p');
                 whyEl.className = 'text-xs italic text-gray-400 dark:text-gray-500 mt-1 why-it-matters';
+                whyEl.dataset.category = item.inspection_category;
+                whyEl.dataset.priority = priority;
                 whyEl.textContent = whyText;
                 textWrap.appendChild(whyEl);
             }
@@ -640,7 +680,19 @@ async function loadEstimate() {
     }
 }
 
+function showSubmitError(msg) {
+    var el = document.getElementById('submit-error');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideSubmitError() {
+    document.getElementById('submit-error').classList.add('hidden');
+}
+
 async function submitApproval() {
+    hideSubmitError();
     var btn = document.getElementById('approve-btn');
     btn.disabled = true;
     btn.querySelector('span').textContent = t[currentLang].submitting || 'Submitting...';
@@ -660,7 +712,7 @@ async function submitApproval() {
         if (!json.success) {
             btn.disabled = false;
             btn.querySelector('span').textContent = t[currentLang].approveSelected;
-            alert(json.error || 'Failed to submit. Please try again.');
+            showSubmitError(json.error || t[currentLang].submitError);
             return;
         }
 
@@ -680,7 +732,7 @@ async function submitApproval() {
     } catch (err) {
         btn.disabled = false;
         btn.querySelector('span').textContent = t[currentLang].approveSelected;
-        alert('Network error. Please try again.');
+        showSubmitError(t[currentLang].networkError);
     }
 }
 
