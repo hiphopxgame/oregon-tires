@@ -182,6 +182,17 @@
                 </div>
             </div>
 
+            <!-- Decline Reason (shown when all items unchecked) -->
+            <div id="decline-reason-wrap" class="hidden mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" data-t="declineReasonLabel">Reason for declining (optional)</label>
+                <select id="decline-reason" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                    <option value="" data-t="selectReason">— Select a reason —</option>
+                    <option value="too_expensive" data-t="tooExpensive">Too expensive</option>
+                    <option value="will_do_later" data-t="willDoLater">Will do later</option>
+                    <option value="already_done" data-t="alreadyDone">Already done elsewhere</option>
+                </select>
+            </div>
+
             <!-- Submit Buttons -->
             <div id="action-buttons">
                 <div id="submit-error" class="hidden mb-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-700 dark:text-red-400"></div>
@@ -299,6 +310,12 @@ var t = {
         approveXofY: 'Approve {x} of {y} Services',
         declineAll: 'Decline All',
         approveAll: 'Approve All Services',
+        confirmDecline: 'Are you sure you want to decline all services? This cannot be undone.',
+        declineReasonLabel: 'Reason for declining (optional)',
+        selectReason: '— Select a reason —',
+        tooExpensive: 'Too expensive',
+        willDoLater: 'Will do later',
+        alreadyDone: 'Already done elsewhere',
     },
     es: {
         backToHome: 'Volver al Inicio',
@@ -345,6 +362,12 @@ var t = {
         approveXofY: 'Aprobar {x} de {y} Servicios',
         declineAll: 'Rechazar Todos',
         approveAll: 'Aprobar Todos los Servicios',
+        confirmDecline: '¿Está seguro de que desea rechazar todos los servicios? Esto no se puede deshacer.',
+        declineReasonLabel: 'Razón del rechazo (opcional)',
+        selectReason: '— Seleccione una razón —',
+        tooExpensive: 'Muy caro',
+        willDoLater: 'Lo haré después',
+        alreadyDone: 'Ya se hizo en otro lugar',
     }
 };
 
@@ -642,6 +665,8 @@ function updateButtonLabel() {
     } else {
         span.textContent = (t[currentLang].approveXofY || 'Approve {x} of {y} Services').replace('{x}', approved).replace('{y}', total);
     }
+    var wrap = document.getElementById('decline-reason-wrap');
+    if (wrap) wrap.classList.toggle('hidden', approved > 0);
 }
 
 async function loadEstimate() {
@@ -753,9 +778,18 @@ function hideSubmitError() {
 async function submitApproval() {
     hideSubmitError();
     var btn = document.getElementById('approve-btn');
+
+    // Check if all items declined — confirm before proceeding
+    var approvedCount = 0;
+    for (var id in itemApprovals) { if (itemApprovals[id]) approvedCount++; }
+    if (approvedCount === 0) {
+        if (!confirm(t[currentLang].confirmDecline)) return;
+    }
+
     btn.disabled = true;
     btn.querySelector('span').textContent = t[currentLang].submitting || 'Submitting...';
 
+    var reason = document.getElementById('decline-reason');
     try {
         var res = await fetch('/api/estimate-approve.php', {
             method: 'POST',
@@ -763,7 +797,8 @@ async function submitApproval() {
             credentials: 'include',
             body: JSON.stringify({
                 token: estimateToken,
-                approvals: itemApprovals
+                approvals: itemApprovals,
+                decline_reason: reason ? reason.value : ''
             })
         });
         var json = await res.json();

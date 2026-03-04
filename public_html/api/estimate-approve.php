@@ -163,9 +163,18 @@ try {
         $taxAmount = round($approvedSubtotal * (float) $est['tax_rate'], 2);
         $total = round($approvedSubtotal + $taxAmount, 2);
 
+        // Store optional decline reason
+        $declineReason = null;
+        if ($newStatus === 'declined' && !empty($data['decline_reason'])) {
+            $allowed = ['too_expensive', 'will_do_later', 'already_done'];
+            if (in_array($data['decline_reason'], $allowed, true)) {
+                $declineReason = $data['decline_reason'];
+            }
+        }
+
         $db->prepare(
-            "UPDATE oretir_estimates SET status = ?, customer_responded_at = NOW(), subtotal = ?, tax_amount = ?, total = ?, updated_at = NOW() WHERE id = ?"
-        )->execute([$newStatus, $approvedSubtotal, $taxAmount, $total, $est['id']]);
+            "UPDATE oretir_estimates SET status = ?, customer_responded_at = NOW(), subtotal = ?, tax_amount = ?, total = ?, decline_reason = ?, updated_at = NOW() WHERE id = ?"
+        )->execute([$newStatus, $approvedSubtotal, $taxAmount, $total, $declineReason, $est['id']]);
 
         // Update RO status
         if ($newStatus === 'approved' || $newStatus === 'partial') {

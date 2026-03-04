@@ -129,11 +129,11 @@ build_images() {
 
 sync_files() {
     local files
-    files=$(changed_files | sort -u | grep -v '^$')
+    files=$(changed_files | sort -u | grep -v '^$' || true)
 
     # Always include freshly-built CSS
     if [ "$HAS_CSS_BUILD" = true ] && [ -f "${SOURCE_DIR}/assets/styles.css" ]; then
-        files=$(echo -e "${files}\npublic_html/assets/styles.css" | sort -u | grep -v '^$')
+        files=$(echo -e "${files}\npublic_html/assets/styles.css" | sort -u | grep -v '^$' || true)
     fi
 
     if [ -z "$files" ]; then
@@ -222,7 +222,7 @@ cmd_diff() {
 
     echo ""
     local files
-    files=$(changed_files | sort -u | grep -v '^$')
+    files=$(changed_files | sort -u | grep -v '^$' || true)
     if [ -z "$files" ]; then
         ok "No changes to deploy"
     else
@@ -258,7 +258,7 @@ cmd_status() {
         dim "$(git -C "$LOCAL_ROOT" log --oneline -1 "$last_sha" 2>/dev/null || echo 'Unknown')"
 
         local pending
-        pending=$(changed_files | grep -v '^$' | wc -l | tr -d ' ')
+        pending=$(changed_files | grep -v '^$' | wc -l | tr -d ' ' || echo "0")
         if [ "$pending" -gt 0 ]; then
             warn "${pending} files pending deploy"
         else

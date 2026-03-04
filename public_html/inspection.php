@@ -1114,7 +1114,14 @@ function buildItemRow(item) {
             img.decoding = 'async';
             img.className = 'w-20 h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer flex-shrink-0';
             img.style.scrollSnapAlign = 'start';
-            img.onerror = function() { this.style.display = 'none'; };
+            img.onerror = function() {
+                this.onerror = null;
+                this.src = '';
+                this.alt = 'Photo unavailable';
+                this.className = 'w-20 h-20 rounded-lg border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-gray-200 dark:bg-gray-700';
+                this.style.display = 'flex';
+                this.removeAttribute('cursor-pointer');
+            };
             img.addEventListener('click', function(e) { e.stopPropagation(); showPhoto(p.image_url, p.caption || ''); });
             photoWrap.appendChild(img);
         });
