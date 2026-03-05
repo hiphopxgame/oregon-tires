@@ -2,7 +2,7 @@
 /**
  * Oregon Tires — Service Detail Page Template
  * Variables expected: $serviceName, $serviceNameEs, $serviceSlug, $serviceIcon,
- * $serviceDescription, $serviceDescriptionEs, $startingPrice,
+ * $serviceDescription, $serviceDescriptionEs,
  * $serviceBody, $serviceBodyEs, $faqItems, $relatedServices
  */
 $pageTitle = "$serviceName in Portland, OR | Oregon Tires Auto Care";
@@ -147,11 +147,7 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
           <h1 class="text-3xl md:text-5xl font-bold" data-t="heroTitle"><?= htmlspecialchars($serviceName) ?></h1>
         </div>
         <p class="text-lg md:text-xl mb-6 max-w-3xl opacity-90" data-t="heroSubtitle"><?= htmlspecialchars($serviceDescription) ?></p>
-        <div class="flex flex-wrap items-center gap-4 mb-6">
-          <span class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-lg font-bold">
-            Starting at <?= htmlspecialchars($startingPrice) ?> <span class="text-sm font-normal opacity-75">per tire/service</span>
-          </span>
-        </div>
+        <div class="mb-6"></div>
         <div class="flex flex-wrap gap-3">
           <a href="/book-appointment/?service=<?= htmlspecialchars($serviceSlug) ?>" class="bg-amber-500 text-black px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-lg">Book Now</a>
           <a href="tel:5033679714" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition">Call (503) 367-9714</a>
@@ -262,8 +258,7 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <?php foreach ($relatedServices as $rs): ?>
           <a href="/<?= htmlspecialchars($rs['slug']) ?>" class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 text-center border border-gray-200 dark:border-gray-700 hover:border-brand dark:hover:border-green-400 transition block">
-            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1"><?= htmlspecialchars($rs['name']) ?></div>
-            <div class="text-2xl font-bold text-brand dark:text-green-400"><?= htmlspecialchars($rs['price']) ?></div>
+            <div class="text-lg font-bold text-brand dark:text-green-400 mb-1"><?= htmlspecialchars($rs['name']) ?></div>
             <span class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white">Learn More &rarr;</span>
           </a>
           <?php endforeach; ?>

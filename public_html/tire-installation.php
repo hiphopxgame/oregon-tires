@@ -3,9 +3,8 @@ $serviceName = 'Tire Installation';
 $serviceNameEs = 'Instalacion de Llantas';
 $serviceSlug = 'tire-installation';
 $serviceIcon = '&#x1F527;';
-$serviceDescription = 'Professional tire installation in Portland, OR. Mounting, balancing, and TPMS reset included. Starting at $20 per tire. Bilingual English & Spanish service.';
-$serviceDescriptionEs = 'Instalacion profesional de llantas en Portland, OR. Montaje, balanceo y reinicio de TPMS incluidos. Desde $20 por llanta. Servicio bilingue.';
-$startingPrice = '$20+';
+$serviceDescription = 'Professional tire installation in Portland, OR. Mounting, balancing, and TPMS reset included. Bilingual English & Spanish service.';
+$serviceDescriptionEs = 'Instalacion profesional de llantas en Portland, OR. Montaje, balanceo y reinicio de TPMS incluidos. Servicio bilingue.';
 $serviceBody = '<p>Oregon Tires Auto Care offers professional tire installation for all vehicle types. Every installation includes mounting, computer-aided balancing, TPMS sensor reset, and a torque-to-spec finish. We work with tires you purchase from us or bring in yourself.</p><p>We carry a wide selection of new and quality used tires from trusted brands. Whether you need all-season, winter, or performance tires, our technicians will help you find the right fit for your vehicle and driving needs.</p>';
 $serviceBodyEs = '<p>Oregon Tires Auto Care ofrece instalacion profesional de llantas para todo tipo de vehiculo. Cada instalacion incluye montaje, balanceo por computadora, reinicio del sensor TPMS y torque a especificacion. Trabajamos con llantas compradas con nosotros o que usted traiga.</p><p>Tenemos una amplia seleccion de llantas nuevas y usadas de calidad. Ya sea que necesite llantas para toda temporada, invierno o alto rendimiento, nuestros tecnicos le ayudaran a encontrar la opcion correcta.</p>';
 $faqItems = [
@@ -14,8 +13,8 @@ $faqItems = [
     ['q' => 'Do you offer tire disposal?', 'a' => 'Yes, we properly recycle old tires for a small environmental fee.', 'qEs' => 'Ofrecen desecho de llantas?', 'aEs' => 'Si, reciclamos adecuadamente las llantas viejas por una pequena tarifa ambiental.'],
 ];
 $relatedServices = [
-    ['name' => 'Tire Repair', 'slug' => 'tire-repair', 'price' => '$15+'],
-    ['name' => 'Wheel Alignment', 'slug' => 'wheel-alignment', 'price' => '$75+'],
-    ['name' => 'Brake Service', 'slug' => 'brake-service', 'price' => '$100+'],
+    ['name' => 'Tire Repair', 'slug' => 'tire-repair'],
+    ['name' => 'Wheel Alignment', 'slug' => 'wheel-alignment'],
+    ['name' => 'Brake Service', 'slug' => 'brake-service'],
 ];
 require __DIR__ . '/templates/service-detail.php';

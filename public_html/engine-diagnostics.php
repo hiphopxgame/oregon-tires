@@ -3,9 +3,8 @@ $serviceName = 'Engine Diagnostics';
 $serviceNameEs = 'Diagnostico de Motor';
 $serviceSlug = 'engine-diagnostics';
 $serviceIcon = '&#x1F50D;';
-$serviceDescription = 'Advanced engine diagnostic services in Portland, OR. Check engine light diagnosis, OBD-II scanning, and performance testing. Starting at $50. Bilingual English & Spanish service.';
-$serviceDescriptionEs = 'Servicios avanzados de diagnostico de motor en Portland, OR. Diagnostico de luz de motor, escaneo OBD-II y pruebas de rendimiento. Desde $50. Servicio bilingue.';
-$startingPrice = '$50+';
+$serviceDescription = 'Advanced engine diagnostic services in Portland, OR. Check engine light diagnosis, OBD-II scanning, and performance testing. Bilingual English & Spanish service.';
+$serviceDescriptionEs = 'Servicios avanzados de diagnostico de motor en Portland, OR. Diagnostico de luz de motor, escaneo OBD-II y pruebas de rendimiento. Servicio bilingue.';
 $serviceBody = '<p>Oregon Tires Auto Care provides full computer diagnostic services using professional OBD-II scanning equipment. We identify the causes behind check engine lights, engine misfires, sensor failures, emissions issues, and overall performance problems.</p><p>After the diagnostic scan, we provide a detailed report with clear explanations of what we found and our repair recommendations with upfront pricing. We never pressure you into repairs — just honest information so you can make the best decision for your vehicle.</p>';
 $serviceBodyEs = '<p>Oregon Tires Auto Care ofrece servicios completos de diagnostico por computadora usando equipo profesional de escaneo OBD-II. Identificamos las causas detras de las luces de motor, fallas de encendido, fallas de sensores, problemas de emisiones y problemas generales de rendimiento.</p><p>Despues del escaneo diagnostico, proporcionamos un informe detallado con explicaciones claras de lo que encontramos y nuestras recomendaciones de reparacion con precios transparentes. Nunca lo presionamos para hacer reparaciones — solo informacion honesta para que pueda tomar la mejor decision para su vehiculo.</p>';
 $faqItems = [
@@ -14,8 +13,8 @@ $faqItems = [
     ['q' => 'Do you fix what you find?', 'a' => 'Yes! Once we diagnose the issue, we provide a detailed estimate for the repair. With your approval, our technicians can perform the repair right away in most cases.', 'qEs' => 'Reparan lo que encuentran?', 'aEs' => 'Si! Una vez que diagnosticamos el problema, proporcionamos un estimado detallado para la reparacion. Con su aprobacion, nuestros tecnicos pueden realizar la reparacion de inmediato en la mayoria de los casos.'],
 ];
 $relatedServices = [
-    ['name' => 'Oil Change', 'slug' => 'oil-change', 'price' => '$35+'],
-    ['name' => 'Brake Service', 'slug' => 'brake-service', 'price' => '$100+'],
-    ['name' => 'Suspension Repair', 'slug' => 'suspension-repair', 'price' => '$120+'],
+    ['name' => 'Oil Change', 'slug' => 'oil-change'],
+    ['name' => 'Brake Service', 'slug' => 'brake-service'],
+    ['name' => 'Suspension Repair', 'slug' => 'suspension-repair'],
 ];
 require __DIR__ . '/templates/service-detail.php';
