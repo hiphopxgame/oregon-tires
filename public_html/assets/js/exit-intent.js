@@ -47,7 +47,7 @@
     // Create overlay
     var overlay = document.createElement('div');
     overlay.id = 'exit-popup-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;';
+    overlay.style.cssText = 'position:fixed;inset:0;background:var(--color-overlay, rgba(0,0,0,0.6));z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;';
 
     var popup = document.createElement('div');
     var animateSlide = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -111,7 +111,7 @@
 
     var submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
-    submitBtn.style.cssText = 'background:var(--ot-amber);color:#000;padding:0.75rem 1rem;border:none;border-radius:0.5rem;font-weight:600;cursor:pointer;font-size:0.875rem;white-space:nowrap;';
+    submitBtn.style.cssText = 'background:var(--ot-amber);color:var(--color-text, #000);padding:0.75rem 1rem;border:none;border-radius:0.5rem;font-weight:600;cursor:pointer;font-size:0.875rem;white-space:nowrap;';
     submitBtn.textContent = cta;
     form.appendChild(submitBtn);
 
