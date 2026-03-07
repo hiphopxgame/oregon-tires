@@ -10,5 +10,7 @@ Disallow: /sql/
 Disallow: /templates/
 Disallow: /tests/
 Disallow: /_uploads/
+Disallow: /members
+Disallow: /checkout
 
 Sitemap: https://oregon.tires/sitemap.xml

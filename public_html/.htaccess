@@ -45,6 +45,9 @@
     # Blog post clean URLs: /blog/SLUG → blog-post.php?slug=SLUG
     RewriteRule ^blog/([a-z0-9-]+)/?$ blog-post.php?slug=$1 [L,QSA]
 
+    # Dynamic sitemap: /sitemap.xml → api/sitemap.php
+    RewriteRule ^sitemap\.xml$ api/sitemap.php [L]
+
     # 301 redirect old root js/ → admin/js/ (ot-charts.js moved)
     RewriteRule ^js/(.+)$ /admin/js/$1 [R=301,L]
 
