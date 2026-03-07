@@ -9,6 +9,10 @@
 (function() {
 'use strict';
 
+function t(key, fallback) {
+  return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fallback;
+}
+
 // ─── State ───────────────────────────────────────────────────────────────────
 var roList = [];
 var roPage = 1;
@@ -32,8 +36,8 @@ var statusColors = {
 };
 
 function createStatusBadge(status) {
-  var label = (status || 'intake').replace(/_/g, ' ');
-  label = label.charAt(0).toUpperCase() + label.slice(1);
+  var statusKey = 'roStatus' + (status || 'intake').replace(/_([a-z])/g, function(m,c){ return c.toUpperCase(); }).replace(/^[a-z]/, function(c){ return c.toUpperCase(); });
+  var label = t(statusKey, (status || 'intake').replace(/_/g, ' ').replace(/^[a-z]/, function(c){ return c.toUpperCase(); }));
   var cls = statusColors[status] || statusColors.intake;
   var span = document.createElement('span');
   span.className = 'px-2.5 py-1 rounded-full text-xs font-bold ' + cls;
@@ -44,12 +48,25 @@ function createStatusBadge(status) {
 function formatDate(dateStr) {
   if (!dateStr) return '-';
   var d = new Date(dateStr);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString(currentLang === 'es' ? 'es-MX' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 // ─── Status Timeline / Stepper ──────────────────────────────────────────────
 var timelineStatuses = ['intake', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'waiting_parts', 'ready', 'completed', 'invoiced'];
-var timelineLabels  = { intake: 'Intake', diagnosis: 'Diag', estimate_pending: 'Est.', pending_approval: 'Approval', approved: 'Approved', in_progress: 'In Prog', waiting_parts: 'Parts', ready: 'Ready', completed: 'Done', invoiced: 'Invoiced' };
+function getTimelineLabels() {
+  return {
+    intake: t('roStatusIntake', 'Intake'),
+    diagnosis: t('roTimelineDiag', 'Diag'),
+    estimate_pending: t('roTimelineEst', 'Est.'),
+    pending_approval: t('roTimelineApproval', 'Approval'),
+    approved: t('roStatusApproved', 'Approved'),
+    in_progress: t('roTimelineInProg', 'In Prog'),
+    waiting_parts: t('roTimelineParts', 'Parts'),
+    ready: t('roStatusReady', 'Ready'),
+    completed: t('roTimelineDone', 'Done'),
+    invoiced: t('roStatusInvoiced', 'Invoiced')
+  };
+}
 
 function renderStatusTimeline(currentStatus) {
   var isCancelled = currentStatus === 'cancelled';
@@ -69,7 +86,7 @@ function renderStatusTimeline(currentStatus) {
     xMark.style.fontSize = '14px';
     cancelBadge.appendChild(xMark);
     var cancelTxt = document.createElement('span');
-    cancelTxt.textContent = 'Cancelled';
+    cancelTxt.textContent = t('roStatusCancelled', 'Cancelled');
     cancelBadge.appendChild(cancelTxt);
     cancelBanner.appendChild(cancelBadge);
     wrapper.appendChild(cancelBanner);
@@ -121,7 +138,7 @@ function renderStatusTimeline(currentStatus) {
 
     // Label
     var label = document.createElement('div');
-    label.textContent = timelineLabels[status] || status;
+    label.textContent = getTimelineLabels()[status] || status;
     var labelColor = isCurrent ? '#16a34a' : isPast ? '#4b5563' : '#9ca3af';
     var labelWeight = isCurrent ? '700' : isPast ? '600' : '400';
     if (isCancelled) { labelColor = '#9ca3af'; labelWeight = '400'; }
@@ -155,7 +172,7 @@ window.loadRepairOrders = async function() {
     renderRoTable();
   } catch (err) {
     console.error('loadRepairOrders error:', err);
-    showToast('Failed to load repair orders', true);
+    showToast(t('roFailedLoad', 'Failed to load repair orders'), true);
   }
 };
 
@@ -169,7 +186,7 @@ function renderRoTable() {
     var cell = document.createElement('td');
     cell.colSpan = 6;
     cell.className = 'p-8 text-center text-gray-400';
-    cell.textContent = 'No repair orders found';
+    cell.textContent = t('roNoOrders', 'No repair orders found');
     row.appendChild(cell);
     tbody.appendChild(row);
     return;
@@ -215,7 +232,7 @@ function renderRoTable() {
     tdAct.className = 'p-3 text-sm';
     var viewBtn = document.createElement('button');
     viewBtn.className = 'text-green-600 hover:text-green-800 text-sm font-medium';
-    viewBtn.textContent = 'View';
+    viewBtn.textContent = t('actionView', 'View');
     viewBtn.addEventListener('click', function(e) { e.stopPropagation(); viewRoDetail(ro.id); });
     tdAct.appendChild(viewBtn);
     tr.appendChild(tdAct);
@@ -251,7 +268,7 @@ window.viewRoDetail = async function(id) {
     currentRo = json.data;
     renderRoDetailModal();
   } catch (err) {
-    showToast('Failed to load repair order: ' + err.message, true);
+    showToast(t('roFailedLoad', 'Failed to load repair order') + ': ' + err.message, true);
   }
 };
 
@@ -308,7 +325,8 @@ function renderRoDetailModal() {
   ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','waiting_parts','ready','completed','invoiced','cancelled'].forEach(function(s) {
     var opt = document.createElement('option');
     opt.value = s;
-    opt.textContent = s.replace(/_/g, ' ');
+    var sKey = 'roStatus' + s.replace(/_([a-z])/g, function(m,c){ return c.toUpperCase(); }).replace(/^[a-z]/, function(c){ return c.toUpperCase(); });
+    opt.textContent = t(sKey, s.replace(/_/g, ' '));
     opt.className = 'text-gray-900';
     if (s === ro.status) opt.selected = true;
     statusSelect.appendChild(opt);
@@ -316,13 +334,13 @@ function renderRoDetailModal() {
 
   var updateBtn = document.createElement('button');
   updateBtn.className = 'bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-white/30 font-medium';
-  updateBtn.textContent = 'Update Status';
+  updateBtn.textContent = t('roUpdateStatus', 'Update Status');
   updateBtn.addEventListener('click', async function() {
     var newStatus = statusSelect.value;
     if (newStatus === ro.status) return;
     try {
       await api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: newStatus } });
-      showToast('Status updated to ' + newStatus.replace(/_/g, ' '));
+      showToast(t('roStatusUpdatedTo', 'Status updated to') + ' ' + newStatus.replace(/_/g, ' '));
       modal.remove();
       loadRepairOrders();
     } catch (err) {
@@ -347,15 +365,15 @@ function renderRoDetailModal() {
   grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-4';
 
   [
-    ['Customer', customer],
-    ['Email', ro.customer_email || '-'],
-    ['Phone', ro.customer_phone || '-'],
-    ['Vehicle', vehicle],
+    [t('roThCustomer', 'Customer'), customer],
+    [t('emailLabel2', 'Email'), ro.customer_email || '-'],
+    [t('phone', 'Phone'), ro.customer_phone || '-'],
+    [t('roThVehicle', 'Vehicle'), vehicle],
     ['VIN', ro.vin || '-'],
-    ['Mileage In', ro.mileage_in ? Number(ro.mileage_in).toLocaleString() : '-'],
-    ['Promised Date', ro.promised_date || '-'],
-    ['Created', formatDate(ro.created_at)],
-    ['Updated', formatDate(ro.updated_at)],
+    [t('roMileageIn', 'Mileage In'), ro.mileage_in ? Number(ro.mileage_in).toLocaleString() : '-'],
+    [t('roPromisedDate', 'Promised Date'), ro.promised_date || '-'],
+    [t('roThCreated', 'Created'), formatDate(ro.created_at)],
+    [t('roUpdated', 'Updated'), formatDate(ro.updated_at)],
   ].forEach(function(pair) {
     var div = document.createElement('div');
     var lbl = document.createElement('p');
@@ -376,7 +394,7 @@ function renderRoDetailModal() {
     concernDiv.className = 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4';
     var concernLbl = document.createElement('h3');
     concernLbl.className = 'font-bold text-amber-800 dark:text-amber-300 text-sm mb-1';
-    concernLbl.textContent = 'Customer Concern';
+    concernLbl.textContent = t('roCustomerConcern', 'Customer Concern');
     var concernTxt = document.createElement('p');
     concernTxt.className = 'text-sm text-gray-700 dark:text-gray-300';
     concernTxt.textContent = ro.customer_concern;
@@ -391,11 +409,11 @@ function renderRoDetailModal() {
 
   var inspBtn = document.createElement('button');
   inspBtn.className = 'px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition';
-  inspBtn.textContent = 'New Inspection';
+  inspBtn.textContent = t('roNewInspection', 'New Inspection');
   inspBtn.addEventListener('click', async function() {
     try {
       await api('inspections.php', { method: 'POST', body: { repair_order_id: ro.id } });
-      showToast('Inspection created with template items');
+      showToast(t('roInspectionCreated', 'Inspection created with template items'));
       viewRoDetail(ro.id);
     } catch(err) { showToast('Failed: ' + err.message, true); }
   });
@@ -403,7 +421,7 @@ function renderRoDetailModal() {
 
   var estBtn = document.createElement('button');
   estBtn.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition';
-  estBtn.textContent = 'New Estimate';
+  estBtn.textContent = t('roNewEstimate', 'New Estimate');
   estBtn.addEventListener('click', async function() {
     var inspId = null;
     if (ro.inspections && ro.inspections.length > 0) inspId = ro.inspections[0].id;
@@ -411,7 +429,7 @@ function renderRoDetailModal() {
       var payload = { repair_order_id: ro.id, tax_rate: 0.0 };
       if (inspId) payload.from_inspection_id = inspId;
       await api('estimates.php', { method: 'POST', body: payload });
-      showToast('Estimate created');
+      showToast(t('roEstimateCreated', 'Estimate created'));
       viewRoDetail(ro.id);
     } catch(err) { showToast('Failed: ' + err.message, true); }
   });
@@ -423,7 +441,7 @@ function renderRoDetailModal() {
     var inspSection = document.createElement('div');
     var inspH = document.createElement('h3');
     inspH.className = 'font-bold text-gray-900 dark:text-white mb-3';
-    inspH.textContent = 'Inspections (' + ro.inspections.length + ')';
+    inspH.textContent = t('roInspections', 'Inspections') + ' (' + ro.inspections.length + ')';
     inspSection.appendChild(inspH);
 
     ro.inspections.forEach(function(insp) {
@@ -459,10 +477,10 @@ function renderRoDetailModal() {
       if (insp.status !== 'sent' && insp.status !== 'completed') {
         var compBtn = document.createElement('button');
         compBtn.className = 'text-green-600 hover:text-green-800 text-sm font-medium';
-        compBtn.textContent = 'Complete';
+        compBtn.textContent = t('roComplete', 'Complete');
         compBtn.addEventListener('click', (function(iid) { return async function(e) {
           e.stopPropagation();
-          try { await api('inspections.php', { method: 'PUT', body: { id: iid, action: 'complete' } }); showToast('Inspection completed'); viewRoDetail(ro.id); }
+          try { await api('inspections.php', { method: 'PUT', body: { id: iid, action: 'complete' } }); showToast(t('roInspectionCompleted', 'Inspection completed')); viewRoDetail(ro.id); }
           catch(err) { showToast('Failed: ' + err.message, true); }
         }; })(insp.id));
         iActions.appendChild(compBtn);
@@ -471,22 +489,22 @@ function renderRoDetailModal() {
       if (insp.status === 'completed') {
         var sendBtn = document.createElement('button');
         sendBtn.className = 'text-blue-600 hover:text-blue-800 text-sm font-medium';
-        sendBtn.textContent = 'Send to Customer';
+        sendBtn.textContent = t('roSendToCustomer', 'Send to Customer');
         sendBtn.addEventListener('click', (function(iid) { return async function(e) {
           e.stopPropagation();
-          try { await api('inspections.php', { method: 'PUT', body: { id: iid, action: 'send' } }); showToast('Inspection sent to customer'); viewRoDetail(ro.id); }
+          try { await api('inspections.php', { method: 'PUT', body: { id: iid, action: 'send' } }); showToast(t('roInspectionSent', 'Inspection sent to customer')); viewRoDetail(ro.id); }
           catch(err) { showToast('Failed: ' + err.message, true); }
         }; })(insp.id));
         iActions.appendChild(sendBtn);
 
         var resendInspBtn = document.createElement('button');
         resendInspBtn.className = 'text-orange-600 hover:text-orange-800 text-sm font-medium';
-        resendInspBtn.textContent = 'Resend to Customer';
+        resendInspBtn.textContent = t('roResendToCustomer', 'Resend to Customer');
         resendInspBtn.addEventListener('click', (function(iid) { return async function(e) {
           e.stopPropagation();
           try {
             await api('inspections.php', { method: 'PUT', body: { id: iid, action: 'send' } });
-            showToast('Inspection re-sent to customer');
+            showToast(t('roInspectionResent', 'Inspection re-sent to customer'));
           } catch(err) { showToast('Failed: ' + err.message, true); }
         }; })(insp.id));
         iActions.appendChild(resendInspBtn);
@@ -495,12 +513,12 @@ function renderRoDetailModal() {
       if (insp.status === 'sent') {
         var resendSentInspBtn = document.createElement('button');
         resendSentInspBtn.className = 'text-orange-600 hover:text-orange-800 text-sm font-medium';
-        resendSentInspBtn.textContent = 'Resend to Customer';
+        resendSentInspBtn.textContent = t('roResendToCustomer', 'Resend to Customer');
         resendSentInspBtn.addEventListener('click', (function(iid) { return async function(e) {
           e.stopPropagation();
           try {
             await api('inspections.php', { method: 'PUT', body: { id: iid, action: 'send' } });
-            showToast('Inspection re-sent to customer');
+            showToast(t('roInspectionResent', 'Inspection re-sent to customer'));
           } catch(err) { showToast('Failed: ' + err.message, true); }
         }; })(insp.id));
         iActions.appendChild(resendSentInspBtn);
@@ -517,7 +535,7 @@ function renderRoDetailModal() {
     var estSection = document.createElement('div');
     var estH = document.createElement('h3');
     estH.className = 'font-bold text-gray-900 dark:text-white mb-3';
-    estH.textContent = 'Estimates (' + ro.estimates.length + ')';
+    estH.textContent = t('roEstimates', 'Estimates') + ' (' + ro.estimates.length + ')';
     estSection.appendChild(estH);
 
     ro.estimates.forEach(function(est) {
@@ -559,10 +577,10 @@ function renderRoDetailModal() {
       if (est.status === 'draft') {
         var sendEstBtn = document.createElement('button');
         sendEstBtn.className = 'text-blue-600 hover:text-blue-800 text-sm font-medium';
-        sendEstBtn.textContent = 'Send to Customer';
+        sendEstBtn.textContent = t('roSendToCustomer', 'Send to Customer');
         sendEstBtn.addEventListener('click', (function(eid) { return async function(e) {
           e.stopPropagation();
-          try { await api('estimates.php', { method: 'PUT', body: { id: eid, action: 'send' } }); showToast('Estimate sent to customer'); viewRoDetail(ro.id); }
+          try { await api('estimates.php', { method: 'PUT', body: { id: eid, action: 'send' } }); showToast(t('roEstimateSent', 'Estimate sent to customer')); viewRoDetail(ro.id); }
           catch(err) { showToast('Failed: ' + err.message, true); }
         }; })(est.id));
         eActions.appendChild(sendEstBtn);
@@ -571,12 +589,12 @@ function renderRoDetailModal() {
       if (est.status === 'sent' || est.status === 'viewed' || est.status === 'approved' || est.status === 'partial') {
         var resendEstBtn = document.createElement('button');
         resendEstBtn.className = 'text-orange-600 hover:text-orange-800 text-sm font-medium';
-        resendEstBtn.textContent = 'Resend to Customer';
+        resendEstBtn.textContent = t('roResendToCustomer', 'Resend to Customer');
         resendEstBtn.addEventListener('click', (function(eid) { return async function(e) {
           e.stopPropagation();
           try {
             await api('estimates.php', { method: 'PUT', body: { id: eid, action: 'send' } });
-            showToast('Estimate re-sent to customer');
+            showToast(t('roEstimateResent', 'Estimate re-sent to customer'));
           } catch(err) { showToast('Failed: ' + err.message, true); }
         }; })(est.id));
         eActions.appendChild(resendEstBtn);
@@ -594,7 +612,7 @@ function renderRoDetailModal() {
     apptDiv.className = 'bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4';
     var apptH = document.createElement('h3');
     apptH.className = 'font-bold text-gray-900 dark:text-white text-sm mb-2';
-    apptH.textContent = 'Linked Appointment';
+    apptH.textContent = t('roLinkedAppointment', 'Linked Appointment');
     apptDiv.appendChild(apptH);
     var apptInfo = document.createElement('p');
     apptInfo.className = 'text-sm text-gray-600 dark:text-gray-300';
@@ -626,7 +644,7 @@ window.roShowCreateModal = function(appointmentId) {
 
   var title = document.createElement('h2');
   title.className = 'text-xl font-bold text-gray-900 dark:text-white mb-4';
-  title.textContent = 'Create Repair Order';
+  title.textContent = t('roCreateRepairOrder', 'Create Repair Order');
   card.appendChild(title);
 
   var optWrap = document.createElement('div');
@@ -637,13 +655,13 @@ window.roShowCreateModal = function(appointmentId) {
   fromApptDiv.className = 'border border-gray-200 dark:border-gray-700 rounded-xl p-4';
   var fromApptH = document.createElement('h3');
   fromApptH.className = 'font-bold text-gray-900 dark:text-white mb-2';
-  fromApptH.textContent = 'From Appointment';
+  fromApptH.textContent = t('roFromAppointment', 'From Appointment');
   fromApptDiv.appendChild(fromApptH);
 
   // Search input
   var searchInput = document.createElement('input');
   searchInput.type = 'text';
-  searchInput.placeholder = 'Search by name, phone, service, reference...';
+  searchInput.placeholder = t('roSearchApptPlaceholder', 'Search by name, phone, service, reference...');
   searchInput.className = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-2 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600';
   fromApptDiv.appendChild(searchInput);
 
@@ -653,7 +671,7 @@ window.roShowCreateModal = function(appointmentId) {
   listWrap.className = 'border border-gray-200 dark:border-gray-700 rounded-lg mb-3';
   var listLoading = document.createElement('div');
   listLoading.className = 'p-4 text-center text-sm text-gray-500 dark:text-gray-400';
-  listLoading.textContent = 'Loading appointments...';
+  listLoading.textContent = t('loading', 'Loading appointments...');
   listWrap.appendChild(listLoading);
   fromApptDiv.appendChild(listWrap);
 
@@ -664,10 +682,10 @@ window.roShowCreateModal = function(appointmentId) {
 
   var apptBtn = document.createElement('button');
   apptBtn.className = 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 w-full opacity-50 cursor-not-allowed';
-  apptBtn.textContent = 'Create from Appointment';
+  apptBtn.textContent = t('roCreateFromAppt', 'Create from Appointment');
   apptBtn.disabled = true;
   apptBtn.addEventListener('click', async function() {
-    if (!selectedApptId) { showToast('Select an appointment first', true); return; }
+    if (!selectedApptId) { showToast(t('roSelectApptFirst', 'Select an appointment first'), true); return; }
     try {
       var json = await api('repair-orders.php', { method: 'POST', body: { appointment_id: selectedApptId } });
       showToast('Repair order ' + json.data.ro_number + ' created!');
@@ -700,7 +718,7 @@ window.roShowCreateModal = function(appointmentId) {
     if (filtered.length === 0) {
       var empty = document.createElement('div');
       empty.className = 'p-4 text-center text-sm text-gray-500 dark:text-gray-400';
-      empty.textContent = filter ? 'No matching appointments' : 'No available appointments';
+      empty.textContent = filter ? t('roNoMatchingAppts', 'No matching appointments') : t('roNoAvailableAppts', 'No available appointments');
       listWrap.appendChild(empty);
       return;
     }
@@ -781,7 +799,7 @@ window.roShowCreateModal = function(appointmentId) {
     clearChildren(listWrap);
     var errDiv = document.createElement('div');
     errDiv.className = 'p-4 text-center text-sm text-red-500';
-    errDiv.textContent = 'Failed to load appointments';
+    errDiv.textContent = t('roFailedLoadAppts', 'Failed to load appointments');
     listWrap.appendChild(errDiv);
   });
 
@@ -792,30 +810,30 @@ window.roShowCreateModal = function(appointmentId) {
   walkDiv.className = 'border border-gray-200 dark:border-gray-700 rounded-xl p-4';
   var walkH = document.createElement('h3');
   walkH.className = 'font-bold text-gray-900 dark:text-white mb-2';
-  walkH.textContent = 'Walk-in (No Appointment)';
+  walkH.textContent = t('roWalkIn', 'Walk-in (No Appointment)');
   walkDiv.appendChild(walkH);
 
   var custInput = document.createElement('input');
-  custInput.type = 'number'; custInput.id = 'ro-cust-id'; custInput.placeholder = 'Customer ID';
+  custInput.type = 'number'; custInput.id = 'ro-cust-id'; custInput.placeholder = t('roCustomerId', 'Customer ID');
   custInput.className = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-2 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600';
   walkDiv.appendChild(custInput);
 
   var vehInput = document.createElement('input');
-  vehInput.type = 'number'; vehInput.id = 'ro-veh-id'; vehInput.placeholder = 'Vehicle ID (optional)';
+  vehInput.type = 'number'; vehInput.id = 'ro-veh-id'; vehInput.placeholder = t('roVehicleId', 'Vehicle ID (optional)');
   vehInput.className = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-2 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600';
   walkDiv.appendChild(vehInput);
 
   var concernInput = document.createElement('textarea');
-  concernInput.id = 'ro-concern'; concernInput.placeholder = 'Customer concern (optional)'; concernInput.rows = 2;
+  concernInput.id = 'ro-concern'; concernInput.placeholder = t('roConcernPlaceholder', 'Customer concern (optional)'); concernInput.rows = 2;
   concernInput.className = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-3 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600';
   walkDiv.appendChild(concernInput);
 
   var walkBtn = document.createElement('button');
   walkBtn.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 w-full';
-  walkBtn.textContent = 'Create Walk-in RO';
+  walkBtn.textContent = t('roCreateWalkIn', 'Create Walk-in RO');
   walkBtn.addEventListener('click', async function() {
     var custId = parseInt(document.getElementById('ro-cust-id').value);
-    if (!custId) { showToast('Customer ID is required', true); return; }
+    if (!custId) { showToast(t('roCustomerIdRequired', 'Customer ID is required'), true); return; }
     var payload = { customer_id: custId };
     var vehId = parseInt(document.getElementById('ro-veh-id').value);
     if (vehId) payload.vehicle_id = vehId;
@@ -834,7 +852,7 @@ window.roShowCreateModal = function(appointmentId) {
 
   var cancelBtn = document.createElement('button');
   cancelBtn.className = 'mt-4 w-full text-center text-gray-500 hover:text-gray-700 text-sm';
-  cancelBtn.textContent = 'Cancel';
+  cancelBtn.textContent = t('cancel', 'Cancel');
   cancelBtn.addEventListener('click', function() { modal.remove(); });
   card.appendChild(cancelBtn);
 

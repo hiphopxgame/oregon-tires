@@ -23,6 +23,10 @@ var COLUMNS = [
 
 var kanbanActive = false;
 
+function t(key, fallback) {
+  return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fallback;
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function isDark() {
@@ -186,7 +190,18 @@ function createColumn(colDef, cards) {
     'color:' + (dark ? '#e5e7eb' : '#374151') + ';' +
     'text-transform:uppercase;' +
     'letter-spacing:0.5px;';
-  label.textContent = colDef.label;
+  var labelKeys = {
+    intake: 'roStatusIntake',
+    diagnosis: 'roStatusDiagnosis',
+    estimate_pending: 'roTimelineEst',
+    pending_approval: 'roTimelineApproval',
+    approved: 'roStatusApproved',
+    in_progress: 'roStatusInProgress',
+    waiting_parts: 'roTimelineParts',
+    ready: 'roStatusReady',
+    completed: 'roTimelineDone'
+  };
+  label.textContent = t(labelKeys[colDef.key], colDef.label);
 
   var badge = document.createElement('span');
   badge.style.cssText =
@@ -228,7 +243,7 @@ function createColumn(colDef, cards) {
       'padding:16px 8px;' +
       'font-size:11px;' +
       'color:' + (dark ? '#4b5563' : '#d1d5db') + ';';
-    empty.textContent = 'No orders';
+    empty.textContent = t('kanbanNoOrders', 'No orders');
     cardList.appendChild(empty);
   }
 
@@ -282,7 +297,7 @@ async function handleStatusDrop(roId, newStatus) {
       body: { id: roId, status: newStatus }
     });
     var friendlyStatus = newStatus.replace(/_/g, ' ');
-    showToast('Moved to ' + friendlyStatus.charAt(0).toUpperCase() + friendlyStatus.slice(1));
+    showToast(t('roMovedTo', 'Moved to') + ' ' + friendlyStatus.charAt(0).toUpperCase() + friendlyStatus.slice(1));
     // Reload the kanban board
     loadKanban();
     // Also refresh the table data in the background so switching views stays in sync
@@ -290,7 +305,7 @@ async function handleStatusDrop(roId, newStatus) {
       loadRepairOrders();
     }
   } catch (err) {
-    showToast('Failed to update status: ' + (err.message || 'Unknown error'), true);
+    showToast(t('kanbanFailedUpdate', 'Failed to update status') + ': ' + (err.message || 'Unknown error'), true);
   }
 }
 
@@ -348,7 +363,7 @@ window.loadKanban = async function() {
     'padding:40px;' +
     'color:' + (isDark() ? '#9ca3af' : '#6b7280') + ';' +
     'font-size:14px;';
-  loadingMsg.textContent = 'Loading kanban board...';
+  loadingMsg.textContent = t('kanbanLoading', 'Loading kanban board...');
   container.appendChild(loadingMsg);
 
   try {
@@ -377,7 +392,7 @@ window.loadKanban = async function() {
       'padding:40px;' +
       'color:#ef4444;' +
       'font-size:14px;';
-    errMsg.textContent = 'Failed to load kanban: ' + (err.message || 'Unknown error');
+    errMsg.textContent = t('kanbanFailedLoad', 'Failed to load kanban') + ': ' + (err.message || 'Unknown error');
     container.appendChild(errMsg);
     console.error('loadKanban error:', err);
   }
@@ -400,7 +415,7 @@ window.toggleKanbanView = function() {
     kanbanView.style.display = 'block';
     if (toggleBtn) {
       toggleBtn.textContent = '';
-      var tableIcon = document.createTextNode('Table View');
+      var tableIcon = document.createTextNode(t('kanbanTableView', 'Table View'));
       toggleBtn.appendChild(tableIcon);
     }
     loadKanban();
@@ -410,7 +425,7 @@ window.toggleKanbanView = function() {
     kanbanView.style.display = 'none';
     if (toggleBtn) {
       toggleBtn.textContent = '';
-      var kanbanIcon = document.createTextNode('Kanban View');
+      var kanbanIcon = document.createTextNode(t('kanbanView', 'Kanban View'));
       toggleBtn.appendChild(kanbanIcon);
     }
   }
@@ -433,7 +448,7 @@ function injectKanbanElements() {
         var toggleBtn = document.createElement('button');
         toggleBtn.id = 'ro-view-toggle';
         toggleBtn.className = 'bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 flex items-center gap-1';
-        toggleBtn.textContent = 'Kanban View';
+        toggleBtn.textContent = t('kanbanView', 'Kanban View');
         toggleBtn.addEventListener('click', function() {
           toggleKanbanView();
         });

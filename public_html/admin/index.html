@@ -402,7 +402,7 @@
           </div>
         </div>
         <div class="relative hidden md:block" id="global-search-wrap">
-          <input type="text" id="global-search" placeholder="Search everything... (Ctrl+K)" class="w-64 bg-white/10 text-white placeholder-white/60 rounded-lg px-4 py-2 text-sm focus:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30" aria-label="Global search">
+          <input type="text" id="global-search" data-t="globalSearchPlaceholder" placeholder="Search everything... (Ctrl+K)" class="w-64 bg-white/10 text-white placeholder-white/60 rounded-lg px-4 py-2 text-sm focus:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30" aria-label="Global search">
           <div id="global-search-results" class="absolute top-full mt-1 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 hidden max-h-96 overflow-y-auto z-50"></div>
         </div>
         <div class="flex items-center gap-3">
@@ -446,21 +446,21 @@
         <button onclick="switchTab('subscribers')" data-tab="subscribers" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📧 <span data-t="tabSubscribers">Subscribers</span> <span id="subscribers-badge" class="ml-1 bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full hidden"></span></button>
       </nav>
       <select id="mobile-tab-select" onchange="switchTab(this.value)" class="hidden w-full mt-2 bg-white/20 text-white border border-white/30 rounded-lg px-4 py-3 text-sm font-medium appearance-none cursor-pointer" style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22white%22 d=%22M2 4l4 4 4-4%22/></svg>');background-repeat:no-repeat;background-position:right 12px center;">
-        <option value="overview">Overview</option>
-        <option value="appointments">Appointments</option>
-        <option value="customers">Customers</option>
-        <option value="repairorders">Repair Orders</option>
-        <option value="messages">Messages</option>
-        <option value="employees">Employees</option>
-        <option value="gallery">Gallery</option>
-        <option value="blog">Blog</option>
-        <option value="promotions">Promotions</option>
+        <option value="overview" data-t="tabOverview">Overview</option>
+        <option value="appointments" data-t="tabAppointments">Appointments</option>
+        <option value="customers" data-t="tabCustomers">Customers</option>
+        <option value="repairorders" data-t="tabRepairOrders">Repair Orders</option>
+        <option value="messages" data-t="tabMessages">Messages</option>
+        <option value="employees" data-t="tabEmployees">Employees</option>
+        <option value="gallery" data-t="tabGallery">Gallery</option>
+        <option value="blog" data-t="tabBlog">Blog</option>
+        <option value="promotions" data-t="tabPromotions">Promotions</option>
         <option value="faq">FAQ</option>
         <option value="reviews">Reviews</option>
-        <option value="analytics">Analytics</option>
-        <option value="docs">Docs</option>
-        <option value="sitecontent">Site Content</option>
-        <option value="subscribers">Subscribers</option>
+        <option value="analytics" data-t="tabAnalytics">Analytics</option>
+        <option value="docs" data-t="tabDocs">Docs</option>
+        <option value="sitecontent" data-t="tabSiteContent">Site Content</option>
+        <option value="subscribers" data-t="tabSubscribers">Subscribers</option>
       </select>
     </div>
   </header>
@@ -554,7 +554,7 @@
           <div class="flex flex-wrap gap-3 mb-4">
             <input type="text" id="appt-search" data-t="searchPlaceholder" placeholder="Search by name, email, service..." onkeyup="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]" aria-label="Search">
             <select id="appt-filter" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
-              <option value="all">All Status</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+              <option value="all" data-t="apptStatusAll">All Status</option><option value="new" data-t="apptStatusNew">New</option><option value="confirmed" data-t="apptStatusConfirmed">Confirmed</option><option value="completed" data-t="apptStatusCompleted">Completed</option><option value="cancelled" data-t="apptStatusCancelled">Cancelled</option>
             </select>
             <select id="appt-month" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
               <option value="all">All Months</option>
@@ -569,10 +569,10 @@
             <div class="flex gap-2">
               <select id="bulk-status" class="text-sm border border-gray-300 rounded-lg px-3 py-1.5">
                 <option value="" data-t="changeStatus">Change Status</option>
-                <option value="new">New</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="new" data-t="apptStatusNew">New</option>
+                <option value="confirmed" data-t="apptStatusConfirmed">Confirmed</option>
+                <option value="completed" data-t="apptStatusCompleted">Completed</option>
+                <option value="cancelled" data-t="apptStatusCancelled">Cancelled</option>
               </select>
               <button onclick="applyBulkStatus()" class="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700" data-t="applyStatus">Apply</button>
               <select id="bulk-employee" class="text-sm border border-gray-300 rounded-lg px-3 py-1.5">
@@ -672,32 +672,32 @@
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
         <!-- Filters -->
         <div class="flex flex-wrap gap-3 mb-4">
-          <input type="text" id="ro-search" oninput="loadRepairOrders()" class="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" placeholder="Search RO#, customer, VIN...">
+          <input type="text" id="ro-search" oninput="loadRepairOrders()" class="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" data-t="roSearchPlaceholder" placeholder="Search RO#, customer, VIN...">
           <select id="ro-status-filter" onchange="loadRepairOrders()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
-            <option value="">All Statuses</option>
-            <option value="intake">Intake</option>
-            <option value="diagnosis">Diagnosis</option>
-            <option value="estimate_pending">Estimate Pending</option>
-            <option value="pending_approval">Pending Approval</option>
-            <option value="approved">Approved</option>
-            <option value="in_progress">In Progress</option>
-            <option value="waiting_parts">Waiting Parts</option>
-            <option value="ready">Ready</option>
-            <option value="completed">Completed</option>
-            <option value="invoiced">Invoiced</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="" data-t="roStatusAll">All Statuses</option>
+            <option value="intake" data-t="roStatusIntake">Intake</option>
+            <option value="diagnosis" data-t="roStatusDiagnosis">Diagnosis</option>
+            <option value="estimate_pending" data-t="roStatusEstimatePending">Estimate Pending</option>
+            <option value="pending_approval" data-t="roStatusPendingApproval">Pending Approval</option>
+            <option value="approved" data-t="roStatusApproved">Approved</option>
+            <option value="in_progress" data-t="roStatusInProgress">In Progress</option>
+            <option value="waiting_parts" data-t="roStatusWaitingParts">Waiting Parts</option>
+            <option value="ready" data-t="roStatusReady">Ready</option>
+            <option value="completed" data-t="roStatusCompleted">Completed</option>
+            <option value="invoiced" data-t="roStatusInvoiced">Invoiced</option>
+            <option value="cancelled" data-t="roStatusCancelled">Cancelled</option>
           </select>
         </div>
         <!-- RO Table -->
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead><tr class="bg-amber-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
-              <th class="p-3">RO #</th>
-              <th class="p-3">Customer</th>
-              <th class="p-3">Vehicle</th>
-              <th class="p-3">Status</th>
-              <th class="p-3">Created</th>
-              <th class="p-3">Actions</th>
+              <th class="p-3" data-t="roThNumber">RO #</th>
+              <th class="p-3" data-t="roThCustomer">Customer</th>
+              <th class="p-3" data-t="roThVehicle">Vehicle</th>
+              <th class="p-3" data-t="roThStatus">Status</th>
+              <th class="p-3" data-t="roThCreated">Created</th>
+              <th class="p-3" data-t="roThActions">Actions</th>
             </tr></thead>
             <tbody id="ro-table"></tbody>
           </table>
@@ -719,7 +719,7 @@
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="nameRequired">Name *</label><input id="new-emp-name" class="w-full p-2 border rounded mt-1" placeholder="Employee name"></div>
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="emailLabel2">Email</label><input id="new-emp-email" type="email" class="w-full p-2 border rounded mt-1" placeholder="email@example.com"></div>
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="phone">Phone</label><input id="new-emp-phone" class="w-full p-2 border rounded mt-1" placeholder="(555) 123-4567"></div>
-            <div><label class="text-sm font-medium dark:text-gray-300" data-t="role">Role</label><select id="new-emp-role" class="w-full p-2 border rounded mt-1"><option value="Employee">Employee</option><option value="Manager">Manager</option></select></div>
+            <div><label class="text-sm font-medium dark:text-gray-300" data-t="role">Role</label><select id="new-emp-role" class="w-full p-2 border rounded mt-1"><option value="Employee" data-t="roleEmployee">Employee</option><option value="Manager" data-t="roleManager">Manager</option></select></div>
           </div>
           <div class="flex gap-2 mt-3">
             <button onclick="addEmployee()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm" data-t="save">💾 Save</button>
@@ -812,9 +812,9 @@
         <div class="flex flex-wrap gap-3 mb-4 items-center">
           <input type="text" id="blog-search" placeholder="Search posts..." oninput="blogSearchDebounce()" class="px-3 py-2 border rounded-lg text-sm w-64 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
           <select id="blog-status-filter" onchange="loadBlogPosts(1)" class="px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
-            <option value="">All Statuses</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
+            <option value="" data-t="roStatusAll">All Statuses</option>
+            <option value="published" data-t="blogPublished">Published</option>
+            <option value="draft" data-t="blogDraft">Draft</option>
           </select>
         </div>
         <!-- Table -->
@@ -822,11 +822,11 @@
           <table class="w-full text-sm">
             <thead class="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300">Title</th>
-                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300">Status</th>
-                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300">Date</th>
-                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300">Author</th>
-                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300">Actions</th>
+                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300" data-t="blogThTitle">Title</th>
+                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300" data-t="blogThStatus">Status</th>
+                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300" data-t="blogThDate">Date</th>
+                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300" data-t="blogThAuthor">Author</th>
+                <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300" data-t="blogThActions">Actions</th>
               </tr>
             </thead>
             <tbody id="blog-table-body"></tbody>
@@ -1081,14 +1081,14 @@
           <table class="w-full responsive-table">
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
-                <th class="px-4 py-3 font-medium">Title</th>
-                <th class="px-4 py-3 font-medium">Type</th>
-                <th class="px-4 py-3 font-medium">Image</th>
-                <th class="px-4 py-3 font-medium">Status</th>
-                <th class="px-4 py-3 font-medium">Date Range</th>
-                <th class="px-4 py-3 font-medium text-center">Order</th>
-                <th class="px-4 py-3 font-medium">Color</th>
-                <th class="px-4 py-3 font-medium">Actions</th>
+                <th class="px-4 py-3 font-medium" data-t="promoThTitle">Title</th>
+                <th class="px-4 py-3 font-medium" data-t="promoThType">Type</th>
+                <th class="px-4 py-3 font-medium" data-t="promoThImage">Image</th>
+                <th class="px-4 py-3 font-medium" data-t="promoThStatus">Status</th>
+                <th class="px-4 py-3 font-medium" data-t="promoThDateRange">Date Range</th>
+                <th class="px-4 py-3 font-medium text-center" data-t="promoThOrder">Order</th>
+                <th class="px-4 py-3 font-medium" data-t="promoThColor">Color</th>
+                <th class="px-4 py-3 font-medium" data-t="promoThActions">Actions</th>
               </tr>
             </thead>
             <tbody id="promotions-table-body">
@@ -1152,10 +1152,10 @@
           <table class="w-full responsive-table">
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
-                <th class="px-4 py-3 font-medium">Question</th>
-                <th class="px-4 py-3 font-medium">Status</th>
-                <th class="px-4 py-3 font-medium text-center">Order</th>
-                <th class="px-4 py-3 font-medium">Actions</th>
+                <th class="px-4 py-3 font-medium" data-t="faqThQuestion">Question</th>
+                <th class="px-4 py-3 font-medium" data-t="faqThStatus">Status</th>
+                <th class="px-4 py-3 font-medium text-center" data-t="faqThOrder">Order</th>
+                <th class="px-4 py-3 font-medium" data-t="faqThActions">Actions</th>
               </tr>
             </thead>
             <tbody id="faq-table-body">
@@ -1225,11 +1225,11 @@
           <table class="w-full responsive-table">
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
-                <th class="px-4 py-3 font-medium">Name</th>
-                <th class="px-4 py-3 font-medium">Rating</th>
-                <th class="px-4 py-3 font-medium">Preview</th>
-                <th class="px-4 py-3 font-medium">Status</th>
-                <th class="px-4 py-3 font-medium">Actions</th>
+                <th class="px-4 py-3 font-medium" data-t="reviewThName">Name</th>
+                <th class="px-4 py-3 font-medium" data-t="reviewThRating">Rating</th>
+                <th class="px-4 py-3 font-medium" data-t="reviewThPreview">Preview</th>
+                <th class="px-4 py-3 font-medium" data-t="reviewThStatus">Status</th>
+                <th class="px-4 py-3 font-medium" data-t="reviewThActions">Actions</th>
               </tr>
             </thead>
             <tbody id="testimonials-table-body">
@@ -5662,6 +5662,186 @@ const adminT = {
     chartBayUtilization: 'Bay Utilization Today',
     chartBookingTrend: 'Booking Trend (30 Days)',
     chartNoData: 'No data yet',
+    // RO Status labels
+    roStatusAll: 'All Statuses',
+    roStatusIntake: 'Intake',
+    roStatusDiagnosis: 'Diagnosis',
+    roStatusEstimatePending: 'Estimate Pending',
+    roStatusPendingApproval: 'Pending Approval',
+    roStatusApproved: 'Approved',
+    roStatusInProgress: 'In Progress',
+    roStatusWaitingParts: 'Waiting Parts',
+    roStatusReady: 'Ready',
+    roStatusCompleted: 'Completed',
+    roStatusInvoiced: 'Invoiced',
+    roStatusCancelled: 'Cancelled',
+    // RO Table headers
+    roThNumber: 'RO #',
+    roThCustomer: 'Customer',
+    roThVehicle: 'Vehicle',
+    roThStatus: 'Status',
+    roThCreated: 'Created',
+    roThActions: 'Actions',
+    // RO Detail labels
+    roCustomerConcern: 'Customer Concern',
+    roNewInspection: 'New Inspection',
+    roNewEstimate: 'New Estimate',
+    roInspections: 'Inspections',
+    roEstimates: 'Estimates',
+    roLinkedAppointment: 'Linked Appointment',
+    roUpdateStatus: 'Update Status',
+    roCreateRepairOrder: 'Create Repair Order',
+    roFromAppointment: 'From Appointment',
+    roWalkIn: 'Walk-in (No Appointment)',
+    roCreateFromAppt: 'Create from Appointment',
+    roCreateWalkIn: 'Create Walk-in RO',
+    roNoOrders: 'No repair orders found',
+    roComplete: 'Complete',
+    roSendToCustomer: 'Send to Customer',
+    roResendToCustomer: 'Resend to Customer',
+    roSelectApptFirst: 'Select an appointment first',
+    roSearchApptPlaceholder: 'Search by name, phone, service, reference...',
+    roNoMatchingAppts: 'No matching appointments',
+    roNoAvailableAppts: 'No available appointments',
+    roCreatingFor: 'Creating RO for',
+    roCustomerId: 'Customer ID',
+    roVehicleId: 'Vehicle ID (optional)',
+    roConcernPlaceholder: 'Customer concern (optional)',
+    roFailedLoad: 'Failed to load repair orders',
+    roFailedLoadAppts: 'Failed to load appointments',
+    roStatusUpdatedTo: 'Status updated to',
+    roMovedTo: 'Moved to',
+    roInspectionCreated: 'Inspection created with template items',
+    roEstimateCreated: 'Estimate created',
+    roInspectionCompleted: 'Inspection completed',
+    roInspectionSent: 'Inspection sent to customer',
+    roInspectionResent: 'Inspection re-sent to customer',
+    roEstimateSent: 'Estimate sent to customer',
+    roEstimateResent: 'Estimate re-sent to customer',
+    // RO Search placeholder
+    roSearchPlaceholder: 'Search RO#, customer, VIN...',
+    globalSearchPlaceholder: 'Search everything... (Ctrl+K)',
+    // Blog table headers
+    blogThTitle: 'Title',
+    blogThStatus: 'Status',
+    blogThDate: 'Date',
+    blogThAuthor: 'Author',
+    blogThActions: 'Actions',
+    blogNoPostsFound: 'No blog posts found.',
+    blogNewPost: 'New Blog Post',
+    blogEditPost: 'Edit Post',
+    blogPublished: 'Published',
+    blogDraft: 'Draft',
+    blogPrev: '\u2190 Prev',
+    blogNext: 'Next \u2192',
+    blogPage: 'Page',
+    blogOf: 'of',
+    // FAQ table headers
+    faqThQuestion: 'Question',
+    faqThStatus: 'Status',
+    faqThOrder: 'Order',
+    faqThActions: 'Actions',
+    faqNoFaqs: 'No FAQs yet. Click "New FAQ" to create one.',
+    faqNewFaq: 'New FAQ',
+    faqEditFaq: 'Edit FAQ',
+    faqCreateFaq: 'Create FAQ',
+    faqUpdateFaq: 'Update FAQ',
+    faqActive: 'Active',
+    faqInactive: 'Inactive',
+    faqActivated: 'FAQ activated',
+    faqDeactivated: 'FAQ deactivated',
+    faqDeleted: 'FAQ deleted',
+    faqUpdated: 'FAQ updated',
+    faqCreated: 'FAQ created',
+    // Promotions table headers
+    promoThTitle: 'Title',
+    promoThType: 'Type',
+    promoThImage: 'Image',
+    promoThStatus: 'Status',
+    promoThDateRange: 'Date Range',
+    promoThOrder: 'Order',
+    promoThColor: 'Color',
+    promoThActions: 'Actions',
+    promoNoPromos: 'No promotions yet. Click "New Promotion" to create one.',
+    promoNewPromo: 'New Promotion',
+    promoEditPromo: 'Edit Promotion',
+    promoCreatePromo: 'Create Promotion',
+    promoUpdatePromo: 'Update Promotion',
+    promoLive: 'Live',
+    promoScheduled: 'Scheduled',
+    promoExpired: 'Expired',
+    promoInactive: 'Inactive',
+    promoBanner: 'Banner',
+    promoExitPopup: 'Exit Popup',
+    promoActivated: 'Promotion activated',
+    promoDeactivated: 'Promotion deactivated',
+    promoDeleted: 'Promotion deleted',
+    promoUpdated: 'Promotion updated',
+    promoCreated: 'Promotion created',
+    // Reviews table headers
+    reviewThName: 'Name',
+    reviewThRating: 'Rating',
+    reviewThPreview: 'Preview',
+    reviewThStatus: 'Status',
+    reviewThActions: 'Actions',
+    reviewNoReviews: 'No reviews yet. Click "New Review" to create one.',
+    reviewNewReview: 'New Review',
+    reviewEditReview: 'Edit Review',
+    reviewCreateReview: 'Create Review',
+    reviewUpdateReview: 'Update Review',
+    reviewActive: 'Active',
+    reviewInactive: 'Inactive',
+    reviewActivated: 'Review activated',
+    reviewDeactivated: 'Review deactivated',
+    reviewDeleted: 'Review deleted',
+    reviewUpdated: 'Review updated',
+    reviewCreated: 'Review created',
+    // Subscribers
+    subscriberThEmail: 'Email',
+    subscriberThLanguage: 'Language',
+    subscriberThSource: 'Source',
+    subscriberThSubscribed: 'Subscribed',
+    subscriberThStatus: 'Status',
+    subscriberThActions: 'Actions',
+    subscriberActive: 'Active',
+    subscriberUnsubscribed: 'Unsubscribed',
+    subscriberNoResults: 'No subscribers found.',
+    subscriberFailedLoad: 'Failed to load subscribers.',
+    subscriberRemoved: 'Subscriber removed',
+    subscriberFailedUnsub: 'Failed to unsubscribe',
+    subscriberUnsubscribe: 'Unsubscribe',
+    subscriberPrevious: 'Previous',
+    subscriberNext: 'Next',
+    subscriberPage: 'Page',
+    subscriberOf: 'of',
+    // Employee roles
+    roleEmployee: 'Employee',
+    roleManager: 'Manager',
+    // Appointment status dropdown labels
+    apptStatusAll: 'All Status',
+    apptStatusNew: 'New',
+    apptStatusConfirmed: 'Confirmed',
+    apptStatusCompleted: 'Completed',
+    apptStatusCancelled: 'Cancelled',
+    // Shared action labels
+    actionView: 'View',
+    actionEdit: 'Edit',
+    actionDelete: 'Delete',
+    actionActivate: 'Activate',
+    actionDeactivate: 'Deactivate',
+    // Kanban
+    kanbanView: 'Kanban View',
+    kanbanTableView: 'Table View',
+    kanbanNoOrders: 'No orders',
+    kanbanLoading: 'Loading kanban board...',
+    kanbanFailedLoad: 'Failed to load kanban',
+    // RO timeline labels
+    roTimelineDiag: 'Diag',
+    roTimelineEst: 'Est.',
+    roTimelineApproval: 'Approval',
+    roTimelineInProg: 'In Prog',
+    roTimelineParts: 'Parts',
+    roTimelineDone: 'Done',
   },
   es: {
     // Login
@@ -5972,6 +6152,186 @@ const adminT = {
     chartBayUtilization: 'Uso de Bah\u00EDas Hoy',
     chartBookingTrend: 'Tendencia de Reservas (30 D\u00EDas)',
     chartNoData: 'Sin datos a\u00FAn',
+    // RO Status labels
+    roStatusAll: 'Todos los Estados',
+    roStatusIntake: 'Recepci\u00F3n',
+    roStatusDiagnosis: 'Diagn\u00F3stico',
+    roStatusEstimatePending: 'Presupuesto Pendiente',
+    roStatusPendingApproval: 'Pendiente de Aprobaci\u00F3n',
+    roStatusApproved: 'Aprobado',
+    roStatusInProgress: 'En Progreso',
+    roStatusWaitingParts: 'Esperando Partes',
+    roStatusReady: 'Listo',
+    roStatusCompleted: 'Completado',
+    roStatusInvoiced: 'Facturado',
+    roStatusCancelled: 'Cancelado',
+    // RO Table headers
+    roThNumber: 'RO #',
+    roThCustomer: 'Cliente',
+    roThVehicle: 'Veh\u00EDculo',
+    roThStatus: 'Estado',
+    roThCreated: 'Creado',
+    roThActions: 'Acciones',
+    // RO Detail labels
+    roCustomerConcern: 'Preocupaci\u00F3n del Cliente',
+    roNewInspection: 'Nueva Inspecci\u00F3n',
+    roNewEstimate: 'Nuevo Presupuesto',
+    roInspections: 'Inspecciones',
+    roEstimates: 'Presupuestos',
+    roLinkedAppointment: 'Cita Vinculada',
+    roUpdateStatus: 'Actualizar Estado',
+    roCreateRepairOrder: 'Crear Orden de Reparaci\u00F3n',
+    roFromAppointment: 'Desde una Cita',
+    roWalkIn: 'Sin Cita (Walk-in)',
+    roCreateFromAppt: 'Crear desde Cita',
+    roCreateWalkIn: 'Crear RO Walk-in',
+    roNoOrders: 'No se encontraron \u00F3rdenes de reparaci\u00F3n',
+    roComplete: 'Completar',
+    roSendToCustomer: 'Enviar al Cliente',
+    roResendToCustomer: 'Reenviar al Cliente',
+    roSelectApptFirst: 'Seleccione una cita primero',
+    roSearchApptPlaceholder: 'Buscar por nombre, tel\u00E9fono, servicio, referencia...',
+    roNoMatchingAppts: 'No hay citas que coincidan',
+    roNoAvailableAppts: 'No hay citas disponibles',
+    roCreatingFor: 'Creando RO para',
+    roCustomerId: 'ID del Cliente',
+    roVehicleId: 'ID del Veh\u00EDculo (opcional)',
+    roConcernPlaceholder: 'Preocupaci\u00F3n del cliente (opcional)',
+    roFailedLoad: 'Error al cargar \u00F3rdenes de reparaci\u00F3n',
+    roFailedLoadAppts: 'Error al cargar citas',
+    roStatusUpdatedTo: 'Estado actualizado a',
+    roMovedTo: 'Movido a',
+    roInspectionCreated: 'Inspecci\u00F3n creada con \u00EDtems de plantilla',
+    roEstimateCreated: 'Presupuesto creado',
+    roInspectionCompleted: 'Inspecci\u00F3n completada',
+    roInspectionSent: 'Inspecci\u00F3n enviada al cliente',
+    roInspectionResent: 'Inspecci\u00F3n reenviada al cliente',
+    roEstimateSent: 'Presupuesto enviado al cliente',
+    roEstimateResent: 'Presupuesto reenviado al cliente',
+    // RO Search placeholder
+    roSearchPlaceholder: 'Buscar RO#, cliente, VIN...',
+    globalSearchPlaceholder: 'Buscar todo... (Ctrl+K)',
+    // Blog table headers
+    blogThTitle: 'T\u00EDtulo',
+    blogThStatus: 'Estado',
+    blogThDate: 'Fecha',
+    blogThAuthor: 'Autor',
+    blogThActions: 'Acciones',
+    blogNoPostsFound: 'No se encontraron publicaciones.',
+    blogNewPost: 'Nueva Publicaci\u00F3n',
+    blogEditPost: 'Editar Publicaci\u00F3n',
+    blogPublished: 'Publicado',
+    blogDraft: 'Borrador',
+    blogPrev: '\u2190 Anterior',
+    blogNext: 'Siguiente \u2192',
+    blogPage: 'P\u00E1gina',
+    blogOf: 'de',
+    // FAQ table headers
+    faqThQuestion: 'Pregunta',
+    faqThStatus: 'Estado',
+    faqThOrder: 'Orden',
+    faqThActions: 'Acciones',
+    faqNoFaqs: 'No hay FAQs a\u00FAn. Haga clic en "Nueva FAQ" para crear una.',
+    faqNewFaq: 'Nueva FAQ',
+    faqEditFaq: 'Editar FAQ',
+    faqCreateFaq: 'Crear FAQ',
+    faqUpdateFaq: 'Actualizar FAQ',
+    faqActive: 'Activa',
+    faqInactive: 'Inactiva',
+    faqActivated: 'FAQ activada',
+    faqDeactivated: 'FAQ desactivada',
+    faqDeleted: 'FAQ eliminada',
+    faqUpdated: 'FAQ actualizada',
+    faqCreated: 'FAQ creada',
+    // Promotions table headers
+    promoThTitle: 'T\u00EDtulo',
+    promoThType: 'Tipo',
+    promoThImage: 'Imagen',
+    promoThStatus: 'Estado',
+    promoThDateRange: 'Rango de Fechas',
+    promoThOrder: 'Orden',
+    promoThColor: 'Color',
+    promoThActions: 'Acciones',
+    promoNoPromos: 'No hay promociones a\u00FAn. Haga clic en "Nueva Promoci\u00F3n" para crear una.',
+    promoNewPromo: 'Nueva Promoci\u00F3n',
+    promoEditPromo: 'Editar Promoci\u00F3n',
+    promoCreatePromo: 'Crear Promoci\u00F3n',
+    promoUpdatePromo: 'Actualizar Promoci\u00F3n',
+    promoLive: 'En Vivo',
+    promoScheduled: 'Programada',
+    promoExpired: 'Expirada',
+    promoInactive: 'Inactiva',
+    promoBanner: 'Banner',
+    promoExitPopup: 'Popup de Salida',
+    promoActivated: 'Promoci\u00F3n activada',
+    promoDeactivated: 'Promoci\u00F3n desactivada',
+    promoDeleted: 'Promoci\u00F3n eliminada',
+    promoUpdated: 'Promoci\u00F3n actualizada',
+    promoCreated: 'Promoci\u00F3n creada',
+    // Reviews table headers
+    reviewThName: 'Nombre',
+    reviewThRating: 'Calificaci\u00F3n',
+    reviewThPreview: 'Vista Previa',
+    reviewThStatus: 'Estado',
+    reviewThActions: 'Acciones',
+    reviewNoReviews: 'No hay rese\u00F1as a\u00FAn. Haga clic en "Nueva Rese\u00F1a" para crear una.',
+    reviewNewReview: 'Nueva Rese\u00F1a',
+    reviewEditReview: 'Editar Rese\u00F1a',
+    reviewCreateReview: 'Crear Rese\u00F1a',
+    reviewUpdateReview: 'Actualizar Rese\u00F1a',
+    reviewActive: 'Activa',
+    reviewInactive: 'Inactiva',
+    reviewActivated: 'Rese\u00F1a activada',
+    reviewDeactivated: 'Rese\u00F1a desactivada',
+    reviewDeleted: 'Rese\u00F1a eliminada',
+    reviewUpdated: 'Rese\u00F1a actualizada',
+    reviewCreated: 'Rese\u00F1a creada',
+    // Subscribers
+    subscriberThEmail: 'Correo',
+    subscriberThLanguage: 'Idioma',
+    subscriberThSource: 'Fuente',
+    subscriberThSubscribed: 'Suscrito',
+    subscriberThStatus: 'Estado',
+    subscriberThActions: 'Acciones',
+    subscriberActive: 'Activo',
+    subscriberUnsubscribed: 'Desuscrito',
+    subscriberNoResults: 'No se encontraron suscriptores.',
+    subscriberFailedLoad: 'Error al cargar suscriptores.',
+    subscriberRemoved: 'Suscriptor eliminado',
+    subscriberFailedUnsub: 'Error al desuscribir',
+    subscriberUnsubscribe: 'Desuscribir',
+    subscriberPrevious: 'Anterior',
+    subscriberNext: 'Siguiente',
+    subscriberPage: 'P\u00E1gina',
+    subscriberOf: 'de',
+    // Employee roles
+    roleEmployee: 'Empleado',
+    roleManager: 'Gerente',
+    // Appointment status dropdown labels
+    apptStatusAll: 'Todos',
+    apptStatusNew: 'Nuevo',
+    apptStatusConfirmed: 'Confirmado',
+    apptStatusCompleted: 'Completado',
+    apptStatusCancelled: 'Cancelado',
+    // Shared action labels
+    actionView: 'Ver',
+    actionEdit: 'Editar',
+    actionDelete: 'Eliminar',
+    actionActivate: 'Activar',
+    actionDeactivate: 'Desactivar',
+    // Kanban
+    kanbanView: 'Vista Kanban',
+    kanbanTableView: 'Vista Tabla',
+    kanbanNoOrders: 'Sin \u00F3rdenes',
+    kanbanLoading: 'Cargando tablero kanban...',
+    kanbanFailedLoad: 'Error al cargar kanban',
+    // RO timeline labels
+    roTimelineDiag: 'Diag',
+    roTimelineEst: 'Est.',
+    roTimelineApproval: 'Aprob.',
+    roTimelineInProg: 'En Prog',
+    roTimelineParts: 'Partes',
+    roTimelineDone: 'Hecho',
   }
 };
 

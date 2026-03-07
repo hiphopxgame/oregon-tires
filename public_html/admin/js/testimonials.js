@@ -6,6 +6,10 @@
 (function() {
   'use strict';
 
+  function t(key, fallback) {
+    return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fallback;
+  }
+
   const API = '/api/admin/testimonials.php';
   let testimonials = [];
   let editingId = null;
@@ -51,7 +55,7 @@
       const td = document.createElement('td');
       td.colSpan = 6;
       td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
-      td.textContent = 'No reviews yet. Click "New Review" to create one.';
+      td.textContent = t('reviewNoReviews', 'No reviews yet. Click "New Review" to create one.');
       tr.appendChild(td);
       container.appendChild(tr);
       return;
@@ -91,7 +95,7 @@
       statusBadge.className = isActive
         ? 'text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
         : 'text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300';
-      statusBadge.textContent = isActive ? 'Active' : 'Inactive';
+      statusBadge.textContent = isActive ? t('reviewActive', 'Active') : t('reviewInactive', 'Inactive');
       tdStatus.appendChild(statusBadge);
       tr.appendChild(tdStatus);
 
@@ -103,7 +107,7 @@
 
       const editBtn = document.createElement('button');
       editBtn.className = 'text-blue-600 hover:text-blue-800 text-sm font-medium dark:text-blue-400';
-      editBtn.textContent = 'Edit';
+      editBtn.textContent = t('actionEdit', 'Edit');
       editBtn.addEventListener('click', function() { openEditForm(rev); });
       actionsWrap.appendChild(editBtn);
 
@@ -111,13 +115,13 @@
       toggleBtn.className = isActive
         ? 'text-amber-600 hover:text-amber-800 text-sm font-medium dark:text-amber-400'
         : 'text-green-600 hover:text-green-800 text-sm font-medium dark:text-green-400';
-      toggleBtn.textContent = isActive ? 'Deactivate' : 'Activate';
+      toggleBtn.textContent = isActive ? t('actionDeactivate', 'Deactivate') : t('actionActivate', 'Activate');
       toggleBtn.addEventListener('click', function() { toggleReviewActive(rev); });
       actionsWrap.appendChild(toggleBtn);
 
       const delBtn = document.createElement('button');
       delBtn.className = 'text-red-600 hover:text-red-800 text-sm font-medium dark:text-red-400';
-      delBtn.textContent = 'Delete';
+      delBtn.textContent = t('actionDelete', 'Delete');
       delBtn.addEventListener('click', function() { deleteReview(rev.id); });
       actionsWrap.appendChild(delBtn);
 
@@ -151,8 +155,8 @@
     document.getElementById('review-text-es').value = '';
     document.getElementById('review-active').checked = true;
     document.getElementById('review-sort').value = '0';
-    document.getElementById('review-form-title').textContent = 'New Review';
-    document.getElementById('review-save-btn').textContent = 'Create Review';
+    document.getElementById('review-form-title').textContent = t('reviewNewReview', 'New Review');
+    document.getElementById('review-save-btn').textContent = t('reviewCreateReview', 'Create Review');
   }
 
   // ─── Open form for editing ──────────────────────────────────
@@ -164,8 +168,8 @@
     document.getElementById('review-text-es').value = rev.review_text_es || '';
     document.getElementById('review-active').checked = Number(rev.is_active) === 1;
     document.getElementById('review-sort').value = rev.sort_order || '0';
-    document.getElementById('review-form-title').textContent = 'Edit Review';
-    document.getElementById('review-save-btn').textContent = 'Update Review';
+    document.getElementById('review-form-title').textContent = t('reviewEditReview', 'Edit Review');
+    document.getElementById('review-save-btn').textContent = t('reviewUpdateReview', 'Update Review');
 
     const form = document.getElementById('review-form-panel');
     form.classList.remove('hidden');
@@ -201,7 +205,7 @@
       });
       const json = await res.json();
       if (json.success) {
-        if (typeof showToast === 'function') showToast(editingId ? 'Review updated' : 'Review created');
+        if (typeof showToast === 'function') showToast(editingId ? t('reviewUpdated', 'Review updated') : t('reviewCreated', 'Review created'));
         document.getElementById('review-form-panel').classList.add('hidden');
         editingId = null;
         loadTestimonials();
@@ -234,7 +238,7 @@
       });
       const json = await res.json();
       if (json.success) {
-        if (typeof showToast === 'function') showToast(payload.is_active ? 'Review activated' : 'Review deactivated');
+        if (typeof showToast === 'function') showToast(payload.is_active ? t('reviewActivated', 'Review activated') : t('reviewDeactivated', 'Review deactivated'));
         loadTestimonials();
       }
     } catch (err) {
@@ -255,7 +259,7 @@
       });
       const json = await res.json();
       if (json.success) {
-        if (typeof showToast === 'function') showToast('Review deleted');
+        if (typeof showToast === 'function') showToast(t('reviewDeleted', 'Review deleted'));
         loadTestimonials();
       }
     } catch (err) {

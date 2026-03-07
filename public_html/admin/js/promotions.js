@@ -6,6 +6,10 @@
 (function() {
   'use strict';
 
+  function t(key, fallback) {
+    return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fallback;
+  }
+
   const API = '/api/admin/promotions.php';
   let promotions = [];
   let editingId = null;
@@ -59,7 +63,7 @@
       const td = document.createElement('td');
       td.colSpan = 8;
       td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
-      td.textContent = 'No promotions yet. Click "New Promotion" to create one.';
+      td.textContent = t('promoNoPromos', 'No promotions yet. Click "New Promotion" to create one.');
       tr.appendChild(td);
       container.appendChild(tr);
       return;
@@ -92,10 +96,10 @@
       const typeBadge = document.createElement('span');
       if (promo.placement === 'exit_intent') {
         typeBadge.className = 'text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 font-medium';
-        typeBadge.textContent = 'Exit Popup';
+        typeBadge.textContent = t('promoExitPopup', 'Exit Popup');
       } else {
         typeBadge.className = 'text-xs px-2 py-1 rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 font-medium';
-        typeBadge.textContent = 'Banner';
+        typeBadge.textContent = t('promoBanner', 'Banner');
       }
       tdType.appendChild(typeBadge);
       tr.appendChild(tdType);
@@ -131,16 +135,16 @@
 
       if (!isActive) {
         statusBadge.className = 'text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300';
-        statusBadge.textContent = 'Inactive';
+        statusBadge.textContent = t('promoInactive', 'Inactive');
       } else if (isLive) {
         statusBadge.className = 'text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
-        statusBadge.textContent = 'Live';
+        statusBadge.textContent = t('promoLive', 'Live');
       } else if (isScheduled) {
         statusBadge.className = 'text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
-        statusBadge.textContent = 'Scheduled';
+        statusBadge.textContent = t('promoScheduled', 'Scheduled');
       } else if (isExpired) {
         statusBadge.className = 'text-xs px-2 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
-        statusBadge.textContent = 'Expired';
+        statusBadge.textContent = t('promoExpired', 'Expired');
       }
       tdStatus.appendChild(statusBadge);
       tr.appendChild(tdStatus);
@@ -177,7 +181,7 @@
 
       const editBtn = document.createElement('button');
       editBtn.className = 'text-blue-600 hover:text-blue-800 text-sm font-medium dark:text-blue-400';
-      editBtn.textContent = 'Edit';
+      editBtn.textContent = t('actionEdit', 'Edit');
       editBtn.addEventListener('click', function() { openEditForm(promo); });
       actionsWrap.appendChild(editBtn);
 
@@ -185,13 +189,13 @@
       toggleBtn.className = isActive
         ? 'text-amber-600 hover:text-amber-800 text-sm font-medium dark:text-amber-400'
         : 'text-green-600 hover:text-green-800 text-sm font-medium dark:text-green-400';
-      toggleBtn.textContent = isActive ? 'Deactivate' : 'Activate';
+      toggleBtn.textContent = isActive ? t('actionDeactivate', 'Deactivate') : t('actionActivate', 'Activate');
       toggleBtn.addEventListener('click', function() { toggleActive(promo); });
       actionsWrap.appendChild(toggleBtn);
 
       const delBtn = document.createElement('button');
       delBtn.className = 'text-red-600 hover:text-red-800 text-sm font-medium dark:text-red-400';
-      delBtn.textContent = 'Delete';
+      delBtn.textContent = t('actionDelete', 'Delete');
       delBtn.addEventListener('click', function() { deletePromotion(promo.id); });
       actionsWrap.appendChild(delBtn);
 
@@ -234,8 +238,8 @@
     document.getElementById('promo-starts').value = '';
     document.getElementById('promo-ends').value = '';
     document.getElementById('promo-sort').value = '0';
-    document.getElementById('promo-form-title').textContent = 'New Promotion';
-    document.getElementById('promo-save-btn').textContent = 'Create Promotion';
+    document.getElementById('promo-form-title').textContent = t('promoNewPromo', 'New Promotion');
+    document.getElementById('promo-save-btn').textContent = t('promoCreatePromo', 'Create Promotion');
     // Reset exit-intent fields
     document.getElementById('promo-subtitle-en').value = '';
     document.getElementById('promo-subtitle-es').value = '';
@@ -289,8 +293,8 @@
     document.getElementById('promo-nospam-en').value = promo.nospam_en || '';
     document.getElementById('promo-nospam-es').value = promo.nospam_es || '';
     document.getElementById('promo-popup-icon').value = promo.popup_icon || '';
-    document.getElementById('promo-form-title').textContent = 'Edit Promotion';
-    document.getElementById('promo-save-btn').textContent = 'Update Promotion';
+    document.getElementById('promo-form-title').textContent = t('promoEditPromo', 'Edit Promotion');
+    document.getElementById('promo-save-btn').textContent = t('promoUpdatePromo', 'Update Promotion');
     // Image
     var imgInput = document.getElementById('promo-image-file');
     if (imgInput) imgInput.value = '';
@@ -378,7 +382,7 @@
       });
       const json = await res.json();
       if (json.success) {
-        if (typeof showToast === 'function') showToast(editingId ? 'Promotion updated' : 'Promotion created');
+        if (typeof showToast === 'function') showToast(editingId ? t('promoUpdated', 'Promotion updated') : t('promoCreated', 'Promotion created'));
         document.getElementById('promotion-form-panel').classList.add('hidden');
         editingId = null;
         loadPromotions();
@@ -432,7 +436,7 @@
       });
       const json = await res.json();
       if (json.success) {
-        if (typeof showToast === 'function') showToast(Number(promo.is_active) === 1 ? 'Promotion deactivated' : 'Promotion activated');
+        if (typeof showToast === 'function') showToast(Number(promo.is_active) === 1 ? t('promoDeactivated', 'Promotion deactivated') : t('promoActivated', 'Promotion activated'));
         loadPromotions();
       }
     } catch (err) {
@@ -452,7 +456,7 @@
       });
       const json = await res.json();
       if (json.success) {
-        if (typeof showToast === 'function') showToast('Promotion deleted');
+        if (typeof showToast === 'function') showToast(t('promoDeleted', 'Promotion deleted'));
         loadPromotions();
       }
     } catch (err) {

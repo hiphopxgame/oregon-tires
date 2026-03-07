@@ -6,6 +6,10 @@
 (function() {
   'use strict';
 
+  function t(key, fallback) {
+    return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fallback;
+  }
+
   const API = '/api/admin/faq.php';
   let faqs = [];
   let editingId = null;
@@ -46,7 +50,7 @@
       const td = document.createElement('td');
       td.colSpan = 5;
       td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
-      td.textContent = 'No FAQs yet. Click "New FAQ" to create one.';
+      td.textContent = t('faqNoFaqs', 'No FAQs yet. Click "New FAQ" to create one.');
       tr.appendChild(td);
       container.appendChild(tr);
       return;
@@ -74,7 +78,7 @@
       statusBadge.className = isActive
         ? 'text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
         : 'text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300';
-      statusBadge.textContent = isActive ? 'Active' : 'Inactive';
+      statusBadge.textContent = isActive ? t('faqActive', 'Active') : t('faqInactive', 'Inactive');
       tdStatus.appendChild(statusBadge);
       tr.appendChild(tdStatus);
 
@@ -92,7 +96,7 @@
 
       const editBtn = document.createElement('button');
       editBtn.className = 'text-blue-600 hover:text-blue-800 text-sm font-medium dark:text-blue-400';
-      editBtn.textContent = 'Edit';
+      editBtn.textContent = t('actionEdit', 'Edit');
       editBtn.addEventListener('click', function() { openEditForm(faq); });
       actionsWrap.appendChild(editBtn);
 
@@ -100,13 +104,13 @@
       toggleBtn.className = isActive
         ? 'text-amber-600 hover:text-amber-800 text-sm font-medium dark:text-amber-400'
         : 'text-green-600 hover:text-green-800 text-sm font-medium dark:text-green-400';
-      toggleBtn.textContent = isActive ? 'Deactivate' : 'Activate';
+      toggleBtn.textContent = isActive ? t('actionDeactivate', 'Deactivate') : t('actionActivate', 'Activate');
       toggleBtn.addEventListener('click', function() { toggleFaqActive(faq); });
       actionsWrap.appendChild(toggleBtn);
 
       const delBtn = document.createElement('button');
       delBtn.className = 'text-red-600 hover:text-red-800 text-sm font-medium dark:text-red-400';
-      delBtn.textContent = 'Delete';
+      delBtn.textContent = t('actionDelete', 'Delete');
       delBtn.addEventListener('click', function() { deleteFaq(faq.id); });
       actionsWrap.appendChild(delBtn);
 
@@ -140,8 +144,8 @@
     document.getElementById('faq-answer-es').value = '';
     document.getElementById('faq-active').checked = true;
     document.getElementById('faq-sort').value = '0';
-    document.getElementById('faq-form-title').textContent = 'New FAQ';
-    document.getElementById('faq-save-btn').textContent = 'Create FAQ';
+    document.getElementById('faq-form-title').textContent = t('faqNewFaq', 'New FAQ');
+    document.getElementById('faq-save-btn').textContent = t('faqCreateFaq', 'Create FAQ');
   }
 
   // ─── Open form for editing ──────────────────────────────────
@@ -153,8 +157,8 @@
     document.getElementById('faq-answer-es').value = faq.answer_es || '';
     document.getElementById('faq-active').checked = Number(faq.is_active) === 1;
     document.getElementById('faq-sort').value = faq.sort_order || '0';
-    document.getElementById('faq-form-title').textContent = 'Edit FAQ';
-    document.getElementById('faq-save-btn').textContent = 'Update FAQ';
+    document.getElementById('faq-form-title').textContent = t('faqEditFaq', 'Edit FAQ');
+    document.getElementById('faq-save-btn').textContent = t('faqUpdateFaq', 'Update FAQ');
 
     const form = document.getElementById('faq-form-panel');
     form.classList.remove('hidden');
@@ -190,7 +194,7 @@
       });
       const json = await res.json();
       if (json.success) {
-        if (typeof showToast === 'function') showToast(editingId ? 'FAQ updated' : 'FAQ created');
+        if (typeof showToast === 'function') showToast(editingId ? t('faqUpdated', 'FAQ updated') : t('faqCreated', 'FAQ created'));
         document.getElementById('faq-form-panel').classList.add('hidden');
         editingId = null;
         loadFaqs();
@@ -223,7 +227,7 @@
       });
       const json = await res.json();
       if (json.success) {
-        if (typeof showToast === 'function') showToast(payload.is_active ? 'FAQ activated' : 'FAQ deactivated');
+        if (typeof showToast === 'function') showToast(payload.is_active ? t('faqActivated', 'FAQ activated') : t('faqDeactivated', 'FAQ deactivated'));
         loadFaqs();
       }
     } catch (err) {
@@ -244,7 +248,7 @@
       });
       const json = await res.json();
       if (json.success) {
-        if (typeof showToast === 'function') showToast('FAQ deleted');
+        if (typeof showToast === 'function') showToast(t('faqDeleted', 'FAQ deleted'));
         loadFaqs();
       }
     } catch (err) {

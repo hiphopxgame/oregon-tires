@@ -5,6 +5,10 @@
 (function() {
   'use strict';
 
+  function t(key, fallback) {
+    return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fallback;
+  }
+
   var currentPage = 1;
   var currentSearch = '';
   var csrfToken = document.querySelector('meta[name="csrf-token"]');
@@ -41,7 +45,7 @@
         grid.textContent = '';
         var errP = document.createElement('p');
         errP.className = 'text-red-600 dark:text-red-400 p-4';
-        errP.textContent = 'Failed to load subscribers.';
+        errP.textContent = t('subscriberFailedLoad', 'Failed to load subscribers.');
         grid.appendChild(errP);
       }
     }
@@ -63,7 +67,7 @@
     activeStat.className = 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg px-4 py-2';
     var activeSpan = document.createElement('span');
     activeSpan.className = 'text-sm text-green-700 dark:text-green-400 font-semibold';
-    activeSpan.textContent = activeCount + ' Active';
+    activeSpan.textContent = activeCount + ' ' + t('subscriberActive', 'Active');
     activeStat.appendChild(activeSpan);
     statsDiv.appendChild(activeStat);
 
@@ -71,7 +75,7 @@
     totalStat.className = 'bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-2';
     var totalSpan = document.createElement('span');
     totalSpan.className = 'text-sm text-gray-600 dark:text-gray-300';
-    totalSpan.textContent = total + ' Total';
+    totalSpan.textContent = total + ' ' + t('analyticsTotal', 'Total');
     totalStat.appendChild(totalSpan);
     statsDiv.appendChild(totalStat);
 
@@ -80,7 +84,7 @@
     if (subscribers.length === 0) {
       var emptyP = document.createElement('p');
       emptyP.className = 'text-gray-500 dark:text-gray-400 text-center py-8';
-      emptyP.textContent = 'No subscribers found.';
+      emptyP.textContent = t('subscriberNoResults', 'No subscribers found.');
       grid.appendChild(emptyP);
       return;
     }
@@ -96,12 +100,12 @@
     thead.className = 'bg-gray-50 dark:bg-gray-700';
     var headerRow = document.createElement('tr');
     var headers = [
-      { text: 'Email', align: 'left' },
-      { text: 'Language', align: 'left' },
-      { text: 'Source', align: 'left' },
-      { text: 'Subscribed', align: 'left' },
-      { text: 'Status', align: 'left' },
-      { text: 'Actions', align: 'right' }
+      { text: t('subscriberThEmail', 'Email'), align: 'left' },
+      { text: t('subscriberThLanguage', 'Language'), align: 'left' },
+      { text: t('subscriberThSource', 'Source'), align: 'left' },
+      { text: t('subscriberThSubscribed', 'Subscribed'), align: 'left' },
+      { text: t('subscriberThStatus', 'Status'), align: 'left' },
+      { text: t('subscriberThActions', 'Actions'), align: 'right' }
     ];
     headers.forEach(function(h) {
       var th = document.createElement('th');
@@ -152,10 +156,10 @@
       var badge = document.createElement('span');
       if (isActive) {
         badge.className = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
-        badge.textContent = 'Active';
+        badge.textContent = t('subscriberActive', 'Active');
       } else {
         badge.className = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400';
-        badge.textContent = 'Unsubscribed';
+        badge.textContent = t('subscriberUnsubscribed', 'Unsubscribed');
       }
       tdStatus.appendChild(badge);
       tr.appendChild(tdStatus);
@@ -166,7 +170,7 @@
       if (isActive) {
         var unsubBtn = document.createElement('button');
         unsubBtn.className = 'text-red-600 dark:text-red-400 hover:text-red-800 text-xs font-medium';
-        unsubBtn.textContent = 'Unsubscribe';
+        unsubBtn.textContent = t('subscriberUnsubscribe', 'Unsubscribe');
         unsubBtn.addEventListener('click', function() {
           unsubscribeSubscriber(sub.id, unsubBtn);
         });
@@ -193,7 +197,7 @@
 
       var pagInfo = document.createElement('span');
       pagInfo.className = 'text-sm text-gray-500 dark:text-gray-400';
-      pagInfo.textContent = 'Page ' + page + ' of ' + pages;
+      pagInfo.textContent = t('subscriberPage', 'Page') + ' ' + page + ' ' + t('subscriberOf', 'of') + ' ' + pages;
       pagDiv.appendChild(pagInfo);
 
       var btnGroup = document.createElement('div');
@@ -202,14 +206,14 @@
       if (page > 1) {
         var prevBtn = document.createElement('button');
         prevBtn.className = 'px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition';
-        prevBtn.textContent = 'Previous';
+        prevBtn.textContent = t('subscriberPrevious', 'Previous');
         prevBtn.addEventListener('click', function() { loadSubscribers(page - 1); });
         btnGroup.appendChild(prevBtn);
       }
       if (page < pages) {
         var nextBtn = document.createElement('button');
         nextBtn.className = 'px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition';
-        nextBtn.textContent = 'Next';
+        nextBtn.textContent = t('subscriberNext', 'Next');
         nextBtn.addEventListener('click', function() { loadSubscribers(page + 1); });
         btnGroup.appendChild(nextBtn);
       }
@@ -237,11 +241,11 @@
       var json = await res.json();
       if (!json.success) throw new Error(json.message || 'Failed to unsubscribe');
 
-      if (typeof showToast === 'function') showToast('Subscriber removed', false);
+      if (typeof showToast === 'function') showToast(t('subscriberRemoved', 'Subscriber removed'), false);
       loadSubscribers();
     } catch (err) {
       console.error('unsubscribeSubscriber error:', err);
-      if (typeof showToast === 'function') showToast('Failed to unsubscribe', true);
+      if (typeof showToast === 'function') showToast(t('subscriberFailedUnsub', 'Failed to unsubscribe'), true);
       if (btn) btn.disabled = false;
     }
   };
@@ -275,7 +279,7 @@
   function formatDate(dateStr) {
     if (!dateStr) return '-';
     var d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return d.toLocaleDateString((typeof currentLang !== 'undefined' && currentLang === 'es') ? 'es-MX' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
 })();

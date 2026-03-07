@@ -6,6 +6,10 @@
 (function () {
   'use strict';
 
+  function t(key, fallback) {
+    return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fallback;
+  }
+
   var blogPosts = [];
   var blogCategories = [];
   var blogCurrentPage = 1;
@@ -38,7 +42,7 @@
 
   function formatDate(dateStr) {
     if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(dateStr).toLocaleDateString((typeof currentLang !== 'undefined' && currentLang === 'es') ? 'es-MX' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   function truncate(str, len) {
@@ -96,7 +100,7 @@
       var td = document.createElement('td');
       td.setAttribute('colspan', '5');
       td.className = 'text-center py-8 text-gray-500 dark:text-gray-400';
-      td.textContent = 'No blog posts found.';
+      td.textContent = t('blogNoPostsFound', 'No blog posts found.');
       tr.appendChild(td);
       tbody.appendChild(tr);
       return;
@@ -128,7 +132,7 @@
       badge.className = post.status === 'published'
         ? 'px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
         : 'px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      badge.textContent = post.status === 'published' ? 'Published' : 'Draft';
+      badge.textContent = post.status === 'published' ? t('blogPublished', 'Published') : t('blogDraft', 'Draft');
       tdStatus.appendChild(badge);
       tr.appendChild(tdStatus);
 
@@ -154,18 +158,18 @@
       viewBtn.href = '/blog/' + encodeURIComponent(post.slug);
       viewBtn.target = '_blank';
       viewBtn.className = 'text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-      viewBtn.textContent = 'View';
+      viewBtn.textContent = t('actionView', 'View');
       actionsWrap.appendChild(viewBtn);
 
       var editBtn = document.createElement('button');
       editBtn.className = 'text-xs px-2 py-1 rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800';
-      editBtn.textContent = 'Edit';
+      editBtn.textContent = t('actionEdit', 'Edit');
       editBtn.addEventListener('click', function () { openBlogEditor(post.id); });
       actionsWrap.appendChild(editBtn);
 
       var delBtn = document.createElement('button');
       delBtn.className = 'text-xs px-2 py-1 rounded bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800';
-      delBtn.textContent = 'Delete';
+      delBtn.textContent = t('actionDelete', 'Delete');
       delBtn.addEventListener('click', function () { deleteBlogPost(post.id, post.title_en); });
       actionsWrap.appendChild(delBtn);
 
@@ -187,19 +191,19 @@
 
     var prevBtn = document.createElement('button');
     prevBtn.className = 'px-3 py-1 rounded text-sm border hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50';
-    prevBtn.textContent = '\u2190 Prev';
+    prevBtn.textContent = t('blogPrev', '\u2190 Prev');
     prevBtn.disabled = blogCurrentPage <= 1;
     prevBtn.addEventListener('click', function () { loadBlogPosts(blogCurrentPage - 1); });
     container.appendChild(prevBtn);
 
     var info = document.createElement('span');
     info.className = 'text-sm text-gray-500 dark:text-gray-400 px-3';
-    info.textContent = 'Page ' + blogCurrentPage + ' of ' + blogTotalPages;
+    info.textContent = t('blogPage', 'Page') + ' ' + blogCurrentPage + ' ' + t('blogOf', 'of') + ' ' + blogTotalPages;
     container.appendChild(info);
 
     var nextBtn = document.createElement('button');
     nextBtn.className = 'px-3 py-1 rounded text-sm border hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50';
-    nextBtn.textContent = 'Next \u2192';
+    nextBtn.textContent = t('blogNext', 'Next \u2192');
     nextBtn.disabled = blogCurrentPage >= blogTotalPages;
     nextBtn.addEventListener('click', function () { loadBlogPosts(blogCurrentPage + 1); });
     container.appendChild(nextBtn);
@@ -212,7 +216,7 @@
     if (!modal) return;
 
     // Reset form
-    document.getElementById('blog-form-title').textContent = editingPostId ? 'Edit Post' : 'New Blog Post';
+    document.getElementById('blog-form-title').textContent = editingPostId ? t('blogEditPost', 'Edit Post') : t('blogNewPost', 'New Blog Post');
     document.getElementById('blog-title-en').value = '';
     document.getElementById('blog-title-es').value = '';
     document.getElementById('blog-slug').value = '';
