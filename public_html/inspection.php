@@ -43,7 +43,7 @@
     details[open] > summary svg { transform: rotate(90deg); }
     /* Respect reduced motion preference */
     @media (prefers-reduced-motion: reduce) {
-        .animate-pulse { animation: none !important; }
+        .motion-safe\:animate-pulse { animation: none !important; }
         .score-ring-circle { transition: none !important; }
         .scorecard-row { transition: none !important; }
     }
@@ -141,7 +141,7 @@
 
         <!-- Loading -->
         <div id="loading-state" class="text-center py-16">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <div class="motion-safe:animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
             <p class="text-gray-500 dark:text-gray-400" data-t="loading">Loading inspection report...</p>
         </div>
 
@@ -973,7 +973,7 @@ function renderReportCard(data) {
             // Make CTA red when safety items exist
             var ctaLink = document.getElementById('estimate-link');
             if (ctaLink) {
-                ctaLink.className = 'block w-full text-center px-6 py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 transition text-lg shadow-lg animate-pulse';
+                ctaLink.className = 'block w-full text-center px-6 py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 transition text-lg shadow-lg motion-safe:animate-pulse';
             }
         }
     }

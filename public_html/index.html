@@ -428,23 +428,24 @@
 
   <style>
     html { scroll-behavior: smooth; }
-    :root { --brand-primary: #15803d; --brand-dark: #0D3618; }
-    a, h1, h2, h3 { caret-color: #15803d; }
-    .star { color: #facc15; }
-    .fade-in { animation: fadeIn 0.6s ease-in; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    /* FAQ accordion chevron */
+    :root { --brand-primary: var(--ot-green-mid); --brand-dark: var(--ot-green-dark); }
+    a, h1, h2, h3 { caret-color: var(--ot-green-mid); }
+    .star { color: var(--ot-star); }
     .faq-item summary { list-style: none; }
     .faq-item summary::-webkit-details-marker { display: none; }
-    .faq-item summary .faq-chevron { transition: transform 0.2s ease; }
-    .faq-item[open] summary .faq-chevron { transform: rotate(180deg); }
+    @media (prefers-reduced-motion: no-preference) {
+      .fade-in { animation: fadeIn 0.6s ease-in; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      .faq-item summary .faq-chevron { transition: transform 0.2s ease; }
+      .faq-item[open] summary .faq-chevron { transform: rotate(180deg); }
+    }
     /* Gallery lightbox */
     .gallery-lightbox { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; flex-direction: column; cursor: zoom-out; }
     .gallery-lightbox.active { display: flex; }
     .gallery-lightbox img { max-width: 90vw; max-height: 80vh; object-fit: contain; border-radius: 8px; cursor: default; }
     .gallery-lightbox-caption { color: #fff; text-align: center; margin-top: 12px; max-width: 90vw; }
     .gallery-lightbox-caption h4 { font-size: 1.125rem; font-weight: 600; }
-    .gallery-lightbox-caption p { font-size: 0.875rem; color: #d1d5db; margin-top: 4px; }
+    .gallery-lightbox-caption p { font-size: 0.875rem; color: var(--ot-input-border); margin-top: 4px; }
     .gallery-lightbox-close { position: absolute; top: 16px; right: 16px; color: #fff; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .gallery-lightbox-close:hover { background: rgba(255,255,255,0.2); }
     .gallery-lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); color: #fff; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -750,7 +751,7 @@
 
   <!-- Hero -->
   <main id="main-content">
-  <section id="home" class="bg-brand text-white py-20 scroll-mt-24 relative bg-cover bg-center" role="img" aria-label="Oregon Tires Auto Care shop exterior" style="background-color: #0D3618; background-image: url('assets/hero-bg.webp');">
+  <section id="home" class="bg-brand text-white py-20 scroll-mt-24 relative bg-cover bg-center" role="img" aria-label="Oregon Tires Auto Care shop exterior" style="background-color: var(--ot-green-dark); background-image: url('assets/hero-bg.webp');">
     <!-- Fallback for browsers without WebP -->
     <script>if(!document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp')===0)document.getElementById('home').style.backgroundImage="url('assets/hero-bg.png')";</script>
     <div class="absolute inset-0 bg-black/50" aria-hidden="true"></div>
@@ -775,7 +776,7 @@
       <!-- Scarcity: appointment slots remaining today -->
       <div id="slots-remaining" class="mt-4 hidden">
         <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm font-medium text-amber-300 border border-amber-400/30">
-          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" aria-hidden="true"></span>
+          <span class="w-2 h-2 rounded-full bg-amber-400 motion-safe:animate-pulse" aria-hidden="true"></span>
           <span id="slots-text"></span>
         </span>
       </div>
@@ -801,49 +802,49 @@
       <!-- Feature cards with dynamic images -->
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="service-feature-cards">
         <a href="/engine-diagnostics" class="block bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="0">
-          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-expert-technicians" src="images/expert-technicians.webp" alt="Expert Technicians" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-expert-technicians" src="images/expert-technicians.webp" alt="Expert Technicians" class="w-full h-full object-cover" width="400" height="128" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="expertService">Expert Technicians</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="expertServiceDesc">Our certified mechanics have years of experience with all vehicle makes and models.</p>
           </div>
         </a>
         <a href="/tire-repair" class="block bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="100">
-          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-fast-cars" src="images/fast-cars.webp" alt="Fast Service" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-fast-cars" src="images/fast-cars.webp" alt="Fast Service" class="w-full h-full object-cover" width="400" height="128" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="quickService">Fast Service</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="quickServiceDesc">Most services completed while you wait. We value your time and get you back on the road quickly.</p>
           </div>
         </a>
         <a href="/brake-service" class="block bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="200">
-          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-quality-car-parts" src="images/quality-parts.webp" alt="Quality Parts" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-quality-car-parts" src="images/quality-parts.webp" alt="Quality Parts" class="w-full h-full object-cover" width="400" height="128" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="qualityParts">Quality Parts</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="qualityPartsDesc">We use only premium parts and materials to ensure lasting repairs and optimal performance.</p>
           </div>
         </a>
         <a href="/book-appointment" class="block bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="300">
-          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-bilingual-support" src="images/bilingual-service.webp" alt="Bilingual Support" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-bilingual-support" src="images/bilingual-service.webp" alt="Bilingual Support" class="w-full h-full object-cover" width="400" height="128" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="bilingualService">Bilingual Support</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="bilingualServiceDesc">Fluent in both English and Spanish to serve our diverse Portland community.</p>
           </div>
         </a>
         <a href="/tire-installation" class="block bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="0">
-          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-tire-shop" src="images/tire-services.webp" alt="Tire Services" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-tire-shop" src="images/tire-services.webp" alt="Tire Services" class="w-full h-full object-cover" width="400" height="128" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="tireServices">Tire Services</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="tireServicesDesc">New and used tires, mount and balance, repair — everything your tires need.</p>
           </div>
         </a>
         <a href="/oil-change" class="block bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="100">
-          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-auto-repair" src="images/auto-maintenance.webp" alt="Auto Maintenance" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-auto-repair" src="images/auto-maintenance.webp" alt="Auto Maintenance" class="w-full h-full object-cover" width="400" height="128" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="autoMaintenance">Auto Maintenance</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="autoMaintenanceDesc">Oil changes, brake services, tuneups and more to keep your vehicle running smoothly.</p>
           </div>
         </a>
         <a href="/wheel-alignment" class="block bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition" data-reveal data-reveal-delay="200">
-          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-specialized-tools" src="images/specialized-services.webp" alt="Specialized Services" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
+          <div class="h-32 bg-gray-200 overflow-hidden"><img id="svc-img-specialized-tools" src="images/specialized-services.webp" alt="Specialized Services" class="w-full h-full object-cover" width="400" height="128" loading="lazy" decoding="async"></div>
           <div class="p-6">
             <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-2" data-t="specializedServices">Specialized Services</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm" data-t="specializedServicesDesc">Alignment, mechanical inspection, mobile service, and roadside assistance.</p>
@@ -1050,7 +1051,7 @@
       <div class="text-center mb-10">
         <!-- Review Velocity Widget -->
         <div class="inline-flex items-center gap-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-full px-4 py-2 mb-4">
-          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse" aria-hidden="true"></span>
+          <span class="w-2 h-2 rounded-full bg-green-500 motion-safe:animate-pulse" aria-hidden="true"></span>
           <span class="text-sm font-semibold text-green-700 dark:text-green-400" id="review-velocity" data-t="reviewVelocity">12 new 5-star reviews this month</span>
         </div>
         <h2 class="text-4xl font-bold text-brand dark:text-green-400 mb-4" data-t="customerReviews">What Our Customers Say</h2>
@@ -1122,12 +1123,12 @@
       </div>
       <div id="gallery-section-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="sr-only" data-t="loadingGallery" aria-live="polite">Loading promotions...</div>
-        <div class="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
-        <div class="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
-        <div class="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
-        <div class="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
-        <div class="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
-        <div class="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
+        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
+        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
+        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
+        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
+        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
+        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
       </div>
     </div>
   </section>
@@ -2399,7 +2400,8 @@ loadSiteSettings();
     var body = lang === 'es' ? (promo.body_es || promo.body_en) : promo.body_en;
     var ctaText = lang === 'es' ? (promo.cta_text_es || promo.cta_text_en) : promo.cta_text_en;
     var ctaUrl = promo.cta_url || '/book-appointment/';
-    var bgColor = promo.bg_color || '#f59e0b';
+    var rootStyles = getComputedStyle(document.documentElement);
+    var bgColor = promo.bg_color || rootStyles.getPropertyValue('--ot-amber').trim() || '#f59e0b';
     var textColor = promo.text_color || '#000000';
     var badgeText = promo.badge_text || '';
 

@@ -106,7 +106,7 @@ $paypalClientId = $_ENV['PAYPAL_CLIENT_ID'] ?? '';
       <div id="state-crypto-processing" class="hidden fade-in">
         <div class="bg-[#111827] border border-gray-800 rounded-xl p-8 text-center">
           <div class="w-20 h-20 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10 text-black animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+            <svg class="w-10 h-10 text-black motion-safe:animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
           </div>
           <h2 class="text-2xl font-bold text-amber-500 mb-2" data-t="processing">Processing your payment...</h2>
           <p class="text-gray-400 mb-2" data-t="cryptoProcessingMsg">We have received your transaction hash. Our team will verify the payment shortly.</p>

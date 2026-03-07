@@ -95,7 +95,7 @@
 
         <!-- Loading -->
         <div id="loading-state" class="text-center py-16">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <div class="motion-safe:animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
             <p class="text-gray-500 dark:text-gray-400" data-t="loading">Loading estimate...</p>
         </div>
 

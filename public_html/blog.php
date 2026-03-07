@@ -90,7 +90,7 @@ $canonicalUrl = 'https://oregon.tires/blog';
           <!-- Cards rendered by JS -->
         </div>
         <div id="blog-loading" class="text-center py-12">
-          <div class="inline-block w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+          <div class="inline-block w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full motion-safe:animate-spin"></div>
           <p class="mt-3 text-gray-500 dark:text-gray-400" data-t="loading">Loading articles...</p>
         </div>
         <div id="blog-empty" class="hidden text-center py-12">

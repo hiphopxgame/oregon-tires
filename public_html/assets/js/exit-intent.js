@@ -50,12 +50,13 @@
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;';
 
     var popup = document.createElement('div');
-    popup.style.cssText = 'background:white;border-radius:1rem;max-width:28rem;width:100%;padding:2rem;position:relative;box-shadow:0 25px 50px rgba(0,0,0,0.25);animation:otSlideUp 0.3s ease;';
+    var animateSlide = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    popup.style.cssText = 'background:var(--ot-card-bg);border-radius:1rem;max-width:28rem;width:100%;padding:2rem;position:relative;box-shadow:0 25px 50px rgba(0,0,0,0.25);' + (animateSlide ? 'animation:otSlideUp 0.3s ease;' : '');
 
     // Close button
     var closeBtn = document.createElement('button');
     closeBtn.id = 'exit-popup-close';
-    closeBtn.style.cssText = 'position:absolute;top:0.75rem;right:0.75rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;line-height:1;';
+    closeBtn.style.cssText = 'position:absolute;top:0.75rem;right:0.75rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--ot-text-secondary);line-height:1;';
     closeBtn.setAttribute('aria-label', 'Close');
     closeBtn.textContent = '\u00d7';
     popup.appendChild(closeBtn);
@@ -74,14 +75,14 @@
 
     // Title
     var h3 = document.createElement('h3');
-    h3.style.cssText = 'font-size:1.25rem;font-weight:bold;color:#111;margin-bottom:0.25rem;';
+    h3.style.cssText = 'font-size:1.25rem;font-weight:bold;color:var(--ot-text-primary);margin-bottom:0.25rem;';
     h3.textContent = title;
     content.appendChild(h3);
 
     // Subtitle
     if (subtitle) {
       var subtitleP = document.createElement('p');
-      subtitleP.style.cssText = 'font-size:1.1rem;font-weight:600;color:#15803d;margin-bottom:0.5rem;';
+      subtitleP.style.cssText = 'font-size:1.1rem;font-weight:600;color:var(--ot-green-mid);margin-bottom:0.5rem;';
       subtitleP.textContent = subtitle;
       content.appendChild(subtitleP);
     }
@@ -89,7 +90,7 @@
     // Description
     if (desc) {
       var descP = document.createElement('p');
-      descP.style.cssText = 'font-size:0.875rem;color:#666;margin-bottom:1rem;';
+      descP.style.cssText = 'font-size:0.875rem;color:var(--ot-text-secondary);margin-bottom:1rem;';
       descP.textContent = desc;
       content.appendChild(descP);
     }
@@ -104,13 +105,13 @@
     emailInput.id = 'exit-popup-email';
     emailInput.required = true;
     emailInput.placeholder = placeholder;
-    emailInput.style.cssText = 'flex:1;padding:0.75rem;border:1px solid #ddd;border-radius:0.5rem;font-size:0.875rem;';
+    emailInput.style.cssText = 'flex:1;padding:0.75rem;border:1px solid var(--ot-input-border);border-radius:0.5rem;font-size:0.875rem;background:var(--ot-input-bg);color:var(--ot-text-primary);';
     emailInput.setAttribute('aria-label', 'Email');
     form.appendChild(emailInput);
 
     var submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
-    submitBtn.style.cssText = 'background:#f59e0b;color:#000;padding:0.75rem 1rem;border:none;border-radius:0.5rem;font-weight:600;cursor:pointer;font-size:0.875rem;white-space:nowrap;';
+    submitBtn.style.cssText = 'background:var(--ot-amber);color:#000;padding:0.75rem 1rem;border:none;border-radius:0.5rem;font-weight:600;cursor:pointer;font-size:0.875rem;white-space:nowrap;';
     submitBtn.textContent = cta;
     form.appendChild(submitBtn);
 
@@ -119,7 +120,7 @@
     // No spam text
     if (noSpam) {
       var noSpamP = document.createElement('p');
-      noSpamP.style.cssText = 'font-size:0.75rem;color:#999;margin-top:0.5rem;';
+      noSpamP.style.cssText = 'font-size:0.75rem;color:var(--ot-text-secondary);margin-top:0.5rem;';
       noSpamP.textContent = noSpam;
       content.appendChild(noSpamP);
     }
@@ -134,10 +135,12 @@
     overlay.appendChild(popup);
     document.body.appendChild(overlay);
 
-    // Add animation keyframes
-    var style = document.createElement('style');
-    style.textContent = '@keyframes otSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}';
-    document.head.appendChild(style);
+    // Add animation keyframes (respects reduced motion preference)
+    if (animateSlide) {
+      var style = document.createElement('style');
+      style.textContent = '@keyframes otSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}';
+      document.head.appendChild(style);
+    }
 
     // Close handlers
     closeBtn.addEventListener('click', function() {
@@ -165,18 +168,18 @@
       .then(function(data) {
         statusEl.style.display = 'block';
         if (data.success) {
-          statusEl.style.color = '#15803d';
+          statusEl.style.color = 'var(--ot-green-mid)';
           statusEl.textContent = thanks;
           if (typeof gtag === 'function') gtag('event', 'subscribe', { method: 'exit_intent' });
           setTimeout(function() { overlay.remove(); }, 3000);
         } else {
-          statusEl.style.color = '#dc2626';
+          statusEl.style.color = 'var(--ot-error)';
           statusEl.textContent = data.error || errorMsg;
         }
       })
       .catch(function() {
         statusEl.style.display = 'block';
-        statusEl.style.color = '#dc2626';
+        statusEl.style.color = 'var(--ot-error)';
         statusEl.textContent = errorMsg;
       });
     });
