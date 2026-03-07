@@ -7,18 +7,18 @@
 
 header('Content-Type: application/xml; charset=utf-8');
 header('X-Robots-Tag: noindex');
+header('Cache-Control: public, max-age=3600'); // Cache for 1 hour
 
 $baseUrl = 'https://oregon.tires';
+$docRoot = dirname(__DIR__);
 
 // ---------------------------------------------------------------------------
 // Helper: generate a single <url> block with optional hreflang
 // ---------------------------------------------------------------------------
-function sitemapUrl(string $loc, float $priority, string $changefreq, string $lastmod, bool $bilingual = true): string {
+function sitemapUrl(string $loc, string $lastmod, bool $bilingual = true): string {
     $xml  = "  <url>\n";
     $xml .= "    <loc>{$loc}</loc>\n";
     $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
-    $xml .= "    <changefreq>{$changefreq}</changefreq>\n";
-    $xml .= "    <priority>{$priority}</priority>\n";
     if ($bilingual) {
         $xml .= "    <xhtml:link rel=\"alternate\" hreflang=\"en\" href=\"{$loc}\" />\n";
         $xml .= "    <xhtml:link rel=\"alternate\" hreflang=\"es\" href=\"{$loc}?lang=es\" />\n";
@@ -28,21 +28,37 @@ function sitemapUrl(string $loc, float $priority, string $changefreq, string $la
     return $xml;
 }
 
+// Get real file modification date, fallback to deploy date
+function fileLastmod(string $docRoot, string $path): string {
+    // Map URL path to PHP file
+    $file = $path === '/' ? '/index.php' : '/' . ltrim($path, '/') . '.php';
+    $fullPath = $docRoot . $file;
+    if (file_exists($fullPath)) {
+        return date('Y-m-d', filemtime($fullPath));
+    }
+    // Check for directory index (e.g., /book-appointment/ → book-appointment/index.html)
+    $dirIndex = $docRoot . '/' . trim($path, '/') . '/index.html';
+    if (file_exists($dirIndex)) {
+        return date('Y-m-d', filemtime($dirIndex));
+    }
+    return date('Y-m-d');
+}
+
 // ---------------------------------------------------------------------------
 // Static pages
 // ---------------------------------------------------------------------------
 $staticPages = [
-    ['path' => '/',                 'priority' => 1.0, 'freq' => 'weekly'],
-    ['path' => '/book-appointment/','priority' => 0.9, 'freq' => 'weekly'],
-    ['path' => '/contact',          'priority' => 0.8, 'freq' => 'monthly'],
-    ['path' => '/why-us',           'priority' => 0.8, 'freq' => 'monthly'],
-    ['path' => '/care-plan',        'priority' => 0.8, 'freq' => 'monthly'],
-    ['path' => '/fleet-services',   'priority' => 0.7, 'freq' => 'monthly'],
-    ['path' => '/guarantee',        'priority' => 0.6, 'freq' => 'monthly'],
-    ['path' => '/blog',             'priority' => 0.8, 'freq' => 'weekly'],
-    ['path' => '/faq',              'priority' => 0.7, 'freq' => 'monthly'],
-    ['path' => '/reviews',          'priority' => 0.7, 'freq' => 'monthly'],
-    ['path' => '/service-areas',    'priority' => 0.7, 'freq' => 'monthly'],
+    '/',
+    '/book-appointment/',
+    '/contact',
+    '/why-us',
+    '/care-plan',
+    '/fleet-services',
+    '/guarantee',
+    '/blog',
+    '/faq',
+    '/reviews',
+    '/service-areas',
 ];
 
 // ---------------------------------------------------------------------------
@@ -62,22 +78,14 @@ $services = [
 // Service area pages
 // ---------------------------------------------------------------------------
 $serviceAreas = [
-    ['slug' => 'tires-se-portland',   'priority' => 0.8],
-    ['slug' => 'tires-clackamas',     'priority' => 0.7],
-    ['slug' => 'tires-happy-valley',  'priority' => 0.7],
-    ['slug' => 'tires-milwaukie',     'priority' => 0.7],
-    ['slug' => 'tires-lents',         'priority' => 0.7],
-    ['slug' => 'tires-woodstock',     'priority' => 0.7],
-    ['slug' => 'tires-foster-powell', 'priority' => 0.7],
-    ['slug' => 'tires-mt-scott',      'priority' => 0.7],
-];
-
-// ---------------------------------------------------------------------------
-// Utility pages
-// ---------------------------------------------------------------------------
-$utilityPages = [
-    ['path' => '/status',   'priority' => 0.5, 'freq' => 'monthly'],
-    ['path' => '/feedback', 'priority' => 0.4, 'freq' => 'monthly'],
+    'tires-se-portland',
+    'tires-clackamas',
+    'tires-happy-valley',
+    'tires-milwaukie',
+    'tires-lents',
+    'tires-woodstock',
+    'tires-foster-powell',
+    'tires-mt-scott',
 ];
 
 // ---------------------------------------------------------------------------
@@ -138,36 +146,29 @@ if ($dbConfig) {
 // ---------------------------------------------------------------------------
 // Build XML output
 // ---------------------------------------------------------------------------
-$today = date('Y-m-d');
-
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . "\n";
 echo '        xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
 
 // Static pages
-foreach ($staticPages as $page) {
-    echo sitemapUrl($baseUrl . $page['path'], $page['priority'], $page['freq'], $today, true);
+foreach ($staticPages as $path) {
+    echo sitemapUrl($baseUrl . $path, fileLastmod($docRoot, $path));
 }
 
 // Service detail pages
 foreach ($services as $slug) {
-    echo sitemapUrl($baseUrl . '/' . $slug, 0.8, 'monthly', $today, true);
+    echo sitemapUrl($baseUrl . '/' . $slug, fileLastmod($docRoot, '/' . $slug));
 }
 
 // Service area pages
-foreach ($serviceAreas as $area) {
-    echo sitemapUrl($baseUrl . '/' . $area['slug'], $area['priority'], 'monthly', $today, true);
+foreach ($serviceAreas as $slug) {
+    echo sitemapUrl($baseUrl . '/' . $slug, fileLastmod($docRoot, '/' . $slug));
 }
 
-// Blog posts (from DB, no hreflang — content is single-language)
+// Blog posts from DB (no hreflang — content is single-language per post)
 foreach ($blogPosts as $post) {
-    $lastmod = !empty($post['updated_at']) ? date('Y-m-d', strtotime($post['updated_at'])) : $today;
-    echo sitemapUrl($baseUrl . '/blog/' . htmlspecialchars($post['slug']), 0.7, 'monthly', $lastmod, false);
-}
-
-// Utility pages
-foreach ($utilityPages as $page) {
-    echo sitemapUrl($baseUrl . $page['path'], $page['priority'], $page['freq'], $today, true);
+    $lastmod = !empty($post['updated_at']) ? date('Y-m-d', strtotime($post['updated_at'])) : date('Y-m-d');
+    echo sitemapUrl($baseUrl . '/blog/' . htmlspecialchars($post['slug']), $lastmod, false);
 }
 
 echo '</urlset>' . "\n";
