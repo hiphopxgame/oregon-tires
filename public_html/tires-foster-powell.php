@@ -13,7 +13,7 @@ $landmarks = [
 $testimonial = [
   'text' => 'I live in Foster-Powell and this is the best tire shop nearby. Quick service and they always explain everything clearly.',
   'textEs' => 'Vivo en Foster-Powell y esta es la mejor tienda de llantas cercana. Servicio rápido y siempre explican todo claramente.',
-  'author' => 'David M.',
+  'name' => 'David M.',
   'detail' => 'Foster-Powell resident',
   'detailEs' => 'Residente de Foster-Powell',
 ];

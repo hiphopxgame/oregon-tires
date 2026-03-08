@@ -13,7 +13,7 @@ $landmarks = [
 $testimonial = [
   'text' => 'Great prices and fast service. I always bring my car here from Lents — it\'s just a quick drive down Foster.',
   'textEs' => 'Buenos precios y servicio rápido. Siempre traigo mi carro desde Lents — es un viaje rápido por Foster.',
-  'author' => 'Miguel R.',
+  'name' => 'Miguel R.',
   'detail' => 'Lents resident',
   'detailEs' => 'Residente de Lents',
 ];

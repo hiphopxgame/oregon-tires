@@ -13,7 +13,7 @@ $landmarks = [
 $testimonial = [
   'text' => 'Best tire shop in the Mt. Scott area. Fair prices, bilingual staff, and they got me in and out quickly.',
   'textEs' => 'La mejor tienda de llantas en el área de Mt. Scott. Precios justos, personal bilingüe y me atendieron rápidamente.',
-  'author' => 'Ana G.',
+  'name' => 'Ana G.',
   'detail' => 'Mt. Scott resident',
   'detailEs' => 'Residente de Mt. Scott',
 ];
