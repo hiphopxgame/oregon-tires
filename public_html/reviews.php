@@ -131,73 +131,111 @@ $canonicalUrl = 'https://oregon.tires/reviews';
       </div>
     </section>
 
-    <!-- Testimonials -->
-    <section class="py-12 bg-gray-50 dark:bg-gray-800">
-      <div class="container mx-auto px-4 max-w-5xl">
-        <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-8 text-center" data-t="testimonialsTitle">Customer Testimonials</h2>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Maria R. -->
-          <blockquote class="bg-white dark:bg-gray-700 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-600">
-            <div class="flex mb-3">
-              <span class="text-yellow-400 text-lg" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+    <!-- Rating Summary + Reviews -->
+    <section class="py-10 bg-gray-50 dark:bg-gray-800">
+      <div class="container mx-auto px-4 max-w-6xl">
+
+        <!-- Rating Summary Card -->
+        <div id="rating-summary" class="bg-white dark:bg-gray-700 rounded-2xl shadow-md p-6 md:p-8 mb-8 border border-gray-200 dark:border-gray-600">
+          <div class="flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
+            <!-- Big rating number -->
+            <div class="text-center md:text-left flex-shrink-0">
+              <div id="summary-rating" class="text-6xl font-extrabold text-brand dark:text-green-400 leading-none">4.8</div>
+              <div class="flex justify-center md:justify-start mt-1 mb-1">
+                <span class="text-yellow-400 text-2xl" id="summary-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400" id="summary-count" data-t="summaryCount">970+ reviews</div>
             </div>
-            <p class="text-gray-600 dark:text-gray-300 text-sm italic mb-4" data-t="review1Text">"Excellent service! They installed my tires quickly and the price was very fair."</p>
-            <cite class="text-brand dark:text-green-400 font-semibold not-italic text-sm">&mdash; Maria R.</cite>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="review1Service">Tire Installation</p>
-          </blockquote>
-          <!-- James T. -->
-          <blockquote class="bg-white dark:bg-gray-700 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-600">
-            <div class="flex mb-3">
-              <span class="text-yellow-400 text-lg" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            <!-- Rating distribution bars -->
+            <div class="flex-1 min-w-0">
+              <div id="rating-bars" class="space-y-1.5">
+                <div class="flex items-center gap-2 text-sm" data-star="5">
+                  <span class="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">5</span>
+                  <span class="text-yellow-400">&#9733;</span>
+                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 5 star reviews">
+                    <div class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width:0%"></div>
+                  </div>
+                  <span class="w-8 text-right text-xs text-gray-500 dark:text-gray-400">0</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm" data-star="4">
+                  <span class="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">4</span>
+                  <span class="text-yellow-400">&#9733;</span>
+                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 4 star reviews">
+                    <div class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width:0%"></div>
+                  </div>
+                  <span class="w-8 text-right text-xs text-gray-500 dark:text-gray-400">0</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm" data-star="3">
+                  <span class="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">3</span>
+                  <span class="text-yellow-400">&#9733;</span>
+                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 3 star reviews">
+                    <div class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width:0%"></div>
+                  </div>
+                  <span class="w-8 text-right text-xs text-gray-500 dark:text-gray-400">0</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm" data-star="2">
+                  <span class="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">2</span>
+                  <span class="text-yellow-400">&#9733;</span>
+                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 2 star reviews">
+                    <div class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width:0%"></div>
+                  </div>
+                  <span class="w-8 text-right text-xs text-gray-500 dark:text-gray-400">0</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm" data-star="1">
+                  <span class="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">1</span>
+                  <span class="text-yellow-400">&#9733;</span>
+                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 1 star reviews">
+                    <div class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width:0%"></div>
+                  </div>
+                  <span class="w-8 text-right text-xs text-gray-500 dark:text-gray-400">0</span>
+                </div>
+              </div>
             </div>
-            <p class="text-gray-600 dark:text-gray-300 text-sm italic mb-4" data-t="review2Text">"Honest mechanics who explain what needs to be done. No upselling."</p>
-            <cite class="text-brand dark:text-green-400 font-semibold not-italic text-sm">&mdash; James T.</cite>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="review2Service">General Repair</p>
-          </blockquote>
-          <!-- Carlos M. -->
-          <blockquote class="bg-white dark:bg-gray-700 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-600">
-            <div class="flex mb-3">
-              <span class="text-yellow-400 text-lg" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            <!-- Write review CTA -->
+            <div class="flex-shrink-0 text-center">
+              <a href="https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition shadow" data-t="leaveReviewBtn">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                Leave Us a Review
+              </a>
             </div>
-            <p class="text-gray-600 dark:text-gray-300 text-sm italic mb-4" data-t="review3Text">"Finally found a shop where I can communicate in Spanish. Great work on my brakes."</p>
-            <cite class="text-brand dark:text-green-400 font-semibold not-italic text-sm">&mdash; Carlos M.</cite>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="review3Service">Brake Service</p>
-          </blockquote>
-          <!-- Sarah L. -->
-          <blockquote class="bg-white dark:bg-gray-700 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-600">
-            <div class="flex mb-3">
-              <span class="text-yellow-400 text-lg" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            </div>
-            <p class="text-gray-600 dark:text-gray-300 text-sm italic mb-4" data-t="review4Text">"Best tire prices in SE Portland. Quick service and friendly staff."</p>
-            <cite class="text-brand dark:text-green-400 font-semibold not-italic text-sm">&mdash; Sarah L.</cite>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="review4Service">Tire Sales</p>
-          </blockquote>
-          <!-- Roberto G. -->
-          <blockquote class="bg-white dark:bg-gray-700 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-600">
-            <div class="flex mb-3">
-              <span class="text-yellow-400 text-lg" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            </div>
-            <p class="text-gray-600 dark:text-gray-300 text-sm italic mb-4" data-t="review5Text">"Brought my fleet vehicles here. Reliable, fast turnaround, fair pricing."</p>
-            <cite class="text-brand dark:text-green-400 font-semibold not-italic text-sm">&mdash; Roberto G.</cite>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="review5Service">Fleet Service</p>
-          </blockquote>
-          <!-- Jennifer K. -->
-          <blockquote class="bg-white dark:bg-gray-700 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-600">
-            <div class="flex mb-3">
-              <span class="text-yellow-400 text-lg" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            </div>
-            <p class="text-gray-600 dark:text-gray-300 text-sm italic mb-4" data-t="review6Text">"They caught a brake issue during my oil change. Saved me from an expensive repair later."</p>
-            <cite class="text-brand dark:text-green-400 font-semibold not-italic text-sm">&mdash; Jennifer K.</cite>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="review6Service">Oil Change</p>
-          </blockquote>
+          </div>
         </div>
 
-        <!-- Leave a Review CTA (inline) -->
-        <div class="mt-10 text-center">
-          <a href="https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-brand text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800 transition shadow-lg" data-t="leaveReviewBtn">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-            Leave Us a Review on Google
-          </a>
+        <!-- Toolbar: filters + sort + count -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Source filters -->
+            <button data-filter="all" class="review-filter-btn px-3 py-1.5 text-sm rounded-full border border-gray-300 dark:border-gray-600 font-medium transition bg-brand text-white border-brand" data-t="filterAll">All</button>
+            <button data-filter="google" class="review-filter-btn px-3 py-1.5 text-sm rounded-full border border-gray-300 dark:border-gray-600 font-medium transition hover:border-blue-400 dark:hover:border-blue-500" data-t="filterGoogle">
+              <span class="inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Google</span>
+            </button>
+            <button data-filter="manual" class="review-filter-btn px-3 py-1.5 text-sm rounded-full border border-gray-300 dark:border-gray-600 font-medium transition hover:border-green-400 dark:hover:border-green-500" data-t="filterManual">Verified</button>
+            <!-- Active star filter indicator (hidden by default) -->
+            <button id="star-filter-badge" class="hidden px-3 py-1.5 text-sm rounded-full border border-amber-400 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-medium transition items-center gap-1">
+              <span id="star-filter-label">5 &#9733;</span>
+              <span class="ml-1 text-xs opacity-60 hover:opacity-100 cursor-pointer" id="clear-star-filter">&times;</span>
+            </button>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="reviews-showing" class="text-sm text-gray-500 dark:text-gray-400"></span>
+            <select id="sort-select" class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-200 cursor-pointer">
+              <option value="newest" data-t="sortNewest">Newest</option>
+              <option value="highest" data-t="sortHighest">Highest Rated</option>
+              <option value="lowest" data-t="sortLowest">Lowest Rated</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Reviews list -->
+        <div id="reviews-grid" class="grid md:grid-cols-2 gap-5" aria-live="polite">
+          <div class="col-span-full text-center py-8 text-gray-400">Loading reviews...</div>
+        </div>
+
+        <!-- Empty state for filters -->
+        <div id="reviews-empty" class="hidden text-center py-12">
+          <div class="text-4xl mb-3">&#9734;</div>
+          <p class="text-gray-500 dark:text-gray-400 text-lg" data-t="noMatchingReviews">No reviews match this filter</p>
+          <button id="clear-all-filters" class="mt-3 text-brand dark:text-green-400 font-medium text-sm hover:underline" data-t="clearFilters">Clear all filters</button>
         </div>
       </div>
     </section>
@@ -258,7 +296,7 @@ $canonicalUrl = 'https://oregon.tires/reviews';
     </div>
   </div>
 
-  <!-- Bilingual Translation Script -->
+  <!-- Bilingual Translation + Dynamic Reviews Script -->
   <script>
   (function(){
     var t = {
@@ -266,22 +304,12 @@ $canonicalUrl = 'https://oregon.tires/reviews';
       breadcrumbCurrent:  { en: 'Reviews', es: 'Rese\u00f1as' },
       heroTitle:          { en: 'What Our Customers Say', es: 'Lo Que Dicen Nuestros Clientes' },
       heroSubtitle:       { en: 'Portland drivers trust Oregon Tires Auto Care for honest, bilingual service. See why we have a 4.8-star rating.', es: 'Los conductores de Portland conf\u00edan en Oregon Tires Auto Care por su servicio honesto y biling\u00fce. Descubre por qu\u00e9 tenemos una calificaci\u00f3n de 4.8 estrellas.' },
-      heroReviewCount:    { en: '150+ Google Reviews', es: '150+ Rese\u00f1as en Google' },
+      heroReviewCount:    { en: '{{count}}+ Google Reviews', es: '{{count}}+ Rese\u00f1as en Google' },
       leaveReview:        { en: 'Leave Us a Review on Google', es: 'D\u00e9janos una Rese\u00f1a en Google' },
       viewOnGoogle:       { en: 'View on Google Maps', es: 'Ver en Google Maps' },
       testimonialsTitle:  { en: 'Customer Testimonials', es: 'Testimonios de Clientes' },
-      review1Text:        { en: '\u201cExcellent service! They installed my tires quickly and the price was very fair.\u201d', es: '\u201c\u00a1Excelente servicio! Instalaron mis llantas r\u00e1pidamente y el precio fue muy justo.\u201d' },
-      review1Service:     { en: 'Tire Installation', es: 'Instalaci\u00f3n de Llantas' },
-      review2Text:        { en: '\u201cHonest mechanics who explain what needs to be done. No upselling.\u201d', es: '\u201cMec\u00e1nicos honestos que explican lo que se necesita hacer. Sin ventas adicionales.\u201d' },
-      review2Service:     { en: 'General Repair', es: 'Reparaci\u00f3n General' },
-      review3Text:        { en: '\u201cFinally found a shop where I can communicate in Spanish. Great work on my brakes.\u201d', es: '\u201cPor fin encontr\u00e9 un taller donde puedo comunicarme en espa\u00f1ol. Excelente trabajo en mis frenos.\u201d' },
-      review3Service:     { en: 'Brake Service', es: 'Servicio de Frenos' },
-      review4Text:        { en: '\u201cBest tire prices in SE Portland. Quick service and friendly staff.\u201d', es: '\u201cLos mejores precios de llantas en el sureste de Portland. Servicio r\u00e1pido y personal amable.\u201d' },
-      review4Service:     { en: 'Tire Sales', es: 'Venta de Llantas' },
-      review5Text:        { en: '\u201cBrought my fleet vehicles here. Reliable, fast turnaround, fair pricing.\u201d', es: '\u201cTraje mis veh\u00edculos de flota aqu\u00ed. Confiable, r\u00e1pido y precios justos.\u201d' },
-      review5Service:     { en: 'Fleet Service', es: 'Servicio de Flotas' },
-      review6Text:        { en: '\u201cThey caught a brake issue during my oil change. Saved me from an expensive repair later.\u201d', es: '\u201cDetectaron un problema de frenos durante mi cambio de aceite. Me ahorraron una reparaci\u00f3n costosa despu\u00e9s.\u201d' },
-      review6Service:     { en: 'Oil Change', es: 'Cambio de Aceite' },
+      sortNewest:         { en: 'Newest', es: 'M\u00e1s Recientes' },
+      sortHighest:        { en: 'Highest Rated', es: 'Mejor Calificados' },
       leaveReviewBtn:     { en: 'Leave Us a Review on Google', es: 'D\u00e9janos una Rese\u00f1a en Google' },
       trustTitle:         { en: 'Why Customers Trust Us', es: 'Por Qu\u00e9 los Clientes Conf\u00edan en Nosotros' },
       statYears:          { en: 'Years in Portland', es: 'A\u00f1os en Portland' },
@@ -289,12 +317,23 @@ $canonicalUrl = 'https://oregon.tires/reviews';
       statBilingual:      { en: 'Fully Bilingual', es: 'Completamente Biling\u00fce' },
       statWarranty:       { en: '12K Mile Warranty', es: '12K Millas de Garant\u00eda' },
       ctaTitle:           { en: 'Ready to Experience the Difference?', es: '\u00bfListo para Experimentar la Diferencia?' },
-      ctaSubtitle:        { en: 'Join 150+ happy customers. Book online or call for same-day service.', es: '\u00danete a m\u00e1s de 150 clientes satisfechos. Reserva en l\u00ednea o llama para servicio el mismo d\u00eda.' },
+      ctaSubtitle:        { en: 'Join {{count}}+ happy customers. Book online or call for same-day service.', es: '\u00danete a m\u00e1s de {{count}} clientes satisfechos. Reserva en l\u00ednea o llama para servicio el mismo d\u00eda.' },
       ctaBook:            { en: 'Book Free Estimate', es: 'Reserve Estimado Gratis' },
       ctaCall:            { en: 'Call (503) 367-9714', es: 'Llame (503) 367-9714' },
       ctaContact:         { en: 'Contact Us', es: 'Cont\u00e1ctenos' },
       callNow:            { en: 'Call Now', es: 'Llamar' },
-      bookNow:            { en: 'Book Now', es: 'Reservar' }
+      bookNow:            { en: 'Book Now', es: 'Reservar' },
+      filterAll:          { en: 'All', es: 'Todas' },
+      filterGoogle:       { en: 'Google', es: 'Google' },
+      filterManual:       { en: 'Verified', es: 'Verificadas' },
+      sortLowest:         { en: 'Lowest Rated', es: 'Menor Calificaci\u00f3n' },
+      summaryCount:       { en: '970+ reviews', es: '970+ rese\u00f1as' },
+      noMatchingReviews:  { en: 'No reviews match this filter', es: 'No hay rese\u00f1as con este filtro' },
+      clearFilters:       { en: 'Clear all filters', es: 'Limpiar filtros' },
+      googleBadge:        { en: 'Google', es: 'Google' },
+      daysAgo:            { en: 'days ago', es: 'd\u00edas' },
+      weeksAgo:           { en: 'weeks ago', es: 'semanas' },
+      monthsAgo:          { en: 'months ago', es: 'meses' }
     };
     var params = new URLSearchParams(window.location.search);
     var lang = params.get('lang');
@@ -310,6 +349,285 @@ $canonicalUrl = 'https://oregon.tires/reviews';
       var key = el.getAttribute('data-t');
       if (t[key] && t[key][lang]) el.textContent = t[key][lang];
     });
+
+    // ─── Dynamic Reviews ──────────────────────────────────────
+    var allReviews = [];
+    var currentSort = 'newest';
+    var currentSourceFilter = 'all';
+    var currentStarFilter = 0;
+    var TRUNCATE_LEN = 180;
+
+    function formatRelativeDate(dateStr) {
+      if (!dateStr) return '';
+      var d = new Date(dateStr);
+      var now = new Date();
+      var diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+      if (diff < 1) return lang === 'es' ? 'Hoy' : 'Today';
+      if (diff < 7) return (diff || 1) + ' ' + (t.daysAgo[lang] || 'days ago');
+      if (diff < 30) return Math.floor(diff / 7) + ' ' + (t.weeksAgo[lang] || 'weeks ago');
+      if (diff < 365) return Math.floor(diff / 30) + ' ' + (t.monthsAgo[lang] || 'months ago');
+      return Math.floor(diff / 365) + (lang === 'es' ? ' a\u00f1o(s)' : ' year(s) ago');
+    }
+
+    function renderStars(rating) {
+      return '\u2605'.repeat(rating) + '\u2606'.repeat(5 - rating);
+    }
+
+    // ─── Rating distribution bars ─────────────────────────────
+    function updateRatingBars() {
+      var counts = {5:0, 4:0, 3:0, 2:0, 1:0};
+      var total = allReviews.length;
+      allReviews.forEach(function(r) { counts[Number(r.rating) || 5]++; });
+      for (var star = 5; star >= 1; star--) {
+        var row = document.querySelector('[data-star="' + star + '"]');
+        if (!row) continue;
+        var fill = row.querySelector('.bg-yellow-400');
+        var spans = row.querySelectorAll('span');
+        var pct = total ? Math.round(counts[star] / total * 100) : 0;
+        if (fill) fill.style.width = pct + '%';
+        if (spans.length >= 4) spans[3].textContent = counts[star];
+      }
+    }
+
+    // ─── Click rating bar to filter ───────────────────────────
+    document.querySelectorAll('#rating-bars [data-star]').forEach(function(row) {
+      var barEl = row.querySelector('[role="button"]');
+      if (!barEl) return;
+      barEl.addEventListener('click', function() {
+        var star = Number(row.dataset.star);
+        currentStarFilter = (currentStarFilter === star) ? 0 : star;
+        updateStarFilterBadge();
+        filterSortAndRender();
+      });
+    });
+
+    function updateStarFilterBadge() {
+      var badge = document.getElementById('star-filter-badge');
+      if (!badge) return;
+      if (currentStarFilter > 0) {
+        badge.classList.remove('hidden');
+        badge.classList.add('inline-flex');
+        document.getElementById('star-filter-label').textContent = currentStarFilter + ' \u2605';
+      } else {
+        badge.classList.add('hidden');
+        badge.classList.remove('inline-flex');
+      }
+    }
+
+    document.getElementById('clear-star-filter').addEventListener('click', function(e) {
+      e.stopPropagation();
+      currentStarFilter = 0;
+      updateStarFilterBadge();
+      filterSortAndRender();
+    });
+
+    // ─── Source filter buttons ─────────────────────────────────
+    document.querySelectorAll('.review-filter-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        currentSourceFilter = btn.dataset.filter;
+        document.querySelectorAll('.review-filter-btn').forEach(function(b) {
+          if (b.dataset.filter === currentSourceFilter) {
+            b.className = 'review-filter-btn px-3 py-1.5 text-sm rounded-full border font-medium transition bg-brand text-white border-brand';
+          } else {
+            b.className = 'review-filter-btn px-3 py-1.5 text-sm rounded-full border border-gray-300 dark:border-gray-600 font-medium transition hover:border-gray-400';
+          }
+        });
+        filterSortAndRender();
+      });
+    });
+
+    // ─── Sort select ──────────────────────────────────────────
+    document.getElementById('sort-select').addEventListener('change', function() {
+      currentSort = this.value;
+      filterSortAndRender();
+    });
+
+    // ─── Clear all filters ────────────────────────────────────
+    document.getElementById('clear-all-filters').addEventListener('click', function() {
+      currentSourceFilter = 'all';
+      currentStarFilter = 0;
+      updateStarFilterBadge();
+      document.querySelectorAll('.review-filter-btn').forEach(function(b) {
+        b.className = b.dataset.filter === 'all'
+          ? 'review-filter-btn px-3 py-1.5 text-sm rounded-full border font-medium transition bg-brand text-white border-brand'
+          : 'review-filter-btn px-3 py-1.5 text-sm rounded-full border border-gray-300 dark:border-gray-600 font-medium transition hover:border-gray-400';
+      });
+      filterSortAndRender();
+    });
+
+    // ─── Core filter + sort + render ──────────────────────────
+    function getFilteredReviews() {
+      return allReviews.filter(function(r) {
+        if (currentSourceFilter === 'google' && r.source !== 'google') return false;
+        if (currentSourceFilter === 'manual' && r.source !== 'manual') return false;
+        if (currentStarFilter > 0 && Number(r.rating) !== currentStarFilter) return false;
+        return true;
+      });
+    }
+
+    function filterSortAndRender() {
+      var filtered = getFilteredReviews();
+      if (currentSort === 'highest') {
+        filtered.sort(function(a, b) { return (Number(b.rating) || 5) - (Number(a.rating) || 5); });
+      } else if (currentSort === 'lowest') {
+        filtered.sort(function(a, b) { return (Number(a.rating) || 5) - (Number(b.rating) || 5); });
+      } else {
+        filtered.sort(function(a, b) {
+          return new Date(b.google_published_at || b.created_at || 0) - new Date(a.google_published_at || a.created_at || 0);
+        });
+      }
+      var grid = document.getElementById('reviews-grid');
+      var emptyState = document.getElementById('reviews-empty');
+      if (filtered.length === 0) {
+        grid.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+      } else {
+        grid.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+      }
+      var showingEl = document.getElementById('reviews-showing');
+      if (showingEl) {
+        var showLabel = lang === 'es' ? 'Mostrando' : 'Showing';
+        var ofLabel = lang === 'es' ? 'de' : 'of';
+        if (filtered.length === allReviews.length) {
+          showingEl.textContent = filtered.length + ' ' + (lang === 'es' ? 'rese\u00f1as' : 'reviews');
+        } else {
+          showingEl.textContent = showLabel + ' ' + filtered.length + ' ' + ofLabel + ' ' + allReviews.length;
+        }
+      }
+      renderReviewCards(filtered);
+    }
+
+    function renderReviewCards(reviews) {
+      var grid = document.getElementById('reviews-grid');
+      if (!grid) return;
+      grid.textContent = '';
+      reviews.forEach(function(r) {
+        var reviewText = lang === 'es' ? (r.review_text_es || r.review_text_en) : r.review_text_en;
+        var rating = Number(r.rating) || 5;
+        var dateStr = r.google_published_at || r.created_at;
+        var isLong = reviewText.length > TRUNCATE_LEN;
+
+        var card = document.createElement('blockquote');
+        card.className = 'bg-white dark:bg-gray-700 rounded-xl shadow-sm p-5 border border-gray-200 dark:border-gray-600 transition hover:shadow-md';
+
+        // Top row: stars + source + date
+        var topRow = document.createElement('div');
+        topRow.className = 'flex items-center justify-between mb-3';
+        var starsWrap = document.createElement('div');
+        starsWrap.className = 'flex items-center gap-2';
+        var starSpan = document.createElement('span');
+        starSpan.className = 'text-yellow-400 text-lg';
+        starSpan.setAttribute('aria-label', rating + ' out of 5 stars');
+        starSpan.textContent = renderStars(rating);
+        starsWrap.appendChild(starSpan);
+        if (r.source === 'google') {
+          var srcBadge = document.createElement('span');
+          srcBadge.className = 'text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300 font-medium';
+          srcBadge.textContent = 'Google';
+          starsWrap.appendChild(srcBadge);
+        }
+        topRow.appendChild(starsWrap);
+        var dateEl = document.createElement('span');
+        dateEl.className = 'text-xs text-gray-400 dark:text-gray-500 flex-shrink-0';
+        dateEl.textContent = formatRelativeDate(dateStr);
+        topRow.appendChild(dateEl);
+        card.appendChild(topRow);
+
+        // Review text with truncation
+        var textEl = document.createElement('p');
+        textEl.className = 'text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-3';
+        if (isLong) {
+          textEl.textContent = '\u201c' + reviewText.substring(0, TRUNCATE_LEN) + '...\u201d';
+          var readMore = document.createElement('button');
+          readMore.className = 'text-brand dark:text-green-400 text-xs font-medium ml-1 hover:underline';
+          readMore.textContent = lang === 'es' ? 'Leer m\u00e1s' : 'Read more';
+          readMore.addEventListener('click', (function(fullText, el, btn) {
+            return function() {
+              var expanded = el.dataset.expanded === '1';
+              if (expanded) {
+                el.textContent = '\u201c' + fullText.substring(0, TRUNCATE_LEN) + '...\u201d';
+                el.appendChild(btn);
+                btn.textContent = lang === 'es' ? 'Leer m\u00e1s' : 'Read more';
+                el.dataset.expanded = '0';
+              } else {
+                el.textContent = '\u201c' + fullText + '\u201d';
+                el.appendChild(btn);
+                btn.textContent = lang === 'es' ? 'Leer menos' : 'Read less';
+                el.dataset.expanded = '1';
+              }
+            };
+          })(reviewText, textEl, readMore));
+          textEl.appendChild(readMore);
+        } else {
+          textEl.textContent = '\u201c' + reviewText + '\u201d';
+        }
+        card.appendChild(textEl);
+
+        // Author row
+        var authorRow = document.createElement('div');
+        authorRow.className = 'flex items-center gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-600';
+        if (r.author_photo_url) {
+          var avatar = document.createElement('img');
+          avatar.src = r.author_photo_url;
+          avatar.alt = '';
+          avatar.className = 'w-9 h-9 rounded-full object-cover';
+          avatar.loading = 'lazy';
+          authorRow.appendChild(avatar);
+        } else {
+          var initials = document.createElement('span');
+          initials.className = 'w-9 h-9 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center text-xs font-bold text-green-700 dark:text-green-300';
+          initials.textContent = (r.customer_name || '?')[0].toUpperCase();
+          authorRow.appendChild(initials);
+        }
+        var nameEl = document.createElement('cite');
+        nameEl.className = 'text-gray-800 dark:text-gray-200 font-medium not-italic text-sm';
+        nameEl.textContent = r.customer_name;
+        authorRow.appendChild(nameEl);
+        card.appendChild(authorRow);
+
+        grid.appendChild(card);
+      });
+    }
+
+    // ─── Load reviews from API ────────────────────────────────
+    fetch('/api/testimonials.php?scope=all', { credentials: 'include' })
+      .then(function(res) { return res.json(); })
+      .then(function(json) {
+        allReviews = (json.success && json.data) ? json.data : [];
+        updateRatingBars();
+        filterSortAndRender();
+      })
+      .catch(function(err) {
+        console.error('Error loading reviews:', err);
+      });
+
+    // ─── Load stats and update hero + summary ─────────────────
+    fetch('/api/testimonials.php?scope=stats', { credentials: 'include' })
+      .then(function(res) { return res.json(); })
+      .then(function(json) {
+        if (!json.success || !json.data) return;
+        var count = json.data.review_count || '150';
+        var rating = json.data.rating_value || '4.8';
+        // Hero
+        var heroCount = document.querySelector('[data-t="heroReviewCount"]');
+        if (heroCount) heroCount.textContent = (t.heroReviewCount[lang] || '{{count}}+ Google Reviews').replace('{{count}}', count);
+        var heroRating = document.querySelector('.bg-white\\/10 .text-2xl');
+        if (heroRating) heroRating.textContent = rating;
+        // Summary card
+        var summaryRating = document.getElementById('summary-rating');
+        if (summaryRating) summaryRating.textContent = rating;
+        var summaryCount = document.getElementById('summary-count');
+        if (summaryCount) summaryCount.textContent = count + '+ ' + (lang === 'es' ? 'rese\u00f1as' : 'reviews');
+        // Trust section
+        document.querySelectorAll('.text-3xl.font-bold.text-brand').forEach(function(el) {
+          if (el.textContent.includes('150')) el.textContent = count + '+';
+        });
+        // CTA
+        var ctaSub = document.querySelector('[data-t="ctaSubtitle"]');
+        if (ctaSub) ctaSub.textContent = (t.ctaSubtitle[lang] || '').replace('{{count}}', count);
+      })
+      .catch(function() {});
   })();
   </script>
 </body>

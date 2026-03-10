@@ -1069,7 +1069,7 @@
           </div>
           <div class="text-gray-600 dark:text-gray-300 mb-4" data-t="basedOnReviews" data-setting="review_count">Based on 150+ Google Reviews</div>
           <div class="flex flex-wrap justify-center gap-3">
-            <a href="https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" class="inline-block border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-6 py-2 rounded-lg font-medium hover:bg-brand/5 dark:hover:bg-green-400/10 transition" data-t="viewAllReviews" id="google-review-link">View All Reviews on Google</a>
+            <a href="/reviews" class="inline-block border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-6 py-2 rounded-lg font-medium hover:bg-brand/5 dark:hover:bg-green-400/10 transition" data-t="viewAllReviews" id="google-review-link">View All Reviews</a>
             <a href="https://search.google.com/local/writereview?placeid=ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" class="inline-block bg-amber-500 text-black px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="leaveReview">Leave Us a Review</a>
           </div>
         </div>
@@ -1513,7 +1513,7 @@ const t = {
     gallery: 'Promotions', gallerySubtitle: 'Check out our latest deals and promotions',
     outOfStars: 'out of 5 stars',
     basedOnReviews: 'Based on 150+ Google Reviews',
-    viewAllReviews: 'View All Reviews on Google',
+    viewAllReviews: 'View All Reviews',
     loadingGallery: 'Loading promotions...',
     address: 'Address',
     physicalAddress: '8536 SE 82nd Ave, Portland, OR 97266',
@@ -1668,7 +1668,7 @@ const t = {
     gallery: 'Promociones', gallerySubtitle: 'Vea nuestras últimas ofertas y promociones',
     outOfStars: 'de 5 estrellas',
     basedOnReviews: 'Basado en más de 150 reseñas de Google',
-    viewAllReviews: 'Ver todas las reseñas en Google',
+    viewAllReviews: 'Ver Todas las Rese\u00f1as',
     loadingGallery: 'Cargando promociones...',
     address: 'Dirección',
     physicalAddress: '8536 SE 82nd Ave, Portland, OR 97266',
@@ -1804,10 +1804,10 @@ function normalizeAssetPath(url) {
 }
 
 // ===== REVIEWS =====
-// ===== DYNAMIC REVIEWS FROM API =====
+// ===== DYNAMIC REVIEWS FROM API (homepage scope) =====
 async function loadReviews() {
   try {
-    var res = await fetch(API_BASE + '/testimonials.php', { credentials: 'include' });
+    var res = await fetch(API_BASE + '/testimonials.php?scope=homepage', { credentials: 'include' });
     var json = await res.json();
     var allReviews = (json.success && json.data) ? json.data : [];
     renderReviews(allReviews);
@@ -1816,9 +1816,9 @@ async function loadReviews() {
   }
 }
 
-function formatReviewDate(createdAt) {
-  if (!createdAt) return '';
-  var d = new Date(createdAt);
+function formatReviewDate(dateStr) {
+  if (!dateStr) return '';
+  var d = new Date(dateStr);
   var now = new Date();
   var diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
   if (diff < 7) return (diff || 1) + ' ' + (t[currentLang].daysAgo || 'days ago');
@@ -1828,8 +1828,9 @@ function formatReviewDate(createdAt) {
 
 function renderReviews(allReviews) {
   var sorted = (allReviews || []).slice().sort(function(a, b) {
+    if (Number(a.sort_order) !== Number(b.sort_order)) return Number(a.sort_order) - Number(b.sort_order);
     if (b.rating !== a.rating) return b.rating - a.rating;
-    return new Date(b.date || 0) - new Date(a.date || 0);
+    return 0;
   }).slice(0, 3);
   var grid = document.getElementById('reviews-grid');
   grid.textContent = '';
@@ -1837,6 +1838,7 @@ function renderReviews(allReviews) {
     var lang = currentLang || 'en';
     var reviewText = lang === 'es' ? (r.review_text_es || r.review_text_en) : r.review_text_en;
     var rating = Number(r.rating) || 5;
+    var dateStr = r.google_published_at || r.created_at;
 
     var card = document.createElement('div');
     card.className = 'bg-white dark:bg-gray-700 rounded-xl shadow-md p-6 fade-in';
@@ -1845,28 +1847,64 @@ function renderReviews(allReviews) {
     var starSpan = document.createElement('span');
     starSpan.className = 'star';
     starSpan.textContent = '\u2605'.repeat(rating) + '\u2606'.repeat(5 - rating);
-    var badge = document.createElement('span');
-    badge.className = 'text-xs bg-gray-100 dark:bg-gray-600 px-2 py-1 rounded';
-    badge.textContent = t[currentLang].verified;
-    stars.appendChild(starSpan);
-    stars.appendChild(badge);
+    if (r.source === 'google') {
+      var badge = document.createElement('span');
+      badge.className = 'text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded';
+      badge.textContent = 'Google';
+      stars.appendChild(starSpan);
+      stars.appendChild(badge);
+    } else {
+      var badge = document.createElement('span');
+      badge.className = 'text-xs bg-gray-100 dark:bg-gray-600 px-2 py-1 rounded';
+      badge.textContent = t[currentLang].verified;
+      stars.appendChild(starSpan);
+      stars.appendChild(badge);
+    }
+    // Avatar + name
+    var nameRow = document.createElement('div');
+    nameRow.className = 'flex items-center gap-2 mb-1';
+    if (r.author_photo_url) {
+      var avatar = document.createElement('img');
+      avatar.src = r.author_photo_url;
+      avatar.alt = '';
+      avatar.className = 'w-8 h-8 rounded-full object-cover';
+      avatar.loading = 'lazy';
+      nameRow.appendChild(avatar);
+    }
     var name = document.createElement('h4');
     name.className = 'font-bold text-lg';
     name.textContent = r.customer_name;
+    nameRow.appendChild(name);
     var date = document.createElement('p');
     date.className = 'text-sm text-gray-500 dark:text-gray-400 mb-2';
-    date.textContent = formatReviewDate(r.created_at);
+    date.textContent = formatReviewDate(dateStr);
     var text = document.createElement('p');
     text.className = 'text-gray-600 dark:text-gray-300';
     text.textContent = reviewText;
     card.appendChild(stars);
-    card.appendChild(name);
+    card.appendChild(nameRow);
     card.appendChild(date);
     card.appendChild(text);
     grid.appendChild(card);
   });
 }
 loadReviews();
+
+// Load dynamic stats for rating + review count
+fetch(API_BASE + '/testimonials.php?scope=stats', { credentials: 'include' })
+  .then(function(res) { return res.json(); })
+  .then(function(json) {
+    if (!json.success || !json.data) return;
+    var ratingEl = document.querySelector('[data-setting="rating_value"]');
+    var countEl = document.querySelector('[data-setting="review_count"]');
+    if (ratingEl) ratingEl.textContent = json.data.rating_value || '4.8';
+    if (countEl) {
+      var count = json.data.review_count || '150';
+      var label = currentLang === 'es' ? 'Basado en ' + count + '+ Rese\u00f1as en Google' : 'Based on ' + count + '+ Google Reviews';
+      countEl.textContent = label;
+    }
+  })
+  .catch(function() {});
 
 // ===== DYNAMIC FAQ FROM API =====
 async function loadFaqs() {
