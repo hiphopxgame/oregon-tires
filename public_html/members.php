@@ -47,6 +47,12 @@ $memberDashboardConfig = [
     'scripts'        => [],
     'nav_include'    => __DIR__ . '/templates/header.php',
     'footer_include' => __DIR__ . '/templates/footer.php',
+    'universal_tab_labels' => [
+        'profile'  => memberT('profile', $lang),
+        'settings' => memberT('settings', $lang),
+        'activity' => memberT('activity', $lang),
+        'security' => memberT('security', $lang),
+    ],
 ];
 
 // Define Oregon Tires custom dashboard tabs (bilingual)

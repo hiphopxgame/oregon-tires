@@ -108,6 +108,13 @@ function memberT(string $key, string $lang = ''): string
         'never'             => ['en' => 'Never', 'es' => 'Nunca'],
         'phone'             => ['en' => 'Phone', 'es' => 'Teléfono'],
         'email'             => ['en' => 'Email', 'es' => 'Correo'],
+
+        // Universal dashboard tabs
+        'profile'           => ['en' => 'Profile', 'es' => 'Perfil'],
+        'settings'          => ['en' => 'Settings', 'es' => "Configuraci\u{00f3}n"],
+        'activity'          => ['en' => 'Activity', 'es' => 'Actividad'],
+        'security'          => ['en' => 'Security', 'es' => 'Seguridad'],
+        'change_password'   => ['en' => 'Change Password', 'es' => "Cambiar Contrase\u{00f1}a"],
     ];
 
     return $strings[$key][$lang] ?? $strings[$key]['en'] ?? $key;
