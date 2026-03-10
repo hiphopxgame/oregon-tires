@@ -205,7 +205,7 @@ try {
 
         require_once __DIR__ . '/../includes/sms.php';
         if (function_exists('sendApprovalConfirmationSms')) {
-            sendApprovalConfirmationSms($est['phone'] ?? '', $custName, $est['ro_number'], $lang);
+            sendApprovalConfirmationSms($est['phone'] ?? '', $custName, $lang);
         }
 
         // Notify shop owner
