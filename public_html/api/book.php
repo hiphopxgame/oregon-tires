@@ -101,7 +101,69 @@ try {
 
     // ─── Check for time slot conflicts ──────────────────────────────────────
     $db = getDB();
-    $maxPerSlot = 2; // max bookings per time slot
+
+    // Dynamic capacity from employee schedules
+    $maxPerSlot = 2; // fallback if schedule tables don't exist
+    try {
+        $dayOfWeek = (int) (new DateTime($preferredDate))->format('w');
+        $slotHour = (int) substr($preferredTime, 0, 2);
+
+        // Check shop-wide closure
+        $closureStmt = $db->prepare(
+            "SELECT id FROM oretir_schedule_overrides
+             WHERE override_date = ? AND employee_id IS NULL AND is_closed = 1 LIMIT 1"
+        );
+        $closureStmt->execute([$preferredDate]);
+        if ($closureStmt->fetch()) {
+            jsonError('The shop is closed on this date. Please choose a different day.', 409);
+        }
+
+        // Count employees available at this time slot
+        $schedStmt = $db->prepare(
+            "SELECT s.employee_id, s.start_time, s.end_time
+             FROM oretir_schedules s
+             JOIN oretir_employees e ON s.employee_id = e.id
+             WHERE s.day_of_week = ? AND s.is_available = 1 AND e.is_active = 1"
+        );
+        $schedStmt->execute([$dayOfWeek]);
+        $schedRows = $schedStmt->fetchAll();
+
+        if (count($schedRows) > 0) {
+            // Load employee overrides for this date
+            $ovStmt = $db->prepare(
+                "SELECT employee_id, is_closed, start_time, end_time
+                 FROM oretir_schedule_overrides
+                 WHERE override_date = ? AND employee_id IS NOT NULL"
+            );
+            $ovStmt->execute([$preferredDate]);
+            $empOverrides = [];
+            foreach ($ovStmt->fetchAll() as $ov) {
+                $empOverrides[(int) $ov['employee_id']] = $ov;
+            }
+
+            $slotCapacity = 0;
+            foreach ($schedRows as $sched) {
+                $empId = (int) $sched['employee_id'];
+                $empStart = (int) substr($sched['start_time'], 0, 2);
+                $empEnd   = (int) substr($sched['end_time'], 0, 2);
+
+                if (isset($empOverrides[$empId])) {
+                    if ((int) $empOverrides[$empId]['is_closed']) continue;
+                    $empStart = (int) substr($empOverrides[$empId]['start_time'], 0, 2);
+                    $empEnd   = (int) substr($empOverrides[$empId]['end_time'], 0, 2);
+                }
+
+                if ($slotHour >= $empStart && $slotHour < $empEnd) {
+                    $slotCapacity++;
+                }
+            }
+            $maxPerSlot = $slotCapacity;
+        }
+    } catch (\Throwable $schedErr) {
+        // Tables don't exist yet — use fallback capacity of 2
+        error_log("book.php schedule capacity check skipped: " . $schedErr->getMessage());
+    }
+
     $conflictStmt = $db->prepare(
         'SELECT COUNT(*) FROM oretir_appointments
          WHERE preferred_date = ? AND preferred_time = ? AND status NOT IN (?, ?)'

@@ -40,7 +40,24 @@ try {
         $stmt = $db->prepare('INSERT INTO oretir_employees (name, email, phone, role, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, 1, NOW(), NOW())');
         $stmt->execute([$name, $email, $phone, $role]);
 
-        jsonSuccess(['id' => (int) $db->lastInsertId()], 201);
+        $newEmpId = (int) $db->lastInsertId();
+
+        // Auto-seed default weekly schedule (Mon-Sat 08:00-17:00, Sun off)
+        try {
+            $schedStmt = $db->prepare(
+                "INSERT INTO oretir_schedules (employee_id, day_of_week, start_time, end_time, is_available, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, NOW(), NOW())
+                 ON DUPLICATE KEY UPDATE updated_at = NOW()"
+            );
+            for ($dow = 0; $dow <= 6; $dow++) {
+                $schedStmt->execute([$newEmpId, $dow, '08:00:00', '17:00:00', $dow === 0 ? 0 : 1]);
+            }
+        } catch (\Throwable $schedErr) {
+            // Schedule tables may not exist yet — graceful degradation
+            error_log("employees.php: auto-seed schedule failed for employee #{$newEmpId}: " . $schedErr->getMessage());
+        }
+
+        jsonSuccess(['id' => $newEmpId], 201);
     }
 
     // PUT

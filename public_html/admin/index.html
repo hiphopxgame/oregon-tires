@@ -753,6 +753,23 @@
           </div>
         </div>
         <div id="employees-content"></div>
+
+        <!-- Work Schedules Section -->
+        <div id="schedule-management" class="mt-8">
+          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+            <h2 class="text-xl font-bold" data-t="schedWorkSchedules">Work Schedules</h2>
+            <div class="flex gap-2">
+              <button onclick="showScheduleView('weekly')" id="sched-btn-weekly" class="bg-white text-brand-light px-3 py-1.5 rounded-lg text-sm font-medium">Weekly</button>
+              <button onclick="showScheduleView('daily')" id="sched-btn-daily" class="border border-white/40 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/10">Daily</button>
+              <button onclick="showScheduleView('overrides')" id="sched-btn-overrides" class="border border-white/40 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/10">Overrides</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+            <div id="schedule-weekly-view"></div>
+            <div id="schedule-daily-view" class="hidden"></div>
+            <div id="schedule-overrides-view" class="hidden"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -6285,6 +6302,36 @@ const adminT = {
     roTimelineInProg: 'In Prog',
     roTimelineParts: 'Parts',
     roTimelineDone: 'Done',
+    // Schedules
+    schedWorkSchedules: 'Work Schedules',
+    schedWeekly: 'Weekly',
+    schedDaily: 'Daily',
+    schedOverrides: 'Overrides',
+    schedEmployee: 'Employee',
+    schedMon: 'Mon', schedTue: 'Tue', schedWed: 'Wed', schedThu: 'Thu', schedFri: 'Fri', schedSat: 'Sat', schedSun: 'Sun',
+    schedOff: 'OFF',
+    schedSave: 'Save',
+    schedSaved: 'Saved!',
+    schedStart: 'Start',
+    schedEnd: 'End',
+    schedAvailable: 'Available',
+    schedCapacity: 'Capacity',
+    schedWorking: 'working',
+    schedNoSchedules: 'No employee schedules found. Add employees first.',
+    schedShopClosed: 'Shop Closed',
+    schedDayOff: 'Day Off',
+    schedSpecialHours: 'Special Hours',
+    schedAddOverride: 'Add Override',
+    schedDate: 'Date',
+    schedType: 'Type',
+    schedShopWide: 'Shop-Wide',
+    schedReason: 'Reason',
+    schedNoOverrides: 'No upcoming overrides.',
+    schedDelete: 'Delete',
+    schedClosure: 'Closure',
+    schedAssigned: 'Assigned',
+    schedUnassigned: 'Unassigned',
+    schedSlots: 'slots',
   },
   es: {
     // Login
@@ -6817,6 +6864,36 @@ const adminT = {
     roTimelineInProg: 'En Prog',
     roTimelineParts: 'Partes',
     roTimelineDone: 'Hecho',
+    // Schedules
+    schedWorkSchedules: 'Horarios de Trabajo',
+    schedWeekly: 'Semanal',
+    schedDaily: 'Diario',
+    schedOverrides: 'Excepciones',
+    schedEmployee: 'Empleado',
+    schedMon: 'Lun', schedTue: 'Mar', schedWed: 'Mi\u00E9', schedThu: 'Jue', schedFri: 'Vie', schedSat: 'S\u00E1b', schedSun: 'Dom',
+    schedOff: 'LIBRE',
+    schedSave: 'Guardar',
+    schedSaved: '\u00A1Guardado!',
+    schedStart: 'Inicio',
+    schedEnd: 'Fin',
+    schedAvailable: 'Disponible',
+    schedCapacity: 'Capacidad',
+    schedWorking: 'trabajando',
+    schedNoSchedules: 'No se encontraron horarios. Agregue empleados primero.',
+    schedShopClosed: 'Taller Cerrado',
+    schedDayOff: 'D\u00EDa Libre',
+    schedSpecialHours: 'Horario Especial',
+    schedAddOverride: 'Agregar Excepci\u00F3n',
+    schedDate: 'Fecha',
+    schedType: 'Tipo',
+    schedShopWide: 'Todo el Taller',
+    schedReason: 'Raz\u00F3n',
+    schedNoOverrides: 'No hay excepciones pr\u00F3ximas.',
+    schedDelete: 'Eliminar',
+    schedClosure: 'Cierre',
+    schedAssigned: 'Asignado',
+    schedUnassigned: 'Sin asignar',
+    schedSlots: 'espacios',
   }
 };
 
@@ -7898,6 +7975,623 @@ function toggleEmpAppts(empId) {
   var el = document.getElementById('emp-appts-' + empId);
   if (el) el.classList.toggle('hidden');
 }
+
+// ===== WORK SCHEDULES =====
+var scheduleData = { weekly: null, daily: null, overrides: null };
+var currentScheduleView = 'weekly';
+var dayNames = ['schedSun','schedMon','schedTue','schedWed','schedThu','schedFri','schedSat'];
+
+function showScheduleView(view) {
+  currentScheduleView = view;
+  ['weekly','daily','overrides'].forEach(function(v) {
+    var el = document.getElementById('schedule-' + v + '-view');
+    var btn = document.getElementById('sched-btn-' + v);
+    if (el) el.classList.toggle('hidden', v !== view);
+    if (btn) {
+      btn.className = v === view
+        ? 'bg-white text-brand-light px-3 py-1.5 rounded-lg text-sm font-medium'
+        : 'border border-white/40 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/10';
+    }
+  });
+  loadSchedules(view);
+}
+
+async function loadSchedules(type) {
+  var T = adminT[currentLang];
+  type = type || currentScheduleView;
+  try {
+    if (type === 'weekly') {
+      var res = await fetch('/api/admin/schedules.php?type=weekly', { credentials: 'include' });
+      var json = await res.json();
+      if (json.success) { scheduleData.weekly = json.data; showWeeklySchedules(); }
+    } else if (type === 'daily') {
+      var dateEl = document.getElementById('sched-daily-date');
+      var date = dateEl ? dateEl.value : new Date().toISOString().split('T')[0];
+      var res = await fetch('/api/admin/schedules.php?type=daily&date=' + date, { credentials: 'include' });
+      var json = await res.json();
+      if (json.success) { scheduleData.daily = json.data; showDailySchedule(); }
+    } else if (type === 'overrides') {
+      var res = await fetch('/api/admin/schedules.php?type=overrides', { credentials: 'include' });
+      var json = await res.json();
+      if (json.success) { scheduleData.overrides = json.data; showOverrides(); }
+    }
+  } catch (err) {
+    console.error('loadSchedules error:', err);
+  }
+}
+
+function showWeeklySchedules() {
+  var T = adminT[currentLang];
+  var container = document.getElementById('schedule-weekly-view');
+  var data = scheduleData.weekly;
+  if (!data || !data.length) {
+    container.textContent = T.schedNoSchedules;
+    container.className = 'text-gray-500 dark:text-gray-400 text-center py-8';
+    return;
+  }
+  container.className = '';
+
+  // Build table using DOM methods — all text via textContent, admin-only authenticated content
+  var wrapper = document.createElement('div');
+  wrapper.className = 'overflow-x-auto';
+  var table = document.createElement('table');
+  table.className = 'w-full text-sm';
+
+  // Header
+  var thead = document.createElement('thead');
+  var headRow = document.createElement('tr');
+  headRow.className = 'bg-gray-50 dark:bg-gray-700';
+  var empTh = document.createElement('th');
+  empTh.className = 'px-3 py-2 text-left font-medium dark:text-gray-300';
+  empTh.textContent = T.schedEmployee;
+  headRow.appendChild(empTh);
+  var dayOrder = [1,2,3,4,5,6,0];
+  dayOrder.forEach(function(d) {
+    var th = document.createElement('th');
+    th.className = 'px-3 py-2 text-center font-medium dark:text-gray-300';
+    th.textContent = T[dayNames[d]];
+    headRow.appendChild(th);
+  });
+  var actionTh = document.createElement('th');
+  actionTh.className = 'px-3 py-2';
+  headRow.appendChild(actionTh);
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  // Body
+  var tbody = document.createElement('tbody');
+  data.forEach(function(emp) {
+    if (!emp.is_active) return;
+    var row = document.createElement('tr');
+    row.className = 'border-t dark:border-gray-600';
+    row.id = 'sched-row-' + emp.employee_id;
+
+    var nameTd = document.createElement('td');
+    nameTd.className = 'px-3 py-3 font-medium dark:text-gray-200';
+    nameTd.textContent = emp.employee_name;
+    row.appendChild(nameTd);
+
+    dayOrder.forEach(function(dow) {
+      var td = document.createElement('td');
+      td.className = 'px-2 py-3 text-center';
+      var day = emp.days.find(function(dd) { return dd.day_of_week === dow; });
+
+      if (day && day.is_available) {
+        var st = day.start_time.substring(0,5);
+        var et = day.end_time.substring(0,5);
+        var cellDiv = document.createElement('div');
+        cellDiv.className = 'flex flex-col gap-1';
+        var startInput = document.createElement('input');
+        startInput.type = 'time'; startInput.value = st;
+        startInput.className = 'sched-time w-full text-xs border rounded px-1 py-0.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+        startInput.setAttribute('data-emp', emp.employee_id);
+        startInput.setAttribute('data-dow', dow);
+        startInput.setAttribute('data-field', 'start');
+        var endInput = document.createElement('input');
+        endInput.type = 'time'; endInput.value = et;
+        endInput.className = 'sched-time w-full text-xs border rounded px-1 py-0.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+        endInput.setAttribute('data-emp', emp.employee_id);
+        endInput.setAttribute('data-dow', dow);
+        endInput.setAttribute('data-field', 'end');
+        cellDiv.appendChild(startInput);
+        cellDiv.appendChild(endInput);
+        td.appendChild(cellDiv);
+      } else {
+        var offBtn = document.createElement('button');
+        offBtn.textContent = T.schedOff;
+        offBtn.className = 'text-xs text-gray-400 dark:text-gray-500 hover:text-brand px-2 py-1 border border-dashed rounded dark:border-gray-600';
+        offBtn.onclick = (function(eId, d) { return function() { toggleDayAvailability(eId, d, true); }; })(emp.employee_id, dow);
+        td.appendChild(offBtn);
+      }
+      row.appendChild(td);
+    });
+
+    var saveTd = document.createElement('td');
+    saveTd.className = 'px-2 py-3';
+    var saveBtn = document.createElement('button');
+    saveBtn.textContent = T.schedSave;
+    saveBtn.className = 'bg-brand text-white px-3 py-1 rounded text-xs hover:bg-brand-dark';
+    saveBtn.id = 'sched-save-' + emp.employee_id;
+    saveBtn.onclick = (function(eId) { return function() { saveWeeklySchedule(eId); }; })(emp.employee_id);
+    saveTd.appendChild(saveBtn);
+    row.appendChild(saveTd);
+
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  wrapper.appendChild(table);
+
+  container.textContent = '';
+  container.appendChild(wrapper);
+}
+
+async function saveWeeklySchedule(empId) {
+  var T = adminT[currentLang];
+  var days = [];
+  var dayOrder = [1,2,3,4,5,6,0];
+
+  dayOrder.forEach(function(dow) {
+    var startEl = document.querySelector('.sched-time[data-emp="' + empId + '"][data-dow="' + dow + '"][data-field="start"]');
+    var endEl = document.querySelector('.sched-time[data-emp="' + empId + '"][data-dow="' + dow + '"][data-field="end"]');
+
+    if (startEl && endEl) {
+      days.push({ day_of_week: dow, start_time: startEl.value, end_time: endEl.value, is_available: 1 });
+    } else {
+      days.push({ day_of_week: dow, start_time: '08:00', end_time: '17:00', is_available: 0 });
+    }
+  });
+
+  try {
+    var btn = document.getElementById('sched-save-' + empId);
+    if (btn) btn.textContent = '...';
+    var res = await fetch('/api/admin/schedules.php', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+      body: JSON.stringify({ action: 'set_weekly', employee_id: empId, days: days })
+    });
+    var json = await res.json();
+    if (json.success) {
+      if (btn) { btn.textContent = T.schedSaved; setTimeout(function() { btn.textContent = T.schedSave; }, 1500); }
+      if (typeof showToast === 'function') showToast(T.schedSaved, 'success');
+    } else {
+      if (btn) btn.textContent = T.schedSave;
+      if (typeof showToast === 'function') showToast(json.error || 'Error', 'error');
+    }
+  } catch (err) {
+    console.error('saveWeeklySchedule error:', err);
+  }
+}
+
+function toggleDayAvailability(empId, dow, makeAvailable) {
+  var emp = scheduleData.weekly.find(function(e) { return e.employee_id === empId; });
+  if (!emp) return;
+  var day = emp.days.find(function(d) { return d.day_of_week === dow; });
+  if (day) {
+    day.is_available = makeAvailable;
+    day.start_time = '08:00:00';
+    day.end_time = '17:00:00';
+  } else {
+    emp.days.push({ day_of_week: dow, start_time: '08:00:00', end_time: '17:00:00', is_available: makeAvailable });
+  }
+  showWeeklySchedules();
+}
+
+function buildDailyScheduleDOM() {
+  var T = adminT[currentLang];
+  var container = document.getElementById('schedule-daily-view');
+  var data = scheduleData.daily;
+  var today = new Date().toISOString().split('T')[0];
+  var dateVal = data ? data.date : today;
+
+  // Clear and rebuild with DOM methods
+  container.textContent = '';
+
+  // Header row
+  var headerDiv = document.createElement('div');
+  headerDiv.className = 'flex items-center gap-4 mb-6';
+  var dateInput = document.createElement('input');
+  dateInput.type = 'date'; dateInput.id = 'sched-daily-date'; dateInput.value = dateVal;
+  dateInput.className = 'border rounded px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+  dateInput.onchange = function() { loadSchedules('daily'); };
+  headerDiv.appendChild(dateInput);
+
+  if (data) {
+    var dowNames = [T.schedSun,T.schedMon,T.schedTue,T.schedWed,T.schedThu,T.schedFri,T.schedSat];
+    var dowSpan = document.createElement('span');
+    dowSpan.className = 'text-sm text-gray-600 dark:text-gray-400';
+    dowSpan.textContent = dowNames[data.day_of_week];
+    headerDiv.appendChild(dowSpan);
+
+    var workingSpan = document.createElement('span');
+    workingSpan.className = 'text-sm font-medium dark:text-gray-200';
+    workingSpan.textContent = data.working_count + ' ' + T.schedWorking;
+    headerDiv.appendChild(workingSpan);
+
+    if (data.shop_override && data.shop_override.is_closed == 1) {
+      var closedBadge = document.createElement('span');
+      closedBadge.className = 'bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium dark:bg-red-900 dark:text-red-300';
+      closedBadge.textContent = T.schedShopClosed;
+      headerDiv.appendChild(closedBadge);
+    }
+  }
+  container.appendChild(headerDiv);
+
+  if (!data) {
+    var placeholder = document.createElement('p');
+    placeholder.className = 'text-gray-500 dark:text-gray-400 text-center py-4';
+    placeholder.textContent = 'Select a date';
+    container.appendChild(placeholder);
+    return;
+  }
+
+  // Employee cards
+  if (data.employees && data.employees.length) {
+    var grid = document.createElement('div');
+    grid.className = 'grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6';
+    data.employees.forEach(function(emp) {
+      var isOff = emp.ov_is_closed == 1 || (!emp.is_available && !emp.override_id);
+      var startT = (emp.ov_start_time || emp.start_time || '').substring(0,5);
+      var endT = (emp.ov_end_time || emp.end_time || '').substring(0,5);
+      var empAppts = data.appointments.filter(function(a) { return a.assigned_employee_id == emp.employee_id; });
+
+      var card = document.createElement('div');
+      card.className = 'border rounded-lg p-4 ' + (isOff ? 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700' : 'bg-white dark:bg-gray-800 border-brand/20 dark:border-green-800');
+
+      var cardHeader = document.createElement('div');
+      cardHeader.className = 'flex justify-between items-center mb-2';
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'font-medium dark:text-gray-200';
+      nameSpan.textContent = emp.employee_name;
+      cardHeader.appendChild(nameSpan);
+
+      var badge = document.createElement('span');
+      if (isOff) {
+        badge.className = 'text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-400';
+        badge.textContent = T.schedOff;
+      } else {
+        badge.className = 'text-xs bg-brand/10 text-brand px-2 py-0.5 rounded-full dark:bg-green-900/40 dark:text-green-400';
+        badge.textContent = startT + ' - ' + endT;
+      }
+      cardHeader.appendChild(badge);
+      card.appendChild(cardHeader);
+
+      if (!isOff && empAppts.length) {
+        var apptList = document.createElement('div');
+        apptList.className = 'space-y-1 mt-2';
+        empAppts.forEach(function(a) {
+          var apptDiv = document.createElement('div');
+          apptDiv.className = 'text-xs flex items-center gap-2 bg-gray-50 dark:bg-gray-700 p-1.5 rounded';
+          var timeB = document.createElement('strong');
+          timeB.textContent = (a.preferred_time || '').substring(0,5);
+          apptDiv.appendChild(timeB);
+          var nameS = document.createElement('span');
+          nameS.textContent = a.first_name + ' ' + a.last_name;
+          apptDiv.appendChild(nameS);
+          var svcS = document.createElement('span');
+          svcS.className = 'text-gray-400';
+          svcS.textContent = '(' + a.service + ')';
+          apptDiv.appendChild(svcS);
+          apptList.appendChild(apptDiv);
+        });
+        card.appendChild(apptList);
+      } else if (!isOff) {
+        var noAppt = document.createElement('p');
+        noAppt.className = 'text-xs text-gray-400 dark:text-gray-500 mt-2';
+        noAppt.textContent = 'No appointments assigned';
+        card.appendChild(noAppt);
+      }
+
+      if (emp.ov_reason) {
+        var reasonP = document.createElement('p');
+        reasonP.className = 'text-xs text-gray-500 dark:text-gray-400 mt-2 italic';
+        reasonP.textContent = emp.ov_reason;
+        card.appendChild(reasonP);
+      }
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
+  }
+
+  // Unassigned appointments
+  var unassigned = data.appointments.filter(function(a) { return !a.assigned_employee_id; });
+  if (unassigned.length) {
+    var unassignedH = document.createElement('h4');
+    unassignedH.className = 'font-medium text-amber-700 dark:text-amber-400 mb-2';
+    unassignedH.textContent = T.schedUnassigned + ' (' + unassigned.length + ')';
+    container.appendChild(unassignedH);
+
+    var uList = document.createElement('div');
+    uList.className = 'space-y-2 mb-4';
+    unassigned.forEach(function(a) {
+      var uDiv = document.createElement('div');
+      uDiv.className = 'flex items-center gap-3 border border-amber-200 dark:border-amber-800 rounded p-3 bg-amber-50 dark:bg-amber-900/20';
+      var uTime = document.createElement('strong');
+      uTime.className = 'text-sm';
+      uTime.textContent = (a.preferred_time || '').substring(0,5);
+      uDiv.appendChild(uTime);
+      var uName = document.createElement('span');
+      uName.className = 'text-sm dark:text-gray-200';
+      uName.textContent = a.first_name + ' ' + a.last_name;
+      uDiv.appendChild(uName);
+      var uSvc = document.createElement('span');
+      uSvc.className = 'text-xs text-gray-500 dark:text-gray-400';
+      uSvc.textContent = '(' + a.service + ')';
+      uDiv.appendChild(uSvc);
+      uList.appendChild(uDiv);
+    });
+    container.appendChild(uList);
+  }
+
+  // Slot capacity summary (collapsible)
+  if (data.slot_capacity && Object.keys(data.slot_capacity).length) {
+    var details = document.createElement('details');
+    details.className = 'mt-4';
+    var summary = document.createElement('summary');
+    summary.className = 'cursor-pointer text-sm font-medium text-gray-600 dark:text-gray-400';
+    summary.textContent = T.schedCapacity + ' ' + T.schedSlots;
+    details.appendChild(summary);
+
+    var slotGrid = document.createElement('div');
+    slotGrid.className = 'grid grid-cols-4 md:grid-cols-8 gap-2 mt-3';
+    var sortedSlots = Object.keys(data.slot_capacity).sort();
+    sortedSlots.forEach(function(slot) {
+      var cap = data.slot_capacity[slot];
+      var booked = data.appointments.filter(function(a) { return (a.preferred_time || '').substring(0,5) === slot; }).length;
+      var full = booked >= cap;
+      var slotDiv = document.createElement('div');
+      slotDiv.className = 'text-center p-2 rounded text-xs ' + (full ? 'bg-red-100 dark:bg-red-900/30' : 'bg-green-50 dark:bg-green-900/20');
+      var slotLabel = document.createElement('div');
+      slotLabel.className = 'font-medium dark:text-gray-200';
+      slotLabel.textContent = slot;
+      slotDiv.appendChild(slotLabel);
+      var slotCount = document.createElement('div');
+      slotCount.className = full ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
+      slotCount.textContent = booked + '/' + cap;
+      slotDiv.appendChild(slotCount);
+      slotGrid.appendChild(slotDiv);
+    });
+    details.appendChild(slotGrid);
+    container.appendChild(details);
+  }
+}
+
+function showDailySchedule() { buildDailyScheduleDOM(); }
+
+function buildOverridesDOM() {
+  var T = adminT[currentLang];
+  var container = document.getElementById('schedule-overrides-view');
+  var data = scheduleData.overrides || [];
+
+  container.textContent = '';
+
+  // Add override form
+  var formBox = document.createElement('div');
+  formBox.className = 'mb-6 p-4 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600';
+  var formTitle = document.createElement('h4');
+  formTitle.className = 'font-medium mb-3 dark:text-gray-200';
+  formTitle.textContent = T.schedAddOverride;
+  formBox.appendChild(formTitle);
+
+  var formGrid = document.createElement('div');
+  formGrid.className = 'grid md:grid-cols-5 gap-3 items-end';
+
+  // Date field
+  var dateWrap = document.createElement('div');
+  var dateLabel = document.createElement('label');
+  dateLabel.className = 'text-xs font-medium dark:text-gray-300';
+  dateLabel.textContent = T.schedDate;
+  dateWrap.appendChild(dateLabel);
+  var dateInput = document.createElement('input');
+  dateInput.type = 'date'; dateInput.id = 'override-date';
+  dateInput.className = 'w-full border rounded px-3 py-2 text-sm mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200';
+  dateWrap.appendChild(dateInput);
+  formGrid.appendChild(dateWrap);
+
+  // Employee select
+  var empWrap = document.createElement('div');
+  var empLabel = document.createElement('label');
+  empLabel.className = 'text-xs font-medium dark:text-gray-300';
+  empLabel.textContent = T.schedEmployee;
+  empWrap.appendChild(empLabel);
+  var empSelect = document.createElement('select');
+  empSelect.id = 'override-employee';
+  empSelect.className = 'w-full border rounded px-3 py-2 text-sm mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200';
+  var shopOpt = document.createElement('option');
+  shopOpt.value = ''; shopOpt.textContent = T.schedShopWide;
+  empSelect.appendChild(shopOpt);
+  if (scheduleData.weekly) {
+    scheduleData.weekly.forEach(function(emp) {
+      if (emp.is_active) {
+        var opt = document.createElement('option');
+        opt.value = emp.employee_id; opt.textContent = emp.employee_name;
+        empSelect.appendChild(opt);
+      }
+    });
+  }
+  empWrap.appendChild(empSelect);
+  formGrid.appendChild(empWrap);
+
+  // Type select
+  var typeWrap = document.createElement('div');
+  var typeLabel = document.createElement('label');
+  typeLabel.className = 'text-xs font-medium dark:text-gray-300';
+  typeLabel.textContent = T.schedType;
+  typeWrap.appendChild(typeLabel);
+  var typeSelect = document.createElement('select');
+  typeSelect.id = 'override-type';
+  typeSelect.className = 'w-full border rounded px-3 py-2 text-sm mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200';
+  typeSelect.onchange = toggleOverrideTimes;
+  var closedOpt = document.createElement('option');
+  closedOpt.value = 'closed'; closedOpt.textContent = T.schedClosure;
+  typeSelect.appendChild(closedOpt);
+  var hoursOpt = document.createElement('option');
+  hoursOpt.value = 'hours'; hoursOpt.textContent = T.schedSpecialHours;
+  typeSelect.appendChild(hoursOpt);
+  typeWrap.appendChild(typeSelect);
+  formGrid.appendChild(typeWrap);
+
+  // Time inputs (hidden by default)
+  var timesWrap = document.createElement('div');
+  timesWrap.id = 'override-times-wrap'; timesWrap.className = 'hidden';
+  var timesLabel = document.createElement('label');
+  timesLabel.className = 'text-xs font-medium dark:text-gray-300';
+  timesLabel.textContent = T.schedStart + ' / ' + T.schedEnd;
+  timesWrap.appendChild(timesLabel);
+  var timesFlex = document.createElement('div');
+  timesFlex.className = 'flex gap-1 mt-1';
+  var startIn = document.createElement('input');
+  startIn.type = 'time'; startIn.id = 'override-start'; startIn.value = '08:00';
+  startIn.className = 'border rounded px-2 py-2 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200';
+  timesFlex.appendChild(startIn);
+  var endIn = document.createElement('input');
+  endIn.type = 'time'; endIn.id = 'override-end'; endIn.value = '17:00';
+  endIn.className = 'border rounded px-2 py-2 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200';
+  timesFlex.appendChild(endIn);
+  timesWrap.appendChild(timesFlex);
+  formGrid.appendChild(timesWrap);
+
+  // Reason field
+  var reasonWrap = document.createElement('div');
+  var reasonLabel = document.createElement('label');
+  reasonLabel.className = 'text-xs font-medium dark:text-gray-300';
+  reasonLabel.textContent = T.schedReason;
+  reasonWrap.appendChild(reasonLabel);
+  var reasonInput = document.createElement('input');
+  reasonInput.type = 'text'; reasonInput.id = 'override-reason';
+  reasonInput.placeholder = 'Holiday, vacation...';
+  reasonInput.className = 'w-full border rounded px-3 py-2 text-sm mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200';
+  reasonWrap.appendChild(reasonInput);
+  formGrid.appendChild(reasonWrap);
+
+  formBox.appendChild(formGrid);
+  var addBtn = document.createElement('button');
+  addBtn.className = 'mt-3 bg-brand text-white px-4 py-2 rounded-lg text-sm';
+  addBtn.textContent = T.schedAddOverride;
+  addBtn.onclick = saveOverride;
+  formBox.appendChild(addBtn);
+  container.appendChild(formBox);
+
+  // Override list
+  if (data.length) {
+    var list = document.createElement('div');
+    list.className = 'space-y-2';
+    data.forEach(function(ov) {
+      var row = document.createElement('div');
+      row.className = 'flex items-center justify-between border rounded-lg p-3 dark:border-gray-600';
+      var leftDiv = document.createElement('div');
+      leftDiv.className = 'flex items-center gap-3 flex-wrap';
+
+      var dateSpan = document.createElement('span');
+      dateSpan.className = 'font-medium text-sm dark:text-gray-200';
+      dateSpan.textContent = ov.override_date;
+      leftDiv.appendChild(dateSpan);
+
+      var empSpan = document.createElement('span');
+      empSpan.className = 'text-sm dark:text-gray-300';
+      empSpan.textContent = ov.employee_name || T.schedShopWide;
+      leftDiv.appendChild(empSpan);
+
+      var typeBadge = document.createElement('span');
+      var typeLabel = ov.is_closed == 1 ? T.schedClosure : T.schedSpecialHours;
+      var times = ov.is_closed == 1 ? '' : ' (' + (ov.start_time||'').substring(0,5) + '-' + (ov.end_time||'').substring(0,5) + ')';
+      typeBadge.className = ov.is_closed == 1
+        ? 'text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+        : 'text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
+      typeBadge.textContent = typeLabel + times;
+      leftDiv.appendChild(typeBadge);
+
+      if (ov.reason) {
+        var reasonSpan = document.createElement('span');
+        reasonSpan.className = 'text-xs text-gray-500 dark:text-gray-400 italic';
+        reasonSpan.textContent = ov.reason;
+        leftDiv.appendChild(reasonSpan);
+      }
+      row.appendChild(leftDiv);
+
+      var delBtn = document.createElement('button');
+      delBtn.className = 'text-red-600 dark:text-red-400 text-xs border border-red-200 dark:border-red-800 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/40';
+      delBtn.textContent = T.schedDelete;
+      delBtn.onclick = (function(id) { return function() { deleteOverride(id); }; })(ov.id);
+      row.appendChild(delBtn);
+      list.appendChild(row);
+    });
+    container.appendChild(list);
+  } else {
+    var noData = document.createElement('p');
+    noData.className = 'text-gray-500 dark:text-gray-400 text-center py-4';
+    noData.textContent = T.schedNoOverrides;
+    container.appendChild(noData);
+  }
+}
+
+function showOverrides() { buildOverridesDOM(); }
+
+function toggleOverrideTimes() {
+  var wrap = document.getElementById('override-times-wrap');
+  var type = document.getElementById('override-type').value;
+  if (wrap) wrap.classList.toggle('hidden', type === 'closed');
+}
+
+async function saveOverride() {
+  var T = adminT[currentLang];
+  var date = document.getElementById('override-date').value;
+  if (!date) { if (typeof showToast === 'function') showToast('Date required', 'error'); return; }
+
+  var empVal = document.getElementById('override-employee').value;
+  var type = document.getElementById('override-type').value;
+  var reason = document.getElementById('override-reason').value;
+
+  var payload = {
+    action: 'set_override',
+    override_date: date,
+    is_closed: type === 'closed' ? 1 : 0,
+    reason: reason
+  };
+  if (empVal) payload.employee_id = parseInt(empVal);
+  if (type === 'hours') {
+    payload.start_time = document.getElementById('override-start').value;
+    payload.end_time = document.getElementById('override-end').value;
+  }
+
+  try {
+    var res = await fetch('/api/admin/schedules.php', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+      body: JSON.stringify(payload)
+    });
+    var json = await res.json();
+    if (json.success) {
+      if (typeof showToast === 'function') showToast(T.schedSaved, 'success');
+      loadSchedules('overrides');
+    } else {
+      if (typeof showToast === 'function') showToast(json.error || 'Error', 'error');
+    }
+  } catch (err) { console.error('saveOverride error:', err); }
+}
+
+async function deleteOverride(id) {
+  var T = adminT[currentLang];
+  if (!confirm(T.schedDelete + '?')) return;
+  try {
+    var res = await fetch('/api/admin/schedules.php', {
+      method: 'DELETE', credentials: 'include',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+      body: JSON.stringify({ id: id })
+    });
+    var json = await res.json();
+    if (json.success) {
+      if (typeof showToast === 'function') showToast(T.schedSaved, 'success');
+      loadSchedules('overrides');
+    }
+  } catch (err) { console.error('deleteOverride error:', err); }
+}
+
+// Auto-load schedules when employees tab renders
+var _origRenderEmployees = renderEmployees;
+renderEmployees = function() {
+  _origRenderEmployees();
+  loadSchedules('weekly');
+};
 
 // ===== GALLERY =====
 function toggleAddGalleryForm() {

@@ -205,7 +205,6 @@ try {
             $time     = sprintf('%02d:%02d', $h, $m);
             $count    = $slotCounts[$time] ?? 0;
             $capacity = $useSchedules ? ($slotCapacity[$time] ?? 0) : $legacyCapacity;
-            $capacity = min($capacity, $maxBays);
             $available = $capacity > 0 && $count < $capacity;
 
             $allSlots[$time] = [
@@ -228,7 +227,7 @@ try {
 
     $responseData = [
         'date'         => $date,
-        'max_per_slot' => $maxBays,
+        'max_per_slot' => $useSchedules ? max(array_values($slotCapacity) ?: [0]) : $legacyCapacity,
         'slots'        => $allSlots,
     ];
 
