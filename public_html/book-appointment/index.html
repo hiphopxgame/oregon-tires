@@ -253,7 +253,7 @@
                 </label>
               </div>
             </div>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-3 text-center" data-t="pricingDisclaimer">Service times are estimates and may vary.</p>
+            <p class="text-sm text-gray-400 dark:text-gray-500 mt-3 text-center" data-t="pricingDisclaimer">Service times are estimates and may vary.</p>
           </fieldset>
         </div>
 
@@ -275,8 +275,9 @@
                    hx-target="#time-slots-grid"
                    hx-swap="innerHTML"
                    hx-indicator="#time-loading"
-                   class="w-full max-w-xs p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" data-t="dateNote">Monday - Saturday only. No Sundays.</p>
+                   aria-describedby="booking-date-note"
+                   class="w-full max-w-xs p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="booking-date-note" data-t="dateNote">Monday - Saturday only. No Sundays.</p>
           </div>
 
           <!-- Time label with connection arrow -->
@@ -289,7 +290,7 @@
           <div>
             <input type="hidden" name="preferred_time" id="booking-time">
             <div id="time-slots-container" class="border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-lg p-4 transition-all" style="min-height: 80px;">
-              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2" id="time-slots-grid">
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2" id="time-slots-grid" role="group" aria-label="Available time slots">
                 <div class="col-span-full flex flex-col items-center justify-center py-6 text-center" id="time-placeholder">
                   <svg class="w-8 h-8 text-gray-300 dark:text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -338,17 +339,17 @@
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label for="vehicle-year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="vehicleYear">Year</label>
-              <select name="vehicle_year" id="vehicle-year" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <select name="vehicle_year" id="vehicle-year" class="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
                 <option value="">--</option>
               </select>
             </div>
             <div>
               <label for="vehicle-make" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="vehicleMake">Make</label>
-              <input type="text" name="vehicle_make" id="vehicle-make" placeholder="e.g. Toyota" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="text" name="vehicle_make" id="vehicle-make" placeholder="e.g. Toyota" class="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
             <div>
               <label for="vehicle-model" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="vehicleModel">Model</label>
-              <input type="text" name="vehicle_model" id="vehicle-model" placeholder="e.g. Camry" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="text" name="vehicle_model" id="vehicle-model" placeholder="e.g. Camry" class="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
           </div>
         </div>
@@ -363,28 +364,28 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <label for="booking-first-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="firstName">First Name</label>
-              <input type="text" name="first_name" id="booking-first-name" aria-required="true" autocomplete="given-name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="text" name="first_name" id="booking-first-name" aria-required="true" autocomplete="given-name" class="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
             <div>
               <label for="booking-last-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="lastName">Last Name</label>
-              <input type="text" name="last_name" id="booking-last-name" aria-required="true" autocomplete="family-name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="text" name="last_name" id="booking-last-name" aria-required="true" autocomplete="family-name" class="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <label for="booking-phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="phone">Phone</label>
-              <input type="tel" name="phone" id="booking-phone" aria-required="true" autocomplete="tel" placeholder="(503) 123-4567" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="tel" name="phone" id="booking-phone" aria-required="true" autocomplete="tel" placeholder="(503) 123-4567" class="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
             <div>
               <label for="booking-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="email">Email</label>
-              <input type="email" name="email" id="booking-email" aria-required="true" autocomplete="email" placeholder="your@email.com" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <input type="email" name="email" id="booking-email" aria-required="true" autocomplete="email" placeholder="your@email.com" class="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             </div>
           </div>
 
           <!-- Notes -->
           <div>
             <label for="booking-notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="notes">Notes</label>
-            <textarea name="notes" id="booking-notes" rows="3" placeholder="" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500"></textarea>
+            <textarea name="notes" id="booking-notes" rows="3" placeholder="" class="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500"></textarea>
           </div>
         </div>
 

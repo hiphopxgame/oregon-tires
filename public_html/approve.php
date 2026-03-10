@@ -75,6 +75,9 @@
 </head>
 <body class="bg-white dark:bg-[#0A0A0A] min-h-screen flex flex-col">
 
+<!-- Skip to Content -->
+<a href="#estimate-state" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-green-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold">Skip to content</a>
+
 <!-- Header -->
 <header class="sticky top-0 z-50 bg-white/90 dark:bg-[#111827]/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -84,7 +87,7 @@
         </a>
         <nav class="flex items-center gap-4">
             <a href="/" class="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 text-sm font-medium" data-t="backToHome">Back to Home</a>
-            <button onclick="toggleLanguage()" class="text-xs font-bold px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700" id="lang-toggle">EN | ES</button>
+            <button onclick="toggleLanguage()" class="text-sm font-bold px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 min-h-[44px] min-w-[44px]" id="lang-toggle" aria-label="Toggle language between English and Spanish">EN | ES</button>
         </nav>
     </div>
 </header>
@@ -137,7 +140,7 @@
 
             <!-- Print Button -->
             <div class="mb-6 text-center" id="print-estimate-btn">
-                <button onclick="window.print()" class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition shadow-sm">
+                <button onclick="window.print()" class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                     <span data-t="printEstimate">Print Estimate</span>
                 </button>
@@ -185,7 +188,7 @@
             <!-- Decline Reason (shown when all items unchecked) -->
             <div id="decline-reason-wrap" class="hidden mb-4">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" data-t="declineReasonLabel">Reason for declining (optional)</label>
-                <select id="decline-reason" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                <select id="decline-reason" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
                     <option value="" data-t="selectReason">— Select a reason —</option>
                     <option value="too_expensive" data-t="tooExpensive">Too expensive</option>
                     <option value="will_do_later" data-t="willDoLater">Will do later</option>
@@ -196,7 +199,7 @@
             <!-- Submit Buttons -->
             <div id="action-buttons">
                 <div id="submit-error" class="hidden mb-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-700 dark:text-red-400"></div>
-                <button id="approve-btn" onclick="submitApproval()" class="w-full px-6 py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition text-lg shadow-lg mb-3">
+                <button id="approve-btn" onclick="submitApproval()" class="w-full px-6 py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition text-lg shadow-lg mb-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                     <span data-t="approveSelected">Approve Selected Services</span>
                 </button>
                 <p class="text-center text-xs text-gray-400 dark:text-gray-500" data-t="approveHint">You can approve all or select specific services above</p>

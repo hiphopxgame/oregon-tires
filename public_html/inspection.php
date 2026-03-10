@@ -121,6 +121,9 @@
 </head>
 <body class="bg-white dark:bg-[#0A0A0A] min-h-screen flex flex-col">
 
+<!-- Skip to Content -->
+<a href="#inspection-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-green-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold">Skip to content</a>
+
 <!-- Header -->
 <header class="sticky top-0 z-50 bg-white/90 dark:bg-[#111827]/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -130,13 +133,13 @@
         </a>
         <nav class="flex items-center gap-4">
             <a href="/" class="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 text-sm font-medium" data-t="backToHome">Back to Home</a>
-            <button onclick="toggleLanguage()" class="text-xs font-bold px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700" id="lang-toggle">EN | ES</button>
+            <button onclick="toggleLanguage()" class="text-sm font-bold px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 min-h-[44px] min-w-[44px]" id="lang-toggle" aria-label="Toggle language between English and Spanish">EN | ES</button>
         </nav>
     </div>
 </header>
 
 <!-- Page Content -->
-<main class="flex-1 py-8">
+<main id="inspection-content" class="flex-1 py-8">
     <div class="container mx-auto px-4 max-w-2xl">
 
         <!-- Loading -->
@@ -216,11 +219,11 @@
 
             <!-- Action Buttons (Print + Share) -->
             <div class="mb-6 flex justify-center gap-3 flex-wrap" id="print-report-btn">
-                <button onclick="window.print()" class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition shadow-sm">
+                <button onclick="window.print()" class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                     <span data-t="printReport">Print Report</span>
                 </button>
-                <button id="share-btn" onclick="shareReport()" class="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition shadow-sm">
+                <button id="share-btn" onclick="shareReport()" class="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                     <span data-t="shareReport">Share</span>
                 </button>
@@ -263,11 +266,11 @@
 
 <!-- Photo Overlay -->
 <div id="photo-overlay" class="fixed inset-0 z-50 bg-black/80 hidden items-center justify-center p-4" onclick="closePhoto()">
-    <button onclick="closePhoto()" class="fixed top-4 right-4 z-50 text-white text-4xl leading-none font-light w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition" aria-label="Close">&times;</button>
-    <button id="photo-prev" onclick="event.stopPropagation(); navigatePhoto(-1)" class="fixed left-3 top-1/2 -translate-y-1/2 z-50 text-white text-3xl w-11 h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition" aria-label="Previous">&#8249;</button>
-    <button id="photo-next" onclick="event.stopPropagation(); navigatePhoto(1)" class="fixed right-3 top-1/2 -translate-y-1/2 z-50 text-white text-3xl w-11 h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition" aria-label="Next">&#8250;</button>
+    <button onclick="closePhoto()" class="fixed top-4 right-4 z-50 text-white text-4xl leading-none font-light w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition focus:outline-none focus:ring-2 focus:ring-white" aria-label="Close photo overlay">&times;</button>
+    <button id="photo-prev" onclick="event.stopPropagation(); navigatePhoto(-1)" class="fixed left-3 top-1/2 -translate-y-1/2 z-50 text-white text-3xl w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition focus:outline-none focus:ring-2 focus:ring-white" aria-label="Previous photo">&#8249;</button>
+    <button id="photo-next" onclick="event.stopPropagation(); navigatePhoto(1)" class="fixed right-3 top-1/2 -translate-y-1/2 z-50 text-white text-3xl w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition focus:outline-none focus:ring-2 focus:ring-white" aria-label="Next photo">&#8250;</button>
     <div class="max-w-3xl w-full" onclick="event.stopPropagation()">
-        <img id="photo-overlay-img" src="" class="w-full rounded-xl" alt="">
+        <img id="photo-overlay-img" src="" class="w-full rounded-xl" alt="Inspection photo" role="img">
         <p id="photo-overlay-caption" class="text-white text-center mt-3 text-sm"></p>
         <p id="photo-overlay-counter" class="text-white/60 text-center mt-1 text-xs"></p>
     </div>
@@ -1016,14 +1019,18 @@ function showPhoto(url, caption) {
     if (currentPhotoIndex === -1) currentPhotoIndex = 0;
     renderOverlayPhoto();
     var overlay = document.getElementById('photo-overlay');
+    overlay._prevFocus = document.activeElement;
     overlay.classList.remove('hidden');
     overlay.classList.add('flex');
+    // Focus close button for keyboard users
+    overlay.querySelector('[aria-label="Close photo overlay"]').focus();
 }
 
 function renderOverlayPhoto() {
     var photo = allPhotos[currentPhotoIndex];
     if (!photo) return;
     document.getElementById('photo-overlay-img').src = photo.url;
+    document.getElementById('photo-overlay-img').alt = photo.caption || 'Inspection photo';
     document.getElementById('photo-overlay-caption').textContent = photo.caption;
     document.getElementById('photo-overlay-counter').textContent = (currentPhotoIndex + 1) + ' ' + (t[currentLang].photoOf || 'of') + ' ' + allPhotos.length;
     // Show/hide arrows
@@ -1040,6 +1047,8 @@ function closePhoto() {
     var overlay = document.getElementById('photo-overlay');
     overlay.classList.add('hidden');
     overlay.classList.remove('flex');
+    // Restore focus to element that opened the overlay
+    if (overlay._prevFocus) { try { overlay._prevFocus.focus(); } catch(e) {} }
 }
 
 // Keyboard navigation
@@ -1107,23 +1116,27 @@ function buildItemRow(item) {
         photoWrap.className = 'flex gap-2 mt-2 ml-6 overflow-x-auto scroll-snap-x';
         photoWrap.style.scrollSnapType = 'x mandatory';
         item.photos.forEach(function(p) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'flex-shrink-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 dark:focus:ring-offset-gray-900 p-0 border-0 bg-transparent';
+            btn.style.scrollSnapAlign = 'start';
+            btn.setAttribute('aria-label', (p.caption || 'Inspection photo') + ' — click to enlarge');
+            btn.addEventListener('click', function(e) { e.stopPropagation(); showPhoto(p.image_url, p.caption || ''); });
             var img = document.createElement('img');
             img.src = p.image_url;
             img.alt = p.caption || 'Inspection photo';
             img.loading = 'lazy';
             img.decoding = 'async';
-            img.className = 'w-20 h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer flex-shrink-0';
-            img.style.scrollSnapAlign = 'start';
+            img.className = 'w-20 h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer';
             img.onerror = function() {
                 this.onerror = null;
                 this.src = '';
                 this.alt = 'Photo unavailable';
-                this.className = 'w-20 h-20 rounded-lg border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-gray-200 dark:bg-gray-700';
-                this.style.display = 'flex';
-                this.removeAttribute('cursor-pointer');
+                this.className = 'w-20 h-20 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-200 dark:bg-gray-700';
+                btn.style.cursor = 'default';
             };
-            img.addEventListener('click', function(e) { e.stopPropagation(); showPhoto(p.image_url, p.caption || ''); });
-            photoWrap.appendChild(img);
+            btn.appendChild(img);
+            photoWrap.appendChild(btn);
         });
         row.appendChild(photoWrap);
     }
