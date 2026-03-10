@@ -919,125 +919,125 @@
           <h2 class="text-2xl font-bold">🏷 <span data-t="promotionsHeading">Seasonal Promotions</span></h2>
           <p class="text-green-100" data-t="promotionsSubtitle">Manage homepage banner promotions with date scheduling</p>
         </div>
-        <button onclick="togglePromotionForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ New Promotion</button>
+        <button onclick="togglePromotionForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium" data-t="promoNewPromoBtn">+ New Promotion</button>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
 
         <!-- Inline form (hidden by default) -->
         <div id="promotion-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-          <h4 id="promo-form-title" class="font-bold text-lg mb-4 dark:text-gray-200">New Promotion</h4>
+          <h4 id="promo-form-title" class="font-bold text-lg mb-4 dark:text-gray-200" data-t="promoNewPromo">New Promotion</h4>
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Title (EN) *</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelTitleEn">Title (EN) *</label>
               <input id="promo-title-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Spring Tire Sale..." oninput="updatePromoPreview()">
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Title (ES)</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelTitleEs">Title (ES)</label>
               <input id="promo-title-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Venta de Llantas...">
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Body (EN)</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelBodyEn">Body (EN)</label>
               <textarea id="promo-body-en" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Promotion details in English..."></textarea>
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Body (ES)</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelBodyEs">Body (ES)</label>
               <textarea id="promo-body-es" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Detalles de la promocion..."></textarea>
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">CTA Text (EN)</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelCtaEn">CTA Text (EN)</label>
               <input id="promo-cta-text-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" value="Book Now" oninput="updatePromoPreview()">
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">CTA Text (ES)</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelCtaEs">CTA Text (ES)</label>
               <input id="promo-cta-text-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" value="Reserve Ahora">
             </div>
             <div class="banner-only-field">
-              <label class="text-sm font-medium dark:text-gray-300">CTA URL</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelCtaUrl">CTA URL</label>
               <input id="promo-cta-url" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" value="/book-appointment/">
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Placement</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelPlacement">Placement</label>
               <select id="promo-placement" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" onchange="toggleExitIntentFields()">
-                <option value="banner">Banner</option>
-                <option value="exit_intent">Exit-Intent Popup</option>
+                <option value="banner" data-t="promoBanner">Banner</option>
+                <option value="exit_intent" data-t="promoExitPopup">Exit-Intent Popup</option>
               </select>
             </div>
             <div class="banner-only-field">
-              <label class="text-sm font-medium dark:text-gray-300">Badge Text</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelBadge">Badge Text</label>
               <input id="promo-badge" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="SPRING SALE" oninput="updatePromoPreview()">
             </div>
             <!-- Exit-Intent Popup Fields (hidden by default) -->
             <div id="exit-intent-fields" class="hidden md:col-span-2 grid md:grid-cols-2 gap-4 p-4 border rounded-lg bg-amber-50 dark:bg-gray-600 dark:border-gray-500">
               <div class="md:col-span-2">
-                <span class="text-xs font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wide">Exit-Intent Popup Fields</span>
+                <span class="text-xs font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wide" data-t="promoExitIntentSection">Exit-Intent Popup Fields</span>
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Subtitle (EN)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelSubtitleEn">Subtitle (EN)</label>
                 <input id="promo-subtitle-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Get a FREE 21-Point Health Check">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Subtitle (ES)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelSubtitleEs">Subtitle (ES)</label>
                 <input id="promo-subtitle-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Obtén una Inspección GRATIS">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Email Placeholder (EN)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelPlaceholderEn">Email Placeholder (EN)</label>
                 <input id="promo-placeholder-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="your@email.com">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Email Placeholder (ES)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelPlaceholderEs">Email Placeholder (ES)</label>
                 <input id="promo-placeholder-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="tu@correo.com">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Success Message (EN)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelSuccessEn">Success Message (EN)</label>
                 <input id="promo-success-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Check your email! Your coupon is on its way.">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Success Message (ES)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelSuccessEs">Success Message (ES)</label>
                 <input id="promo-success-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="¡Revisa tu correo! Tu cupón está en camino.">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Error Message (EN)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelErrorEn">Error Message (EN)</label>
                 <input id="promo-error-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Something went wrong. Please try again.">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Error Message (ES)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelErrorEs">Error Message (ES)</label>
                 <input id="promo-error-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Algo salió mal. Intenta de nuevo.">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">No-Spam Text (EN)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelNospamEn">No-Spam Text (EN)</label>
                 <input id="promo-nospam-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="No spam. Unsubscribe anytime.">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">No-Spam Text (ES)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelNospamEs">No-Spam Text (ES)</label>
                 <input id="promo-nospam-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Sin spam. Cancela cuando quieras.">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Icon (emoji)</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelIcon">Icon (emoji)</label>
                 <input id="promo-popup-icon" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="🔍" maxlength="10">
               </div>
             </div>
             <div class="md:col-span-2 banner-only-field">
-              <label class="text-sm font-medium dark:text-gray-300">Banner Image (optional)</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelImage">Banner Image (optional)</label>
               <input id="promo-image-file" type="file" accept="image/*" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100 text-sm">
               <div id="promo-image-preview" class="hidden mt-2">
                 <img src="" alt="Preview" class="h-16 w-auto rounded border dark:border-gray-600">
-                <span class="text-xs text-gray-500 ml-2">New image preview</span>
+                <span class="text-xs text-gray-500 ml-2" data-t="promoImagePreview">New image preview</span>
               </div>
               <div id="promo-existing-image" class="hidden mt-2 flex items-center gap-2">
                 <img src="" alt="Current" class="h-16 w-auto rounded border dark:border-gray-600">
-                <button type="button" onclick="removePromoImage()" class="text-red-500 hover:text-red-700 text-xs underline">Remove image</button>
+                <button type="button" onclick="removePromoImage()" class="text-red-500 hover:text-red-700 text-xs underline" data-t="promoRemoveImage">Remove image</button>
               </div>
             </div>
             <div class="flex gap-4 banner-only-field">
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">BG Color</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelBgColor">BG Color</label>
                 <div class="flex items-center gap-2 mt-1">
                   <input id="promo-bg-color" type="color" value="#f59e0b" class="w-10 h-10 rounded cursor-pointer" oninput="updatePromoPreview()">
                   <span class="text-xs text-gray-400 dark:text-gray-500">#f59e0b</span>
                 </div>
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Text Color</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelTextColor">Text Color</label>
                 <div class="flex items-center gap-2 mt-1">
                   <input id="promo-text-color" type="color" value="#000000" class="w-10 h-10 rounded cursor-pointer" oninput="updatePromoPreview()">
                   <span class="text-xs text-gray-400 dark:text-gray-500">#000000</span>
@@ -1047,32 +1047,32 @@
             <div class="flex items-center gap-6">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input id="promo-active" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
-                <span class="text-sm font-medium dark:text-gray-300">Active</span>
+                <span class="text-sm font-medium dark:text-gray-300" data-t="promoLabelActive">Active</span>
               </label>
               <div class="banner-only-field">
-                <label class="text-sm font-medium dark:text-gray-300">Sort Order</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelSortOrder">Sort Order</label>
                 <input id="promo-sort" type="number" value="0" min="0" class="w-20 p-2 border rounded mt-1 ml-2 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
               </div>
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Starts At</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelStartsAt">Starts At</label>
               <input id="promo-starts" type="datetime-local" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Ends At</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelEndsAt">Ends At</label>
               <input id="promo-ends" type="datetime-local" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
             </div>
           </div>
           <div class="mt-4 banner-only-field">
-            <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Banner Preview</label>
+            <label class="text-sm font-medium text-gray-500 dark:text-gray-400" data-t="promoLabelPreview">Banner Preview</label>
             <div id="promo-live-preview" class="mt-1 px-4 py-3 rounded-lg text-sm" style="background-color: #f59e0b; color: #000;">
-              <span class="font-semibold">Your Promotion Title</span>
-              <span class="ml-3 underline font-bold">Book Now →</span>
+              <span class="font-semibold" data-t="promoPreviewTitle">Your Promotion Title</span>
+              <span class="ml-3 underline font-bold" data-t="promoPreviewCta">Book Now →</span>
             </div>
           </div>
           <div class="flex gap-2 mt-4">
-            <button onclick="savePromotion()" id="promo-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">Create Promotion</button>
-            <button onclick="togglePromotionForm()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300">Cancel</button>
+            <button onclick="savePromotion()" id="promo-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition" data-t="promoCreatePromo">Create Promotion</button>
+            <button onclick="togglePromotionForm()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300" data-t="promoCancel">Cancel</button>
           </div>
         </div>
 
@@ -1168,14 +1168,28 @@
 
     <!-- REVIEWS TAB -->
     <div id="tab-reviews" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center flex-wrap gap-3">
         <div>
-          <h2 class="text-2xl font-bold">⭐ Customer Reviews</h2>
-          <p class="text-green-100">Manage testimonials displayed on the homepage</p>
+          <h2 class="text-2xl font-bold">Customer Reviews</h2>
+          <p class="text-green-100">Manage testimonials &amp; Google reviews</p>
         </div>
-        <button onclick="toggleReviewForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ New Review</button>
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <button id="btn-fetch-google" onclick="fetchFromGoogle()" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition">Fetch from Google</button>
+            <div id="google-last-synced" class="text-xs text-green-200 mt-1">Never synced</div>
+          </div>
+          <button onclick="toggleReviewForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ New Review</button>
+        </div>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+
+        <!-- Filter bar -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button onclick="setReviewFilter('all')" data-filter="all" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-brand text-white">All</button>
+          <button onclick="setReviewFilter('google')" data-filter="google" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-gray-100 dark:bg-gray-600">Google</button>
+          <button onclick="setReviewFilter('manual')" data-filter="manual" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-gray-100 dark:bg-gray-600">Manual</button>
+          <button onclick="setReviewFilter('homepage')" data-filter="homepage" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-gray-100 dark:bg-gray-600">On Homepage</button>
+        </div>
 
         <!-- Inline form (hidden by default) -->
         <div id="review-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
@@ -1188,11 +1202,11 @@
             <div>
               <label class="text-sm font-medium dark:text-gray-300">Rating</label>
               <select id="review-rating" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
-                <option value="5">★★★★★ (5)</option>
-                <option value="4">★★★★☆ (4)</option>
-                <option value="3">★★★☆☆ (3)</option>
-                <option value="2">★★☆☆☆ (2)</option>
-                <option value="1">★☆☆☆☆ (1)</option>
+                <option value="5">&#9733;&#9733;&#9733;&#9733;&#9733; (5)</option>
+                <option value="4">&#9733;&#9733;&#9733;&#9733;&#9734; (4)</option>
+                <option value="3">&#9733;&#9733;&#9733;&#9734;&#9734; (3)</option>
+                <option value="2">&#9733;&#9733;&#9734;&#9734;&#9734; (2)</option>
+                <option value="1">&#9733;&#9734;&#9734;&#9734;&#9734; (1)</option>
               </select>
             </div>
             <div>
@@ -1201,12 +1215,16 @@
             </div>
             <div>
               <label class="text-sm font-medium dark:text-gray-300">Review Text (ES)</label>
-              <textarea id="review-text-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Texto de la reseña en Español"></textarea>
+              <textarea id="review-text-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Texto de la rese&ntilde;a en Espa&ntilde;ol"></textarea>
             </div>
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-6 flex-wrap">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input id="review-active" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
                 <span class="text-sm font-medium dark:text-gray-300">Active</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="review-homepage" type="checkbox" class="w-5 h-5 text-amber-500 rounded">
+                <span class="text-sm font-medium dark:text-gray-300">Show on Homepage</span>
               </label>
               <div>
                 <label class="text-sm font-medium dark:text-gray-300">Sort Order</label>
@@ -1225,15 +1243,17 @@
           <table class="w-full responsive-table">
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                <th class="px-4 py-3 font-medium">Source</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThName">Name</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThRating">Rating</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThPreview">Preview</th>
+                <th class="px-4 py-3 font-medium text-center">Homepage</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThStatus">Status</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThActions">Actions</th>
               </tr>
             </thead>
             <tbody id="testimonials-table-body">
-              <tr><td colspan="5" class="text-center py-8 text-gray-400">Loading...</td></tr>
+              <tr><td colspan="7" class="text-center py-8 text-gray-400">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1247,15 +1267,15 @@
         <button onclick="loadAnalytics()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="analyticsRefresh">Refresh</button>
       </div>
       <div class="flex flex-wrap gap-2 mb-6 items-center">
-        <button onclick="setAnalyticsRange(7)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition" data-days="7">Last 7 Days</button>
-        <button onclick="setAnalyticsRange(30)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition bg-brand text-white border-brand" data-days="30">Last 30 Days</button>
-        <button onclick="setAnalyticsRange(90)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition" data-days="90">Last 90 Days</button>
-        <button onclick="setAnalyticsRange(365)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition" data-days="365">This Year</button>
-        <button onclick="setAnalyticsRange(0)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition" data-days="0">All Time</button>
+        <button onclick="setAnalyticsRange(7)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition" data-days="7" data-t="analyticsLast7">Last 7 Days</button>
+        <button onclick="setAnalyticsRange(30)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition bg-brand text-white border-brand" data-days="30" data-t="analyticsLast30">Last 30 Days</button>
+        <button onclick="setAnalyticsRange(90)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition" data-days="90" data-t="analyticsLast90">Last 90 Days</button>
+        <button onclick="setAnalyticsRange(365)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition" data-days="365" data-t="analyticsThisYear">This Year</button>
+        <button onclick="setAnalyticsRange(0)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition" data-days="0" data-t="analyticsAllTime">All Time</button>
         <div class="flex items-center gap-2 ml-auto">
-          <input type="date" id="analytics-from" class="border rounded-lg px-3 py-1.5 text-sm" onchange="applyCustomRange()" aria-label="Analytics date from">
-          <span class="text-gray-400">to</span>
-          <input type="date" id="analytics-to" class="border rounded-lg px-3 py-1.5 text-sm" onchange="applyCustomRange()" aria-label="Analytics date to">
+          <input type="date" id="analytics-from" class="border rounded-lg px-3 py-1.5 text-sm" onchange="applyCustomRange()" aria-label="Start date">
+          <span class="text-gray-400" data-t="analyticsTo">to</span>
+          <input type="date" id="analytics-to" class="border rounded-lg px-3 py-1.5 text-sm" onchange="applyCustomRange()" aria-label="End date">
         </div>
       </div>
       <div id="analytics-content"></div>
@@ -5763,7 +5783,8 @@ const adminT = {
     tabRepairOrders: 'Repair Orders',
     tabMessages: 'Messages',
     tabEmployees: 'Employees',
-    tabGallery: 'Promotions',
+    tabGallery: 'Gallery',
+    tabPromotions: 'Promotions',
     tabAnalytics: 'Analytics',
     tabDocs: 'Docs',
     tabSiteContent: 'Site Content',
@@ -5848,8 +5869,8 @@ const adminT = {
     cancel: 'Cancel',
     createAdminAccount: 'Create Admin Account',
     // Gallery
-    galleryServiceImages: 'Promotions & Service Images',
-    gallerySubTab: 'Promotions',
+    galleryServiceImages: 'Gallery & Service Images',
+    gallerySubTab: 'Gallery',
     serviceImagesSubTab: 'Service Images',
     addNewImage: 'Add New Image',
     imageFile: 'Image File *',
@@ -5897,6 +5918,12 @@ const adminT = {
     analyticsPriority: 'Priority',
     analyticsResolved: 'Resolved',
     analyticsBookings: 'bookings',
+    analyticsLast7: 'Last 7 Days',
+    analyticsLast30: 'Last 30 Days',
+    analyticsLast90: 'Last 90 Days',
+    analyticsThisYear: 'This Year',
+    analyticsAllTime: 'All Time',
+    analyticsTo: 'to',
     // Docs
     documentation: 'Documentation',
     docsSubtitle: 'Instruction manual, feature list, and improvement roadmap',
@@ -6159,6 +6186,41 @@ const adminT = {
     promoDeleted: 'Promotion deleted',
     promoUpdated: 'Promotion updated',
     promoCreated: 'Promotion created',
+    promoNewPromoBtn: '+ New Promotion',
+    promoLabelTitleEn: 'Title (EN) *',
+    promoLabelTitleEs: 'Title (ES)',
+    promoLabelBodyEn: 'Body (EN)',
+    promoLabelBodyEs: 'Body (ES)',
+    promoLabelCtaEn: 'CTA Text (EN)',
+    promoLabelCtaEs: 'CTA Text (ES)',
+    promoLabelCtaUrl: 'CTA URL',
+    promoLabelPlacement: 'Placement',
+    promoLabelBadge: 'Badge Text',
+    promoExitIntentSection: 'Exit-Intent Popup Fields',
+    promoLabelSubtitleEn: 'Subtitle (EN)',
+    promoLabelSubtitleEs: 'Subtitle (ES)',
+    promoLabelPlaceholderEn: 'Email Placeholder (EN)',
+    promoLabelPlaceholderEs: 'Email Placeholder (ES)',
+    promoLabelSuccessEn: 'Success Message (EN)',
+    promoLabelSuccessEs: 'Success Message (ES)',
+    promoLabelErrorEn: 'Error Message (EN)',
+    promoLabelErrorEs: 'Error Message (ES)',
+    promoLabelNospamEn: 'No-Spam Text (EN)',
+    promoLabelNospamEs: 'No-Spam Text (ES)',
+    promoLabelIcon: 'Icon (emoji)',
+    promoLabelImage: 'Banner Image (optional)',
+    promoImagePreview: 'New image preview',
+    promoRemoveImage: 'Remove image',
+    promoLabelBgColor: 'BG Color',
+    promoLabelTextColor: 'Text Color',
+    promoLabelActive: 'Active',
+    promoLabelSortOrder: 'Sort Order',
+    promoLabelStartsAt: 'Starts At',
+    promoLabelEndsAt: 'Ends At',
+    promoLabelPreview: 'Banner Preview',
+    promoPreviewTitle: 'Your Promotion Title',
+    promoPreviewCta: 'Book Now →',
+    promoCancel: 'Cancel',
     // Reviews table headers
     reviewThName: 'Name',
     reviewThRating: 'Rating',
@@ -6253,7 +6315,8 @@ const adminT = {
     tabRepairOrders: '\u00D3rdenes de Reparaci\u00F3n',
     tabMessages: 'Mensajes',
     tabEmployees: 'Empleados',
-    tabGallery: 'Promociones',
+    tabGallery: 'Galería',
+    tabPromotions: 'Promociones',
     tabAnalytics: 'Anal\u00EDticas',
     tabDocs: 'Documentos',
     tabSiteContent: 'Contenido del Sitio',
@@ -6338,8 +6401,8 @@ const adminT = {
     cancel: 'Cancelar',
     createAdminAccount: 'Crear Cuenta de Administrador',
     // Gallery
-    galleryServiceImages: 'Promociones e Im\u00E1genes de Servicios',
-    gallerySubTab: 'Promociones',
+    galleryServiceImages: 'Galería e Imágenes de Servicios',
+    gallerySubTab: 'Galería',
     serviceImagesSubTab: 'Im\u00E1genes de Servicios',
     addNewImage: 'Agregar Nueva Imagen',
     imageFile: 'Archivo de Imagen *',
@@ -6387,6 +6450,12 @@ const adminT = {
     analyticsPriority: 'Prioritarios',
     analyticsResolved: 'Resueltos',
     analyticsBookings: 'reservas',
+    analyticsLast7: 'Últimos 7 Días',
+    analyticsLast30: 'Últimos 30 Días',
+    analyticsLast90: 'Últimos 90 Días',
+    analyticsThisYear: 'Este Año',
+    analyticsAllTime: 'Todo el Tiempo',
+    analyticsTo: 'a',
     // Docs
     documentation: 'Documentaci\u00F3n',
     docsSubtitle: 'Manual de instrucciones, lista de funciones y mejoras',
@@ -6649,6 +6718,41 @@ const adminT = {
     promoDeleted: 'Promoci\u00F3n eliminada',
     promoUpdated: 'Promoci\u00F3n actualizada',
     promoCreated: 'Promoci\u00F3n creada',
+    promoNewPromoBtn: '+ Nueva Promoción',
+    promoLabelTitleEn: 'Título (EN) *',
+    promoLabelTitleEs: 'Título (ES)',
+    promoLabelBodyEn: 'Cuerpo (EN)',
+    promoLabelBodyEs: 'Cuerpo (ES)',
+    promoLabelCtaEn: 'Texto CTA (EN)',
+    promoLabelCtaEs: 'Texto CTA (ES)',
+    promoLabelCtaUrl: 'URL del CTA',
+    promoLabelPlacement: 'Ubicación',
+    promoLabelBadge: 'Texto de Insignia',
+    promoExitIntentSection: 'Campos de Popup de Salida',
+    promoLabelSubtitleEn: 'Subtítulo (EN)',
+    promoLabelSubtitleEs: 'Subtítulo (ES)',
+    promoLabelPlaceholderEn: 'Placeholder de Email (EN)',
+    promoLabelPlaceholderEs: 'Placeholder de Email (ES)',
+    promoLabelSuccessEn: 'Mensaje de Éxito (EN)',
+    promoLabelSuccessEs: 'Mensaje de Éxito (ES)',
+    promoLabelErrorEn: 'Mensaje de Error (EN)',
+    promoLabelErrorEs: 'Mensaje de Error (ES)',
+    promoLabelNospamEn: 'Texto Anti-Spam (EN)',
+    promoLabelNospamEs: 'Texto Anti-Spam (ES)',
+    promoLabelIcon: 'Ícono (emoji)',
+    promoLabelImage: 'Imagen del Banner (opcional)',
+    promoImagePreview: 'Vista previa de nueva imagen',
+    promoRemoveImage: 'Eliminar imagen',
+    promoLabelBgColor: 'Color de Fondo',
+    promoLabelTextColor: 'Color de Texto',
+    promoLabelActive: 'Activa',
+    promoLabelSortOrder: 'Orden',
+    promoLabelStartsAt: 'Inicia',
+    promoLabelEndsAt: 'Termina',
+    promoLabelPreview: 'Vista Previa del Banner',
+    promoPreviewTitle: 'Título de Tu Promoción',
+    promoPreviewCta: 'Reservar Ahora →',
+    promoCancel: 'Cancelar',
     // Reviews table headers
     reviewThName: 'Nombre',
     reviewThRating: 'Calificaci\u00F3n',
