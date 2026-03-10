@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS oretir_employee_skills (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  employee_id INT NOT NULL,
+  employee_id INT UNSIGNED NOT NULL,
   service_type VARCHAR(50) NOT NULL,
   certified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
