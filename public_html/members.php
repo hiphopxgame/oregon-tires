@@ -87,7 +87,7 @@ $memberDashboardTabs = [
 $isShopAdmin = false;
 if (MemberAuth::isMemberLoggedIn()) {
     $member = MemberAuth::getCurrentMember();
-    $adminCheck = $pdo->prepare('SELECT id FROM oretir_admin_users WHERE email = ? AND role IN (?, ?) LIMIT 1');
+    $adminCheck = $pdo->prepare('SELECT id FROM oretir_admins WHERE email = ? AND role IN (?, ?) LIMIT 1');
     $adminCheck->execute([$member['email'] ?? '', 'admin', 'superadmin']);
     $isShopAdmin = (bool) $adminCheck->fetch();
 }
