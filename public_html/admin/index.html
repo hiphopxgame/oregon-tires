@@ -535,15 +535,18 @@
                 <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-green-100 border-2 border-green-500"></div> Has appointments</div>
                 <div class="flex items-center gap-2"><div class="w-3 h-3 rounded ring-2 ring-amber-500"></div> Today</div>
                 <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-brand"></div> Selected</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-red-100 border-2 border-red-400"></div> <span data-t="schedShopClosed">Shop Closed</span></div>
               </div>
             </div>
-            <!-- Day Detail with Assignment -->
+            <!-- Day Detail with Assignment + Schedule Overlay -->
             <div class="lg:col-span-2">
               <div class="flex justify-between items-center mb-4">
-                <button onclick="calNavDay(-1)" class="px-3 py-1 border rounded hover:bg-gray-100" data-t="prevDay">◀ Prev Day</button>
+                <button onclick="calNavDay(-1)" class="px-3 py-1 border rounded hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 dark:text-gray-200" data-t="prevDay">◀ Prev Day</button>
                 <h3 class="text-xl font-bold text-brand dark:text-green-400" id="cal-day-label"></h3>
-                <button onclick="calNavDay(1)" class="px-3 py-1 border rounded hover:bg-gray-100" data-t="nextDay">Next Day ▶</button>
+                <button onclick="calNavDay(1)" class="px-3 py-1 border rounded hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 dark:text-gray-200" data-t="nextDay">Next Day ▶</button>
               </div>
+              <!-- Schedule + capacity summary bar -->
+              <div id="cal-day-schedule-bar" class="mb-4"></div>
               <div id="cal-day-appointments" class="space-y-3"></div>
             </div>
           </div>
@@ -7620,93 +7623,457 @@ function renderOverviewCharts() {
 }
 
 // ===== CALENDAR =====
+// Overrides cache for mini calendar
+var calOverridesCache = {};
+async function fetchCalMonthOverrides(y, m) {
+  var key = y + '-' + m;
+  if (calOverridesCache[key]) return calOverridesCache[key];
+  var from = y + '-' + String(m+1).padStart(2,'0') + '-01';
+  var to = y + '-' + String(m+1).padStart(2,'0') + '-' + new Date(y,m+1,0).getDate();
+  try {
+    var res = await fetch('/api/admin/schedules.php?type=overrides&from=' + from + '&to=' + to, { credentials: 'include' });
+    var json = await res.json();
+    if (json.success) {
+      var closures = {};
+      (json.data || []).forEach(function(ov) {
+        if (ov.is_closed == 1 && !ov.employee_id) closures[ov.override_date] = ov.reason || true;
+      });
+      calOverridesCache[key] = closures;
+      return closures;
+    }
+  } catch (e) {}
+  return {};
+}
+
 function renderCalendar() {
-  const grid = document.getElementById('cal-grid');
-  const y = calDate.getFullYear(), m = calDate.getMonth();
+  var grid = document.getElementById('cal-grid');
+  var y = calDate.getFullYear(), m = calDate.getMonth();
   document.getElementById('cal-month-label').textContent = calDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  
-  const firstDay = new Date(y,m,1).getDay(), daysInMonth = new Date(y,m+1,0).getDate();
-  let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="font-bold text-xs text-gray-500 py-1">${d}</div>`).join('');
-  for(let i=0;i<firstDay;i++) html += '<div></div>';
-  for(let d=1;d<=daysInMonth;d++) {
-    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const count = appointments.filter(a=>a.preferred_date===dateStr).length;
-    const isSelected = calSelectedDate.toISOString().split('T')[0] === dateStr;
-    const isToday = new Date().toISOString().split('T')[0] === dateStr;
-    const hasAppts = count > 0;
-    let cellClasses = 'p-1 text-center cursor-pointer rounded-lg hover:bg-gray-100 relative';
-    if(isSelected) cellClasses += ' bg-brand text-white hover:bg-brand';
-    else if(hasAppts) cellClasses += ' bg-green-100 border-2 border-green-500 font-bold';
-    if(isToday && !isSelected) cellClasses += ' ring-2 ring-amber-500';
-    html += `<div onclick="selectCalDay('${dateStr}')" class="${cellClasses}">
-      <div class="text-sm">${d}</div>
-      ${count ? `<div class="text-xs ${isSelected?'text-white/80':'text-green-700'} font-bold">${count} appt${count>1?'s':''}</div>` : ''}
-    </div>`;
+
+  // Fetch month overrides then render
+  fetchCalMonthOverrides(y, m).then(function(closures) {
+    renderCalendarGrid(y, m, closures);
+  });
+  // Render immediately without closures, then update once loaded
+  renderCalendarGrid(y, m, calOverridesCache[y + '-' + m] || {});
+}
+
+function renderCalendarGrid(y, m, closures) {
+  var grid = document.getElementById('cal-grid');
+  grid.textContent = '';
+
+  var T = adminT[currentLang];
+  var dayLabels = [T.schedSun||'Sun',T.schedMon||'Mon',T.schedTue||'Tue',T.schedWed||'Wed',T.schedThu||'Thu',T.schedFri||'Fri',T.schedSat||'Sat'];
+  dayLabels.forEach(function(d) {
+    var lbl = document.createElement('div');
+    lbl.className = 'font-bold text-xs text-gray-500 dark:text-gray-400 py-1';
+    lbl.textContent = d;
+    grid.appendChild(lbl);
+  });
+
+  var firstDay = new Date(y,m,1).getDay(), daysInMonth = new Date(y,m+1,0).getDate();
+  for (var i = 0; i < firstDay; i++) {
+    grid.appendChild(document.createElement('div'));
   }
-  grid.innerHTML = html;
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dateStr = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    var count = appointments.filter(function(a) { return a.preferred_date === dateStr; }).length;
+    var isSelected = calSelectedDate.toISOString().split('T')[0] === dateStr;
+    var isToday = new Date().toISOString().split('T')[0] === dateStr;
+    var hasAppts = count > 0;
+    var isClosed = !!closures[dateStr];
+    var isSunday = new Date(y, m, d).getDay() === 0;
+
+    var cell = document.createElement('div');
+    var cellClasses = 'p-1 text-center cursor-pointer rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 relative';
+    if (isSelected) cellClasses += ' bg-brand text-white hover:bg-brand';
+    else if (isClosed) cellClasses += ' bg-red-100 border-2 border-red-400 dark:bg-red-900/30 dark:border-red-800';
+    else if (hasAppts) cellClasses += ' bg-green-100 border-2 border-green-500 font-bold dark:bg-green-900/30 dark:border-green-700';
+    if (isToday && !isSelected) cellClasses += ' ring-2 ring-amber-500';
+    if (isSunday && !isSelected && !isClosed) cellClasses += ' text-gray-400 dark:text-gray-500';
+    cell.className = cellClasses;
+    cell.onclick = (function(ds) { return function() { selectCalDay(ds); }; })(dateStr);
+
+    var dayNum = document.createElement('div');
+    dayNum.className = 'text-sm';
+    dayNum.textContent = d;
+    cell.appendChild(dayNum);
+
+    if (isClosed && !isSelected) {
+      var closedLabel = document.createElement('div');
+      closedLabel.className = 'text-[9px] text-red-600 dark:text-red-400 font-medium leading-tight';
+      closedLabel.textContent = T.schedClosure || 'Closed';
+      cell.appendChild(closedLabel);
+    } else if (count) {
+      var countLabel = document.createElement('div');
+      countLabel.className = 'text-xs font-bold ' + (isSelected ? 'text-white/80' : 'text-green-700 dark:text-green-400');
+      countLabel.textContent = count + ' appt' + (count > 1 ? 's' : '');
+      cell.appendChild(countLabel);
+    }
+
+    grid.appendChild(cell);
+  }
   renderCalDay();
 }
 function selectCalDay(dateStr) { calSelectedDate = new Date(dateStr+'T00:00:00'); renderCalendar(); }
 function calNavMonth(dir) { calDate.setMonth(calDate.getMonth()+dir); renderCalendar(); }
 function calNavDay(dir) { calSelectedDate.setDate(calSelectedDate.getDate()+dir); calDate = new Date(calSelectedDate); renderCalendar(); }
-function renderCalDay() {
-  const dateStr = calSelectedDate.toISOString().split('T')[0];
-  document.getElementById('cal-day-label').textContent = calSelectedDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  const dayApts = appointments.filter(a=>a.preferred_date===dateStr).sort((a,b)=>(a.preferred_time||'').localeCompare(b.preferred_time||''));
-  const container = document.getElementById('cal-day-appointments');
-  const activeEmps = employees.filter(e=>e.is_active);
+// Schedule data cache for calendar overlay
+var calScheduleCache = {};
+async function fetchCalDaySchedule(dateStr) {
+  if (calScheduleCache[dateStr]) return calScheduleCache[dateStr];
+  try {
+    var res = await fetch('/api/admin/schedules.php?type=daily&date=' + dateStr, { credentials: 'include' });
+    var json = await res.json();
+    if (json.success) {
+      calScheduleCache[dateStr] = json.data;
+      return json.data;
+    }
+  } catch (e) { console.error('fetchCalDaySchedule error:', e); }
+  return null;
+}
 
-  if (!dayApts.length) {
-    container.innerHTML = '<div class="text-center py-12 text-gray-500"><div class="text-4xl mb-3">📅</div><p class="text-lg font-medium">No appointments</p><p class="text-sm">This day is open for bookings</p></div>';
+function renderCalDay() {
+  var dateStr = calSelectedDate.toISOString().split('T')[0];
+  document.getElementById('cal-day-label').textContent = calSelectedDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+  // Fetch schedule data then render the full view
+  fetchCalDaySchedule(dateStr).then(function(sched) {
+    renderCalDayWithSchedule(dateStr, sched);
+  });
+}
+
+function renderCalDayWithSchedule(dateStr, sched) {
+  var T = adminT[currentLang];
+  var dayApts = appointments.filter(function(a) { return a.preferred_date===dateStr; }).sort(function(a,b) { return (a.preferred_time||'').localeCompare(b.preferred_time||''); });
+  var container = document.getElementById('cal-day-appointments');
+  var schedBar = document.getElementById('cal-day-schedule-bar');
+  var activeEmps = employees.filter(function(e) { return e.is_active; });
+
+  // ── Schedule bar: employee availability + capacity ──
+  schedBar.textContent = '';
+  if (sched) {
+    var barDiv = document.createElement('div');
+    barDiv.className = 'border rounded-lg p-3 bg-gray-50 dark:bg-gray-700 dark:border-gray-600';
+
+    // Shop closure warning
+    if (sched.shop_override && sched.shop_override.is_closed == 1) {
+      var closedDiv = document.createElement('div');
+      closedDiv.className = 'flex items-center gap-2 text-red-700 dark:text-red-400 font-medium';
+      var closedIcon = document.createElement('span');
+      closedIcon.className = 'text-lg';
+      closedIcon.textContent = '\u26D4';
+      closedDiv.appendChild(closedIcon);
+      var closedText = document.createElement('span');
+      closedText.textContent = T.schedShopClosed;
+      closedDiv.appendChild(closedText);
+      if (sched.shop_override.reason) {
+        var reasonSpan = document.createElement('span');
+        reasonSpan.className = 'text-sm font-normal text-gray-500 dark:text-gray-400';
+        reasonSpan.textContent = ' \u2014 ' + sched.shop_override.reason;
+        closedDiv.appendChild(reasonSpan);
+      }
+      barDiv.appendChild(closedDiv);
+      schedBar.appendChild(barDiv);
+
+      // If shop closed, still show any existing appointments below
+      if (!dayApts.length) {
+        container.textContent = '';
+        var emptyDiv = document.createElement('div');
+        emptyDiv.className = 'text-center py-8 text-gray-500 dark:text-gray-400';
+        var emptyIcon = document.createElement('div');
+        emptyIcon.className = 'text-4xl mb-3';
+        emptyIcon.textContent = '\u26D4';
+        emptyDiv.appendChild(emptyIcon);
+        var emptyMsg = document.createElement('p');
+        emptyMsg.className = 'text-lg font-medium';
+        emptyMsg.textContent = T.schedShopClosed;
+        emptyDiv.appendChild(emptyMsg);
+        container.appendChild(emptyDiv);
+        return;
+      }
+    } else {
+      // Employee availability row
+      var empRow = document.createElement('div');
+      empRow.className = 'flex flex-wrap gap-2 mb-2';
+
+      if (sched.employees && sched.employees.length) {
+        sched.employees.forEach(function(emp) {
+          var isOff = emp.ov_is_closed == 1 || (!emp.is_available && !emp.override_id);
+          var chip = document.createElement('span');
+          if (isOff) {
+            chip.className = 'inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-500 dark:bg-gray-600 dark:text-gray-400 line-through';
+          } else {
+            chip.className = 'inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400';
+          }
+          var dot = document.createElement('span');
+          dot.className = isOff ? 'w-1.5 h-1.5 rounded-full bg-gray-400' : 'w-1.5 h-1.5 rounded-full bg-green-500';
+          chip.appendChild(dot);
+          var nameText = document.createTextNode(emp.employee_name);
+          chip.appendChild(nameText);
+          if (!isOff) {
+            var timeText = document.createTextNode(' ' + (emp.ov_start_time || emp.start_time || '').substring(0,5) + '-' + (emp.ov_end_time || emp.end_time || '').substring(0,5));
+            chip.appendChild(timeText);
+          }
+          empRow.appendChild(chip);
+        });
+      }
+      barDiv.appendChild(empRow);
+
+      // Capacity summary row
+      if (sched.slot_capacity && Object.keys(sched.slot_capacity).length) {
+        var capRow = document.createElement('div');
+        capRow.className = 'flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400';
+        var capLabel = document.createElement('span');
+        capLabel.className = 'font-medium';
+        capLabel.textContent = T.schedCapacity + ':';
+        capRow.appendChild(capLabel);
+
+        // Show a mini capacity bar for each hour
+        var hourSummary = {};
+        var sortedSlots = Object.keys(sched.slot_capacity).sort();
+        sortedSlots.forEach(function(slot) {
+          var hour = slot.substring(0,2);
+          if (!hourSummary[hour]) hourSummary[hour] = { cap: sched.slot_capacity[slot], booked: 0 };
+        });
+        dayApts.forEach(function(a) {
+          var hour = (a.preferred_time || '').substring(0,2);
+          if (hourSummary[hour]) hourSummary[hour].booked++;
+        });
+
+        Object.keys(hourSummary).sort().forEach(function(hour) {
+          var info = hourSummary[hour];
+          var pct = info.cap > 0 ? Math.round((info.booked / info.cap) * 100) : 0;
+          var slotEl = document.createElement('div');
+          slotEl.className = 'flex flex-col items-center';
+          slotEl.title = info.booked + '/' + info.cap + ' booked';
+          var hourLabel = document.createElement('span');
+          hourLabel.className = 'text-[10px] leading-none';
+          hourLabel.textContent = hour;
+          slotEl.appendChild(hourLabel);
+          var barOuter = document.createElement('div');
+          barOuter.className = 'w-4 h-3 rounded-sm bg-gray-200 dark:bg-gray-600 overflow-hidden';
+          var barInner = document.createElement('div');
+          barInner.className = 'h-full rounded-sm transition-all ' + (pct >= 100 ? 'bg-red-500' : pct >= 50 ? 'bg-amber-400' : 'bg-green-500');
+          barInner.style.width = Math.min(pct, 100) + '%';
+          barOuter.appendChild(barInner);
+          slotEl.appendChild(barOuter);
+          capRow.appendChild(slotEl);
+        });
+
+        var staffCount = document.createElement('span');
+        staffCount.className = 'ml-auto font-medium';
+        staffCount.textContent = sched.working_count + ' ' + T.schedWorking;
+        capRow.appendChild(staffCount);
+        barDiv.appendChild(capRow);
+      }
+
+      schedBar.appendChild(barDiv);
+    }
+  }
+
+  // ── Appointment cards ──
+  container.textContent = '';
+
+  if (!dayApts.length && !(sched && sched.shop_override && sched.shop_override.is_closed == 1)) {
+    var emptyDiv = document.createElement('div');
+    emptyDiv.className = 'text-center py-12 text-gray-500 dark:text-gray-400';
+    var emptyIcon = document.createElement('div');
+    emptyIcon.className = 'text-4xl mb-3';
+    emptyIcon.textContent = '\uD83D\uDCC5';
+    emptyDiv.appendChild(emptyIcon);
+    var emptyTitle = document.createElement('p');
+    emptyTitle.className = 'text-lg font-medium';
+    emptyTitle.textContent = 'No appointments';
+    emptyDiv.appendChild(emptyTitle);
+    var emptySub = document.createElement('p');
+    emptySub.className = 'text-sm';
+    emptySub.textContent = sched && sched.working_count > 0
+      ? sched.working_count + ' employee' + (sched.working_count > 1 ? 's' : '') + ' available'
+      : 'This day is open for bookings';
+    emptyDiv.appendChild(emptySub);
+    container.appendChild(emptyDiv);
     return;
   }
 
-  // Unassigned count
-  const unassigned = dayApts.filter(a=>!a.assigned_employee_id).length;
-  let headerHtml = '';
+  // Unassigned warning
+  var unassigned = dayApts.filter(function(a) { return !a.assigned_employee_id; }).length;
   if (unassigned > 0) {
-    headerHtml = `<div class="bg-orange-50 border border-orange-300 rounded-lg p-3 mb-4 flex justify-between items-center">
-      <span class="text-orange-800 font-medium">⚠️ ${unassigned} unassigned appointment${unassigned>1?'s':''}</span>
-      <button onclick="quickAssignDay('${dateStr}')" class="bg-orange-600 text-white px-3 py-1 rounded text-sm hover:bg-orange-700">⚡ Quick Assign All</button>
-    </div>`;
+    var warnDiv = document.createElement('div');
+    warnDiv.className = 'bg-orange-50 border border-orange-300 rounded-lg p-3 mb-4 flex justify-between items-center dark:bg-orange-900/20 dark:border-orange-800';
+    var warnText = document.createElement('span');
+    warnText.className = 'text-orange-800 font-medium dark:text-orange-300';
+    warnText.textContent = '\u26A0\uFE0F ' + unassigned + ' unassigned appointment' + (unassigned > 1 ? 's' : '');
+    warnDiv.appendChild(warnText);
+    var qAssignBtn = document.createElement('button');
+    qAssignBtn.className = 'bg-orange-600 text-white px-3 py-1 rounded text-sm hover:bg-orange-700';
+    qAssignBtn.textContent = '\u26A1 Quick Assign All';
+    qAssignBtn.onclick = function() { quickAssignDay(dateStr); };
+    warnDiv.appendChild(qAssignBtn);
+    container.appendChild(warnDiv);
   }
 
-  container.innerHTML = headerHtml + dayApts.map(a => `
-    <div class="border rounded-lg p-4 hover:shadow-md transition ${!a.assigned_employee_id ? 'border-orange-300 bg-orange-50/50' : 'hover:bg-gray-50'}">
-      <div class="flex justify-between items-start gap-4">
-        <div class="flex-1">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-lg font-bold text-brand dark:text-green-400">${fmtTime(a.preferred_time)}</span>
-            ${statusBadge(a.status)}${calSyncBadge(a)}
-          </div>
-          <h4 class="font-medium">${esc(a.first_name)} ${esc(a.last_name)}</h4>
-          <p class="text-sm text-gray-600">${esc(a.service)}</p>
-          <p class="text-sm text-gray-500">${esc(a.email)} ${a.phone?'• '+esc(a.phone):''}</p>
-          ${a.message ? `<p class="text-xs text-gray-500 mt-1 italic border-l-2 border-gray-300 pl-2">"${esc(a.message)}"</p>` : ''}
-          ${a.admin_notes ? `<p class="text-xs text-blue-600 mt-1">📝 ${esc(a.admin_notes)}</p>` : ''}
-        </div>
-        <div class="flex flex-col gap-2 min-w-[180px]">
-          <div>
-            <label class="text-xs font-medium text-gray-500">Employee</label>
-            <select onchange="updateApptAssignment('${a.id}',this.value)" class="w-full border rounded px-2 py-1.5 text-sm ${!a.assigned_employee_id ? 'border-orange-400 bg-orange-50' : 'border-green-400 bg-green-50'}">
-              <option value="">${adminT[currentLang].unassigned}</option>
-              ${activeEmps.map(e=>`<option value="${e.id}" ${a.assigned_employee_id===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}
-            </select>
-          </div>
-          <div>
-            <label class="text-xs font-medium text-gray-500">Status</label>
-            <select onchange="updateApptStatus('${a.id}',this.value)" class="w-full border rounded px-2 py-1.5 text-sm">
-              <option value="new" ${a.status==='new'?'selected':''}>New</option>
-              <option value="confirmed" ${a.status==='confirmed'?'selected':''}>Confirmed</option>
-              <option value="completed" ${a.status==='completed'?'selected':''}>Completed</option>
-              <option value="cancelled" ${a.status==='cancelled'?'selected':''}>Cancelled</option>
-            </select>
-          </div>
-          <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100 text-center">📝 Notes</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
+  // Group by time slot for capacity context
+  var slotGroups = {};
+  dayApts.forEach(function(a) {
+    var slotKey = (a.preferred_time || '').substring(0, 5);
+    if (!slotGroups[slotKey]) slotGroups[slotKey] = [];
+    slotGroups[slotKey].push(a);
+  });
+
+  var sortedSlotKeys = Object.keys(slotGroups).sort();
+  sortedSlotKeys.forEach(function(slotKey) {
+    var aptsInSlot = slotGroups[slotKey];
+    var slotCap = sched && sched.slot_capacity && sched.slot_capacity[slotKey] ? sched.slot_capacity[slotKey] : null;
+
+    // Slot header with capacity indicator
+    if (slotCap !== null) {
+      var slotHeader = document.createElement('div');
+      slotHeader.className = 'flex items-center gap-2 mb-1 mt-3 first:mt-0';
+      var timeLabel = document.createElement('span');
+      timeLabel.className = 'text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide';
+      timeLabel.textContent = slotKey;
+      slotHeader.appendChild(timeLabel);
+      var capBadge = document.createElement('span');
+      var isFull = aptsInSlot.length >= slotCap;
+      capBadge.className = 'text-[10px] px-1.5 py-0.5 rounded-full font-medium ' +
+        (isFull ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400' : 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400');
+      capBadge.textContent = aptsInSlot.length + '/' + slotCap;
+      slotHeader.appendChild(capBadge);
+      var divider = document.createElement('div');
+      divider.className = 'flex-1 border-t border-gray-200 dark:border-gray-600';
+      slotHeader.appendChild(divider);
+      container.appendChild(slotHeader);
+    }
+
+    aptsInSlot.forEach(function(a) {
+      var card = document.createElement('div');
+      card.className = 'border rounded-lg p-4 hover:shadow-md transition dark:border-gray-600 ' +
+        (!a.assigned_employee_id ? 'border-orange-300 bg-orange-50/50 dark:bg-orange-900/10 dark:border-orange-800' : 'hover:bg-gray-50 dark:hover:bg-gray-700');
+
+      var row = document.createElement('div');
+      row.className = 'flex justify-between items-start gap-4';
+
+      // Left side - appointment info
+      var leftDiv = document.createElement('div');
+      leftDiv.className = 'flex-1';
+
+      var topRow = document.createElement('div');
+      topRow.className = 'flex items-center gap-2 mb-1 flex-wrap';
+      var timeSpan = document.createElement('span');
+      timeSpan.className = 'text-lg font-bold text-brand dark:text-green-400';
+      timeSpan.textContent = fmtTime(a.preferred_time);
+      topRow.appendChild(timeSpan);
+
+      // Status badge (reusing existing statusBadge which returns HTML string)
+      var badgeContainer = document.createElement('span');
+      badgeContainer.insertAdjacentHTML('beforeend', statusBadge(a.status) + calSyncBadge(a));
+      topRow.appendChild(badgeContainer);
+      leftDiv.appendChild(topRow);
+
+      var nameEl = document.createElement('h4');
+      nameEl.className = 'font-medium dark:text-gray-200';
+      nameEl.textContent = a.first_name + ' ' + a.last_name;
+      leftDiv.appendChild(nameEl);
+
+      var svcEl = document.createElement('p');
+      svcEl.className = 'text-sm text-gray-600 dark:text-gray-400';
+      svcEl.textContent = a.service;
+      leftDiv.appendChild(svcEl);
+
+      var contactEl = document.createElement('p');
+      contactEl.className = 'text-sm text-gray-500 dark:text-gray-400';
+      contactEl.textContent = a.email + (a.phone ? ' \u2022 ' + a.phone : '');
+      leftDiv.appendChild(contactEl);
+
+      if (a.admin_notes) {
+        var notesEl = document.createElement('p');
+        notesEl.className = 'text-xs text-blue-600 dark:text-blue-400 mt-1';
+        notesEl.textContent = '\uD83D\uDCDD ' + a.admin_notes;
+        leftDiv.appendChild(notesEl);
+      }
+
+      row.appendChild(leftDiv);
+
+      // Right side - controls
+      var rightDiv = document.createElement('div');
+      rightDiv.className = 'flex flex-col gap-2 min-w-[180px]';
+
+      // Employee select
+      var empWrap = document.createElement('div');
+      var empLbl = document.createElement('label');
+      empLbl.className = 'text-xs font-medium text-gray-500 dark:text-gray-400';
+      empLbl.textContent = 'Employee';
+      empWrap.appendChild(empLbl);
+      var empSel = document.createElement('select');
+      empSel.className = 'w-full border rounded px-2 py-1.5 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ' +
+        (!a.assigned_employee_id ? 'border-orange-400 bg-orange-50 dark:border-orange-700 dark:bg-orange-900/20' : 'border-green-400 bg-green-50 dark:border-green-700 dark:bg-green-900/20');
+      empSel.onchange = (function(apptId) { return function() { updateApptAssignment(apptId, this.value); }; })(a.id);
+      var defaultOpt = document.createElement('option');
+      defaultOpt.value = '';
+      defaultOpt.textContent = T.schedUnassigned || 'Unassigned';
+      empSel.appendChild(defaultOpt);
+
+      // Filter employees to those working this slot (if schedule data available)
+      var workingEmpIds = null;
+      if (sched && sched.employees) {
+        workingEmpIds = [];
+        sched.employees.forEach(function(emp) {
+          var isOff = emp.ov_is_closed == 1 || (!emp.is_available && !emp.override_id);
+          if (!isOff) {
+            var empStart = parseInt((emp.ov_start_time || emp.start_time || '08:00').substring(0,2));
+            var empEnd = parseInt((emp.ov_end_time || emp.end_time || '17:00').substring(0,2));
+            if (parseInt(slotKey.substring(0,2)) >= empStart && parseInt(slotKey.substring(0,2)) < empEnd) {
+              workingEmpIds.push(parseInt(emp.employee_id));
+            }
+          }
+        });
+      }
+
+      activeEmps.forEach(function(e) {
+        var opt = document.createElement('option');
+        opt.value = e.id;
+        if (a.assigned_employee_id === e.id) opt.selected = true;
+        var isWorking = workingEmpIds === null || workingEmpIds.indexOf(parseInt(e.id)) !== -1;
+        opt.textContent = e.name + (isWorking ? '' : ' (off)');
+        if (!isWorking && a.assigned_employee_id !== e.id) opt.className = 'text-gray-400';
+        empSel.appendChild(opt);
+      });
+      empWrap.appendChild(empSel);
+      rightDiv.appendChild(empWrap);
+
+      // Status select
+      var statusWrap = document.createElement('div');
+      var statusLbl = document.createElement('label');
+      statusLbl.className = 'text-xs font-medium text-gray-500 dark:text-gray-400';
+      statusLbl.textContent = 'Status';
+      statusWrap.appendChild(statusLbl);
+      var statusSel = document.createElement('select');
+      statusSel.className = 'w-full border rounded px-2 py-1.5 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+      statusSel.onchange = (function(apptId) { return function() { updateApptStatus(apptId, this.value); }; })(a.id);
+      ['new','confirmed','completed','cancelled'].forEach(function(s) {
+        var sOpt = document.createElement('option');
+        sOpt.value = s;
+        sOpt.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+        if (a.status === s) sOpt.selected = true;
+        statusSel.appendChild(sOpt);
+      });
+      statusWrap.appendChild(statusSel);
+      rightDiv.appendChild(statusWrap);
+
+      // Notes button
+      var notesBtn = document.createElement('button');
+      notesBtn.className = 'border rounded px-2 py-1 text-xs hover:bg-gray-100 text-center dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
+      notesBtn.textContent = '\uD83D\uDCDD Notes';
+      notesBtn.onclick = (function(apptId) { return function() { openNotesModal(apptId); }; })(a.id);
+      rightDiv.appendChild(notesBtn);
+
+      row.appendChild(rightDiv);
+      card.appendChild(row);
+      container.appendChild(card);
+    });
+  });
 }
 
 // ===== APPOINTMENTS =====
