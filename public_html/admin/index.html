@@ -496,6 +496,10 @@
           <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="chartBookingTrend">Booking Trend (30 Days)</h3>
           <div id="chart-booking-trend"></div>
         </div>
+        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 lg:col-span-2">
+          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="serviceStaffing">Service Staffing</h3>
+          <div id="chart-service-staffing"></div>
+        </div>
       </div>
       <div class="grid lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="upcomingSchedule">Upcoming Schedule</h3><div id="overview-upcoming" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div></div>
@@ -6286,6 +6290,16 @@ const adminT = {
     apptStatusConfirmed: 'Confirmed',
     apptStatusCompleted: 'Completed',
     apptStatusCancelled: 'Cancelled',
+    // Service skills
+    serviceCertifications: 'Service Certifications',
+    notCertified: 'Not Certified',
+    allServices: 'All Services',
+    serviceStaffing: 'Service Staffing',
+    appointmentsLabel: 'appointments',
+    certifiedStaff: 'certified staff',
+    workload: 'Workload',
+    ofToday: 'of today',
+    noSkillsAssigned: 'No skills assigned',
     // Shared action labels
     actionView: 'View',
     actionEdit: 'Edit',
@@ -6848,6 +6862,16 @@ const adminT = {
     apptStatusConfirmed: 'Confirmado',
     apptStatusCompleted: 'Completado',
     apptStatusCancelled: 'Cancelado',
+    // Service skills
+    serviceCertifications: 'Certificaciones de Servicio',
+    notCertified: 'No Certificado',
+    allServices: 'Todos los Servicios',
+    serviceStaffing: 'Personal por Servicio',
+    appointmentsLabel: 'citas',
+    certifiedStaff: 'personal certificado',
+    workload: 'Carga de Trabajo',
+    ofToday: 'del d\u00EDa',
+    noSkillsAssigned: 'Sin certificaciones',
     // Shared action labels
     actionView: 'Ver',
     actionEdit: 'Editar',
@@ -6963,6 +6987,48 @@ let appointments = [], messages = [], employees = [], emailLogs = [], galleryIma
 let currentNotesId = null, apptPage = 1, apptSortBy = 'created', apptSortOrder = 'desc';
 let calDate = new Date(), calSelectedDate = new Date();
 let adminUsers = [], currentUser = null;
+
+// ===== SERVICE COLOR MAP =====
+var SERVICE_COLORS = {
+  'tire-installation':      { bg:'bg-blue-100', text:'text-blue-800', darkBg:'dark:bg-blue-900/30', darkText:'dark:text-blue-300', dot:'bg-blue-500', hex:'#3B82F6', label:'Tire Install', labelEs:'Instalaci\u00F3n' },
+  'tire-repair':            { bg:'bg-blue-100', text:'text-blue-700', darkBg:'dark:bg-blue-900/30', darkText:'dark:text-blue-300', dot:'bg-blue-400', hex:'#60A5FA', label:'Tire Repair', labelEs:'Reparaci\u00F3n' },
+  'oil-change':             { bg:'bg-orange-100', text:'text-orange-800', darkBg:'dark:bg-orange-900/30', darkText:'dark:text-orange-300', dot:'bg-orange-500', hex:'#F97316', label:'Oil Change', labelEs:'Cambio Aceite' },
+  'brake-service':          { bg:'bg-red-100', text:'text-red-800', darkBg:'dark:bg-red-900/30', darkText:'dark:text-red-300', dot:'bg-red-500', hex:'#EF4444', label:'Brakes', labelEs:'Frenos' },
+  'wheel-alignment':        { bg:'bg-purple-100', text:'text-purple-800', darkBg:'dark:bg-purple-900/30', darkText:'dark:text-purple-300', dot:'bg-purple-500', hex:'#8B5CF6', label:'Alignment', labelEs:'Alineaci\u00F3n' },
+  'tuneup':                 { bg:'bg-emerald-100', text:'text-emerald-800', darkBg:'dark:bg-emerald-900/30', darkText:'dark:text-emerald-300', dot:'bg-emerald-500', hex:'#10B981', label:'Tune-Up', labelEs:'Afinaci\u00F3n' },
+  'mechanical-inspection':  { bg:'bg-cyan-100', text:'text-cyan-800', darkBg:'dark:bg-cyan-900/30', darkText:'dark:text-cyan-300', dot:'bg-cyan-500', hex:'#06B6D4', label:'Inspection', labelEs:'Inspecci\u00F3n' },
+  'mobile-service':         { bg:'bg-yellow-100', text:'text-yellow-800', darkBg:'dark:bg-yellow-900/30', darkText:'dark:text-yellow-300', dot:'bg-yellow-500', hex:'#EAB308', label:'Mobile', labelEs:'M\u00F3vil' },
+  'other':                  { bg:'bg-gray-100', text:'text-gray-700', darkBg:'dark:bg-gray-700', darkText:'dark:text-gray-300', dot:'bg-gray-400', hex:'#9CA3AF', label:'Other', labelEs:'Otro' },
+};
+
+function serviceColorBadge(serviceType) {
+  var c = SERVICE_COLORS[serviceType] || SERVICE_COLORS['other'];
+  var lbl = currentLang === 'es' ? c.labelEs : c.label;
+  var span = document.createElement('span');
+  span.className = 'inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium ' + c.bg + ' ' + c.text + ' ' + c.darkBg + ' ' + c.darkText;
+  var dot = document.createElement('span');
+  dot.className = 'w-1.5 h-1.5 rounded-full ' + c.dot + ' inline-block';
+  span.appendChild(dot);
+  span.appendChild(document.createTextNode(lbl));
+  return span;
+}
+
+function serviceColorDot(serviceType, title) {
+  var c = SERVICE_COLORS[serviceType] || SERVICE_COLORS['other'];
+  var dot = document.createElement('span');
+  dot.className = 'w-2 h-2 rounded-full ' + c.dot + ' inline-block';
+  if (title) dot.title = title;
+  return dot;
+}
+
+function serviceBadgeHtml(svc) {
+  var c = SERVICE_COLORS[svc] || SERVICE_COLORS['other'];
+  var lbl = currentLang === 'es' ? c.labelEs : c.label;
+  return '<span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium '
+    + c.bg + ' ' + c.text + ' ' + c.darkBg + ' ' + c.darkText + '">'
+    + '<span class="w-1.5 h-1.5 rounded-full ' + c.dot + ' inline-block"></span>'
+    + esc(lbl) + '</span>';
+}
 
 // ===== API HELPERS =====
 async function api(endpoint, opts = {}) {
@@ -7459,39 +7525,126 @@ function renderEmployeeSchedule(stats) {
   var T = adminT[currentLang];
   var empContainer = document.getElementById('overview-employees');
   var activeEmps = employees.filter(function(e) { return e.is_active; });
-  if (!activeEmps.length) { empContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">' + (T.noActiveEmployees || 'No active employees') + '</p>'; return; }
+  if (!activeEmps.length) { empContainer.textContent = ''; var p = document.createElement('p'); p.className = 'text-gray-500 dark:text-gray-400 text-center py-4'; p.textContent = T.noActiveEmployees || 'No active employees'; empContainer.appendChild(p); return; }
+  var totalToday = stats.today.length;
 
   // Note: employee + appointment values are escaped via esc() — admin-only authenticated content
-  empContainer.innerHTML = activeEmps.map(function(emp) {
+  empContainer.textContent = '';
+  activeEmps.forEach(function(emp) {
     var empToday = stats.today.filter(function(a) { return a.assigned_employee_id === emp.id; });
     var empUpcoming = stats.upcoming.filter(function(a) { return a.assigned_employee_id === emp.id; });
     var empCompleted = appointments.filter(function(a) { return a.assigned_employee_id === emp.id && a.status === 'completed'; });
 
-    var h = '<div class="border rounded-lg p-4 dark:border-gray-600 dark:bg-gray-800">';
-    h += '<div class="flex justify-between items-center mb-2"><div><h4 class="font-medium dark:text-gray-200">' + esc(emp.name) + '</h4><p class="text-sm text-gray-500 dark:text-gray-400">' + esc(emp.email || '') + '</p></div>';
-    h += '<div class="flex gap-2 flex-wrap justify-end">';
-    if (empToday.length) h += '<span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 font-medium">' + empToday.length + ' ' + (T.todayLabel || 'today') + '</span>';
-    h += '<span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 font-medium">' + empUpcoming.length + ' ' + (T.upcoming || 'upcoming') + '</span>';
-    h += '<span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">' + empCompleted.length + ' ' + (T.completedLabel || 'completed') + '</span>';
-    h += '</div></div>';
-    if (empToday.length) {
-      h += '<div class="mt-2 space-y-1">';
-      empToday.forEach(function(a) {
-        h += '<div class="text-sm flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 p-2 rounded border border-amber-200 dark:border-amber-800"><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(a.service) + ')</span></div>';
+    var card = document.createElement('div');
+    card.className = 'border rounded-lg p-4 dark:border-gray-600 dark:bg-gray-800';
+
+    // Header row: name + skill dots + stats
+    var header = document.createElement('div');
+    header.className = 'flex justify-between items-center mb-2';
+    var nameDiv = document.createElement('div');
+    var h4 = document.createElement('h4');
+    h4.className = 'font-medium dark:text-gray-200 inline';
+    h4.textContent = emp.name;
+    nameDiv.appendChild(h4);
+    // Skill dots after name
+    if (emp.skills && emp.skills.length) {
+      var dots = document.createElement('span');
+      dots.className = 'inline-flex gap-0.5 ml-2 align-middle';
+      emp.skills.forEach(function(svc) {
+        var d = serviceColorDot(svc, currentLang === 'es' ? (SERVICE_COLORS[svc] || SERVICE_COLORS['other']).labelEs : (SERVICE_COLORS[svc] || SERVICE_COLORS['other']).label);
+        dots.appendChild(d);
       });
-      h += '</div>';
+      nameDiv.appendChild(dots);
+    }
+    var emailP = document.createElement('p');
+    emailP.className = 'text-sm text-gray-500 dark:text-gray-400';
+    emailP.textContent = emp.email || '';
+    nameDiv.appendChild(emailP);
+    header.appendChild(nameDiv);
+
+    var statsDiv = document.createElement('div');
+    statsDiv.className = 'flex gap-2 flex-wrap justify-end';
+    if (empToday.length) {
+      var todayBadge = document.createElement('span');
+      todayBadge.className = 'text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 font-medium';
+      todayBadge.textContent = empToday.length + ' ' + (T.todayLabel || 'today');
+      statsDiv.appendChild(todayBadge);
+    }
+    var upBadge = document.createElement('span');
+    upBadge.className = 'text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 font-medium';
+    upBadge.textContent = empUpcoming.length + ' ' + (T.upcoming || 'upcoming');
+    statsDiv.appendChild(upBadge);
+    var compBadge = document.createElement('span');
+    compBadge.className = 'text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
+    compBadge.textContent = empCompleted.length + ' ' + (T.completedLabel || 'completed');
+    statsDiv.appendChild(compBadge);
+    header.appendChild(statsDiv);
+    card.appendChild(header);
+
+    // Workload bar
+    if (totalToday > 0) {
+      var loadPct = Math.round((empToday.length / totalToday) * 100);
+      var barWrap = document.createElement('div');
+      barWrap.className = 'flex items-center gap-2 mb-2';
+      var barOuter = document.createElement('div');
+      barOuter.className = 'flex-1 h-1 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden';
+      var barInner = document.createElement('div');
+      var barColor = loadPct > 80 ? 'bg-red-500' : loadPct > 50 ? 'bg-amber-400' : 'bg-brand';
+      barInner.className = 'h-full rounded-full ' + barColor;
+      barInner.style.width = loadPct + '%';
+      barOuter.appendChild(barInner);
+      barWrap.appendChild(barOuter);
+      var barLabel = document.createElement('span');
+      barLabel.className = 'text-[10px] text-gray-400 shrink-0';
+      barLabel.textContent = empToday.length + '/' + totalToday + ' ' + (T.todayLabel || 'today');
+      barWrap.appendChild(barLabel);
+      card.appendChild(barWrap);
+    }
+
+    // Today's appointments with colored badges
+    if (empToday.length) {
+      var todayDiv = document.createElement('div');
+      todayDiv.className = 'space-y-1';
+      empToday.forEach(function(a) {
+        var row = document.createElement('div');
+        row.className = 'text-sm flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 p-2 rounded border border-amber-200 dark:border-amber-800';
+        var timeB = document.createElement('strong');
+        timeB.textContent = fmtTime(a.preferred_time);
+        row.appendChild(timeB);
+        row.appendChild(document.createTextNode(' \u2014 ' + a.first_name + ' ' + a.last_name + ' '));
+        row.appendChild(serviceColorBadge(a.service));
+        row.appendChild(document.createTextNode(' '));
+        var sBadge = document.createElement('span');
+        sBadge.insertAdjacentHTML('beforeend', statusBadge(a.status));
+        row.appendChild(sBadge);
+        todayDiv.appendChild(row);
+      });
+      card.appendChild(todayDiv);
     }
     var nextUp = empUpcoming.filter(function(a) { return a.preferred_date !== stats.todayStr; });
     if (nextUp.length) {
       nextUp.slice(0, 2).forEach(function(a) {
-        h += '<div class="text-sm flex items-center gap-2 bg-gray-50 dark:bg-gray-700 p-2 rounded mb-1 mt-1">' + fmtDate(a.preferred_date) + ' ' + fmtTime(a.preferred_time) + ' — ' + esc(a.first_name) + ' ' + esc(a.last_name) + '</div>';
+        var row = document.createElement('div');
+        row.className = 'text-sm flex items-center gap-2 bg-gray-50 dark:bg-gray-700 p-2 rounded mb-1 mt-1';
+        row.appendChild(document.createTextNode(fmtDate(a.preferred_date) + ' ' + fmtTime(a.preferred_time) + ' \u2014 ' + a.first_name + ' ' + a.last_name + ' '));
+        row.appendChild(serviceColorBadge(a.service));
+        card.appendChild(row);
       });
-      if (nextUp.length > 2) h += '<p class="text-xs text-gray-400">+' + (nextUp.length - 2) + ' more</p>';
+      if (nextUp.length > 2) {
+        var more = document.createElement('p');
+        more.className = 'text-xs text-gray-400';
+        more.textContent = '+' + (nextUp.length - 2) + ' more';
+        card.appendChild(more);
+      }
     }
-    if (!empToday.length && !nextUp.length) h += '<p class="text-sm text-gray-400 dark:text-gray-500 mt-2">' + (T.noUpcomingAppts || 'No upcoming appointments') + '</p>';
-    h += '</div>';
-    return h;
-  }).join('');
+    if (!empToday.length && !nextUp.length) {
+      var noAppt = document.createElement('p');
+      noAppt.className = 'text-sm text-gray-400 dark:text-gray-500 mt-2';
+      noAppt.textContent = T.noUpcomingAppts || 'No upcoming appointments';
+      card.appendChild(noAppt);
+    }
+    empContainer.appendChild(card);
+  });
 }
 
 function renderOverview() {
@@ -7575,8 +7728,10 @@ function renderOverviewCharts() {
     var svc = a.service || 'Other';
     svcMap[svc] = (svcMap[svc] || 0) + 1;
   });
-  var svcData = Object.keys(svcMap).map(function(k) { return { label: k, value: svcMap[k] }; })
-    .sort(function(a, b) { return b.value - a.value; });
+  var svcData = Object.keys(svcMap).map(function(k) {
+    var c = SERVICE_COLORS[k] || SERVICE_COLORS['other'];
+    return { label: currentLang === 'es' ? c.labelEs : c.label, value: svcMap[k], color: c.hex };
+  }).sort(function(a, b) { return b.value - a.value; });
   if (svcData.length > 0) {
     OTCharts.pieChart(svcEl, svcData, { donut: true, size: 180, centerLabel: String(appointments.length) });
   } else {
@@ -7619,6 +7774,94 @@ function renderOverviewCharts() {
     OTCharts.lineChart(trendEl, trendData, { height: 140, color: OTCharts.TOKENS.colors.brandMid, fillArea: true, showDots: false });
   } else {
     showNoData(trendEl);
+  }
+
+  // 5) Service Staffing — horizontal bars: appointments vs certified staff
+  var staffEl = clearEl('chart-service-staffing');
+  var allSvcTypes = Object.keys(SERVICE_COLORS);
+  var staffData = [];
+  allSvcTypes.forEach(function(svc) {
+    var c = SERVICE_COLORS[svc];
+    var apptCount = appointments.filter(function(a) {
+      return a.service === svc && a.status !== 'cancelled' && a.status !== 'completed';
+    }).length;
+    var certCount = employees.filter(function(e) {
+      return e.is_active && e.skills && e.skills.indexOf(svc) !== -1;
+    }).length;
+    if (apptCount > 0 || certCount > 0) {
+      staffData.push({ label: currentLang === 'es' ? c.labelEs : c.label, appointments: apptCount, staff: certCount, color: c.hex, svc: svc });
+    }
+  });
+  if (staffData.length > 0) {
+    var maxVal = Math.max.apply(null, staffData.map(function(d) { return Math.max(d.appointments, d.staff); }));
+    if (maxVal < 1) maxVal = 1;
+    staffData.forEach(function(d) {
+      var row = document.createElement('div');
+      row.className = 'flex items-center gap-3 mb-2';
+      var lbl = document.createElement('span');
+      lbl.className = 'text-xs font-medium w-20 text-right text-gray-700 dark:text-gray-300 shrink-0';
+      lbl.textContent = d.label;
+      row.appendChild(lbl);
+      var barsWrap = document.createElement('div');
+      barsWrap.className = 'flex-1 flex flex-col gap-0.5';
+      var aBar = document.createElement('div');
+      aBar.className = 'flex items-center gap-1';
+      var aFill = document.createElement('div');
+      aFill.className = 'h-3 rounded-sm transition-all';
+      aFill.style.width = Math.max((d.appointments / maxVal) * 100, d.appointments > 0 ? 4 : 0) + '%';
+      aFill.style.backgroundColor = d.color;
+      aBar.appendChild(aFill);
+      var aLbl = document.createElement('span');
+      aLbl.className = 'text-[10px] text-gray-500 dark:text-gray-400';
+      aLbl.textContent = d.appointments + ' ' + (T.appointmentsLabel || 'appts');
+      aBar.appendChild(aLbl);
+      barsWrap.appendChild(aBar);
+      var sBar = document.createElement('div');
+      sBar.className = 'flex items-center gap-1';
+      var sFill = document.createElement('div');
+      sFill.className = 'h-3 rounded-sm bg-green-500 transition-all';
+      sFill.style.width = Math.max((d.staff / maxVal) * 100, d.staff > 0 ? 4 : 0) + '%';
+      sBar.appendChild(sFill);
+      var sLbl = document.createElement('span');
+      sLbl.className = 'text-[10px] text-gray-500 dark:text-gray-400';
+      sLbl.textContent = d.staff + ' ' + (T.certifiedStaff || 'staff');
+      sBar.appendChild(sLbl);
+      barsWrap.appendChild(sBar);
+      row.appendChild(barsWrap);
+      if (d.staff === 0 && d.appointments > 0) {
+        var warn = document.createElement('span');
+        warn.className = 'text-red-500 text-sm shrink-0';
+        warn.title = 'No certified staff';
+        warn.textContent = '\u26A0\uFE0F';
+        row.appendChild(warn);
+      } else if (d.appointments > d.staff * 3) {
+        var warn2 = document.createElement('span');
+        warn2.className = 'text-amber-500 text-sm shrink-0';
+        warn2.title = 'High load';
+        warn2.textContent = '\u26A0\uFE0F';
+        row.appendChild(warn2);
+      }
+      staffEl.appendChild(row);
+    });
+    var legend = document.createElement('div');
+    legend.className = 'flex items-center gap-4 mt-3 text-[10px] text-gray-500 dark:text-gray-400';
+    var legAppt = document.createElement('span');
+    legAppt.className = 'inline-flex items-center gap-1';
+    var legApptDot = document.createElement('span');
+    legApptDot.className = 'w-3 h-2 rounded-sm bg-gray-400 inline-block';
+    legAppt.appendChild(legApptDot);
+    legAppt.appendChild(document.createTextNode(' ' + (T.appointmentsLabel || 'appointments')));
+    legend.appendChild(legAppt);
+    var legStaff = document.createElement('span');
+    legStaff.className = 'inline-flex items-center gap-1';
+    var legStaffDot = document.createElement('span');
+    legStaffDot.className = 'w-3 h-2 rounded-sm bg-green-500 inline-block';
+    legStaff.appendChild(legStaffDot);
+    legStaff.appendChild(document.createTextNode(' ' + (T.certifiedStaff || 'certified staff')));
+    legend.appendChild(legStaff);
+    staffEl.appendChild(legend);
+  } else {
+    showNoData(staffEl);
   }
 }
 
@@ -7815,6 +8058,25 @@ function renderCalDayWithSchedule(dateStr, sched) {
           if (!isOff) {
             var timeText = document.createTextNode(' ' + (emp.ov_start_time || emp.start_time || '').substring(0,5) + '-' + (emp.ov_end_time || emp.end_time || '').substring(0,5));
             chip.appendChild(timeText);
+            // Skill dots
+            if (emp.skills && emp.skills.length) {
+              var dotsWrap = document.createElement('span');
+              dotsWrap.className = 'inline-flex gap-0.5 ml-1';
+              emp.skills.slice(0, 6).forEach(function(svc) {
+                var d = serviceColorDot(svc, currentLang === 'es'
+                  ? (SERVICE_COLORS[svc] || SERVICE_COLORS['other']).labelEs
+                  : (SERVICE_COLORS[svc] || SERVICE_COLORS['other']).label);
+                d.classList.add('w-1.5', 'h-1.5');
+                dotsWrap.appendChild(d);
+              });
+              if (emp.skills.length > 6) {
+                var moreSpan = document.createElement('span');
+                moreSpan.className = 'text-[8px] text-gray-400';
+                moreSpan.textContent = '+' + (emp.skills.length - 6);
+                dotsWrap.appendChild(moreSpan);
+              }
+              chip.appendChild(dotsWrap);
+            }
           }
           empRow.appendChild(chip);
         });
@@ -7977,9 +8239,8 @@ function renderCalDayWithSchedule(dateStr, sched) {
       nameEl.textContent = a.first_name + ' ' + a.last_name;
       leftDiv.appendChild(nameEl);
 
-      var svcEl = document.createElement('p');
-      svcEl.className = 'text-sm text-gray-600 dark:text-gray-400';
-      svcEl.textContent = a.service;
+      var svcEl = serviceColorBadge(a.service);
+      svcEl.classList.add('mt-0.5');
       leftDiv.appendChild(svcEl);
 
       var contactEl = document.createElement('p');
@@ -8032,12 +8293,23 @@ function renderCalDayWithSchedule(dateStr, sched) {
       }
 
       activeEmps.forEach(function(e) {
+        var hasSkills = e.skills && e.skills.length > 0;
+        var isCertified = !hasSkills || e.skills.indexOf(a.service) !== -1;
+        var isWorking = workingEmpIds === null || workingEmpIds.indexOf(parseInt(e.id)) !== -1;
+        // Hide uncertified employees unless currently assigned
+        if (!isCertified && a.assigned_employee_id !== e.id) return;
         var opt = document.createElement('option');
         opt.value = e.id;
         if (a.assigned_employee_id === e.id) opt.selected = true;
-        var isWorking = workingEmpIds === null || workingEmpIds.indexOf(parseInt(e.id)) !== -1;
-        opt.textContent = e.name + (isWorking ? '' : ' (off)');
-        if (!isWorking && a.assigned_employee_id !== e.id) opt.className = 'text-gray-400';
+        if (!isCertified) {
+          opt.textContent = e.name + ' (not certified)';
+          opt.className = 'text-red-400';
+        } else if (!isWorking) {
+          opt.textContent = e.name + ' (off)';
+          opt.className = 'text-gray-400';
+        } else {
+          opt.textContent = e.name;
+        }
         empSel.appendChild(opt);
       });
       empWrap.appendChild(empSel);
@@ -8115,7 +8387,7 @@ function renderAppointments() {
     <tr class="border-b hover:bg-gray-50">
       <td class="px-4 py-3"><input type="checkbox" class="appt-checkbox rounded" value="${a.id}" onchange="updateBulkToolbar()"></td>
       <td class="p-3"><div class="font-medium">${esc(a.first_name)} ${esc(a.last_name)}</div><div class="text-xs text-gray-500">Created: ${new Date(a.created_at).toLocaleDateString()}</div></td>
-      <td class="p-3">${esc(a.service)}</td>
+      <td class="p-3">${serviceBadgeHtml(a.service)}</td>
       <td class="p-3"><div class="font-medium">${fmtDate(a.preferred_date)}</div><div class="text-xs text-gray-500">${fmtTime(a.preferred_time)}</div>
         ${a.status==='completed'&&a.actual_duration_minutes?`<div class="text-xs text-green-700 font-medium mt-1">Completed in ${a.actual_duration_minutes}min</div>`:''}</td>
       <td class="p-3"><div class="text-sm">${esc(a.email)}</div>${a.phone?`<div class="text-xs text-gray-500">${esc(a.phone)}</div>`:''}</td>
@@ -8288,54 +8560,106 @@ function renderEmployeeCard(emp, inactive) {
   var T = adminT[currentLang];
   var todayStr = new Date().toISOString().split('T')[0];
   var todayDate = new Date(todayStr + 'T00:00:00');
-  const empUpcoming = appointments.filter(a => a.assigned_employee_id===emp.id && new Date(a.preferred_date+'T00:00:00') >= todayDate && a.status !== 'completed' && a.status !== 'cancelled');
-  const empToday = empUpcoming.filter(a => a.preferred_date === todayStr);
-  const empCompleted = appointments.filter(a => a.assigned_employee_id===emp.id && a.status === 'completed');
-  const isEmpAdmin = adminUsers.some(u => u.email && emp.email && u.email.toLowerCase() === emp.email.toLowerCase());
-  return `<div class="border rounded-lg p-4 ${inactive?'bg-gray-50 dark:bg-gray-900':isEmpAdmin?'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800':'bg-white dark:bg-gray-800 dark:border-gray-600'}" id="emp-card-${emp.id}">
-    <div id="emp-view-${emp.id}">
-      <div class="flex items-center justify-between">
-        <div class="flex-1">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="font-medium dark:text-gray-200">${esc(emp.name)}</span>
-            <span class="text-xs px-2 py-1 rounded-full ${emp.role==='Manager'?'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300':'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}">${emp.role||'Employee'}</span>
-            ${isEmpAdmin?'<span class="text-xs px-2 py-1 rounded-full bg-green-600 text-white">Admin</span>':''}
-            ${inactive?'<span class="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400">Inactive</span>':''}
-          </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">${emp.email?esc(emp.email):''}${emp.email&&emp.phone?' • ':''}${emp.phone?esc(emp.phone):''}</div>
-          ${!inactive ? `<div class="mt-2 flex gap-2 flex-wrap">
-            ${empToday.length ? '<span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 font-medium">' + empToday.length + ' ' + (T.todayLabel || 'today') + '</span>' : ''}
-            <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 font-medium">${empUpcoming.length} ${T.upcoming || 'upcoming'}</span>
-            <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">${empCompleted.length} ${T.completedLabel || 'completed'}</span>
-            ${empUpcoming.length ? `<button onclick="toggleEmpAppts('${emp.id}')" class="text-xs px-2 py-1 rounded-full bg-brand/10 text-brand dark:bg-green-900/30 dark:text-green-400 hover:bg-brand/20 cursor-pointer">${T.viewSchedule || 'View Schedule'}</button>` : ''}
-          </div>` : ''}
-        </div>
-        <div class="flex items-center gap-2 flex-wrap">
-          <button onclick="startEditEmployee('${emp.id}')" class="border rounded px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700">Edit</button>
-          <button onclick="toggleEmployeeStatus('${emp.id}',${!emp.is_active})" class="border rounded px-3 py-1 text-xs ${inactive?'text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900':'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900'}">${inactive?'Activate':'Deactivate'}</button>
-          ${!inactive && emp.email && !isEmpAdmin ? `<button onclick="makeAdmin('${esc(emp.email)}','${esc(emp.name)}')" class="border rounded px-3 py-1 text-xs text-blue-600 hover:bg-blue-50 dark:border-gray-600 dark:text-blue-400 dark:hover:bg-blue-900">Make Admin</button>` : ''}
-          ${isEmpAdmin ? `<button onclick="revokeAdminByEmail('${esc(emp.email)}')" class="border rounded px-3 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-gray-600 dark:text-red-400 dark:hover:bg-red-900">Revoke Admin</button>` : ''}
-        </div>
-      </div>
-      <div id="emp-appts-${emp.id}" class="hidden mt-3 space-y-1 border-t pt-3 dark:border-gray-600">
-        ${empToday.length ? '<p class="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">' + (T.todayLabel || 'Today') + '</p>' + empToday.map(a => '<div class="text-sm flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 p-2 rounded border border-amber-200 dark:border-amber-800"><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(a.service) + ')</span>' + statusBadge(a.status) + '</div>').join('') : ''}
-        ${empUpcoming.filter(a => a.preferred_date !== todayStr).length ? '<p class="text-xs font-semibold text-blue-700 dark:text-blue-400 mb-1 mt-2">' + (T.upcoming || 'Upcoming') + '</p>' + empUpcoming.filter(a => a.preferred_date !== todayStr).slice(0, 8).map(a => '<div class="text-sm flex items-center gap-2 bg-gray-50 dark:bg-gray-700 p-2 rounded border dark:border-gray-600"><span class="text-gray-500 dark:text-gray-400 text-xs w-24">' + fmtDate(a.preferred_date) + '</span><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(a.service) + ')</span>' + statusBadge(a.status) + '</div>').join('') + (empUpcoming.filter(a => a.preferred_date !== todayStr).length > 8 ? '<p class="text-xs text-gray-400 mt-1">+' + (empUpcoming.filter(a => a.preferred_date !== todayStr).length - 8) + ' more</p>' : '') : ''}
-        ${!empToday.length && !empUpcoming.filter(a => a.preferred_date !== todayStr).length ? '<p class="text-sm text-gray-400 dark:text-gray-500">' + (T.noUpcomingAppts || 'No upcoming appointments') + '</p>' : ''}
-      </div>
-    </div>
-    <div id="emp-edit-${emp.id}" class="hidden">
-      <div class="grid md:grid-cols-4 gap-3 items-end">
-        <div><label class="text-xs font-medium dark:text-gray-300">Name *</label><input id="edit-emp-name-${emp.id}" value="${esc(emp.name)}" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>
-        <div><label class="text-xs font-medium dark:text-gray-300">Email</label><input id="edit-emp-email-${emp.id}" value="${esc(emp.email||'')}" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>
-        <div><label class="text-xs font-medium dark:text-gray-300">Phone</label><input id="edit-emp-phone-${emp.id}" value="${esc(emp.phone||'')}" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>
-        <div><label class="text-xs font-medium dark:text-gray-300">Role</label><select id="edit-emp-role-${emp.id}" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"><option value="Employee" ${emp.role==='Employee'?'selected':''}>Employee</option><option value="Manager" ${emp.role==='Manager'?'selected':''}>Manager</option></select></div>
-      </div>
-      <div class="flex gap-2 mt-3">
-        <button onclick="saveEditEmployee('${emp.id}')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">Save</button>
-        <button onclick="cancelEditEmployee('${emp.id}')" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-600 dark:text-gray-300">Cancel</button>
-      </div>
-    </div>
-  </div>`;
+  var empUpcoming = appointments.filter(function(a) { return a.assigned_employee_id===emp.id && new Date(a.preferred_date+'T00:00:00') >= todayDate && a.status !== 'completed' && a.status !== 'cancelled'; });
+  var empToday = empUpcoming.filter(function(a) { return a.preferred_date === todayStr; });
+  var empCompleted = appointments.filter(function(a) { return a.assigned_employee_id===emp.id && a.status === 'completed'; });
+  var isEmpAdmin = adminUsers.some(function(u) { return u.email && emp.email && u.email.toLowerCase() === emp.email.toLowerCase(); });
+  var totalTodayAppts = appointments.filter(function(a) { return a.preferred_date === todayStr && a.status !== 'cancelled'; }).length;
+
+  // Avatar initials
+  var parts = (emp.name || '').split(' ');
+  var initials = (parts[0] ? parts[0][0] : '') + (parts[1] ? parts[1][0] : '');
+  initials = initials.toUpperCase();
+  var avatarBg = emp.role === 'Manager' ? 'bg-green-600' : 'bg-gray-400';
+
+  // Skills HTML
+  var skillsHtml = '';
+  if (emp.skills && emp.skills.length && !inactive) {
+    skillsHtml = '<div class="flex flex-wrap gap-1.5 mt-2">' + emp.skills.map(function(svc) {
+      var c = SERVICE_COLORS[svc] || SERVICE_COLORS['other'];
+      var lbl = currentLang === 'es' ? c.labelEs : c.label;
+      return '<span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium ' + c.bg + ' ' + c.text + ' ' + c.darkBg + ' ' + c.darkText + '"><span class="w-1.5 h-1.5 rounded-full ' + c.dot + ' inline-block"></span>' + esc(lbl) + '</span>';
+    }).join('') + '</div>';
+  }
+
+  // Workload bar
+  var loadPct = totalTodayAppts > 0 ? Math.round((empToday.length / totalTodayAppts) * 100) : 0;
+  var loadColor = loadPct > 80 ? 'bg-red-500' : loadPct > 50 ? 'bg-amber-400' : 'bg-green-500';
+  var workloadHtml = !inactive ? '<div class="mt-2 flex items-center gap-2"><div class="w-24 h-1 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden"><div class="h-full rounded-full ' + loadColor + '" style="width:' + loadPct + '%"></div></div><span class="text-[10px] text-gray-400">' + loadPct + '% ' + (T.ofToday || 'of today') + '</span></div>' : '';
+
+  // Edit mode: skill checkboxes
+  var allSvcKeys = Object.keys(SERVICE_COLORS);
+  var empSkillSet = emp.skills || [];
+  var skillCheckboxes = allSvcKeys.map(function(svc) {
+    var c = SERVICE_COLORS[svc];
+    var lbl = currentLang === 'es' ? c.labelEs : c.label;
+    var checked = empSkillSet.indexOf(svc) !== -1;
+    var checkedCls = checked ? c.bg + ' border-current ' + c.text + ' ' + c.darkBg + ' ' + c.darkText : 'border-gray-300 dark:border-gray-600 text-gray-400';
+    return '<label class="inline-flex items-center gap-1.5 cursor-pointer px-2.5 py-1 rounded-lg border text-xs ' + checkedCls + '" data-svc="' + svc + '">'
+      + '<input type="checkbox" value="' + svc + '" ' + (checked ? 'checked' : '') + ' class="hidden" onchange="toggleSkillLabel(this)">'
+      + '<span class="w-2 h-2 rounded-full ' + (checked ? c.dot : 'bg-gray-300 dark:bg-gray-600') + ' inline-block"></span>'
+      + esc(lbl) + '</label>';
+  }).join('');
+
+  return '<div class="border rounded-lg p-4 ' + (inactive ? 'bg-gray-50 dark:bg-gray-900' : isEmpAdmin ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : 'bg-white dark:bg-gray-800 dark:border-gray-600') + '" id="emp-card-' + emp.id + '">'
+    + '<div id="emp-view-' + emp.id + '">'
+    + '<div class="flex items-start gap-3">'
+    // Avatar
+    + '<div class="h-12 w-12 ' + avatarBg + ' rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">' + esc(initials) + '</div>'
+    // Info + skills
+    + '<div class="flex-1 min-w-0">'
+    + '<div class="flex items-center gap-2 flex-wrap">'
+    + '<span class="font-semibold text-base dark:text-gray-200">' + esc(emp.name) + '</span>'
+    + '<span class="text-xs px-2 py-0.5 rounded-full ' + (emp.role === 'Manager' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300') + '">' + (emp.role || 'Employee') + '</span>'
+    + (isEmpAdmin ? '<span class="text-xs px-2 py-0.5 rounded-full bg-green-600 text-white">Admin</span>' : '')
+    + (inactive ? '<span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400">Inactive</span>' : '')
+    + '</div>'
+    + '<div class="text-sm text-gray-500 dark:text-gray-400">' + (emp.email ? esc(emp.email) : '') + (emp.email && emp.phone ? ' \u2022 ' : '') + (emp.phone ? esc(emp.phone) : '') + '</div>'
+    + skillsHtml
+    + '</div>'
+    // Stats column
+    + '<div class="flex flex-col items-end gap-1 shrink-0">'
+    + (!inactive ? (
+        (empToday.length ? '<span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 font-medium">' + empToday.length + ' ' + (T.todayLabel || 'today') + '</span>' : '')
+        + '<span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 font-medium">' + empUpcoming.length + ' ' + (T.upcoming || 'upcoming') + '</span>'
+        + '<span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">' + empCompleted.length + ' ' + (T.completedLabel || 'completed') + '</span>'
+      ) : '')
+    + '</div>'
+    + '</div>'
+    + workloadHtml
+    // Action row
+    + '<div class="flex items-center justify-between mt-3 pt-2 border-t dark:border-gray-600">'
+    + '<div class="flex items-center gap-2 flex-wrap">'
+    + '<button onclick="startEditEmployee(\'' + emp.id + '\')" class="border rounded px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700">Edit</button>'
+    + '<button onclick="toggleEmployeeStatus(\'' + emp.id + '\',' + (!emp.is_active) + ')" class="border rounded px-3 py-1 text-xs ' + (inactive ? 'text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900' : 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900') + '">' + (inactive ? 'Activate' : 'Deactivate') + '</button>'
+    + (!inactive && emp.email && !isEmpAdmin ? '<button onclick="makeAdmin(\'' + esc(emp.email) + '\',\'' + esc(emp.name) + '\')" class="border rounded px-3 py-1 text-xs text-blue-600 hover:bg-blue-50 dark:border-gray-600 dark:text-blue-400 dark:hover:bg-blue-900">Make Admin</button>' : '')
+    + (isEmpAdmin ? '<button onclick="revokeAdminByEmail(\'' + esc(emp.email) + '\')" class="border rounded px-3 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-gray-600 dark:text-red-400 dark:hover:bg-red-900">Revoke Admin</button>' : '')
+    + '</div>'
+    + (empUpcoming.length && !inactive ? '<button onclick="toggleEmpAppts(\'' + emp.id + '\')" class="text-xs px-3 py-1 rounded-full bg-brand/10 text-brand dark:bg-green-900/30 dark:text-green-400 hover:bg-brand/20 cursor-pointer">' + (T.viewSchedule || 'View Schedule') + ' \u25BE</button>' : '')
+    + '</div>'
+    // Expanded schedule
+    + '<div id="emp-appts-' + emp.id + '" class="hidden mt-3 space-y-1 border-t pt-3 dark:border-gray-600">'
+    + (empToday.length ? '<p class="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">' + (T.todayLabel || 'Today') + '</p>' + empToday.map(function(a) { return '<div class="text-sm flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 p-2 rounded border border-amber-200 dark:border-amber-800"><strong>' + fmtTime(a.preferred_time) + '</strong> \u2014 ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' ' + serviceBadgeHtml(a.service) + statusBadge(a.status) + '</div>'; }).join('') : '')
+    + (empUpcoming.filter(function(a) { return a.preferred_date !== todayStr; }).length ? '<p class="text-xs font-semibold text-blue-700 dark:text-blue-400 mb-1 mt-2">' + (T.upcoming || 'Upcoming') + '</p>' + empUpcoming.filter(function(a) { return a.preferred_date !== todayStr; }).slice(0, 8).map(function(a) { return '<div class="text-sm flex items-center gap-2 bg-gray-50 dark:bg-gray-700 p-2 rounded border dark:border-gray-600"><span class="text-gray-500 dark:text-gray-400 text-xs w-24">' + fmtDate(a.preferred_date) + '</span><strong>' + fmtTime(a.preferred_time) + '</strong> \u2014 ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' ' + serviceBadgeHtml(a.service) + statusBadge(a.status) + '</div>'; }).join('') + (empUpcoming.filter(function(a) { return a.preferred_date !== todayStr; }).length > 8 ? '<p class="text-xs text-gray-400 mt-1">+' + (empUpcoming.filter(function(a) { return a.preferred_date !== todayStr; }).length - 8) + ' more</p>' : '') : '')
+    + (!empToday.length && !empUpcoming.filter(function(a) { return a.preferred_date !== todayStr; }).length ? '<p class="text-sm text-gray-400 dark:text-gray-500">' + (T.noUpcomingAppts || 'No upcoming appointments') + '</p>' : '')
+    + '</div>'
+    + '</div>'
+    // Edit mode
+    + '<div id="emp-edit-' + emp.id + '" class="hidden">'
+    + '<div class="grid md:grid-cols-4 gap-3 items-end">'
+    + '<div><label class="text-xs font-medium dark:text-gray-300">Name *</label><input id="edit-emp-name-' + emp.id + '" value="' + esc(emp.name) + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>'
+    + '<div><label class="text-xs font-medium dark:text-gray-300">Email</label><input id="edit-emp-email-' + emp.id + '" value="' + esc(emp.email || '') + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>'
+    + '<div><label class="text-xs font-medium dark:text-gray-300">Phone</label><input id="edit-emp-phone-' + emp.id + '" value="' + esc(emp.phone || '') + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>'
+    + '<div><label class="text-xs font-medium dark:text-gray-300">Role</label><select id="edit-emp-role-' + emp.id + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"><option value="Employee" ' + (emp.role === 'Employee' ? 'selected' : '') + '>Employee</option><option value="Manager" ' + (emp.role === 'Manager' ? 'selected' : '') + '>Manager</option></select></div>'
+    + '</div>'
+    + '<div class="mt-3"><label class="text-xs font-medium dark:text-gray-300">' + (T.serviceCertifications || 'Service Certifications') + '</label>'
+    + '<div id="edit-emp-skills-' + emp.id + '" class="flex flex-wrap gap-2 mt-2">' + skillCheckboxes + '</div></div>'
+    + '<div class="flex gap-2 mt-3">'
+    + '<button onclick="saveEditEmployee(\'' + emp.id + '\')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">Save</button>'
+    + '<button onclick="cancelEditEmployee(\'' + emp.id + '\')" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-600 dark:text-gray-300">Cancel</button>'
+    + '</div>'
+    + '</div>'
+    + '</div>';
 }
 
 function toggleEmpAppts(empId) {
@@ -9857,6 +10181,20 @@ async function toggleEmployeeStatus(id, newStatus) {
   } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
+function toggleSkillLabel(cb) {
+  var label = cb.closest('label');
+  var svc = label.getAttribute('data-svc');
+  var c = SERVICE_COLORS[svc] || SERVICE_COLORS['other'];
+  var dotEl = label.querySelector('span.rounded-full');
+  if (cb.checked) {
+    label.className = 'inline-flex items-center gap-1.5 cursor-pointer px-2.5 py-1 rounded-lg border text-xs ' + c.bg + ' border-current ' + c.text + ' ' + c.darkBg + ' ' + c.darkText;
+    if (dotEl) dotEl.className = 'w-2 h-2 rounded-full ' + c.dot + ' inline-block';
+  } else {
+    label.className = 'inline-flex items-center gap-1.5 cursor-pointer px-2.5 py-1 rounded-lg border text-xs border-gray-300 dark:border-gray-600 text-gray-400';
+    if (dotEl) dotEl.className = 'w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 inline-block';
+  }
+}
+
 function startEditEmployee(id) {
   document.getElementById('emp-view-'+id).classList.add('hidden');
   document.getElementById('emp-edit-'+id).classList.remove('hidden');
@@ -9866,13 +10204,17 @@ function cancelEditEmployee(id) {
   document.getElementById('emp-view-'+id).classList.remove('hidden');
 }
 async function saveEditEmployee(id) {
-  const name = document.getElementById('edit-emp-name-'+id).value;
+  var name = document.getElementById('edit-emp-name-'+id).value;
   if(!name) { showToast(adminT[currentLang].nameIsRequired, true); return; }
+  var skillCbs = document.querySelectorAll('#edit-emp-skills-' + id + ' input[type=checkbox]');
+  var skills = [];
+  skillCbs.forEach(function(cb) { if (cb.checked) skills.push(cb.value); });
   try {
     await api('employees.php', { method: 'PUT', body: {
-      id, name, email: document.getElementById('edit-emp-email-'+id).value || null,
+      id: id, name: name, email: document.getElementById('edit-emp-email-'+id).value || null,
       phone: document.getElementById('edit-emp-phone-'+id).value || null,
-      role: document.getElementById('edit-emp-role-'+id).value
+      role: document.getElementById('edit-emp-role-'+id).value,
+      skills: skills
     }});
     showToast(adminT[currentLang].employeeUpdated); loadEmployees();
   } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
@@ -10183,13 +10525,36 @@ function switchDocsView(view) {
 
 // Quick assign all unassigned appointments for a day
 function quickAssignDay(dateStr) {
-  const dayApts = appointments.filter(a => a.preferred_date === dateStr && !a.assigned_employee_id);
-  const activeEmps = employees.filter(e => e.is_active);
-  if(!activeEmps.length) { showToast(adminT[currentLang].noActiveEmployees, true); return; }
-  dayApts.forEach((apt, i) => {
-    const emp = activeEmps[i % activeEmps.length];
+  var T = adminT[currentLang];
+  var dayApts = appointments.filter(function(a) { return a.preferred_date === dateStr && !a.assigned_employee_id; });
+  var activeEmps = employees.filter(function(e) { return e.is_active; });
+  if (!activeEmps.length) { showToast(T.noActiveEmployees, true); return; }
+
+  // Track assignment counts for load balancing
+  var loadCount = {};
+  activeEmps.forEach(function(e) { loadCount[e.id] = 0; });
+  appointments.filter(function(a) {
+    return a.preferred_date === dateStr && a.assigned_employee_id;
+  }).forEach(function(a) {
+    if (loadCount[a.assigned_employee_id] !== undefined) loadCount[a.assigned_employee_id]++;
+  });
+
+  var skipped = 0;
+  dayApts.forEach(function(apt) {
+    var certified = activeEmps.filter(function(e) {
+      if (!e.skills || !e.skills.length) return true;
+      return e.skills.indexOf(apt.service) !== -1;
+    });
+    if (!certified.length) { skipped++; return; }
+    certified.sort(function(a, b) { return (loadCount[a.id] || 0) - (loadCount[b.id] || 0); });
+    var emp = certified[0];
+    loadCount[emp.id] = (loadCount[emp.id] || 0) + 1;
     updateApptAssignment(apt.id, emp.id);
   });
+
+  if (skipped > 0) {
+    showToast(skipped + ' ' + (T.notCertified || 'could not be assigned (no certified employee)'), true);
+  }
 }
 
 // Sub-tab switching for Messages

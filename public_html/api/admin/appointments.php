@@ -130,8 +130,35 @@ try {
         }
 
         if (array_key_exists('assigned_employee_id', $body)) {
-            $fields[] = 'assigned_employee_id = ?';
-            $params[] = $body['assigned_employee_id'] ? (int) $body['assigned_employee_id'] : null;
+            if ($body['assigned_employee_id']) {
+                $empId = (int) $body['assigned_employee_id'];
+                try {
+                    $svcStmt = $db->prepare('SELECT service FROM oretir_appointments WHERE id = ?');
+                    $svcStmt->execute([$id]);
+                    $svcRow = $svcStmt->fetch();
+                    if ($svcRow) {
+                        $anyStmt = $db->prepare('SELECT COUNT(*) FROM oretir_employee_skills WHERE employee_id = ?');
+                        $anyStmt->execute([$empId]);
+                        if ((int) $anyStmt->fetchColumn() > 0) {
+                            $certStmt = $db->prepare('SELECT COUNT(*) FROM oretir_employee_skills WHERE employee_id = ? AND service_type = ?');
+                            $certStmt->execute([$empId, $svcRow['service']]);
+                            if ((int) $certStmt->fetchColumn() === 0) {
+                                $nameStmt = $db->prepare('SELECT name FROM oretir_employees WHERE id = ?');
+                                $nameStmt->execute([$empId]);
+                                $empName = ($nameStmt->fetch()['name'] ?? 'Employee');
+                                jsonError($empName . ' is not certified for ' . ucwords(str_replace('-', ' ', $svcRow['service'])) . '.', 422);
+                            }
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    error_log("appointments.php: skill check skipped: " . $e->getMessage());
+                }
+                $fields[] = 'assigned_employee_id = ?';
+                $params[] = $empId;
+            } else {
+                $fields[] = 'assigned_employee_id = ?';
+                $params[] = null;
+            }
         }
 
         if (isset($body['admin_notes'])) {
@@ -363,11 +390,27 @@ try {
 
     if ($action === 'bulk_assign') {
         $employeeId = isset($body['employee_id']) ? (int) $body['employee_id'] : null;
+        $updated = 0; $skipped = 0;
         $stmt = $db->prepare('UPDATE oretir_appointments SET assigned_employee_id = ?, updated_at = NOW() WHERE id = ?');
-        foreach ($ids as $id) {
-            $stmt->execute([$employeeId, $id]);
+        foreach ($ids as $apptId) {
+            if ($employeeId) {
+                try {
+                    $svcStmt = $db->prepare('SELECT service FROM oretir_appointments WHERE id = ?');
+                    $svcStmt->execute([$apptId]);
+                    $svcRow = $svcStmt->fetch();
+                    $anyStmt = $db->prepare('SELECT COUNT(*) FROM oretir_employee_skills WHERE employee_id = ?');
+                    $anyStmt->execute([$employeeId]);
+                    if ((int) $anyStmt->fetchColumn() > 0 && $svcRow) {
+                        $certStmt = $db->prepare('SELECT COUNT(*) FROM oretir_employee_skills WHERE employee_id = ? AND service_type = ?');
+                        $certStmt->execute([$employeeId, $svcRow['service']]);
+                        if ((int) $certStmt->fetchColumn() === 0) { $skipped++; continue; }
+                    }
+                } catch (\Throwable $e) { /* allow */ }
+            }
+            $stmt->execute([$employeeId, $apptId]);
+            $updated++;
         }
-        jsonSuccess(['updated' => count($ids)]);
+        jsonSuccess(['updated' => $updated, 'skipped' => $skipped]);
     }
 
     jsonError('Invalid action.', 400);

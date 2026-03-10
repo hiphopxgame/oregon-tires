@@ -12,7 +12,23 @@ try {
 
     if ($method === 'GET') {
         $stmt = $db->query('SELECT * FROM oretir_employees ORDER BY name ASC');
-        jsonSuccess($stmt->fetchAll());
+        $employees = $stmt->fetchAll();
+
+        // Attach skills per employee
+        try {
+            $skillRows = $db->query('SELECT employee_id, service_type FROM oretir_employee_skills ORDER BY employee_id, service_type')->fetchAll();
+            $skillMap = [];
+            foreach ($skillRows as $sr) {
+                $skillMap[(int)$sr['employee_id']][] = $sr['service_type'];
+            }
+            foreach ($employees as &$emp) {
+                $emp['skills'] = $skillMap[(int)$emp['id']] ?? [];
+            }
+        } catch (\Throwable $e) {
+            // Table may not exist yet
+            foreach ($employees as &$emp) { $emp['skills'] = []; }
+        }
+        jsonSuccess($employees);
     }
 
     verifyCsrf();
@@ -55,6 +71,19 @@ try {
         } catch (\Throwable $schedErr) {
             // Schedule tables may not exist yet — graceful degradation
             error_log("employees.php: auto-seed schedule failed for employee #{$newEmpId}: " . $schedErr->getMessage());
+        }
+
+        // Auto-seed all service skills for new employee
+        try {
+            $allServices = ['tire-installation','tire-repair','wheel-alignment','oil-change',
+                            'brake-service','tuneup','mechanical-inspection','mobile-service','other'];
+            $skillStmt = $db->prepare(
+                'INSERT INTO oretir_employee_skills (employee_id, service_type) VALUES (?, ?)
+                 ON DUPLICATE KEY UPDATE certified_at = certified_at'
+            );
+            foreach ($allServices as $svc) { $skillStmt->execute([$newEmpId, $svc]); }
+        } catch (\Throwable $e) {
+            error_log("employees.php: auto-seed skills failed for #{$newEmpId}: " . $e->getMessage());
         }
 
         jsonSuccess(['id' => $newEmpId], 201);
@@ -101,7 +130,25 @@ try {
         $params[] = $body['is_active'] ? 1 : 0;
     }
 
+    // Handle skill updates (separate from main field updates)
+    if (isset($body['skills']) && is_array($body['skills'])) {
+        try {
+            $db->prepare('DELETE FROM oretir_employee_skills WHERE employee_id = ?')->execute([$id]);
+            $skillStmt = $db->prepare('INSERT INTO oretir_employee_skills (employee_id, service_type) VALUES (?, ?)');
+            foreach ($body['skills'] as $svc) {
+                $svc = sanitize((string) $svc, 50);
+                if ($svc) $skillStmt->execute([$id, $svc]);
+            }
+        } catch (\Throwable $e) {
+            error_log("employees.php: skill update failed for #{$id}: " . $e->getMessage());
+        }
+    }
+
     if (empty($fields)) {
+        // Skills may have been the only update
+        if (isset($body['skills'])) {
+            jsonSuccess(['updated' => $id]);
+        }
         jsonError('No fields to update.', 400);
     }
 

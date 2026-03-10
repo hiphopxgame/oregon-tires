@@ -84,6 +84,23 @@ try {
             $stmt->execute([$date, $dayOfWeek]);
             $empSchedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Attach skills per employee
+            $empIds = array_unique(array_column($empSchedules, 'employee_id'));
+            $skillMap = [];
+            if ($empIds) {
+                try {
+                    $in = implode(',', array_map('intval', $empIds));
+                    $skillRows = $db->query("SELECT employee_id, service_type FROM oretir_employee_skills WHERE employee_id IN ({$in})")->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($skillRows as $sr) {
+                        $skillMap[(int)$sr['employee_id']][] = $sr['service_type'];
+                    }
+                } catch (\Throwable $e) { /* table may not exist */ }
+            }
+            foreach ($empSchedules as &$es) {
+                $es['skills'] = $skillMap[(int)$es['employee_id']] ?? [];
+            }
+            unset($es);
+
             // Appointments for this date
             $stmt = $db->prepare(
                 "SELECT a.id, a.preferred_time, a.service, a.first_name, a.last_name, a.status,
