@@ -76,7 +76,7 @@ try {
         // Auto-seed all service skills for new employee
         try {
             $allServices = ['tire-installation','tire-repair','wheel-alignment','oil-change',
-                            'brake-service','tuneup','mechanical-inspection','mobile-service','other'];
+                            'brake-service','tuneup','mechanical-inspection','mobile-service','roadside-assistance','other'];
             $skillStmt = $db->prepare(
                 'INSERT INTO oretir_employee_skills (employee_id, service_type) VALUES (?, ?)
                  ON DUPLICATE KEY UPDATE certified_at = certified_at'

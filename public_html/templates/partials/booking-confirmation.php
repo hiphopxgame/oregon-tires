@@ -47,14 +47,14 @@ $serviceNames = [
         'wheel-alignment' => 'Wheel Alignment', 'oil-change' => 'Oil Change',
         'brake-service' => 'Brake Service', 'tuneup' => 'Tuneup',
         'mechanical-inspection' => 'Mechanical Inspection', 'mobile-service' => 'Mobile Service',
-        'other' => 'Other',
+        'roadside-assistance' => 'Roadside Assistance', 'other' => 'Other',
     ],
     'es' => [
         'tire-installation' => 'Instalación de Llantas', 'tire-repair' => 'Reparación de Llantas',
         'wheel-alignment' => 'Alineación de Ruedas', 'oil-change' => 'Cambio de Aceite',
         'brake-service' => 'Servicio de Frenos', 'tuneup' => 'Afinación',
         'mechanical-inspection' => 'Inspección Mecánica', 'mobile-service' => 'Servicio Móvil',
-        'other' => 'Otro',
+        'roadside-assistance' => 'Asistencia en Carretera', 'other' => 'Otro',
     ],
 ];
 

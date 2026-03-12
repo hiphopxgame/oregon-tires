@@ -124,7 +124,7 @@ function isValidService(string $service): bool
         // Frontend values (book-appointment form)
         'tire-installation', 'tire-repair', 'wheel-alignment',
         'oil-change', 'brake-service', 'tuneup',
-        'mechanical-inspection', 'mobile-service', 'other',
+        'mechanical-inspection', 'mobile-service', 'roadside-assistance', 'other',
         // Legacy backend values
         'tires', 'brakes', 'alignment', 'suspension',
         'diagnostics', 'ac-service', 'general-repair',

@@ -453,6 +453,7 @@ try {
                     'tuneup'                => '2',  // green
                     'mechanical-inspection' => '7',  // cyan
                     'mobile-service'        => '5',  // yellow
+                    'roadside-assistance'   => '4',  // pink/rose
                 ],
             ]);
 

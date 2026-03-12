@@ -46,6 +46,7 @@ try {
             'tuneup'                => '2',
             'mechanical-inspection' => '7',
             'mobile-service'        => '5',
+            'roadside-assistance'   => '4',
         ],
     ]);
 

@@ -47,6 +47,7 @@ function getBusinessConfig(): array {
             ['name' => 'Oil Change', 'nameEs' => 'Cambio de Aceite', 'slug' => 'oil-change'],
             ['name' => 'Engine Diagnostics', 'nameEs' => 'Diagnóstico de Motor', 'slug' => 'engine-diagnostics'],
             ['name' => 'Suspension Repair', 'nameEs' => 'Reparación de Suspensión', 'slug' => 'suspension-repair'],
+            ['name' => 'Roadside Assistance', 'nameEs' => 'Asistencia en Carretera', 'slug' => 'roadside-assistance'],
         ],
         'serviceAreas' => [
             ['name' => 'SE Portland', 'nameEs' => 'SE Portland', 'slug' => 'tires-se-portland'],

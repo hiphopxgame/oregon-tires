@@ -243,6 +243,22 @@
           "priceCurrency": "USD"
         }
       }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Roadside Assistance",
+      "description": "Emergency roadside help — flat tire change, jump start, lockout assistance, and towing coordination.",
+      "provider": {
+        "@type": "AutomotiveBusiness",
+        "name": "Oregon Tires Auto Care",
+        "url": "https://oregon.tires"
+      },
+      "areaServed": {
+        "@type": "City",
+        "name": "Portland",
+        "addressRegion": "OR"
+      }
     }
   ]
   </script>
@@ -527,6 +543,30 @@
         </div>
       </div>
 
+      <!-- Roadside Assistance -->
+      <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md p-8 mb-8 fade-in" id="roadside-assistance">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="text-3xl">&#x1F6A8;</span>
+              <h2 class="text-2xl font-bold text-brand dark:text-green-400" data-t="svcRoadsideTitle">Roadside Assistance</h2>
+            </div>
+            <div class="text-sm text-gray-500 dark:text-gray-400 mb-3" data-t="svcRoadsidePrice">Call for pricing</div>
+            <p class="text-gray-600 dark:text-gray-300 mb-4" data-t="svcRoadsideDesc">Stranded on the road? We provide emergency roadside assistance throughout the Portland metro area. From flat tire changes to jump starts and lockout help, our bilingual team is ready to get you back on the road quickly and safely.</p>
+            <ul class="space-y-2 text-gray-600 dark:text-gray-300 mb-6">
+              <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">&#10003;</span> <span data-t="svcRoadsideF1">Flat tire change</span></li>
+              <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">&#10003;</span> <span data-t="svcRoadsideF2">Battery jump start</span></li>
+              <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">&#10003;</span> <span data-t="svcRoadsideF3">Lockout assistance</span></li>
+              <li class="flex items-start gap-2"><span class="text-brand dark:text-green-400">&#10003;</span> <span data-t="svcRoadsideF4">Towing coordination</span></li>
+            </ul>
+          </div>
+          <div class="md:text-right">
+            <span class="block text-xl font-bold text-brand dark:text-green-400 mb-3" data-t="svcRoadsideCallUs">Call Us</span>
+            <a href="/book-appointment/?service=roadside-assistance" class="inline-block bg-amber-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="bookThisService">Book This Service</a>
+          </div>
+        </div>
+      </div>
+
       <!-- CTA Banner -->
       <div class="bg-brand text-white rounded-xl shadow-lg p-8 text-center">
         <h2 class="text-2xl font-bold mb-3" data-t="svcCtaTitle">Not Sure What You Need?</h2>
@@ -666,6 +706,14 @@ const t = {
     svcSuspF2: 'Strut replacement',
     svcSuspF3: 'Spring replacement',
     svcSuspF4: 'Full suspension inspection',
+    svcRoadsideTitle: 'Roadside Assistance',
+    svcRoadsidePrice: 'Call for pricing',
+    svcRoadsideDesc: 'Stranded on the road? We provide emergency roadside assistance throughout the Portland metro area. From flat tire changes to jump starts and lockout help, our bilingual team is ready to get you back on the road quickly and safely.',
+    svcRoadsideF1: 'Flat tire change',
+    svcRoadsideF2: 'Battery jump start',
+    svcRoadsideF3: 'Lockout assistance',
+    svcRoadsideF4: 'Towing coordination',
+    svcRoadsideCallUs: 'Call Us',
     svcCtaTitle: 'Not Sure What You Need?',
     svcCtaDesc: 'Give us a call and our bilingual team will help you figure out the best service for your vehicle.'
   },
@@ -740,6 +788,14 @@ const t = {
     svcSuspF2: 'Reemplazo de puntales',
     svcSuspF3: 'Reemplazo de resortes',
     svcSuspF4: 'Inspección completa de suspensión',
+    svcRoadsideTitle: 'Asistencia en Carretera',
+    svcRoadsidePrice: 'Llame para precios',
+    svcRoadsideDesc: '¿Varado en la carretera? Ofrecemos asistencia en carretera de emergencia en toda el área metropolitana de Portland. Desde cambio de llantas ponchadas hasta arranque de batería y ayuda con cerraduras, nuestro equipo bilingüe está listo para ayudarlo.',
+    svcRoadsideF1: 'Cambio de llanta ponchada',
+    svcRoadsideF2: 'Arranque de batería',
+    svcRoadsideF3: 'Asistencia con cerraduras',
+    svcRoadsideF4: 'Coordinación de grúa',
+    svcRoadsideCallUs: 'Llámenos',
     svcCtaTitle: '¿No sabe qué necesita?',
     svcCtaDesc: 'Llámenos y nuestro equipo bilingüe le ayudará a determinar el mejor servicio para su vehículo.'
   }
