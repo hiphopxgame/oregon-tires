@@ -117,7 +117,15 @@
   <script>
   (function() {
     var lang = localStorage.getItem('oregontires_lang') || 'en';
+    var params = new URLSearchParams(window.location.search);
+    var urlLang = params.get('lang');
+    if (urlLang === 'es' || urlLang === 'en') { lang = urlLang; localStorage.setItem('oregontires_lang', lang); }
+
     if (lang === 'es') {
+      document.documentElement.lang = 'es';
+      document.title = 'P\u00e1gina No Encontrada - Oregon Tires Auto Care';
+
+      // Existing ID-based translations
       var t = {
         't-title': 'P\u00e1gina No Encontrada',
         't-subtitle': 'Page Not Found',
@@ -133,6 +141,65 @@
         var el = document.getElementById(id);
         if (el) el.textContent = t[id];
       }
+
+      // Service names in Popular Services grid
+      var serviceMap = {
+        'Tire Installation': 'Instalaci\u00f3n de Llantas',
+        'Oil Change': 'Cambio de Aceite',
+        'Brake Service': 'Servicio de Frenos',
+        'Alignment': 'Alineaci\u00f3n'
+      };
+      document.querySelectorAll('.grid .text-sm.font-medium').forEach(function(el) {
+        var name = el.textContent.trim();
+        if (serviceMap[name]) el.textContent = serviceMap[name];
+      });
+
+      // Quick Links section
+      var linkMap = {
+        'Homepage': 'P\u00e1gina Principal',
+        'All Services': 'Todos los Servicios',
+        'Book Appointment': 'Programar Cita',
+        'FAQ': 'Preguntas Frecuentes',
+        'Care Plan': 'Plan de Cuidado',
+        'Our Guarantee': 'Nuestra Garant\u00eda',
+        'SE Portland': 'SE Portland',
+        'Clackamas': 'Clackamas',
+        'About Us': 'Acerca de Nosotros',
+        'Contact': 'Contacto'
+      };
+      document.querySelectorAll('.grid.grid-cols-2.gap-2 a').forEach(function(el) {
+        var name = el.textContent.trim();
+        if (linkMap[name]) el.textContent = linkMap[name];
+      });
+
+      // Nav links
+      document.querySelectorAll('nav a').forEach(function(el) {
+        if (el.textContent.trim() === 'Home') el.textContent = 'Inicio';
+        if (el.textContent.trim() === 'Services') el.textContent = 'Servicios';
+        if (el.textContent.trim() === 'Schedule Service') el.textContent = 'Programar Servicio';
+      });
+
+      // Footer
+      document.querySelectorAll('footer p').forEach(function(el) {
+        if (el.textContent.indexOf('All rights reserved') !== -1) el.textContent = '\u00a9 2026 Oregon Tires Auto Care. Todos los derechos reservados.';
+        if (el.textContent.indexOf('Powered by') !== -1) {
+          var link = el.querySelector('a');
+          if (link) {
+            while (el.firstChild) el.removeChild(el.firstChild);
+            el.appendChild(document.createTextNode('Desarrollado por '));
+            el.appendChild(link);
+          }
+        }
+      });
+
+      // Hours text
+      document.querySelectorAll('p.text-sm').forEach(function(el) {
+        if (el.textContent.indexOf('Mon-Sat 7AM-7PM') !== -1) el.textContent = 'Lun-S\u00e1b 7AM-7PM \u00b7 Se Habla Espa\u00f1ol';
+      });
+
+      // Skip to main content
+      var skipLink = document.querySelector('a[href="#main-content"]');
+      if (skipLink) skipLink.textContent = 'Saltar al contenido principal';
     }
   })();
   </script>

@@ -264,5 +264,217 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
     </div>
   </div>
 <script src="/assets/js/scroll-reveal.js" defer></script>
+<!-- Bilingual Toggle Script -->
+<script>
+(function() {
+  var areaNameEs = '<?= addslashes($areaNameEs) ?>';
+  var areaDescriptionEs = '<?= addslashes($areaDescriptionEs) ?>';
+  var pageTitleEs = '<?= addslashes($pageTitleEs) ?>';
+
+  var landmarksEs = [
+    <?php foreach ($landmarks as $i => $lm): ?>
+    { name: '<?= addslashes($lm['nameEs'] ?? $lm['name']) ?>', distance: '<?= addslashes($lm['distance']) ?>' }<?= $i < count($landmarks) - 1 ? ',' : '' ?>
+    <?php endforeach; ?>
+  ];
+
+  var testimonialTextEs = '<?= addslashes($testimonial['textEs'] ?? $testimonial['text']) ?>';
+  var testimonialDetailEs = '<?= addslashes($testimonial['detailEs'] ?? $testimonial['detail'] ?? '') ?>';
+
+  var serviceNamesEs = {
+    'Tire Installation': 'Instalaci\u00f3n de Llantas',
+    'Tire Repair': 'Reparaci\u00f3n de Llantas',
+    'Oil Change': 'Cambio de Aceite',
+    'Brake Service': 'Servicio de Frenos',
+    'Wheel Alignment': 'Alineaci\u00f3n de Ruedas',
+    'Tuneup': 'Afinaci\u00f3n',
+    'Inspection': 'Inspecci\u00f3n',
+    'Mobile Service': 'Servicio M\u00f3vil'
+  };
+
+  var params = new URLSearchParams(window.location.search);
+  var lang = params.get('lang') || localStorage.getItem('oregontires_lang') || 'en';
+
+  if (lang === 'es') {
+    localStorage.setItem('oregontires_lang', 'es');
+    document.documentElement.lang = 'es';
+
+    document.title = pageTitleEs;
+    var meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute('content', areaDescriptionEs);
+
+    // data-t elements
+    var dt = document.querySelector('[data-t="heroTitle"]');
+    if (dt) dt.textContent = 'Llantas y Servicio Automotriz en ' + areaNameEs;
+    dt = document.querySelector('[data-t="heroSubtitle"]');
+    if (dt) dt.textContent = areaDescriptionEs;
+    dt = document.querySelector('[data-t="areaName"]');
+    if (dt) dt.textContent = areaNameEs;
+    dt = document.querySelector('[data-t="howToFind"]');
+    if (dt) dt.textContent = 'Convenientemente Ubicados Cerca de ' + areaNameEs;
+
+    // Breadcrumb
+    var breadNav = document.querySelector('nav[aria-label="Breadcrumb"]');
+    if (breadNav) {
+      breadNav.setAttribute('aria-label', 'Navegaci\u00f3n');
+      var links = breadNav.querySelectorAll('a');
+      links.forEach(function(a) {
+        if (a.textContent.trim() === 'Home') a.textContent = 'Inicio';
+        if (a.textContent.trim() === 'Services') a.textContent = 'Servicios';
+      });
+    }
+
+    // Hero CTA buttons
+    document.querySelectorAll('a.bg-amber-500').forEach(function(el) {
+      if (el.textContent.trim() === 'Get Your Free Estimate') el.textContent = 'Obtenga Su Estimado Gratis';
+      if (el.textContent.trim() === 'Book Free Estimate') el.textContent = 'Reserve Su Estimado Gratis';
+    });
+
+    // Hero section aria-label
+    var heroSection = document.querySelector('section[role="img"]');
+    if (heroSection) heroSection.setAttribute('aria-label', areaNameEs + ' \u00e1rea de servicio');
+
+    // Trust signals
+    document.querySelectorAll('.text-white\\/90 span, .text-white\\/90 .flex').forEach(function(el) {
+      var txt = el.textContent.trim();
+      if (txt === 'Since 2008') el.textContent = 'Desde 2008';
+    });
+    // Stars text (contains SVG so use childNodes)
+    document.querySelectorAll('.text-white\\/90 .flex.items-center').forEach(function(el) {
+      el.childNodes.forEach(function(node) {
+        if (node.nodeType === 3 && node.textContent.indexOf('Stars') !== -1) {
+          node.textContent = node.textContent.replace('4.8 Stars \u00b7 150+ Reviews', '4.8 Estrellas \u00b7 150+ Rese\u00f1as');
+        }
+      });
+    });
+
+    // "Call (503) 367-9714" buttons — change "Call" to "Llamar"
+    document.querySelectorAll('a[href="tel:5033679714"]').forEach(function(el) {
+      if (el.textContent.trim() === 'Call (503) 367-9714') el.textContent = 'Llamar (503) 367-9714';
+    });
+
+    // Location paragraph — rebuild with textContent
+    var locParas = document.querySelectorAll('.bg-gray-50 > .container p.text-gray-600, .dark\\:bg-gray-800 > .container p.text-gray-600');
+    locParas.forEach(function(p) {
+      if (p.textContent.indexOf('Oregon Tires Auto Care is located at') !== -1) {
+        while (p.firstChild) p.removeChild(p.firstChild);
+        p.appendChild(document.createTextNode('Oregon Tires Auto Care est\u00e1 ubicado en '));
+        var strong = document.createElement('strong');
+        strong.textContent = '8536 SE 82nd Ave, Portland, OR 97266';
+        p.appendChild(strong);
+        p.appendChild(document.createTextNode(', a solo minutos de ' + areaNameEs + '.'));
+      }
+    });
+
+    // Nearby Landmarks heading
+    document.querySelectorAll('h3').forEach(function(h3) {
+      if (h3.textContent.trim() === 'Nearby Landmarks') h3.textContent = 'Puntos de Referencia Cercanos';
+    });
+
+    // Landmark list items
+    var landmarkLis = document.querySelectorAll('.space-y-2 li');
+    landmarkLis.forEach(function(li, i) {
+      if (landmarksEs[i]) {
+        var span = li.querySelector('span:last-child');
+        if (span) span.textContent = landmarksEs[i].distance + ' de ' + landmarksEs[i].name;
+      }
+    });
+
+    // Section headings
+    document.querySelectorAll('section h2').forEach(function(h2) {
+      var txt = h2.textContent.trim();
+      if (txt.indexOf('Auto Services for') !== -1) h2.textContent = 'Servicios Automotrices para Conductores de ' + areaNameEs;
+      if (txt.indexOf('Customers Say') !== -1) h2.textContent = 'Lo Que Dicen los Clientes de ' + areaNameEs;
+      if (txt.indexOf('Why') !== -1 && txt.indexOf('Choose') !== -1) h2.textContent = 'Por Qu\u00e9 los Conductores de ' + areaNameEs + ' Eligen Oregon Tires';
+      if (txt.indexOf('Ready for Service') !== -1) h2.textContent = '\u00bfListo para Servicio en ' + areaNameEs + '?';
+      if (txt === 'Also Serving Nearby Areas') h2.textContent = 'Tambi\u00e9n Servimos \u00c1reas Cercanas';
+    });
+
+    // Service card names and "Call" price
+    document.querySelectorAll('.rounded-xl .text-sm.text-gray-500, .rounded-xl .text-sm.text-gray-400').forEach(function(el) {
+      var name = el.textContent.trim();
+      if (serviceNamesEs[name]) el.textContent = serviceNamesEs[name];
+    });
+    document.querySelectorAll('.text-2xl.font-bold.text-brand').forEach(function(el) {
+      if (el.textContent.trim() === 'Call') el.textContent = 'Llamar';
+    });
+
+    // "Book Now" links
+    document.querySelectorAll('.rounded-full.bg-brand.text-white').forEach(function(el) {
+      if (el.textContent.trim().indexOf('Book Now') !== -1) el.textContent = 'Reservar \u2192';
+    });
+
+    // Price disclaimer
+    document.querySelectorAll('p.text-center.text-sm.text-gray-500').forEach(function(el) {
+      if (el.textContent.indexOf('Prices vary') !== -1) el.textContent = 'Los precios var\u00edan seg\u00fan el veh\u00edculo. Llame para una cotizaci\u00f3n exacta.';
+    });
+
+    // Testimonial quote and star aria-label
+    var quoteP = document.querySelector('blockquote p');
+    if (quoteP) quoteP.textContent = '\u201c' + testimonialTextEs + '\u201d';
+    var starSpan = document.querySelector('blockquote .text-yellow-400');
+    if (starSpan) starSpan.setAttribute('aria-label', '5 de 5 estrellas');
+    // Testimonial cite detail
+    if (testimonialDetailEs) {
+      var cite = document.querySelector('blockquote cite');
+      if (cite) {
+        var citeName = '<?= addslashes($testimonial['name']) ?>';
+        cite.textContent = '\u2014 ' + citeName;
+        if (testimonialDetailEs) {
+          cite.textContent += ', ' + testimonialDetailEs;
+        }
+      }
+    }
+
+    // Why Choose Us benefits
+    var benefitTitles = ['100% Biling\u00fce', 'Precios Honestos', 'Garant\u00eda de 12 Meses', 'Servicio M\u00f3vil'];
+    var benefitDescs = [
+      'Servicio completo en ingl\u00e9s y espa\u00f1ol',
+      'Sin tarifas ocultas ni ventas agresivas',
+      'Garant\u00eda de 12,000 millas en todos los servicios',
+      'Vamos a su ubicaci\u00f3n en ' + areaNameEs
+    ];
+    document.querySelectorAll('.grid.md\\:grid-cols-2 strong').forEach(function(el, i) {
+      if (benefitTitles[i]) el.textContent = benefitTitles[i];
+    });
+    document.querySelectorAll('.grid.md\\:grid-cols-2 p.text-sm').forEach(function(el, i) {
+      if (benefitDescs[i]) el.textContent = benefitDescs[i];
+    });
+
+    // CTA paragraph
+    document.querySelectorAll('.bg-amber-500.text-black p').forEach(function(el) {
+      if (el.textContent.indexOf('Book online or call') !== -1) el.textContent = 'Reserve en l\u00ednea o llame para servicio el mismo d\u00eda. Estimados gratis, sin compromiso.';
+    });
+
+    // Text Us button
+    document.querySelectorAll('.bg-amber-500 a').forEach(function(el) {
+      if (el.textContent.trim() === 'Text Us') el.textContent = 'Env\u00ede Texto';
+    });
+
+    // Sticky mobile CTA — text is inline alongside emoji spans
+    var mobileCtas = document.querySelectorAll('.fixed.bottom-0 a');
+    mobileCtas.forEach(function(el) {
+      el.childNodes.forEach(function(node) {
+        if (node.nodeType === 3) {
+          if (node.textContent.indexOf('Call Now') !== -1) node.textContent = ' Llamar ';
+          if (node.textContent.indexOf('Book Now') !== -1) node.textContent = ' Reservar ';
+        }
+      });
+    });
+    // Sticky CTA aria-label
+    var stickyCta = document.querySelector('.fixed.bottom-0[role="complementary"]');
+    if (stickyCta) stickyCta.setAttribute('aria-label', 'Acciones r\u00e1pidas');
+
+    // Skip to main content
+    var skipLink = document.querySelector('a[href="#main-content"]');
+    if (skipLink) skipLink.textContent = 'Saltar al contenido principal';
+
+    // Map iframe title
+    var iframe = document.querySelector('iframe');
+    if (iframe) iframe.setAttribute('title', 'Oregon Tires Auto Care - Direcciones desde ' + areaNameEs);
+  } else {
+    localStorage.setItem('oregontires_lang', 'en');
+  }
+})();
+</script>
 </body>
 </html>
