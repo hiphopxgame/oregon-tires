@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/mail.php';
+require_once __DIR__ . '/../../includes/schedule.php';
 
 try {
     requireMethod('GET', 'PUT', 'POST');
@@ -133,10 +134,11 @@ try {
             if ($body['assigned_employee_id']) {
                 $empId = (int) $body['assigned_employee_id'];
                 try {
-                    $svcStmt = $db->prepare('SELECT service FROM oretir_appointments WHERE id = ?');
+                    $svcStmt = $db->prepare('SELECT service, preferred_date, preferred_time FROM oretir_appointments WHERE id = ?');
                     $svcStmt->execute([$id]);
                     $svcRow = $svcStmt->fetch();
                     if ($svcRow) {
+                        // Skill check
                         $anyStmt = $db->prepare('SELECT COUNT(*) FROM oretir_employee_skills WHERE employee_id = ?');
                         $anyStmt->execute([$empId]);
                         if ((int) $anyStmt->fetchColumn() > 0) {
@@ -148,6 +150,26 @@ try {
                                 $empName = ($nameStmt->fetch()['name'] ?? 'Employee');
                                 jsonError($empName . ' is not certified for ' . ucwords(str_replace('-', ' ', $svcRow['service'])) . '.', 422);
                             }
+                        }
+
+                        // Schedule validation
+                        try {
+                            $avail = isEmployeeAvailable($db, $empId, $svcRow['preferred_date'], $svcRow['preferred_time']);
+                            if (!$avail['available']) {
+                                if (empty($body['force_assign'])) {
+                                    http_response_code(409);
+                                    echo json_encode([
+                                        'success' => false,
+                                        'error'   => $avail['reason'],
+                                        'conflict' => true,
+                                        'hours'   => $avail['hours'],
+                                    ], JSON_UNESCAPED_UNICODE);
+                                    exit;
+                                }
+                                // force_assign is truthy — allow but note warning
+                            }
+                        } catch (\Throwable $schedErr) {
+                            error_log("appointments.php: schedule check skipped: " . $schedErr->getMessage());
                         }
                     }
                 } catch (\Throwable $e) {
@@ -164,6 +186,11 @@ try {
         if (isset($body['admin_notes'])) {
             $fields[] = 'admin_notes = ?';
             $params[] = sanitize($body['admin_notes'], 2000);
+        }
+
+        if (isset($body['task_summary'])) {
+            $fields[] = 'task_summary = ?';
+            $params[] = sanitize($body['task_summary'], 500);
         }
 
         if (empty($fields)) {
@@ -229,6 +256,26 @@ try {
             }
         }
 
+        // ─── Send assignment notification when employee is assigned ────
+        if (array_key_exists('assigned_employee_id', $body) && $body['assigned_employee_id']) {
+            try {
+                $assignStmt = $db->prepare(
+                    'SELECT id, reference_number, service, preferred_date, preferred_time,
+                            first_name, last_name, email, language, task_summary,
+                            vehicle_year, vehicle_make, vehicle_model,
+                            assigned_employee_id
+                     FROM oretir_appointments WHERE id = ?'
+                );
+                $assignStmt->execute([$id]);
+                $assignRow = $assignStmt->fetch();
+                if ($assignRow && !empty($assignRow['email']) && $assignRow['assigned_employee_id']) {
+                    sendAssignmentNotificationEmail($assignRow);
+                }
+            } catch (\Throwable $e) {
+                error_log("appointments.php: Assignment email error for #{$id}: " . $e->getMessage());
+            }
+        }
+
         // Sync status change to Google Calendar
         if (isset($body['status']) && !empty($_ENV['GOOGLE_CALENDAR_CREDENTIALS'])) {
             try {
@@ -288,6 +335,8 @@ try {
         $employeeId    = isset($body['assigned_employee_id']) && $body['assigned_employee_id'] !== ''
                          ? (int) $body['assigned_employee_id'] : null;
 
+        $taskSummary = isset($body['task_summary']) ? sanitize((string) $body['task_summary'], 500) : null;
+
         // Validate required fields
         if (!$firstName || !$lastName || !$email || !$phone || !$service || !$preferredDate || !$preferredTime) {
             jsonError('Missing required fields.', 400);
@@ -299,6 +348,33 @@ try {
         if (!isValidPhone($phone)) jsonError('Invalid phone number.', 400);
         if (!in_array($language, ['english', 'spanish'], true)) $language = 'english';
         if (!in_array($source, ['walk-in', 'phone', 'admin'], true)) $source = 'walk-in';
+
+        // Auto-generate task summary if not provided
+        if (!$taskSummary) {
+            $vParts = array_filter([$vehicleYear, $vehicleMake, $vehicleModel]);
+            $taskSummary = generateTaskSummary($service, implode(' ', $vParts) ?: null, $notes ?: null);
+        }
+
+        // Schedule validation for assigned employee
+        if ($employeeId) {
+            try {
+                $avail = isEmployeeAvailable($db, $employeeId, $preferredDate, $preferredTime);
+                if (!$avail['available']) {
+                    if (empty($body['force_assign'])) {
+                        http_response_code(409);
+                        echo json_encode([
+                            'success'  => false,
+                            'error'    => $avail['reason'],
+                            'conflict' => true,
+                            'hours'    => $avail['hours'],
+                        ], JSON_UNESCAPED_UNICODE);
+                        exit;
+                    }
+                }
+            } catch (\Throwable $schedErr) {
+                error_log("appointments.php: schedule check on create skipped: " . $schedErr->getMessage());
+            }
+        }
 
         // Generate unique reference number
         $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -321,15 +397,15 @@ try {
                 (reference_number, service, preferred_date, preferred_time,
                  vehicle_year, vehicle_make, vehicle_model,
                  first_name, last_name, phone, email, notes,
-                 status, language, assigned_employee_id, admin_notes,
+                 status, language, assigned_employee_id, admin_notes, task_summary,
                  created_at, updated_at)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())'
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())'
         );
         $stmt->execute([
             $referenceNumber, $service, $preferredDate, $preferredTime,
             $vehicleYear ?: null, $vehicleMake ?: null, $vehicleModel ?: null,
             $firstName, $lastName, $phone, $email, $notes ?: null,
-            'confirmed', $language, $employeeId, $adminNotes
+            'confirmed', $language, $employeeId, $adminNotes, $taskSummary
         ]);
         $appointmentId = (int) $db->lastInsertId();
 
@@ -357,6 +433,26 @@ try {
             logEmail('appointment_confirmed', "Confirmation email sent to {$email} for {$referenceNumber} (admin-created)");
         } catch (\Throwable $e) {
             error_log("appointments.php: Confirmation email error for admin-created #{$appointmentId}: " . $e->getMessage());
+        }
+
+        // Send assignment notification if employee was assigned
+        if ($employeeId) {
+            try {
+                $assignStmt = $db->prepare(
+                    'SELECT id, reference_number, service, preferred_date, preferred_time,
+                            first_name, last_name, email, language, task_summary,
+                            vehicle_year, vehicle_make, vehicle_model,
+                            assigned_employee_id
+                     FROM oretir_appointments WHERE id = ?'
+                );
+                $assignStmt->execute([$appointmentId]);
+                $assignRow = $assignStmt->fetch();
+                if ($assignRow && $assignRow['assigned_employee_id']) {
+                    sendAssignmentNotificationEmail($assignRow);
+                }
+            } catch (\Throwable $e) {
+                error_log("appointments.php: Assignment email error for new #{$appointmentId}: " . $e->getMessage());
+            }
         }
 
         jsonSuccess(['appointment_id' => $appointmentId, 'reference_number' => $referenceNumber]);
@@ -395,17 +491,24 @@ try {
         foreach ($ids as $apptId) {
             if ($employeeId) {
                 try {
-                    $svcStmt = $db->prepare('SELECT service FROM oretir_appointments WHERE id = ?');
+                    $svcStmt = $db->prepare('SELECT service, preferred_date, preferred_time FROM oretir_appointments WHERE id = ?');
                     $svcStmt->execute([$apptId]);
                     $svcRow = $svcStmt->fetch();
+                    if (!$svcRow) { $skipped++; continue; }
+
+                    // Skill check
                     $anyStmt = $db->prepare('SELECT COUNT(*) FROM oretir_employee_skills WHERE employee_id = ?');
                     $anyStmt->execute([$employeeId]);
-                    if ((int) $anyStmt->fetchColumn() > 0 && $svcRow) {
+                    if ((int) $anyStmt->fetchColumn() > 0) {
                         $certStmt = $db->prepare('SELECT COUNT(*) FROM oretir_employee_skills WHERE employee_id = ? AND service_type = ?');
                         $certStmt->execute([$employeeId, $svcRow['service']]);
                         if ((int) $certStmt->fetchColumn() === 0) { $skipped++; continue; }
                     }
-                } catch (\Throwable $e) { /* allow */ }
+
+                    // Schedule check
+                    $avail = isEmployeeAvailable($db, $employeeId, $svcRow['preferred_date'], $svcRow['preferred_time']);
+                    if (!$avail['available']) { $skipped++; continue; }
+                } catch (\Throwable $e) { /* allow assignment if check fails */ }
             }
             $stmt->execute([$employeeId, $apptId]);
             $updated++;

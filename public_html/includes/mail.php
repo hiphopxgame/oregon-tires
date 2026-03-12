@@ -827,6 +827,104 @@ function sendAppointmentReminderEmail(array $appointment): bool
 }
 
 /**
+ * Send assignment notification emails to customer and employee.
+ *
+ * @param array $appointment Full appointment row (must include: id, first_name, last_name,
+ *              email, service, preferred_date, preferred_time, language, reference_number,
+ *              assigned_employee_id, task_summary, and optionally vehicle_year/make/model)
+ */
+function sendAssignmentNotificationEmail(array $appointment): void
+{
+    $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $db = getDB();
+
+    // Fetch employee info
+    $empStmt = $db->prepare('SELECT id, name, email FROM oretir_employees WHERE id = ?');
+    $empStmt->execute([$appointment['assigned_employee_id']]);
+    $employee = $empStmt->fetch();
+
+    if (!$employee) {
+        error_log("sendAssignmentNotificationEmail: Employee #{$appointment['assigned_employee_id']} not found");
+        return;
+    }
+
+    $customerName = trim($appointment['first_name'] . ' ' . $appointment['last_name']);
+    $customerLang = ($appointment['language'] ?? 'english') === 'spanish' ? 'es' : 'en';
+    $serviceDisplay = ucwords(str_replace('-', ' ', $appointment['service']));
+    $displayTime = formatTimeDisplay($appointment['preferred_time']);
+
+    $dateObj = new DateTime($appointment['preferred_date']);
+    $displayDate = ($customerLang === 'es') ? $dateObj->format('d/m/Y') : $dateObj->format('m/d/Y');
+
+    $vParts = array_filter([
+        $appointment['vehicle_year'] ?? '',
+        $appointment['vehicle_make'] ?? '',
+        $appointment['vehicle_model'] ?? '',
+    ]);
+    $vehicleInfo = implode(' ', $vParts) ?: 'N/A';
+
+    $taskLine = '';
+    if (!empty($appointment['task_summary'])) {
+        $taskLine = '<br><strong>Task:</strong> ' . htmlspecialchars($appointment['task_summary'], ENT_QUOTES, 'UTF-8');
+    }
+
+    $refNumber = $appointment['reference_number'] ?? str_pad((string) $appointment['id'], 5, '0', STR_PAD_LEFT);
+
+    $vars = [
+        'name'             => $customerName,
+        'service'          => $serviceDisplay,
+        'date'             => $displayDate,
+        'time'             => $displayTime,
+        'employee_name'    => $employee['name'],
+        'vehicle'          => $vehicleInfo,
+        'task_line'        => $taskLine,
+        'task_summary'     => $appointment['task_summary'] ?? '',
+        'reference_number' => $refNumber,
+    ];
+
+    // 1. Customer email
+    try {
+        $result = sendBrandedTemplateEmail(
+            $appointment['email'],
+            'assignment_customer',
+            $vars,
+            $customerLang,
+            $baseUrl,
+            false
+        );
+        if ($result['success']) {
+            logEmail('appointment_assigned', "Assignment email sent to customer {$appointment['email']} for {$refNumber}");
+        } else {
+            logEmail('appointment_assigned_failed', "Assignment email FAILED for {$appointment['email']}: " . ($result['error'] ?? 'unknown'));
+        }
+    } catch (\Throwable $e) {
+        error_log("sendAssignmentNotificationEmail: Customer email error: " . $e->getMessage());
+    }
+
+    // 2. Employee email (only if employee has an email)
+    if (!empty($employee['email'])) {
+        try {
+            $adminUrl = $baseUrl . '/admin/';
+            $result = sendBrandedTemplateEmail(
+                $employee['email'],
+                'assignment_employee',
+                $vars,
+                'both',
+                $adminUrl,
+                false
+            );
+            if ($result['success']) {
+                logEmail('appointment_assigned_employee', "Assignment email sent to employee {$employee['email']} for {$refNumber}");
+            } else {
+                logEmail('appointment_assigned_employee_failed', "Assignment email FAILED for employee {$employee['email']}: " . ($result['error'] ?? 'unknown'));
+            }
+        } catch (\Throwable $e) {
+            error_log("sendAssignmentNotificationEmail: Employee email error: " . $e->getMessage());
+        }
+    }
+}
+
+/**
  * Send a branded booking notification email to the shop owner.
  */
 function sendBookingOwnerNotification(

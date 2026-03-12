@@ -597,6 +597,7 @@
                 <th class="p-3 cursor-pointer" onclick="sortAppts('service')" data-t="thService">Service ↕</th>
                 <th class="p-3 cursor-pointer" onclick="sortAppts('date')" data-t="thDateTime">Date & Time ↕</th>
                 <th class="p-3" data-t="thContact">Contact</th>
+                <th class="p-3" data-t="thTask">Task</th>
                 <th class="p-3" data-t="thEmployee">Employee</th>
                 <th class="p-3 cursor-pointer" onclick="sortAppts('status')" data-t="thStatus">Status ↕</th>
                 <th class="p-3" data-t="thActions">Actions</th>
@@ -5721,6 +5722,7 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
             <option value="tuneup">Tuneup</option>
             <option value="mechanical-inspection">Mechanical Inspection</option>
             <option value="mobile-service">Mobile Service</option>
+            <option value="roadside-assistance">Roadside Assistance</option>
             <option value="other">Other</option>
           </select>
         </label>
@@ -5750,6 +5752,11 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
       <div class="mb-4">
         <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Assign Employee</span>
           <select id="new-appt-employee" class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"></select>
+        </label>
+      </div>
+      <div class="mb-4">
+        <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Task Summary</span>
+          <textarea name="appt-task-summary" rows="2" maxlength="500" placeholder="Auto-generated if left blank" class="mt-1 w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
         </label>
       </div>
       <div class="mb-4">
@@ -6998,6 +7005,7 @@ var SERVICE_COLORS = {
   'tuneup':                 { bg:'bg-emerald-100', text:'text-emerald-800', darkBg:'dark:bg-emerald-900/30', darkText:'dark:text-emerald-300', dot:'bg-emerald-500', hex:'#10B981', label:'Tune-Up', labelEs:'Afinaci\u00F3n' },
   'mechanical-inspection':  { bg:'bg-cyan-100', text:'text-cyan-800', darkBg:'dark:bg-cyan-900/30', darkText:'dark:text-cyan-300', dot:'bg-cyan-500', hex:'#06B6D4', label:'Inspection', labelEs:'Inspecci\u00F3n' },
   'mobile-service':         { bg:'bg-yellow-100', text:'text-yellow-800', darkBg:'dark:bg-yellow-900/30', darkText:'dark:text-yellow-300', dot:'bg-yellow-500', hex:'#EAB308', label:'Mobile', labelEs:'M\u00F3vil' },
+  'roadside-assistance':    { bg:'bg-rose-100', text:'text-rose-800', darkBg:'dark:bg-rose-900/30', darkText:'dark:text-rose-300', dot:'bg-rose-500', hex:'#F43F5E', label:'Roadside', labelEs:'Carretera' },
   'other':                  { bg:'bg-gray-100', text:'text-gray-700', darkBg:'dark:bg-gray-700', darkText:'dark:text-gray-300', dot:'bg-gray-400', hex:'#9CA3AF', label:'Other', labelEs:'Otro' },
 };
 
@@ -8248,6 +8256,13 @@ function renderCalDayWithSchedule(dateStr, sched) {
       contactEl.textContent = a.email + (a.phone ? ' \u2022 ' + a.phone : '');
       leftDiv.appendChild(contactEl);
 
+      if (a.task_summary) {
+        var taskEl = document.createElement('p');
+        taskEl.className = 'text-xs text-green-700 dark:text-green-400 mt-1 font-medium';
+        taskEl.textContent = '\uD83D\uDD27 ' + a.task_summary;
+        leftDiv.appendChild(taskEl);
+      }
+
       if (a.admin_notes) {
         var notesEl = document.createElement('p');
         notesEl.className = 'text-xs text-blue-600 dark:text-blue-400 mt-1';
@@ -8391,6 +8406,7 @@ function renderAppointments() {
       <td class="p-3"><div class="font-medium">${fmtDate(a.preferred_date)}</div><div class="text-xs text-gray-500">${fmtTime(a.preferred_time)}</div>
         ${a.status==='completed'&&a.actual_duration_minutes?`<div class="text-xs text-green-700 font-medium mt-1">Completed in ${a.actual_duration_minutes}min</div>`:''}</td>
       <td class="p-3"><div class="text-sm">${esc(a.email)}</div>${a.phone?`<div class="text-xs text-gray-500">${esc(a.phone)}</div>`:''}</td>
+      <td class="p-3 text-xs max-w-[180px]"><span class="task-summary-text cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 block truncate" onclick="editTaskSummary('${a.id}', this)" title="${esc(a.task_summary||'')}">${a.task_summary ? esc(a.task_summary) : '<span class=&quot;text-gray-400 italic&quot;>+ Add task</span>'}</span></td>
       <td class="p-3 text-sm">${a.assigned_employee_id ? esc(employees.find(e=>e.id===a.assigned_employee_id)?.name||'Unknown') : '<span class="text-gray-400">' + adminT[currentLang].unassignedLabel + '</span>'}</td>
       <td class="p-3">${statusBadge(a.status)}${calSyncBadge(a)}</td>
       <td class="p-3"><div class="flex flex-col gap-1">
@@ -8405,7 +8421,7 @@ function renderAppointments() {
         ${a.status!=='cancelled'?`<button onclick="roShowCreateModal('${a.id}')" class="border border-green-500 text-green-700 rounded px-2 py-1 text-xs hover:bg-green-50 font-medium">🔧 Create RO</button>`:''}
       </div></td>
     </tr>
-  `).join('') : '<tr><td colspan="8" class="p-6 text-center text-gray-500">No appointments found</td></tr>';
+  `).join('') : '<tr><td colspan="9" class="p-6 text-center text-gray-500">No appointments found</td></tr>';
   // Reset select-all checkbox and bulk toolbar on re-render
   const selectAllCb = document.getElementById('select-all-appts');
   if (selectAllCb) selectAllCb.checked = false;
@@ -10054,14 +10070,50 @@ async function updateApptStatus(id, status) {
   } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
-async function updateApptAssignment(id, empId) {
+async function updateApptAssignment(id, empId, forceAssign) {
   const update = { id, assigned_employee_id: empId || null };
   if(empId) update.status = 'confirmed';
+  if(forceAssign) update.force_assign = true;
   try {
-    await api('appointments.php', { method: 'PUT', body: update });
+    const url = API + '/appointments.php';
+    const headers = { 'Content-Type': 'application/json' };
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+    const res = await fetch(url, { method: 'PUT', headers, body: JSON.stringify(update), credentials: 'include' });
+    const json = await res.json();
+    if (res.status === 409 && json.conflict) {
+      if (confirm(json.error + '\n\nAssign anyway?')) {
+        updateApptAssignment(id, empId, true);
+        return;
+      } else {
+        loadAppointments();
+        return;
+      }
+    }
+    if (!res.ok || !json.success) throw new Error(json.error || 'Request failed');
     showToast(empId ? adminT[currentLang].employeeAssigned : adminT[currentLang].assignmentRemoved);
     loadAppointments();
   } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
+}
+
+// ===== INLINE TASK SUMMARY EDIT =====
+function editTaskSummary(apptId, el) {
+  var current = (appointments.find(a => a.id == apptId) || {}).task_summary || '';
+  var ta = document.createElement('textarea');
+  ta.value = current;
+  ta.maxLength = 500;
+  ta.rows = 2;
+  ta.className = 'w-full border rounded px-2 py-1 text-xs dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+  ta.style.minWidth = '160px';
+  el.replaceWith(ta);
+  ta.focus();
+  function save() {
+    var val = ta.value.trim();
+    api('appointments.php', { method: 'PUT', body: { id: apptId, task_summary: val } })
+      .then(function() { loadAppointments(); })
+      .catch(function(e) { showToast('Error: ' + e.message, true); loadAppointments(); });
+  }
+  ta.onblur = save;
+  ta.onkeydown = function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } if (e.key === 'Escape') { loadAppointments(); } };
 }
 
 // ===== BULK OPERATIONS =====
@@ -10113,7 +10165,7 @@ function exportAppointmentsCsv() {
     showToast(adminT[currentLang].noAppointments || 'No appointments to export', true);
     return;
   }
-  const headers = ['Customer', 'Service', 'Date', 'Time', 'Phone', 'Email', 'Employee', 'Status'];
+  const headers = ['Customer', 'Service', 'Date', 'Time', 'Contact', 'Task', 'Employee', 'Status'];
   var csv = headers.join(',') + '\n';
   rows.forEach(function(row) {
     var cells = row.querySelectorAll('td');
@@ -10749,6 +10801,7 @@ async function createAppointment(e) {
     vehicle_make: form.querySelector('[name="appt-vehicle-make"]').value.trim() || '',
     vehicle_model: form.querySelector('[name="appt-vehicle-model"]').value.trim() || '',
     assigned_employee_id: document.getElementById('new-appt-employee').value || null,
+    task_summary: form.querySelector('[name="appt-task-summary"]').value.trim() || '',
     notes: form.querySelector('[name="appt-notes"]').value.trim() || '',
     language: (form.querySelector('input[name="appt-language"]:checked') || {}).value || 'english'
   };
@@ -10761,7 +10814,21 @@ async function createAppointment(e) {
   btn.disabled = true;
   btn.textContent = adminT[currentLang].creating || 'Creating...';
   try {
-    var json = await api('appointments.php', { method: 'POST', body: data });
+    var url = API + '/appointments.php';
+    var hdrs = { 'Content-Type': 'application/json' };
+    if (csrfToken) hdrs['X-CSRF-Token'] = csrfToken;
+    var res = await fetch(url, { method: 'POST', headers: hdrs, body: JSON.stringify(data), credentials: 'include' });
+    var json = await res.json();
+    if (res.status === 409 && json.conflict) {
+      if (confirm(json.error + '\n\nCreate anyway?')) {
+        data.force_assign = true;
+        var res2 = await fetch(url, { method: 'POST', headers: hdrs, body: JSON.stringify(data), credentials: 'include' });
+        json = await res2.json();
+        if (!res2.ok || !json.success) throw new Error(json.error || 'Request failed');
+      } else { btn.disabled = false; btn.textContent = adminT[currentLang].createAppointment || 'Create Appointment'; return; }
+    } else if (!res.ok || !json.success) {
+      throw new Error(json.error || 'Request failed');
+    }
     showToast((adminT[currentLang].appointmentCreated || 'Appointment created!') + ' \u2014 ' + json.data.reference_number);
     document.getElementById('new-appt-form').reset();
     document.getElementById('new-appt-modal').classList.add('hidden');
