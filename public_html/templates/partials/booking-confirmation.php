@@ -20,6 +20,7 @@ $labels = [
         'phone' => 'Phone',
         'email' => 'Email',
         'reference' => 'Reference #',
+        'tireSize' => 'Tire Size',
         'backToHome' => 'Back to Home',
         'bookAnother' => 'Book Another',
         'accountCreated' => "We've created an account for you! Check your email to set a password and track your appointments online.",
@@ -35,6 +36,7 @@ $labels = [
         'phone' => 'Teléfono',
         'email' => 'Correo',
         'reference' => 'Referencia #',
+        'tireSize' => 'Tamaño de Llanta',
         'backToHome' => 'Ir al Inicio',
         'bookAnother' => 'Programar Otra',
         'accountCreated' => 'Hemos creado una cuenta para usted. Revise su correo para establecer su contrasena y ver sus citas en linea.',
@@ -88,8 +90,15 @@ $details = [
 
 // Insert vehicle row if present
 $vehicleParts = array_filter([$bookingData['vehicleYear'] ?? '', $bookingData['vehicleMake'] ?? '', $bookingData['vehicleModel'] ?? '']);
+$extraRows = 0;
 if ($vehicleParts) {
     array_splice($details, 4, 0, [[$l['vehicle'], htmlspecialchars(implode(' ', $vehicleParts), ENT_QUOTES, 'UTF-8')]]);
+    $extraRows++;
+}
+
+// Insert tire size row if present (after vehicle row)
+if (!empty($bookingData['tireSize'])) {
+    array_splice($details, 4 + $extraRows, 0, [[$l['tireSize'], htmlspecialchars($bookingData['tireSize'], ENT_QUOTES, 'UTF-8')]]);
 }
 ?>
 <div class="mt-8 bg-white rounded-xl shadow-lg p-8 text-center fade-in dark:bg-gray-700" role="alert" aria-live="assertive" id="booking-confirmation-result">

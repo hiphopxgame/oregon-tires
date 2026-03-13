@@ -262,6 +262,26 @@
             </div>
             <p class="text-sm text-gray-400 dark:text-gray-500 mt-3 text-center" data-t="pricingDisclaimer">Service times are estimates and may vary.</p>
           </fieldset>
+
+          <!-- Tire Size Helper (shown for tire-related services) -->
+          <div id="tire-size-section" class="hidden mt-6 border-2 border-green-200 dark:border-green-800 rounded-lg p-5 bg-green-50/50 dark:bg-green-900/20 transition-all duration-300">
+            <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-3 flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <span data-t="findTireSize">Find My Tire Size</span>
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4" data-t="tireSizeOptional">Optional — helps us have the right tires ready</p>
+            <picture class="block max-w-md mx-auto mb-4">
+              <source srcset="/assets/img/tire-size-guide.webp" type="image/webp">
+              <img src="/assets/img/tire-size-guide.jpg" alt="Tire size location guide — check your tire sidewall" class="w-full rounded-lg shadow-sm" loading="lazy" width="600" height="400">
+            </picture>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-3 text-center" data-t="tireSizeHelp">Check your tire sidewall for a code like 225/65R17</p>
+            <div class="max-w-xs mx-auto">
+              <label for="tire-size-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="tireSize">Tire Size</label>
+              <input type="text" id="tire-size-input" name="tire_size" maxlength="30"
+                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+                     placeholder="e.g. 225/65R17">
+            </div>
+          </div>
         </div>
 
         <!-- Step 2: Date & Time -->
@@ -599,7 +619,12 @@ const t = {
     callNow: 'Call Now',
     smsOptIn: 'Text me updates about my service (appointment reminders, vehicle ready notifications)',
     privacyConsent: 'I agree to the collection and use of my personal information to process this appointment request.',
-    pricingDisclaimer: 'Service times are estimates and may vary.'
+    pricingDisclaimer: 'Service times are estimates and may vary.',
+    findTireSize: 'Find My Tire Size',
+    tireSize: 'Tire Size',
+    tireSizeHelp: 'Check your tire sidewall for a code like 225/65R17',
+    tireSizePlaceholder: 'e.g. 225/65R17',
+    tireSizeOptional: 'Optional — helps us have the right tires ready'
   },
   es: {
     home: 'Inicio',
@@ -684,7 +709,12 @@ const t = {
     backToHome: 'Ir al Inicio',
     smsOptIn: 'Enviarme actualizaciones por mensaje de texto (recordatorios de cita, notificaciones de vehiculo listo)',
     privacyConsent: 'Acepto la recopilacion y el uso de mi informacion personal para procesar esta solicitud de cita.',
-    pricingDisclaimer: 'Los tiempos de servicio son estimados y pueden variar.'
+    pricingDisclaimer: 'Los tiempos de servicio son estimados y pueden variar.',
+    findTireSize: 'Encontrar Tamaño de Llanta',
+    tireSize: 'Tamaño de Llanta',
+    tireSizeHelp: 'Revise el costado de su llanta para un código como 225/65R17',
+    tireSizePlaceholder: 'ej. 225/65R17',
+    tireSizeOptional: 'Opcional — nos ayuda a tener las llantas correctas'
   }
 };
 
@@ -1203,6 +1233,8 @@ function toggleLanguage() {
   if (modelInput) modelInput.placeholder = t[currentLang].vehicleModelPlaceholder;
   var vinInput = document.querySelector('input[name="vehicle_vin"]');
   if (vinInput) vinInput.placeholder = t[currentLang].vinPlaceholder;
+  var tireSizeInput = document.getElementById('tire-size-input');
+  if (tireSizeInput) tireSizeInput.placeholder = t[currentLang].tireSizePlaceholder;
   updateServiceMeta();
   // Re-fetch time slots in new language if date is selected
   var dateInput = document.getElementById('booking-date');
@@ -1234,6 +1266,8 @@ if (currentLang !== 'en') {
   if (modelInput) modelInput.placeholder = t[currentLang].vehicleModelPlaceholder;
   var vinInput = document.querySelector('input[name="vehicle_vin"]');
   if (vinInput) vinInput.placeholder = t[currentLang].vinPlaceholder;
+  var tireSizeInput = document.getElementById('tire-size-input');
+  if (tireSizeInput) tireSizeInput.placeholder = t[currentLang].tireSizePlaceholder;
 }
 
 // ===== MOBILE MENU =====
@@ -1305,12 +1339,20 @@ document.querySelectorAll('#mobile-menu a').forEach(function(link) {
 });
 
 // ===== BOOKING FUNNEL TRACKING (GA4) =====
-// Track service selection
+// Track service selection + show/hide tire size section
+var TIRE_SERVICES = ['tire-installation', 'tire-repair', 'wheel-alignment'];
 document.querySelectorAll('input[name="service"]').forEach(function(radio) {
   radio.addEventListener('change', function() {
     if (typeof gtag === 'function') gtag('event', 'booking_step', {
       event_category: 'booking_funnel', step: 'service_selected', service: this.value
     });
+    var section = document.getElementById('tire-size-section');
+    if (TIRE_SERVICES.indexOf(this.value) !== -1) {
+      section.classList.remove('hidden');
+    } else {
+      section.classList.add('hidden');
+      document.getElementById('tire-size-input').value = '';
+    }
   });
 });
 

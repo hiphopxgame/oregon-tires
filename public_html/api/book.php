@@ -44,6 +44,7 @@ try {
     $vehicleMake  = sanitize((string) ($data['vehicle_make'] ?? ''), 50);
     $vehicleModel = sanitize((string) ($data['vehicle_model'] ?? ''), 50);
     $vehicleVin   = sanitize((string) ($data['vehicle_vin'] ?? ''), 17);
+    $tireSize     = sanitize((string) ($data['tire_size'] ?? ''), 30);
     $notes        = sanitize((string) ($data['notes'] ?? ''), 2000);
     $language     = sanitize((string) ($data['language'] ?? 'english'), 20);
     $smsOptIn     = !empty($data['sms_opt_in']) ? 1 : 0;
@@ -217,10 +218,10 @@ try {
     // ─── Insert into database ───────────────────────────────────────────────
     $stmt = $db->prepare(
         'INSERT INTO oretir_appointments
-            (reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, vehicle_vin,
+            (reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, vehicle_vin, tire_size,
              first_name, last_name, phone, email, notes, sms_opt_in, utm_source, utm_medium, utm_campaign, utm_content, status, language, created_at, updated_at)
          VALUES
-            (:reference_number, :service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model, :vehicle_vin,
+            (:reference_number, :service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model, :vehicle_vin, :tire_size,
              :first_name, :last_name, :phone, :email, :notes, :sms_opt_in, :utm_source, :utm_medium, :utm_campaign, :utm_content, :status, :language, NOW(), NOW())'
     );
     $stmt->execute([
@@ -232,6 +233,7 @@ try {
         ':vehicle_make'     => $vehicleMake ?: null,
         ':vehicle_model'    => $vehicleModel ?: null,
         ':vehicle_vin'      => $vehicleVin ?: null,
+        ':tire_size'        => $tireSize ?: null,
         ':first_name'       => $firstName,
         ':last_name'        => $lastName,
         ':phone'            => $phone,
@@ -582,6 +584,7 @@ try {
             'vehicleYear' => $vehicleYear,
             'vehicleMake' => $vehicleMake,
             'vehicleModel' => $vehicleModel,
+            'tireSize' => $tireSize,
             'visit_count' => $visitCount,
             'returning_customer' => $returningCustomer,
         ];
