@@ -51,11 +51,8 @@
     # 301 redirect old root js/ → admin/js/ (ot-charts.js moved)
     RewriteRule ^js/(.+)$ /admin/js/$1 [R=301,L]
 
-    # Dashboard: /admin → redirect to /members
-    RewriteRule ^admin/?$ /members [R=301,L]
-
-    # Dashboard: /members → serve admin dashboard
-    RewriteRule ^members/?$ admin/index.html [L]
+    # Admin dashboard
+    RewriteRule ^admin/?$ admin/index.html [L]
 
     # API Versioning: /api/v1/* → /api/* alias
     RewriteRule ^api/v1/(.+)$ /api/$1 [L,QSA]

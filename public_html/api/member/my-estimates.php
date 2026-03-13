@@ -30,16 +30,23 @@ try {
 
     $memberId = (int) $_SESSION['member_id'];
 
-    // Get estimates for this customer's repair orders
+    // Fetch member email for fallback matching
+    $memberStmt = $pdo->prepare('SELECT email FROM members WHERE id = ? LIMIT 1');
+    $memberStmt->execute([$memberId]);
+    $memberEmail = $memberStmt->fetchColumn();
+
+    // Get estimates for this customer's repair orders (member_id OR email fallback)
     $stmt = $pdo->prepare(
-        'SELECT e.id, e.estimate_number, e.total, e.status, e.created_at, ro.ro_number
+        'SELECT e.id, e.estimate_number, e.total, e.status, e.created_at, ro.ro_number,
+                insp.customer_view_token
          FROM oretir_estimates e
          JOIN oretir_repair_orders ro ON e.repair_order_id = ro.id
          JOIN oretir_customers c ON ro.customer_id = c.id
-         WHERE c.member_id = ?
+         LEFT JOIN oretir_inspections insp ON insp.repair_order_id = ro.id
+         WHERE (c.member_id = ? OR c.email = ?)
          ORDER BY e.created_at DESC'
     );
-    $stmt->execute([$memberId]);
+    $stmt->execute([$memberId, $memberEmail]);
     $estimates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     ?>
@@ -78,6 +85,13 @@ try {
                                 <p style="margin: 0.25rem 0 0; font-size: 0.75rem; color: var(--member-text-muted);">
                                     <?= htmlspecialchars(date('M d, Y', strtotime($est['created_at']))) ?>
                                 </p>
+                                <?php if (!empty($est['customer_view_token'])): ?>
+                                <p style="margin: 0.5rem 0 0;">
+                                    <a href="/inspection/<?= htmlspecialchars($est['customer_view_token']) ?>" style="color: var(--member-accent); text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                                        <?= htmlspecialchars(memberT('view_inspection', $lang)) ?> →
+                                    </a>
+                                </p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>

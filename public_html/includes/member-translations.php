@@ -109,12 +109,40 @@ function memberT(string $key, string $lang = ''): string
         'phone'             => ['en' => 'Phone', 'es' => 'Teléfono'],
         'email'             => ['en' => 'Email', 'es' => 'Correo'],
 
+        // Conversations
+        'conversations'        => ['en' => 'Conversations', 'es' => 'Conversaciones'],
+        'new_message'          => ['en' => 'New Message', 'es' => 'Nuevo Mensaje'],
+        'send_message'         => ['en' => 'Send Message', 'es' => 'Enviar Mensaje'],
+        'reply'                => ['en' => 'Reply', 'es' => 'Responder'],
+        'subject'              => ['en' => 'Subject', 'es' => 'Asunto'],
+        'message_body'         => ['en' => 'Message', 'es' => 'Mensaje'],
+        'no_conversations'     => ['en' => 'No conversations yet. Start one using the button above.', 'es' => 'Aún no hay conversaciones. Inicie una usando el botón de arriba.'],
+        'unread'               => ['en' => 'unread', 'es' => 'sin leer'],
+        'status_open'          => ['en' => 'Open', 'es' => 'Abierto'],
+        'status_waiting'       => ['en' => 'Waiting for Reply', 'es' => 'Esperando Respuesta'],
+        'status_resolved'      => ['en' => 'Resolved', 'es' => 'Resuelto'],
+        'status_closed'        => ['en' => 'Closed', 'es' => 'Cerrado'],
+        'previous_submissions' => ['en' => 'Previous Contact Submissions', 'es' => 'Envíos de Contacto Anteriores'],
+        'type_your_message'    => ['en' => 'Type your message...', 'es' => 'Escriba su mensaje...'],
+        'message_sent'         => ['en' => 'Message sent!', 'es' => '¡Mensaje enviado!'],
+
         // Universal dashboard tabs
         'profile'           => ['en' => 'Profile', 'es' => 'Perfil'],
         'settings'          => ['en' => 'Settings', 'es' => "Configuraci\u{00f3}n"],
         'activity'          => ['en' => 'Activity', 'es' => 'Actividad'],
         'security'          => ['en' => 'Security', 'es' => 'Seguridad'],
         'change_password'   => ['en' => 'Change Password', 'es' => "Cambiar Contrase\u{00f1}a"],
+
+        // Loyalty
+        'valued_customer'   => ['en' => 'Valued Customer', 'es' => 'Cliente Valioso'],
+        'regular_customer'  => ['en' => 'Regular Customer', 'es' => 'Cliente Frecuente'],
+        'loyal_customer'    => ['en' => 'Loyal Customer', 'es' => 'Cliente Leal'],
+        'visits_count'      => ['en' => '%d visits', 'es' => '%d visitas'],
+        'your_technician'   => ['en' => 'Your technician', 'es' => "Su t\u{00e9}cnico"],
+        'view_inspection'   => ['en' => 'View Inspection', 'es' => "Ver Inspecci\u{00f3}n"],
+        'photos'            => ['en' => 'photos', 'es' => 'fotos'],
+        'welcome_back'      => ['en' => 'Welcome back!', 'es' => "\u{00a1}Bienvenido de nuevo!"],
+        'visit_number'      => ['en' => 'This is your visit #%d', 'es' => 'Esta es su visita #%d'],
     ];
 
     return $strings[$key][$lang] ?? $strings[$key]['en'] ?? $key;

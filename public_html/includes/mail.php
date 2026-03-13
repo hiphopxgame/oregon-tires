@@ -525,7 +525,8 @@ function sendBookingConfirmationEmail(
     string $rawService = '',
     string $rawDate = '',
     string $rawTime = '',
-    string $cancelToken = ''
+    string $cancelToken = '',
+    int $visitCount = 0
 ): array {
     $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
 
@@ -564,6 +565,31 @@ function sendBookingConfirmationEmail(
             </td>
           </tr>
         </table>
+      </div>
+    </td>
+  </tr>
+HTML;
+    }
+
+    // Build loyalty messaging (only for returning customers)
+    $loyaltyHtml = '';
+    if ($visitCount > 1) {
+        if ($visitCount >= 10) {
+            $loyaltyEn = "Thank you for being a loyal customer! This is your visit #{$visitCount}.";
+            $loyaltyEs = "¡Gracias por ser un cliente leal! Esta es su visita #{$visitCount}.";
+        } elseif ($visitCount >= 4) {
+            $loyaltyEn = "You're one of our valued regulars! Visit #{$visitCount}.";
+            $loyaltyEs = "¡Es uno de nuestros clientes frecuentes! Visita #{$visitCount}.";
+        } else {
+            $loyaltyEn = "Thanks for coming back! Visit #{$visitCount}.";
+            $loyaltyEs = "¡Gracias por regresar! Visita #{$visitCount}.";
+        }
+        $loyaltyHtml = <<<HTML
+  <tr>
+    <td style="padding:0 36px 24px;">
+      <div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:12px;padding:16px;text-align:center;">
+        <p style="color:#92400e;font-size:14px;font-weight:700;margin:0;">⭐ {$loyaltyEn}</p>
+        <p style="color:#92400e;font-size:14px;font-weight:700;margin:4px 0 0;">⭐ {$loyaltyEs}</p>
       </div>
     </td>
   </tr>
@@ -680,7 +706,10 @@ HTML;
         $bodySections = $esSection . $divider . $enSection;
     }
 
-    // Insert calendar links after the language sections
+    // Insert loyalty messaging after the language sections
+    $bodySections .= $loyaltyHtml;
+
+    // Insert calendar links after loyalty messaging
     $bodySections .= $calendarHtml;
 
     // Insert cancel/reschedule links after calendar links
@@ -1521,6 +1550,34 @@ function sendSubscriberWelcomeEmail(string $email, string $lang = 'en'): array
         logEmail('subscriber_welcome', "Subscriber welcome email sent to {$email} (lang: {$language})");
     } else {
         logEmail('subscriber_welcome_failed', "Subscriber welcome email FAILED for {$email}: " . ($result['error'] ?? 'unknown'));
+    }
+
+    return $result;
+}
+
+/**
+ * Send a conversation reply notification email to the customer.
+ */
+function sendConversationReplyEmail(
+    string $email,
+    string $name,
+    string $subject,
+    string $preview,
+    string $language = 'both'
+): array {
+    $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $viewUrl = $baseUrl . '/members';
+
+    $vars = [
+        'name'    => $name,
+        'subject' => $subject,
+        'preview' => htmlspecialchars(substr($preview, 0, 200), ENT_QUOTES, 'UTF-8'),
+    ];
+
+    $result = sendBrandedTemplateEmail($email, 'conversation_reply', $vars, $language, $viewUrl);
+
+    if ($result['success']) {
+        logEmail('conversation_reply', "Conversation reply notification sent to {$email}", $email);
     }
 
     return $result;

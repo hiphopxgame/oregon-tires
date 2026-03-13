@@ -296,6 +296,16 @@ try {
         error_log("Oregon Tires book.php: customer/vehicle auto-create failed for appointment #{$appointmentId}: " . $custErr->getMessage());
     }
 
+    // ─── Query visit count for loyalty messaging ─────────────────────────────
+    $visitCount = 0;
+    $returningCustomer = false;
+    if ($bookingCustomerId) {
+        $vcStmt = $db->prepare('SELECT visit_count FROM oretir_customers WHERE id = ? LIMIT 1');
+        $vcStmt->execute([$bookingCustomerId]);
+        $visitCount = (int) $vcStmt->fetchColumn();
+        $returningCustomer = $visitCount > 1;
+    }
+
     // ─── Smart Account Creation for guests ──────────────────────────────────
     $newMemberId = null;
     if (empty($_SESSION['member_id'])) {
@@ -537,7 +547,8 @@ try {
             $service,          // raw service slug for calendar
             $preferredDate,    // raw YYYY-MM-DD for calendar
             $preferredTime,    // raw HH:MM for calendar
-            $cancelToken       // cancel/reschedule token
+            $cancelToken,      // cancel/reschedule token
+            $visitCount        // loyalty visit count
         );
     } catch (\Throwable $e) {
         // Don't fail the booking if confirmation email fails
@@ -548,6 +559,8 @@ try {
         'appointment_id'   => $appointmentId,
         'reference_number' => $referenceNumber,
         'account_created'  => empty($_SESSION['member_id']) && isset($newMemberId) && $newMemberId > 0,
+        'returning_customer' => $returningCustomer,
+        'visit_count' => $visitCount,
     ];
 
     if ($paymentResponse !== null) {
@@ -569,6 +582,8 @@ try {
             'vehicleYear' => $vehicleYear,
             'vehicleMake' => $vehicleMake,
             'vehicleModel' => $vehicleModel,
+            'visit_count' => $visitCount,
+            'returning_customer' => $returningCustomer,
         ];
         $bookingResponse = $response;
         require __DIR__ . '/../templates/partials/booking-confirmation.php';

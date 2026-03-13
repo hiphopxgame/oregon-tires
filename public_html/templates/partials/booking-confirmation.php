@@ -112,6 +112,21 @@ if ($vehicleParts) {
     </div>
     <?php endif; ?>
 
+    <?php if (!empty($bookingData['returning_customer'])): ?>
+    <div class="p-4 rounded-lg border mb-6" style="background:#fef3c7;border-color:#fbbf24;">
+        <p class="text-sm font-semibold" style="margin:0;color:#92400e;">
+            <?php
+            $vc = (int) ($bookingData['visit_count'] ?? 0);
+            if ($lang === 'es') {
+                echo "⭐ ¡Bienvenido de nuevo! Esta es su visita #{$vc}.";
+            } else {
+                echo "⭐ Welcome back! This is your visit #{$vc}.";
+            }
+            ?>
+        </p>
+    </div>
+    <?php endif; ?>
+
     <div class="flex justify-center gap-4 flex-wrap">
         <a href="/" class="bg-brand text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition" data-t="backToHome"><?= htmlspecialchars($l['backToHome'], ENT_QUOTES, 'UTF-8') ?></a>
         <a href="/book-appointment/" class="border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-6 py-2 rounded-lg font-semibold hover:bg-brand/5 dark:hover:bg-green-400/10 transition" data-t="bookAnother"><?= htmlspecialchars($l['bookAnother'], ENT_QUOTES, 'UTF-8') ?></a>

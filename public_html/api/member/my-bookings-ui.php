@@ -36,12 +36,28 @@ try {
     $memberStmt->execute([$memberId]);
     $memberEmail = $memberStmt->fetchColumn();
 
+    // Get customer visit_count for loyalty badge
+    $visitCount = 0;
+    if ($memberEmail) {
+        $vcStmt = $pdo->prepare('SELECT visit_count FROM oretir_customers WHERE email = ? LIMIT 1');
+        $vcStmt->execute([$memberEmail]);
+        $vc = $vcStmt->fetchColumn();
+        if ($vc !== false) {
+            $visitCount = (int) $vc;
+        }
+    }
+
     // Enhanced query: match by member_id OR by email on orphaned appointments
     $sql = 'SELECT DISTINCT a.id, a.reference_number, a.service, a.preferred_date, a.preferred_time,
                    a.vehicle_year, a.vehicle_make, a.vehicle_model, a.status, a.language,
-                   a.created_at
+                   a.created_at, e.name as employee_name,
+                   insp.customer_view_token,
+                   (SELECT COUNT(*) FROM oretir_inspection_photos ip WHERE ip.inspection_id = insp.id) as photo_count
             FROM oretir_appointments a
             LEFT JOIN oretir_customers c ON a.customer_id = c.id
+            LEFT JOIN oretir_employees e ON a.assigned_employee_id = e.id
+            LEFT JOIN oretir_repair_orders ro ON ro.appointment_id = a.id
+            LEFT JOIN oretir_inspections insp ON insp.repair_order_id = ro.id
             WHERE (a.member_id = :mid';
 
     $params = [':mid' => $memberId];
@@ -87,6 +103,22 @@ try {
                 <p><?= htmlspecialchars(memberT('appt_subtitle', $lang)) ?></p>
             </div>
 
+            <?php if ($visitCount >= 3):
+                if ($visitCount >= 10) {
+                    $loyaltyLabel = memberT('loyal_customer', $lang);
+                } elseif ($visitCount >= 5) {
+                    $loyaltyLabel = memberT('regular_customer', $lang);
+                } else {
+                    $loyaltyLabel = memberT('valued_customer', $lang);
+                }
+                $visitsLabel = sprintf(memberT('visits_count', $lang), $visitCount);
+            ?>
+            <div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:var(--member-radius);padding:0.75rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+                <span style="font-size:1.25rem;">⭐</span>
+                <span style="color:#92400e;font-weight:600;font-size:0.9rem;"><?= htmlspecialchars($loyaltyLabel) ?> — <?= htmlspecialchars($visitsLabel) ?></span>
+            </div>
+            <?php endif; ?>
+
             <?php if (empty($bookings)): ?>
                 <p class="member-text-muted" style="text-align: center; padding: 2rem 0;">
                     <?= htmlspecialchars(memberT('no_appointments', $lang)) ?>
@@ -103,6 +135,11 @@ try {
                                     <h3 style="margin: 0 0 0.25rem; font-size: 0.95rem;">
                                         <?= htmlspecialchars($booking['vehicle_year'] . ' ' . $booking['vehicle_make'] . ' ' . $booking['vehicle_model']) ?>
                                     </h3>
+                                    <?php if (!empty($booking['employee_name'])): ?>
+                                    <p style="margin: 0 0 0.25rem; color: var(--member-text-muted); font-size: 0.875rem;">
+                                        <?= htmlspecialchars(memberT('your_technician', $lang)) ?>: <?= htmlspecialchars($booking['employee_name']) ?>
+                                    </p>
+                                    <?php endif; ?>
                                     <p style="margin: 0; color: var(--member-text-muted); font-size: 0.875rem;">
                                         <?= htmlspecialchars(memberT('ref', $lang)) ?>: <?= htmlspecialchars($booking['reference_number']) ?>
                                     </p>
@@ -118,6 +155,18 @@ try {
                                 <p style="margin: 0.25rem 0 0;">
                                     <?= htmlspecialchars(memberT('date_time', $lang)) ?>: <?= htmlspecialchars(date('M d, Y g:i A', strtotime($booking['preferred_date'] . ' ' . $booking['preferred_time']))) ?>
                                 </p>
+                                <?php if (!empty($booking['customer_view_token'])): ?>
+                                <p style="margin: 0.5rem 0 0;">
+                                    <a href="/inspection/<?= htmlspecialchars($booking['customer_view_token']) ?>" style="color: var(--member-accent); text-decoration: none; font-size: 0.875rem; font-weight: 600;">
+                                        <?= htmlspecialchars(memberT('view_inspection', $lang)) ?>
+                                        <?php if (!empty($booking['photo_count'])): ?>
+                                        <span style="background: var(--member-accent); color: var(--member-accent-text); padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.7rem; margin-left: 0.25rem;">
+                                            <?= (int) $booking['photo_count'] ?> <?= htmlspecialchars(memberT('photos', $lang)) ?>
+                                        </span>
+                                        <?php endif; ?>
+                                    </a>
+                                </p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>

@@ -464,7 +464,7 @@
         <button onclick="switchTab('appointments')" data-tab="appointments" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📅 <span data-t="tabAppointments">Appointments</span></button>
         <button onclick="switchTab('customers')" data-tab="customers" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👤 <span data-t="tabCustomers">Customers</span></button>
         <button onclick="switchTab('repairorders')" data-tab="repairorders" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🔧 <span data-t="tabRepairOrders">Repair Orders</span></button>
-        <button onclick="switchTab('messages')" data-tab="messages" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">💬 <span data-t="tabMessages">Messages</span></button>
+        <button onclick="switchTab('messages')" data-tab="messages" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">💬 <span data-t="tabMessages">Messages</span> <span id="conv-unread-badge" class="ml-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full hidden"></span></button>
         <button onclick="switchTab('employees')" data-tab="employees" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👥 <span data-t="tabEmployees">Employees</span></button>
         <button onclick="switchTab('gallery')" data-tab="gallery" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 <span data-t="tabGallery">Gallery</span></button>
         <button onclick="switchTab('blog')" data-tab="blog" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📝 <span data-t="tabBlog">Blog</span></button>
@@ -647,6 +647,7 @@
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
         <div class="flex gap-2 mb-6 border-b pb-3">
           <button onclick="switchMessagesSubTab('contacts')" id="msg-sub-contacts" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">💬 <span data-t="contactMessages">Contact Messages</span></button>
+          <button onclick="switchMessagesSubTab('conversations')" id="msg-sub-conversations" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">💬 <span data-t="conversations">Conversations</span></button>
           <button onclick="switchMessagesSubTab('emaillogs')" id="msg-sub-emaillogs" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📝 <span data-t="websiteChanges">Website Changes</span></button>
         </div>
         <div id="msg-subtab-contacts">
@@ -658,6 +659,39 @@
               </tr></thead>
               <tbody id="messages-table"></tbody>
             </table>
+          </div>
+        </div>
+        <div id="msg-subtab-conversations" class="hidden">
+          <div class="flex justify-between items-center mb-4">
+            <div class="flex gap-2">
+              <select id="conv-status-filter" onchange="loadConversations()" class="border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+                <option value="">All Status</option>
+                <option value="open">Open</option>
+                <option value="waiting_reply">Waiting Reply</option>
+                <option value="resolved">Resolved</option>
+                <option value="closed">Closed</option>
+              </select>
+              <label class="flex items-center gap-1 text-sm"><input type="checkbox" id="conv-unread-filter" onchange="loadConversations()"> Unread only</label>
+            </div>
+            <button onclick="loadConversations()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
+          </div>
+          <div id="conversations-list" class="space-y-3"></div>
+          <div id="conversation-detail" class="hidden">
+            <button onclick="closeConversationDetail()" class="mb-4 text-brand hover:underline text-sm">← Back to list</button>
+            <div id="conv-detail-header" class="mb-4 p-4 bg-gray-50 rounded-lg dark:bg-gray-700"></div>
+            <div id="conv-detail-messages" class="space-y-3 mb-4 max-h-96 overflow-y-auto"></div>
+            <div class="flex gap-2">
+              <textarea id="conv-reply-input" rows="3" class="flex-1 border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" placeholder="Type your reply..."></textarea>
+              <div class="flex flex-col gap-2">
+                <button onclick="sendAdminReply()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">Send</button>
+                <select id="conv-status-select" onchange="updateConvStatus()" class="border rounded-lg px-2 py-1 text-xs dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+                  <option value="">Status...</option>
+                  <option value="resolved">Resolve</option>
+                  <option value="closed">Close</option>
+                  <option value="open">Reopen</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
         <div id="msg-subtab-emaillogs" class="hidden">
@@ -5902,6 +5936,8 @@ const adminT = {
     messagesWebsiteChanges: 'Messages & Website Changes',
     messagesSubtitle: 'Manage all messages and website change history',
     contactMessages: 'Contact Messages',
+    conversations: 'Conversations',
+    convNoConversations: 'No conversations found',
     websiteChanges: 'Website Changes',
     thMessage: 'Message',
     thDate: 'Date',
@@ -6474,6 +6510,8 @@ const adminT = {
     messagesWebsiteChanges: 'Mensajes y Cambios del Sitio',
     messagesSubtitle: 'Administrar todos los mensajes e historial de cambios',
     contactMessages: 'Mensajes de Contacto',
+    conversations: 'Conversaciones',
+    convNoConversations: 'No se encontraron conversaciones',
     websiteChanges: 'Cambios del Sitio',
     thMessage: 'Mensaje',
     thDate: 'Fecha',
@@ -7415,6 +7453,7 @@ async function loadAllData() {
   await Promise.all([loadAppointments(), loadEmployees(), loadAdminUsers(), loadCustomers()]);
   // Mark these tabs as loaded since their data was fetched
   if (typeof loadedTabs !== 'undefined') { loadedTabs.add('appointments'); loadedTabs.add('employees'); loadedTabs.add('customers'); }
+  refreshConvUnreadBadge();
 }
 
 async function loadAppointments() {
@@ -7458,7 +7497,7 @@ async function loadAdminUsers() {
 let pollingInterval = null;
 function setupPolling() {
   if (pollingInterval) clearInterval(pollingInterval);
-  pollingInterval = setInterval(() => { loadAppointments(); loadMessages(); }, 30000);
+  pollingInterval = setInterval(() => { loadAppointments(); loadMessages(); refreshConvUnreadBadge(); }, 30000);
 }
 
 // ===== MONTH FILTER =====
@@ -8530,6 +8569,180 @@ function viewEmail(id) {
   iframe.onload = function() { iframe.style.height = iframe.contentDocument.body.scrollHeight + 'px'; };
   document.getElementById('email-modal').classList.remove('hidden');
   trapFocus(document.getElementById('email-modal'));
+}
+
+// ===== CONVERSATIONS =====
+let conversations = [];
+let currentConvId = null;
+
+async function loadConversations() {
+  try {
+    const status = document.getElementById('conv-status-filter') ? document.getElementById('conv-status-filter').value : '';
+    const unread = document.getElementById('conv-unread-filter') && document.getElementById('conv-unread-filter').checked ? '1' : '';
+    let url = 'conversations.php?';
+    if (status) url += 'status=' + encodeURIComponent(status) + '&';
+    if (unread) url += 'unread=1&';
+    const json = await api(url);
+    conversations = json.data || [];
+  } catch(e) { console.error('loadConversations failed:', e); conversations = []; }
+  renderConversations();
+}
+
+function renderConversations() {
+  const list = document.getElementById('conversations-list');
+  if (!conversations.length) {
+    list.textContent = '';
+    const p = document.createElement('p');
+    p.className = 'text-center text-gray-500 py-8';
+    p.textContent = adminT[currentLang] && adminT[currentLang].convNoConversations ? adminT[currentLang].convNoConversations : 'No conversations found';
+    list.appendChild(p);
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  conversations.forEach(function(c) {
+    const statusColors = {open:'bg-green-100 text-green-700',waiting_reply:'bg-yellow-100 text-yellow-700',resolved:'bg-blue-100 text-blue-700',closed:'bg-gray-100 text-gray-500'};
+    const color = statusColors[c.status] || 'bg-gray-100 text-gray-500';
+
+    const card = document.createElement('div');
+    card.className = 'p-4 border rounded-lg hover:bg-gray-50 cursor-pointer dark:border-gray-600 dark:hover:bg-gray-700';
+    card.onclick = function() { openConversation(c.id); };
+
+    const row = document.createElement('div');
+    row.className = 'flex justify-between items-start';
+
+    const left = document.createElement('div');
+    const h4 = document.createElement('h4');
+    h4.className = 'font-semibold text-sm';
+    h4.textContent = c.subject || '';
+    if (c.unread_count > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'bg-red-500 text-white text-xs px-2 py-0.5 rounded-full ml-2';
+      badge.textContent = c.unread_count;
+      h4.appendChild(badge);
+    }
+    left.appendChild(h4);
+    const meta = document.createElement('p');
+    meta.className = 'text-xs text-gray-500 mt-1';
+    meta.textContent = (c.customer_name || '') + ' \u00B7 ' + (c.customer_email || '');
+    left.appendChild(meta);
+
+    const right = document.createElement('div');
+    right.className = 'flex items-center gap-2';
+    const statusSpan = document.createElement('span');
+    statusSpan.className = 'text-xs px-2 py-0.5 rounded ' + color;
+    statusSpan.textContent = (c.status || '').replace('_', ' ');
+    right.appendChild(statusSpan);
+    const dateSpan = document.createElement('span');
+    dateSpan.className = 'text-xs text-gray-400';
+    dateSpan.textContent = c.last_message_at ? new Date(c.last_message_at).toLocaleDateString() : '';
+    right.appendChild(dateSpan);
+
+    row.appendChild(left);
+    row.appendChild(right);
+    card.appendChild(row);
+    frag.appendChild(card);
+  });
+  list.textContent = '';
+  list.appendChild(frag);
+}
+
+async function openConversation(id) {
+  currentConvId = id;
+  try {
+    var json = await api('conversations.php?id=' + id);
+    var conv = json.data;
+    document.getElementById('conversations-list').classList.add('hidden');
+    document.getElementById('conversation-detail').classList.remove('hidden');
+
+    // Header
+    var header = document.getElementById('conv-detail-header');
+    header.textContent = '';
+    var h3 = document.createElement('h3');
+    h3.className = 'font-bold';
+    h3.textContent = conv.subject || '';
+    header.appendChild(h3);
+    var hp = document.createElement('p');
+    hp.className = 'text-sm text-gray-500';
+    hp.textContent = (conv.customer_name || '') + ' \u00B7 ' + (conv.status || '').replace('_', ' ');
+    header.appendChild(hp);
+
+    // Messages
+    var msgsDiv = document.getElementById('conv-detail-messages');
+    msgsDiv.textContent = '';
+    var msgs = conv.messages || [];
+    msgs.forEach(function(m) {
+      var isCustomer = m.sender_type === 'customer';
+      var isSystem = m.sender_type === 'system';
+      var bg = isSystem ? 'bg-gray-100 dark:bg-gray-600 italic' : (isCustomer ? 'bg-blue-50 dark:bg-blue-900/30' : 'bg-green-50 dark:bg-green-900/30');
+      var align = isCustomer ? '' : ' ml-8';
+      var bubble = document.createElement('div');
+      bubble.className = 'p-3 rounded-lg ' + bg + align;
+      var topRow = document.createElement('div');
+      topRow.className = 'flex justify-between items-center mb-1';
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'text-xs font-semibold';
+      nameSpan.textContent = m.sender_name || m.sender_type;
+      topRow.appendChild(nameSpan);
+      var timeSpan = document.createElement('span');
+      timeSpan.className = 'text-xs text-gray-400';
+      timeSpan.textContent = new Date(m.created_at).toLocaleString();
+      topRow.appendChild(timeSpan);
+      bubble.appendChild(topRow);
+      var bodyP = document.createElement('p');
+      bodyP.className = 'text-sm';
+      bodyP.textContent = m.body || '';
+      bubble.appendChild(bodyP);
+      msgsDiv.appendChild(bubble);
+    });
+
+    // Mark as read
+    api('conversations.php?id=' + id, { method: 'POST', body: JSON.stringify({ action: 'mark_read' }) }).catch(function() {});
+  } catch(e) { console.error('openConversation failed:', e); }
+}
+
+function closeConversationDetail() {
+  currentConvId = null;
+  document.getElementById('conversations-list').classList.remove('hidden');
+  document.getElementById('conversation-detail').classList.add('hidden');
+  loadConversations();
+}
+
+async function sendAdminReply() {
+  if (!currentConvId) return;
+  var input = document.getElementById('conv-reply-input');
+  var body = input.value.trim();
+  if (!body) return;
+  try {
+    await api('conversations.php?id=' + currentConvId, { method: 'POST', body: JSON.stringify({ body: body }) });
+    input.value = '';
+    showToast('Reply sent');
+    openConversation(currentConvId);
+  } catch(e) { showToast('Failed to send reply', true); }
+}
+
+async function updateConvStatus() {
+  if (!currentConvId) return;
+  var select = document.getElementById('conv-status-select');
+  var status = select.value;
+  if (!status) return;
+  try {
+    await api('conversations.php?id=' + currentConvId, { method: 'PUT', body: JSON.stringify({ status: status }) });
+    showToast('Status updated');
+    select.value = '';
+    openConversation(currentConvId);
+  } catch(e) { showToast('Failed to update status', true); }
+}
+
+async function refreshConvUnreadBadge() {
+  try {
+    var json = await api('conversations.php?unread=1&count_only=1');
+    var count = json.total || 0;
+    var badge = document.getElementById('conv-unread-badge');
+    if (badge) {
+      if (count > 0) { badge.textContent = count; badge.classList.remove('hidden'); }
+      else { badge.classList.add('hidden'); }
+    }
+  } catch(e) { /* silent */ }
 }
 
 function openMessageModal(id) {
@@ -10642,11 +10855,15 @@ function quickAssignDay(dateStr) {
 
 // Sub-tab switching for Messages
 function switchMessagesSubTab(sub) {
-  document.getElementById('msg-subtab-contacts').classList.toggle('hidden', sub !== 'contacts');
-  document.getElementById('msg-subtab-emaillogs').classList.toggle('hidden', sub !== 'emaillogs');
-  document.getElementById('msg-sub-contacts').className = sub === 'contacts' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white' : 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
-  document.getElementById('msg-sub-emaillogs').className = sub === 'emaillogs' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white' : 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
+  var tabs = ['contacts', 'emaillogs', 'conversations'];
+  var activeClass = 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white';
+  var inactiveClass = 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50';
+  tabs.forEach(function(t) {
+    document.getElementById('msg-subtab-' + t).classList.toggle('hidden', sub !== t);
+    document.getElementById('msg-sub-' + t).className = sub === t ? activeClass : inactiveClass;
+  });
   if(sub === 'emaillogs') loadEmailLogs();
+  if(sub === 'conversations') loadConversations();
 }
 
 // Sub-tab switching for Gallery
