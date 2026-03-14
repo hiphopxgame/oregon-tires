@@ -89,23 +89,8 @@ $memberDashboardTabs = [
     ],
 ];
 
-// Admin-only tab: Customer Directory
-$isShopAdmin = false;
-if (MemberAuth::isMemberLoggedIn()) {
-    $member = MemberAuth::getCurrentMember();
-    $adminCheck = $pdo->prepare('SELECT id FROM oretir_admins WHERE email = ? AND role IN (?, ?) LIMIT 1');
-    $adminCheck->execute([$member['email'] ?? '', 'admin', 'superadmin']);
-    $isShopAdmin = (bool) $adminCheck->fetch();
-}
-
-if ($isShopAdmin) {
-    $memberDashboardTabs[] = [
-        'id'           => 'customers',
-        'label'        => memberT('customer_directory', $lang),
-        'icon'         => '👥',
-        'api_endpoint' => '/api/member/my-customers.php',
-    ];
-}
+// Disable wallet connections — not relevant for auto shop
+unset($_ENV['METAMASK_ENABLED'], $_ENV['WALLETCONNECT_PROJECT_ID'], $_ENV['COINBASE_WALLET_ENABLED']);
 
 // Load universal dashboard template
 require MEMBER_KIT_PATH . '/templates/member/dashboard.php';

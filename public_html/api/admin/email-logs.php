@@ -5,8 +5,8 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 try {
-    requireMethod('GET');
     requireAdmin();
+    requireMethod('GET');
 
     $db = getDB();
     $stmt = $db->query('SELECT * FROM oretir_email_logs ORDER BY created_at DESC LIMIT 50');

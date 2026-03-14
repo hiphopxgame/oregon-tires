@@ -7,8 +7,8 @@ require_once __DIR__ . '/../../includes/mail.php';
 require_once __DIR__ . '/../../includes/schedule.php';
 
 try {
-    requireMethod('GET', 'PUT', 'POST');
     $admin = requireAdmin();
+    requireMethod('GET', 'PUT', 'POST');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
 

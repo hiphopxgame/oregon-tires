@@ -6,8 +6,8 @@ require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/mail.php';
 
 try {
-    requireMethod('GET', 'POST', 'DELETE');
     $admin = requireAdmin();
+    requireMethod('GET', 'POST', 'DELETE');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
 

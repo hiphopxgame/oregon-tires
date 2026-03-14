@@ -5,8 +5,8 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 try {
-    requireMethod('GET', 'POST');
     $admin = requireAdmin();
+    requireMethod('GET', 'POST');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
 

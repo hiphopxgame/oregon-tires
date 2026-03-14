@@ -16,8 +16,8 @@ const ALLOWED_SERVICE_KEYS = [
 ];
 
 try {
-    requireMethod('GET', 'POST', 'PUT');
     requireAdmin();
+    requireMethod('GET', 'POST', 'PUT');
 
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];

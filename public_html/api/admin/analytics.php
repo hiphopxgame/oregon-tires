@@ -17,8 +17,8 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 try {
-    requireMethod('GET');
     $admin = requireAdmin();
+    requireMethod('GET');
     $db = getDB();
 
     // ─── Appointments by service ──────────────────────────────────────────

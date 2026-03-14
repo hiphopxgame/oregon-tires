@@ -15,8 +15,8 @@ require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/mail.php';
 
 try {
-    requireMethod('GET', 'POST', 'PUT');
     $admin = requireAdmin();
+    requireMethod('GET', 'POST', 'PUT');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
     $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
