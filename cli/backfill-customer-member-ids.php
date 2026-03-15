@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../public_html/includes/bootstrap.php';
+require_once __DIR__ . '/../includes/bootstrap.php';
 
 $dryRun = in_array('--dry-run', $argv ?? [], true);
 $pdo = getDB();

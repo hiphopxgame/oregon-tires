@@ -30,15 +30,44 @@ try {
 
     $memberId = (int) $_SESSION['member_id'];
 
-    // Query vehicles linked to this customer
-    $stmt = $pdo->prepare(
-        'SELECT id, year, make, model, vin, tire_size, license_plate, created_at
-         FROM oretir_vehicles
-         WHERE member_id = ?
-         ORDER BY created_at DESC'
-    );
-    $stmt->execute([$memberId]);
+    // Fetch member email for matching guest-booked vehicles
+    $memberStmt = $pdo->prepare('SELECT email FROM members WHERE id = ? LIMIT 1');
+    $memberStmt->execute([$memberId]);
+    $memberEmail = $memberStmt->fetchColumn();
+
+    // Query vehicles: match by member_id OR via customer email (orphaned vehicles)
+    $sql = 'SELECT DISTINCT v.id, v.year, v.make, v.model, v.vin, v.tire_size, v.license_plate, v.created_at
+            FROM oretir_vehicles v
+            LEFT JOIN oretir_customers c ON v.customer_id = c.id
+            WHERE (v.member_id = :mid';
+
+    $params = [':mid' => $memberId];
+
+    if ($memberEmail) {
+        $sql .= ' OR (c.email = :email AND v.member_id IS NULL)';
+        $params[':email'] = $memberEmail;
+    }
+
+    $sql .= ') ORDER BY v.created_at DESC';
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Backfill: claim orphaned vehicles so future queries are fast
+    if ($memberEmail) {
+        try {
+            $backfill = $pdo->prepare(
+                'UPDATE oretir_vehicles v
+                 JOIN oretir_customers c ON v.customer_id = c.id
+                 SET v.member_id = :mid
+                 WHERE c.email = :email AND v.member_id IS NULL'
+            );
+            $backfill->execute([':mid' => $memberId, ':email' => $memberEmail]);
+        } catch (\Throwable $e) {
+            error_log("Oregon Tires backfill orphaned vehicles error: " . $e->getMessage());
+        }
+    }
 
     ?>
     <div class="member-page">

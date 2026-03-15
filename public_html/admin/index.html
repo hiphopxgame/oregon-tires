@@ -5408,6 +5408,16 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_inspection-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Desde $50"></div>
             </div>
             <div class="grid md:grid-cols-3 gap-4 items-start">
+              <label class="font-medium text-sm pt-2 dark:text-gray-300">Suspension Repair</label>
+              <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_suspension-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="From $150"></div>
+              <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_suspension-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Desde $150"></div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4 items-start">
+              <label class="font-medium text-sm pt-2 dark:text-gray-300">Roadside Assistance</label>
+              <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_roadside-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Call for pricing"></div>
+              <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_roadside-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Llame para precios"></div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Care Plan</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_care_plan-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="$19/mo"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_care_plan-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="$19/mes"></div>
@@ -7005,6 +7015,7 @@ function toggleAdminLanguage() {
   document.documentElement.lang = currentLang;
   document.getElementById('admin-lang-toggle').textContent = currentLang === 'en' ? 'ES' : 'EN';
   applyAdminTranslations();
+  refreshActiveTab();
   // Persist language preference to server + update settings dropdown
   var langEl = document.getElementById('settings-language');
   if (langEl) langEl.value = currentLang;
@@ -7032,6 +7043,53 @@ function applyAdminTranslations() {
   document.querySelectorAll('.doc-lang-es').forEach(function(el) {
     el.classList.toggle('hidden', currentLang !== 'es');
   });
+}
+
+function refreshActiveTab() {
+  var activeBtn = document.querySelector('.tab-btn.tab-active');
+  var tab = activeBtn ? activeBtn.getAttribute('data-tab') : 'overview';
+  switch (tab) {
+    case 'overview':
+      renderOverview();
+      break;
+    case 'appointments':
+      renderAppointments();
+      renderCalendar();
+      break;
+    case 'messages':
+      renderMessages();
+      break;
+    case 'employees':
+      renderEmployees();
+      break;
+    case 'customers':
+      if (typeof loadCustomers === 'function') loadCustomers();
+      break;
+    case 'gallery':
+      renderGallery();
+      break;
+    case 'repairorders':
+      if (typeof loadRepairOrders === 'function') loadRepairOrders();
+      break;
+    case 'subscribers':
+      if (typeof loadSubscribers === 'function') loadSubscribers();
+      break;
+    case 'promotions':
+      if (typeof loadPromotions === 'function') loadPromotions();
+      break;
+    case 'faq':
+      if (typeof loadFaqs === 'function') loadFaqs();
+      break;
+    case 'reviews':
+      if (typeof loadTestimonials === 'function') loadTestimonials();
+      break;
+    case 'analytics':
+      if (typeof loadAnalytics === 'function') loadAnalytics();
+      break;
+    case 'sitecontent':
+      if (typeof loadSiteSettings === 'function') { loadSiteSettings(); loadEmailTemplates(); }
+      break;
+  }
 }
 
 // ===== DARK MODE =====
@@ -10621,7 +10679,7 @@ async function revokeAdminByEmail(email) {
 }
 
 // ===== SITE SETTINGS (Editable Content) =====
-const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count', 'google_analytics_id', 'price_tire_install', 'price_tire_repair', 'price_oil_change', 'price_brake_service', 'price_alignment', 'price_tuneup', 'price_inspection', 'price_care_plan', 'founding_year'];
+const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count', 'google_analytics_id', 'price_tire_install', 'price_tire_repair', 'price_oil_change', 'price_brake_service', 'price_alignment', 'price_tuneup', 'price_inspection', 'price_suspension', 'price_roadside', 'price_care_plan', 'founding_year'];
 const SITE_SETTINGS_DEFAULTS = {
   phone: { en: '(503) 367-9714', es: '(503) 367-9714' },
   email: { en: 'oregontirespdx@gmail.com', es: 'oregontirespdx@gmail.com' },
@@ -10638,6 +10696,8 @@ const SITE_SETTINGS_DEFAULTS = {
   price_alignment: { en: 'From $75', es: 'Desde $75' },
   price_tuneup: { en: 'From $80', es: 'Desde $80' },
   price_inspection: { en: 'From $50', es: 'Desde $50' },
+  price_suspension: { en: 'From $150', es: 'Desde $150' },
+  price_roadside: { en: 'Call for pricing', es: 'Llame para precios' },
   price_care_plan: { en: '$19/mo', es: '$19/mes' },
   founding_year: { en: '2008', es: '2008' }
 };

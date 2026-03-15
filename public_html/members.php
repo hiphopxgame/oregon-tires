@@ -53,6 +53,8 @@ $memberDashboardConfig = [
         'activity' => memberT('activity', $lang),
         'security' => memberT('security', $lang),
     ],
+    'hide_register_link'       => true,
+    'hide_login_activity_link' => true,
 ];
 
 // Define Oregon Tires custom dashboard tabs (bilingual)

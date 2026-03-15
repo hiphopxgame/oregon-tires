@@ -157,14 +157,14 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <?php
           $services = [
-            ['name' => 'Tire Installation', 'price' => '$20+', 'slug' => 'tire-installation'],
-            ['name' => 'Tire Repair', 'price' => '$15+', 'slug' => 'tire-repair'],
-            ['name' => 'Oil Change', 'price' => '$35+', 'slug' => 'oil-change'],
-            ['name' => 'Brake Service', 'price' => '$100+', 'slug' => 'brake-service'],
-            ['name' => 'Wheel Alignment', 'price' => '$75+', 'slug' => 'wheel-alignment'],
-            ['name' => 'Tuneup', 'price' => '$80+', 'slug' => 'tuneup'],
-            ['name' => 'Inspection', 'price' => '$50+', 'slug' => 'inspection'],
-            ['name' => 'Mobile Service', 'price' => 'Call', 'slug' => 'mobile-service'],
+            ['name' => 'Tire Installation', 'price' => '$20+', 'slug' => 'tire-installation', 'setting' => 'price_tire_install'],
+            ['name' => 'Tire Repair', 'price' => '$15+', 'slug' => 'tire-repair', 'setting' => 'price_tire_repair'],
+            ['name' => 'Oil Change', 'price' => '$35+', 'slug' => 'oil-change', 'setting' => 'price_oil_change'],
+            ['name' => 'Brake Service', 'price' => '$100+', 'slug' => 'brake-service', 'setting' => 'price_brake_service'],
+            ['name' => 'Wheel Alignment', 'price' => '$75+', 'slug' => 'wheel-alignment', 'setting' => 'price_alignment'],
+            ['name' => 'Tuneup', 'price' => '$80+', 'slug' => 'tuneup', 'setting' => 'price_tuneup'],
+            ['name' => 'Inspection', 'price' => '$50+', 'slug' => 'inspection', 'setting' => 'price_inspection'],
+            ['name' => 'Mobile Service', 'price' => 'Call', 'slug' => 'mobile-service', 'setting' => 'price_roadside'],
           ];
           $servicePages = ['tire-installation', 'tire-repair', 'oil-change', 'brake-service', 'wheel-alignment', 'engine-diagnostics', 'suspension-repair'];
           foreach ($services as $i => $svc): ?>
@@ -174,7 +174,7 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
             <?php else: ?>
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-1"><?= $svc['name'] ?></div>
             <?php endif; ?>
-            <div class="text-2xl font-bold text-brand dark:text-green-400"><?= $svc['price'] ?></div>
+            <div class="text-2xl font-bold text-brand dark:text-green-400" data-setting="<?= htmlspecialchars($svc['setting']) ?>"><?= $svc['price'] ?></div>
             <a href="/book-appointment/?service=<?= $svc['slug'] ?>" class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white hover:bg-green-700 transition">Book Now &rarr;</a>
           </div>
           <?php endforeach; ?>
@@ -474,6 +474,18 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
   } else {
     localStorage.setItem('oregontires_lang', 'en');
   }
+
+  // Load dynamic prices from DB
+  fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json){
+    var data = json.data || [];
+    for (var i = 0; i < data.length; i++) {
+      var row = data[i];
+      document.querySelectorAll('[data-setting="' + row.setting_key + '"]').forEach(function(el) {
+        var val = lang === 'es' ? (row.value_es || row.value_en) : row.value_en;
+        if (val) el.textContent = val;
+      });
+    }
+  }).catch(function(){});
 })();
 </script>
 </body>
