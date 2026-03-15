@@ -13,8 +13,8 @@ $faqItems = [
     ['q' => 'How long does brake service take?', 'a' => 'A standard brake pad replacement takes 1-2 hours. More complex repairs involving rotors or calipers may take 2-3 hours.', 'qEs' => 'Cuanto tiempo toma el servicio de frenos?', 'aEs' => 'Un reemplazo estandar de pastillas de freno toma 1-2 horas. Reparaciones mas complejas que involucran rotores o calibradores pueden tomar 2-3 horas.'],
 ];
 $relatedServices = [
-    ['name' => 'Wheel Alignment', 'slug' => 'wheel-alignment'],
-    ['name' => 'Engine Diagnostics', 'slug' => 'engine-diagnostics'],
-    ['name' => 'Suspension Repair', 'slug' => 'suspension-repair'],
+    ['name' => 'Wheel Alignment', 'nameEs' => 'Alineacion de Ruedas', 'slug' => 'wheel-alignment'],
+    ['name' => 'Engine Diagnostics', 'nameEs' => 'Diagnostico de Motor', 'slug' => 'engine-diagnostics'],
+    ['name' => 'Suspension Repair', 'nameEs' => 'Reparacion de Suspension', 'slug' => 'suspension-repair'],
 ];
 require __DIR__ . '/templates/service-detail.php';

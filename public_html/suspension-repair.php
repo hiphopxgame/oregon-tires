@@ -13,8 +13,8 @@ $faqItems = [
     ['q' => 'What is the difference between shocks and struts?', 'a' => 'Shocks and struts both dampen road vibrations, but they have different designs. Struts are a structural part of the suspension and include a coil spring, while shocks are standalone components. Your vehicle uses one or the other — not both on the same wheel.', 'qEs' => 'Cual es la diferencia entre amortiguadores y puntales?', 'aEs' => 'Los amortiguadores y puntales ambos amortiguan las vibraciones del camino, pero tienen disenos diferentes. Los puntales son una parte estructural de la suspension e incluyen un resorte helicoidal, mientras que los amortiguadores son componentes independientes. Su vehiculo usa uno u otro — no ambos en la misma rueda.'],
 ];
 $relatedServices = [
-    ['name' => 'Wheel Alignment', 'slug' => 'wheel-alignment'],
-    ['name' => 'Brake Service', 'slug' => 'brake-service'],
-    ['name' => 'Engine Diagnostics', 'slug' => 'engine-diagnostics'],
+    ['name' => 'Wheel Alignment', 'nameEs' => 'Alineacion de Ruedas', 'slug' => 'wheel-alignment'],
+    ['name' => 'Brake Service', 'nameEs' => 'Servicio de Frenos', 'slug' => 'brake-service'],
+    ['name' => 'Engine Diagnostics', 'nameEs' => 'Diagnostico de Motor', 'slug' => 'engine-diagnostics'],
 ];
 require __DIR__ . '/templates/service-detail.php';

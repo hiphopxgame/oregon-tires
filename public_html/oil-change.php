@@ -13,8 +13,8 @@ $faqItems = [
     ['q' => 'How long does an oil change take?', 'a' => 'A standard oil change takes about 20-30 minutes. No appointment needed for most oil changes.', 'qEs' => 'Cuanto tiempo toma un cambio de aceite?', 'aEs' => 'Un cambio de aceite estandar toma aproximadamente 20-30 minutos. No se necesita cita para la mayoria de los cambios de aceite.'],
 ];
 $relatedServices = [
-    ['name' => 'Engine Diagnostics', 'slug' => 'engine-diagnostics'],
-    ['name' => 'Brake Service', 'slug' => 'brake-service'],
-    ['name' => 'Tire Installation', 'slug' => 'tire-installation'],
+    ['name' => 'Engine Diagnostics', 'nameEs' => 'Diagnostico de Motor', 'slug' => 'engine-diagnostics'],
+    ['name' => 'Brake Service', 'nameEs' => 'Servicio de Frenos', 'slug' => 'brake-service'],
+    ['name' => 'Tire Installation', 'nameEs' => 'Instalacion de Llantas', 'slug' => 'tire-installation'],
 ];
 require __DIR__ . '/templates/service-detail.php';

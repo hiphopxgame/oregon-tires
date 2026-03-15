@@ -13,8 +13,8 @@ $faqItems = [
     ['q' => 'Do you offer tire disposal?', 'a' => 'Yes, we properly recycle old tires for a small environmental fee.', 'qEs' => 'Ofrecen desecho de llantas?', 'aEs' => 'Si, reciclamos adecuadamente las llantas viejas por una pequena tarifa ambiental.'],
 ];
 $relatedServices = [
-    ['name' => 'Tire Repair', 'slug' => 'tire-repair'],
-    ['name' => 'Wheel Alignment', 'slug' => 'wheel-alignment'],
-    ['name' => 'Brake Service', 'slug' => 'brake-service'],
+    ['name' => 'Tire Repair', 'nameEs' => 'Reparacion de Llantas', 'slug' => 'tire-repair'],
+    ['name' => 'Wheel Alignment', 'nameEs' => 'Alineacion de Ruedas', 'slug' => 'wheel-alignment'],
+    ['name' => 'Brake Service', 'nameEs' => 'Servicio de Frenos', 'slug' => 'brake-service'],
 ];
 require __DIR__ . '/templates/service-detail.php';

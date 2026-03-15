@@ -54,6 +54,7 @@
     navContact:{ en:'Contact', es:'Contacto' },
     navBlog:{ en:'Blog', es:'Blog' },
     navSchedule:{ en:'Schedule Service', es:'Agendar Servicio' },
+    topHours:{ en:'\uD83D\uDD50 Mon-Sat 7AM-7PM', es:'\uD83D\uDD50 Lun-S\u00e1b 7AM-7PM' },
     footContact:{ en:'Contact Information', es:'Informaci\u00f3n de Contacto' },
     footHours:{ en:'Mon-Sat 7AM-7PM', es:'Lun-S\u00e1b 7AM-7PM' },
     footServices:{ en:'Services', es:'Servicios' },
@@ -74,11 +75,25 @@
     if (!lang) { try { lang = localStorage.getItem('oregontires_lang'); } catch(e){} }
     if (!lang) { lang = (navigator.language||'').startsWith('es') ? 'es' : 'en'; }
   }
-  if (lang === 'es') {
+  // Update lang toggle button text
+  var langBtn = document.getElementById('lang-toggle');
+  if (langBtn) langBtn.textContent = lang === 'es' ? '\uD83C\uDF10 EN' : '\uD83C\uDF10 ES';
+  // Apply nav/footer translations
+  function applyNavTranslations(l) {
     document.querySelectorAll('[data-t]').forEach(function(el){
       var k = el.getAttribute('data-t');
-      if (nav[k] && nav[k][lang]) el.textContent = nav[k][lang];
+      if (nav[k] && nav[k][l]) el.textContent = nav[k][l];
     });
   }
+  if (lang === 'es') applyNavTranslations('es');
+  // Language toggle function for header button
+  window.__toggleLang = function() {
+    var newLang = (localStorage.getItem('oregontires_lang') || 'en') === 'es' ? 'en' : 'es';
+    localStorage.setItem('oregontires_lang', newLang);
+    // Reload with new lang param to trigger full page translation
+    var url = new URL(window.location.href);
+    url.searchParams.set('lang', newLang);
+    window.location.href = url.toString();
+  };
 })();
 </script>

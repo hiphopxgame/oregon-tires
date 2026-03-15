@@ -56,6 +56,7 @@ $staticPages = [
     '/fleet-services',
     '/guarantee',
     '/blog',
+    '/promotions',
     '/faq',
     '/reviews',
     '/service-areas',
@@ -169,6 +170,24 @@ foreach ($serviceAreas as $slug) {
 foreach ($blogPosts as $post) {
     $lastmod = !empty($post['updated_at']) ? date('Y-m-d', strtotime($post['updated_at'])) : date('Y-m-d');
     echo sitemapUrl($baseUrl . '/blog/' . htmlspecialchars($post['slug']), $lastmod, false);
+}
+
+// Promotions from DB (bilingual)
+$galleryImages = [];
+if ($dbConfig && isset($pdo)) {
+    try {
+        $stmt = $pdo->query(
+            "SELECT id, created_at FROM oretir_gallery_images WHERE is_active = 1 ORDER BY display_order ASC"
+        );
+        $galleryImages = $stmt->fetchAll();
+    } catch (\Throwable $e) {
+        $galleryImages = [];
+    }
+}
+
+foreach ($galleryImages as $gi) {
+    $lastmod = !empty($gi['created_at']) ? date('Y-m-d', strtotime($gi['created_at'])) : date('Y-m-d');
+    echo sitemapUrl($baseUrl . '/promotions/' . (int) $gi['id'], $lastmod);
 }
 
 echo '</urlset>' . "\n";

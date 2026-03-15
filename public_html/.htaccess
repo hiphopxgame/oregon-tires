@@ -45,6 +45,14 @@
     # Blog post clean URLs: /blog/SLUG → blog-post.php?slug=SLUG
     RewriteRule ^blog/([a-z0-9-]+)/?$ blog-post.php?slug=$1 [L,QSA]
 
+    # Promotions clean URLs: /promotions/{id} → promotions.php?id={id}
+    RewriteCond %{QUERY_STRING} ^id=([0-9]+)$
+    RewriteRule ^promotions$ /promotions/%1? [R=301,L]
+    RewriteCond %{QUERY_STRING} ^id=([0-9]+)$
+    RewriteRule ^promotions\.php$ /promotions/%1? [R=301,L]
+
+    RewriteRule ^promotions/([0-9]+)/?$ promotions.php?id=$1 [L,QSA]
+
     # Dynamic sitemap: /sitemap.xml → api/sitemap.php
     RewriteRule ^sitemap\.xml$ api/sitemap.php [L]
 

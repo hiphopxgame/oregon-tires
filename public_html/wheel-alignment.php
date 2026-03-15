@@ -13,8 +13,8 @@ $faqItems = [
     ['q' => 'How long does a wheel alignment take?', 'a' => 'A standard 4-wheel alignment takes about 45-60 minutes depending on your vehicle and the adjustments needed.', 'qEs' => 'Cuanto tiempo toma una alineacion?', 'aEs' => 'Una alineacion estandar de 4 ruedas toma aproximadamente 45-60 minutos dependiendo de su vehiculo y los ajustes necesarios.'],
 ];
 $relatedServices = [
-    ['name' => 'Tire Installation', 'slug' => 'tire-installation'],
-    ['name' => 'Suspension Repair', 'slug' => 'suspension-repair'],
-    ['name' => 'Tire Repair', 'slug' => 'tire-repair'],
+    ['name' => 'Tire Installation', 'nameEs' => 'Instalacion de Llantas', 'slug' => 'tire-installation'],
+    ['name' => 'Suspension Repair', 'nameEs' => 'Reparacion de Suspension', 'slug' => 'suspension-repair'],
+    ['name' => 'Tire Repair', 'nameEs' => 'Reparacion de Llantas', 'slug' => 'tire-repair'],
 ];
 require __DIR__ . '/templates/service-detail.php';

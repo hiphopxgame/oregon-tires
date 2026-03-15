@@ -31,6 +31,23 @@
   }
   .member-page { padding-top: 1rem; }
 </style>
+<!-- Top Info Bar -->
+<div class="bg-brand text-white text-sm py-2">
+  <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
+    <div class="flex flex-wrap items-center gap-4">
+      <span>&#x1F4DE; <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></span>
+      <span class="hidden sm:inline">&#x2709;&#xFE0F; <a href="mailto:oregontirespdx@gmail.com" class="hover:text-amber-300">oregontirespdx@gmail.com</a></span>
+      <span class="hidden md:inline">&#x1F4CD; 8536 SE 82nd Ave, Portland, OR 97266</span>
+      <span class="hidden lg:inline" data-t="topHours">&#x1F550; Mon-Sat 7AM-7PM</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="https://www.instagram.com/oregontires" target="_blank" class="hover:text-amber-300">Instagram</a>
+      <a href="https://www.facebook.com/61571913202998/" target="_blank" class="hover:text-amber-300">Facebook</a>
+      <button onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light')" aria-label="Toggle dark mode" class="text-sm text-white hover:text-amber-300 transition-colors">&#x1F319;</button>
+      <button onclick="window.__toggleLang ? window.__toggleLang() : location.href='?lang=' + (localStorage.getItem('oregontires_lang') === 'es' ? 'en' : 'es')" class="hover:text-amber-300 font-medium" id="lang-toggle" aria-label="Switch language">&#x1F310; ES</button>
+    </div>
+  </div>
+</div>
 <header class="bg-white shadow-md sticky top-0 z-50 dark:bg-gray-800">
   <div class="container mx-auto px-4 py-3 flex justify-between items-center">
     <a href="/">

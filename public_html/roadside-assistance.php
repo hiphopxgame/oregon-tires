@@ -13,8 +13,8 @@ $faqItems = [
     ['q' => 'What\'s included in roadside assistance?', 'a' => 'Our roadside service includes flat tire changes, battery jump starts, lockout assistance, and towing coordination. We can also perform basic roadside tire repairs when possible.', 'qEs' => 'Que incluye la asistencia en carretera?', 'aEs' => 'Nuestro servicio en carretera incluye cambio de llantas ponchadas, arranque de bateria con cables, asistencia con cerraduras y coordinacion de grua. Tambien podemos realizar reparaciones basicas de llantas cuando sea posible.'],
 ];
 $relatedServices = [
-    ['name' => 'Tire Repair', 'slug' => 'tire-repair'],
-    ['name' => 'Mobile Service', 'slug' => 'mobile-service'],
-    ['name' => 'Tire Installation', 'slug' => 'tire-installation'],
+    ['name' => 'Tire Repair', 'nameEs' => 'Reparacion de Llantas', 'slug' => 'tire-repair'],
+    ['name' => 'Mobile Service', 'nameEs' => 'Servicio Movil', 'slug' => 'mobile-service'],
+    ['name' => 'Tire Installation', 'nameEs' => 'Instalacion de Llantas', 'slug' => 'tire-installation'],
 ];
 require __DIR__ . '/templates/service-detail.php';

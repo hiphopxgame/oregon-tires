@@ -439,20 +439,7 @@
       .faq-item summary .faq-chevron { transition: transform 0.2s ease; }
       .faq-item[open] summary .faq-chevron { transform: rotate(180deg); }
     }
-    /* Gallery lightbox */
-    .gallery-lightbox { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; flex-direction: column; cursor: zoom-out; }
-    .gallery-lightbox.active { display: flex; }
-    .gallery-lightbox img { max-width: 90vw; max-height: 80vh; object-fit: contain; border-radius: 8px; cursor: default; }
-    .gallery-lightbox-caption { color: #fff; text-align: center; margin-top: 12px; max-width: 90vw; }
-    .gallery-lightbox-caption h4 { font-size: 1.125rem; font-weight: 600; }
-    .gallery-lightbox-caption p { font-size: 0.875rem; color: var(--ot-input-border); margin-top: 4px; }
-    .gallery-lightbox-close { position: absolute; top: 16px; right: 16px; color: #fff; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .gallery-lightbox-close:hover { background: rgba(255,255,255,0.2); }
-    .gallery-lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); color: #fff; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .gallery-lightbox-nav:hover { background: rgba(255,255,255,0.2); }
-    .gallery-lightbox-nav.prev { left: 16px; }
-    .gallery-lightbox-nav.next { right: 16px; }
-    .gallery-card { cursor: pointer; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   </style>
 
   <!-- Google Analytics 4 — Hybrid loader (configurable via admin panel) -->
@@ -726,7 +713,7 @@
         <a href="#services" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="services">Services</a>
         <a href="#about" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="about">About</a>
         <a href="#reviews" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="testimonials">Reviews</a>
-        <a href="#gallery" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="gallery">Promotions</a>
+        <a href="/promotions" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="gallery">Promotions</a>
         <a href="#faq" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="faqNav">FAQ</a>
         <a href="#contact" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="contact">Contact</a>
         <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="getFreeEstimate">Free Estimate</a>
@@ -739,7 +726,7 @@
       <a href="#services" class="block py-2 text-brand dark:text-green-400" data-t="services">Services</a>
       <a href="#about" class="block py-2 text-brand dark:text-green-400" data-t="about">About</a>
       <a href="#reviews" class="block py-2 text-brand dark:text-green-400" data-t="testimonials">Reviews</a>
-      <a href="#gallery" class="block py-2 text-brand dark:text-green-400" data-t="gallery">Promotions</a>
+      <a href="/promotions" class="block py-2 text-brand dark:text-green-400" data-t="gallery">Promotions</a>
       <a href="#faq" class="block py-2 text-brand dark:text-green-400" data-t="faqNav">FAQ</a>
       <a href="#contact" class="block py-2 text-brand dark:text-green-400" data-t="contact">Contact</a>
       <a href="/book-appointment" class="block bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold text-center hover:bg-amber-600 transition mt-2" data-t="getFreeEstimate">Free Estimate</a>
@@ -1126,9 +1113,9 @@
         <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
         <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
         <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
-        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
-        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
-        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
+      </div>
+      <div id="gallery-view-all" class="hidden text-center mt-8">
+        <a href="/promotions" class="inline-block bg-brand text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800 transition shadow" data-t="viewAllPromotions">View All Promotions &rarr;</a>
       </div>
     </div>
   </section>
@@ -1522,6 +1509,7 @@ const t = {
     poweredBy: 'Powered by',
     noGalleryImages: 'No promotions yet.',
     galleryLoadError: 'Could not load promotions.',
+    viewAllPromotions: 'View All Promotions →',
     messageSent: 'Message sent successfully!',
     messageError: 'Error sending message. Please try again.',
     verified: 'Verified',
@@ -1677,6 +1665,7 @@ const t = {
     poweredBy: 'Desarrollado por',
     noGalleryImages: 'Aún no hay promociones.',
     galleryLoadError: 'No se pudieron cargar las promociones.',
+    viewAllPromotions: 'Ver Todas las Promociones →',
     messageSent: 'Mensaje enviado con éxito!',
     messageError: 'Error al enviar mensaje. Por favor intente de nuevo.',
     verified: 'Verificado',
@@ -1855,7 +1844,7 @@ function renderReviews(allReviews) {
       stars.appendChild(badge);
     } else {
       var badge = document.createElement('span');
-      badge.className = 'text-xs bg-gray-100 dark:bg-gray-600 px-2 py-1 rounded';
+      badge.className = 'text-xs bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-2 py-1 rounded';
       badge.textContent = t[currentLang].verified;
       stars.appendChild(starSpan);
       stars.appendChild(badge);
@@ -1872,7 +1861,7 @@ function renderReviews(allReviews) {
       nameRow.appendChild(avatar);
     }
     var name = document.createElement('h4');
-    name.className = 'font-bold text-lg';
+    name.className = 'font-bold text-lg dark:text-white';
     name.textContent = r.customer_name;
     nameRow.appendChild(name);
     var date = document.createElement('p');
@@ -2042,6 +2031,7 @@ async function loadGalleryForSite() {
     const res = await fetch(API_BASE + '/gallery.php', { credentials: 'include' });
     const json = await res.json();
     const grid = document.getElementById('gallery-section-grid');
+    const viewAllBtn = document.getElementById('gallery-view-all');
     const images = (json.success && json.data) ? json.data : [];
     if (!images.length) {
       grid.textContent = '';
@@ -2052,16 +2042,15 @@ async function loadGalleryForSite() {
       return;
     }
     grid.textContent = '';
-    window._galleryImages = images;
-    images.forEach(function(img, idx) {
-      var card = document.createElement('div');
-      card.className = 'gallery-card rounded-xl overflow-hidden shadow-md hover:shadow-lg transition group';
-      card.setAttribute('data-gallery-index', idx);
-      card.setAttribute('role', 'button');
-      card.setAttribute('tabindex', '0');
+    var preview = images.slice(0, 3);
+    preview.forEach(function(img) {
       var imgTitle = currentLang === 'es' ? (img.title_es || img.title_en) : img.title_en;
       var imgDesc = currentLang === 'es' ? (img.description_es || img.description_en) : img.description_en;
-      card.setAttribute('aria-label', (imgTitle || t[currentLang].galleryImage) + ' — click to enlarge');
+
+      var card = document.createElement('a');
+      card.href = '/promotions/' + img.id;
+      card.className = 'rounded-xl overflow-hidden shadow-md hover:shadow-lg transition group bg-white dark:bg-gray-800';
+
       var imgWrap = document.createElement('div');
       imgWrap.className = 'relative h-56 bg-gray-200 dark:bg-gray-700 overflow-hidden';
       var imgEl = document.createElement('img');
@@ -2071,42 +2060,29 @@ async function loadGalleryForSite() {
       imgEl.decoding = 'async';
       imgEl.className = 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300';
       imgWrap.appendChild(imgEl);
-      // Tap-to-enlarge overlay
-      var overlay = document.createElement('div');
-      overlay.className = 'absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center';
-      var zoomIcon = document.createElement('span');
-      zoomIcon.className = 'text-white text-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-lg';
-      zoomIcon.textContent = '\uD83D\uDD0D';
-      overlay.appendChild(zoomIcon);
-      imgWrap.appendChild(overlay);
       card.appendChild(imgWrap);
+
       if (imgTitle) {
         var info = document.createElement('div');
-        info.className = 'p-4 bg-white dark:bg-gray-800';
+        info.className = 'p-4';
         var h4 = document.createElement('h4');
-        h4.className = 'font-semibold text-brand dark:text-green-400';
+        h4.className = 'font-semibold text-brand dark:text-green-400 group-hover:underline';
         h4.textContent = imgTitle;
         info.appendChild(h4);
         if (imgDesc) {
           var desc = document.createElement('p');
-          desc.className = 'text-sm text-gray-600 dark:text-gray-300 mt-1';
+          desc.className = 'text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2';
           desc.textContent = imgDesc;
           info.appendChild(desc);
         }
         card.appendChild(info);
       }
-      // Direct click handler (doesn't rely on event delegation)
-      (function(cardIdx) {
-        card.addEventListener('click', function() {
-          openGalleryLightbox(cardIdx);
-        });
-        card.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') openGalleryLightbox(cardIdx);
-        });
-      })(idx);
       grid.appendChild(card);
     });
-    initGalleryLightbox();
+    // Show "View All" button if there are more than 3
+    if (images.length > 3 && viewAllBtn) {
+      viewAllBtn.classList.remove('hidden');
+    }
   } catch (e) {
     console.error('Error loading gallery:', e);
     var errGrid = document.getElementById('gallery-section-grid');
@@ -2117,105 +2093,6 @@ async function loadGalleryForSite() {
     errGrid.appendChild(errMsg);
   }
 }
-
-// ===== GALLERY LIGHTBOX =====
-var _galleryCurrentIndex = 0;
-
-function openGalleryLightbox(idx) {
-  var images = window._galleryImages || [];
-  if (!images[idx]) return;
-  _galleryCurrentIndex = idx;
-  var img = images[idx];
-  var lightbox = document.getElementById('gallery-lightbox');
-  var lbImg = document.getElementById('gallery-lightbox-img');
-  var lbCaption = document.getElementById('gallery-lightbox-caption');
-  var lbTitle = currentLang === 'es' ? (img.title_es || img.title_en) : img.title_en;
-  var lbDesc = currentLang === 'es' ? (img.description_es || img.description_en) : img.description_en;
-  lbImg.src = img.image_url || '';
-  lbImg.alt = lbTitle || '';
-  lbCaption.textContent = '';
-  if (lbTitle) {
-    var h4 = document.createElement('h4');
-    h4.textContent = lbTitle;
-    lbCaption.appendChild(h4);
-    if (lbDesc) {
-      var p = document.createElement('p');
-      p.textContent = lbDesc;
-      lbCaption.appendChild(p);
-    }
-  }
-  lightbox.classList.add('active');
-  document.body.style.overflow = 'hidden';
-  // Focus trap: move focus into lightbox
-  lightbox._prevFocus = document.activeElement;
-  lightbox.querySelector('.gallery-lightbox-close').focus();
-}
-
-function closeGalleryLightbox() {
-  var lightbox = document.getElementById('gallery-lightbox');
-  lightbox.classList.remove('active');
-  document.body.style.overflow = '';
-  document.getElementById('gallery-lightbox-img').src = '';
-  // Restore focus to element that triggered lightbox
-  if (lightbox._prevFocus) { try { lightbox._prevFocus.focus(); } catch(e) {} }
-}
-
-function navigateGallery(dir) {
-  var images = window._galleryImages || [];
-  var next = _galleryCurrentIndex + dir;
-  if (next < 0) next = images.length - 1;
-  if (next >= images.length) next = 0;
-  openGalleryLightbox(next);
-}
-
-function initGalleryLightbox() {
-  var lightbox = document.getElementById('gallery-lightbox');
-  if (!lightbox || lightbox._initialized) return;
-  lightbox._initialized = true;
-
-  // Close button
-  lightbox.querySelector('.gallery-lightbox-close').addEventListener('click', function(e) {
-    e.stopPropagation();
-    closeGalleryLightbox();
-  });
-
-  // Nav buttons
-  lightbox.querySelector('.prev').addEventListener('click', function(e) {
-    e.stopPropagation();
-    navigateGallery(-1);
-  });
-  lightbox.querySelector('.next').addEventListener('click', function(e) {
-    e.stopPropagation();
-    navigateGallery(1);
-  });
-
-  // Click backdrop to close
-  lightbox.addEventListener('click', function(e) {
-    if (e.target === lightbox) closeGalleryLightbox();
-  });
-
-  // Keyboard navigation
-  document.addEventListener('keydown', function(e) {
-    if (!lightbox.classList.contains('active')) return;
-    if (e.key === 'Escape') closeGalleryLightbox();
-    if (e.key === 'ArrowLeft') navigateGallery(-1);
-    if (e.key === 'ArrowRight') navigateGallery(1);
-  });
-
-  // Touch swipe support
-  var touchStartX = 0;
-  lightbox.addEventListener('touchstart', function(e) {
-    touchStartX = e.changedTouches[0].screenX;
-  }, { passive: true });
-  lightbox.addEventListener('touchend', function(e) {
-    var diff = e.changedTouches[0].screenX - touchStartX;
-    if (Math.abs(diff) > 50) {
-      navigateGallery(diff > 0 ? -1 : 1);
-    }
-  }, { passive: true });
-}
-
-// Init calls are deferred to after currentLang is defined (see below)
 
 
 let lastContactSubmitTime = 0;
@@ -2709,14 +2586,7 @@ if ('PerformanceObserver' in window) {
   sections.forEach(function(s) { observer.observe(s); });
 })();
 </script>
-  <!-- Gallery Lightbox -->
-  <div class="gallery-lightbox" id="gallery-lightbox" role="dialog" aria-label="Image viewer" aria-modal="true">
-    <button class="gallery-lightbox-close" aria-label="Close">&times;</button>
-    <button class="gallery-lightbox-nav prev" aria-label="Previous image">&#8249;</button>
-    <button class="gallery-lightbox-nav next" aria-label="Next image">&#8250;</button>
-    <img src="" alt="Gallery image" id="gallery-lightbox-img" role="img">
-    <div class="gallery-lightbox-caption" id="gallery-lightbox-caption"></div>
-  </div>
+
 
   <script src="/assets/js/scroll-reveal.js" defer></script>
   <script src="/assets/js/exit-intent.js" defer></script>

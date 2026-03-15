@@ -13,8 +13,8 @@ $faqItems = [
     ['q' => 'How quickly can you arrive?', 'a' => 'For same-day requests, we typically arrive within 1-2 hours depending on availability and distance. You can also schedule a specific time that works best for you.', 'qEs' => 'Que tan rapido pueden llegar?', 'aEs' => 'Para solicitudes del mismo dia, tipicamente llegamos en 1-2 horas dependiendo de la disponibilidad y distancia. Tambien puede programar un horario especifico que le convenga.'],
 ];
 $relatedServices = [
-    ['name' => 'Roadside Assistance', 'slug' => 'roadside-assistance'],
-    ['name' => 'Tire Repair', 'slug' => 'tire-repair'],
-    ['name' => 'Tire Installation', 'slug' => 'tire-installation'],
+    ['name' => 'Roadside Assistance', 'nameEs' => 'Asistencia en Carretera', 'slug' => 'roadside-assistance'],
+    ['name' => 'Tire Repair', 'nameEs' => 'Reparacion de Llantas', 'slug' => 'tire-repair'],
+    ['name' => 'Tire Installation', 'nameEs' => 'Instalacion de Llantas', 'slug' => 'tire-installation'],
 ];
 require __DIR__ . '/templates/service-detail.php';

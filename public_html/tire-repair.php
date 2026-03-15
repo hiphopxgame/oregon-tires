@@ -13,8 +13,8 @@ $faqItems = [
     ['q' => 'What is the difference between a patch and a plug?', 'a' => 'A plug fills the puncture hole from the outside, while a patch seals it from the inside. We use a combination plug/patch for the safest and most durable repair — this is the industry-standard method.', 'qEs' => 'Cual es la diferencia entre un parche y un tapon?', 'aEs' => 'Un tapon llena el agujero del pinchazo desde el exterior, mientras que un parche lo sella desde el interior. Usamos una combinacion de tapon/parche para la reparacion mas segura y duradera — este es el metodo estandar de la industria.'],
 ];
 $relatedServices = [
-    ['name' => 'Tire Installation', 'slug' => 'tire-installation'],
-    ['name' => 'Wheel Alignment', 'slug' => 'wheel-alignment'],
-    ['name' => 'Brake Service', 'slug' => 'brake-service'],
+    ['name' => 'Tire Installation', 'nameEs' => 'Instalacion de Llantas', 'slug' => 'tire-installation'],
+    ['name' => 'Wheel Alignment', 'nameEs' => 'Alineacion de Ruedas', 'slug' => 'wheel-alignment'],
+    ['name' => 'Brake Service', 'nameEs' => 'Servicio de Frenos', 'slug' => 'brake-service'],
 ];
 require __DIR__ . '/templates/service-detail.php';

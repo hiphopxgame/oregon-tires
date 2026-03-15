@@ -149,15 +149,15 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
         <p class="text-lg md:text-xl mb-6 max-w-3xl opacity-90" data-t="heroSubtitle"><?= htmlspecialchars($serviceDescription) ?></p>
         <div class="mb-6"></div>
         <div class="flex flex-wrap gap-3">
-          <a href="/book-appointment/?service=<?= htmlspecialchars($serviceSlug) ?>" class="bg-amber-500 text-black px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-lg">Book Now</a>
-          <a href="tel:5033679714" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition">Call (503) 367-9714</a>
+          <a href="/book-appointment/?service=<?= htmlspecialchars($serviceSlug) ?>" class="bg-amber-500 text-black px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition shadow-lg" data-t="heroBook">Book Now</a>
+          <a href="tel:5033679714" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition" data-t="heroCall">Call (503) 367-9714</a>
         </div>
         <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-white/90">
-          <span class="flex items-center gap-1"><svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg> 4.8 Stars &middot; 150+ Reviews</span>
+          <span class="flex items-center gap-1"><svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg> <span data-t="heroStars">4.8 Stars &middot; 150+ Reviews</span></span>
           <span class="hidden sm:inline text-white/40">|</span>
-          <span>Since 2008</span>
+          <span data-t="heroSince">Since 2008</span>
           <span class="hidden sm:inline text-white/40">|</span>
-          <span>Se Habla Espa&ntilde;ol</span>
+          <span data-t="heroBilingual">Se Habla Espa&ntilde;ol</span>
         </div>
       </div>
     </section>
@@ -256,10 +256,10 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
       <div class="container mx-auto px-4 max-w-4xl">
         <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-6 text-center" data-t="relatedTitle">Related Services</h2>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <?php foreach ($relatedServices as $rs): ?>
+          <?php foreach ($relatedServices as $i => $rs): ?>
           <a href="/<?= htmlspecialchars($rs['slug']) ?>" class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 text-center border border-gray-200 dark:border-gray-700 hover:border-brand dark:hover:border-green-400 transition block">
-            <div class="text-lg font-bold text-brand dark:text-green-400 mb-1"><?= htmlspecialchars($rs['name']) ?></div>
-            <span class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white">Learn More &rarr;</span>
+            <div class="text-lg font-bold text-brand dark:text-green-400 mb-1" data-t="related<?= $i ?>Name"><?= htmlspecialchars($rs['name']) ?></div>
+            <span class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand text-white" data-t="relatedLearnMore">Learn More &rarr;</span>
           </a>
           <?php endforeach; ?>
         </div>
@@ -287,9 +287,9 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
         <h2 class="text-2xl font-bold mb-3" data-t="ctaTitle">Ready for <?= htmlspecialchars($serviceName) ?>?</h2>
         <p class="mb-6" data-t="ctaSubtitle">Book online or call for same-day service. Free estimates, no obligation.</p>
         <div class="flex justify-center gap-3 flex-wrap">
-          <a href="/book-appointment/?service=<?= htmlspecialchars($serviceSlug) ?>" class="bg-brand text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800 transition shadow-lg">Book Free Estimate</a>
-          <a href="tel:5033679714" class="border-2 border-black text-black px-8 py-3 rounded-lg font-semibold hover:bg-black/10 transition">Call (503) 367-9714</a>
-          <a href="sms:5033679714" class="border-2 border-black text-black px-8 py-3 rounded-lg font-semibold hover:bg-black/10 transition">Text Us</a>
+          <a href="/book-appointment/?service=<?= htmlspecialchars($serviceSlug) ?>" class="bg-brand text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800 transition shadow-lg" data-t="ctaBook">Book Free Estimate</a>
+          <a href="tel:5033679714" class="border-2 border-black text-black px-8 py-3 rounded-lg font-semibold hover:bg-black/10 transition" data-t="ctaCall">Call (503) 367-9714</a>
+          <a href="sms:5033679714" class="border-2 border-black text-black px-8 py-3 rounded-lg font-semibold hover:bg-black/10 transition" data-t="ctaText">Text Us</a>
         </div>
       </div>
     </section>
@@ -301,10 +301,10 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
   <div class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-brand shadow-[0_-4px_12px_rgba(0,0,0,0.15)] border-t border-green-700" role="complementary" aria-label="Quick actions">
     <div class="flex">
       <a href="tel:5033679714" class="flex-1 flex items-center justify-center gap-2 py-3.5 text-white font-semibold text-sm border-r border-green-700">
-        <span aria-hidden="true">&#x1F4DE;</span> Call Now
+        <span aria-hidden="true">&#x1F4DE;</span> <span data-t="mobileCall">Call Now</span>
       </a>
       <a href="/book-appointment/?service=<?= htmlspecialchars($serviceSlug) ?>" class="flex-1 flex items-center justify-center gap-2 py-3.5 bg-amber-500 text-black font-semibold text-sm">
-        <span aria-hidden="true">&#x1F4C5;</span> Book Now
+        <span aria-hidden="true">&#x1F4C5;</span> <span data-t="mobileBook">Book Now</span>
       </a>
     </div>
   </div>
@@ -334,10 +334,24 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
       'faq<?= $i ?>A': '<?= addslashes($faq['aEs']) ?>',
       <?php endforeach; ?>
       relatedTitle: 'Servicios Relacionados',
+      relatedLearnMore: 'Ver Mas \u2192',
+      <?php foreach ($relatedServices as $i => $rs): ?>
+      'related<?= $i ?>Name': '<?= addslashes($rs['nameEs'] ?? $rs['name']) ?>',
+      <?php endforeach; ?>
       reviewTitle: 'Lo Que Dicen Nuestros Clientes',
       reviewText: '"Excelente servicio! Instalaron mis llantas nuevas rapidamente y el precio fue muy justo. El personal habla espanol, lo que facilito la comunicacion."',
       ctaTitle: 'Listo para <?= addslashes($serviceNameEs) ?>?',
-      ctaSubtitle: 'Reserve en linea o llame para servicio el mismo dia. Estimados gratis, sin compromiso.'
+      ctaSubtitle: 'Reserve en linea o llame para servicio el mismo dia. Estimados gratis, sin compromiso.',
+      ctaBook: 'Estimado Gratis',
+      ctaCall: 'Llamar (503) 367-9714',
+      ctaText: 'Envienos un Texto',
+      heroBook: 'Reserve Ahora',
+      heroCall: 'Llamar (503) 367-9714',
+      heroStars: '4.8 Estrellas \u00b7 150+ Rese\u00f1as',
+      heroSince: 'Desde 2008',
+      heroBilingual: 'Se Habla Espa\u00f1ol',
+      mobileCall: 'Llamar',
+      mobileBook: 'Reservar'
     };
     var params = new URLSearchParams(window.location.search);
     var lang = params.get('lang') || localStorage.getItem('oregontires_lang') || 'en';

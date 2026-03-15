@@ -13,8 +13,8 @@ $faqItems = [
     ['q' => 'Do you fix what you find?', 'a' => 'Yes! Once we diagnose the issue, we provide a detailed estimate for the repair. With your approval, our technicians can perform the repair right away in most cases.', 'qEs' => 'Reparan lo que encuentran?', 'aEs' => 'Si! Una vez que diagnosticamos el problema, proporcionamos un estimado detallado para la reparacion. Con su aprobacion, nuestros tecnicos pueden realizar la reparacion de inmediato en la mayoria de los casos.'],
 ];
 $relatedServices = [
-    ['name' => 'Oil Change', 'slug' => 'oil-change'],
-    ['name' => 'Brake Service', 'slug' => 'brake-service'],
-    ['name' => 'Suspension Repair', 'slug' => 'suspension-repair'],
+    ['name' => 'Oil Change', 'nameEs' => 'Cambio de Aceite', 'slug' => 'oil-change'],
+    ['name' => 'Brake Service', 'nameEs' => 'Servicio de Frenos', 'slug' => 'brake-service'],
+    ['name' => 'Suspension Repair', 'nameEs' => 'Reparacion de Suspension', 'slug' => 'suspension-repair'],
 ];
 require __DIR__ . '/templates/service-detail.php';
