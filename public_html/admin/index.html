@@ -454,6 +454,7 @@
               <div id="notif-empty" class="px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500 hidden" data-t="noNotifications">No new notifications</div>
             </div>
           </div>
+          <a href="/members?tab=profile" class="text-sm hover:text-amber-200" data-t="myAccount">My Account</a>
           <a href="/" class="text-sm hover:text-amber-200" data-t="viewSite">View Site</a>
           <button onclick="signOut()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition" data-t="signOut">Sign Out</button>
         </div>
@@ -7457,11 +7458,7 @@ document.getElementById('forgot-form').addEventListener('submit', async function
 
 async function signOut() {
   try { await api('logout.php', { method: 'POST' }); } catch(e) {}
-  csrfToken = '';
-  currentUser = null;
-  document.getElementById('admin-dashboard').classList.add('hidden');
-  document.getElementById('forgot-password-screen').classList.add('hidden');
-  document.getElementById('login-screen').classList.remove('hidden');
+  window.location.href = '/members';
 }
 
 (async () => {
@@ -7469,7 +7466,11 @@ async function signOut() {
     const json = await api('session.php');
     csrfToken = json.data.csrf_token;
     showDashboard(json.data);
-  } catch(e) { /* not logged in */ }
+  } catch(e) {
+    // Not logged in — redirect to unified login at /members
+    window.location.href = '/members';
+    return;
+  }
 })();
 
 function showDashboard(user) {

@@ -28,7 +28,10 @@ try {
         jsonError('Reset failed. Token may be expired or already used.');
     }
 
-    jsonSuccess(['message' => 'Password has been reset. You may now log in.']);
+    jsonSuccess([
+        'message'  => 'Password has been reset. You may now log in.',
+        'redirect' => '/members',
+    ]);
 } catch (\Throwable $e) {
     error_log("Oregon Tires customer/reset-password error: " . $e->getMessage());
     jsonError('Server error', 500);
