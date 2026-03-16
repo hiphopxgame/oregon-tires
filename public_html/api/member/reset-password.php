@@ -24,8 +24,8 @@ try {
 
     $result = MemberAuth::resetPassword($token, $password);
 
-    if (!$result['success']) {
-        jsonError($result['error'] ?? 'Reset failed. Token may be expired.');
+    if (!$result) {
+        jsonError('Reset failed. Token may be expired or already used.');
     }
 
     jsonSuccess(['message' => 'Password has been reset. You may now log in.']);
