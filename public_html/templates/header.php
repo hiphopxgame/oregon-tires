@@ -60,8 +60,11 @@
       <a href="/#reviews" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="navReviews">Reviews</a>
       <a href="/#contact" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="navContact">Contact</a>
       <a href="/blog" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="navBlog">Blog</a>
+      <?php if (!empty($_SESSION['member_id'])): ?>
+      <a href="/dashboard" class="text-brand dark:text-green-400 font-medium hover:opacity-70"><?= ($_SESSION['dashboard_role'] ?? 'member') !== 'member' ? 'Dashboard' : 'My Account' ?></a>
+      <?php endif; ?>
       <?php if (!empty($_SESSION['admin_id'])): ?>
-      <a href="/admin/" class="text-amber-600 dark:text-amber-400 font-medium hover:opacity-70">Admin Panel</a>
+      <a href="/admin/" class="text-amber-600 dark:text-amber-400 font-medium hover:opacity-70">Admin</a>
       <?php endif; ?>
       <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="navSchedule">Schedule Service</a>
     </nav>
@@ -74,8 +77,11 @@
     <a href="/#reviews" class="block py-2 text-brand dark:text-green-400" data-t="navReviews">Reviews</a>
     <a href="/#contact" class="block py-2 text-brand dark:text-green-400" data-t="navContact">Contact</a>
     <a href="/blog" class="block py-2 text-brand dark:text-green-400" data-t="navBlog">Blog</a>
+    <?php if (!empty($_SESSION['member_id'])): ?>
+    <a href="/dashboard" class="block py-2 text-brand dark:text-green-400 font-medium"><?= ($_SESSION['dashboard_role'] ?? 'member') !== 'member' ? 'Dashboard' : 'My Account' ?></a>
+    <?php endif; ?>
     <?php if (!empty($_SESSION['admin_id'])): ?>
-    <a href="/admin/" class="block py-2 text-amber-600 dark:text-amber-400 font-medium">Admin Panel</a>
+    <a href="/admin/" class="block py-2 text-amber-600 dark:text-amber-400 font-medium">Admin</a>
     <?php endif; ?>
     <a href="/book-appointment" class="block py-2 text-brand dark:text-green-400 font-semibold" data-t="navSchedule">Schedule Service</a>
   </div>

@@ -25,11 +25,6 @@ function initMemberKit(PDO $pdo): void
         define('MEMBER_KIT_PATH', $path);
     }
 
-    // Stub translation function expected by member-kit templates
-    if (!function_exists('t')) {
-        function t(string $key): ?string { return null; }
-    }
-
     require_once $path . '/loader.php';
 
     MemberAuth::init($pdo, [
@@ -52,23 +47,42 @@ function initMemberKit(PDO $pdo): void
         $_SESSION['member_email'] = $member['email'] ?? '';
         $_SESSION['is_customer']  = true;
 
-        // Cross-DB: check if this user is a HW super admin
-        $email = $member['email'] ?? '';
+        $email    = $member['email'] ?? '';
+        $memberId = (int) $member['id'];
+
+        // ── Detect role: admin > employee > member ──────────────────────
+        $detectedRole = 'member';
+
+        // 1. Check local oretir_admins table
+        if ($email !== '') {
+            try {
+                $stmt = $pdo->prepare('SELECT id, role, display_name, language FROM oretir_admins WHERE email = ? AND is_active = 1 LIMIT 1');
+                $stmt->execute([$email]);
+                $localAdmin = $stmt->fetch();
+                if ($localAdmin) {
+                    $detectedRole = 'admin';
+                    $_SESSION['admin_id']       = $localAdmin['id'];
+                    $_SESSION['admin_email']    = $email;
+                    $_SESSION['admin_role']     = $localAdmin['role'] ?? 'admin';
+                    $_SESSION['admin_name']     = $localAdmin['display_name'] ?? $member['display_name'] ?? $email;
+                    $_SESSION['admin_language'] = $localAdmin['language'] ?? 'both';
+                    $_SESSION['login_time']     = time();
+                }
+            } catch (\Throwable $e) {
+                error_log('Local admin check failed: ' . $e->getMessage());
+            }
+        }
+
+        // 2. Cross-DB: HW super admin overrides local admin
         if ($email !== '') {
             try {
                 $hwDb = $_ENV['HW_DB_NAME'] ?? 'hiphopwo_rld_system';
                 $stmt = $pdo->prepare("SELECT 1 FROM {$hwDb}.users WHERE email = ? AND is_admin = 1 AND disabled_at IS NULL LIMIT 1");
                 $stmt->execute([$email]);
                 if ($stmt->fetch()) {
-                    // Sync is_admin flag to local members table
-                    $pdo->prepare('UPDATE members SET is_admin = 1 WHERE id = ?')
-                        ->execute([$member['id']]);
-
-                    // Set member-kit super admin session
+                    $detectedRole = 'admin';
                     $_SESSION['is_super_admin'] = true;
-
-                    // Bridge: set Oregon Tires admin session keys so /admin/ works
-                    $_SESSION['admin_id']       = (int) $member['id'];
+                    $_SESSION['admin_id']       = $memberId;
                     $_SESSION['admin_email']    = $email;
                     $_SESSION['admin_role']     = 'super_admin';
                     $_SESSION['admin_name']     = $member['display_name'] ?? $member['username'] ?? $email;
@@ -77,6 +91,47 @@ function initMemberKit(PDO $pdo): void
                 }
             } catch (\Throwable $e) {
                 error_log('HW super admin check failed: ' . $e->getMessage());
+            }
+        }
+
+        // 3. Check oretir_employees (only if not already admin)
+        if ($detectedRole !== 'admin') {
+            try {
+                $stmt = $pdo->prepare('SELECT id, name, role FROM oretir_employees WHERE member_id = ? AND is_active = 1 LIMIT 1');
+                $stmt->execute([$memberId]);
+                $employee = $stmt->fetch();
+                if (!$employee && $email !== '') {
+                    // Fallback: match by email if member_id not linked yet
+                    $stmt = $pdo->prepare('SELECT id, name, role FROM oretir_employees WHERE email = ? AND is_active = 1 LIMIT 1');
+                    $stmt->execute([$email]);
+                    $employee = $stmt->fetch();
+                    // Auto-link employee to member account
+                    if ($employee) {
+                        $pdo->prepare('UPDATE oretir_employees SET member_id = ? WHERE id = ?')
+                            ->execute([$memberId, $employee['id']]);
+                    }
+                }
+                if ($employee) {
+                    $detectedRole = 'employee';
+                    $_SESSION['employee_id']   = (int) $employee['id'];
+                    $_SESSION['employee_name'] = $employee['name'];
+                    $_SESSION['employee_role'] = $employee['role']; // Employee or Manager
+                }
+            } catch (\Throwable $e) {
+                error_log('Employee check failed: ' . $e->getMessage());
+            }
+        }
+
+        // Persist role to members table + session
+        $_SESSION['dashboard_role'] = $detectedRole;
+        try {
+            $pdo->prepare('UPDATE members SET role = ?, is_admin = ? WHERE id = ?')
+                ->execute([$detectedRole, $detectedRole === 'admin' ? 1 : 0, $memberId]);
+        } catch (\Throwable $e) {
+            // role column may not exist yet (pre-migration)
+            if ($detectedRole === 'admin') {
+                $pdo->prepare('UPDATE members SET is_admin = 1 WHERE id = ?')
+                    ->execute([$memberId]);
             }
         }
 

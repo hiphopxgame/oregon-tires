@@ -126,6 +126,31 @@ function memberT(string $key, string $lang = ''): string
         'type_your_message'    => ['en' => 'Type your message...', 'es' => 'Escriba su mensaje...'],
         'message_sent'         => ['en' => 'Message sent!', 'es' => '¡Mensaje enviado!'],
 
+        // Employee tabs
+        'my_schedule'       => ['en' => 'My Schedule', 'es' => 'Mi Horario'],
+        'assigned_work'     => ['en' => 'Assigned Work', 'es' => 'Trabajo Asignado'],
+        'schedule_subtitle' => ['en' => 'Your weekly work schedule', 'es' => 'Su horario de trabajo semanal'],
+        'no_schedule'       => ['en' => 'No schedule found. Contact your manager.', 'es' => 'No se encontró horario. Contacte a su gerente.'],
+        'assigned_subtitle' => ['en' => 'Repair orders assigned to you', 'es' => 'Órdenes de reparación asignadas a usted'],
+        'no_assigned_work'  => ['en' => 'No work currently assigned to you.', 'es' => 'No tiene trabajo asignado actualmente.'],
+        'day_sunday'        => ['en' => 'Sunday', 'es' => 'Domingo'],
+        'day_monday'        => ['en' => 'Monday', 'es' => 'Lunes'],
+        'day_tuesday'       => ['en' => 'Tuesday', 'es' => 'Martes'],
+        'day_wednesday'     => ['en' => 'Wednesday', 'es' => 'Miércoles'],
+        'day_thursday'      => ['en' => 'Thursday', 'es' => 'Jueves'],
+        'day_friday'        => ['en' => 'Friday', 'es' => 'Viernes'],
+        'day_saturday'      => ['en' => 'Saturday', 'es' => 'Sábado'],
+        'off'               => ['en' => 'Off', 'es' => 'Libre'],
+        'today_override'    => ['en' => 'Schedule Override', 'es' => 'Excepción de Horario'],
+        'ro_number'         => ['en' => 'RO #', 'es' => 'OT #'],
+        'status'            => ['en' => 'Status', 'es' => 'Estado'],
+
+        // Admin tab
+        'admin_panel'       => ['en' => 'Admin Panel', 'es' => 'Panel Admin'],
+        'admin_desc'        => ['en' => 'Full shop management dashboard', 'es' => 'Panel completo de gestión del taller'],
+        'open_admin'        => ['en' => 'Open Admin Panel', 'es' => 'Abrir Panel Admin'],
+        'admin_features'    => ['en' => 'From the admin panel you can manage:', 'es' => 'Desde el panel admin puede gestionar:'],
+
         // Universal dashboard tabs
         'profile'           => ['en' => 'Profile', 'es' => 'Perfil'],
         'settings'          => ['en' => 'Settings', 'es' => "Configuraci\u{00f3}n"],
@@ -143,6 +168,58 @@ function memberT(string $key, string $lang = ''): string
         'photos'            => ['en' => 'photos', 'es' => 'fotos'],
         'welcome_back'      => ['en' => 'Welcome back!', 'es' => "\u{00a1}Bienvenido de nuevo!"],
         'visit_number'      => ['en' => 'This is your visit #%d', 'es' => 'Esta es su visita #%d'],
+
+        // ── Auth Pages (Login / Register / Forgot / Reset) ───────────
+        // Nav tabs
+        'sign_in'               => ['en' => 'Sign In', 'es' => "Iniciar Sesi\u{00f3}n"],
+        'create_account'        => ['en' => 'Create Account', 'es' => 'Crear Cuenta'],
+        'reset_password_tab'    => ['en' => 'Reset Password', 'es' => "Restablecer Contrase\u{00f1}a"],
+
+        // Login page
+        'welcome_back_sub'     => ['en' => 'Welcome back', 'es' => 'Bienvenido de nuevo'],
+        'new_here'              => ['en' => 'New here?', 'es' => "\u{00bf}Nuevo aqu\u{00ed}?"],
+        'create_free_account'   => ['en' => 'Create your free account', 'es' => 'Crea tu cuenta gratis'],
+        'email_label'           => ['en' => 'Email', 'es' => "Correo electr\u{00f3}nico"],
+        'password_label'        => ['en' => 'Password', 'es' => "Contrase\u{00f1}a"],
+        'forgot_link'           => ['en' => 'Forgot?', 'es' => "\u{00bf}Olvidaste?"],
+        'remember_device'       => ['en' => 'Remember this device for 30 days', 'es' => "Recordar este dispositivo por 30 d\u{00ed}as"],
+        'remember_device_30_days' => ['en' => 'Remember this device for 30 days', 'es' => "Recordar este dispositivo por 30 d\u{00ed}as"],
+        'sign_in_btn'           => ['en' => 'Sign In', 'es' => "Iniciar Sesi\u{00f3}n"],
+        'encrypted_badge'       => ['en' => '256-bit encrypted · Your data stays private', 'es' => "Cifrado 256-bit \u{00b7} Tu informaci\u{00f3}n es privada"],
+        'or_continue_with'      => ['en' => 'or continue with', 'es' => "o contin\u{00fa}a con"],
+        'or_connect_wallet'     => ['en' => 'or connect wallet', 'es' => 'o conecta billetera'],
+        'create_an_account'     => ['en' => 'Create an account', 'es' => 'Crear una cuenta'],
+        'email_verified_success'=> ['en' => 'Email verified successfully. You can now sign in.', 'es' => "Correo verificado. Ya puede iniciar sesi\u{00f3}n."],
+        'account_created_check_email' => ['en' => 'Account created! Please check your email to verify your address before signing in.', 'es' => "\u{00a1}Cuenta creada! Revise su correo para verificar su direcci\u{00f3}n antes de iniciar sesi\u{00f3}n."],
+        'too_many_requests'     => ['en' => 'Too many requests.', 'es' => 'Demasiadas solicitudes.'],
+        'try_again_later'       => ['en' => 'Please try again later.', 'es' => "Int\u{00e9}ntelo m\u{00e1}s tarde."],
+        'session_expiring'      => ['en' => 'Your session will expire in', 'es' => "Su sesi\u{00f3}n expirar\u{00e1} en"],
+        'extend_session'        => ['en' => 'Extend session', 'es' => "Extender sesi\u{00f3}n"],
+
+        // Register page
+        'join_site'             => ['en' => 'Join', 'es' => "\u{00da}nase a"],
+        'sign_up_with'          => ['en' => 'Sign up with', 'es' => "Reg\u{00ed}strate con"],
+        'or_divider'            => ['en' => 'or', 'es' => 'o'],
+        'username_label'        => ['en' => 'Username', 'es' => 'Nombre de usuario'],
+        'display_name_label'    => ['en' => 'Display Name', 'es' => 'Nombre para mostrar'],
+        'password_placeholder'  => ['en' => 'At least 8 characters', 'es' => 'Al menos 8 caracteres'],
+        'confirm_password'      => ['en' => 'Confirm Password', 'es' => "Confirmar Contrase\u{00f1}a"],
+        'repeat_password'       => ['en' => 'Repeat your password', 'es' => "Repita su contrase\u{00f1}a"],
+        'create_account_btn'    => ['en' => 'Create Account', 'es' => 'Crear Cuenta'],
+        'already_have_account'  => ['en' => 'Already have an account? Sign in', 'es' => "\u{00bf}Ya tiene cuenta? Inicie sesi\u{00f3}n"],
+
+        // Forgot password page
+        'reset_password_title'  => ['en' => 'Reset Password', 'es' => "Restablecer Contrase\u{00f1}a"],
+        'enter_email_reset'     => ['en' => 'Enter your email to receive a reset link', 'es' => 'Ingrese su correo para recibir un enlace'],
+        'email_address'         => ['en' => 'Email Address', 'es' => "Correo Electr\u{00f3}nico"],
+        'send_reset_link'       => ['en' => 'Send Reset Link', 'es' => 'Enviar Enlace'],
+        'back_to_sign_in'       => ['en' => 'Back to Sign In', 'es' => "Volver a Iniciar Sesi\u{00f3}n"],
+
+        // Reset password page
+        'set_new_password'      => ['en' => 'Set New Password', 'es' => "Establecer Nueva Contrase\u{00f1}a"],
+        'choose_strong_password'=> ['en' => 'Choose a strong password', 'es' => "Elija una contrase\u{00f1}a segura"],
+        'new_password'          => ['en' => 'New Password', 'es' => "Nueva Contrase\u{00f1}a"],
+        'reset_password_btn'    => ['en' => 'Reset Password', 'es' => "Restablecer Contrase\u{00f1}a"],
     ];
 
     return $strings[$key][$lang] ?? $strings[$key]['en'] ?? $key;

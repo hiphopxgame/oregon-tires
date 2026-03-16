@@ -61,6 +61,7 @@ function adminLogin(string $email, string $password): array|string
     $_SESSION['admin_language'] = $admin['language'] ?? 'both';
     $_SESSION['login_time']     = time();
     $_SESSION['csrf_token']     = bin2hex(random_bytes(32));
+    $_SESSION['dashboard_role'] = 'admin';
 
     return $admin;
 }
