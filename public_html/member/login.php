@@ -6,8 +6,15 @@
  */
 
 $redirect = '/members';
+$params = [];
 if (!empty($_GET['return'])) {
-    $redirect .= '?return=' . urlencode($_GET['return']);
+    $params['return'] = $_GET['return'];
+}
+if (!empty($_GET['lang'])) {
+    $params['lang'] = $_GET['lang'];
+}
+if ($params) {
+    $redirect .= '?' . http_build_query($params);
 }
 header('Location: ' . $redirect, true, 302);
 exit;

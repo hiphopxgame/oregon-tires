@@ -45,6 +45,9 @@
     # Dashboard alias: /dashboard → members.php (unified dashboard)
     RewriteRule ^dashboard/?$ members.php [L,QSA]
 
+    # /member (bare) → /members redirect
+    RewriteRule ^member/?$ /members [R=302,L,QSA]
+
     # Member password reset: /reset-password/TOKEN → member/reset-password.php?token=TOKEN
     RewriteRule ^reset-password/([a-f0-9]+)/?$ member/reset-password.php?token=$1 [L,QSA]
 

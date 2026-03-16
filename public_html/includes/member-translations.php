@@ -13,7 +13,11 @@ declare(strict_types=1);
 function getMemberLang(): string
 {
     $lang = $_GET['lang'] ?? $_SESSION['member_lang'] ?? $_COOKIE['lang'] ?? 'en';
-    return in_array($lang, ['en', 'es'], true) ? $lang : 'en';
+    $lang = in_array($lang, ['en', 'es'], true) ? $lang : 'en';
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        $_SESSION['member_lang'] = $lang;
+    }
+    return $lang;
 }
 
 /**

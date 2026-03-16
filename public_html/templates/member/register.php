@@ -7,12 +7,13 @@
  */
 ?>
 
+<?php $langQ = (getMemberLang() !== 'en') ? '?lang=' . getMemberLang() : ''; ?>
 <div class="member-page">
     <div class="member-card">
         <nav class="member-nav-tabs" aria-label="Account navigation">
-            <a href="/member/login" class="member-nav-tab"><?= htmlspecialchars(t('sign_in') ?? 'Sign In') ?></a>
-            <a href="/member/register" class="member-nav-tab active" aria-current="page"><?= htmlspecialchars(t('create_account') ?? 'Create Account') ?></a>
-            <a href="/member/forgot-password" class="member-nav-tab"><?= htmlspecialchars(t('reset_password_tab') ?? 'Reset Password') ?></a>
+            <a href="/member/login<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('sign_in') ?? 'Sign In') ?></a>
+            <a href="/member/register<?= $langQ ?>" class="member-nav-tab active" aria-current="page"><?= htmlspecialchars(t('create_account') ?? 'Create Account') ?></a>
+            <a href="/member/forgot-password<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('reset_password_tab') ?? 'Reset Password') ?></a>
         </nav>
 
         <div class="member-header">
@@ -72,7 +73,7 @@
         </form>
 
         <div class="member-footer">
-            <a href="/member/login" class="member-link"><?= htmlspecialchars(t('already_have_account') ?? 'Already have an account? Sign in') ?></a>
+            <a href="/member/login<?= $langQ ?>" class="member-link"><?= htmlspecialchars(t('already_have_account') ?? 'Already have an account? Sign in') ?></a>
         </div>
     </div>
 </div>

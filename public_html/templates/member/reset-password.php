@@ -43,8 +43,9 @@ if ($token === '') {
             <button type="submit" class="member-btn"><?= htmlspecialchars(t('reset_password_btn') ?? 'Reset Password') ?></button>
         </form>
 
+        <?php $langQ = (getMemberLang() !== 'en') ? '?lang=' . getMemberLang() : ''; ?>
         <div class="member-footer">
-            <a href="/member/login" class="member-link"><?= htmlspecialchars(t('back_to_sign_in') ?? 'Back to Sign In') ?></a>
+            <a href="/member/login<?= $langQ ?>" class="member-link"><?= htmlspecialchars(t('back_to_sign_in') ?? 'Back to Sign In') ?></a>
         </div>
     </div>
 </div>
