@@ -47,7 +47,10 @@ try {
 
         $language = $admin['language'] ?? 'both';
 
-        sendBrandedResetEmail($admin['email'], $admin['display_name'], $resetUrl, $language);
+        $emailResult = sendBrandedResetEmail($admin['email'], $admin['display_name'], $resetUrl, $language);
+        if (!$emailResult['success']) {
+            error_log("Oregon Tires admin password reset email FAILED for {$admin['email']}: " . ($emailResult['error'] ?? 'unknown'));
+        }
     }
 
     // Always return the same response to prevent email enumeration

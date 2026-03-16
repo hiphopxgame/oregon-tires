@@ -1436,12 +1436,40 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
           if (makeInput && d.make) makeInput.value = d.make;
           var modelInput = document.getElementById('vehicle-model');
           if (modelInput && d.model) modelInput.value = d.model;
-          // Show success
+          // Show success + specs card
           statusEl.textContent = '';
           var okP = document.createElement('p');
           okP.className = 'text-xs mt-1 text-green-600 dark:text-green-400 font-medium';
-          okP.textContent = t[currentLang].vinDecoded;
+          okP.textContent = currentLang === 'es' ? 'Vehiculo identificado!' : 'Vehicle identified!';
           statusEl.appendChild(okP);
+          // Build specs card using safe DOM methods
+          var specLabels = currentLang === 'es'
+            ? {engine:'Motor',transmission:'Transmision',drive_type:'Traccion',body_class:'Carroceria',fuel_type:'Combustible',trim_level:'Version',doors:'Puertas'}
+            : {engine:'Engine',transmission:'Transmission',drive_type:'Drive',body_class:'Body',fuel_type:'Fuel',trim_level:'Trim',doors:'Doors'};
+          var specKeys = ['engine','transmission','drive_type','body_class','fuel_type','trim_level','doors'];
+          var hasSpecs = specKeys.some(function(k){ return d[k]; });
+          if (hasSpecs) {
+            var card = document.createElement('div');
+            card.className = 'mt-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg';
+            var title = document.createElement('p');
+            title.className = 'text-sm font-semibold text-brand dark:text-green-400 mb-1';
+            title.textContent = [d.year, d.make, d.model].filter(Boolean).join(' ');
+            card.appendChild(title);
+            var grid = document.createElement('div');
+            grid.className = 'grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-gray-600 dark:text-gray-300';
+            specKeys.forEach(function(k) {
+              if (!d[k]) return;
+              var item = document.createElement('div');
+              var label = document.createElement('span');
+              label.className = 'font-medium text-gray-800 dark:text-gray-200';
+              label.textContent = specLabels[k] + ': ';
+              item.appendChild(label);
+              item.appendChild(document.createTextNode(d[k]));
+              grid.appendChild(item);
+            });
+            card.appendChild(grid);
+            statusEl.appendChild(card);
+          }
         } else {
           statusEl.textContent = '';
           var errP = document.createElement('p');

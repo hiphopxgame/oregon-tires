@@ -364,17 +364,23 @@ function renderRoDetailModal() {
   var grid = document.createElement('div');
   grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-4';
 
-  [
+  var vehicleSpecs = [ro.engine, ro.transmission, ro.drive_type].filter(Boolean).join(' | ');
+  var infoItems = [
     [t('roThCustomer', 'Customer'), customer],
     [t('emailLabel2', 'Email'), ro.customer_email || '-'],
     [t('phone', 'Phone'), ro.customer_phone || '-'],
-    [t('roThVehicle', 'Vehicle'), vehicle],
+    [t('roThVehicle', 'Vehicle'), vehicle + (ro.trim_level ? ' ' + ro.trim_level : '')],
     ['VIN', ro.vin || '-'],
     [t('roMileageIn', 'Mileage In'), ro.mileage_in ? Number(ro.mileage_in).toLocaleString() : '-'],
+  ];
+  if (vehicleSpecs) infoItems.push(['Specs', vehicleSpecs]);
+  if (ro.fuel_type) infoItems.push(['Fuel', ro.fuel_type]);
+  infoItems.push(
     [t('roPromisedDate', 'Promised Date'), ro.promised_date || '-'],
     [t('roThCreated', 'Created'), formatDate(ro.created_at)],
-    [t('roUpdated', 'Updated'), formatDate(ro.updated_at)],
-  ].forEach(function(pair) {
+    [t('roUpdated', 'Updated'), formatDate(ro.updated_at)]
+  );
+  infoItems.forEach(function(pair) {
     var div = document.createElement('div');
     var lbl = document.createElement('p');
     lbl.className = 'text-xs text-gray-400 uppercase font-medium';

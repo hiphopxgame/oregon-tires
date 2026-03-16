@@ -462,6 +462,27 @@ function sendBrandedResetEmail(string $email, string $name, string $resetUrl, st
 
     $result = sendBrandedTemplateEmail($email, 'reset', $vars, $language, $resetUrl, true);
 
+    // Fallback: if DB template missing, send a simple reset email directly
+    if (!$result['success'] && str_contains($result['error'] ?? '', 'not found')) {
+        $safeName = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+        $safeUrl  = htmlspecialchars($resetUrl, ENT_QUOTES, 'UTF-8');
+        $subject  = "Password Reset — Oregon Tires Auto Care";
+        $html = <<<HTML
+        <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+            <h2 style="color:#15803d;">Password Reset</h2>
+            <p>Hi {$safeName},</p>
+            <p>We received a request to reset your password. Click the button below to set a new password:</p>
+            <p style="text-align:center;margin:24px 0;">
+                <a href="{$safeUrl}" style="background:#15803d;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">Reset Password</a>
+            </p>
+            <p style="color:#64748b;font-size:14px;">If you didn't request this, you can ignore this email. The link expires in 1 hour.</p>
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;">
+            <p style="color:#94a3b8;font-size:12px;">Oregon Tires Auto Care &bull; (503) 367-9714</p>
+        </div>
+        HTML;
+        $result = sendMail($email, $subject, $html);
+    }
+
     if ($result['success']) {
         logEmail('password_reset', "Password reset email sent to {$email}", $email);
     }

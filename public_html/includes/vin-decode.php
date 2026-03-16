@@ -227,7 +227,7 @@ function findOrCreateCustomer(string $email, string $firstName, string $lastName
  *
  * @return int|null Vehicle ID or null on failure
  */
-function findOrCreateVehicle(int $customerId, ?string $year, ?string $make, ?string $model, ?string $vin = null, ?PDO $db = null): ?int
+function findOrCreateVehicle(int $customerId, ?string $year, ?string $make, ?string $model, ?string $vin = null, ?PDO $db = null, array $specs = []): ?int
 {
     $db = $db ?? getDB();
 
@@ -235,36 +235,83 @@ function findOrCreateVehicle(int $customerId, ?string $year, ?string $make, ?str
         return null;
     }
 
+    // Spec fields that can be populated from VIN decode
+    $specCols = ['trim_level', 'engine', 'transmission', 'drive_type', 'body_class', 'doors', 'fuel_type'];
+
     try {
         if (!empty($vin)) {
-            $stmt = $db->prepare('SELECT id FROM oretir_vehicles WHERE vin = ? AND customer_id = ? LIMIT 1');
+            $stmt = $db->prepare('SELECT id, engine FROM oretir_vehicles WHERE vin = ? AND customer_id = ? LIMIT 1');
             $stmt->execute([$vin, $customerId]);
             $existing = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($existing) {
+                // Backfill specs if vehicle exists but has no factory data
+                if (empty($existing['engine']) && !empty($specs)) {
+                    $sets = ['updated_at = NOW()'];
+                    $vals = [];
+                    foreach ($specCols as $col) {
+                        if (!empty($specs[$col])) {
+                            $sets[] = "$col = ?";
+                            $vals[] = $specs[$col];
+                        }
+                    }
+                    if (count($vals) > 0) {
+                        $vals[] = $existing['id'];
+                        $db->prepare('UPDATE oretir_vehicles SET ' . implode(', ', $sets) . ' WHERE id = ?')
+                           ->execute($vals);
+                    }
+                }
                 return (int) $existing['id'];
             }
         }
 
         if (!empty($year) && !empty($make) && !empty($model)) {
             $stmt = $db->prepare(
-                'SELECT id FROM oretir_vehicles WHERE customer_id = ? AND year = ? AND make = ? AND model = ? LIMIT 1'
+                'SELECT id, engine FROM oretir_vehicles WHERE customer_id = ? AND year = ? AND make = ? AND model = ? LIMIT 1'
             );
             $stmt->execute([$customerId, $year, $make, $model]);
             $existing = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($existing) {
+                // Backfill VIN + specs if missing
+                $sets = ['updated_at = NOW()'];
+                $vals = [];
                 if (!empty($vin)) {
-                    $db->prepare('UPDATE oretir_vehicles SET vin = ?, updated_at = NOW() WHERE id = ?')
-                       ->execute([$vin, $existing['id']]);
+                    $sets[] = 'vin = ?';
+                    $vals[] = $vin;
+                }
+                if (empty($existing['engine'])) {
+                    foreach ($specCols as $col) {
+                        if (!empty($specs[$col])) {
+                            $sets[] = "$col = ?";
+                            $vals[] = $specs[$col];
+                        }
+                    }
+                }
+                if (count($vals) > 0) {
+                    $vals[] = $existing['id'];
+                    $db->prepare('UPDATE oretir_vehicles SET ' . implode(', ', $sets) . ' WHERE id = ?')
+                       ->execute($vals);
                 }
                 return (int) $existing['id'];
             }
         }
 
+        // Build INSERT with all available spec fields
+        $cols = ['customer_id', 'vin', 'year', 'make', 'model'];
+        $vals = [$customerId, $vin ?: null, $year ?: null, $make ?: null, $model ?: null];
+        foreach ($specCols as $col) {
+            if (!empty($specs[$col])) {
+                $cols[] = $col;
+                $vals[] = $specs[$col];
+            }
+        }
+        $placeholders = implode(', ', array_fill(0, count($cols), '?'));
+        $colNames = implode(', ', $cols);
+
         $stmt = $db->prepare(
-            'INSERT INTO oretir_vehicles (customer_id, vin, year, make, model, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, NOW(), NOW())'
+            "INSERT INTO oretir_vehicles ({$colNames}, created_at, updated_at)
+             VALUES ({$placeholders}, NOW(), NOW())"
         );
-        $stmt->execute([$customerId, $vin ?: null, $year ?: null, $make ?: null, $model ?: null]);
+        $stmt->execute($vals);
         return (int) $db->lastInsertId();
 
     } catch (\Throwable $e) {

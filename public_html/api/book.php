@@ -283,13 +283,30 @@ try {
     try {
         $bookingCustomerId = findOrCreateCustomer($email, $firstName, $lastName, $phone, $language, $db);
         if ($bookingCustomerId) {
+            // Look up factory specs from VIN cache if VIN was decoded
+            $vehicleSpecs = [];
+            if (!empty($vehicleVin)) {
+                $cached = getVinFromCache($vehicleVin, $db);
+                if ($cached) {
+                    $vehicleSpecs = array_filter([
+                        'trim_level'   => $cached['trim_level'] ?? '',
+                        'engine'       => $cached['engine'] ?? '',
+                        'transmission' => $cached['transmission'] ?? '',
+                        'drive_type'   => $cached['drive_type'] ?? '',
+                        'body_class'   => $cached['body_class'] ?? '',
+                        'doors'        => $cached['doors'] ?? '',
+                        'fuel_type'    => $cached['fuel_type'] ?? '',
+                    ]);
+                }
+            }
             $bookingVehicleId = findOrCreateVehicle(
                 $bookingCustomerId,
                 $vehicleYear ?: null,
                 $vehicleMake ?: null,
                 $vehicleModel ?: null,
                 $vehicleVin ?: null,
-                $db
+                $db,
+                $vehicleSpecs
             );
             $db->prepare('UPDATE oretir_appointments SET customer_id = ?, vehicle_id = ? WHERE id = ?')
                ->execute([$bookingCustomerId, $bookingVehicleId, $appointmentId]);

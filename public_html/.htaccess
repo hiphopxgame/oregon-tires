@@ -42,6 +42,9 @@
     RewriteRule ^cancel/([a-f0-9]+)/?$ cancel.php?token=$1 [L,QSA]
     RewriteRule ^reschedule/([a-f0-9]+)/?$ reschedule.php?token=$1 [L,QSA]
 
+    # Member password reset: /reset-password/TOKEN → member/reset-password.php?token=TOKEN
+    RewriteRule ^reset-password/([a-f0-9]+)/?$ member/reset-password.php?token=$1 [L,QSA]
+
     # Blog post clean URLs: /blog/SLUG → blog-post.php?slug=SLUG
     RewriteRule ^blog/([a-z0-9-]+)/?$ blog-post.php?slug=$1 [L,QSA]
 

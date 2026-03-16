@@ -36,7 +36,9 @@ try {
     $memberEmail = $memberStmt->fetchColumn();
 
     // Query vehicles: match by member_id OR via customer email (orphaned vehicles)
-    $sql = 'SELECT DISTINCT v.id, v.year, v.make, v.model, v.vin, v.tire_size, v.license_plate, v.created_at
+    $sql = 'SELECT DISTINCT v.id, v.year, v.make, v.model, v.vin, v.trim_level, v.engine, v.transmission,
+                   v.drive_type, v.body_class, v.fuel_type, v.doors, v.tire_size_front, v.tire_size_rear,
+                   v.tire_size, v.license_plate, v.color, v.mileage, v.created_at
             FROM oretir_vehicles v
             LEFT JOIN oretir_customers c ON v.customer_id = c.id
             WHERE (v.member_id = :mid';
@@ -83,12 +85,20 @@ try {
                 </p>
             <?php else: ?>
                 <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <?php foreach ($vehicles as $vehicle): ?>
+                    <?php foreach ($vehicles as $vehicle):
+                        $specLabels = $lang === 'es'
+                            ? ['engine' => 'Motor', 'transmission' => 'Transmision', 'drive_type' => 'Traccion', 'body_class' => 'Carroceria', 'fuel_type' => 'Combustible', 'trim_level' => 'Version', 'doors' => 'Puertas']
+                            : ['engine' => 'Engine', 'transmission' => 'Transmission', 'drive_type' => 'Drive', 'body_class' => 'Body', 'fuel_type' => 'Fuel', 'trim_level' => 'Trim', 'doors' => 'Doors'];
+                        $specs = array_filter(array_intersect_key($vehicle, $specLabels));
+                    ?>
                         <div style="padding: 1rem; background: var(--member-surface-hover); border-radius: var(--member-radius); border-left: 3px solid var(--member-accent);">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
                                 <div>
                                     <h3 style="margin: 0 0 0.25rem; font-size: 0.95rem;">
                                         <?= htmlspecialchars($vehicle['year'] . ' ' . $vehicle['make'] . ' ' . $vehicle['model']) ?>
+                                        <?php if (!empty($vehicle['trim_level'])): ?>
+                                            <span style="font-weight: normal; color: var(--member-text-muted); font-size: 0.8rem;"><?= htmlspecialchars($vehicle['trim_level']) ?></span>
+                                        <?php endif; ?>
                                     </h3>
                                     <?php if (!empty($vehicle['license_plate'])): ?>
                                         <p style="margin: 0; color: var(--member-text-muted); font-size: 0.875rem;">
@@ -96,15 +106,35 @@ try {
                                         </p>
                                     <?php endif; ?>
                                 </div>
+                                <?php if (!empty($vehicle['color'])): ?>
+                                    <span style="font-size: 0.75rem; color: var(--member-text-muted);"><?= htmlspecialchars($vehicle['color']) ?></span>
+                                <?php endif; ?>
                             </div>
+                            <?php if (!empty($specs)): ?>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.125rem 1rem; font-size: 0.75rem; color: var(--member-text-muted); margin-bottom: 0.5rem;">
+                                    <?php foreach ($specs as $key => $val): if ($key === 'trim_level') continue; ?>
+                                        <div><strong style="color: var(--member-text);"><?= $specLabels[$key] ?>:</strong> <?= htmlspecialchars($val) ?></div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
                             <?php if (!empty($vehicle['vin'])): ?>
-                                <p style="margin: 0.5rem 0 0; font-size: 0.75rem; color: var(--member-text-muted);">
-                                    VIN: <?= htmlspecialchars($vehicle['vin']) ?>
+                                <p style="margin: 0.25rem 0 0; font-size: 0.75rem; color: var(--member-text-muted);">
+                                    VIN: <span style="font-family: monospace; letter-spacing: 0.05em;"><?= htmlspecialchars($vehicle['vin']) ?></span>
                                 </p>
                             <?php endif; ?>
-                            <?php if (!empty($vehicle['tire_size'])): ?>
+                            <?php
+                            $tireDisplay = $vehicle['tire_size_front'] ?: ($vehicle['tire_size'] ?? '');
+                            if (!empty($tireDisplay)): ?>
                                 <p style="margin: 0.25rem 0 0; font-size: 0.75rem; color: var(--member-text-muted);">
-                                    <?= htmlspecialchars(memberT('tire_size', $lang)) ?>: <?= htmlspecialchars($vehicle['tire_size']) ?>
+                                    <?= htmlspecialchars(memberT('tire_size', $lang)) ?>: <?= htmlspecialchars($tireDisplay) ?>
+                                    <?php if (!empty($vehicle['tire_size_rear']) && $vehicle['tire_size_rear'] !== $tireDisplay): ?>
+                                        / <?= htmlspecialchars($vehicle['tire_size_rear']) ?> (<?= $lang === 'es' ? 'traseras' : 'rear' ?>)
+                                    <?php endif; ?>
+                                </p>
+                            <?php endif; ?>
+                            <?php if (!empty($vehicle['mileage'])): ?>
+                                <p style="margin: 0.25rem 0 0; font-size: 0.75rem; color: var(--member-text-muted);">
+                                    <?= $lang === 'es' ? 'Kilometraje' : 'Mileage' ?>: <?= number_format((int) $vehicle['mileage']) ?>
                                 </p>
                             <?php endif; ?>
                         </div>
