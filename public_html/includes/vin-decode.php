@@ -236,7 +236,7 @@ function findOrCreateVehicle(int $customerId, ?string $year, ?string $make, ?str
     }
 
     // Spec fields that can be populated from VIN decode
-    $specCols = ['trim_level', 'engine', 'transmission', 'drive_type', 'body_class', 'doors', 'fuel_type'];
+    $specCols = ['trim_level', 'engine', 'transmission', 'drive_type', 'body_class', 'doors', 'fuel_type', 'license_plate'];
 
     try {
         if (!empty($vin)) {

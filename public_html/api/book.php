@@ -45,6 +45,7 @@ try {
     $vehicleModel = sanitize((string) ($data['vehicle_model'] ?? ''), 50);
     $vehicleVin   = sanitize((string) ($data['vehicle_vin'] ?? ''), 17);
     $tireSize     = sanitize((string) ($data['tire_size'] ?? ''), 30);
+    $licensePlate = strtoupper(preg_replace('/[^A-Z0-9]/', '', sanitize((string) ($data['license_plate'] ?? ''), 20)));
     $notes        = sanitize((string) ($data['notes'] ?? ''), 2000);
     $language     = sanitize((string) ($data['language'] ?? 'english'), 20);
     $smsOptIn     = !empty($data['sms_opt_in']) ? 1 : 0;
@@ -298,6 +299,9 @@ try {
                         'fuel_type'    => $cached['fuel_type'] ?? '',
                     ]);
                 }
+            }
+            if (!empty($licensePlate)) {
+                $vehicleSpecs['license_plate'] = $licensePlate;
             }
             $bookingVehicleId = findOrCreateVehicle(
                 $bookingCustomerId,
