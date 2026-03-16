@@ -33,6 +33,11 @@ if (!defined('MEMBER_KIT_URL')) {
     define('MEMBER_KIT_URL', '/shared/member-kit');
 }
 
+// Point to local bilingual template overrides for auth pages
+if (!defined('MEMBER_KIT_SITE_TEMPLATES')) {
+    define('MEMBER_KIT_SITE_TEMPLATES', __DIR__ . '/templates');
+}
+
 // Start session and init member-kit
 startSecureSession();
 $pdo = getDB();

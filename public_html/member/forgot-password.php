@@ -9,6 +9,16 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/member-translations.php';
+
+// Define t() BEFORE member-kit loads so templates get translations
+if (!function_exists('t')) {
+    function t(string $key): ?string {
+        $val = memberT($key);
+        return $val !== $key ? $val : null;
+    }
+}
+
 require_once __DIR__ . '/../includes/member-kit-init.php';
 require_once __DIR__ . '/../includes/engine-kit-init.php';
 
@@ -43,7 +53,7 @@ $memberDashboardConfig = $memberDashboardConfig ?? [];
 $_themeVars = $memberDashboardConfig['theme'] ?? [];
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= getMemberLang() ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,7 +104,7 @@ $_themeVars = $memberDashboardConfig['theme'] ?? [];
         include $_siteNavInclude;
     }
 
-    include MEMBER_KIT_PATH . '/templates/member/forgot-password.php';
+    include __DIR__ . '/../templates/member/forgot-password.php';
 
     if ($_siteFooterInclude && file_exists($_siteFooterInclude)) {
         include $_siteFooterInclude;
