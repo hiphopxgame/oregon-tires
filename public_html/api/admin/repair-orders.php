@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../includes/vin-decode.php';
 
 try {
     startSecureSession();
-    $admin = requireAdmin();
+    $staff = requireStaff();
     requireMethod('GET', 'POST', 'PUT');
     $db = getDB();
 

@@ -11,12 +11,10 @@ try {
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
 
-    // ─── All routes require superadmin ──────────────────────────────────
-    if ($admin['role'] !== 'superadmin') {
-        jsonError('Superadmin access required.', 403);
-    }
+    // ─── Permission helpers ──────────────────────────────────────────────
+    $isSuperAdmin = in_array($admin['role'], ['superadmin', 'super_admin'], true);
 
-    // ─── GET: List active admins ────────────────────────────────────────
+    // ─── GET: List active admins (any admin) ──────────────────────────────
     if ($method === 'GET') {
         $stmt = $db->query(
             'SELECT id, email, display_name, role, language, created_at,
@@ -139,6 +137,11 @@ try {
             jsonError('Invalid role. Must be admin or superadmin.', 400);
         }
 
+        // Only superadmins can create other superadmins
+        if ($role === 'superadmin' && !$isSuperAdmin) {
+            jsonError('Only superadmins can create superadmin accounts.', 403);
+        }
+
         if (!in_array($language, ['en', 'es', 'both'], true)) {
             jsonError('Invalid language. Must be en, es, or both.', 400);
         }
@@ -186,6 +189,14 @@ try {
 
     if ($id === (int) $admin['id']) {
         jsonError('You cannot deactivate your own account.', 400);
+    }
+
+    // Only superadmins can revoke other superadmins
+    $targetStmt = $db->prepare('SELECT role FROM oretir_admins WHERE id = ? AND is_active = 1 LIMIT 1');
+    $targetStmt->execute([$id]);
+    $targetAdmin = $targetStmt->fetch();
+    if ($targetAdmin && in_array($targetAdmin['role'], ['superadmin', 'super_admin'], true) && !$isSuperAdmin) {
+        jsonError('Only superadmins can revoke superadmin accounts.', 403);
     }
 
     $stmt = $db->prepare('UPDATE oretir_admins SET is_active = 0, updated_at = NOW() WHERE id = ?');

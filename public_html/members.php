@@ -74,6 +74,12 @@ if ($dashboardRole === 'member' && MemberAuth::isMemberLoggedIn()) {
 $isEmployee = in_array($dashboardRole, ['employee', 'admin'], true);
 $isAdmin    = $dashboardRole === 'admin';
 
+// If admin or employee and no explicit tab requested, redirect to admin panel
+if (($isAdmin || $isEmployee) && !isset($_GET['tab'])) {
+    header('Location: /admin/');
+    exit;
+}
+
 // Site key for branding
 $siteKey = 'oregon_tires';
 
@@ -132,34 +138,21 @@ $memberDashboardTabs = [
     ],
 ];
 
-// Employee + Admin tabs
-if ($isEmployee) {
-    $memberDashboardTabs[] = [
-        'id'           => 'my-schedule',
-        'label'        => memberT('my_schedule', $lang),
-        'icon'         => '🕐',
-        'api_endpoint' => '/api/member/my-schedule.php',
-    ];
-    $memberDashboardTabs[] = [
-        'id'           => 'assigned-work',
-        'label'        => memberT('assigned_work', $lang),
-        'icon'         => '🔧',
-        'api_endpoint' => '/api/member/my-assigned-work.php',
-    ];
-}
-
-// Admin-only tabs
-if ($isAdmin) {
-    $memberDashboardTabs[] = [
-        'id'       => 'admin-panel',
-        'label'    => memberT('admin_panel', $lang),
-        'icon'     => '⚙️',
-        'template' => __DIR__ . '/templates/dashboard-admin-tab.php',
-    ];
-}
+// Staff banner: if staff explicitly visits /members?tab=X, show link to /admin/
+$showStaffBanner = ($isAdmin || $isEmployee) && isset($_GET['tab']);
 
 // Disable wallet connections — not relevant for auto shop
 unset($_ENV['METAMASK_ENABLED'], $_ENV['WALLETCONNECT_PROJECT_ID'], $_ENV['COINBASE_WALLET_ENABLED']);
+
+// Staff banner (rendered before dashboard if staff visits /members?tab=X)
+if (!empty($showStaffBanner)): ?>
+<div style="max-width:900px;margin:1rem auto;padding:0 1rem;">
+  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+    <span style="font-size:14px;color:#166534;"><?= htmlspecialchars(memberT('go_to_admin', $lang)) ?></span>
+    <a href="/admin/" style="font-size:14px;font-weight:500;color:#15803d;text-decoration:none;"><?= htmlspecialchars(memberT('admin_panel', $lang)) ?> &rarr;</a>
+  </div>
+</div>
+<?php endif;
 
 // Load universal dashboard template
 require MEMBER_KIT_PATH . '/templates/member/dashboard.php';

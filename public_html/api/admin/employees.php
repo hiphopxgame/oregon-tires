@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 try {
-    $admin = requireAdmin();
+    $staff = requireStaff();
     requireMethod('GET', 'POST', 'PUT');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
@@ -29,6 +29,11 @@ try {
             foreach ($employees as &$emp) { $emp['skills'] = []; }
         }
         jsonSuccess($employees);
+    }
+
+    // POST/PUT require admin
+    if ($staff['type'] !== 'admin') {
+        jsonError('Admin access required.', 403);
     }
 
     verifyCsrf();

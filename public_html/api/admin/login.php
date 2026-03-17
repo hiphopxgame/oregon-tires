@@ -35,12 +35,14 @@ try {
        ->execute([$result['id']]);
 
     jsonSuccess([
-        'id'         => $result['id'],
-        'email'      => $result['email'],
-        'role'       => $result['role'],
-        'name'       => $result['display_name'],
-        'language'   => $result['language'] ?? 'en',
-        'csrf_token' => $_SESSION['csrf_token'] ?? '',
+        'id'          => $result['id'],
+        'email'       => $result['email'],
+        'role'        => $result['role'],
+        'name'        => $result['display_name'],
+        'type'        => 'admin',
+        'language'    => $result['language'] ?? 'en',
+        'employee_id' => $_SESSION['employee_id'] ?? null,
+        'csrf_token'  => $_SESSION['csrf_token'] ?? '',
     ]);
 } catch (\Throwable $e) {
     error_log('Login error: ' . $e->getMessage());

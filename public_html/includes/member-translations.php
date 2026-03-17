@@ -154,6 +154,7 @@ function memberT(string $key, string $lang = ''): string
         'admin_desc'        => ['en' => 'Full shop management dashboard', 'es' => 'Panel completo de gestión del taller'],
         'open_admin'        => ['en' => 'Open Admin Panel', 'es' => 'Abrir Panel Admin'],
         'admin_features'    => ['en' => 'From the admin panel you can manage:', 'es' => 'Desde el panel admin puede gestionar:'],
+        'go_to_admin'       => ['en' => 'You have staff access. Manage the shop from the admin panel.', 'es' => 'Tiene acceso de personal. Gestione el taller desde el panel admin.'],
 
         // Universal dashboard tabs
         'profile'           => ['en' => 'Profile', 'es' => 'Perfil'],

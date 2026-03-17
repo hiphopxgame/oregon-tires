@@ -476,6 +476,8 @@
         <button onclick="switchTab('docs')" data-tab="docs" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📖 <span data-t="tabDocs">Docs</span></button>
         <button onclick="switchTab('sitecontent')" data-tab="sitecontent" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📝 <span data-t="tabSiteContent">Site Content</span></button>
         <button onclick="switchTab('subscribers')" data-tab="subscribers" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📧 <span data-t="tabSubscribers">Subscribers</span> <span id="subscribers-badge" class="ml-1 bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full hidden"></span></button>
+        <button onclick="switchTab('myschedule')" data-tab="myschedule" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600" style="display:none">🕐 <span data-t="tabMySchedule">My Schedule</span></button>
+        <button onclick="switchTab('mywork')" data-tab="mywork" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600" style="display:none">🔧 <span data-t="tabMyWork">My Work</span></button>
       </nav>
       <select id="mobile-tab-select" onchange="switchTab(this.value)" class="hidden w-full mt-2 bg-white/20 text-white border border-white/30 rounded-lg px-4 py-3 text-sm font-medium appearance-none cursor-pointer" style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22white%22 d=%22M2 4l4 4 4-4%22/></svg>');background-repeat:no-repeat;background-position:right 12px center;">
         <option value="overview" data-t="tabOverview">Overview</option>
@@ -493,6 +495,8 @@
         <option value="docs" data-t="tabDocs">Docs</option>
         <option value="sitecontent" data-t="tabSiteContent">Site Content</option>
         <option value="subscribers" data-t="tabSubscribers">Subscribers</option>
+        <option value="myschedule" data-t="tabMySchedule" style="display:none">My Schedule</option>
+        <option value="mywork" data-t="tabMyWork" style="display:none">My Work</option>
       </select>
     </div>
   </header>
@@ -5605,6 +5609,28 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
       </div>
     </div>
 
+    <!-- MY SCHEDULE TAB (staff) -->
+    <div id="tab-myschedule" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl">
+        <h2 class="text-2xl font-bold">🕐 <span data-t="tabMySchedule">My Schedule</span></h2>
+        <p class="text-green-100" data-t="myScheduleSubtitle">Your weekly work schedule</p>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800" id="myschedule-content">
+        <p class="text-gray-400">Loading...</p>
+      </div>
+    </div>
+
+    <!-- MY WORK TAB (staff) -->
+    <div id="tab-mywork" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl">
+        <h2 class="text-2xl font-bold">🔧 <span data-t="tabMyWork">My Work</span></h2>
+        <p class="text-green-100" data-t="myWorkSubtitle">Repair orders and appointments assigned to you</p>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800" id="mywork-content">
+        <p class="text-gray-400">Loading...</p>
+      </div>
+    </div>
+
   </div>
 
 <!-- NOTES MODAL -->
@@ -6434,6 +6460,18 @@ const adminT = {
     schedAssigned: 'Assigned',
     schedUnassigned: 'Unassigned',
     schedSlots: 'slots',
+    // My Schedule / My Work
+    tabMySchedule: 'My Schedule',
+    tabMyWork: 'My Work',
+    myScheduleSubtitle: 'Your weekly work schedule',
+    myWorkSubtitle: 'Repair orders and appointments assigned to you',
+    noScheduleFound: 'No schedule found. Contact your manager.',
+    noAssignedWork: 'No work currently assigned to you.',
+    roleAdmin: 'Admin',
+    roleSuperAdmin: 'Super Admin',
+    roleEmployee: 'Employee',
+    roleManager: 'Manager',
+    youBadge: 'YOU',
   },
   es: {
     // Login
@@ -7008,6 +7046,18 @@ const adminT = {
     schedAssigned: 'Asignado',
     schedUnassigned: 'Sin asignar',
     schedSlots: 'espacios',
+    // My Schedule / My Work
+    tabMySchedule: 'Mi Horario',
+    tabMyWork: 'Mi Trabajo',
+    myScheduleSubtitle: 'Su horario de trabajo semanal',
+    myWorkSubtitle: '\u00D3rdenes de reparaci\u00F3n y citas asignadas a usted',
+    noScheduleFound: 'No se encontr\u00F3 horario. Contacte a su gerente.',
+    noAssignedWork: 'No tiene trabajo asignado actualmente.',
+    roleAdmin: 'Admin',
+    roleSuperAdmin: 'Super Admin',
+    roleEmployee: 'Empleado',
+    roleManager: 'Gerente',
+    youBadge: 'T\u00DA',
   }
 };
 
@@ -7477,14 +7527,9 @@ function showDashboard(user) {
   currentUser = user;
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('admin-dashboard').classList.remove('hidden');
-  document.getElementById('admin-email').textContent = user.email;
-  document.getElementById('admin-role').textContent = user.role || 'Admin';
+  document.getElementById('admin-email').textContent = user.name || user.email;
   document.getElementById('settings-name').value = user.name || '';
   document.getElementById('settings-email').value = user.email || '';
-
-  // Show Improvements tab only for superadmins
-  var improvBtn = document.getElementById('docs-view-improvements');
-  if (improvBtn) improvBtn.style.display = user.role === 'superadmin' ? '' : 'none';
 
   // Apply user's language preference to the admin panel UI
   var langEl = document.getElementById('settings-language');
@@ -7494,13 +7539,55 @@ function showDashboard(user) {
   } else if (user.language === 'es') {
     currentLang = 'es';
   } else {
-    // 'both' — default to Spanish (primary audience)
     currentLang = 'es';
   }
   document.documentElement.lang = currentLang;
   document.getElementById('admin-lang-toggle').textContent = currentLang === 'en' ? 'ES' : 'EN';
-  applyAdminTranslations();
 
+  var T = adminT[currentLang];
+  var isAdmin = user.type === 'admin';
+  var isEmployee = user.type === 'employee';
+  var hasEmployeeId = !!user.employee_id;
+
+  // Role label in header
+  var roleLabel = T.roleEmployee || 'Employee';
+  if (isAdmin) {
+    if (user.role === 'super_admin' || user.role === 'superadmin') roleLabel = T.roleSuperAdmin || 'Super Admin';
+    else roleLabel = T.roleAdmin || 'Admin';
+  } else if (user.role === 'Manager') {
+    roleLabel = T.roleManager || 'Manager';
+  }
+  document.getElementById('admin-role').textContent = roleLabel;
+
+  // Show Improvements tab only for superadmins
+  var improvBtn = document.getElementById('docs-view-improvements');
+  if (improvBtn) improvBtn.style.display = user.role === 'superadmin' || user.role === 'super_admin' ? '' : 'none';
+
+  // ── Role-based tab visibility ──────────────────────────────────
+  var adminOnlyTabs = ['customers', 'messages', 'gallery', 'blog', 'promotions', 'faq', 'reviews', 'analytics', 'docs', 'sitecontent', 'subscribers'];
+  var staffTabs = ['myschedule', 'mywork'];
+
+  // Hide admin-only tabs for employees
+  if (isEmployee) {
+    adminOnlyTabs.forEach(function(tab) {
+      var btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
+      if (btn) btn.style.display = 'none';
+      var opt = document.querySelector('#mobile-tab-select option[value="' + tab + '"]');
+      if (opt) opt.style.display = 'none';
+    });
+  }
+
+  // Show My Schedule / My Work for employees, or admins who are also employees
+  if (isEmployee || (isAdmin && hasEmployeeId)) {
+    staffTabs.forEach(function(tab) {
+      var btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
+      if (btn) btn.style.display = '';
+      var opt = document.querySelector('#mobile-tab-select option[value="' + tab + '"]');
+      if (opt) opt.style.display = '';
+    });
+  }
+
+  applyAdminTranslations();
   loadAllData();
   setupPolling();
   populateMonthFilter();
@@ -8835,11 +8922,13 @@ function renderEmployees() {
   const empEmails = employees.map(e => (e.email||'').toLowerCase()).filter(Boolean);
   const adminOnly = adminUsers.filter(u => !empEmails.includes(u.email.toLowerCase()));
   
+  var isAdminUser = currentUser && currentUser.type === 'admin';
+  var isSuperAdmin = isAdminUser && (currentUser.role === 'superadmin' || currentUser.role === 'super_admin');
   container.innerHTML = `
-    <div class="flex justify-end gap-2 mb-4">
+    ${isAdminUser ? `<div class="flex justify-end gap-2 mb-4">
       <button onclick="toggleAddEmployeeForm()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">+ Add Employee</button>
       <button onclick="toggleAddAdminForm()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">+ Add Admin</button>
-    </div>
+    </div>` : ''}
     ${adminOnly.length ? `<h3 class="font-bold text-green-700 mb-3">🛡 Dashboard Admins (${adminOnly.length})</h3>
       <div class="space-y-3 mb-6">${adminOnly.map(u => {
         const status = u.invite_status || 'no_invite';
@@ -8857,16 +8946,16 @@ function renderEmployees() {
           <div class="flex items-center gap-3">
             <div class="h-10 w-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">🛡</div>
             <div>
-              <div class="flex items-center gap-2 flex-wrap"><span class="font-medium dark:text-white">${esc(u.display_name)}</span><span class="bg-green-600 text-white px-2 py-0.5 rounded-full text-xs">Admin</span>${statusBadge}<span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs dark:bg-gray-700 dark:text-gray-300">${langLabel}</span></div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="font-medium dark:text-white">${esc(u.display_name)}</span>${u.role === 'superadmin' || u.role === 'super_admin' ? '<span class="bg-purple-600 text-white px-2 py-0.5 rounded-full text-xs">Super Admin</span>' : '<span class="bg-green-600 text-white px-2 py-0.5 rounded-full text-xs">Admin</span>'}${currentUser && currentUser.email && u.email && currentUser.email.toLowerCase() === u.email.toLowerCase() ? '<span class="bg-amber-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">' + (adminT[currentLang].youBadge || 'YOU') + '</span>' : ''}${statusBadge}<span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs dark:bg-gray-700 dark:text-gray-300">${langLabel}</span></div>
               <div class="text-sm text-gray-600 dark:text-gray-400">${esc(u.email)}</div>
               <div class="text-sm text-gray-500 dark:text-gray-500">${statusLine}</div>
             </div>
           </div>
-          <div class="flex items-center gap-2 flex-wrap">
+          ${isSuperAdmin ? `<div class="flex items-center gap-2 flex-wrap">
             <button onclick="openSetPasswordModal('${u.id}','${esc(u.display_name)}')" class="text-green-700 border border-green-300 px-3 py-1 rounded-lg text-sm hover:bg-green-50 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-900/40">🔑 Set Password</button>
             ${(status === 'invited' || status === 'invite_expired' || status === 'no_invite') ? `<button onclick="resendAdminInvite('${u.id}')" class="text-blue-600 border border-blue-200 px-3 py-1 rounded-lg text-sm hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/40">📨 Send Invite</button>` : ''}
             <button onclick="revokeAdmin('${u.id}')" class="text-red-600 border border-red-200 px-3 py-1 rounded-lg text-sm hover:bg-red-50 dark:text-red-400 dark:border-red-700 dark:hover:bg-red-900/40">🗑 Revoke</button>
-          </div>
+          </div>` : ''}
         </div>`;
       }).join('')}</div>` : ''}
     <h3 class="font-bold text-brand mb-3">Active Employees (${active.length})</h3>
@@ -8883,6 +8972,8 @@ function renderEmployeeCard(emp, inactive) {
   var empToday = empUpcoming.filter(function(a) { return a.preferred_date === todayStr; });
   var empCompleted = appointments.filter(function(a) { return a.assigned_employee_id===emp.id && a.status === 'completed'; });
   var isEmpAdmin = adminUsers.some(function(u) { return u.email && emp.email && u.email.toLowerCase() === emp.email.toLowerCase(); });
+  var empAdminRecord = isEmpAdmin ? adminUsers.find(function(u) { return u.email && emp.email && u.email.toLowerCase() === emp.email.toLowerCase(); }) : null;
+  var isEmpSuperAdmin = empAdminRecord && (empAdminRecord.role === 'superadmin' || empAdminRecord.role === 'super_admin');
   var totalTodayAppts = appointments.filter(function(a) { return a.preferred_date === todayStr && a.status !== 'cancelled'; }).length;
 
   // Avatar initials
@@ -8930,7 +9021,8 @@ function renderEmployeeCard(emp, inactive) {
     + '<div class="flex items-center gap-2 flex-wrap">'
     + '<span class="font-semibold text-base dark:text-gray-200">' + esc(emp.name) + '</span>'
     + '<span class="text-xs px-2 py-0.5 rounded-full ' + (emp.role === 'Manager' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300') + '">' + (emp.role || 'Employee') + '</span>'
-    + (isEmpAdmin ? '<span class="text-xs px-2 py-0.5 rounded-full bg-green-600 text-white">Admin</span>' : '')
+    + (isEmpSuperAdmin ? '<span class="text-xs px-2 py-0.5 rounded-full bg-purple-600 text-white">Super Admin</span>' : isEmpAdmin ? '<span class="text-xs px-2 py-0.5 rounded-full bg-green-600 text-white">Admin Access</span>' : '<span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300">Staff Only</span>')
+    + (currentUser && currentUser.email && emp.email && currentUser.email.toLowerCase() === emp.email.toLowerCase() ? '<span class="text-xs px-2 py-0.5 rounded-full bg-amber-500 text-white font-bold">' + (T.youBadge || 'YOU') + '</span>' : '')
     + (inactive ? '<span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400">Inactive</span>' : '')
     + '</div>'
     + '<div class="text-sm text-gray-500 dark:text-gray-400">' + (emp.email ? esc(emp.email) : '') + (emp.email && emp.phone ? ' \u2022 ' : '') + (emp.phone ? esc(emp.phone) : '') + '</div>'
@@ -8949,10 +9041,10 @@ function renderEmployeeCard(emp, inactive) {
     // Action row
     + '<div class="flex items-center justify-between mt-3 pt-2 border-t dark:border-gray-600">'
     + '<div class="flex items-center gap-2 flex-wrap">'
-    + '<button onclick="startEditEmployee(\'' + emp.id + '\')" class="border rounded px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700">Edit</button>'
-    + '<button onclick="toggleEmployeeStatus(\'' + emp.id + '\',' + (!emp.is_active) + ')" class="border rounded px-3 py-1 text-xs ' + (inactive ? 'text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900' : 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900') + '">' + (inactive ? 'Activate' : 'Deactivate') + '</button>'
-    + (!inactive && emp.email && !isEmpAdmin ? '<button onclick="makeAdmin(\'' + esc(emp.email) + '\',\'' + esc(emp.name) + '\')" class="border rounded px-3 py-1 text-xs text-blue-600 hover:bg-blue-50 dark:border-gray-600 dark:text-blue-400 dark:hover:bg-blue-900">Make Admin</button>' : '')
-    + (isEmpAdmin ? '<button onclick="revokeAdminByEmail(\'' + esc(emp.email) + '\')" class="border rounded px-3 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-gray-600 dark:text-red-400 dark:hover:bg-red-900">Revoke Admin</button>' : '')
+    + (currentUser && currentUser.type === 'admin' ? '<button onclick="startEditEmployee(\'' + emp.id + '\')" class="border rounded px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700">Edit</button>' : '')
+    + (currentUser && currentUser.type === 'admin' ? '<button onclick="toggleEmployeeStatus(\'' + emp.id + '\',' + (!emp.is_active) + ')" class="border rounded px-3 py-1 text-xs ' + (inactive ? 'text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900' : 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900') + '">' + (inactive ? 'Activate' : 'Deactivate') + '</button>' : '')
+    + (currentUser && currentUser.type === 'admin' && !inactive && emp.email && !isEmpAdmin ? '<button onclick="makeAdmin(\'' + esc(emp.email) + '\',\'' + esc(emp.name) + '\')" class="border rounded px-3 py-1 text-xs text-blue-600 hover:bg-blue-50 dark:border-gray-600 dark:text-blue-400 dark:hover:bg-blue-900">Make Admin</button>' : '')
+    + (currentUser && currentUser.type === 'admin' && isEmpAdmin ? '<button onclick="revokeAdminByEmail(\'' + esc(emp.email) + '\')" class="border rounded px-3 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-gray-600 dark:text-red-400 dark:hover:bg-red-900">Revoke Admin</button>' : '')
     + '</div>'
     + (empUpcoming.length && !inactive ? '<button onclick="toggleEmpAppts(\'' + emp.id + '\')" class="text-xs px-3 py-1 rounded-full bg-brand/10 text-brand dark:bg-green-900/30 dark:text-green-400 hover:bg-brand/20 cursor-pointer">' + (T.viewSchedule || 'View Schedule') + ' \u25BE</button>' : '')
     + '</div>'
@@ -10853,6 +10945,8 @@ function switchTab(tab) {
   if(tab==='promotions' && typeof loadPromotions === 'function') loadPromotions();
   if(tab==='faq' && typeof loadFaqs === 'function') loadFaqs();
   if(tab==='reviews' && typeof loadTestimonials === 'function') loadTestimonials();
+  if(tab==='myschedule') loadMySchedule();
+  if(tab==='mywork') loadMyWork();
 }
 
 // Sub-tab switching for Appointments (Calendar vs List)
@@ -10878,6 +10972,120 @@ function switchDocsView(view) {
     if (t === 'vision') btn.className = view === t ? visionActive : visionInactive;
     else btn.className = view === t ? active : inactive;
   });
+}
+
+// ===== MY SCHEDULE / MY WORK (staff tabs) =====
+async function loadMySchedule() {
+  var T = adminT[currentLang];
+  var container = document.getElementById('myschedule-content');
+  var empId = currentUser.employee_id;
+  if (!empId) { container.textContent = T.noScheduleFound; return; }
+  try {
+    var res = await fetch('/api/admin/schedules.php?type=weekly', { credentials: 'include' });
+    var json = await res.json();
+    if (!json.success || !json.data) throw new Error('No data');
+    var mySchedule = json.data.filter(function(s) { return parseInt(s.employee_id) === empId; });
+    if (!mySchedule.length) { container.textContent = T.noScheduleFound; return; }
+    var dayLabels = [T.schedSun||'Sun', T.schedMon||'Mon', T.schedTue||'Tue', T.schedWed||'Wed', T.schedThu||'Thu', T.schedFri||'Fri', T.schedSat||'Sat'];
+    // Build schedule grid using DOM methods
+    container.textContent = '';
+    var grid = document.createElement('div');
+    grid.className = 'grid gap-3 sm:grid-cols-2 lg:grid-cols-4';
+    for (var dow = 0; dow < 7; dow++) {
+      var slot = mySchedule.find(function(s) { return parseInt(s.day_of_week) === dow; });
+      var isAvail = slot && parseInt(slot.is_available);
+      var card = document.createElement('div');
+      card.className = 'border rounded-lg p-4 ' + (isAvail ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : 'bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700');
+      var dayLabel = document.createElement('div');
+      dayLabel.className = 'font-medium dark:text-gray-200';
+      dayLabel.textContent = dayLabels[dow];
+      var timeLabel = document.createElement('div');
+      timeLabel.className = 'text-sm text-gray-600 dark:text-gray-400 mt-1';
+      timeLabel.textContent = isAvail ? fmtTime(slot.start_time) + ' - ' + fmtTime(slot.end_time) : (T.off || 'Off');
+      card.appendChild(dayLabel);
+      card.appendChild(timeLabel);
+      grid.appendChild(card);
+    }
+    container.appendChild(grid);
+    // Show today's appointments assigned to me
+    var todayStr = new Date().toISOString().split('T')[0];
+    var myAppts = appointments.filter(function(a) { return parseInt(a.assigned_employee_id) === empId && a.preferred_date === todayStr && a.status !== 'cancelled'; });
+    if (myAppts.length) {
+      var heading = document.createElement('h3');
+      heading.className = 'font-bold text-brand dark:text-green-400 mt-6 mb-3';
+      heading.textContent = (T.todayLabel || 'Today') + ' (' + myAppts.length + ')';
+      container.appendChild(heading);
+      var list = document.createElement('div');
+      list.className = 'space-y-2';
+      myAppts.forEach(function(a) {
+        var row = document.createElement('div');
+        row.className = 'flex items-center gap-3 p-3 border rounded-lg dark:border-gray-700 dark:bg-gray-800';
+        var timeEl = document.createElement('span');
+        timeEl.className = 'font-medium';
+        timeEl.textContent = fmtTime(a.preferred_time);
+        var nameEl = document.createElement('span');
+        nameEl.textContent = (a.first_name||'') + ' ' + (a.last_name||'');
+        row.appendChild(timeEl);
+        row.appendChild(nameEl);
+        list.appendChild(row);
+      });
+      container.appendChild(list);
+    }
+  } catch(e) {
+    container.textContent = 'Error loading schedule.';
+    console.error('loadMySchedule:', e);
+  }
+}
+
+async function loadMyWork() {
+  var T = adminT[currentLang];
+  var container = document.getElementById('mywork-content');
+  var empId = currentUser.employee_id;
+  if (!empId) { container.textContent = T.noAssignedWork; return; }
+  try {
+    var apptRes = await fetch('/api/admin/appointments.php?employee_id=' + empId + '&limit=100&sort_by=preferred_date&sort_order=asc', { credentials: 'include' });
+    var apptJson = await apptRes.json();
+    var myAppts = (apptJson.data || []).filter(function(a) { return a.status !== 'completed' && a.status !== 'cancelled'; });
+    if (!myAppts.length) { container.textContent = T.noAssignedWork; return; }
+    container.textContent = '';
+    var list = document.createElement('div');
+    list.className = 'space-y-3';
+    myAppts.forEach(function(a) {
+      var vehicle = [a.vehicle_year, a.vehicle_make, a.vehicle_model].filter(Boolean).join(' ');
+      var card = document.createElement('div');
+      card.className = 'border rounded-lg p-4 dark:border-gray-700 dark:bg-gray-800';
+      var header = document.createElement('div');
+      header.className = 'flex items-center justify-between flex-wrap gap-2';
+      var nameWrap = document.createElement('div');
+      var nameEl = document.createElement('span');
+      nameEl.className = 'font-semibold dark:text-gray-200';
+      nameEl.textContent = (a.first_name||'') + ' ' + (a.last_name||'');
+      nameWrap.appendChild(nameEl);
+      if (a.reference_number) {
+        var refEl = document.createElement('span');
+        refEl.className = 'text-xs text-gray-400 ml-2';
+        refEl.textContent = a.reference_number;
+        nameWrap.appendChild(refEl);
+      }
+      header.appendChild(nameWrap);
+      card.appendChild(header);
+      var details = document.createElement('div');
+      details.className = 'mt-2 text-sm text-gray-600 dark:text-gray-400';
+      details.textContent = fmtDate(a.preferred_date) + ' ' + fmtTime(a.preferred_time) + (vehicle ? ' \u00B7 ' + vehicle : '');
+      card.appendChild(details);
+      if (a.task_summary) {
+        var summary = document.createElement('p');
+        summary.className = 'mt-1 text-sm text-gray-500 dark:text-gray-500';
+        summary.textContent = a.task_summary;
+        card.appendChild(summary);
+      }
+      list.appendChild(card);
+    });
+    container.appendChild(list);
+  } catch(e) {
+    container.textContent = 'Error loading assigned work.';
+    console.error('loadMyWork:', e);
+  }
 }
 
 // Quick assign all unassigned appointments for a day

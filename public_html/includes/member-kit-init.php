@@ -94,31 +94,45 @@ function initMemberKit(PDO $pdo): void
             }
         }
 
-        // 3. Check oretir_employees (only if not already admin)
-        if ($detectedRole !== 'admin') {
-            try {
-                $stmt = $pdo->prepare('SELECT id, name, role FROM oretir_employees WHERE member_id = ? AND is_active = 1 LIMIT 1');
-                $stmt->execute([$memberId]);
+        // 3. Check oretir_employees (set employee_id for employees AND admins who are also employees)
+        try {
+            $stmt = $pdo->prepare('SELECT id, name, role FROM oretir_employees WHERE member_id = ? AND is_active = 1 LIMIT 1');
+            $stmt->execute([$memberId]);
+            $employee = $stmt->fetch();
+            if (!$employee && $email !== '') {
+                // Fallback: match by email if member_id not linked yet
+                $stmt = $pdo->prepare('SELECT id, name, role FROM oretir_employees WHERE email = ? AND is_active = 1 LIMIT 1');
+                $stmt->execute([$email]);
                 $employee = $stmt->fetch();
-                if (!$employee && $email !== '') {
-                    // Fallback: match by email if member_id not linked yet
-                    $stmt = $pdo->prepare('SELECT id, name, role FROM oretir_employees WHERE email = ? AND is_active = 1 LIMIT 1');
-                    $stmt->execute([$email]);
-                    $employee = $stmt->fetch();
-                    // Auto-link employee to member account
-                    if ($employee) {
-                        $pdo->prepare('UPDATE oretir_employees SET member_id = ? WHERE id = ?')
-                            ->execute([$memberId, $employee['id']]);
-                    }
-                }
+                // Auto-link employee to member account
                 if ($employee) {
-                    $detectedRole = 'employee';
-                    $_SESSION['employee_id']   = (int) $employee['id'];
-                    $_SESSION['employee_name'] = $employee['name'];
-                    $_SESSION['employee_role'] = $employee['role']; // Employee or Manager
+                    $pdo->prepare('UPDATE oretir_employees SET member_id = ? WHERE id = ?')
+                        ->execute([$memberId, $employee['id']]);
                 }
-            } catch (\Throwable $e) {
-                error_log('Employee check failed: ' . $e->getMessage());
+            }
+            if ($employee) {
+                $_SESSION['employee_id']   = (int) $employee['id'];
+                $_SESSION['employee_name'] = $employee['name'];
+                $_SESSION['employee_role'] = $employee['role']; // Employee or Manager
+                if ($detectedRole !== 'admin') {
+                    $detectedRole = 'employee';
+                }
+            }
+        } catch (\Throwable $e) {
+            error_log('Employee check failed: ' . $e->getMessage());
+        }
+
+        // Ensure login_time + csrf_token are set for all staff
+        if (in_array($detectedRole, ['admin', 'employee'], true)) {
+            if (empty($_SESSION['login_time'])) {
+                $_SESSION['login_time'] = time();
+            }
+            if (empty($_SESSION['csrf_token'])) {
+                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            }
+            // Store email for employees who don't have it set via admin path
+            if ($detectedRole === 'employee' && empty($_SESSION['admin_email'])) {
+                $_SESSION['employee_email'] = $email;
             }
         }
 

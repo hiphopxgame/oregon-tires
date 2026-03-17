@@ -62,6 +62,7 @@ function startSecureSession(): void
         ini_set('session.cookie_secure', '1');
     }
 
+    session_name('oregon_session');
     session_start();
 }
 

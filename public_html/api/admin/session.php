@@ -6,17 +6,19 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 try {
-    $admin = requireAdmin();
+    $user = requireStaff();
 
     requireMethod('GET');
 
     jsonSuccess([
-        'id'         => $admin['id'],
-        'email'      => $admin['email'],
-        'role'       => $admin['role'],
-        'name'       => $admin['name'],
-        'language'   => $admin['language'] ?? 'both',
-        'csrf_token' => $_SESSION['csrf_token'] ?? '',
+        'id'          => $user['id'],
+        'email'       => $user['email'],
+        'role'        => $user['role'],
+        'name'        => $user['name'],
+        'type'        => $user['type'],
+        'language'    => $user['language'] ?? 'both',
+        'employee_id' => $user['employee_id'] ?? null,
+        'csrf_token'  => $_SESSION['csrf_token'] ?? '',
     ]);
 } catch (\Throwable $e) {
     error_log('Session check error: ' . $e->getMessage());

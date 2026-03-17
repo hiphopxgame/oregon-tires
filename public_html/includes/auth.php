@@ -93,6 +93,49 @@ function requireAdmin(): array
 }
 
 /**
+ * Check if current session is an authenticated staff member (admin or employee).
+ * Returns a normalized user array for either role.
+ */
+function requireStaff(): array
+{
+    startSecureSession();
+
+    // Session timeout (8 hours)
+    if (time() - ($_SESSION['login_time'] ?? 0) > 28800) {
+        session_destroy();
+        jsonError('Session expired. Please log in again.', 401);
+    }
+
+    // Check admin first
+    if (!empty($_SESSION['admin_id'])) {
+        return [
+            'id'          => $_SESSION['admin_id'],
+            'email'       => $_SESSION['admin_email'],
+            'role'        => $_SESSION['admin_role'],
+            'name'        => $_SESSION['admin_name'],
+            'type'        => 'admin',
+            'language'    => $_SESSION['admin_language'] ?? 'both',
+            'employee_id' => $_SESSION['employee_id'] ?? null,
+        ];
+    }
+
+    // Check employee
+    if (!empty($_SESSION['employee_id'])) {
+        return [
+            'id'          => $_SESSION['employee_id'],
+            'email'       => $_SESSION['employee_email'] ?? '',
+            'role'        => $_SESSION['employee_role'] ?? 'Employee',
+            'name'        => $_SESSION['employee_name'] ?? '',
+            'type'        => 'employee',
+            'language'    => $_SESSION['admin_language'] ?? 'both',
+            'employee_id' => $_SESSION['employee_id'],
+        ];
+    }
+
+    jsonError('Authentication required.', 401);
+}
+
+/**
  * Verify CSRF token from request header.
  */
 function verifyCsrf(): void
@@ -157,6 +200,7 @@ function requireCustomerAuth(): void
 function getCurrentUserType(): ?string
 {
     if (!empty($_SESSION['admin_id'])) return 'admin';
+    if (!empty($_SESSION['employee_id'])) return 'employee';
     if (!empty($_SESSION['member_id'])) return 'customer';
     return null;
 }
