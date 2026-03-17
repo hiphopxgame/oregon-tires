@@ -76,8 +76,41 @@ $isAdmin    = $dashboardRole === 'admin';
 
 // If admin or employee and no explicit tab requested, redirect to admin panel
 if (($isAdmin || $isEmployee) && !isset($_GET['tab'])) {
-    header('Location: /admin/');
-    exit;
+    // Ensure admin session vars are set before redirecting — the onLogin callback
+    // only fires during MemberAuth::login(), so returning members need this fallback
+    if ($isAdmin && empty($_SESSION['admin_id'])) {
+        $email = $_SESSION['member_email'] ?? '';
+        if ($email !== '') {
+            try {
+                $stmt = $pdo->prepare('SELECT id, role, display_name, language FROM oretir_admins WHERE email = ? AND is_active = 1 LIMIT 1');
+                $stmt->execute([$email]);
+                $localAdmin = $stmt->fetch();
+                if ($localAdmin) {
+                    $_SESSION['admin_id']       = $localAdmin['id'];
+                    $_SESSION['admin_email']    = $email;
+                    $_SESSION['admin_role']     = $localAdmin['role'] ?? 'admin';
+                    $_SESSION['admin_name']     = $localAdmin['display_name'] ?? $email;
+                    $_SESSION['admin_language'] = $localAdmin['language'] ?? 'both';
+                    $_SESSION['login_time']     = $_SESSION['login_time'] ?? time();
+                    if (empty($_SESSION['csrf_token'])) {
+                        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                    }
+                } else {
+                    // Not actually an admin — don't redirect
+                    $isAdmin = false;
+                    $isEmployee = false;
+                    $dashboardRole = 'member';
+                    $_SESSION['dashboard_role'] = 'member';
+                }
+            } catch (\Throwable $e) {
+                error_log('Admin session recovery failed: ' . $e->getMessage());
+            }
+        }
+    }
+    if ($isAdmin || $isEmployee) {
+        header('Location: /admin/');
+        exit;
+    }
 }
 
 // Site key for branding
