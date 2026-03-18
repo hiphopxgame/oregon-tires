@@ -587,6 +587,42 @@ try {
         error_log("Booking confirmation email failed for #{$appointmentId}: " . $e->getMessage());
     }
 
+    // ─── Queue push notification for booking confirmation ────────────────
+    try {
+        require_once __DIR__ . '/../includes/push.php';
+        $serviceDisplay = ucwords(str_replace('-', ' ', $service));
+        $displayDate = $customerLang === 'es'
+            ? (new \DateTime($preferredDate))->format('d/m/Y')
+            : (new \DateTime($preferredDate))->format('m/d/Y');
+        $pushDisplayTime = formatTimeDisplay($preferredTime);
+
+        if ($bookingCustomerId) {
+            queueNotificationForCustomer(
+                $bookingCustomerId,
+                'booking_confirmed',
+                'Booking Confirmed!',
+                "\u00a1Cita Confirmada!",
+                "Your {$serviceDisplay} appointment on {$displayDate} at {$pushDisplayTime} is confirmed. Ref: {$referenceNumber}",
+                "Su cita de {$serviceDisplay} el {$displayDate} a las {$pushDisplayTime} est\u00e1 confirmada. Ref: {$referenceNumber}",
+                '/book-appointment/'
+            );
+        }
+        $effectiveMemberId = (int) ($_SESSION['member_id'] ?? $newMemberId ?? 0);
+        if ($effectiveMemberId > 0) {
+            queueNotificationForMember(
+                $effectiveMemberId,
+                'booking_confirmed',
+                'Booking Confirmed!',
+                "\u00a1Cita Confirmada!",
+                "Your {$serviceDisplay} appointment on {$displayDate} at {$pushDisplayTime} is confirmed. Ref: {$referenceNumber}",
+                "Su cita de {$serviceDisplay} el {$displayDate} a las {$pushDisplayTime} est\u00e1 confirmada. Ref: {$referenceNumber}",
+                '/book-appointment/'
+            );
+        }
+    } catch (\Throwable $pushErr) {
+        error_log("Oregon Tires book.php: push notification queue failed for #{$appointmentId}: " . $pushErr->getMessage());
+    }
+
     $response = [
         'appointment_id'   => $appointmentId,
         'reference_number' => $referenceNumber,

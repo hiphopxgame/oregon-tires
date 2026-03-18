@@ -2389,11 +2389,15 @@ function toggleDarkMode() {
 
 // ===== SERVICE WORKER =====
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
+  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+    // Check for updates periodically
+    setInterval(function() { reg.update(); }, 3600000);
+  }).catch(function() {});
 }
 
 </script>
 
+  <script src="/assets/js/pwa-manager.js" defer></script>
   <script src="/assets/js/web-vitals.js" defer></script>
   <script src="/assets/js/contact-form.js" defer></script>
   <script src="/assets/js/ui-enhancements.js" defer></script>

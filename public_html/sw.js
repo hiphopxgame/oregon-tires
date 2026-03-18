@@ -1,14 +1,16 @@
 // Bump version on each deploy to bust stale caches
-const CACHE_VERSION = '20';
+const CACHE_VERSION = '21';
 const CACHE_NAME = 'oregon-tires-v' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
   '/',
   '/manifest.json',
+  '/offline.html',
   '/assets/logo.webp',
   '/assets/logo.png',
   '/assets/hero-bg.webp',
   '/assets/favicon.png',
+  '/assets/js/pwa-manager.js',
   '/images/fast-cars.webp',
   '/images/tire-services.webp',
   '/images/quality-parts.webp',
@@ -24,6 +26,7 @@ const PRECACHE_URLS = [
   '/engine-diagnostics',
   '/suspension-repair',
   '/fleet-services',
+  '/book-appointment/',
 ];
 
 // ─── Install — Pre-cache critical assets ────────────────────────────────────
@@ -74,11 +77,8 @@ self.addEventListener('fetch', (event) => {
         .catch(() =>
           caches.match(request).then(cached => {
             if (cached) return cached;
-            // Offline fallback — simple HTML page
-            return new Response(
-              `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline — Oregon Tires</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f3f4f6;color:#1f2937;text-align:center;padding:2rem}.card{background:#fff;border-radius:1rem;padding:2.5rem;max-width:28rem;box-shadow:0 4px 24px rgba(0,0,0,.08)}h1{font-size:1.5rem;margin-bottom:.75rem;color:#15803d}p{line-height:1.6;margin-bottom:1rem}button{background:#15803d;color:#fff;border:none;padding:.75rem 1.5rem;border-radius:.5rem;font-size:1rem;cursor:pointer}button:hover{background:#166534}</style></head><body><div class="card"><h1>You are offline</h1><p>Oregon Tires Auto Care is not available right now. Please check your internet connection and try again.</p><button onclick="location.reload()">Try Again</button></div></body></html>`,
-              { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
-            );
+            // Serve bilingual offline fallback page
+            return caches.match('/offline.html');
           })
         )
     );
@@ -116,3 +116,156 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// ─── Push Notifications ─────────────────────────────────────────────────────
+
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  let payload;
+  try {
+    payload = event.data.json();
+  } catch (e) {
+    payload = { title: 'Oregon Tires', body: event.data.text() };
+  }
+
+  const title = payload.title || 'Oregon Tires Auto Care';
+  const options = {
+    body: payload.body || '',
+    icon: payload.icon || '/assets/icon-192.png',
+    badge: payload.badge || '/assets/favicon.png',
+    tag: payload.tag || 'oregon-tires',
+    vibrate: [200, 100, 200],
+    data: {
+      url: payload.url || '/',
+      type: payload.data?.type || 'general',
+    },
+    actions: [],
+  };
+
+  // Add contextual actions based on notification type
+  const type = payload.data?.type || '';
+  if (type === 'booking_confirmed' || type === 'appointment_reminder') {
+    options.actions = [
+      { action: 'view', title: 'View Booking' },
+      { action: 'dismiss', title: 'Dismiss' },
+    ];
+  } else if (type === 'estimate_ready') {
+    options.actions = [
+      { action: 'view', title: 'View Estimate' },
+      { action: 'dismiss', title: 'Dismiss' },
+    ];
+  } else if (type === 'vehicle_ready') {
+    options.actions = [
+      { action: 'view', title: 'View Details' },
+    ];
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// ─── Notification Click Handler ─────────────────────────────────────────────
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'dismiss') return;
+
+  const url = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      // Focus existing window if available
+      for (const client of windowClients) {
+        if (client.url.includes(new URL(url, self.location.origin).pathname) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Open new window
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
+    })
+  );
+});
+
+// ─── Background Sync — Offline Booking Replay ───────────────────────────────
+
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'offline-booking') {
+    event.waitUntil(replayOfflineBookings());
+  }
+});
+
+function openOfflineDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('oregon_tires_offline', 1);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('pending_bookings')) {
+        db.createObjectStore('pending_bookings', { keyPath: 'sync_id' });
+      }
+    };
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function replayOfflineBookings() {
+  try {
+    const db = await openOfflineDB();
+
+    const entries = await new Promise((resolve, reject) => {
+      const tx = db.transaction('pending_bookings', 'readonly');
+      const store = tx.objectStore('pending_bookings');
+      const getAll = store.getAll();
+      getAll.onsuccess = () => resolve(getAll.result);
+      getAll.onerror = () => reject(getAll.error);
+    });
+
+    if (!entries || entries.length === 0) return;
+
+    for (const entry of entries) {
+      try {
+        const response = await fetch('/api/offline-sync.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sync_id: entry.sync_id,
+            action_type: 'booking',
+            payload: entry.payload,
+          }),
+        });
+
+        const json = await response.json();
+
+        if (json.success) {
+          // Remove from IDB
+          await new Promise((resolve, reject) => {
+            const delTx = db.transaction('pending_bookings', 'readwrite');
+            delTx.objectStore('pending_bookings').delete(entry.sync_id);
+            delTx.oncomplete = resolve;
+            delTx.onerror = () => reject(delTx.error);
+          });
+
+          // Show confirmation notification
+          const ref = json.data?.result?.reference_number || '';
+          await self.registration.showNotification('Booking Submitted!', {
+            body: ref ? 'Your offline booking is confirmed. Ref: ' + ref : 'Your offline booking has been submitted.',
+            icon: '/assets/icon-192.png',
+            badge: '/assets/favicon.png',
+            tag: 'offline-sync-' + entry.sync_id,
+            data: { url: '/book-appointment/' },
+          });
+        }
+      } catch (fetchErr) {
+        // Will retry on next sync
+        console.error('SW: offline booking replay failed', fetchErr);
+      }
+    }
+  } catch (err) {
+    console.error('SW: replayOfflineBookings error', err);
+  }
+}

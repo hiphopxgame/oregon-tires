@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline — Oregon Tires Auto Care</title>
+  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
+  <meta name="theme-color" content="#15803d">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+    .card {
+      background: #fff;
+      border-radius: 1rem;
+      padding: 2.5rem;
+      max-width: 32rem;
+      width: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .logo { width: 120px; height: auto; margin: 0 auto 1.5rem; display: block; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #15803d; }
+    h2 { font-size: 1.25rem; margin-bottom: 0.5rem; color: #15803d; }
+    .subtitle { color: #6b7280; margin-bottom: 1.5rem; line-height: 1.6; }
+    .divider { border: none; border-top: 1px solid #e5e7eb; margin: 1.5rem 0; }
+    .available { text-align: left; margin-bottom: 1.5rem; }
+    .available h3 { font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .available ul { list-style: none; padding: 0; }
+    .available li { padding: 0.375rem 0; color: #4b5563; font-size: 0.9rem; }
+    .available li::before { content: "\2713"; color: #15803d; font-weight: bold; margin-right: 0.5rem; }
+    .btn-row { display: flex; flex-direction: column; gap: 0.75rem; }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      text-align: center;
+    }
+    .btn-primary { background: #15803d; color: #fff; }
+    .btn-primary:hover { background: #166534; }
+    .btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+    .btn-secondary:hover { background: #e5e7eb; }
+    .phone { color: #15803d; font-weight: 600; text-decoration: none; }
+    .phone:hover { text-decoration: underline; }
+    .lang-toggle { margin-top: 1rem; }
+    .lang-toggle button { background: none; border: none; color: #6b7280; cursor: pointer; font-size: 0.875rem; text-decoration: underline; }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+      body { background: #111827; color: #f3f4f6; }
+      .card { background: #1f2937; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+      h1, h2 { color: #4ade80; }
+      .subtitle { color: #9ca3af; }
+      .divider { border-top-color: #374151; }
+      .available h3 { color: #d1d5db; }
+      .available li { color: #9ca3af; }
+      .available li::before { color: #4ade80; }
+      .btn-primary { background: #166534; }
+      .btn-primary:hover { background: #15803d; }
+      .btn-secondary { background: #374151; color: #d1d5db; border-color: #4b5563; }
+      .btn-secondary:hover { background: #4b5563; }
+      .phone { color: #4ade80; }
+    }
+  </style>
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
+</head>
+<body>
+  <div class="card">
+    <img src="/assets/logo.png" alt="Oregon Tires Auto Care" class="logo" onerror="this.style.display='none'">
+
+    <!-- English -->
+    <div id="section-en">
+      <h1>You're Offline</h1>
+      <p class="subtitle">It looks like you've lost your internet connection. Don't worry — some features are still available.</p>
+
+      <div class="available">
+        <h3>Available Offline</h3>
+        <ul>
+          <li>Browse cached service pages</li>
+          <li>Start a booking (queued until online)</li>
+          <li>View previously loaded content</li>
+        </ul>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="location.reload()">Try Again</button>
+        <a href="/book-appointment/" class="btn btn-secondary">Book Appointment</a>
+        <a href="tel:+15033679714" class="phone">(503) 367-9714</a>
+      </div>
+    </div>
+
+    <!-- Spanish -->
+    <div id="section-es" style="display:none">
+      <h2>Estás Sin Conexión</h2>
+      <p class="subtitle">Parece que perdiste tu conexión a internet. No te preocupes — algunas funciones siguen disponibles.</p>
+
+      <div class="available">
+        <h3>Disponible Sin Conexión</h3>
+        <ul>
+          <li>Ver páginas de servicios en caché</li>
+          <li>Iniciar una reserva (en cola hasta reconectar)</li>
+          <li>Ver contenido cargado anteriormente</li>
+        </ul>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="location.reload()">Intentar de Nuevo</button>
+        <a href="/book-appointment/" class="btn btn-secondary">Reservar Cita</a>
+        <a href="tel:+15033679714" class="phone">(503) 367-9714</a>
+      </div>
+    </div>
+
+    <div class="lang-toggle">
+      <button id="lang-btn" onclick="toggleLang()">Español</button>
+    </div>
+  </div>
+
+  <script>
+  var showingEs = false;
+  function toggleLang() {
+    showingEs = !showingEs;
+    document.getElementById('section-en').style.display = showingEs ? 'none' : '';
+    document.getElementById('section-es').style.display = showingEs ? '' : 'none';
+    document.getElementById('lang-btn').textContent = showingEs ? 'English' : 'Español';
+    document.documentElement.lang = showingEs ? 'es' : 'en';
+  }
+  // Auto-detect language from localStorage
+  try {
+    var savedLang = localStorage.getItem('lang') || localStorage.getItem('oregontires_lang');
+    if (savedLang === 'es') toggleLang();
+  } catch(e) {}
+  </script>
+</body>
+</html>

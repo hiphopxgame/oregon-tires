@@ -1670,6 +1670,9 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
       vehicle_model: (document.getElementById('vehicle-model') || {}).value || '',
       vehicle_vin: (document.getElementById('vehicle-vin') || {}).value || '',
       license_plate: (document.getElementById('plate-input') || {}).value || '',
+      tire_size: (document.getElementById('tire-size-input') || {}).value || '',
+      tire_preference: (function(){ var el = form.querySelector('input[name="tire_preference"]:checked'); return el ? el.value : ''; })(),
+      tire_count: (document.getElementById('tire_count') || {}).value || '',
       notes: (form.querySelector('textarea[name="notes"]') || {}).value || '',
       language: currentLang === 'es' ? 'spanish' : 'english',
       sms_opt_in: document.getElementById('sms-opt-in').checked ? 1 : 0
@@ -1714,6 +1717,10 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
         card.appendChild(homeLink);
         container.appendChild(card);
         card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Prompt push notification subscription after successful booking
+        if (typeof OTPush !== 'undefined' && OTPush.promptAfterBooking) {
+          setTimeout(function() { OTPush.promptAfterBooking(); }, 2000);
+        }
       } else {
         showStatus(json.error || t[currentLang].bookingError, 'red');
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = t[currentLang].bookNow; }
@@ -2116,5 +2123,7 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
   } catch(e) {}
 })();
 </script>
+<script src="/assets/js/pwa-manager.js" defer></script>
+<script src="/assets/js/offline-booking.js" defer></script>
 </body>
 </html>

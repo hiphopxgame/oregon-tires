@@ -25,6 +25,7 @@ if (php_sapi_name() !== 'cli') {
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/mail.php';
 require_once __DIR__ . '/../includes/sms.php';
+require_once __DIR__ . '/../includes/push.php';
 
 $tomorrow = (new DateTime('tomorrow'))->format('Y-m-d');
 $smsEnabled = !empty($_ENV['TWILIO_SID']);
@@ -78,6 +79,30 @@ try {
                 $emailFailed++;
                 echo "  ✗ Email FAILED for {$appt['email']} (#{$appt['id']})\n";
             }
+        }
+
+        // Queue push notification reminder
+        try {
+            $serviceDisplay = ucwords(str_replace('-', ' ', $appt['service']));
+            $pushTime = formatTimeDisplay($appt['preferred_time']);
+            $subs = findPushSubscriptionsByEmail($appt['email']);
+            if (!empty($subs)) {
+                $custId = (int) ($subs[0]['customer_id'] ?? 0);
+                if ($custId > 0) {
+                    queueNotificationForCustomer(
+                        $custId,
+                        'appointment_reminder',
+                        "Reminder: {$serviceDisplay} Tomorrow",
+                        "Recordatorio: {$serviceDisplay} Ma\u00f1ana",
+                        "Your {$serviceDisplay} appointment is tomorrow at {$pushTime}. Oregon Tires Auto Care.",
+                        "Su cita de {$serviceDisplay} es ma\u00f1ana a las {$pushTime}. Oregon Tires Auto Care.",
+                        '/members?tab=bookings'
+                    );
+                }
+                echo "  \u2713 Push reminder queued for {$appt['email']}\n";
+            }
+        } catch (\Throwable $pushErr) {
+            error_log("send-reminders.php: push queue failed for #{$appt['id']}: " . $pushErr->getMessage());
         }
 
         // Send SMS reminder if enabled and not already sent

@@ -2,8 +2,10 @@
   "name": "Oregon Tires Auto Care",
   "short_name": "Oregon Tires",
   "description": "Professional tire & auto services in Portland, OR. Bilingual - English & Spanish.",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#0D3618",
   "theme_color": "#15803d",
   "lang": "en",
@@ -23,13 +25,25 @@
       "src": "/assets/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/assets/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
@@ -41,10 +55,23 @@
       "icons": [{ "src": "/assets/favicon.png", "sizes": "32x32" }]
     },
     {
-      "name": "Check Status",
-      "short_name": "Status",
-      "url": "/status/",
+      "name": "My Bookings",
+      "short_name": "Bookings",
+      "url": "/members?tab=bookings",
       "description": "Check your appointment status"
+    },
+    {
+      "name": "Call Us",
+      "short_name": "Call",
+      "url": "tel:+15033679714",
+      "description": "Call Oregon Tires"
     }
-  ]
+  ],
+  "share_target": {
+    "action": "/book-appointment/",
+    "method": "GET",
+    "params": {
+      "text": "notes"
+    }
+  }
 }
