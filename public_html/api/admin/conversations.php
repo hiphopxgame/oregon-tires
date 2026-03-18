@@ -4,7 +4,7 @@
  *
  * GET (no id)     — List all conversations with customer info
  * GET ?id=N       — Conversation detail with all messages
- * POST ?id=N      — Admin reply (sender_type='admin')
+ * POST ?id=N      — Admin reply (sender_type='admin', email-aware)
  * PUT ?id=N       — Update conversation status
  */
 
@@ -24,7 +24,7 @@ try {
     // ─── GET: List or Detail ─────────────────────────────────────────────
     if ($method === 'GET') {
         if ($id > 0) {
-            // Conversation detail
+            // Conversation detail — include source + email_thread_id
             $convStmt = $db->prepare(
                 'SELECT c.*,
                         CONCAT(cust.first_name, " ", cust.last_name) as customer_name,
@@ -40,15 +40,28 @@ try {
                 jsonError('Conversation not found.', 404);
             }
 
-            // Fetch messages
+            // Fetch messages — include source + attachments_json
             $msgStmt = $db->prepare(
-                'SELECT id, sender_type, sender_name, body, is_read, created_at
+                'SELECT id, sender_type, sender_name, body, is_read, source, attachments_json, created_at
                  FROM oretir_conversation_messages
                  WHERE conversation_id = ?
                  ORDER BY created_at ASC'
             );
             $msgStmt->execute([$id]);
-            $conversation['messages'] = $msgStmt->fetchAll(PDO::FETCH_ASSOC);
+            $messages = $msgStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Parse attachments_json for each message
+            foreach ($messages as &$msg) {
+                if (!empty($msg['attachments_json'])) {
+                    $msg['attachments'] = json_decode($msg['attachments_json'], true) ?: [];
+                } else {
+                    $msg['attachments'] = [];
+                }
+                unset($msg['attachments_json']);
+            }
+            unset($msg);
+
+            $conversation['messages'] = $messages;
 
             // Mark customer messages as read
             $db->prepare(
@@ -60,7 +73,7 @@ try {
             jsonSuccess($conversation);
         }
 
-        // List all conversations
+        // List all conversations — include source column
         $where = [];
         $params = [];
 
@@ -70,6 +83,15 @@ try {
             if (in_array($_GET['status'], $validStatuses, true)) {
                 $where[] = 'c.status = ?';
                 $params[] = $_GET['status'];
+            }
+        }
+
+        // Source filter (web, email, contact_form)
+        if (!empty($_GET['source'])) {
+            $validSources = ['web', 'email', 'contact_form'];
+            if (in_array($_GET['source'], $validSources, true)) {
+                $where[] = 'c.source = ?';
+                $params[] = $_GET['source'];
             }
         }
 
@@ -115,9 +137,9 @@ try {
             jsonError('Message body is required (max 5000 characters).', 400);
         }
 
-        // Verify conversation exists
+        // Verify conversation exists — include source for email-aware reply
         $convStmt = $db->prepare(
-            'SELECT c.id, c.customer_id, c.subject,
+            'SELECT c.id, c.customer_id, c.subject, c.source,
                     cust.email as customer_email,
                     CONCAT(cust.first_name, " ", cust.last_name) as customer_name,
                     cust.language as customer_language
@@ -133,12 +155,13 @@ try {
         }
 
         $senderName = $admin['name'] ?? 'Oregon Tires';
+        $isEmailConv = ($conversation['source'] ?? '') === 'email';
 
         // Insert admin message
         $db->prepare(
-            'INSERT INTO oretir_conversation_messages (conversation_id, sender_type, sender_name, body, is_read, created_at)
-             VALUES (?, ?, ?, ?, 0, NOW())'
-        )->execute([$id, 'admin', $senderName, $body]);
+            'INSERT INTO oretir_conversation_messages (conversation_id, sender_type, sender_name, body, is_read, source, created_at)
+             VALUES (?, ?, ?, ?, 0, ?, NOW())'
+        )->execute([$id, 'admin', $senderName, $body, $isEmailConv ? 'email' : 'web']);
 
         // Mark all customer messages as read
         $db->prepare(
@@ -156,13 +179,40 @@ try {
         if (!empty($conversation['customer_email'])) {
             try {
                 $custLang = ($conversation['customer_language'] ?? 'english') === 'spanish' ? 'es' : 'en';
-                sendConversationReplyEmail(
-                    $conversation['customer_email'],
-                    $conversation['customer_name'] ?: 'Customer',
-                    $conversation['subject'],
-                    $body,
-                    $custLang === 'es' ? 'es' : 'en'
-                );
+
+                if ($isEmailConv) {
+                    // Email-sourced conversation: send threaded email reply
+                    $inReplyTo = null;
+                    $replyStmt = $db->prepare(
+                        'SELECT message_id_header FROM oretir_email_message_ids
+                         WHERE conversation_id = ? AND direction = ?
+                         ORDER BY created_at DESC LIMIT 1'
+                    );
+                    $replyStmt->execute([$id, 'inbound']);
+                    $lastInbound = $replyStmt->fetch(PDO::FETCH_ASSOC);
+                    if ($lastInbound) {
+                        $inReplyTo = $lastInbound['message_id_header'];
+                    }
+
+                    sendEmailReply(
+                        $conversation['customer_email'],
+                        $conversation['customer_name'] ?: 'Customer',
+                        $conversation['subject'],
+                        $body,
+                        $id,
+                        $inReplyTo,
+                        $custLang
+                    );
+                } else {
+                    // Web-sourced conversation: send standard notification
+                    sendConversationReplyEmail(
+                        $conversation['customer_email'],
+                        $conversation['customer_name'] ?: 'Customer',
+                        $conversation['subject'],
+                        $body,
+                        $custLang === 'es' ? 'es' : 'en'
+                    );
+                }
             } catch (\Throwable $e) {
                 error_log("conversations.php (admin): email notification error: " . $e->getMessage());
             }

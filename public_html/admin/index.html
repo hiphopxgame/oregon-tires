@@ -193,6 +193,75 @@
       #mobile-tab-select { display: block !important; }
     }
 
+    /* ── Nav Group Dropdowns ── */
+    .nav-group { position: relative; display: inline-block; }
+    .nav-group-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      white-space: nowrap;
+      color: white;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+    .nav-group-btn:hover { background-color: rgba(255,255,255,0.15); }
+    .nav-group.group-active > .nav-group-btn {
+      background-color: white;
+      color: #007030;
+    }
+    .dark .nav-group.group-active > .nav-group-btn {
+      background-color: #1f2937;
+      color: #4ade80;
+    }
+    .nav-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: 220px;
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      padding: 0.5rem;
+      z-index: 50;
+      margin-top: 0.25rem;
+    }
+    .dark .nav-dropdown {
+      background: #1f2937;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+    .nav-group:hover > .nav-dropdown,
+    .nav-group:focus-within > .nav-dropdown { display: block; }
+    .nav-dropdown-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 0.15s;
+    }
+    .nav-dropdown-item:hover { background-color: #f0fdf4; color: #007030; }
+    .dark .nav-dropdown-item { color: #d1d5db; }
+    .dark .nav-dropdown-item:hover { background-color: rgba(0,112,48,0.15); color: #4ade80; }
+    .nav-dropdown-item.tab-active {
+      background-color: #007030 !important;
+      color: white !important;
+    }
+    .dark .nav-dropdown-item.tab-active {
+      background-color: #065f46 !important;
+      color: #4ade80 !important;
+    }
+
     /* ── Tab Transitions ── */
     .tab-content {
       transition: opacity 0.3s ease, transform 0.3s ease;
@@ -391,43 +460,93 @@
         </div>
       </div>
       <!-- Navigation -->
-      <nav class="flex flex-wrap gap-1" id="nav-tabs" role="tablist">
+      <nav class="flex flex-wrap gap-1 items-start" id="nav-tabs" role="tablist">
         <button onclick="switchTab('overview')" data-tab="overview" role="tab" aria-selected="true" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition">📊 <span data-t="tabOverview">Overview</span></button>
-        <button onclick="switchTab('appointments')" data-tab="appointments" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📅 <span data-t="tabAppointments">Appointments</span></button>
-        <button onclick="switchTab('customers')" data-tab="customers" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👤 <span data-t="tabCustomers">Customers</span></button>
-        <button onclick="switchTab('repairorders')" data-tab="repairorders" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🔧 <span data-t="tabRepairOrders">Repair Orders</span></button>
-        <button onclick="switchTab('messages')" data-tab="messages" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">💬 <span data-t="tabMessages">Messages</span> <span id="conv-unread-badge" class="ml-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full hidden"></span></button>
-        <button onclick="switchTab('employees')" data-tab="employees" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">👥 <span data-t="tabEmployees">Employees</span></button>
-        <button onclick="switchTab('gallery')" data-tab="gallery" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🖼 <span data-t="tabGallery">Gallery</span></button>
-        <button onclick="switchTab('blog')" data-tab="blog" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📝 <span data-t="tabBlog">Blog</span></button>
-        <button onclick="switchTab('promotions')" data-tab="promotions" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">🏷 <span data-t="tabPromotions">Promotions</span></button>
-        <button onclick="switchTab('faq')" data-tab="faq" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">❓ FAQ</button>
-        <button onclick="switchTab('reviews')" data-tab="reviews" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">⭐ Reviews</button>
-        <button onclick="switchTab('analytics')" data-tab="analytics" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📈 <span data-t="tabAnalytics">Analytics</span></button>
-        <button onclick="switchTab('docs')" data-tab="docs" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📖 <span data-t="tabDocs">Docs</span></button>
-        <button onclick="switchTab('sitecontent')" data-tab="sitecontent" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📝 <span data-t="tabSiteContent">Site Content</span></button>
-        <button onclick="switchTab('subscribers')" data-tab="subscribers" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600">📧 <span data-t="tabSubscribers">Subscribers</span> <span id="subscribers-badge" class="ml-1 bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full hidden"></span></button>
-        <button onclick="switchTab('myschedule')" data-tab="myschedule" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600" style="display:none">🕐 <span data-t="tabMySchedule">My Schedule</span></button>
-        <button onclick="switchTab('mywork')" data-tab="mywork" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600" style="display:none">🔧 <span data-t="tabMyWork">My Work</span></button>
+
+        <div class="nav-group" data-nav-group="shop">
+          <button class="nav-group-btn" data-t="navShop">🔧 Shop ▾</button>
+          <div class="nav-dropdown">
+            <button onclick="switchTab('appointments')" data-tab="appointments" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📅 <span data-t="tabAppointments">Appointments</span></button>
+            <button onclick="switchTab('customers')" data-tab="customers" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">👤 <span data-t="tabCustomers">Customers</span></button>
+            <button onclick="switchTab('repairorders')" data-tab="repairorders" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔧 <span data-t="tabRepairOrders">Repair Orders</span></button>
+            <button onclick="switchTab('invoices')" data-tab="invoices" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🧾 <span data-t="tabInvoices">Invoices</span></button>
+            <button onclick="switchTab('waitlist')" data-tab="waitlist" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">⏳ <span data-t="tabWaitlist">Waitlist</span></button>
+            <button onclick="switchTab('tirequotes')" data-tab="tirequotes" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🛞 <span data-t="tabTireQuotes">Tire Quotes</span></button>
+            <button onclick="switchTab('visits')" data-tab="visits" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">👣 <span data-t="tabVisits">Visit Tracking</span></button>
+          </div>
+        </div>
+
+        <div class="nav-group" data-nav-group="team">
+          <button class="nav-group-btn" data-t="navTeam">👥 Team ▾</button>
+          <div class="nav-dropdown">
+            <button onclick="switchTab('employees')" data-tab="employees" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">👥 <span data-t="tabEmployees">Employees</span></button>
+            <button onclick="switchTab('labor')" data-tab="labor" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">⏱ <span data-t="tabLabor">Labor Tracking</span></button>
+            <button onclick="switchTab('messages')" data-tab="messages" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">💬 <span data-t="tabMessages">Messages</span> <span id="conv-unread-badge" class="ml-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full hidden"></span></button>
+            <button onclick="switchTab('myschedule')" data-tab="myschedule" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item" style="display:none">🕐 <span data-t="tabMySchedule">My Schedule</span></button>
+            <button onclick="switchTab('mywork')" data-tab="mywork" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item" style="display:none">🔧 <span data-t="tabMyWork">My Work</span></button>
+          </div>
+        </div>
+
+        <div class="nav-group" data-nav-group="marketing">
+          <button class="nav-group-btn" data-t="navMarketing">📣 Marketing ▾</button>
+          <div class="nav-dropdown">
+            <button onclick="switchTab('blog')" data-tab="blog" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📝 <span data-t="tabBlog">Blog</span></button>
+            <button onclick="switchTab('promotions')" data-tab="promotions" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🏷 <span data-t="tabPromotions">Promotions</span></button>
+            <button onclick="switchTab('faq')" data-tab="faq" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">❓ FAQ</button>
+            <button onclick="switchTab('reviews')" data-tab="reviews" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">⭐ Reviews</button>
+            <button onclick="switchTab('gallery')" data-tab="gallery" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🖼 <span data-t="tabGallery">Gallery</span></button>
+            <button onclick="switchTab('subscribers')" data-tab="subscribers" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📧 <span data-t="tabSubscribers">Subscribers</span> <span id="subscribers-badge" class="ml-1 bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full hidden"></span></button>
+            <button onclick="switchTab('loyalty')" data-tab="loyalty" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🎁 <span data-t="tabLoyalty">Loyalty &amp; Rewards</span></button>
+            <button onclick="switchTab('referrals')" data-tab="referrals" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🤝 <span data-t="tabReferrals">Referrals</span></button>
+            <button onclick="switchTab('reminders')" data-tab="reminders" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔔 <span data-t="tabReminders">Service Reminders</span></button>
+          </div>
+        </div>
+
+        <div class="nav-group" data-nav-group="settings">
+          <button class="nav-group-btn" data-t="navSettings">⚙️ Settings ▾</button>
+          <div class="nav-dropdown" style="right:0;left:auto">
+            <button onclick="switchTab('analytics')" data-tab="analytics" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📈 <span data-t="tabAnalytics">Analytics</span></button>
+            <button onclick="switchTab('sitecontent')" data-tab="sitecontent" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📝 <span data-t="tabSiteContent">Site Content</span></button>
+            <button onclick="switchTab('docs')" data-tab="docs" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📖 <span data-t="tabDocs">Docs</span></button>
+            <button onclick="switchTab('gbsync')" data-tab="gbsync" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔄 <span data-t="tabGbSync">Google Business</span></button>
+          </div>
+        </div>
       </nav>
       <select id="mobile-tab-select" onchange="switchTab(this.value)" class="hidden w-full mt-2 bg-white text-gray-800 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm font-medium appearance-none cursor-pointer" style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%236b7280%22 d=%22M2 4l4 4 4-4%22/></svg>');background-repeat:no-repeat;background-position:right 12px center;">
         <option value="overview" data-t="tabOverview">Overview</option>
-        <option value="appointments" data-t="tabAppointments">Appointments</option>
-        <option value="customers" data-t="tabCustomers">Customers</option>
-        <option value="repairorders" data-t="tabRepairOrders">Repair Orders</option>
-        <option value="messages" data-t="tabMessages">Messages</option>
-        <option value="employees" data-t="tabEmployees">Employees</option>
-        <option value="gallery" data-t="tabGallery">Gallery</option>
-        <option value="blog" data-t="tabBlog">Blog</option>
-        <option value="promotions" data-t="tabPromotions">Promotions</option>
-        <option value="faq">FAQ</option>
-        <option value="reviews">Reviews</option>
-        <option value="analytics" data-t="tabAnalytics">Analytics</option>
-        <option value="docs" data-t="tabDocs">Docs</option>
-        <option value="sitecontent" data-t="tabSiteContent">Site Content</option>
-        <option value="subscribers" data-t="tabSubscribers">Subscribers</option>
-        <option value="myschedule" data-t="tabMySchedule" style="display:none">My Schedule</option>
-        <option value="mywork" data-t="tabMyWork" style="display:none">My Work</option>
+        <optgroup label="🔧 Shop" data-t-label="navShop">
+          <option value="appointments" data-t="tabAppointments">Appointments</option>
+          <option value="customers" data-t="tabCustomers">Customers</option>
+          <option value="repairorders" data-t="tabRepairOrders">Repair Orders</option>
+          <option value="invoices" data-t="tabInvoices">Invoices</option>
+          <option value="waitlist" data-t="tabWaitlist">Waitlist</option>
+          <option value="tirequotes" data-t="tabTireQuotes">Tire Quotes</option>
+          <option value="visits" data-t="tabVisits">Visit Tracking</option>
+        </optgroup>
+        <optgroup label="👥 Team" data-t-label="navTeam">
+          <option value="employees" data-t="tabEmployees">Employees</option>
+          <option value="labor" data-t="tabLabor">Labor Tracking</option>
+          <option value="messages" data-t="tabMessages">Messages</option>
+          <option value="myschedule" data-t="tabMySchedule" style="display:none">My Schedule</option>
+          <option value="mywork" data-t="tabMyWork" style="display:none">My Work</option>
+        </optgroup>
+        <optgroup label="📣 Marketing" data-t-label="navMarketing">
+          <option value="blog" data-t="tabBlog">Blog</option>
+          <option value="promotions" data-t="tabPromotions">Promotions</option>
+          <option value="faq">FAQ</option>
+          <option value="reviews">Reviews</option>
+          <option value="gallery" data-t="tabGallery">Gallery</option>
+          <option value="subscribers" data-t="tabSubscribers">Subscribers</option>
+          <option value="loyalty" data-t="tabLoyalty">Loyalty &amp; Rewards</option>
+          <option value="referrals" data-t="tabReferrals">Referrals</option>
+          <option value="reminders" data-t="tabReminders">Service Reminders</option>
+        </optgroup>
+        <optgroup label="⚙️ Settings" data-t-label="navSettings">
+          <option value="analytics" data-t="tabAnalytics">Analytics</option>
+          <option value="sitecontent" data-t="tabSiteContent">Site Content</option>
+          <option value="docs" data-t="tabDocs">Docs</option>
+          <option value="gbsync" data-t="tabGbSync">Google Business</option>
+        </optgroup>
       </select>
     </div>
   </header>
@@ -604,7 +723,7 @@
         </div>
         <div id="msg-subtab-conversations" class="hidden">
           <div class="flex justify-between items-center mb-4">
-            <div class="flex gap-2">
+            <div class="flex gap-2 flex-wrap">
               <select id="conv-status-filter" onchange="loadConversations()" class="border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
                 <option value="">All Status</option>
                 <option value="open">Open</option>
@@ -612,15 +731,24 @@
                 <option value="resolved">Resolved</option>
                 <option value="closed">Closed</option>
               </select>
+              <select id="conv-source-filter" onchange="loadConversations()" class="border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+                <option value="" data-t="allSources">All Sources</option>
+                <option value="web">Web</option>
+                <option value="email">Email</option>
+              </select>
               <label class="flex items-center gap-1 text-sm"><input type="checkbox" id="conv-unread-filter" onchange="loadConversations()"> Unread only</label>
             </div>
-            <button onclick="loadConversations()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
+            <div class="flex gap-2">
+              <button onclick="checkEmail()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="checkEmail">Check Email</button>
+              <button onclick="loadConversations()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
+            </div>
           </div>
           <div id="conversations-list" class="space-y-3"></div>
           <div id="conversation-detail" class="hidden">
             <button onclick="closeConversationDetail()" class="mb-4 text-brand hover:underline text-sm">← Back to list</button>
             <div id="conv-detail-header" class="mb-4 p-4 bg-gray-50 rounded-lg dark:bg-gray-700"></div>
             <div id="conv-detail-messages" class="space-y-3 mb-4 max-h-96 overflow-y-auto"></div>
+            <div id="conv-email-info" class="hidden mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm dark:bg-blue-900/30 dark:border-blue-700"></div>
             <div class="flex gap-2">
               <textarea id="conv-reply-input" rows="3" class="flex-1 border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" placeholder="Type your reply..."></textarea>
               <div class="flex flex-col gap-2">
@@ -3914,6 +4042,114 @@ Sitemap: https://oregontires.com/sitemap.xml</pre>
       </div>
     </div>
 
+    <!-- INVOICES TAB -->
+    <div id="tab-invoices" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🧾 <span data-t="tabInvoices">Invoices</span></h2>
+          <p class="text-green-100" data-t="invoicesSubtitle">Generate and manage customer invoices</p>
+        </div>
+        <button onclick="loadInvoices()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="invoices-container"></div>
+    </div>
+
+    <!-- WAITLIST TAB -->
+    <div id="tab-waitlist" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">⏳ <span data-t="tabWaitlist">Waitlist</span></h2>
+          <p class="text-green-100" data-t="waitlistSubtitle">Walk-in queue management</p>
+        </div>
+        <button onclick="loadWaitlist()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="waitlist-container"></div>
+    </div>
+
+    <!-- TIRE QUOTES TAB -->
+    <div id="tab-tirequotes" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🛞 <span data-t="tabTireQuotes">Tire Quotes</span></h2>
+          <p class="text-green-100" data-t="tireQuotesSubtitle">Review and respond to tire quote requests</p>
+        </div>
+        <button onclick="loadTireQuotes()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="tirequotes-container"></div>
+    </div>
+
+    <!-- VISIT TRACKING TAB -->
+    <div id="tab-visits" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">👣 <span data-t="tabVisits">Visit Tracking</span></h2>
+          <p class="text-green-100" data-t="visitsSubtitle">Customer check-ins, bay status, and service timers</p>
+        </div>
+        <button onclick="loadVisitTracker()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="visits-container"></div>
+    </div>
+
+    <!-- LABOR TRACKING TAB -->
+    <div id="tab-labor" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">⏱ <span data-t="tabLabor">Labor Tracking</span></h2>
+          <p class="text-green-100" data-t="laborSubtitle">Technician hours and labor summary across all ROs</p>
+        </div>
+        <button onclick="loadLaborSummary()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="labor-container"></div>
+    </div>
+
+    <!-- LOYALTY & REWARDS TAB -->
+    <div id="tab-loyalty" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🎁 <span data-t="tabLoyalty">Loyalty &amp; Rewards</span></h2>
+          <p class="text-green-100" data-t="loyaltySubtitle">Customer loyalty points and rewards catalog</p>
+        </div>
+        <button onclick="loadLoyalty()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="loyalty-container"></div>
+    </div>
+
+    <!-- REFERRALS TAB -->
+    <div id="tab-referrals" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🤝 <span data-t="tabReferrals">Referrals</span></h2>
+          <p class="text-green-100" data-t="referralsSubtitle">Customer referral codes and tracking</p>
+        </div>
+        <button onclick="loadReferrals()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="referrals-container"></div>
+    </div>
+
+    <!-- SERVICE REMINDERS TAB -->
+    <div id="tab-reminders" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🔔 <span data-t="tabReminders">Service Reminders</span></h2>
+          <p class="text-green-100" data-t="remindersSubtitle">Automated service due date tracking per vehicle</p>
+        </div>
+        <button onclick="loadServiceReminders()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="reminders-container"></div>
+    </div>
+
+    <!-- GOOGLE BUSINESS SYNC TAB -->
+    <div id="tab-gbsync" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🔄 <span data-t="tabGbSync">Google Business</span></h2>
+          <p class="text-green-100" data-t="gbSyncSubtitle">Google Business Profile sync status</p>
+        </div>
+        <button onclick="loadGoogleBusinessSync()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="gbsync-container"></div>
+    </div>
+
   </div>
 
 <!-- NOTES MODAL -->
@@ -4204,6 +4440,28 @@ const adminT = {
     tabAnalytics: 'Analytics',
     tabDocs: 'Docs',
     tabSiteContent: 'Site Content',
+    tabInvoices: 'Invoices',
+    tabWaitlist: 'Waitlist',
+    tabTireQuotes: 'Tire Quotes',
+    tabVisits: 'Visit Tracking',
+    tabLabor: 'Labor Tracking',
+    tabLoyalty: 'Loyalty & Rewards',
+    tabReferrals: 'Referrals',
+    tabReminders: 'Service Reminders',
+    tabGbSync: 'Google Business',
+    navShop: '\uD83D\uDD27 Shop \u25BE',
+    navTeam: '\uD83D\uDC65 Team \u25BE',
+    navMarketing: '\uD83D\uDCE3 Marketing \u25BE',
+    navSettings: '\u2699\uFE0F Settings \u25BE',
+    invoicesSubtitle: 'Generate and manage customer invoices',
+    waitlistSubtitle: 'Walk-in queue management',
+    tireQuotesSubtitle: 'Review and respond to tire quote requests',
+    visitsSubtitle: 'Customer check-ins, bay status, and service timers',
+    laborSubtitle: 'Technician hours and labor summary across all ROs',
+    loyaltySubtitle: 'Customer loyalty points and rewards catalog',
+    referralsSubtitle: 'Customer referral codes and tracking',
+    remindersSubtitle: 'Automated service due date tracking per vehicle',
+    gbSyncSubtitle: 'Google Business Profile sync status',
     // Overview
     dashboardOverview: 'Dashboard Overview',
     totalAppointments: 'Total Appointments',
@@ -4258,6 +4516,17 @@ const adminT = {
     contactMessages: 'Contact Messages',
     conversations: 'Conversations',
     convNoConversations: 'No conversations found',
+    allSources: 'All Sources',
+    checkEmail: 'Check Email',
+    checkingEmail: 'Checking for new emails...',
+    newEmailsFound: 'new email(s) found',
+    noNewEmails: 'No new emails',
+    emailCheckFailed: 'Failed to check email',
+    emailThread: 'Email thread',
+    emailReplyPlaceholder: 'Type your email reply...',
+    emailReplyNote: 'Reply will be sent as a branded email',
+    attachments: 'Attachments',
+    download: 'Download',
     websiteChanges: 'Website Changes',
     thMessage: 'Message',
     thDate: 'Date',
@@ -4743,6 +5012,10 @@ const adminT = {
     schedAssigned: 'Assigned',
     schedUnassigned: 'Unassigned',
     schedSlots: 'slots',
+    schedCopyToWeekdays: 'Copy Mon \u2192 Tue-Sat',
+    schedHours: 'hrs',
+    schedSaveAll: 'Save All Schedules',
+    schedAllSaved: 'All saved!',
     // My Schedule / My Work
     tabMySchedule: 'My Schedule',
     tabMyWork: 'My Work',
@@ -4796,6 +5069,28 @@ const adminT = {
     tabAnalytics: 'Anal\u00EDticas',
     tabDocs: 'Documentos',
     tabSiteContent: 'Contenido del Sitio',
+    tabInvoices: 'Facturas',
+    tabWaitlist: 'Lista de Espera',
+    tabTireQuotes: 'Cotizaciones de Llantas',
+    tabVisits: 'Seguimiento de Visitas',
+    tabLabor: 'Horas de Trabajo',
+    tabLoyalty: 'Lealtad y Recompensas',
+    tabReferrals: 'Referidos',
+    tabReminders: 'Recordatorios de Servicio',
+    tabGbSync: 'Google Business',
+    navShop: '\uD83D\uDD27 Taller \u25BE',
+    navTeam: '\uD83D\uDC65 Equipo \u25BE',
+    navMarketing: '\uD83D\uDCE3 Marketing \u25BE',
+    navSettings: '\u2699\uFE0F Configuraci\u00F3n \u25BE',
+    invoicesSubtitle: 'Generar y gestionar facturas de clientes',
+    waitlistSubtitle: 'Gesti\u00F3n de cola de espera',
+    tireQuotesSubtitle: 'Revisar y responder solicitudes de cotizaci\u00F3n de llantas',
+    visitsSubtitle: 'Registro de clientes, estado de bah\u00EDas y temporizadores',
+    laborSubtitle: 'Horas de t\u00E9cnicos y resumen de mano de obra',
+    loyaltySubtitle: 'Puntos de lealtad y cat\u00E1logo de recompensas',
+    referralsSubtitle: 'C\u00F3digos de referido y seguimiento',
+    remindersSubtitle: 'Seguimiento autom\u00E1tico de fechas de servicio por veh\u00EDculo',
+    gbSyncSubtitle: 'Estado de sincronizaci\u00F3n con Google Business Profile',
     // Overview
     dashboardOverview: 'Resumen del Panel',
     totalAppointments: 'Total de Citas',
@@ -4850,6 +5145,17 @@ const adminT = {
     contactMessages: 'Mensajes de Contacto',
     conversations: 'Conversaciones',
     convNoConversations: 'No se encontraron conversaciones',
+    allSources: 'Todas las Fuentes',
+    checkEmail: 'Verificar Email',
+    checkingEmail: 'Verificando nuevos correos...',
+    newEmailsFound: 'correo(s) nuevo(s) encontrado(s)',
+    noNewEmails: 'No hay correos nuevos',
+    emailCheckFailed: 'Error al verificar correo',
+    emailThread: 'Hilo de email',
+    emailReplyPlaceholder: 'Escriba su respuesta de email...',
+    emailReplyNote: 'La respuesta se enviar\u00E1 como email con marca',
+    attachments: 'Archivos adjuntos',
+    download: 'Descargar',
     websiteChanges: 'Cambios del Sitio',
     thMessage: 'Mensaje',
     thDate: 'Fecha',
@@ -5335,6 +5641,10 @@ const adminT = {
     schedAssigned: 'Asignado',
     schedUnassigned: 'Sin asignar',
     schedSlots: 'espacios',
+    schedCopyToWeekdays: 'Copiar Lun \u2192 Mar-S\u00E1b',
+    schedHours: 'hrs',
+    schedSaveAll: 'Guardar Todos',
+    schedAllSaved: '\u00A1Todo guardado!',
     // My Schedule / My Work
     tabMySchedule: 'Mi Horario',
     tabMyWork: 'Mi Trabajo',
@@ -5860,7 +6170,7 @@ function showDashboard(user) {
   if (improvBtn) improvBtn.style.display = user.role === 'superadmin' || user.role === 'super_admin' ? '' : 'none';
 
   // ── Role-based tab visibility ──────────────────────────────────
-  var adminOnlyTabs = ['customers', 'messages', 'gallery', 'blog', 'promotions', 'faq', 'reviews', 'analytics', 'docs', 'sitecontent', 'subscribers'];
+  var adminOnlyTabs = ['customers', 'messages', 'gallery', 'blog', 'promotions', 'faq', 'reviews', 'analytics', 'docs', 'sitecontent', 'subscribers', 'invoices', 'waitlist', 'tirequotes', 'visits', 'labor', 'loyalty', 'referrals', 'reminders', 'gbsync'];
   var staffTabs = ['myschedule', 'mywork'];
 
   // Hide admin-only tabs for employees
@@ -7021,9 +7331,11 @@ let currentConvId = null;
 async function loadConversations() {
   try {
     const status = document.getElementById('conv-status-filter') ? document.getElementById('conv-status-filter').value : '';
+    const source = document.getElementById('conv-source-filter') ? document.getElementById('conv-source-filter').value : '';
     const unread = document.getElementById('conv-unread-filter') && document.getElementById('conv-unread-filter').checked ? '1' : '';
     let url = 'conversations.php?';
     if (status) url += 'status=' + encodeURIComponent(status) + '&';
+    if (source) url += 'source=' + encodeURIComponent(source) + '&';
     if (unread) url += 'unread=1&';
     const json = await api(url);
     conversations = json.data || [];
@@ -7056,7 +7368,15 @@ function renderConversations() {
     const left = document.createElement('div');
     const h4 = document.createElement('h4');
     h4.className = 'font-semibold text-sm';
-    h4.textContent = c.subject || '';
+    if (c.source === 'email') {
+      const emailIcon = document.createElement('span');
+      emailIcon.className = 'mr-1';
+      emailIcon.title = 'Email conversation';
+      emailIcon.textContent = '\uD83D\uDCE7';
+      h4.appendChild(emailIcon);
+    }
+    const subjectText = document.createTextNode(c.subject || '');
+    h4.appendChild(subjectText);
     if (c.unread_count > 0) {
       const badge = document.createElement('span');
       badge.className = 'bg-red-500 text-white text-xs px-2 py-0.5 rounded-full ml-2';
@@ -7102,12 +7422,38 @@ async function openConversation(id) {
     header.textContent = '';
     var h3 = document.createElement('h3');
     h3.className = 'font-bold';
-    h3.textContent = conv.subject || '';
+    if (conv.source === 'email') {
+      var emailBadge = document.createElement('span');
+      emailBadge.className = 'mr-1';
+      emailBadge.textContent = '\uD83D\uDCE7';
+      h3.appendChild(emailBadge);
+    }
+    h3.appendChild(document.createTextNode(conv.subject || ''));
     header.appendChild(h3);
     var hp = document.createElement('p');
     hp.className = 'text-sm text-gray-500';
-    hp.textContent = (conv.customer_name || '') + ' \u00B7 ' + (conv.status || '').replace('_', ' ');
+    hp.textContent = (conv.customer_name || '') + ' \u00B7 ' + (conv.customer_email || '') + ' \u00B7 ' + (conv.status || '').replace('_', ' ');
     header.appendChild(hp);
+
+    // Email info bar
+    var emailInfo = document.getElementById('conv-email-info');
+    if (conv.source === 'email') {
+      emailInfo.classList.remove('hidden');
+      emailInfo.textContent = '';
+      var infoText = document.createElement('span');
+      infoText.textContent = '\uD83D\uDCE7 ' + (adminT[currentLang] && adminT[currentLang].emailThread ? adminT[currentLang].emailThread : 'Email thread') + ' \u00B7 From: ' + (conv.customer_email || '');
+      emailInfo.appendChild(infoText);
+    } else {
+      emailInfo.classList.add('hidden');
+    }
+
+    // Update reply placeholder based on source
+    var replyInput = document.getElementById('conv-reply-input');
+    if (conv.source === 'email') {
+      replyInput.placeholder = adminT[currentLang] && adminT[currentLang].emailReplyPlaceholder ? adminT[currentLang].emailReplyPlaceholder : 'Type your email reply...';
+    } else {
+      replyInput.placeholder = 'Type your reply...';
+    }
 
     // Messages
     var msgsDiv = document.getElementById('conv-detail-messages');
@@ -7131,10 +7477,56 @@ async function openConversation(id) {
       timeSpan.textContent = new Date(m.created_at).toLocaleString();
       topRow.appendChild(timeSpan);
       bubble.appendChild(topRow);
-      var bodyP = document.createElement('p');
+      var bodyP = document.createElement('div');
       bodyP.className = 'text-sm';
-      bodyP.textContent = m.body || '';
+      if (m.source === 'email') {
+        // Email bodies are server-sanitized HTML — render in a sandboxed iframe
+        var iframe = document.createElement('iframe');
+        iframe.sandbox = 'allow-same-origin';
+        iframe.className = 'w-full border-0 rounded';
+        iframe.style.minHeight = '80px';
+        iframe.srcdoc = '<html><body style="font-family:system-ui,sans-serif;font-size:14px;margin:0;padding:8px;">' + (m.body || '') + '</body></html>';
+        iframe.onload = function() {
+          try { iframe.style.height = iframe.contentDocument.body.scrollHeight + 'px'; } catch(ex) {}
+        };
+        bodyP.appendChild(iframe);
+      } else {
+        bodyP.textContent = m.body || '';
+      }
       bubble.appendChild(bodyP);
+
+      // Render attachments if present
+      if (m.attachments && m.attachments.length > 0) {
+        var attDiv = document.createElement('div');
+        attDiv.className = 'mt-2 pt-2 border-t border-gray-200 dark:border-gray-600';
+        m.attachments.forEach(function(att) {
+          var attRow = document.createElement('div');
+          attRow.className = 'flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 py-1';
+          var icon = document.createElement('span');
+          icon.textContent = '\uD83D\uDCCE';
+          attRow.appendChild(icon);
+          var fname = document.createElement('span');
+          fname.textContent = att.name + ' (' + formatFileSize(att.size) + ')';
+          attRow.appendChild(fname);
+          if (att.path && !att.skipped) {
+            var dl = document.createElement('a');
+            dl.href = '/' + att.path;
+            dl.target = '_blank';
+            dl.className = 'text-blue-600 hover:underline dark:text-blue-400';
+            dl.textContent = adminT[currentLang] && adminT[currentLang].download ? adminT[currentLang].download : 'Download';
+            attRow.appendChild(dl);
+          }
+          if (att.skipped) {
+            var skipNote = document.createElement('span');
+            skipNote.className = 'text-red-500';
+            skipNote.textContent = '(' + att.skipped + ')';
+            attRow.appendChild(skipNote);
+          }
+          attDiv.appendChild(attRow);
+        });
+        bubble.appendChild(attDiv);
+      }
+
       msgsDiv.appendChild(bubble);
     });
 
@@ -7174,6 +7566,30 @@ async function updateConvStatus() {
     select.value = '';
     openConversation(currentConvId);
   } catch(e) { showToast('Failed to update status', true); }
+}
+
+async function checkEmail() {
+  try {
+    showToast(adminT[currentLang] && adminT[currentLang].checkingEmail ? adminT[currentLang].checkingEmail : 'Checking for new emails...');
+    var json = await api('email-check.php');
+    var count = (json.data && json.data.count) || 0;
+    if (count > 0) {
+      showToast(count + ' ' + (adminT[currentLang] && adminT[currentLang].newEmailsFound ? adminT[currentLang].newEmailsFound : 'new email(s) found'));
+      loadConversations();
+    } else {
+      showToast(adminT[currentLang] && adminT[currentLang].noNewEmails ? adminT[currentLang].noNewEmails : 'No new emails');
+    }
+  } catch(e) {
+    showToast(adminT[currentLang] && adminT[currentLang].emailCheckFailed ? adminT[currentLang].emailCheckFailed : 'Failed to check email', true);
+    console.error('checkEmail failed:', e);
+  }
+}
+
+function formatFileSize(bytes) {
+  if (!bytes || bytes === 0) return '0 B';
+  var units = ['B', 'KB', 'MB', 'GB'];
+  var i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return (bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0) + ' ' + units[i];
 }
 
 async function refreshConvUnreadBadge() {
@@ -7376,6 +7792,55 @@ function toggleEmpAppts(empId) {
 }
 
 // ===== WORK SCHEDULES =====
+
+function formatTimeAmPm(timeStr) {
+  if (!timeStr) return '';
+  var parts = timeStr.split(':');
+  var h = parseInt(parts[0], 10);
+  var m = parts[1] || '00';
+  if (isNaN(h)) return timeStr;
+  var suffix = h >= 12 ? 'PM' : 'AM';
+  var h12 = h % 12 || 12;
+  return h12 + ':' + m + ' ' + suffix;
+}
+
+function buildTimeSelect(selectedValue, cssClass, dataAttrs) {
+  var sel = document.createElement('select');
+  sel.className = cssClass;
+  if (dataAttrs) {
+    Object.keys(dataAttrs).forEach(function(k) { sel.setAttribute('data-' + k, dataAttrs[k]); });
+  }
+  var sv = (selectedValue || '').substring(0, 5);
+  var found = false;
+  for (var h = 6; h <= 22; h++) {
+    for (var m = 0; m < 60; m += 30) {
+      var val = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+      var opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = formatTimeAmPm(val);
+      if (val === sv) { opt.selected = true; found = true; }
+      sel.appendChild(opt);
+    }
+  }
+  if (!found && sv) {
+    var custom = document.createElement('option');
+    custom.value = sv;
+    custom.textContent = formatTimeAmPm(sv);
+    custom.selected = true;
+    sel.insertBefore(custom, sel.firstChild);
+  }
+  return sel;
+}
+
+function calculateShiftDuration(startHHMM, endHHMM) {
+  if (!startHHMM || !endHHMM) return '';
+  var sp = startHHMM.split(':'), ep = endHHMM.split(':');
+  var mins = (parseInt(ep[0],10)*60 + parseInt(ep[1],10)) - (parseInt(sp[0],10)*60 + parseInt(sp[1],10));
+  if (mins <= 0) return '';
+  var hrs = mins / 60;
+  return (hrs % 1 === 0 ? hrs : hrs.toFixed(1)) + 'h';
+}
+
 var scheduleData = { weekly: null, daily: null, overrides: null };
 var currentScheduleView = 'weekly';
 var dayNames = ['schedSun','schedMon','schedTue','schedWed','schedThu','schedFri','schedSat'];
@@ -7429,102 +7894,103 @@ function showWeeklySchedules() {
     return;
   }
   container.className = '';
+  container.textContent = '';
 
-  // Build table using DOM methods — all text via textContent, admin-only authenticated content
-  var wrapper = document.createElement('div');
-  wrapper.className = 'overflow-x-auto';
-  var table = document.createElement('table');
-  table.className = 'w-full text-sm';
-
-  // Header
-  var thead = document.createElement('thead');
-  var headRow = document.createElement('tr');
-  headRow.className = 'bg-gray-50 dark:bg-gray-700';
-  var empTh = document.createElement('th');
-  empTh.className = 'px-3 py-2 text-left font-medium dark:text-gray-300';
-  empTh.textContent = T.schedEmployee;
-  headRow.appendChild(empTh);
   var dayOrder = [1,2,3,4,5,6,0];
-  dayOrder.forEach(function(d) {
-    var th = document.createElement('th');
-    th.className = 'px-3 py-2 text-center font-medium dark:text-gray-300';
-    th.textContent = T[dayNames[d]];
-    headRow.appendChild(th);
-  });
-  var actionTh = document.createElement('th');
-  actionTh.className = 'px-3 py-2';
-  headRow.appendChild(actionTh);
-  thead.appendChild(headRow);
-  table.appendChild(thead);
+  var selectClass = 'sched-time w-full text-xs border rounded px-1 py-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 appearance-none';
 
-  // Body
-  var tbody = document.createElement('tbody');
   data.forEach(function(emp) {
     if (!emp.is_active) return;
-    var row = document.createElement('tr');
-    row.className = 'border-t dark:border-gray-600';
-    row.id = 'sched-row-' + emp.employee_id;
+    var card = document.createElement('div');
+    card.className = 'border rounded-lg mb-4 bg-white dark:bg-gray-800 dark:border-gray-600 overflow-hidden';
+    card.id = 'sched-card-' + emp.employee_id;
 
-    var nameTd = document.createElement('td');
-    nameTd.className = 'px-3 py-3 font-medium dark:text-gray-200';
-    nameTd.textContent = emp.employee_name;
-    row.appendChild(nameTd);
+    // Card header
+    var header = document.createElement('div');
+    header.className = 'flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600';
+    var nameEl = document.createElement('span');
+    nameEl.className = 'font-medium dark:text-gray-200';
+    nameEl.textContent = emp.employee_name;
+    header.appendChild(nameEl);
+    var copyBtn = document.createElement('button');
+    copyBtn.className = 'text-xs text-brand hover:text-brand-dark border border-brand/30 px-2 py-1 rounded hover:bg-brand/5 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-900/30';
+    copyBtn.textContent = T.schedCopyToWeekdays;
+    copyBtn.onclick = (function(eId) { return function() { copyToWeekdays(eId); }; })(emp.employee_id);
+    header.appendChild(copyBtn);
+    card.appendChild(header);
+
+    // Day columns grid
+    var grid = document.createElement('div');
+    grid.className = 'grid grid-cols-7 divide-x dark:divide-gray-600';
 
     dayOrder.forEach(function(dow) {
-      var td = document.createElement('td');
-      td.className = 'px-2 py-3 text-center';
-      var day = emp.days.find(function(dd) { return dd.day_of_week === dow; });
+      var col = document.createElement('div');
+      col.className = 'p-2 text-center min-w-0';
+      col.id = 'sched-day-' + emp.employee_id + '-' + dow;
 
-      if (day && day.is_available) {
+      var dayLabel = document.createElement('div');
+      dayLabel.className = 'text-xs font-medium text-gray-500 dark:text-gray-400 mb-2';
+      dayLabel.textContent = T[dayNames[dow]];
+      col.appendChild(dayLabel);
+
+      var day = emp.days.find(function(dd) { return dd.day_of_week === dow; });
+      var isWorking = day && day.is_available;
+
+      // Toggle button
+      var toggle = document.createElement('button');
+      toggle.className = isWorking
+        ? 'w-full text-xs font-medium px-1 py-1 rounded mb-2 bg-brand/10 text-brand border border-brand/30 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700'
+        : 'w-full text-xs font-medium px-1 py-1 rounded mb-2 bg-gray-100 text-gray-400 border border-gray-200 dark:bg-gray-700 dark:text-gray-500 dark:border-gray-600';
+      toggle.textContent = isWorking ? T.schedAvailable : T.schedOff;
+      toggle.onclick = (function(eId, d, wasWorking) {
+        return function() { toggleDayCard(eId, d, !wasWorking); };
+      })(emp.employee_id, dow, isWorking);
+      col.appendChild(toggle);
+
+      if (isWorking) {
         var st = day.start_time.substring(0,5);
         var et = day.end_time.substring(0,5);
-        var cellDiv = document.createElement('div');
-        cellDiv.className = 'flex flex-col gap-1';
-        var startInput = document.createElement('input');
-        startInput.type = 'time'; startInput.value = st;
-        startInput.className = 'sched-time w-full text-xs border rounded px-1 py-0.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
-        startInput.setAttribute('data-emp', emp.employee_id);
-        startInput.setAttribute('data-dow', dow);
-        startInput.setAttribute('data-field', 'start');
-        var endInput = document.createElement('input');
-        endInput.type = 'time'; endInput.value = et;
-        endInput.className = 'sched-time w-full text-xs border rounded px-1 py-0.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
-        endInput.setAttribute('data-emp', emp.employee_id);
-        endInput.setAttribute('data-dow', dow);
-        endInput.setAttribute('data-field', 'end');
-        cellDiv.appendChild(startInput);
-        cellDiv.appendChild(endInput);
-        td.appendChild(cellDiv);
-      } else {
-        var offBtn = document.createElement('button');
-        offBtn.textContent = T.schedOff;
-        offBtn.className = 'text-xs text-gray-400 dark:text-gray-500 hover:text-brand px-2 py-1 border border-dashed rounded dark:border-gray-600';
-        offBtn.onclick = (function(eId, d) { return function() { toggleDayAvailability(eId, d, true); }; })(emp.employee_id, dow);
-        td.appendChild(offBtn);
+        var startSel = buildTimeSelect(st, selectClass, { emp: emp.employee_id, dow: dow, field: 'start' });
+        col.appendChild(startSel);
+        var endSel = buildTimeSelect(et, selectClass, { emp: emp.employee_id, dow: dow, field: 'end' });
+        endSel.style.marginTop = '4px';
+        col.appendChild(endSel);
+
+        var dur = document.createElement('div');
+        dur.className = 'text-xs text-gray-400 dark:text-gray-500 mt-1';
+        dur.textContent = calculateShiftDuration(st, et);
+        col.appendChild(dur);
+
+        // Update duration on change
+        var updateDur = function() {
+          var s = col.querySelector('[data-field="start"]');
+          var e = col.querySelector('[data-field="end"]');
+          if (s && e) dur.textContent = calculateShiftDuration(s.value, e.value);
+        };
+        startSel.onchange = updateDur;
+        endSel.onchange = updateDur;
       }
-      row.appendChild(td);
+
+      grid.appendChild(col);
     });
 
-    var saveTd = document.createElement('td');
-    saveTd.className = 'px-2 py-3';
-    var saveBtn = document.createElement('button');
-    saveBtn.textContent = T.schedSave;
-    saveBtn.className = 'bg-brand text-white px-3 py-1 rounded text-xs hover:bg-brand-dark';
-    saveBtn.id = 'sched-save-' + emp.employee_id;
-    saveBtn.onclick = (function(eId) { return function() { saveWeeklySchedule(eId); }; })(emp.employee_id);
-    saveTd.appendChild(saveBtn);
-    row.appendChild(saveTd);
-
-    tbody.appendChild(row);
+    card.appendChild(grid);
+    container.appendChild(card);
   });
-  table.appendChild(tbody);
-  wrapper.appendChild(table);
 
-  container.textContent = '';
-  container.appendChild(wrapper);
+  // Save All button
+  var saveAllWrap = document.createElement('div');
+  saveAllWrap.className = 'flex justify-end mt-2';
+  var saveAllBtn = document.createElement('button');
+  saveAllBtn.className = 'bg-brand text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-brand-dark';
+  saveAllBtn.id = 'sched-save-all';
+  saveAllBtn.textContent = T.schedSaveAll;
+  saveAllBtn.onclick = saveAllSchedules;
+  saveAllWrap.appendChild(saveAllBtn);
+  container.appendChild(saveAllWrap);
 }
 
-async function saveWeeklySchedule(empId) {
+async function saveWeeklySchedule(empId, silent) {
   var T = adminT[currentLang];
   var days = [];
   var dayOrder = [1,2,3,4,5,6,0];
@@ -7540,24 +8006,17 @@ async function saveWeeklySchedule(empId) {
     }
   });
 
-  try {
-    var btn = document.getElementById('sched-save-' + empId);
-    if (btn) btn.textContent = '...';
-    var res = await fetch('/api/admin/schedules.php', {
-      method: 'POST', credentials: 'include',
-      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
-      body: JSON.stringify({ action: 'set_weekly', employee_id: empId, days: days })
-    });
-    var json = await res.json();
-    if (json.success) {
-      if (btn) { btn.textContent = T.schedSaved; setTimeout(function() { btn.textContent = T.schedSave; }, 1500); }
-      if (typeof showToast === 'function') showToast(T.schedSaved, 'success');
-    } else {
-      if (btn) btn.textContent = T.schedSave;
-      if (typeof showToast === 'function') showToast(json.error || 'Error', 'error');
-    }
-  } catch (err) {
-    console.error('saveWeeklySchedule error:', err);
+  var res = await fetch('/api/admin/schedules.php', {
+    method: 'POST', credentials: 'include',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+    body: JSON.stringify({ action: 'set_weekly', employee_id: empId, days: days })
+  });
+  var json = await res.json();
+  if (json.success) {
+    if (!silent && typeof showToast === 'function') showToast(T.schedSaved, 'success');
+  } else {
+    if (typeof showToast === 'function') showToast(json.error || 'Error', 'error');
+    throw new Error(json.error || 'Save failed');
   }
 }
 
@@ -7567,12 +8026,123 @@ function toggleDayAvailability(empId, dow, makeAvailable) {
   var day = emp.days.find(function(d) { return d.day_of_week === dow; });
   if (day) {
     day.is_available = makeAvailable;
-    day.start_time = '08:00:00';
-    day.end_time = '17:00:00';
+    if (!day.start_time || day.start_time === '00:00:00') day.start_time = '08:00:00';
+    if (!day.end_time || day.end_time === '00:00:00') day.end_time = '17:00:00';
   } else {
     emp.days.push({ day_of_week: dow, start_time: '08:00:00', end_time: '17:00:00', is_available: makeAvailable });
   }
   showWeeklySchedules();
+}
+
+function toggleDayCard(empId, dow, makeAvailable) {
+  // Update the data model
+  var emp = scheduleData.weekly.find(function(e) { return e.employee_id === empId; });
+  if (!emp) return;
+  var day = emp.days.find(function(d) { return d.day_of_week === dow; });
+  if (day) {
+    day.is_available = makeAvailable;
+    if (makeAvailable && (!day.start_time || day.start_time === '00:00:00')) { day.start_time = '08:00:00'; day.end_time = '17:00:00'; }
+  } else if (makeAvailable) {
+    emp.days.push({ day_of_week: dow, start_time: '08:00:00', end_time: '17:00:00', is_available: true });
+  }
+  // Re-render just this day column
+  var col = document.getElementById('sched-day-' + empId + '-' + dow);
+  if (!col) { showWeeklySchedules(); return; }
+  var T = adminT[currentLang];
+  var selectClass = 'sched-time w-full text-xs border rounded px-1 py-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 appearance-none';
+  col.textContent = '';
+
+  var dayLabel = document.createElement('div');
+  dayLabel.className = 'text-xs font-medium text-gray-500 dark:text-gray-400 mb-2';
+  dayLabel.textContent = T[dayNames[dow]];
+  col.appendChild(dayLabel);
+
+  day = emp.days.find(function(d) { return d.day_of_week === dow; });
+  var isWorking = day && day.is_available;
+
+  var toggle = document.createElement('button');
+  toggle.className = isWorking
+    ? 'w-full text-xs font-medium px-1 py-1 rounded mb-2 bg-brand/10 text-brand border border-brand/30 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700'
+    : 'w-full text-xs font-medium px-1 py-1 rounded mb-2 bg-gray-100 text-gray-400 border border-gray-200 dark:bg-gray-700 dark:text-gray-500 dark:border-gray-600';
+  toggle.textContent = isWorking ? T.schedAvailable : T.schedOff;
+  toggle.onclick = function() { toggleDayCard(empId, dow, !isWorking); };
+  col.appendChild(toggle);
+
+  if (isWorking) {
+    var st = day.start_time.substring(0,5);
+    var et = day.end_time.substring(0,5);
+    var startSel = buildTimeSelect(st, selectClass, { emp: empId, dow: dow, field: 'start' });
+    col.appendChild(startSel);
+    var endSel = buildTimeSelect(et, selectClass, { emp: empId, dow: dow, field: 'end' });
+    endSel.style.marginTop = '4px';
+    col.appendChild(endSel);
+    var dur = document.createElement('div');
+    dur.className = 'text-xs text-gray-400 dark:text-gray-500 mt-1';
+    dur.textContent = calculateShiftDuration(st, et);
+    col.appendChild(dur);
+    var updateDur = function() {
+      var s = col.querySelector('[data-field="start"]');
+      var e = col.querySelector('[data-field="end"]');
+      if (s && e) dur.textContent = calculateShiftDuration(s.value, e.value);
+    };
+    startSel.onchange = updateDur;
+    endSel.onchange = updateDur;
+  }
+}
+
+function copyToWeekdays(empId) {
+  var T = adminT[currentLang];
+  var card = document.getElementById('sched-card-' + empId);
+  if (!card) return;
+  var monStart = card.querySelector('[data-emp="' + empId + '"][data-dow="1"][data-field="start"]');
+  var monEnd = card.querySelector('[data-emp="' + empId + '"][data-dow="1"][data-field="end"]');
+  if (!monStart || !monEnd) {
+    if (typeof showToast === 'function') showToast('Set Monday first', 'error');
+    return;
+  }
+  var sv = monStart.value, ev = monEnd.value;
+  // Apply to Tue(2) through Sat(6)
+  [2,3,4,5,6].forEach(function(dow) {
+    var emp = scheduleData.weekly.find(function(e) { return e.employee_id === empId; });
+    if (!emp) return;
+    var day = emp.days.find(function(d) { return d.day_of_week === dow; });
+    if (day) {
+      day.is_available = true;
+      day.start_time = sv + ':00';
+      day.end_time = ev + ':00';
+    } else {
+      emp.days.push({ day_of_week: dow, start_time: sv + ':00', end_time: ev + ':00', is_available: true });
+    }
+    toggleDayCard(empId, dow, true);
+    // Set the values after re-render
+    var col = document.getElementById('sched-day-' + empId + '-' + dow);
+    if (col) {
+      var s = col.querySelector('[data-field="start"]');
+      var e = col.querySelector('[data-field="end"]');
+      if (s) s.value = sv;
+      if (e) e.value = ev;
+    }
+  });
+  if (typeof showToast === 'function') showToast(T.schedCopyToWeekdays + ' \u2714', 'success');
+}
+
+async function saveAllSchedules() {
+  var T = adminT[currentLang];
+  var data = scheduleData.weekly;
+  if (!data) return;
+  var btn = document.getElementById('sched-save-all');
+  if (btn) { btn.textContent = '...'; btn.disabled = true; }
+  var empIds = [];
+  data.forEach(function(emp) { if (emp.is_active) empIds.push(emp.employee_id); });
+  try {
+    await Promise.all(empIds.map(function(eId) { return saveWeeklySchedule(eId, true); }));
+    if (btn) { btn.textContent = T.schedAllSaved; setTimeout(function() { btn.textContent = T.schedSaveAll; }, 2000); }
+    if (typeof showToast === 'function') showToast(T.schedAllSaved, 'success');
+  } catch (err) {
+    console.error('saveAllSchedules error:', err);
+    if (typeof showToast === 'function') showToast('Error saving', 'error');
+  }
+  if (btn) btn.disabled = false;
 }
 
 function buildDailyScheduleDOM() {
@@ -7629,8 +8199,8 @@ function buildDailyScheduleDOM() {
     grid.className = 'grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6';
     data.employees.forEach(function(emp) {
       var isOff = emp.ov_is_closed == 1 || (!emp.is_available && !emp.override_id);
-      var startT = (emp.ov_start_time || emp.start_time || '').substring(0,5);
-      var endT = (emp.ov_end_time || emp.end_time || '').substring(0,5);
+      var startT = formatTimeAmPm((emp.ov_start_time || emp.start_time || '').substring(0,5));
+      var endT = formatTimeAmPm((emp.ov_end_time || emp.end_time || '').substring(0,5));
       var empAppts = data.appointments.filter(function(a) { return a.assigned_employee_id == emp.employee_id; });
 
       var card = document.createElement('div');
@@ -7661,7 +8231,7 @@ function buildDailyScheduleDOM() {
           var apptDiv = document.createElement('div');
           apptDiv.className = 'text-xs flex items-center gap-2 bg-gray-50 dark:bg-gray-700 p-1.5 rounded';
           var timeB = document.createElement('strong');
-          timeB.textContent = (a.preferred_time || '').substring(0,5);
+          timeB.textContent = formatTimeAmPm((a.preferred_time || '').substring(0,5));
           apptDiv.appendChild(timeB);
           var nameS = document.createElement('span');
           nameS.textContent = a.first_name + ' ' + a.last_name;
@@ -7706,7 +8276,7 @@ function buildDailyScheduleDOM() {
       uDiv.className = 'flex items-center gap-3 border border-amber-200 dark:border-amber-800 rounded p-3 bg-amber-50 dark:bg-amber-900/20';
       var uTime = document.createElement('strong');
       uTime.className = 'text-sm';
-      uTime.textContent = (a.preferred_time || '').substring(0,5);
+      uTime.textContent = formatTimeAmPm((a.preferred_time || '').substring(0,5));
       uDiv.appendChild(uTime);
       var uName = document.createElement('span');
       uName.className = 'text-sm dark:text-gray-200';
@@ -7741,7 +8311,7 @@ function buildDailyScheduleDOM() {
       slotDiv.className = 'text-center p-2 rounded text-xs ' + (full ? 'bg-red-100 dark:bg-red-900/30' : 'bg-green-50 dark:bg-green-900/20');
       var slotLabel = document.createElement('div');
       slotLabel.className = 'font-medium dark:text-gray-200';
-      slotLabel.textContent = slot;
+      slotLabel.textContent = formatTimeAmPm(slot);
       slotDiv.appendChild(slotLabel);
       var slotCount = document.createElement('div');
       slotCount.className = full ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
@@ -7838,14 +8408,13 @@ function buildOverridesDOM() {
   timesWrap.appendChild(timesLabel);
   var timesFlex = document.createElement('div');
   timesFlex.className = 'flex gap-1 mt-1';
-  var startIn = document.createElement('input');
-  startIn.type = 'time'; startIn.id = 'override-start'; startIn.value = '08:00';
-  startIn.className = 'border rounded px-2 py-2 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200';
-  timesFlex.appendChild(startIn);
-  var endIn = document.createElement('input');
-  endIn.type = 'time'; endIn.id = 'override-end'; endIn.value = '17:00';
-  endIn.className = 'border rounded px-2 py-2 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200';
-  timesFlex.appendChild(endIn);
+  var overrideSelectClass = 'border rounded px-2 py-2 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200';
+  var startSel = buildTimeSelect('08:00', overrideSelectClass, {});
+  startSel.id = 'override-start';
+  timesFlex.appendChild(startSel);
+  var endSel = buildTimeSelect('17:00', overrideSelectClass, {});
+  endSel.id = 'override-end';
+  timesFlex.appendChild(endSel);
   timesWrap.appendChild(timesFlex);
   formGrid.appendChild(timesWrap);
 
@@ -7892,7 +8461,7 @@ function buildOverridesDOM() {
 
       var typeBadge = document.createElement('span');
       var typeLabel = ov.is_closed == 1 ? T.schedClosure : T.schedSpecialHours;
-      var times = ov.is_closed == 1 ? '' : ' (' + (ov.start_time||'').substring(0,5) + '-' + (ov.end_time||'').substring(0,5) + ')';
+      var times = ov.is_closed == 1 ? '' : ' (' + formatTimeAmPm((ov.start_time||'').substring(0,5)) + ' - ' + formatTimeAmPm((ov.end_time||'').substring(0,5)) + ')';
       typeBadge.className = ov.is_closed == 1
         ? 'text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
         : 'text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
@@ -9295,6 +9864,13 @@ function switchTab(tab) {
   });
   const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
   if(btn) { btn.classList.add('tab-active'); btn.classList.remove('text-white','hover:bg-green-600'); btn.setAttribute('aria-selected', 'true'); }
+  // Highlight parent nav group
+  document.querySelectorAll('.nav-group').forEach(function(g) { g.classList.remove('group-active'); });
+  if (btn) {
+    var pg = btn.closest('.nav-group');
+    if (pg) pg.classList.add('group-active');
+  }
+  // Existing tab loaders
   if(tab==='analytics') loadAnalytics();
   if(tab==='appointments') renderCalendar();
   if(tab==='customers') loadCustomers();
@@ -9306,6 +9882,16 @@ function switchTab(tab) {
   if(tab==='reviews' && typeof loadTestimonials === 'function') loadTestimonials();
   if(tab==='myschedule') loadMySchedule();
   if(tab==='mywork') loadMyWork();
+  // New tab loaders
+  if(tab==='invoices' && typeof loadInvoices === 'function') loadInvoices();
+  if(tab==='waitlist' && typeof loadWaitlist === 'function') loadWaitlist();
+  if(tab==='tirequotes' && typeof loadTireQuotes === 'function') loadTireQuotes();
+  if(tab==='visits' && typeof loadVisitTracker === 'function') loadVisitTracker();
+  if(tab==='labor' && typeof loadLaborSummary === 'function') loadLaborSummary();
+  if(tab==='loyalty' && typeof loadLoyalty === 'function') loadLoyalty();
+  if(tab==='referrals' && typeof loadReferrals === 'function') loadReferrals();
+  if(tab==='reminders' && typeof loadServiceReminders === 'function') loadServiceReminders();
+  if(tab==='gbsync' && typeof loadGoogleBusinessSync === 'function') loadGoogleBusinessSync();
 }
 
 // Sub-tab switching for Appointments (Calendar vs List)
@@ -10487,6 +11073,13 @@ loadMessages = async function() {
 <script src="/admin/js/faq.js"></script>
 <script src="/admin/js/testimonials.js"></script>
 <script src="/admin/js/visit-tracker.js"></script>
+<script src="/admin/js/invoices.js"></script>
+<script src="/admin/js/waitlist.js"></script>
+<script src="/admin/js/tire-quotes.js"></script>
+<script src="/admin/js/loyalty.js"></script>
+<script src="/admin/js/referrals.js"></script>
+<script src="/admin/js/service-reminders.js"></script>
+<script src="/admin/js/google-business.js"></script>
 <script src="/admin/js/calendar-retry.js"></script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';

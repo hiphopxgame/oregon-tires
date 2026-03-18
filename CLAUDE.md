@@ -80,10 +80,26 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `oretir_messages` — individual messages within conversations
 - `oretir_loyalty_points` — customer loyalty point ledger
 
+### Shop Operations (migrations 037–048)
+- `oretir_invoices` — digital invoices from completed ROs (token-based customer view)
+- `oretir_service_reminders` — automated service due date tracking per vehicle
+- `oretir_loyalty_rewards` — redeemable loyalty rewards catalog
+- `oretir_labor_entries` — technician labor hours per RO
+- `oretir_referrals` — customer referral tracking (codes, status, bonus points)
+- `oretir_waitlist` — walk-in queue management
+- `oretir_tire_quotes` — tire quote requests and responses
+
 ### PWA & Push Notifications (migrations 049–052)
 - `oretir_push_subscriptions` — Web Push subscription storage (endpoint, keys, customer/member FK, language, notification preferences)
 - `oretir_notification_queue` — bilingual notification queue with targeting (subscription/customer/member/broadcast), retry logic, scheduling
 - `oretir_offline_sync_log` — offline form submission deduplication via unique sync_id
+
+### Email Integration (migration 053)
+- `oretir_email_message_ids` — email Message-ID tracking for dedup + threading (inbound/outbound, In-Reply-To, conversation FK)
+- `oretir_conversation_messages.source` — message source: web, email, system
+- `oretir_conversation_messages.attachments_json` — JSON array of attachment metadata
+- `oretir_conversations.source` — conversation source: web, email, contact_form
+- `oretir_conversations.email_thread_id` — original email Message-ID for thread root
 
 ## RO Lifecycle
 `intake → diagnosis → estimate_pending → pending_approval → approved → in_progress → waiting_parts → ready → completed → invoiced` (also: `cancelled`)
@@ -128,6 +144,10 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `GET /api/care-plan-status.php` — care plan status
 - `POST /api/care-plan-webhook.php` — PayPal subscription webhook
 - `GET /api/health.php` — health check
+- `GET /api/invoice-view.php?token=` — customer invoice view (token-based)
+- `GET /api/referral-lookup.php?code=` — referral code lookup
+- `POST /api/tire-quote.php` — submit tire quote request
+- `GET/POST /api/waitlist.php` — join/check walk-in waitlist
 - `GET /api/push-vapid-key.php` — VAPID public key for push subscription
 - `POST/PUT/DELETE /api/push-subscribe.php` — push subscription CRUD + preferences
 - `POST /api/offline-sync.php` — offline form replay with sync_id dedup
@@ -174,7 +194,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `GET /api/form/stats.php` — form stats
 - `POST /api/form/mark-read.php` — mark submission read
 
-### Admin (session auth + CSRF — 36 endpoints)
+### Admin (session auth + CSRF — 47 endpoints)
 - `/api/admin/login.php`, `logout.php`, `session.php` — auth
 - `/api/admin/forgot-password.php`, `setup-password.php`, `verify-token.php` — password management
 - `/api/admin/account.php` — admin account settings
@@ -204,10 +224,21 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `/api/admin/email-template-vars.php` — template variable reference
 - `/api/admin/analytics.php` — dashboard analytics
 - `/api/admin/export.php` — data export
+- `/api/admin/invoices.php` — invoice CRUD + generate from RO
+- `/api/admin/labor.php` — labor hours tracking per RO
+- `/api/admin/loyalty.php` — loyalty points management
+- `/api/admin/loyalty-rewards.php` — loyalty rewards catalog
+- `/api/admin/service-reminders.php` — service reminder management
+- `/api/admin/waitlist.php` — walk-in queue management
+- `/api/admin/tire-quotes.php` — tire quote request management
+- `/api/admin/visit-log.php` — visit tracking log
+- `/api/admin/google-business-sync.php` — Google Business Profile sync
+- `/api/admin/business-hours.php` — business hours configuration
 - `/api/admin/calendar-health.php` — calendar sync status
 - `/api/admin/calendar-retry-sync.php` — retry failed syncs
 - `/api/admin/calendar-test-sync.php` — test calendar sync
 - `POST /api/admin/push-broadcast.php` — admin push broadcast to opted-in subscribers (5/day limit)
+- `GET /api/admin/email-check.php` — manual IMAP fetch trigger, returns count of new emails
 
 ## Public Pages (36 pages)
 
@@ -248,11 +279,12 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 ### Utility
 - `send-setup-emails.php` — admin setup email trigger
 
-## Includes (20 files)
+## Includes (21 files)
 - `bootstrap.php` — .env loader, DB connection, session, error tracking init
 - `db.php` — PDO connection helper
 - `auth.php` — session auth, role checks, CSRF
-- `mail.php` — PHPMailer: sendInspectionEmail, sendEstimateEmail, sendApprovalConfirmationEmail, sendReadyEmail, sendBrandedTemplateEmail
+- `mail.php` — PHPMailer: sendInspectionEmail, sendEstimateEmail, sendApprovalConfirmationEmail, sendReadyEmail, sendBrandedTemplateEmail, sendEmailReply
+- `email-fetcher.php` — IMAP inbound email fetcher (webklex/php-imap): EmailFetcher class, threading via Message-ID/In-Reply-To/References
 - `response.php` — JSON response helper (X-API-Version header)
 - `validate.php` — input validation helpers
 - `rate-limit.php` — API rate limiting
@@ -281,8 +313,11 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `create-admins-feb2026.php`, `create-joslyn-admin.php` — one-time admin creation
 - `list-admins.php` — list admin accounts
 - `test-email-account.php`, `test-smtp-debug.php` — SMTP diagnostics
+- `send-service-reminders.php` — automated service due date reminders (weekly cron Mon 9AM)
+- `sync-google-business.php` — Google Business Profile sync (weekly cron Mon 7AM)
 - `generate-vapid-keys.php` — one-time VAPID key pair generation for Web Push
 - `send-push-notifications.php` — push notification queue processor (cron, every 5 min)
+- `fetch-inbound-emails.php` — IMAP inbound email fetch into conversations (cron, every 2 min)
 
 ## Cron Jobs (on server)
 ```
@@ -290,6 +325,9 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 0 10 * * *  cli/send-review-requests.php       # review request emails
 0 6  * * *  cli/fetch-google-reviews.php       # refresh Google Reviews cache
 */5 * * * * cli/send-push-notifications.php    # push notification queue processor
+0 9  * * 1  cli/send-service-reminders.php     # automated service due date reminders (Mon 9AM)
+0 7  * * 1  cli/sync-google-business.php       # Google Business Profile sync (Mon 7AM)
+*/2 * * * * cli/fetch-inbound-emails.php      # IMAP inbound email fetch (every 2 min)
 ```
 
 ## Admin Panel
@@ -307,6 +345,11 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `admin/js/subscribers.js` — subscriber management
 - `admin/js/ot-charts.js` — dashboard charts (Chart.js)
 - `admin/js/brand-toast.js` — branded toast notifications
+- `admin/js/admin-analytics.js` — enhanced analytics dashboard
+- `admin/js/labor-tracker.js` — labor hours tracking UI
+- `admin/js/visit-tracker.js` — visit tracking UI
+- `admin/js/feature-data.js` — feature configuration data
+- `admin/js/calendar-retry.js` — calendar sync retry UI
 
 ### Frontend JS
 - `assets/js/pwa-manager.js` — PWA install prompt (Android + iOS), push subscription, online/offline indicator

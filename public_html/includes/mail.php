@@ -10,7 +10,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 /**
  * Send an email using PHPMailer with SMTP settings from .env
  */
-function sendMail(string $to, string $subject, string $htmlBody, string $textBody = '', string $replyTo = ''): array
+function sendMail(string $to, string $subject, string $htmlBody, string $textBody = '', string $replyTo = '', array $customHeaders = []): array
 {
     $mail = new PHPMailer(true);
 
@@ -50,6 +50,11 @@ function sendMail(string $to, string $subject, string $htmlBody, string $textBod
         $mail->Subject = $subject;
         $mail->Body    = $htmlBody;
         $mail->AltBody = $textBody ?: strip_tags($htmlBody);
+
+        // Apply custom headers (e.g. In-Reply-To, References, Message-ID)
+        foreach ($customHeaders as $headerName => $headerValue) {
+            $mail->addCustomHeader($headerName, $headerValue);
+        }
 
         $mail->send();
 
@@ -358,7 +363,8 @@ function sendBrandedTemplateEmail(
     array $vars,
     string $language = 'both',
     string $buttonUrl = '',
-    bool $showPasswordReqs = false
+    bool $showPasswordReqs = false,
+    array $customHeaders = []
 ): array {
     $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
     $tpl = loadEmailTemplate($templateKey);
@@ -416,7 +422,7 @@ HTML;
         $subject = "🔐 {$subjectEs} | {$subjectEn}";
     }
 
-    return sendMail($to, $subject, $htmlBody, $textBody);
+    return sendMail($to, $subject, $htmlBody, $textBody, '', $customHeaders);
 }
 
 /**
@@ -1700,6 +1706,113 @@ function sendConversationReplyEmail(
 
     if ($result['success']) {
         logEmail('conversation_reply', "Conversation reply notification sent to {$email}", $email);
+    }
+
+    return $result;
+}
+
+/**
+ * Send a branded email reply from the admin dashboard (for email-sourced conversations).
+ *
+ * Generates proper Message-ID and threading headers so the reply appears
+ * threaded in the customer's email client.
+ *
+ * @param string  $to              Recipient email
+ * @param string  $toName          Recipient display name
+ * @param string  $subject         Original email subject (will be prefixed with Re:)
+ * @param string  $messageBody     Admin's reply text
+ * @param int     $conversationId  Conversation ID for Message-ID generation
+ * @param ?string $inReplyTo       Message-ID of the email being replied to
+ * @param string  $language        Language preference: 'en', 'es', or 'both'
+ * @return array ['success' => bool, 'error' => string|null]
+ */
+function sendEmailReply(
+    string $to,
+    string $toName,
+    string $subject,
+    string $messageBody,
+    int $conversationId,
+    ?string $inReplyTo = null,
+    string $language = 'both'
+): array {
+    $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+
+    // Generate outbound Message-ID
+    $outboundMessageId = '<conv-' . $conversationId . '-' . time() . '@oregon.tires>';
+
+    // Build threading headers
+    $customHeaders = [
+        'Message-ID' => $outboundMessageId,
+    ];
+    if ($inReplyTo) {
+        $customHeaders['In-Reply-To'] = $inReplyTo;
+        $customHeaders['References'] = $inReplyTo . ' ' . $outboundMessageId;
+    }
+
+    // Ensure subject has Re: prefix
+    $replySubject = $subject;
+    if (!preg_match('/^Re:/i', $replySubject)) {
+        $replySubject = 'Re: ' . $replySubject;
+    }
+
+    $vars = [
+        'name'    => $toName ?: 'Customer',
+        'subject' => htmlspecialchars($subject, ENT_QUOTES, 'UTF-8'),
+        'message' => nl2br(htmlspecialchars($messageBody, ENT_QUOTES, 'UTF-8')),
+    ];
+
+    // Build branded HTML body using template, but use our own subject for proper threading
+    $tpl = loadEmailTemplate('email_reply');
+    if (empty($tpl)) {
+        // Fallback: send simple reply
+        $html = '<p>' . nl2br(htmlspecialchars($messageBody, ENT_QUOTES, 'UTF-8')) . '</p>';
+        $result = sendMail($to, $replySubject, $html, strip_tags($messageBody), '', $customHeaders);
+    } else {
+        $esGreeting = replaceTemplateVarsRaw($tpl['greeting_es'] ?? '', $vars);
+        $esBody     = replaceTemplateVarsRaw($tpl['body_es'] ?? '', $vars);
+        $esButton   = replaceTemplateVarsRaw($tpl['button_es'] ?? '', $vars);
+        $esFooter   = replaceTemplateVarsRaw($tpl['footer_es'] ?? '', $vars);
+        $enGreeting = replaceTemplateVarsRaw($tpl['greeting_en'] ?? '', $vars);
+        $enBody     = replaceTemplateVarsRaw($tpl['body_en'] ?? '', $vars);
+        $enButton   = replaceTemplateVarsRaw($tpl['button_en'] ?? '', $vars);
+        $enFooter   = replaceTemplateVarsRaw($tpl['footer_en'] ?? '', $vars);
+
+        $mexicanBar = 'linear-gradient(90deg,#c60b1e 0%,#c60b1e 33%,#ffc400 33%,#ffc400 66%,#c60b1e 66%,#c60b1e 100%)';
+        $usBar = 'linear-gradient(90deg,#002868 0%,#002868 33%,#bf0a30 33%,#bf0a30 66%,#002868 66%,#002868 100%)';
+
+        $esSection = buildLanguageSection("\xF0\x9F\x87\xB2\xF0\x9F\x87\xBD", 'Español', $esGreeting, $esBody, $esButton, $baseUrl . '/members', $esFooter, 'h1', $mexicanBar);
+        $enSection = buildLanguageSection("\xF0\x9F\x87\xBA\xF0\x9F\x87\xB8", 'English', $enGreeting, $enBody, $enButton, $baseUrl . '/members', $enFooter, 'h2', $usBar);
+
+        $divider = '<tr><td style="padding:0 36px;"><div style="height:1px;background:linear-gradient(90deg,transparent,#d1d5db,transparent);"></div></td></tr>';
+        $bodySections = ($language === 'en') ? $enSection . $divider . $esSection : $esSection . $divider . $enSection;
+
+        $htmlBody = wrapBrandedEmail($bodySections, $baseUrl, $baseUrl . '/members', false);
+        $textBody = buildBilingualPlainText($tpl, $vars, $language, $baseUrl . '/members');
+
+        $result = sendMail($to, $replySubject, $htmlBody, $textBody, '', $customHeaders);
+    }
+
+    // Record outbound Message-ID for future threading
+    if ($result['success']) {
+        try {
+            $db = getDB();
+            $db->prepare(
+                'INSERT INTO oretir_email_message_ids
+                 (message_id_header, conversation_id, direction, in_reply_to, from_email, subject, has_attachments)
+                 VALUES (?, ?, ?, ?, ?, ?, 0)'
+            )->execute([
+                $outboundMessageId,
+                $conversationId,
+                'outbound',
+                $inReplyTo,
+                $_ENV['SMTP_FROM'] ?? $_ENV['SMTP_USER'] ?? '',
+                substr($replySubject, 0, 255),
+            ]);
+        } catch (\Throwable $e) {
+            error_log("sendEmailReply: Failed to record outbound Message-ID: " . $e->getMessage());
+        }
+
+        logEmail('email_reply', "Email reply sent to {$to} for conversation #{$conversationId}");
     }
 
     return $result;
