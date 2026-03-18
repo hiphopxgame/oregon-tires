@@ -188,20 +188,9 @@
         flex-wrap: wrap;
         justify-content: center;
       }
-      /* Header stacking */
-      header .flex.justify-between { flex-wrap: wrap; gap: 0.75rem; }
-      header .flex.items-center.gap-3:last-child { width: 100%; justify-content: space-between; flex-wrap: wrap; }
-      /* Touch targets */
-      #admin-dark-toggle, #admin-lang-toggle, #notif-bell-btn { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
-      /* Sign Out full width on mobile */
-      header button[onclick="signOut()"] { width: 100%; text-align: center; }
       /* Hide desktop tabs, show mobile dropdown */
       #nav-tabs { display: none !important; }
       #mobile-tab-select { display: block !important; }
-      /* Global search mobile */
-      #global-search-wrap { width: 100%; }
-      #global-search { width: 100%; }
-      #global-search-results { width: 100%; }
     }
 
     /* ── Tab Transitions ── */
@@ -330,35 +319,6 @@
 </head>
 <body class="bg-gray-100 min-h-screen dark:bg-gray-900 dark:text-gray-100">
 
-<!-- PUBLIC SITE HEADER (consistent nav) -->
-<header id="public-header" class="bg-white shadow-md sticky top-0 z-50 dark:bg-gray-800">
-  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-    <a href="/">
-      <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="/assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" width="781" height="275" loading="eager"></picture>
-    </a>
-    <nav class="hidden md:flex items-center gap-6">
-      <a href="/" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="home">Home</a>
-      <a href="/services" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="services">Services</a>
-      <a href="/#about" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="about">About</a>
-      <a href="/#reviews" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="testimonials">Reviews</a>
-      <a href="/#gallery" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="gallery">Promotions</a>
-      <a href="/#faq" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="faqNav">FAQ</a>
-      <a href="/#contact" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="contact">Contact</a>
-      <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="getFreeEstimate">Free Estimate</a>
-    </nav>
-    <button onclick="document.getElementById('pub-mobile-menu').classList.toggle('hidden')" class="md:hidden text-brand dark:text-green-400 text-2xl" aria-label="Toggle navigation menu">☰</button>
-  </div>
-  <div id="pub-mobile-menu" class="hidden md:hidden bg-white border-t px-4 pb-4 dark:bg-gray-800 dark:border-gray-700">
-    <a href="/" class="block py-2 text-brand dark:text-green-400" data-t="home">Home</a>
-    <a href="/services" class="block py-2 text-brand dark:text-green-400" data-t="services">Services</a>
-    <a href="/#about" class="block py-2 text-brand dark:text-green-400" data-t="about">About</a>
-    <a href="/#reviews" class="block py-2 text-brand dark:text-green-400" data-t="testimonials">Reviews</a>
-    <a href="/#gallery" class="block py-2 text-brand dark:text-green-400" data-t="gallery">Promotions</a>
-    <a href="/#faq" class="block py-2 text-brand dark:text-green-400" data-t="faqNav">FAQ</a>
-    <a href="/#contact" class="block py-2 text-brand dark:text-green-400" data-t="contact">Contact</a>
-    <a href="/book-appointment" class="block bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold text-center hover:bg-amber-600 transition mt-2" data-t="getFreeEstimate">Free Estimate</a>
-  </div>
-</header>
 
 <div id="toast-container" class="toast-container"></div>
 
@@ -423,28 +383,29 @@
 <div id="admin-dashboard" class="hidden">
   <!-- Header -->
   <header class="bg-brand-light text-white shadow-lg">
-    <div class="container mx-auto px-4 py-4">
-      <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-3">
-          <a href="/"><img src="/assets/logo.png" alt="Oregon Tires" class="h-12"></a>
-          <div>
-            <h1 class="text-2xl font-bold"><span data-t="headerTitle">Admin Dashboard</span></h1>
-            <p class="text-white/80 text-sm" data-t="managementSubtitle">Oregon Tires Management</p>
+    <div class="container mx-auto px-4 py-3">
+      <!-- Row 1: Logo + controls -->
+      <div class="flex items-center justify-between gap-2 mb-3">
+        <div class="flex items-center gap-2 min-w-0">
+          <a href="/"><img src="/assets/logo.png" alt="Oregon Tires" class="h-10 md:h-12"></a>
+          <div class="min-w-0">
+            <h1 class="text-lg md:text-2xl font-bold truncate"><span data-t="headerTitle">Admin Dashboard</span></h1>
+            <p class="text-white/80 text-xs md:text-sm hidden md:block" data-t="managementSubtitle">Oregon Tires Management</p>
           </div>
         </div>
-        <div class="relative hidden md:block" id="global-search-wrap">
-          <input type="text" id="global-search" data-t="globalSearchPlaceholder" placeholder="Search everything... (Ctrl+K)" class="w-64 bg-white/10 text-white placeholder-white/60 rounded-lg px-4 py-2 text-sm focus:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30" aria-label="Global search">
-          <div id="global-search-results" class="absolute top-full mt-1 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 hidden max-h-96 overflow-y-auto z-50"></div>
-        </div>
-        <div class="flex items-center gap-3">
-          <div class="bg-white/10 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-white/20 transition" onclick="openAccountSettings()">
+        <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
+          <div class="relative hidden md:block" id="global-search-wrap">
+            <input type="text" id="global-search" data-t="globalSearchPlaceholder" placeholder="Search everything... (Ctrl+K)" class="w-64 bg-white/10 text-white placeholder-white/60 rounded-lg px-4 py-2 text-sm focus:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30" aria-label="Global search">
+            <div id="global-search-results" class="absolute top-full mt-1 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 hidden max-h-96 overflow-y-auto z-50"></div>
+          </div>
+          <div class="bg-white/10 px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-sm cursor-pointer hover:bg-white/20 transition hidden md:block" onclick="openAccountSettings()">
             <div class="font-medium" id="admin-email"></div>
             <div class="text-xs text-white/90" id="admin-role" data-t="accountSettings">⚙️ Account Settings</div>
           </div>
-          <button id="admin-dark-toggle" onclick="toggleAdminDarkMode()" aria-label="Toggle dark mode" class="text-sm text-white hover:text-green-200 transition-colors">🌙</button>
-          <button id="admin-lang-toggle" onclick="toggleAdminLanguage()" aria-label="Toggle language" class="text-sm text-white hover:text-green-200 transition-colors">EN</button>
+          <button id="admin-dark-toggle" onclick="toggleAdminDarkMode()" aria-label="Toggle dark mode" class="text-sm text-white hover:text-green-200 transition-colors w-9 h-9 inline-flex items-center justify-center">🌙</button>
+          <button id="admin-lang-toggle" onclick="toggleAdminLanguage()" aria-label="Toggle language" class="text-sm text-white hover:text-green-200 transition-colors w-9 h-9 inline-flex items-center justify-center">EN</button>
           <div class="relative" id="notif-bell-wrap">
-            <button onclick="toggleNotifPanel()" aria-label="Notifications" class="relative text-white hover:text-green-200 transition-colors text-lg" id="notif-bell-btn">🔔<span id="notif-badge" class="notif-badge hidden">0</span></button>
+            <button onclick="toggleNotifPanel()" aria-label="Notifications" class="relative text-white hover:text-green-200 transition-colors text-lg w-9 h-9 inline-flex items-center justify-center" id="notif-bell-btn">🔔<span id="notif-badge" class="notif-badge hidden">0</span></button>
             <div id="notif-dropdown" class="notif-dropdown hidden">
               <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
                 <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm" data-t="notifications">Notifications</span>
@@ -454,9 +415,17 @@
               <div id="notif-empty" class="px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500 hidden" data-t="noNotifications">No new notifications</div>
             </div>
           </div>
-          <a href="/members?tab=profile" class="text-sm hover:text-amber-200" data-t="myAccount">My Account</a>
-          <a href="/" class="text-sm hover:text-amber-200" data-t="viewSite">View Site</a>
-          <button onclick="signOut()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition" data-t="signOut">Sign Out</button>
+          <a href="/members?tab=profile" class="text-xs md:text-sm hover:text-amber-200 hidden md:inline" data-t="myAccount">My Account</a>
+          <a href="/" class="text-xs md:text-sm hover:text-amber-200 hidden md:inline" data-t="viewSite">View Site</a>
+          <button onclick="signOut()" class="bg-red-600 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm hover:bg-red-700 transition" data-t="signOut">Sign Out</button>
+        </div>
+      </div>
+      <!-- Row 2: Mobile-only links + search -->
+      <div class="flex items-center justify-between gap-2 mb-3 md:hidden">
+        <div class="flex items-center gap-3 text-xs">
+          <button onclick="openAccountSettings()" class="text-white/80 hover:text-white">⚙️ <span id="admin-email-mobile" class="sr-only"></span>Account</button>
+          <a href="/members?tab=profile" class="text-white/80 hover:text-white" data-t="myAccount">My Account</a>
+          <a href="/" class="text-white/80 hover:text-white" data-t="viewSite">View Site</a>
         </div>
       </div>
       <!-- Navigation -->
@@ -479,7 +448,7 @@
         <button onclick="switchTab('myschedule')" data-tab="myschedule" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600" style="display:none">🕐 <span data-t="tabMySchedule">My Schedule</span></button>
         <button onclick="switchTab('mywork')" data-tab="mywork" role="tab" aria-selected="false" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-white hover:bg-green-600" style="display:none">🔧 <span data-t="tabMyWork">My Work</span></button>
       </nav>
-      <select id="mobile-tab-select" onchange="switchTab(this.value)" class="hidden w-full mt-2 bg-white/20 text-white border border-white/30 rounded-lg px-4 py-3 text-sm font-medium appearance-none cursor-pointer" style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22white%22 d=%22M2 4l4 4 4-4%22/></svg>');background-repeat:no-repeat;background-position:right 12px center;">
+      <select id="mobile-tab-select" onchange="switchTab(this.value)" class="hidden w-full mt-2 bg-white text-gray-800 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm font-medium appearance-none cursor-pointer" style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%236b7280%22 d=%22M2 4l4 4 4-4%22/></svg>');background-repeat:no-repeat;background-position:right 12px center;">
         <option value="overview" data-t="tabOverview">Overview</option>
         <option value="appointments" data-t="tabAppointments">Appointments</option>
         <option value="customers" data-t="tabCustomers">Customers</option>
@@ -11932,54 +11901,8 @@ async function retryCalendarSync(appointmentId) {
   };
   window.showToastNew = window.showToast;
 
-  // Hide public header/footer when admin dashboard is active
-  const pubHeader = document.getElementById('public-header');
-  const pubFooter = document.getElementById('public-footer');
-  const observer = new MutationObserver(function() {
-    const dashVisible = !document.getElementById('admin-dashboard').classList.contains('hidden');
-    if (pubHeader) pubHeader.style.display = dashVisible ? 'none' : '';
-    if (pubFooter) pubFooter.style.display = dashVisible ? 'none' : '';
-  });
-  observer.observe(document.getElementById('admin-dashboard'), { attributes: true, attributeFilter: ['class'] });
 </script>
 
-<!-- PUBLIC SITE FOOTER (consistent nav) -->
-<footer id="public-footer" class="bg-brand text-white py-12 pb-24 md:pb-12">
-  <div class="container mx-auto px-4">
-    <div class="grid md:grid-cols-3 gap-8">
-      <div>
-        <h3 class="text-xl font-bold mb-4" data-t="contactInfo">Contact Information</h3>
-        <div class="space-y-2 text-gray-200">
-          <p>📞 <a href="tel:5033679714" class="hover:text-amber-300">(503) 367-9714</a></p>
-          <p>✉️ <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></p>
-          <p>📍 8536 SE 82nd Ave, Portland, OR 97266</p>
-          <p>🕐 <span data-t="monSat">Mon-Sat 7AM-7PM</span></p>
-        </div>
-      </div>
-      <div>
-        <h3 class="text-xl font-bold mb-4" data-t="services">Services</h3>
-        <ul class="space-y-1 text-gray-200">
-          <li><a href="/services" class="hover:text-amber-300" data-t="tireInstallation">Tire Installation</a></li>
-          <li><a href="/services" class="hover:text-amber-300" data-t="tireRepair">Tire Repair</a></li>
-          <li><a href="/services" class="hover:text-amber-300" data-t="wheelAlignment">Wheel Alignment</a></li>
-          <li><a href="/services" class="hover:text-amber-300" data-t="brakeService">Brake Service</a></li>
-          <li><a href="/services" class="hover:text-amber-300" data-t="oilChange">Oil Change</a></li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="text-xl font-bold mb-4" data-t="followUs">Follow Us</h3>
-        <div class="space-y-2">
-          <a href="https://www.facebook.com/61571913202998/" target="_blank" class="block text-gray-200 hover:text-amber-300">Facebook</a>
-          <a href="https://www.instagram.com/oregontires" target="_blank" class="block text-gray-200 hover:text-amber-300">Instagram</a>
-        </div>
-      </div>
-    </div>
-    <div class="border-t border-green-600 dark:border-green-500 mt-8 pt-8 text-center text-gray-300 dark:text-gray-200">
-      <p>&copy; <span data-t="copyright">2026 Oregon Tires Auto Care. All rights reserved.</span></p>
-      <p class="mt-3 text-xs text-gray-300"><span data-t="poweredBy">Powered by</span> <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-amber-200 hover:text-amber-100 transition-colors">1vsM.com</a></p>
-    </div>
-  </div>
-</footer>
 
 </body>
 </html>
