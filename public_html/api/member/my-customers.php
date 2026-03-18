@@ -64,6 +64,30 @@ try {
     }
 
     ?>
+    <style>
+    @media (max-width: 640px) {
+        .member-customers-table thead { display: none; }
+        .member-customers-table tbody tr.customer-row {
+            display: block; padding: 0.75rem; margin-bottom: 0.5rem;
+            border: 1px solid var(--member-border); border-radius: var(--member-radius);
+            background: var(--member-surface-hover);
+        }
+        .member-customers-table tbody tr.customer-row td {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.25rem 0; border-bottom: none;
+        }
+        .member-customers-table tbody tr.customer-row td::before {
+            content: attr(data-label); font-weight: 600; font-size: 0.7rem;
+            text-transform: uppercase; color: var(--member-text-muted); margin-right: 0.5rem; flex-shrink: 0;
+        }
+        .member-customers-table tbody tr.customer-detail td {
+            padding: 0.75rem;
+        }
+        .member-customers-table tbody tr.customer-detail td > div {
+            grid-template-columns: 1fr !important;
+        }
+    }
+    </style>
     <div class="member-page">
         <div class="member-card member-card--wide">
             <div class="member-header">
@@ -73,7 +97,7 @@ try {
 
             <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
                 <input type="text" id="customer-search" placeholder="<?= htmlspecialchars(memberT('search_customers', $lang)) ?>"
-                    style="flex: 1; min-width: 200px; padding: 0.5rem 0.75rem; border: 1px solid var(--member-border); border-radius: var(--member-radius); background: var(--member-surface); color: var(--member-text); font-size: 0.875rem;">
+                    style="flex: 1; min-width: 0; padding: 0.5rem 0.75rem; border: 1px solid var(--member-border); border-radius: var(--member-radius); background: var(--member-surface); color: var(--member-text); font-size: 0.875rem;">
                 <span style="padding: 0.25rem 0.75rem; background: var(--member-accent); color: var(--member-accent-text); border-radius: 0.25rem; font-size: 0.75rem; white-space: nowrap;">
                     <?= count($customers) ?> <?= htmlspecialchars(mb_strtolower(memberT('customer', $lang))) ?><?= count($customers) !== 1 ? 's' : '' ?>
                 </span>
@@ -90,7 +114,7 @@ try {
                 </p>
             <?php else: ?>
                 <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                    <table class="member-customers-table" style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
                         <thead>
                             <tr style="border-bottom: 2px solid var(--member-border); text-align: left;">
                                 <th style="padding: 0.5rem 0.75rem;"><?= htmlspecialchars(memberT('customer', $lang)) ?></th>
@@ -112,31 +136,31 @@ try {
                                 onmouseover="this.style.background='var(--member-surface-hover)'"
                                 onmouseout="this.style.background='transparent'"
                                 onclick="toggleCustomerDetail(this)">
-                                <td style="padding: 0.5rem 0.75rem;">
+                                <td data-label="<?= htmlspecialchars(memberT('customer', $lang)) ?>" style="padding: 0.5rem 0.75rem;">
                                     <div style="font-weight: 600;"><?= htmlspecialchars($name ?: '—') ?></div>
                                     <?php if ((int) $cust['visit_count'] > 1): ?>
                                         <span style="font-size: 0.7rem; padding: 0.1rem 0.4rem; background: #15803d; color: #fff; border-radius: 0.2rem;"><?= htmlspecialchars(memberT('returning', $lang)) ?></span>
                                     <?php endif; ?>
                                 </td>
-                                <td style="padding: 0.5rem 0.75rem;">
+                                <td data-label="<?= htmlspecialchars(memberT('contact', $lang)) ?>" style="padding: 0.5rem 0.75rem;">
                                     <div style="font-size: 0.8rem;"><?= htmlspecialchars($cust['email'] ?? '—') ?></div>
                                     <?php if (!empty($cust['phone'])): ?>
                                         <div style="font-size: 0.8rem; color: var(--member-text-muted);"><?= htmlspecialchars($cust['phone']) ?></div>
                                     <?php endif; ?>
                                 </td>
-                                <td style="padding: 0.5rem 0.75rem; font-size: 0.8rem;">
+                                <td data-label="<?= htmlspecialchars(memberT('vehicle', $lang)) ?>" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;">
                                     <?= htmlspecialchars($cust['primary_vehicle'] ?? '—') ?>
                                 </td>
-                                <td style="padding: 0.5rem 0.75rem; text-align: center;">
+                                <td data-label="<?= htmlspecialchars(memberT('visits', $lang)) ?>" style="padding: 0.5rem 0.75rem; text-align: center;">
                                     <?= (int) $cust['visit_count'] ?>
                                 </td>
-                                <td style="padding: 0.5rem 0.75rem; font-size: 0.8rem;">
+                                <td data-label="<?= htmlspecialchars(memberT('last_visit', $lang)) ?>" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;">
                                     <?= $cust['last_visit'] ? htmlspecialchars(date('M d, Y', strtotime($cust['last_visit']))) : htmlspecialchars(memberT('never', $lang)) ?>
                                 </td>
-                                <td style="padding: 0.5rem 0.75rem; text-align: center;">
+                                <td data-label="<?= htmlspecialchars(memberT('vehicles', $lang)) ?>" style="padding: 0.5rem 0.75rem; text-align: center;">
                                     <?= (int) $cust['vehicle_count'] ?>
                                 </td>
-                                <td style="padding: 0.5rem 0.75rem; text-align: center;">
+                                <td data-label="<?= htmlspecialchars(memberT('active_ros', $lang)) ?>" style="padding: 0.5rem 0.75rem; text-align: center;">
                                     <?php if ((int) $cust['active_ro_count'] > 0): ?>
                                         <span style="padding: 0.1rem 0.5rem; background: #d97706; color: #fff; border-radius: 0.2rem; font-size: 0.75rem;">
                                             <?= (int) $cust['active_ro_count'] ?>

@@ -187,7 +187,7 @@
                 </div>
 
                 <!-- Summary Counts -->
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-xl">
                         <div class="text-2xl font-bold text-green-600" id="green-count">0</div>
                         <div class="text-xs text-green-700 dark:text-green-400 font-medium" data-t="good">Good</div>

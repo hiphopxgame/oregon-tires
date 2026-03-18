@@ -72,6 +72,11 @@ try {
     }
 
     ?>
+    <style>
+    @media (min-width: 641px) {
+        .member-vehicle-specs { grid-template-columns: 1fr 1fr !important; }
+    }
+    </style>
     <div class="member-page">
         <div class="member-card member-card--wide">
             <div class="member-header">
@@ -111,7 +116,7 @@ try {
                                 <?php endif; ?>
                             </div>
                             <?php if (!empty($specs)): ?>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.125rem 1rem; font-size: 0.75rem; color: var(--member-text-muted); margin-bottom: 0.5rem;">
+                                <div style="display: grid; grid-template-columns: 1fr; gap: 0.125rem 1rem; font-size: 0.75rem; color: var(--member-text-muted); margin-bottom: 0.5rem;" class="member-vehicle-specs">
                                     <?php foreach ($specs as $key => $val): if ($key === 'trim_level') continue; ?>
                                         <div><strong style="color: var(--member-text);"><?= $specLabels[$key] ?>:</strong> <?= htmlspecialchars($val) ?></div>
                                     <?php endforeach; ?>

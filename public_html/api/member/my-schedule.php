@@ -75,7 +75,7 @@ try {
     if (empty($schedule)) {
         echo '<div class="member-alert member-alert--warning">' . htmlspecialchars(memberT('no_schedule', $lang)) . '</div>';
     } else {
-        echo '<div style="display:grid;gap:0.5rem;max-width:500px;">';
+        echo '<div style="display:grid;gap:0.5rem;max-width:100%;">';
         foreach ($schedule as $row) {
             $dow = (int) $row['day_of_week'];
             $isToday = $dow === $today;
@@ -100,7 +100,7 @@ try {
     // Show upcoming overrides
     if (!empty($overrides)) {
         echo '<h4 style="margin-top:1.5rem;margin-bottom:0.75rem;">' . htmlspecialchars(memberT('today_override', $lang)) . '</h4>';
-        echo '<div style="display:grid;gap:0.5rem;max-width:500px;">';
+        echo '<div style="display:grid;gap:0.5rem;max-width:100%;">';
         foreach ($overrides as $ov) {
             $dateStr = date('M j, Y', strtotime($ov['override_date']));
             $bgOv = 'var(--member-surface)';

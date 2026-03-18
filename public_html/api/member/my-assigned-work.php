@@ -87,7 +87,7 @@ try {
             $dateStr  = date('M j', strtotime($ro['created_at']));
 
             echo '<div style="padding:1rem;border-radius:var(--member-radius);background:var(--member-surface);border:1px solid var(--member-border);">';
-            echo '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">';
+            echo '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;gap:0.5rem;">';
             echo '<span style="font-weight:700;font-family:monospace;">' . htmlspecialchars($ro['ro_number'] ?? '') . '</span>';
             echo '<span style="display:inline-block;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.75rem;font-weight:600;color:#fff;background:' . $color . ';">' . htmlspecialchars($statusLabel) . '</span>';
             echo '</div>';

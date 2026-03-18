@@ -316,7 +316,7 @@ try {
 
             // Messages
             var msgList = document.createElement('div');
-            msgList.style.cssText = 'display:flex;flex-direction:column;gap:0.75rem;max-height:400px;overflow-y:auto;margin-bottom:1rem;';
+            msgList.style.cssText = 'display:flex;flex-direction:column;gap:0.75rem;max-height:400px;overflow-y:auto;margin-bottom:1rem;min-width:0;';
             (conv.messages || []).forEach(function(msg) {
                 var isCustomer = msg.sender_type === 'customer';
                 var bubble = document.createElement('div');
@@ -335,11 +335,11 @@ try {
             // Reply form (if not closed)
             if (conv.status !== 'closed') {
                 var replyRow = document.createElement('div');
-                replyRow.style.cssText = 'display:flex;gap:0.5rem;';
+                replyRow.style.cssText = 'display:flex;gap:0.5rem;flex-wrap:wrap;';
                 var textarea = document.createElement('textarea');
                 textarea.rows = 2;
                 textarea.maxLength = 5000;
-                textarea.style.cssText = 'flex:1;padding:0.5rem;border:1px solid var(--member-border);border-radius:var(--member-radius);background:var(--member-surface);color:var(--member-text);font-size:0.85rem;resize:none;box-sizing:border-box;';
+                textarea.style.cssText = 'flex:1;min-width:0;padding:0.5rem;border:1px solid var(--member-border);border-radius:var(--member-radius);background:var(--member-surface);color:var(--member-text);font-size:0.85rem;resize:none;box-sizing:border-box;';
                 textarea.placeholder = '<?= addslashes(memberT('type_your_message', $lang)) ?>';
                 var replyBtn = document.createElement('button');
                 replyBtn.type = 'button';

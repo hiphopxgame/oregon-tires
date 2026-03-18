@@ -147,7 +147,7 @@
             </div>
 
             <!-- Priority Cost Summary -->
-            <div id="priority-summary" class="hidden grid grid-cols-3 gap-3 mb-6" role="region" aria-label="Cost breakdown by priority"></div>
+            <div id="priority-summary" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6" role="region" aria-label="Cost breakdown by priority"></div>
 
             <!-- Line Items -->
             <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden mb-6 shadow-sm">
