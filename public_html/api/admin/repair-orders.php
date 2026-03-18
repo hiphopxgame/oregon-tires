@@ -318,6 +318,37 @@ try {
 
         $db->prepare('UPDATE oretir_repair_orders SET ' . implode(', ', $fields) . ' WHERE id = ?')->execute($params);
 
+        // ─── Auto-create invoice when RO status changes to 'invoiced' ────
+        if (isset($data['status']) && $data['status'] === 'invoiced') {
+            try {
+                require_once __DIR__ . '/../../includes/invoices.php';
+                require_once __DIR__ . '/../../includes/mail.php';
+                $invoiceResult = createInvoiceFromEstimate($db, $id);
+                if ($invoiceResult) {
+                    // Send invoice email
+                    $custStmt2 = $db->prepare('SELECT first_name, last_name, email, language FROM oretir_customers WHERE id = ?');
+                    $custStmt2->execute([$ro['customer_id']]);
+                    $cust2 = $custStmt2->fetch(PDO::FETCH_ASSOC);
+                    if ($cust2 && !empty($cust2['email'])) {
+                        $vStmt2 = $db->prepare('SELECT year, make, model FROM oretir_vehicles WHERE id = ?');
+                        $vStmt2->execute([$ro['vehicle_id']]);
+                        $v2 = $vStmt2->fetch(PDO::FETCH_ASSOC);
+                        $vehicle2 = $v2 ? trim(implode(' ', array_filter([$v2['year'], $v2['make'], $v2['model']]))) : '';
+                        $custName2 = trim($cust2['first_name'] . ' ' . $cust2['last_name']);
+                        $lang2 = ($cust2['language'] ?? 'english') === 'spanish' ? 'es' : 'en';
+                        $baseUrl2 = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+                        $inv2 = getInvoiceWithItems($db, $invoiceResult['invoice_id']);
+                        $viewUrl2 = $baseUrl2 . '/invoice/' . $inv2['customer_view_token'];
+                        sendInvoiceEmail($cust2['email'], $custName2, $ro['ro_number'], $vehicle2, '$' . number_format((float)$inv2['total'], 2), $invoiceResult['invoice_number'], $viewUrl2, $lang2);
+                        // Update invoice status to 'sent'
+                        $db->prepare('UPDATE oretir_invoices SET status = ? WHERE id = ?')->execute(['sent', $invoiceResult['invoice_id']]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: Auto-invoice creation failed for RO #{$id}: " . $e->getMessage());
+            }
+        }
+
         // ─── Send "Job Finished" notification when status changes to 'ready' ────
         if (isset($data['status']) && $data['status'] === 'ready') {
             try {
