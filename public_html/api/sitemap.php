@@ -59,6 +59,7 @@ $staticPages = [
     '/promotions',
     '/faq',
     '/reviews',
+    '/financing',
     '/service-areas',
 ];
 

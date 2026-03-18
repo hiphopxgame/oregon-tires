@@ -433,6 +433,143 @@ var OTCharts = (function() {
     }
   }
 
+  /**
+   * Employee productivity bar chart (horizontal)
+   * @param {HTMLElement} container
+   * @param {Array} data - [{employee_name, completed_count}]
+   */
+  function employeeProductivityChart(container, data) {
+    if (!data || !data.length) {
+      container.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', 'No data available'));
+      return;
+    }
+    horizontalBars(container, data.map(function(d) {
+      return { label: d.employee_name, value: parseInt(d.completed_count) || 0 };
+    }), { color: TOKENS.colors.brandMid });
+  }
+
+  /**
+   * Revenue trend line chart
+   * @param {HTMLElement} container
+   * @param {Array} data - [{month, revenue, estimate_count}]
+   */
+  function revenueChart(container, data) {
+    if (!data || !data.length) {
+      container.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', 'No revenue data'));
+      return;
+    }
+    lineChart(container, data.map(function(d) {
+      var parts = d.month.split('-');
+      var dt = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1);
+      var label = dt.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      return { label: label, value: parseFloat(d.revenue || 0) };
+    }), { height: 180, color: TOKENS.colors.brandMid, fillArea: true });
+
+    // Revenue totals below chart
+    var t = theme();
+    var totalRev = data.reduce(function(s, d) { return s + parseFloat(d.revenue || 0); }, 0);
+    var totalEst = data.reduce(function(s, d) { return s + parseInt(d.estimate_count || 0); }, 0);
+    var summary = el('div', 'flex gap-6 mt-3 text-sm');
+    var s1 = el('span', 'font-semibold');
+    s1.style.color = t.textPrimary;
+    s1.textContent = 'Total: $' + totalRev.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    var s2 = el('span', '');
+    s2.style.color = t.textSecondary;
+    s2.textContent = totalEst + ' estimates';
+    summary.appendChild(s1);
+    summary.appendChild(s2);
+    container.appendChild(summary);
+  }
+
+  /**
+   * Conversion funnel (horizontal stacked-style bars)
+   * @param {HTMLElement} container
+   * @param {Array} data - [{stage, count}]
+   */
+  function funnelChart(container, data) {
+    if (!data || !data.length) {
+      container.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', 'No data'));
+      return;
+    }
+    var funnelColors = [TOKENS.colors.series[2], TOKENS.colors.series[1], TOKENS.colors.brandMid];
+    horizontalBars(container, data.map(function(d, i) {
+      return { label: d.stage, value: d.count };
+    }), { color: TOKENS.colors.series[2] });
+
+    // Conversion rates
+    var t = theme();
+    if (data.length >= 3 && data[0].count > 0) {
+      var rates = el('div', 'flex gap-4 mt-3 text-xs');
+      rates.style.color = t.textSecondary;
+      var roRate = Math.round((data[1].count / data[0].count) * 100);
+      var compRate = data[1].count > 0 ? Math.round((data[2].count / data[1].count) * 100) : 0;
+      rates.appendChild(el('span', '', 'Booking\u2192RO: ' + roRate + '%'));
+      rates.appendChild(el('span', '', 'RO\u2192Complete: ' + compRate + '%'));
+      container.appendChild(rates);
+    }
+  }
+
+  /**
+   * Service duration bar chart
+   * @param {HTMLElement} container
+   * @param {Array} data - [{service, avg_days, sample_size}]
+   */
+  function durationChart(container, data) {
+    if (!data || !data.length) {
+      container.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', 'No duration data'));
+      return;
+    }
+    var mapped = data.map(function(d) {
+      var label = d.service.replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+      return { label: label, value: parseFloat(d.avg_days) };
+    });
+    horizontalBars(container, mapped, { color: TOKENS.colors.series[3] });
+  }
+
+  /**
+   * Customer retention display
+   * @param {HTMLElement} container
+   * @param {Object} data - {total, repeat, repeat_pct}
+   */
+  function retentionDisplay(container, data) {
+    if (!data || !data.total) {
+      container.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-4', 'No customer data'));
+      return;
+    }
+    var t = theme();
+    var wrap = el('div', 'flex items-center gap-8 flex-wrap');
+
+    // Donut for retention
+    var donutWrap = el('div', '');
+    pieChart(donutWrap, [
+      { label: 'Repeat', value: data.repeat, color: TOKENS.colors.brandMid },
+      { label: 'New', value: data.total - data.repeat, color: TOKENS.colors.series[1] }
+    ], { donut: true, centerLabel: data.repeat_pct + '%', size: 140 });
+    wrap.appendChild(donutWrap);
+
+    // Stats
+    var stats = el('div', 'flex flex-col gap-2');
+    var s1 = el('div', 'text-sm');
+    s1.style.color = t.textSecondary;
+    s1.textContent = 'Total Customers';
+    var v1 = el('div', 'text-2xl font-bold');
+    v1.style.color = t.textPrimary;
+    v1.textContent = String(data.total);
+    var s2 = el('div', 'text-sm');
+    s2.style.color = t.textSecondary;
+    s2.textContent = 'Repeat Customers';
+    var v2 = el('div', 'text-2xl font-bold');
+    v2.style.color = TOKENS.colors.brandMid;
+    v2.textContent = data.repeat + ' (' + data.repeat_pct + '%)';
+    stats.appendChild(s1);
+    stats.appendChild(v1);
+    stats.appendChild(s2);
+    stats.appendChild(v2);
+    wrap.appendChild(stats);
+
+    container.appendChild(wrap);
+  }
+
   // Public API
   return {
     TOKENS: TOKENS,
@@ -442,6 +579,11 @@ var OTCharts = (function() {
     serviceBars: serviceBars,
     pieChart: pieChart,
     lineChart: lineChart,
+    employeeProductivityChart: employeeProductivityChart,
+    revenueChart: revenueChart,
+    funnelChart: funnelChart,
+    durationChart: durationChart,
+    retentionDisplay: retentionDisplay,
     isDark: isDark,
     theme: theme,
   };

@@ -44,7 +44,9 @@ try {
     $vehicleMake  = sanitize((string) ($data['vehicle_make'] ?? ''), 50);
     $vehicleModel = sanitize((string) ($data['vehicle_model'] ?? ''), 50);
     $vehicleVin   = sanitize((string) ($data['vehicle_vin'] ?? ''), 17);
-    $tireSize     = sanitize((string) ($data['tire_size'] ?? ''), 30);
+    $tireSize       = sanitize((string) ($data['tire_size'] ?? ''), 30);
+    $tirePreference = sanitize((string) ($data['tire_preference'] ?? ''), 10);
+    $tireCount      = !empty($data['tire_count']) ? max(1, min(10, (int) $data['tire_count'])) : null;
     $licensePlate = strtoupper(preg_replace('/[^A-Z0-9]/', '', sanitize((string) ($data['license_plate'] ?? ''), 20)));
     $notes        = sanitize((string) ($data['notes'] ?? ''), 2000);
     $language     = sanitize((string) ($data['language'] ?? 'english'), 20);
@@ -94,6 +96,11 @@ try {
     // Vehicle year (optional but if present must be 4 digits)
     if ($vehicleYear !== '' && !preg_match('/^\d{4}$/', $vehicleYear)) {
         jsonError('Vehicle year must be a 4-digit number.');
+    }
+
+    // Tire preference (optional, must be valid if provided)
+    if ($tirePreference !== '' && !in_array($tirePreference, ['new', 'used', 'either'], true)) {
+        $tirePreference = '';
     }
 
     // Language
@@ -219,10 +226,10 @@ try {
     // ─── Insert into database ───────────────────────────────────────────────
     $stmt = $db->prepare(
         'INSERT INTO oretir_appointments
-            (reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, vehicle_vin, tire_size,
+            (reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, vehicle_vin, tire_size, tire_preference, tire_count,
              first_name, last_name, phone, email, notes, sms_opt_in, utm_source, utm_medium, utm_campaign, utm_content, status, language, created_at, updated_at)
          VALUES
-            (:reference_number, :service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model, :vehicle_vin, :tire_size,
+            (:reference_number, :service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model, :vehicle_vin, :tire_size, :tire_preference, :tire_count,
              :first_name, :last_name, :phone, :email, :notes, :sms_opt_in, :utm_source, :utm_medium, :utm_campaign, :utm_content, :status, :language, NOW(), NOW())'
     );
     $stmt->execute([
@@ -235,6 +242,8 @@ try {
         ':vehicle_model'    => $vehicleModel ?: null,
         ':vehicle_vin'      => $vehicleVin ?: null,
         ':tire_size'        => $tireSize ?: null,
+        ':tire_preference'  => $tirePreference ?: null,
+        ':tire_count'       => $tireCount,
         ':first_name'       => $firstName,
         ':last_name'        => $lastName,
         ':phone'            => $phone,

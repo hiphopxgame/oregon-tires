@@ -92,7 +92,8 @@ try {
     if ($method === 'POST') {
         $imageUrl = handlePromoImage();
 
-        $placement = in_array($_POST['placement'] ?? 'banner', ['banner', 'exit_intent'], true)
+        $validPlacements = ['banner', 'exit_intent', 'sidebar', 'inline'];
+        $placement = in_array($_POST['placement'] ?? 'banner', $validPlacements, true)
             ? $_POST['placement'] : 'banner';
         $isActive = (int)($_POST['is_active'] ?? 1);
 
@@ -105,9 +106,9 @@ try {
                  success_msg_en, success_msg_es,
                  error_msg_en, error_msg_es,
                  nospam_en, nospam_es, popup_icon,
-                 bg_color, text_color, badge_text, image_url, is_active,
+                 bg_color, text_color, badge_text_en, badge_text_es, image_url, is_active,
                  starts_at, ends_at, sort_order)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
             $placement,
@@ -131,7 +132,8 @@ try {
             sanitize((string)($_POST['popup_icon'] ?? ''), 20) ?: null,
             sanitize((string)($_POST['bg_color'] ?? '#f59e0b'), 20),
             sanitize((string)($_POST['text_color'] ?? '#000000'), 20),
-            sanitize((string)($_POST['badge_text'] ?? ''), 50) ?: null,
+            sanitize((string)($_POST['badge_text_en'] ?? ''), 50) ?: null,
+            sanitize((string)($_POST['badge_text_es'] ?? ''), 50) ?: null,
             $imageUrl,
             $isActive,
             $_POST['starts_at'] ?? null,
@@ -176,7 +178,8 @@ try {
             $imageUrl = null;
         }
 
-        $placement = in_array($_POST['placement'] ?? 'banner', ['banner', 'exit_intent'], true)
+        $validPlacements = ['banner', 'exit_intent', 'sidebar', 'inline'];
+        $placement = in_array($_POST['placement'] ?? 'banner', $validPlacements, true)
             ? $_POST['placement'] : 'banner';
         $isActive = (int)($_POST['is_active'] ?? 1);
 
@@ -189,7 +192,7 @@ try {
                 success_msg_en = ?, success_msg_es = ?,
                 error_msg_en = ?, error_msg_es = ?,
                 nospam_en = ?, nospam_es = ?, popup_icon = ?,
-                bg_color = ?, text_color = ?, badge_text = ?, image_url = ?,
+                bg_color = ?, text_color = ?, badge_text_en = ?, badge_text_es = ?, image_url = ?,
                 is_active = ?, starts_at = ?, ends_at = ?, sort_order = ?,
                 updated_at = NOW()
              WHERE id = ?'
@@ -216,7 +219,8 @@ try {
             sanitize((string)($_POST['popup_icon'] ?? ''), 20) ?: null,
             sanitize((string)($_POST['bg_color'] ?? '#f59e0b'), 20),
             sanitize((string)($_POST['text_color'] ?? '#000000'), 20),
-            sanitize((string)($_POST['badge_text'] ?? ''), 50) ?: null,
+            sanitize((string)($_POST['badge_text_en'] ?? ''), 50) ?: null,
+            sanitize((string)($_POST['badge_text_es'] ?? ''), 50) ?: null,
             $imageUrl,
             $isActive,
             $_POST['starts_at'] ?? null,

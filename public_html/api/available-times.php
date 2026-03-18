@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/business-hours.php';
 
 try {
     requireMethod('GET');
@@ -63,6 +64,19 @@ try {
     $shopStart    = 7;  // default window
     $shopEnd      = 18; // default window
     $slotCapacity = []; // hour => number of available employees
+
+    // ─── Business hours from config ─────────────────────────────────
+    try {
+        $bizHours = getBusinessHoursForDate($db, $date);
+        if (!$bizHours['is_open']) {
+            $shopClosed = true;
+        } else {
+            $shopStart = (int) substr($bizHours['open_time'], 0, 2);
+            $shopEnd   = (int) substr($bizHours['close_time'], 0, 2);
+        }
+    } catch (\Throwable $bhErr) {
+        error_log("available-times.php: business hours lookup skipped: " . $bhErr->getMessage());
+    }
 
     try {
         $dayOfWeek = (int) (new DateTime($date))->format('w'); // 0=Sun … 6=Sat
@@ -154,6 +168,50 @@ try {
                             }
                         }
                     }
+                }
+
+                // 5) Factor in max_daily_appointments per employee
+                try {
+                    $dailyCountStmt = $db->prepare(
+                        "SELECT e.id, e.max_daily_appointments,
+                                COUNT(a.id) AS daily_count
+                         FROM oretir_employees e
+                         LEFT JOIN oretir_appointments a ON a.assigned_employee_id = e.id
+                              AND a.preferred_date = ?
+                              AND a.status NOT IN ('cancelled')
+                         WHERE e.is_active = 1
+                         GROUP BY e.id"
+                    );
+                    $dailyCountStmt->execute([$date]);
+                    $empDailyCounts = [];
+                    foreach ($dailyCountStmt->fetchAll() as $dc) {
+                        if ((int) $dc['daily_count'] >= (int) $dc['max_daily_appointments']) {
+                            $empDailyCounts[(int) $dc['id']] = true; // at capacity
+                        }
+                    }
+
+                    // Reduce slot capacity for employees at daily limit
+                    if (!empty($empDailyCounts)) {
+                        foreach ($schedules as $sched) {
+                            $empId = (int) $sched['employee_id'];
+                            if (isset($empDailyCounts[$empId])) {
+                                // This employee is at daily capacity — reduce all their slots
+                                $empStart = (int) substr($sched['start_time'], 0, 2);
+                                $empEnd   = (int) substr($sched['end_time'], 0, 2);
+                                for ($h = $shopStart; $h <= $shopEnd; $h++) {
+                                    foreach ([0, 15, 30, 45] as $m) {
+                                        if ($h === $shopEnd && $m > 0) break;
+                                        $key = sprintf('%02d:%02d', $h, $m);
+                                        if ($h >= $empStart && $h < $empEnd && isset($slotCapacity[$key]) && $slotCapacity[$key] > 0) {
+                                            $slotCapacity[$key]--;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (\Throwable $capErr) {
+                    error_log("available-times.php: daily capacity check skipped: " . $capErr->getMessage());
                 }
             }
         }

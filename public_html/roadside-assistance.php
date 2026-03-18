@@ -17,4 +17,34 @@ $relatedServices = [
     ['name' => 'Mobile Service', 'nameEs' => 'Servicio Movil', 'slug' => 'mobile-service'],
     ['name' => 'Tire Installation', 'nameEs' => 'Instalacion de Llantas', 'slug' => 'tire-installation'],
 ];
+
+// Pricing Estimator section (injected before CTA)
+$customSectionsBeforeCTA = '
+  <!-- ═══ Pricing Estimator ═══ -->
+  <section class="py-12 bg-gray-50 dark:bg-gray-800/50">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+        <span data-t="estimator_title">Get an Estimate</span>
+      </h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-6 text-center">
+        <span data-t="estimator_subtitle">Select your service and location for an instant estimate.</span>
+      </p>
+      <div id="roadside-estimator" data-price-base="75" data-price-zone="15"></div>
+    </div>
+  </section>';
+
+// Extra scripts for the estimator
+$customScripts = '
+<script src="/assets/js/roadside-estimator.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    RoadsideEstimator.init("roadside-estimator");
+  });
+</script>';
+
+// Extra translation keys
+$customTranslations = "
+      estimator_title: 'Obtener Estimado',
+      estimator_subtitle: 'Seleccione su servicio y ubicación para un estimado inmediato.',";
+
 require __DIR__ . '/templates/service-detail.php';

@@ -283,6 +283,45 @@
               <div id="tire-size-display" class="hidden mt-3"></div>
             </div>
           </div>
+
+          <!-- Tire-specific fields (shown when tire-installation or tire-repair selected) -->
+          <div id="tire-options" class="hidden mt-6 space-y-4 fade-in">
+            <!-- Tire Preference -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <span data-t="tire_preference">Tire Preference</span>
+              </label>
+              <div class="grid grid-cols-3 gap-3">
+                <label class="relative flex items-center justify-center p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:border-green-500 transition-colors has-[:checked]:border-green-600 has-[:checked]:bg-green-50 dark:has-[:checked]:bg-green-900/20">
+                  <input type="radio" name="tire_preference" value="new" class="sr-only">
+                  <span class="text-sm font-medium" data-t="tire_new">New Tires</span>
+                </label>
+                <label class="relative flex items-center justify-center p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:border-green-500 transition-colors has-[:checked]:border-green-600 has-[:checked]:bg-green-50 dark:has-[:checked]:bg-green-900/20">
+                  <input type="radio" name="tire_preference" value="used" class="sr-only">
+                  <span class="text-sm font-medium" data-t="tire_used">Used Tires</span>
+                </label>
+                <label class="relative flex items-center justify-center p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:border-green-500 transition-colors has-[:checked]:border-green-600 has-[:checked]:bg-green-50 dark:has-[:checked]:bg-green-900/20">
+                  <input type="radio" name="tire_preference" value="either" class="sr-only">
+                  <span class="text-sm font-medium" data-t="tire_either">Either</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Tire Count -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="tire_count">
+                <span data-t="tire_count_label">How many tires?</span>
+              </label>
+              <select id="tire_count" name="tire_count" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                <option value="">—</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5+</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <!-- Step 2: Date & Time -->
@@ -676,7 +715,12 @@ const t = {
     tireWheels: 'Wheels',
     tireWidth: 'Width',
     tireAspect: 'Aspect Ratio',
-    tireRim: 'Rim Diameter'
+    tireRim: 'Rim Diameter',
+    tire_preference: 'Tire Preference',
+    tire_new: 'New Tires',
+    tire_used: 'Used Tires',
+    tire_either: 'Either',
+    tire_count_label: 'How many tires?'
   },
   es: {
     home: 'Inicio',
@@ -777,7 +821,12 @@ const t = {
     tireWheels: 'Ruedas',
     tireWidth: 'Ancho',
     tireAspect: 'Relación de Aspecto',
-    tireRim: 'Diámetro del Rin'
+    tireRim: 'Diámetro del Rin',
+    tire_preference: 'Preferencia de Llantas',
+    tire_new: 'Llantas Nuevas',
+    tire_used: 'Llantas Usadas',
+    tire_either: 'Cualquiera',
+    tire_count_label: '¿Cuántas llantas?'
   }
 };
 
@@ -1419,6 +1468,7 @@ document.querySelectorAll('#mobile-menu a').forEach(function(link) {
 // ===== BOOKING FUNNEL TRACKING (GA4) =====
 // Track service selection + show/hide tire size section
 var TIRE_SERVICES = ['tire-installation', 'tire-repair', 'wheel-alignment'];
+var TIRE_OPTION_SERVICES = ['tire-installation', 'tire-repair'];
 document.querySelectorAll('input[name="service"]').forEach(function(radio) {
   radio.addEventListener('change', function() {
     if (typeof gtag === 'function') gtag('event', 'booking_step', {
@@ -1430,6 +1480,15 @@ document.querySelectorAll('input[name="service"]').forEach(function(radio) {
     } else {
       section.classList.add('hidden');
       document.getElementById('tire-size-input').value = '';
+    }
+    // Toggle tire preference/count options
+    var tireOpts = document.getElementById('tire-options');
+    if (tireOpts) {
+      if (TIRE_OPTION_SERVICES.indexOf(this.value) !== -1) {
+        tireOpts.classList.remove('hidden');
+      } else {
+        tireOpts.classList.add('hidden');
+      }
     }
   });
 });

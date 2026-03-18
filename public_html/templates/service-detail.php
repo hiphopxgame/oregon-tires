@@ -281,6 +281,8 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
       </div>
     </section>
 
+    <?php if (!empty($customSectionsBeforeCTA)) echo $customSectionsBeforeCTA; ?>
+
     <!-- CTA -->
     <section class="bg-amber-500 text-black py-10">
       <div class="container mx-auto px-4 text-center">
@@ -351,10 +353,12 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
       heroSince: 'Desde 2008',
       heroBilingual: 'Se Habla Espa\u00f1ol',
       mobileCall: 'Llamar',
-      mobileBook: 'Reservar'
+      mobileBook: 'Reservar'<?php if (!empty($customTranslations)) echo ',' . $customTranslations; ?>
+
     };
     var params = new URLSearchParams(window.location.search);
     var lang = params.get('lang') || localStorage.getItem('oregontires_lang') || 'en';
+    window.currentLang = lang;
     if (lang === 'es') {
       localStorage.setItem('oregontires_lang', 'es');
       document.documentElement.lang = 'es';
@@ -377,5 +381,6 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
     }
   })();
   </script>
+  <?php if (!empty($customScripts)) echo $customScripts; ?>
 </body>
 </html>

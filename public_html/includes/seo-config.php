@@ -59,6 +59,15 @@ function getBusinessConfig(): array {
             ['name' => 'Foster-Powell', 'nameEs' => 'Foster-Powell', 'slug' => 'tires-foster-powell'],
             ['name' => 'Mt. Scott', 'nameEs' => 'Mt. Scott', 'slug' => 'tires-mt-scott'],
         ],
+        'pages' => [
+            'financing' => [
+                'title' => 'Financing Options',
+                'titleEs' => 'Opciones de Financiamiento',
+                'description' => 'Flexible payment options for tire and auto repair services at Oregon Tires Auto Care in Portland, OR.',
+                'descriptionEs' => 'Opciones de pago flexibles para servicios de llantas y reparación automotriz en Oregon Tires Auto Care en Portland, OR.',
+                'slug' => 'financing',
+            ],
+        ],
         // TODO: Pull from DB when review system is built
         'rating' => '4.8',
         'reviewCount' => '150',

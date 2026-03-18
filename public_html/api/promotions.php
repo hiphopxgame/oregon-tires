@@ -17,7 +17,7 @@ try {
     $db = getDB();
 
     $now = date('Y-m-d H:i:s');
-    $allowedPlacements = ['banner', 'exit_intent'];
+    $allowedPlacements = ['banner', 'exit_intent', 'sidebar', 'inline'];
     $placement = $_GET['placement'] ?? 'banner';
     if (!in_array($placement, $allowedPlacements, true)) {
         $placement = 'banner';
@@ -47,7 +47,7 @@ try {
     } else {
         $stmt = $db->prepare(
             'SELECT id, title_en, title_es, body_en, body_es, cta_text_en, cta_text_es,
-                    cta_url, bg_color, text_color, badge_text, image_url, starts_at, ends_at
+                    cta_url, bg_color, text_color, badge_text_en, badge_text_es, image_url, starts_at, ends_at
              FROM oretir_promotions
              WHERE placement = ?
                AND is_active = 1

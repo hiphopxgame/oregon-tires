@@ -19,7 +19,7 @@ try {
     // ─── GET: List all gallery images ───────────────────────────────
     if ($method === 'GET') {
         $stmt = $db->prepare(
-            'SELECT id, image_url, title_en, title_es, description_en, description_es, is_active, display_order, created_at
+            'SELECT id, image_url, media_type, video_url, category, title_en, title_es, description_en, description_es, is_active, display_order, created_at
              FROM oretir_gallery_images
              ORDER BY display_order ASC, id DESC'
         );
@@ -29,59 +29,74 @@ try {
         jsonSuccess($images);
     }
 
-    // ─── POST: Upload new gallery image (multipart/form-data) ───────
+    // ─── POST: Upload new gallery image/video (multipart/form-data) ──
     if ($method === 'POST') {
         verifyCsrf();
 
-        // Validate uploaded file
-        if (!isset($_FILES['image'])) {
+        // Media type and category
+        $mediaType = isset($_POST['media_type']) && $_POST['media_type'] === 'video' ? 'video' : 'image';
+        $videoUrl  = isset($_POST['video_url']) ? sanitize($_POST['video_url'], 500) : null;
+        $category  = isset($_POST['category']) && in_array($_POST['category'], ['general','completed-work','facility','promotional'], true)
+                     ? $_POST['category'] : 'general';
+
+        // For videos, validate video URL; image upload is optional (thumbnail)
+        if ($mediaType === 'video') {
+            if (!$videoUrl || !preg_match('/(?:youtube\.com|youtu\.be|vimeo\.com)/', $videoUrl)) {
+                jsonError('A valid YouTube or Vimeo URL is required for video entries.', 400);
+            }
+        }
+
+        $imageUrl = null;
+
+        // Handle image upload (required for images, optional for videos)
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['image'];
+            $validation = validateImageUpload($file, 5);
+            if ($validation !== true) {
+                jsonError($validation, 400);
+            }
+
+            // Extract extension from MIME type (more secure than filename)
+            $mimeToExt = [
+                'image/jpeg' => 'jpg',
+                'image/png'  => 'png',
+                'image/webp' => 'webp',
+                'image/gif'  => 'gif',
+            ];
+
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime  = $finfo->file($file['tmp_name']);
+
+            if (!isset($mimeToExt[$mime])) {
+                jsonError('Unsupported image type.', 400);
+            }
+
+            $ext = $mimeToExt[$mime];
+
+            // Generate unique filename
+            $filename  = 'gallery/' . time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
+            $uploadDir = __DIR__ . '/../../uploads/gallery/';
+
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $destPath = __DIR__ . '/../../uploads/' . $filename;
+
+            if (!move_uploaded_file($file['tmp_name'], $destPath)) {
+                jsonError('Failed to save uploaded file.', 500);
+            }
+
+            $imageUrl = '/uploads/' . $filename;
+        } elseif ($mediaType === 'image') {
             jsonError('No image file provided.', 400);
         }
-
-        $file = $_FILES['image'];
-        $validation = validateImageUpload($file, 5);
-        if ($validation !== true) {
-            jsonError($validation, 400);
-        }
-
-        // Extract extension from MIME type (more secure than filename)
-        $mimeToExt = [
-            'image/jpeg' => 'jpg',
-            'image/png'  => 'png',
-            'image/webp' => 'webp',
-            'image/gif'  => 'gif',
-        ];
-
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime  = $finfo->file($file['tmp_name']);
-
-        if (!isset($mimeToExt[$mime])) {
-            jsonError('Unsupported image type.', 400);
-        }
-
-        $ext = $mimeToExt[$mime];
 
         // Form fields (bilingual)
         $titleEn       = isset($_POST['title_en']) ? sanitize($_POST['title_en']) : null;
         $titleEs       = isset($_POST['title_es']) ? sanitize($_POST['title_es']) : null;
         $descriptionEn = isset($_POST['description_en']) ? sanitize($_POST['description_en']) : null;
         $descriptionEs = isset($_POST['description_es']) ? sanitize($_POST['description_es']) : null;
-
-        // Generate unique filename
-        $filename  = 'gallery/' . time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
-        $uploadDir = __DIR__ . '/../../uploads/gallery/';
-
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-
-        $destPath = __DIR__ . '/../../uploads/' . $filename;
-
-        if (!move_uploaded_file($file['tmp_name'], $destPath)) {
-            jsonError('Failed to save uploaded file.', 500);
-        }
-
-        $imageUrl = '/uploads/' . $filename;
 
         // Get next display_order
         $stmt = $db->prepare(
@@ -92,11 +107,14 @@ try {
 
         // Insert record
         $stmt = $db->prepare(
-            'INSERT INTO oretir_gallery_images (image_url, title_en, title_es, description_en, description_es, display_order)
-             VALUES (:image_url, :title_en, :title_es, :description_en, :description_es, :display_order)'
+            'INSERT INTO oretir_gallery_images (image_url, media_type, video_url, category, title_en, title_es, description_en, description_es, display_order)
+             VALUES (:image_url, :media_type, :video_url, :category, :title_en, :title_es, :description_en, :description_es, :display_order)'
         );
         $stmt->execute([
             ':image_url'       => $imageUrl,
+            ':media_type'      => $mediaType,
+            ':video_url'       => $videoUrl,
+            ':category'        => $category,
             ':title_en'        => $titleEn,
             ':title_es'        => $titleEs,
             ':description_en'  => $descriptionEn,
@@ -108,7 +126,7 @@ try {
 
         // Fetch the inserted record
         $stmt = $db->prepare(
-            'SELECT id, image_url, title_en, title_es, description_en, description_es, is_active, display_order, created_at
+            'SELECT id, image_url, media_type, video_url, category, title_en, title_es, description_en, description_es, is_active, display_order, created_at
              FROM oretir_gallery_images WHERE id = :id'
         );
         $stmt->execute([':id' => $newId]);
@@ -132,6 +150,17 @@ try {
         $existing = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$existing) {
             jsonError('Image not found.', 404);
+        }
+
+        // Media type, video URL, category (use existing values as defaults)
+        $mediaType = isset($_POST['media_type']) && $_POST['media_type'] === 'video' ? 'video' : ($existing['media_type'] ?? 'image');
+        $videoUrl  = isset($_POST['video_url']) ? sanitize($_POST['video_url'], 500) : ($existing['video_url'] ?? null);
+        $category  = isset($_POST['category']) && in_array($_POST['category'], ['general','completed-work','facility','promotional'], true)
+                     ? $_POST['category'] : ($existing['category'] ?? 'general');
+
+        // Validate video URL if switching to or staying as video
+        if ($mediaType === 'video' && $videoUrl && !preg_match('/(?:youtube\.com|youtu\.be|vimeo\.com)/', $videoUrl)) {
+            jsonError('A valid YouTube or Vimeo URL is required for video entries.', 400);
         }
 
         $imageUrl = $existing['image_url'];
@@ -189,13 +218,16 @@ try {
         // Update record
         $stmt = $db->prepare(
             'UPDATE oretir_gallery_images SET
-                image_url = :image_url,
+                image_url = :image_url, media_type = :media_type, video_url = :video_url, category = :category,
                 title_en = :title_en, title_es = :title_es,
                 description_en = :description_en, description_es = :description_es
              WHERE id = :id'
         );
         $stmt->execute([
             ':image_url'       => $imageUrl,
+            ':media_type'      => $mediaType,
+            ':video_url'       => $videoUrl,
+            ':category'        => $category,
             ':title_en'        => isset($_POST['title_en']) ? sanitize($_POST['title_en']) : $existing['title_en'],
             ':title_es'        => isset($_POST['title_es']) ? sanitize($_POST['title_es']) : $existing['title_es'],
             ':description_en'  => isset($_POST['description_en']) ? sanitize($_POST['description_en']) : $existing['description_en'],
@@ -205,7 +237,7 @@ try {
 
         // Fetch updated record
         $stmt = $db->prepare(
-            'SELECT id, image_url, title_en, title_es, description_en, description_es, is_active, display_order, created_at
+            'SELECT id, image_url, media_type, video_url, category, title_en, title_es, description_en, description_es, is_active, display_order, created_at
              FROM oretir_gallery_images WHERE id = :id'
         );
         $stmt->execute([':id' => $id]);

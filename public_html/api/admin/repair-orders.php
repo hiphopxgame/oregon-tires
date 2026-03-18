@@ -317,6 +317,34 @@ try {
         $params[] = $id;
 
         $db->prepare('UPDATE oretir_repair_orders SET ' . implode(', ', $fields) . ' WHERE id = ?')->execute($params);
+
+        // ─── Send "Job Finished" notification when status changes to 'ready' ────
+        if (isset($data['status']) && $data['status'] === 'ready') {
+            try {
+                require_once __DIR__ . '/../../includes/mail.php';
+                require_once __DIR__ . '/../../includes/sms.php';
+
+                $notifResult = sendJobFinishedEmail($ro, $db);
+                if (!$notifResult['success']) {
+                    error_log("repair-orders.php: Job finished email failed for RO #{$id}: " . ($notifResult['error'] ?? 'unknown'));
+                }
+
+                // SMS if customer has opted in
+                if (!empty($ro['customer_id'])) {
+                    $custStmt = $db->prepare('SELECT first_name, last_name, phone, language FROM oretir_customers WHERE id = ?');
+                    $custStmt->execute([$ro['customer_id']]);
+                    $cust = $custStmt->fetch(PDO::FETCH_ASSOC);
+                    if ($cust && !empty($cust['phone'])) {
+                        $custName = trim($cust['first_name'] . ' ' . $cust['last_name']);
+                        $lang = ($cust['language'] ?? 'english');
+                        sendJobFinishedSms($cust['phone'], $custName, $ro['ro_number'], $lang);
+                    }
+                }
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: Job finished notification error for RO #{$id}: " . $e->getMessage());
+            }
+        }
+
         jsonSuccess(['message' => 'Repair order updated.']);
     }
 

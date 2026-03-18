@@ -1430,6 +1430,107 @@ function sendReadyEmail(string $email, string $name, string $roNumber, string $v
 }
 
 /**
+ * Send "Job Finished / Vehicle Ready" email to customer from RO context.
+ * Uses DB-driven bilingual templates: email_tpl_job_finished_*
+ */
+function sendJobFinishedEmail(array $ro, PDO $db): array
+{
+    try {
+        // Look up customer
+        $custStmt = $db->prepare('SELECT first_name, last_name, email, phone, language FROM oretir_customers WHERE id = ?');
+        $custStmt->execute([$ro['customer_id']]);
+        $customer = $custStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$customer || empty($customer['email'])) {
+            return ['success' => false, 'error' => 'Customer not found or no email'];
+        }
+
+        // Look up vehicle
+        $vehicleInfo = '';
+        if (!empty($ro['vehicle_id'])) {
+            $vStmt = $db->prepare('SELECT year, make, model FROM oretir_vehicles WHERE id = ?');
+            $vStmt->execute([$ro['vehicle_id']]);
+            $v = $vStmt->fetch(PDO::FETCH_ASSOC);
+            if ($v) {
+                $vehicleInfo = trim(implode(' ', array_filter([$v['year'], $v['make'], $v['model']])));
+            }
+        }
+
+        $lang = ($customer['language'] ?? 'english') === 'spanish' ? 'es' : 'en';
+        $customerName = trim($customer['first_name'] . ' ' . $customer['last_name']);
+        $roNumber = $ro['ro_number'] ?? '';
+        $appUrl = $_ENV['APP_URL'] ?? 'https://oregon.tires';
+        $mapsUrl = 'https://maps.google.com/?q=Oregon+Tires+Auto+Care+Portland';
+
+        // Load templates from DB
+        $tplKeys = [
+            'email_tpl_job_finished_subject_' . $lang,
+            'email_tpl_job_finished_greeting_' . $lang,
+            'email_tpl_job_finished_body_' . $lang,
+            'email_tpl_job_finished_button_' . $lang,
+            'email_tpl_job_finished_footer_' . $lang,
+        ];
+
+        $placeholders = str_repeat('?,', count($tplKeys) - 1) . '?';
+        $tplStmt = $db->prepare(
+            "SELECT setting_key, value_{$lang} as val FROM oretir_site_settings WHERE setting_key IN ({$placeholders})"
+        );
+        $tplStmt->execute($tplKeys);
+        $tplMap = [];
+        foreach ($tplStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $tplMap[$row['setting_key']] = $row['val'];
+        }
+
+        $subject  = $tplMap["email_tpl_job_finished_subject_{$lang}"]
+                    ?? ($lang === 'es' ? '¡Su vehículo está listo! — Oregon Tires' : 'Your Vehicle is Ready! — Oregon Tires');
+        $greeting = $tplMap["email_tpl_job_finished_greeting_{$lang}"]
+                    ?? ($lang === 'es' ? '¡Hola {{name}}!' : 'Hi {{name}}!');
+        $body     = $tplMap["email_tpl_job_finished_body_{$lang}"]
+                    ?? ($lang === 'es'
+                        ? 'Su vehículo <strong>{{vehicle}}</strong> (Orden: <strong>{{ro_number}}</strong>) está listo para recoger.<br><br>Gracias por confiar en Oregon Tires Auto Care.'
+                        : 'Your vehicle <strong>{{vehicle}}</strong> (RO: <strong>{{ro_number}}</strong>) is ready for pickup.<br><br>Thank you for trusting Oregon Tires Auto Care.');
+        $btnText  = $tplMap["email_tpl_job_finished_button_{$lang}"]
+                    ?? ($lang === 'es' ? 'Obtener Direcciones' : 'Get Directions');
+        $footer   = $tplMap["email_tpl_job_finished_footer_{$lang}"]
+                    ?? ($lang === 'es' ? 'Si tiene preguntas, llámenos al <strong>(503) 367-9714</strong>.' : 'If you have questions, call us at <strong>(503) 367-9714</strong>.');
+
+        // Replace placeholders
+        $replacements = [
+            '{{name}}' => htmlspecialchars($customerName),
+            '{{vehicle}}' => htmlspecialchars($vehicleInfo ?: 'your vehicle'),
+            '{{ro_number}}' => htmlspecialchars($roNumber),
+        ];
+
+        foreach ($replacements as $k => $v) {
+            $greeting = str_replace($k, $v, $greeting);
+            $body     = str_replace($k, $v, $body);
+            $subject  = str_replace($k, $v, $subject);
+            $footer   = str_replace($k, $v, $footer);
+        }
+
+        // Build branded email
+        $result = sendBrandedTemplateEmail(
+            $customer['email'],
+            $subject,
+            $greeting,
+            $body,
+            $mapsUrl,
+            $btnText,
+            $footer
+        );
+
+        // Log
+        if (function_exists('logEmail')) {
+            logEmail('job_finished', "Job finished email sent to {$customer['email']} for RO {$roNumber}");
+        }
+
+        return $result;
+    } catch (\Throwable $e) {
+        error_log("sendJobFinishedEmail error: " . $e->getMessage());
+        return ['success' => false, 'error' => $e->getMessage()];
+    }
+}
+
+/**
  * Send account claim email to a customer whose account was auto-created.
  * Uses the Oregon Tires branded email wrapper with bilingual content.
  *

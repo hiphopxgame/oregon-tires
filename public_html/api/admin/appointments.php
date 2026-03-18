@@ -330,6 +330,9 @@ try {
         $vehicleMake   = sanitize((string) ($body['vehicle_make'] ?? ''), 50);
         $vehicleModel  = sanitize((string) ($body['vehicle_model'] ?? ''), 50);
         $notes         = sanitize((string) ($body['notes'] ?? ''), 2000);
+        $tirePreference = sanitize((string) ($body['tire_preference'] ?? ''), 10);
+        $tireCount      = !empty($body['tire_count']) ? max(1, min(10, (int) $body['tire_count'])) : null;
+        if ($tirePreference !== '' && !in_array($tirePreference, ['new', 'used', 'either'], true)) $tirePreference = '';
         $language      = sanitize((string) ($body['language'] ?? 'english'), 20);
         $source        = sanitize((string) ($body['source'] ?? 'walk-in'), 20);
         $employeeId    = isset($body['assigned_employee_id']) && $body['assigned_employee_id'] !== ''
@@ -397,14 +400,16 @@ try {
                 (reference_number, service, preferred_date, preferred_time,
                  vehicle_year, vehicle_make, vehicle_model,
                  first_name, last_name, phone, email, notes,
+                 tire_preference, tire_count,
                  status, language, assigned_employee_id, admin_notes, task_summary,
                  created_at, updated_at)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())'
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())'
         );
         $stmt->execute([
             $referenceNumber, $service, $preferredDate, $preferredTime,
             $vehicleYear ?: null, $vehicleMake ?: null, $vehicleModel ?: null,
             $firstName, $lastName, $phone, $email, $notes ?: null,
+            $tirePreference ?: null, $tireCount,
             'confirmed', $language, $employeeId, $adminNotes, $taskSummary
         ]);
         $appointmentId = (int) $db->lastInsertId();

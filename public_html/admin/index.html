@@ -1025,11 +1025,17 @@
               <select id="promo-placement" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" onchange="toggleExitIntentFields()">
                 <option value="banner" data-t="promoBanner">Banner</option>
                 <option value="exit_intent" data-t="promoExitPopup">Exit-Intent Popup</option>
+                <option value="sidebar" data-t="promoSidebar">Sidebar</option>
+                <option value="inline" data-t="promoInline">Inline</option>
               </select>
             </div>
             <div class="banner-only-field">
-              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelBadge">Badge Text</label>
-              <input id="promo-badge" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="SPRING SALE" oninput="updatePromoPreview()">
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelBadgeEn">Badge Text (EN)</label>
+              <input id="promo-badge-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="SPRING SALE" oninput="updatePromoPreview()">
+            </div>
+            <div class="banner-only-field">
+              <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelBadgeEs">Badge Text (ES)</label>
+              <input id="promo-badge-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="OFERTA DE PRIMAVERA">
             </div>
             <!-- Exit-Intent Popup Fields (hidden by default) -->
             <div id="exit-intent-fields" class="hidden md:col-span-2 grid md:grid-cols-2 gap-4 p-4 border rounded-lg bg-amber-50 dark:bg-gray-600 dark:border-gray-500">
@@ -1128,8 +1134,8 @@
               <input id="promo-ends" type="datetime-local" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
             </div>
           </div>
-          <div class="mt-4 banner-only-field">
-            <label class="text-sm font-medium text-gray-500 dark:text-gray-400" data-t="promoLabelPreview">Banner Preview</label>
+          <div class="mt-4">
+            <label class="text-sm font-medium text-gray-500 dark:text-gray-400" data-t="promoLabelPreview">Live Preview</label>
             <div id="promo-live-preview" class="mt-1 px-4 py-3 rounded-lg text-sm" style="background-color: #f59e0b; color: #000;">
               <span class="font-semibold" data-t="promoPreviewTitle">Your Promotion Title</span>
               <span class="ml-3 underline font-bold" data-t="promoPreviewCta">Book Now →</span>
@@ -10405,6 +10411,68 @@ async function loadAnalytics() {
     btmRow.appendChild(empCard);
 
     frag.appendChild(btmRow);
+
+    // -- Enhanced Analytics Row (server-side data) --
+    var enhRow = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-6 mb-6');
+
+    // Employee Productivity (30d)
+    var epCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
+    epCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', 'Employee Productivity (30d)'));
+    if (sData && sData.employee_productivity) {
+      OTCharts.employeeProductivityChart(epCard, sData.employee_productivity);
+    } else {
+      epCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    enhRow.appendChild(epCard);
+
+    // Revenue Trend (6mo)
+    var revCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
+    revCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', 'Approved Revenue (6mo)'));
+    if (sData && sData.revenue_by_month && sData.revenue_by_month.length) {
+      OTCharts.revenueChart(revCard, sData.revenue_by_month);
+    } else {
+      revCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    enhRow.appendChild(revCard);
+
+    frag.appendChild(enhRow);
+
+    // -- Funnel + Duration Row --
+    var fdRow = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-6 mb-6');
+
+    // Conversion Funnel (30d)
+    var funCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
+    funCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', 'Conversion Funnel (30d)'));
+    if (sData && sData.conversion_funnel) {
+      OTCharts.funnelChart(funCard, sData.conversion_funnel);
+    } else {
+      funCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    fdRow.appendChild(funCard);
+
+    // Service Duration
+    var durCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
+    durCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', 'Avg Service Duration (days)'));
+    if (sData && sData.service_duration && sData.service_duration.length) {
+      OTCharts.durationChart(durCard, sData.service_duration);
+    } else {
+      durCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    fdRow.appendChild(durCard);
+
+    frag.appendChild(fdRow);
+
+    // -- Customer Retention Row (full width) --
+    var retRow = el('div', 'grid grid-cols-1 gap-6 mb-6');
+    var retCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
+    retCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', 'Customer Retention'));
+    if (sData && sData.customer_retention) {
+      OTCharts.retentionDisplay(retCard, sData.customer_retention);
+    } else {
+      retCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    retRow.appendChild(retCard);
+    frag.appendChild(retRow);
 
     container.textContent = '';
     container.appendChild(frag);

@@ -135,6 +135,11 @@ try {
         $params[] = $body['is_active'] ? 1 : 0;
     }
 
+    if (isset($body['max_daily_appointments'])) {
+        $fields[] = 'max_daily_appointments = ?';
+        $params[] = max(1, min(30, (int) $body['max_daily_appointments']));
+    }
+
     // Handle skill updates (separate from main field updates)
     if (isset($body['skills']) && is_array($body['skills'])) {
         try {

@@ -32,6 +32,7 @@
     bannerFields.forEach(function(el) {
       el.classList.toggle('hidden', isExit);
     });
+    updatePreview();
   }
 
   // ─── Load promotions ──────────────────────────────────────────
@@ -80,12 +81,13 @@
       titleText.className = 'font-medium text-sm dark:text-gray-200';
       titleText.textContent = promo.title_en || '(untitled)';
       tdTitle.appendChild(titleText);
-      if (promo.badge_text) {
+      var badgeText = promo.badge_text_en || promo.badge_text || '';
+      if (badgeText) {
         const badge = document.createElement('span');
         badge.className = 'inline-block mt-1 text-xs px-2 py-0.5 rounded-full font-bold';
         badge.style.backgroundColor = promo.bg_color || '#f59e0b';
         badge.style.color = promo.text_color || '#000';
-        badge.textContent = promo.badge_text;
+        badge.textContent = badgeText;
         tdTitle.appendChild(badge);
       }
       tr.appendChild(tdTitle);
@@ -97,6 +99,12 @@
       if (promo.placement === 'exit_intent') {
         typeBadge.className = 'text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 font-medium';
         typeBadge.textContent = t('promoExitPopup', 'Exit Popup');
+      } else if (promo.placement === 'sidebar') {
+        typeBadge.className = 'text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300 font-medium';
+        typeBadge.textContent = t('promoSidebar', 'Sidebar');
+      } else if (promo.placement === 'inline') {
+        typeBadge.className = 'text-xs px-2 py-1 rounded-full bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300 font-medium';
+        typeBadge.textContent = t('promoInline', 'Inline');
       } else {
         typeBadge.className = 'text-xs px-2 py-1 rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 font-medium';
         typeBadge.textContent = t('promoBanner', 'Banner');
@@ -233,7 +241,8 @@
     document.getElementById('promo-cta-url').value = '/book-appointment/';
     document.getElementById('promo-bg-color').value = '#f59e0b';
     document.getElementById('promo-text-color').value = '#000000';
-    document.getElementById('promo-badge').value = '';
+    document.getElementById('promo-badge-en').value = '';
+    document.getElementById('promo-badge-es').value = '';
     document.getElementById('promo-active').checked = true;
     document.getElementById('promo-starts').value = '';
     document.getElementById('promo-ends').value = '';
@@ -276,7 +285,8 @@
     document.getElementById('promo-cta-url').value = promo.cta_url || '/book-appointment/';
     document.getElementById('promo-bg-color').value = promo.bg_color || '#f59e0b';
     document.getElementById('promo-text-color').value = promo.text_color || '#000000';
-    document.getElementById('promo-badge').value = promo.badge_text || '';
+    document.getElementById('promo-badge-en').value = promo.badge_text_en || promo.badge_text || '';
+    document.getElementById('promo-badge-es').value = promo.badge_text_es || '';
     document.getElementById('promo-active').checked = Number(promo.is_active) === 1;
     document.getElementById('promo-starts').value = promo.starts_at ? promo.starts_at.replace(' ', 'T').slice(0, 16) : '';
     document.getElementById('promo-ends').value = promo.ends_at ? promo.ends_at.replace(' ', 'T').slice(0, 16) : '';
@@ -331,7 +341,8 @@
     fd.append('cta_url', document.getElementById('promo-cta-url').value.trim() || '/book-appointment/');
     fd.append('bg_color', document.getElementById('promo-bg-color').value);
     fd.append('text_color', document.getElementById('promo-text-color').value);
-    fd.append('badge_text', document.getElementById('promo-badge').value.trim());
+    fd.append('badge_text_en', document.getElementById('promo-badge-en').value.trim());
+    fd.append('badge_text_es', document.getElementById('promo-badge-es').value.trim());
     fd.append('is_active', document.getElementById('promo-active').checked ? '1' : '0');
     var starts = document.getElementById('promo-starts').value;
     fd.append('starts_at', starts ? starts.replace('T', ' ') + ':00' : '');
@@ -421,7 +432,8 @@
     fd.append('popup_icon', promo.popup_icon || '');
     fd.append('bg_color', promo.bg_color || '#f59e0b');
     fd.append('text_color', promo.text_color || '#000000');
-    fd.append('badge_text', promo.badge_text || '');
+    fd.append('badge_text_en', promo.badge_text_en || promo.badge_text || '');
+    fd.append('badge_text_es', promo.badge_text_es || '');
     fd.append('is_active', Number(promo.is_active) === 1 ? '0' : '1');
     fd.append('starts_at', promo.starts_at || '');
     fd.append('ends_at', promo.ends_at || '');
@@ -484,34 +496,94 @@
     const preview = document.getElementById('promo-live-preview');
     if (!preview) return;
 
+    const placement = document.getElementById('promo-placement').value;
     const bgColor = document.getElementById('promo-bg-color').value;
     const textColor = document.getElementById('promo-text-color').value;
     const titleEn = document.getElementById('promo-title-en').value || 'Your Promotion Title';
-    const badge = document.getElementById('promo-badge').value;
+    const bodyEn = document.getElementById('promo-body-en').value || '';
+    const badge = document.getElementById('promo-badge-en').value;
     const ctaText = document.getElementById('promo-cta-text-en').value || 'Book Now';
 
     preview.style.backgroundColor = bgColor;
     preview.style.color = textColor;
-
+    preview.style.maxWidth = '';
     preview.textContent = '';
 
-    if (badge) {
-      const badgeEl = document.createElement('span');
-      badgeEl.className = 'inline-block px-2 py-0.5 rounded-full text-xs font-bold mr-2 border';
-      badgeEl.style.borderColor = textColor;
-      badgeEl.textContent = badge;
-      preview.appendChild(badgeEl);
+    // Placement type label
+    var placementLabel = document.createElement('div');
+    placementLabel.className = 'text-xs opacity-60 mb-1 uppercase tracking-wide';
+    var placementNames = { banner: 'Banner', exit_intent: 'Exit-Intent Popup', sidebar: 'Sidebar', inline: 'Inline' };
+    placementLabel.textContent = placementNames[placement] || 'Banner';
+    preview.appendChild(placementLabel);
+
+    if (placement === 'exit_intent') {
+      // Exit-intent preview: icon + title + subtitle
+      var icon = document.getElementById('promo-popup-icon').value;
+      if (icon) {
+        var iconEl = document.createElement('span');
+        iconEl.className = 'text-2xl mr-2';
+        iconEl.textContent = icon;
+        preview.appendChild(iconEl);
+      }
+      var titleEl = document.createElement('div');
+      titleEl.className = 'font-bold text-base';
+      titleEl.textContent = titleEn;
+      preview.appendChild(titleEl);
+      var subtitle = document.getElementById('promo-subtitle-en').value;
+      if (subtitle) {
+        var subEl = document.createElement('div');
+        subEl.className = 'text-sm opacity-80 mt-1';
+        subEl.textContent = subtitle;
+        preview.appendChild(subEl);
+      }
+      var ctaEl = document.createElement('div');
+      ctaEl.className = 'mt-2 inline-block px-3 py-1 rounded font-bold text-sm';
+      ctaEl.style.backgroundColor = textColor;
+      ctaEl.style.color = bgColor;
+      ctaEl.textContent = ctaText;
+      preview.appendChild(ctaEl);
+    } else if (placement === 'sidebar') {
+      // Sidebar preview: compact card
+      preview.style.maxWidth = '240px';
+      if (badge) {
+        var badgeEl2 = document.createElement('span');
+        badgeEl2.className = 'inline-block px-2 py-0.5 rounded-full text-xs font-bold mb-1 border';
+        badgeEl2.style.borderColor = textColor;
+        badgeEl2.textContent = badge;
+        preview.appendChild(badgeEl2);
+      }
+      var titleEl2 = document.createElement('div');
+      titleEl2.className = 'font-semibold text-sm';
+      titleEl2.textContent = titleEn;
+      preview.appendChild(titleEl2);
+      if (bodyEn) {
+        var bodyEl = document.createElement('div');
+        bodyEl.className = 'text-xs opacity-80 mt-1';
+        bodyEl.textContent = bodyEn.substring(0, 80) + (bodyEn.length > 80 ? '...' : '');
+        preview.appendChild(bodyEl);
+      }
+      var ctaEl2 = document.createElement('div');
+      ctaEl2.className = 'mt-2 underline font-bold text-xs';
+      ctaEl2.textContent = ctaText + ' \u2192';
+      preview.appendChild(ctaEl2);
+    } else {
+      // Banner / Inline preview
+      if (badge) {
+        var badgeEl3 = document.createElement('span');
+        badgeEl3.className = 'inline-block px-2 py-0.5 rounded-full text-xs font-bold mr-2 border';
+        badgeEl3.style.borderColor = textColor;
+        badgeEl3.textContent = badge;
+        preview.appendChild(badgeEl3);
+      }
+      var titleSpan = document.createElement('span');
+      titleSpan.className = 'font-semibold';
+      titleSpan.textContent = titleEn;
+      preview.appendChild(titleSpan);
+      var ctaSpan = document.createElement('span');
+      ctaSpan.className = 'ml-3 underline font-bold';
+      ctaSpan.textContent = ctaText + ' \u2192';
+      preview.appendChild(ctaSpan);
     }
-
-    const titleSpan = document.createElement('span');
-    titleSpan.className = 'font-semibold';
-    titleSpan.textContent = titleEn;
-    preview.appendChild(titleSpan);
-
-    const ctaSpan = document.createElement('span');
-    ctaSpan.className = 'ml-3 underline font-bold';
-    ctaSpan.textContent = ctaText + ' →';
-    preview.appendChild(ctaSpan);
   }
 
   // Override buildFormData to include remove_image flag

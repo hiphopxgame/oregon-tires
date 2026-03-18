@@ -157,6 +157,22 @@ function sendReadySms(string $phone, string $name, string $language = 'english')
 }
 
 /**
+ * Send "Job Finished" SMS when RO status moves to 'ready'.
+ */
+function sendJobFinishedSms(string $phone, string $customerName, string $roNumber, string $language = 'english'): array
+{
+    $mapsUrl = 'https://maps.google.com/?q=Oregon+Tires+Auto+Care+Portland';
+
+    if ($language === 'spanish') {
+        $body = "¡Hola {$customerName}! Su vehículo (Orden: {$roNumber}) está listo para recoger en Oregon Tires Auto Care. Direcciones: {$mapsUrl}";
+    } else {
+        $body = "Hi {$customerName}! Your vehicle (RO: {$roNumber}) is ready for pickup at Oregon Tires Auto Care. Directions: {$mapsUrl}";
+    }
+
+    return sendSms($phone, $body);
+}
+
+/**
  * Send approval confirmation SMS to customer.
  */
 function sendApprovalConfirmationSms(string $phone, string $name, string $language = 'english'): array

@@ -45,6 +45,16 @@ $templates = [
     ['email_tpl_assignment_employee_body',     'You have been assigned a new appointment:<br><br><strong>Customer:</strong> {{name}}<br><strong>Service:</strong> {{service}}<br><strong>Date:</strong> {{date}} at {{time}}<br><strong>Vehicle:</strong> {{vehicle}}{{task_line}}<br><strong>Reference:</strong> {{reference_number}}', 'Se te ha asignado una nueva cita:<br><br><strong>Cliente:</strong> {{name}}<br><strong>Servicio:</strong> {{service}}<br><strong>Fecha:</strong> {{date}} a las {{time}}<br><strong>Vehículo:</strong> {{vehicle}}{{task_line}}<br><strong>Referencia:</strong> {{reference_number}}'],
     ['email_tpl_assignment_employee_button',   'View in Admin', 'Ver en Admin'],
     ['email_tpl_assignment_employee_footer',   'This is an automated assignment notification from Oregon Tires Auto Care.', 'Esta es una notificación automática de asignación de Oregon Tires Auto Care.'],
+
+    // Job Finished / Vehicle Ready Email
+    ['email_tpl_job_finished_subject_en', 'Your Vehicle is Ready! — Oregon Tires', '¡Su Vehículo Está Listo! — Oregon Tires'],
+    ['email_tpl_job_finished_greeting_en', 'Hi {{name}}!', '¡Hola {{name}}!'],
+    ['email_tpl_job_finished_body_en', 'Great news! Your vehicle <strong>{{vehicle}}</strong> (RO: <strong>{{ro_number}}</strong>) is ready for pickup at Oregon Tires Auto Care.<br><br>Thank you for trusting us with your vehicle!', '¡Buenas noticias! Su vehículo <strong>{{vehicle}}</strong> (Orden: <strong>{{ro_number}}</strong>) está listo para recoger en Oregon Tires Auto Care.<br><br>¡Gracias por confiar en nosotros con su vehículo!'],
+    ['email_tpl_job_finished_button_en', 'Get Directions', 'Obtener Direcciones'],
+    ['email_tpl_job_finished_footer_en', 'If you have any questions, please call us at <strong>(503) 367-9714</strong> or reply to this email.', 'Si tiene alguna pregunta, llámenos al <strong>(503) 367-9714</strong> o responda a este correo.'],
+
+    // Reminder Settings
+    ['reminder_lead_hours', '24', '24'],
 ];
 
 $stmt = $db->prepare(
