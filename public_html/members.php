@@ -95,16 +95,17 @@ if (($isAdmin || $isEmployee) && !isset($_GET['tab'])) {
                     if (empty($_SESSION['csrf_token'])) {
                         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                     }
-                } else {
-                    // Not actually an admin — don't redirect
-                    $isAdmin = false;
-                    $isEmployee = false;
-                    $dashboardRole = 'member';
-                    $_SESSION['dashboard_role'] = 'member';
                 }
             } catch (\Throwable $e) {
                 error_log('Admin session recovery failed: ' . $e->getMessage());
             }
+        }
+        // If recovery failed for ANY reason, don't redirect — show member dashboard
+        if (empty($_SESSION['admin_id'])) {
+            $isAdmin = false;
+            $isEmployee = false;
+            $dashboardRole = 'member';
+            $_SESSION['dashboard_role'] = 'member';
         }
     }
     if ($isAdmin || $isEmployee) {
