@@ -126,11 +126,32 @@ try {
 
     // ─── POST: Admin reply ───────────────────────────────────────────────
     if ($method === 'POST') {
+        $input = getJsonBody();
+        $action = trim($input['action'] ?? '');
+
+        // Bulk mark all conversations read (no id needed)
+        if ($action === 'mark_read_all') {
+            $db->exec(
+                "UPDATE oretir_conversation_messages SET is_read = 1 WHERE sender_type = 'customer' AND is_read = 0"
+            );
+            jsonSuccess(['message' => 'All conversations marked as read.']);
+        }
+
+        // Mark single conversation read
+        if ($action === 'mark_read') {
+            if ($id < 1) {
+                jsonError('Conversation ID required.', 400);
+            }
+            $db->prepare(
+                'UPDATE oretir_conversation_messages SET is_read = 1 WHERE conversation_id = ? AND sender_type = ? AND is_read = 0'
+            )->execute([$id, 'customer']);
+            jsonSuccess(['message' => 'Conversation marked as read.']);
+        }
+
         if ($id < 1) {
             jsonError('Conversation ID required.', 400);
         }
 
-        $input = getJsonBody();
         $body = trim($input['body'] ?? '');
 
         if ($body === '' || mb_strlen($body) > 5000) {

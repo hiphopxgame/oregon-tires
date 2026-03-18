@@ -206,12 +206,10 @@ Admin calendar endpoints exist (`calendar-health.php`, `calendar-test-sync.php`,
 
 ---
 
-### 27. Loyalty Points System
-**Confidence:** 85% | **Priority:** Medium
+### ~~27. Loyalty Points System~~ COMPLETED
+**Status:** Done (2026-03-17)
 
-No reward mechanism for repeat customers beyond care plans.
-
-**Fix:** Add points-per-dollar on completed ROs. Redeemable for discounts on future services. Points balance visible in member portal. Tier bonuses for care plan members.
+Points-per-dollar on completed ROs. Redeemable rewards catalog (admin-managed via `api/admin/loyalty.php` + `api/admin/loyalty-rewards.php`). Points balance visible in member portal. Tier bonuses for care plan members. Tables: `oretir_loyalty_points` (enhanced), `oretir_loyalty_rewards`. Migration 044.
 
 ---
 
@@ -233,12 +231,10 @@ No parts inventory system. Technicians and service writers track parts manually.
 
 ---
 
-### 30. Appointment Text Message Reminders
-**Confidence:** 90% | **Priority:** High
+### ~~30. Appointment Text Message Reminders~~ COMPLETED
+**Status:** Done (2026-03-17)
 
-Cron sends email reminders but not SMS reminders. Many customers miss email.
-
-**Fix:** Add SMS reminders to the 6 PM cron job for customers who opted into SMS. Use existing Twilio integration.
+SMS reminders added to `send-reminders.php` cron job (6 PM daily) for customers who opted into SMS. Uses existing Twilio integration. Push notifications also added for subscribed users.
 
 ---
 
@@ -278,25 +274,91 @@ Currently only single-touch emails (reminder, review request). No multi-step fol
 
 ---
 
+## New Improvements (Shipped 2026-03-17 — Roadmap Features)
+
+### ~~35. Digital Invoices~~ COMPLETED
+**Status:** Done (2026-03-17)
+
+Generate invoices from completed ROs. Token-based customer view (bilingual). Admin CRUD via `api/admin/invoices.php`, customer view via `api/invoice-view.php`. Table: `oretir_invoices`. Migration 042.
+
+---
+
+### ~~36. Automated Service Reminders~~ COMPLETED
+**Status:** Done (2026-03-17)
+
+Track service due dates per vehicle. Automated email reminders via `cli/send-service-reminders.php` (weekly cron Mon 9AM). Admin management via `api/admin/service-reminders.php`. Table: `oretir_service_reminders`. Migration 043.
+
+---
+
+### ~~37. Labor Tracking~~ COMPLETED
+**Status:** Done (2026-03-17)
+
+Log technician hours per RO. Efficiency reporting. Admin UI via `admin/js/labor-tracker.js`, API via `api/admin/labor.php`. Table: `oretir_labor_entries`. Migration 045.
+
+---
+
+### ~~38. Customer Referral Program~~ COMPLETED
+**Status:** Done (2026-03-17)
+
+Referral code generation, tracking, and bonus points. Public lookup via `api/referral-lookup.php`. Table: `oretir_referrals`. Migration 046.
+
+---
+
+### ~~39. Waitlist / Walk-In Queue~~ COMPLETED
+**Status:** Done (2026-03-17)
+
+Walk-in queue management with estimated wait times. Public queue join via `api/waitlist.php`, admin management via `api/admin/waitlist.php`. Table: `oretir_waitlist`. Migration 047.
+
+---
+
+### ~~40. Tire Quote Requests~~ COMPLETED
+**Status:** Done (2026-03-17)
+
+Customer-facing tire quote form. Admin response workflow via `api/admin/tire-quotes.php`, public submission via `api/tire-quote.php`. Table: `oretir_tire_quotes`. Migration 048.
+
+---
+
+### ~~41. Enhanced Admin Analytics~~ COMPLETED
+**Status:** Done (2026-03-17)
+
+Revenue tracking, service breakdown, customer acquisition, employee utilization. Enhanced `api/admin/analytics.php` + new `admin/js/admin-analytics.js`.
+
+---
+
+### ~~42. Google Business Sync~~ COMPLETED
+**Status:** Done (2026-03-17)
+
+Sync business info to Google Business Profile. Weekly cron via `cli/sync-google-business.php` (Mon 7AM). Admin trigger via `api/admin/google-business-sync.php`.
+
+---
+
+### ~~43. PWA Push Notifications & Offline Booking~~ COMPLETED
+**Status:** Done (2026-03-17)
+
+Web Push API (VAPID) with bilingual payloads. Booking confirmations, reminders, RO status, admin broadcast. Offline booking via IndexedDB + Background Sync. Install prompt (Android + iOS). 4 migrations (049–052). Admin broadcast via `api/admin/push-broadcast.php`.
+
+---
+
 ## Completion Summary
 
-**23 of 34 items completed** as of 2026-03-17.
+**34 of 43 items completed** as of 2026-03-18.
 
 | Status | Count | Items |
 |--------|-------|-------|
-| Completed | 23 | #1–11, #13, #14, #17–23 |
+| Completed | 34 | #1–11, #13, #14, #17–23, #27, #30, #35–43 |
 | Remaining (original) | 4 | #12 (Bulk ops), #15 (Lazy maps), #16 (Gallery skeletons), #24 (Password logging) |
-| New (2026-03-03) | 8 | #25–32 |
-| New (2026-03-17) | 2 | #33–34 |
+| Remaining (2026-03-03) | 5 | #25 (WhatsApp), #26 (Calendar sync), #28 (Online payment), #29 (Inventory), #31 (Customer photos) |
+| Remaining (2026-03-17) | 2 | #33 (Vehicle timeline), #34 (Follow-up sequences) |
+| Deferred | 1 | #32 (Multi-location — future) |
 
-### Priority Matrix
+### Priority Matrix (Remaining)
 
 | Priority | Items | Description |
 |----------|-------|-------------|
-| **High** | #28, #30 | Online estimate payment, SMS reminders |
-| **Medium** | #12, #15, #16, #25, #26, #27, #29, #33, #34 | Bulk ops, lazy maps, skeletons, WhatsApp, calendar sync, loyalty, inventory, vehicle timeline, follow-up sequences |
+| **High** | #28 | Online estimate payment |
+| **Medium** | #12, #15, #16, #25, #26, #29, #33, #34 | Bulk ops, lazy maps, skeletons, WhatsApp, calendar sync, inventory, vehicle timeline, follow-up sequences |
 | **Low** | #24, #31, #32 | Password logging, customer photos, multi-location |
 
 ---
 
-*Generated from code reviews. Last updated 2026-03-17.*
+*Generated from code reviews. Last updated 2026-03-18.*

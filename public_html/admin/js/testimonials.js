@@ -36,7 +36,7 @@
       updateLastSynced();
     } catch (err) {
       console.error('loadTestimonials error:', err);
-      if (typeof showToast === 'function') showToast('Failed to load reviews', true);
+      if (typeof showToast === 'function') showToast(t('testimLoadFail', 'Failed to load reviews'), true);
     }
   }
 
@@ -49,15 +49,15 @@
       if (!el || !json.success) return;
       const lastFetched = json.data.last_fetched;
       if (!lastFetched) {
-        el.textContent = 'Never synced';
+        el.textContent = t('testimNeverSynced', 'Never synced');
         return;
       }
       var d = new Date(lastFetched + ' UTC');
       var diff = Math.floor((Date.now() - d.getTime()) / 60000);
-      if (diff < 1) el.textContent = 'Synced just now';
-      else if (diff < 60) el.textContent = 'Synced ' + diff + ' min ago';
-      else if (diff < 1440) el.textContent = 'Synced ' + Math.floor(diff / 60) + 'h ago';
-      else el.textContent = 'Synced ' + Math.floor(diff / 1440) + 'd ago';
+      if (diff < 1) el.textContent = t('testimSyncedJustNow', 'Synced just now');
+      else if (diff < 60) el.textContent = t('testimSyncedMinAgo', 'Synced {n} min ago').replace('{n}', diff);
+      else if (diff < 1440) el.textContent = t('testimSyncedHrAgo', 'Synced {n}h ago').replace('{n}', Math.floor(diff / 60));
+      else el.textContent = t('testimSyncedDayAgo', 'Synced {n}d ago').replace('{n}', Math.floor(diff / 1440));
     } catch (err) {
       // ignore
     }
@@ -66,23 +66,23 @@
   // ─── Fetch from Google ────────────────────────────────────────
   async function fetchFromGoogle() {
     var btn = document.getElementById('btn-fetch-google');
-    if (btn) { btn.disabled = true; btn.textContent = 'Fetching...'; }
+    if (btn) { btn.disabled = true; btn.textContent = t('testimFetching', 'Fetching...'); }
     try {
       const res = await fetch(API + '?action=fetch-google', { credentials: 'include' });
       const json = await res.json();
       if (json.success) {
-        var msg = 'Imported ' + (json.data.imported || 0) + ' new Google review(s)';
+        var msg = t('testimImported', 'Imported {n} new Google review(s)').replace('{n}', json.data.imported || 0);
         if (json.data.total) msg += ' (' + json.data.total + ' total from Google)';
         if (typeof showToast === 'function') showToast(msg);
         loadTestimonials();
       } else {
-        if (typeof showToast === 'function') showToast(json.error || 'Fetch failed', true);
+        if (typeof showToast === 'function') showToast(json.error || t('testimFetchFailed', 'Fetch failed'), true);
       }
     } catch (err) {
       console.error('fetchFromGoogle error:', err);
-      if (typeof showToast === 'function') showToast('Network error', true);
+      if (typeof showToast === 'function') showToast(t('testimNetworkError', 'Network error'), true);
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = '🔄 Fetch from Google'; }
+      if (btn) { btn.disabled = false; btn.textContent = '\uD83D\uDD04 ' + t('testimFetchFromGoogle', 'Fetch from Google'); }
     }
   }
 
@@ -192,7 +192,7 @@
       var isHomepage = Number(rev.show_on_homepage) === 1;
       starBtn.className = 'text-xl transition hover:scale-110 ' + (isHomepage ? 'text-amber-500' : 'text-gray-300 dark:text-gray-600');
       starBtn.textContent = isHomepage ? '\u2605' : '\u2606';
-      starBtn.title = isHomepage ? 'Remove from homepage' : 'Show on homepage';
+      starBtn.title = isHomepage ? t('testimRemoveHomepage', 'Remove from homepage') : t('testimShowHomepage', 'Show on homepage');
       starBtn.addEventListener('click', function() { toggleHomepage(rev); });
       tdHomepage.appendChild(starBtn);
       tr.appendChild(tdHomepage);
@@ -256,7 +256,7 @@
       if (json.success) {
         rev.show_on_homepage = newValue;
         renderTestimonialsTable();
-        if (typeof showToast === 'function') showToast(newValue ? 'Added to homepage' : 'Removed from homepage');
+        if (typeof showToast === 'function') showToast(newValue ? t('testimAddedHomepage', 'Added to homepage') : t('testimRemovedHomepage', 'Removed from homepage'));
       }
     } catch (err) {
       console.error('toggleHomepage error:', err);
@@ -313,7 +313,7 @@
   async function saveReview() {
     const name = document.getElementById('review-name').value.trim();
     if (!name) {
-      if (typeof showToast === 'function') showToast('Customer name is required', true);
+      if (typeof showToast === 'function') showToast(t('testimNameRequired', 'Customer name is required'), true);
       return;
     }
 
@@ -344,11 +344,11 @@
         editingId = null;
         loadTestimonials();
       } else {
-        if (typeof showToast === 'function') showToast(json.error || 'Save failed', true);
+        if (typeof showToast === 'function') showToast(json.error || t('testimSaveFailed', 'Save failed'), true);
       }
     } catch (err) {
       console.error('saveReview error:', err);
-      if (typeof showToast === 'function') showToast('Network error', true);
+      if (typeof showToast === 'function') showToast(t('testimNetworkError', 'Network error'), true);
     }
   }
 
@@ -383,7 +383,7 @@
 
   // ─── Delete review ──────────────────────────────────────────
   async function deleteReview(id) {
-    if (!confirm('Delete this review? This cannot be undone.')) return;
+    if (!confirm(t('testimDeleteConfirm', 'Delete this review? This cannot be undone.'))) return;
 
     try {
       const res = await fetch(API, {

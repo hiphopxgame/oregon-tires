@@ -344,7 +344,7 @@ function renderRoDetailModal() {
       modal.remove();
       loadRepairOrders();
     } catch (err) {
-      showToast('Failed: ' + err.message, true);
+      showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true);
     }
   });
 
@@ -421,7 +421,7 @@ function renderRoDetailModal() {
       await api('inspections.php', { method: 'POST', body: { repair_order_id: ro.id } });
       showToast(t('roInspectionCreated', 'Inspection created with template items'));
       viewRoDetail(ro.id);
-    } catch(err) { showToast('Failed: ' + err.message, true); }
+    } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
   });
   actions.appendChild(inspBtn);
 
@@ -437,7 +437,7 @@ function renderRoDetailModal() {
       await api('estimates.php', { method: 'POST', body: payload });
       showToast(t('roEstimateCreated', 'Estimate created'));
       viewRoDetail(ro.id);
-    } catch(err) { showToast('Failed: ' + err.message, true); }
+    } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
   });
   actions.appendChild(estBtn);
   body.appendChild(actions);
@@ -487,7 +487,7 @@ function renderRoDetailModal() {
         compBtn.addEventListener('click', (function(iid) { return async function(e) {
           e.stopPropagation();
           try { await api('inspections.php', { method: 'PUT', body: { id: iid, action: 'complete' } }); showToast(t('roInspectionCompleted', 'Inspection completed')); viewRoDetail(ro.id); }
-          catch(err) { showToast('Failed: ' + err.message, true); }
+          catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
         }; })(insp.id));
         iActions.appendChild(compBtn);
       }
@@ -499,7 +499,7 @@ function renderRoDetailModal() {
         sendBtn.addEventListener('click', (function(iid) { return async function(e) {
           e.stopPropagation();
           try { await api('inspections.php', { method: 'PUT', body: { id: iid, action: 'send' } }); showToast(t('roInspectionSent', 'Inspection sent to customer')); viewRoDetail(ro.id); }
-          catch(err) { showToast('Failed: ' + err.message, true); }
+          catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
         }; })(insp.id));
         iActions.appendChild(sendBtn);
 
@@ -511,7 +511,7 @@ function renderRoDetailModal() {
           try {
             await api('inspections.php', { method: 'PUT', body: { id: iid, action: 'send' } });
             showToast(t('roInspectionResent', 'Inspection re-sent to customer'));
-          } catch(err) { showToast('Failed: ' + err.message, true); }
+          } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
         }; })(insp.id));
         iActions.appendChild(resendInspBtn);
       }
@@ -525,7 +525,7 @@ function renderRoDetailModal() {
           try {
             await api('inspections.php', { method: 'PUT', body: { id: iid, action: 'send' } });
             showToast(t('roInspectionResent', 'Inspection re-sent to customer'));
-          } catch(err) { showToast('Failed: ' + err.message, true); }
+          } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
         }; })(insp.id));
         iActions.appendChild(resendSentInspBtn);
       }
@@ -587,7 +587,7 @@ function renderRoDetailModal() {
         sendEstBtn.addEventListener('click', (function(eid) { return async function(e) {
           e.stopPropagation();
           try { await api('estimates.php', { method: 'PUT', body: { id: eid, action: 'send' } }); showToast(t('roEstimateSent', 'Estimate sent to customer')); viewRoDetail(ro.id); }
-          catch(err) { showToast('Failed: ' + err.message, true); }
+          catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
         }; })(est.id));
         eActions.appendChild(sendEstBtn);
       }
@@ -601,7 +601,7 @@ function renderRoDetailModal() {
           try {
             await api('estimates.php', { method: 'PUT', body: { id: eid, action: 'send' } });
             showToast(t('roEstimateResent', 'Estimate re-sent to customer'));
-          } catch(err) { showToast('Failed: ' + err.message, true); }
+          } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
         }; })(est.id));
         eActions.appendChild(resendEstBtn);
       }
@@ -694,7 +694,7 @@ window.roShowCreateModal = function(appointmentId) {
     if (!selectedApptId) { showToast(t('roSelectApptFirst', 'Select an appointment first'), true); return; }
     try {
       var json = await api('repair-orders.php', { method: 'POST', body: { appointment_id: selectedApptId } });
-      showToast('Repair order ' + json.data.ro_number + ' created!');
+      showToast(t('roCreatedMsg', 'Repair order created!'));
       modal.remove();
       loadRepairOrders();
     } catch(err) { showToast(err.message, true); }
@@ -771,7 +771,7 @@ window.roShowCreateModal = function(appointmentId) {
         var cName = ((a.first_name || '') + ' ' + (a.last_name || '')).trim();
         var cVeh = [a.vehicle_year, a.vehicle_make, a.vehicle_model].filter(Boolean).join(' ') || 'No vehicle';
         var cDate = a.preferred_date ? fmtDate(a.preferred_date) : '';
-        confirmArea.textContent = 'Creating RO for ' + cName + ' \u2014 ' + cVeh + ' \u2014 ' + cDate;
+        confirmArea.textContent = t('roCreatingFor', 'Creating RO for') + ' ' + cName + ' \u2014 ' + cVeh + ' \u2014 ' + cDate;
         renderApptList(searchInput.value);
       });
       listWrap.appendChild(row);
@@ -796,7 +796,7 @@ window.roShowCreateModal = function(appointmentId) {
           var cVeh = [match.vehicle_year, match.vehicle_make, match.vehicle_model].filter(Boolean).join(' ') || 'No vehicle';
           var cDate = match.preferred_date ? fmtDate(match.preferred_date) : '';
           confirmArea.classList.remove('hidden');
-          confirmArea.textContent = 'Creating RO for ' + cName + ' \u2014 ' + cVeh + ' \u2014 ' + cDate;
+          confirmArea.textContent = t('roCreatingFor', 'Creating RO for') + ' ' + cName + ' \u2014 ' + cVeh + ' \u2014 ' + cDate;
         }
       }
     }
@@ -847,7 +847,7 @@ window.roShowCreateModal = function(appointmentId) {
     if (concern) payload.customer_concern = concern;
     try {
       var json = await api('repair-orders.php', { method: 'POST', body: payload });
-      showToast('Repair order ' + json.data.ro_number + ' created!');
+      showToast(t('roCreatedMsg', 'Repair order created!'));
       modal.remove();
       loadRepairOrders();
     } catch(err) { showToast(err.message, true); }

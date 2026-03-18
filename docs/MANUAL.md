@@ -37,7 +37,13 @@ growwithmagi@gmail.com
 16. [Site Content & Settings](#16-site-content--settings)
 17. [Account Settings](#17-account-settings)
 18. [Customer-Facing Pages](#18-customer-facing-pages)
-19. [Troubleshooting](#19-troubleshooting)
+19. [Invoices & Receipts](#19-invoices--receipts)
+20. [Loyalty & Referrals](#20-loyalty--referrals)
+21. [Labor Tracking](#21-labor-tracking)
+22. [Waitlist / Walk-In Queue](#22-waitlist--walk-in-queue)
+23. [Tire Quote Requests](#23-tire-quote-requests)
+24. [Push Notifications](#24-push-notifications)
+25. [Troubleshooting](#25-troubleshooting)
 
 ---
 
@@ -602,24 +608,32 @@ Visitors subscribe via the email signup form on the public website.
 ## 15. Analytics
 
 1. Go to the **Analytics** tab.
-2. Review:
+2. The enhanced analytics dashboard (`admin-analytics.js`) provides:
 
 ### Appointment Statistics
 - Total appointments, breakdown by status
 - This week's appointment count
 - Trends over time
 
+### Revenue Tracking
+- Revenue by service type
+- Monthly revenue trends
+- Average ticket value
+
 ### Customer Statistics
 - Total unique customers
 - Returning customer count
+- Customer acquisition metrics
 
 ### Employee Performance
 - Appointments handled per employee
 - Appointments completed per employee
 - Average time per appointment
+- Labor utilization rates
 
 ### Popular Times
 - Most-requested time slots — helps with staffing decisions
+- Day-of-week and time-of-day heatmaps
 
 ---
 
@@ -709,7 +723,138 @@ The public booking form includes:
 
 ---
 
-## 19. Troubleshooting
+## 19. Invoices & Receipts
+
+### Generating an Invoice
+
+1. Open a completed Repair Order.
+2. Click **"Generate Invoice"**.
+3. The system creates an invoice with line items carried from the estimate/RO.
+4. Each invoice gets a unique number.
+5. Review and adjust if needed, then click **Save**.
+
+### Sending to Customer
+
+1. On a completed invoice, click **"Send to Customer"**.
+2. The customer receives an email with a link to view the invoice.
+3. The link uses a secure token — no login required.
+4. The customer invoice page is bilingual (EN/ES) with a print button.
+
+### Managing Invoices
+
+1. Go to **Repair Orders** tab → open an RO → **Invoices** section.
+2. View invoice history, resend links, or generate new invoices.
+3. Admin CRUD available via the invoices management interface.
+
+---
+
+## 20. Loyalty & Referrals
+
+### Loyalty Points
+
+1. Points are automatically earned on completed ROs (points-per-dollar).
+2. View customer point balances in the **Customers** tab.
+3. Manage the rewards catalog via the loyalty management interface:
+   - Create rewards with point costs
+   - Set active/inactive status
+   - Track redemptions
+4. Care plan members earn tier bonus multipliers.
+
+### Referral Program
+
+1. Each customer gets a unique referral code.
+2. New customers can enter a referral code during booking.
+3. The referring customer earns bonus loyalty points when the referral completes service.
+4. Track referral status: pending → completed → rewarded.
+5. Public referral lookup available at `/referral-lookup`.
+
+---
+
+## 21. Labor Tracking
+
+### Logging Labor Hours
+
+1. Open a Repair Order.
+2. In the **Labor** section, click **"Add Labor Entry"**.
+3. Select the technician, labor type (diagnosis, repair, inspection), and enter hours.
+4. Save the entry. Multiple entries per RO are supported.
+
+### Viewing Reports
+
+1. The **Analytics** tab includes labor utilization data.
+2. Track hours logged vs. estimated per RO.
+3. Employee performance metrics show efficiency rates.
+4. The `labor-tracker.js` interface provides real-time tracking.
+
+---
+
+## 22. Waitlist / Walk-In Queue
+
+### Adding a Walk-In
+
+1. When a walk-in customer arrives, add them to the waitlist.
+2. Enter customer name, phone, service needed, and vehicle info.
+3. The system assigns a queue position and estimated wait time.
+
+### Managing the Queue
+
+1. View all waiting customers in queue order.
+2. Drag and drop to reorder if needed.
+3. When ready, mark a customer as "called" — they receive an SMS notification (if Twilio configured).
+4. Mark as "completed" or "no-show" when done.
+
+### Customer Self-Service
+
+Customers can check their waitlist position via `/waitlist` (public API).
+
+---
+
+## 23. Tire Quote Requests
+
+### Receiving Quotes
+
+1. Customers submit tire quote requests from the public website.
+2. Requests appear in the admin panel with vehicle info and desired tire specs.
+3. Each request shows: customer name, vehicle, tire size, quantity, preferred brand.
+
+### Responding to Quotes
+
+1. Open a tire quote request.
+2. Enter the quoted price, tire details, and availability.
+3. Change status from "pending" to "quoted".
+4. The customer receives a notification with the quote details.
+5. Track status: pending → quoted → accepted → expired.
+
+---
+
+## 24. Push Notifications
+
+### How Push Notifications Work
+
+1. Customers can opt in to push notifications via the website (browser prompt).
+2. Notifications are sent automatically for:
+   - Booking confirmations
+   - Appointment reminders (next day)
+   - RO status updates
+   - Vehicle ready for pickup
+3. Notifications are bilingual (EN/ES) based on customer preference.
+
+### Broadcasting Promotions
+
+1. Go to the admin panel.
+2. Use the **Push Broadcast** feature to send a promotional notification to all opted-in subscribers.
+3. Enter the message (English and Spanish).
+4. Broadcasts are limited to 5 per day to prevent spam.
+
+### Managing Subscriptions
+
+- The push notification queue processor runs every 5 minutes via cron.
+- Customers can manage their notification preferences (4 toggles: bookings, reminders, status updates, promotions).
+- Failed notifications are retried automatically.
+
+---
+
+## 25. Troubleshooting
 
 ### "I can't log in."
 

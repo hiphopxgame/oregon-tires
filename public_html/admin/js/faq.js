@@ -34,7 +34,7 @@
       renderFaqTable();
     } catch (err) {
       console.error('loadFaqs error:', err);
-      if (typeof showToast === 'function') showToast('Failed to load FAQs', true);
+      if (typeof showToast === 'function') showToast(t('faqLoadFail', 'Failed to load FAQs'), true);
     }
   }
 
@@ -169,7 +169,7 @@
   async function saveFaq() {
     const questionEn = document.getElementById('faq-question-en').value.trim();
     if (!questionEn) {
-      if (typeof showToast === 'function') showToast('Question (EN) is required', true);
+      if (typeof showToast === 'function') showToast(t('faqQuestionRequired', 'Question (EN) is required'), true);
       return;
     }
 
@@ -199,11 +199,11 @@
         editingId = null;
         loadFaqs();
       } else {
-        if (typeof showToast === 'function') showToast(json.error || 'Save failed', true);
+        if (typeof showToast === 'function') showToast(json.error || t('faqSaveFail', 'Save failed'), true);
       }
     } catch (err) {
       console.error('saveFaq error:', err);
-      if (typeof showToast === 'function') showToast('Network error', true);
+      if (typeof showToast === 'function') showToast(t('faqNetworkError', 'Network error'), true);
     }
   }
 
@@ -237,7 +237,7 @@
 
   // ─── Delete FAQ ─────────────────────────────────────────────
   async function deleteFaq(id) {
-    if (!confirm('Delete this FAQ? This cannot be undone.')) return;
+    if (!confirm(t('faqDeleteConfirm', 'Delete this FAQ? This cannot be undone.'))) return;
 
     try {
       const res = await fetch(API, {

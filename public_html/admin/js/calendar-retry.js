@@ -1,6 +1,10 @@
 // Oregon Tires Admin — Calendar Sync Retry
 // Extracted from admin/index.html inline script
 
+function t(key, fb) {
+  return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fb;
+}
+
 async function retryCalendarSync(appointmentId) {
   try {
     var res = await fetch('/api/admin/calendar-retry-sync.php', {
@@ -11,13 +15,13 @@ async function retryCalendarSync(appointmentId) {
     });
     var json = await res.json();
     if (json.success) {
-      showToast('Calendar sync retried successfully');
+      showToast(t('calSyncRetried', 'Calendar sync retried successfully'));
       loadAppointments();
     } else {
-      showToast(json.error || 'Retry failed', true);
+      showToast(json.error || t('calRetryFailed', 'Retry failed'), true);
     }
   } catch (err) {
     console.error('retryCalendarSync error:', err);
-    showToast('Network error', true);
+    showToast(t('calNetworkError', 'Network error'), true);
   }
 }

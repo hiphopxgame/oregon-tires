@@ -18,7 +18,8 @@
 | Content & Marketing | 6 systems | P2 |
 | Public Website | 4 systems | P2 |
 | Infrastructure | 7 systems | P3 |
-| **Total** | **~32 systems, 90+ API endpoints, 36 pages** | |
+| Roadmap Features (2026-03-17) | 10 systems | P1–P2 |
+| **Total** | **~42 systems, 110+ API endpoints, 36 pages** | |
 
 ---
 
@@ -198,9 +199,13 @@
 
 | Schedule | Script | Purpose |
 |----------|--------|---------|
-| Daily 6:00 PM | `send-reminders.php` | Appointment reminders for next day |
+| Daily 6:00 PM | `send-reminders.php` | Appointment reminders for next day (email + SMS + push) |
 | Daily 10:00 AM | `send-review-requests.php` | Review request emails (completed appointments) |
 | Daily 10:00 AM | `send-estimate-reminders.php` | Estimate expiry reminders (2 days before valid_until) |
+| Daily 6:00 AM | `fetch-google-reviews.php` | Refresh Google Reviews cache |
+| Every 5 min | `send-push-notifications.php` | Push notification queue processor |
+| Mon 9:00 AM | `send-service-reminders.php` | Automated service due date reminders |
+| Mon 7:00 AM | `sync-google-business.php` | Google Business Profile sync |
 | On demand | `send-welcome-emails.php` | Onboarding/welcome emails |
 
 ### Appointment Self-Service
@@ -459,9 +464,120 @@ Local SEO targeting for Portland neighborhoods.
 
 ---
 
+## Group 8: Roadmap Features (shipped 2026-03-17)
+
+### Digital Invoices
+
+**API:** `/api/admin/invoices.php` (admin CRUD), `/api/invoice-view.php` (customer token-based view)
+
+- Generate invoices from completed repair orders
+- Token-based customer view (bilingual, no login required)
+- Invoice number auto-generation
+- Line items carried from estimate/RO
+- Print-friendly layout
+- Table: `oretir_invoices` (migration 042)
+
+### Automated Service Reminders
+
+**API:** `/api/admin/service-reminders.php`
+**CLI:** `cli/send-service-reminders.php` (weekly cron, Mon 9AM)
+
+- Track service due dates per vehicle (oil change, tire rotation, brake check, etc.)
+- Automated email reminders when service is due
+- Admin can create/edit/delete reminders per customer+vehicle
+- Bilingual reminder emails via branded template system
+- Table: `oretir_service_reminders` (migration 043)
+
+### Loyalty & Rewards (Enhanced)
+
+**API:** `/api/admin/loyalty.php`, `/api/admin/loyalty-rewards.php`
+
+- Points-per-dollar on completed ROs
+- Redeemable rewards catalog (admin-managed)
+- Points balance visible in member portal
+- Tier bonuses for care plan members
+- Points ledger with transaction history
+- Tables: `oretir_loyalty_points` (enhanced via migration 044), `oretir_loyalty_rewards` (migration 044)
+
+### Labor Tracking
+
+**API:** `/api/admin/labor.php`
+**Admin JS:** `admin/js/labor-tracker.js`
+
+- Log technician hours per repair order
+- Track labor type (diagnosis, repair, inspection)
+- Efficiency reporting (hours logged vs estimated)
+- Employee performance metrics
+- Table: `oretir_labor_entries` (migration 045)
+
+### Customer Referrals
+
+**API:** `/api/referral-lookup.php` (public), `/api/admin/referrals.php` (if wired)
+
+- Referral code generation per customer
+- Track referral source on new bookings
+- Referral bonus points for referring customer
+- Referral status tracking (pending, completed, rewarded)
+- Table: `oretir_referrals` (migration 046)
+
+### Waitlist / Walk-In Queue
+
+**API:** `/api/admin/waitlist.php` (admin), `/api/waitlist.php` (public)
+
+- Walk-in customer queue management
+- Estimated wait time tracking
+- SMS notification when ready (via Twilio)
+- Queue position display
+- Admin drag-and-drop queue reordering
+- Table: `oretir_waitlist` (migration 047)
+
+### Tire Quote Requests
+
+**API:** `/api/admin/tire-quotes.php` (admin), `/api/tire-quote.php` (public)
+
+- Customer-facing tire quote request form
+- Captures vehicle info + desired tire specs
+- Admin quote response workflow
+- Quote status tracking (pending, quoted, accepted, expired)
+- Table: `oretir_tire_quotes` (migration 048)
+
+### Enhanced Analytics
+
+**API:** `/api/admin/analytics.php` (enhanced)
+**Admin JS:** `admin/js/admin-analytics.js`
+
+- Revenue tracking and trends
+- Service type breakdown
+- Customer acquisition metrics
+- Employee utilization rates
+- Appointment conversion funnel
+- Time-of-day and day-of-week heatmaps
+
+### Google Business Sync
+
+**API:** `/api/admin/google-business-sync.php`
+**CLI:** `cli/sync-google-business.php` (weekly cron, Mon 7AM)
+
+- Sync business hours, services, and info to Google Business Profile
+- Pull latest Google reviews into local cache
+- Track sync status and errors
+- Manual sync trigger from admin panel
+
+### Visit Tracking
+
+**API:** `/api/admin/visit-log.php`
+**Admin JS:** `admin/js/visit-tracker.js`
+
+- Log customer walk-in visits
+- Track visit purpose and outcome
+- Visit history per customer
+- Admin dashboard widget for daily visit count
+
+---
+
 ## Database Tables
 
-**Prefix:** `oretir_`
+**Prefix:** `oretir_` | **52 migration files** | **~45 tables**
 
 ### Core Tables
 
@@ -476,6 +592,8 @@ Local SEO targeting for Portland neighborhoods.
 | `oretir_rate_limits` | API rate limiting |
 | `oretir_gallery_images` | Promotions/gallery |
 | `oretir_service_images` | Service card images |
+| `oretir_subscribers` | Email newsletter subscribers |
+| `oretir_blog_posts` | Blog articles |
 
 ### Shop Management Tables
 
@@ -485,6 +603,7 @@ Local SEO targeting for Portland neighborhoods.
 | `oretir_vehicles` | Vehicles linked to customers (VIN, year/make/model, tires) |
 | `oretir_vin_cache` | Permanent NHTSA vPIC decode cache |
 | `oretir_tire_fitment_cache` | Tire fitment lookup cache (90-day TTL) |
+| `oretir_plate_cache` | License plate → vehicle lookup cache |
 | `oretir_repair_orders` | RO lifecycle (11 statuses) |
 | `oretir_inspections` | Digital vehicle inspections |
 | `oretir_inspection_items` | DVI line items with traffic light ratings |
@@ -492,11 +611,49 @@ Local SEO targeting for Portland neighborhoods.
 | `oretir_estimates` | Estimates with approval tokens (8 statuses) |
 | `oretir_estimate_items` | Estimate line items (6 types) |
 
+### Features Tables (migrations 017–036)
+
+| Table | Purpose |
+|-------|---------|
+| `oretir_promotions` | Promotional offers (image, placement targeting) |
+| `oretir_care_plans` | Service care plan definitions |
+| `oretir_care_plan_subscriptions` | Customer care plan enrollments |
+| `oretir_faq` | FAQ entries (bilingual seed) |
+| `oretir_testimonials` | Customer testimonials |
+| `oretir_calendar_sync` | Google Calendar sync tracking |
+| `oretir_google_reviews` | Cached Google Business reviews |
+| `oretir_employee_schedules` | Employee work schedules |
+| `oretir_employee_skills` | Employee skill/certification tracking |
+| `oretir_task_summary` | Daily task summaries for employee dashboard |
+| `oretir_conversations` | Messaging threads (admin↔customer) |
+| `oretir_messages` | Individual messages within conversations |
+| `oretir_loyalty_points` | Customer loyalty point ledger |
+
+### Roadmap Tables (migrations 037–048)
+
+| Table | Purpose |
+|-------|---------|
+| `oretir_invoices` | Digital invoices from completed ROs |
+| `oretir_service_reminders` | Automated service due date tracking |
+| `oretir_loyalty_rewards` | Redeemable loyalty rewards catalog |
+| `oretir_labor_entries` | Technician labor hours per RO |
+| `oretir_referrals` | Customer referral tracking |
+| `oretir_waitlist` | Walk-in queue management |
+| `oretir_tire_quotes` | Tire quote requests and responses |
+
+### PWA & Push Notifications (migrations 049–052)
+
+| Table | Purpose |
+|-------|---------|
+| `oretir_push_subscriptions` | Web Push subscription storage |
+| `oretir_notification_queue` | Bilingual notification queue with targeting + retry |
+| `oretir_offline_sync_log` | Offline form submission deduplication |
+
 ---
 
 ## API Endpoint Summary
 
-### Public Endpoints (~28)
+### Public Endpoints (~33)
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
@@ -511,12 +668,16 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/plate-lookup.php` | GET | License plate lookup (rate limited) |
 | `/api/inspection-view.php` | GET | Customer DVI report (token) |
 | `/api/estimate-approve.php` | GET/POST | Estimate view + approval (token) |
+| `/api/invoice-view.php` | GET | Customer invoice view (token) |
 | `/api/blog.php` | GET | Blog posts |
 | `/api/testimonials.php` | GET | Customer reviews |
 | `/api/promotions.php` | GET | Active promotions |
 | `/api/faq.php` | GET | FAQ items |
 | `/api/feedback.php` | POST | Submit feedback |
 | `/api/subscribe.php` | POST | Newsletter signup |
+| `/api/referral-lookup.php` | GET | Referral code lookup |
+| `/api/tire-quote.php` | POST | Submit tire quote request |
+| `/api/waitlist.php` | GET/POST | Join/check waitlist |
 | `/api/appointment-cancel.php` | POST | Cancel appointment (token) |
 | `/api/appointment-reschedule.php` | POST | Reschedule appointment (token) |
 | `/api/appointment-status.php` | GET | Check appointment status |
@@ -524,9 +685,12 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/care-plan-enroll.php` | POST | Care plan enrollment |
 | `/api/care-plan-status.php` | GET | Care plan status |
 | `/api/care-plan-webhook.php` | POST | Care plan webhook |
+| `/api/push-vapid-key.php` | GET | VAPID public key for push |
+| `/api/push-subscribe.php` | POST/PUT/DELETE | Push subscription CRUD |
+| `/api/offline-sync.php` | POST | Offline form replay |
 | `/api/health.php` | GET | Health check |
 
-### Admin Endpoints (~34, session auth + CSRF)
+### Admin Endpoints (~47, session auth + CSRF)
 
 | Endpoint | Purpose |
 |----------|---------|
@@ -535,26 +699,40 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/admin/inspections.php` | Inspection CRUD + complete + send |
 | `/api/admin/inspection-photos.php` | Photo upload/delete |
 | `/api/admin/estimates.php` | Estimate CRUD + auto-generate + send |
+| `/api/admin/invoices.php` | Invoice CRUD + generate from RO |
 | `/api/admin/customers.php` | Customer CRUD + search |
 | `/api/admin/vehicles.php` | Vehicle CRUD per customer |
 | `/api/admin/vin-decode.php` | VIN decode (no rate limit) |
 | `/api/admin/tire-fitment.php` | Tire fitment (no rate limit) |
+| `/api/admin/labor.php` | Labor hours tracking per RO |
+| `/api/admin/loyalty.php` | Loyalty points management |
+| `/api/admin/loyalty-rewards.php` | Loyalty rewards catalog |
+| `/api/admin/service-reminders.php` | Service reminder management |
+| `/api/admin/referrals.php` | Referral tracking (if wired) |
+| `/api/admin/waitlist.php` | Walk-in queue management |
+| `/api/admin/tire-quotes.php` | Tire quote request management |
+| `/api/admin/visit-log.php` | Visit tracking log |
+| `/api/admin/google-business-sync.php` | Google Business Profile sync |
+| `/api/admin/business-hours.php` | Business hours configuration |
 | `/api/admin/blog.php` | Blog post management |
 | `/api/admin/promotions.php` | Promotion management |
 | `/api/admin/faq.php` | FAQ management |
 | `/api/admin/testimonials.php` | Review management |
 | `/api/admin/subscribers.php` | Subscriber list |
 | `/api/admin/employees.php` | Employee CRUD |
+| `/api/admin/schedules.php` | Employee schedules |
+| `/api/admin/conversations.php` | Messaging management |
 | `/api/admin/gallery.php` | Gallery image management |
 | `/api/admin/service-images.php` | Service image slots |
 | `/api/admin/messages.php` | Contact message management |
 | `/api/admin/email-logs.php` | Email audit trail |
 | `/api/admin/email-template-vars.php` | Template variable reference |
-| `/api/admin/analytics.php` | Analytics data |
+| `/api/admin/analytics.php` | Enhanced analytics dashboard |
 | `/api/admin/export.php` | Data export |
 | `/api/admin/site-settings.php` | Site configuration |
 | `/api/admin/account.php` | Admin account management |
 | `/api/admin/admins.php` | Admin user management |
+| `/api/admin/push-broadcast.php` | Push notification broadcast |
 | `/api/admin/login.php` | Admin login |
 | `/api/admin/logout.php` | Admin logout |
 | `/api/admin/session.php` | Session validation |
@@ -605,4 +783,4 @@ Local SEO targeting for Portland neighborhoods.
 
 ---
 
-*Generated from codebase review. Last updated 2026-03-17.*
+*Generated from codebase review. Last updated 2026-03-18.*

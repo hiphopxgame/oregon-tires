@@ -234,7 +234,7 @@ var LaborTracker = {
 
     var empName = document.createElement('span');
     empName.className = 'font-bold text-gray-900 dark:text-white text-sm';
-    empName.textContent = entry.employee_name || ('Employee #' + entry.employee_id);
+    empName.textContent = entry.employee_name || (t('laborEmployeeNum', 'Employee #') + entry.employee_id);
     info.appendChild(empName);
 
     if (entry.task_description) {
@@ -305,7 +305,7 @@ var LaborTracker = {
     // Employee (col-span-2)
     var empCell = document.createElement('div');
     empCell.className = 'col-span-2 font-medium text-gray-900 dark:text-white truncate';
-    empCell.textContent = entry.employee_name || ('Employee #' + entry.employee_id);
+    empCell.textContent = entry.employee_name || (t('laborEmployeeNum', 'Employee #') + entry.employee_id);
     empCell.title = entry.employee_name || '';
     row.appendChild(empCell);
 
@@ -492,5 +492,97 @@ var LaborTracker = {
 
 // Expose globally
 window.LaborTracker = LaborTracker;
+
+// ─── Cross-RO Labor Summary (for dedicated Labor tab) ──────────────────────
+window.loadLaborSummary = async function() {
+  var container = document.getElementById('labor-container');
+  if (!container) return;
+  container.textContent = '';
+
+  var loadingEl = document.createElement('p');
+  loadingEl.className = 'text-gray-400 dark:text-gray-500 text-center py-8';
+  loadingEl.textContent = t('laborSummaryLoading', 'Loading labor summary...');
+  container.appendChild(loadingEl);
+
+  try {
+    var res = await fetch('/api/admin/labor.php?summary=1', { credentials: 'include' });
+    var json = await res.json();
+    container.textContent = '';
+
+    if (!json.success || !json.data || json.data.length === 0) {
+      var empty = document.createElement('p');
+      empty.className = 'text-gray-400 dark:text-gray-500 text-center py-8';
+      empty.textContent = t('laborSummaryNoData', 'No labor data available.');
+      container.appendChild(empty);
+      return;
+    }
+
+    // Summary table
+    var table = document.createElement('div');
+    table.className = 'bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden';
+
+    var thead = document.createElement('div');
+    thead.className = 'grid grid-cols-6 gap-2 bg-gray-50 dark:bg-gray-900/50 px-6 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider';
+    [t('laborSummaryEmployee', 'Employee'), t('laborSummaryTotalHrs', 'Total Hours'), t('laborSummaryBillableHrs', 'Billable Hours'), t('laborSummaryActiveClocks', 'Active Clocks'), t('laborSummaryRoCount', 'RO Count'), ''].forEach(function(text) {
+      var th = document.createElement('div');
+      th.textContent = text;
+      thead.appendChild(th);
+    });
+    table.appendChild(thead);
+
+    json.data.forEach(function(row) {
+      var tr = document.createElement('div');
+      tr.className = 'grid grid-cols-6 gap-2 px-6 py-3 border-t border-gray-100 dark:border-gray-700 text-sm items-center hover:bg-gray-50 dark:hover:bg-gray-800/50 transition';
+
+      var nameCell = document.createElement('div');
+      nameCell.className = 'font-medium text-gray-900 dark:text-white';
+      nameCell.textContent = row.employee_name || 'Unknown';
+      tr.appendChild(nameCell);
+
+      var totalCell = document.createElement('div');
+      totalCell.className = 'text-gray-700 dark:text-gray-300';
+      totalCell.textContent = (row.total_hours || 0).toFixed(1) + 'h';
+      tr.appendChild(totalCell);
+
+      var billCell = document.createElement('div');
+      billCell.className = 'text-green-600 dark:text-green-400 font-medium';
+      billCell.textContent = (row.billable_hours || 0).toFixed(1) + 'h';
+      tr.appendChild(billCell);
+
+      var activeCell = document.createElement('div');
+      if (row.active_count > 0) {
+        var dot = document.createElement('span');
+        dot.className = 'inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1';
+        activeCell.appendChild(dot);
+        var actText = document.createElement('span');
+        actText.textContent = row.active_count;
+        activeCell.appendChild(actText);
+      } else {
+        activeCell.textContent = '-';
+        activeCell.className = 'text-gray-400';
+      }
+      tr.appendChild(activeCell);
+
+      var roCell = document.createElement('div');
+      roCell.className = 'text-gray-600 dark:text-gray-400';
+      roCell.textContent = row.ro_count || '-';
+      tr.appendChild(roCell);
+
+      var emptyCell = document.createElement('div');
+      tr.appendChild(emptyCell);
+
+      table.appendChild(tr);
+    });
+
+    container.appendChild(table);
+  } catch (err) {
+    container.textContent = '';
+    var errEl = document.createElement('p');
+    errEl.className = 'text-red-500 text-center py-8';
+    errEl.textContent = t('laborSummaryError', 'Error loading labor summary');
+    container.appendChild(errEl);
+    console.error('Labor summary error:', err);
+  }
+};
 
 })();

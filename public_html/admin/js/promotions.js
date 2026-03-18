@@ -48,7 +48,7 @@
       renderPromotionsTable();
     } catch (err) {
       console.error('loadPromotions error:', err);
-      if (typeof showToast === 'function') showToast('Failed to load promotions', true);
+      if (typeof showToast === 'function') showToast(t('promoLoadFail', 'Failed to load promotions'), true);
     }
   }
 
@@ -160,8 +160,8 @@
       // Date range cell
       const tdDates = document.createElement('td');
       tdDates.className = 'px-4 py-3 text-sm text-gray-600 dark:text-gray-400';
-      const startStr = promo.starts_at ? new Date(promo.starts_at).toLocaleDateString() : 'Always';
-      const endStr = promo.ends_at ? new Date(promo.ends_at).toLocaleDateString() : 'Never';
+      const startStr = promo.starts_at ? new Date(promo.starts_at).toLocaleDateString() : t('promoAlways', 'Always');
+      const endStr = promo.ends_at ? new Date(promo.ends_at).toLocaleDateString() : t('promoNever', 'Never');
       tdDates.textContent = startStr + ' — ' + endStr;
       tr.appendChild(tdDates);
 
@@ -373,7 +373,7 @@
   async function savePromotion() {
     const titleEn = document.getElementById('promo-title-en').value.trim();
     if (!titleEn) {
-      if (typeof showToast === 'function') showToast('Title (EN) is required', true);
+      if (typeof showToast === 'function') showToast(t('promoTitleRequired', 'Title (EN) is required'), true);
       return;
     }
 
@@ -398,11 +398,11 @@
         editingId = null;
         loadPromotions();
       } else {
-        if (typeof showToast === 'function') showToast(json.error || 'Save failed', true);
+        if (typeof showToast === 'function') showToast(json.error || t('promoSaveFail', 'Save failed'), true);
       }
     } catch (err) {
       console.error('savePromotion error:', err);
-      if (typeof showToast === 'function') showToast('Network error', true);
+      if (typeof showToast === 'function') showToast(t('promoNetworkError', 'Network error'), true);
     }
   }
 
@@ -458,7 +458,7 @@
 
   // ─── Delete promotion ─────────────────────────────────────────
   async function deletePromotion(id) {
-    if (!confirm('Delete this promotion? This cannot be undone.')) return;
+    if (!confirm(t('promoDeleteConfirm', 'Delete this promotion? This cannot be undone.'))) return;
 
     try {
       const res = await fetch(API + '?id=' + id, {

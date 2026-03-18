@@ -45,10 +45,10 @@ function timeAgo(dateStr) {
   var hours   = Math.floor(minutes / 60);
   var days    = Math.floor(hours / 24);
 
-  if (days > 0)    return days + 'd ago';
-  if (hours > 0)   return hours + 'h ago';
-  if (minutes > 0) return minutes + 'm ago';
-  return 'just now';
+  if (days > 0)    return days + t('kanbanTimeDayAgo', 'd ago');
+  if (hours > 0)   return hours + t('kanbanTimeHrAgo', 'h ago');
+  if (minutes > 0) return minutes + t('kanbanTimeMinAgo', 'm ago');
+  return t('kanbanTimeJustNow', 'just now');
 }
 
 function abbreviateVehicle(year, make, model) {

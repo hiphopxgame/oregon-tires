@@ -136,17 +136,23 @@ function initMemberKit(PDO $pdo): void
             }
         }
 
+        // Auto-link customer record if exists
+        if ($email !== '') {
+            try {
+                $pdo->prepare('UPDATE oretir_customers SET member_id = ? WHERE email = ? AND member_id IS NULL')
+                    ->execute([$memberId, $email]);
+            } catch (\Throwable $e) {
+                error_log('Customer-member link failed: ' . $e->getMessage());
+            }
+        }
+
         // Persist role to members table + session
         $_SESSION['dashboard_role'] = $detectedRole;
         try {
             $pdo->prepare('UPDATE members SET role = ?, is_admin = ? WHERE id = ?')
                 ->execute([$detectedRole, $detectedRole === 'admin' ? 1 : 0, $memberId]);
         } catch (\Throwable $e) {
-            // role column may not exist yet (pre-migration)
-            if ($detectedRole === 'admin') {
-                $pdo->prepare('UPDATE members SET is_admin = 1 WHERE id = ?')
-                    ->execute([$memberId]);
-            }
+            error_log("Failed to persist role for member $memberId: " . $e->getMessage());
         }
 
         // Cross-site activity reporting (fire-and-forget)

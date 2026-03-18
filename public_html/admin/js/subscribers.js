@@ -225,7 +225,7 @@
 
   // ─── Unsubscribe ──────────────────────────────────────────────
   window.unsubscribeSubscriber = async function(id, btn) {
-    if (!confirm('Are you sure you want to unsubscribe this subscriber?')) return;
+    if (!confirm(t('subscriberConfirmUnsub', 'Are you sure you want to unsubscribe this subscriber?'))) return;
 
     if (btn) btn.disabled = true;
     try {

@@ -70,7 +70,7 @@
     blogFetch(url)
       .then(function (res) {
         if (!res.success) {
-          if (typeof showToast === 'function') showToast('Failed to load blog posts', true);
+          if (typeof showToast === 'function') showToast(t('blogLoadFail', 'Failed to load blog posts'), true);
           return;
         }
 
@@ -84,7 +84,7 @@
       })
       .catch(function (err) {
         console.error('Blog load error:', err);
-        if (typeof showToast === 'function') showToast('Error loading blog posts', true);
+        if (typeof showToast === 'function') showToast(t('blogLoadError', 'Error loading blog posts'), true);
       });
   };
 
@@ -305,11 +305,11 @@
     var bodyEn = document.getElementById('blog-body-en').value.trim();
 
     if (!titleEn) {
-      if (typeof showToast === 'function') showToast('Title (EN) is required', true);
+      if (typeof showToast === 'function') showToast(t('blogTitleRequired', 'Title (EN) is required'), true);
       return;
     }
     if (!bodyEn) {
-      if (typeof showToast === 'function') showToast('Body (EN) is required', true);
+      if (typeof showToast === 'function') showToast(t('blogBodyRequired', 'Body (EN) is required'), true);
       return;
     }
 
@@ -338,35 +338,35 @@
     blogFetch('/api/admin/blog.php', { method: method, body: payload })
       .then(function (res) {
         if (res.success) {
-          if (typeof showToast === 'function') showToast(editingPostId ? 'Post updated!' : 'Post created!');
+          if (typeof showToast === 'function') showToast(editingPostId ? t('blogPostUpdated', 'Post updated!') : t('blogPostCreated', 'Post created!'));
           closeBlogEditor();
           loadBlogPosts(blogCurrentPage);
         } else {
-          if (typeof showToast === 'function') showToast(res.error || 'Failed to save', true);
+          if (typeof showToast === 'function') showToast(res.error || t('blogSaveFail', 'Failed to save'), true);
         }
       })
       .catch(function (err) {
         console.error('Blog save error:', err);
-        if (typeof showToast === 'function') showToast('Error saving post', true);
+        if (typeof showToast === 'function') showToast(t('blogSaveError', 'Error saving post'), true);
       });
   };
 
   // ── Delete Post ──────────────────────────────────────────────────
   window.deleteBlogPost = function (id, title) {
-    if (!confirm('Delete "' + (title || 'this post') + '"? This cannot be undone.')) return;
+    if (!confirm(t('blogDeleteConfirm', 'Delete "{title}"? This cannot be undone.').replace('{title}', title || 'this post'))) return;
 
     blogFetch('/api/admin/blog.php?id=' + id, { method: 'DELETE' })
       .then(function (res) {
         if (res.success) {
-          if (typeof showToast === 'function') showToast('Post deleted');
+          if (typeof showToast === 'function') showToast(t('blogPostDeleted', 'Post deleted'));
           loadBlogPosts(blogCurrentPage);
         } else {
-          if (typeof showToast === 'function') showToast(res.error || 'Failed to delete', true);
+          if (typeof showToast === 'function') showToast(res.error || t('blogDeleteFail', 'Failed to delete'), true);
         }
       })
       .catch(function (err) {
         console.error('Blog delete error:', err);
-        if (typeof showToast === 'function') showToast('Error deleting post', true);
+        if (typeof showToast === 'function') showToast(t('blogDeleteError', 'Error deleting post'), true);
       });
   };
 

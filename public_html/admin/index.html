@@ -227,14 +227,15 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
       padding: 0.5rem;
       z-index: 50;
-      margin-top: 0.25rem;
+      padding-top: 0.25rem;
     }
     .dark .nav-dropdown {
       background: #1f2937;
       box-shadow: 0 10px 25px rgba(0,0,0,0.4);
     }
     .nav-group:hover > .nav-dropdown,
-    .nav-group:focus-within > .nav-dropdown { display: block; }
+    .nav-group:focus-within > .nav-dropdown,
+    .nav-group.open > .nav-dropdown { display: block; }
     .nav-dropdown-item {
       display: block;
       width: 100%;
@@ -370,7 +371,7 @@
         <label for="login-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="passwordLabel">Password</label>
         <div class="relative">
           <input type="password" id="login-password" required class="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
-          <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm" aria-label="Toggle password visibility">Show</button>
+          <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm" aria-label="Toggle password visibility" data-t="passwordShow">Show</button>
         </div>
       </div>
       <button type="submit" id="login-btn" data-t="signIn" class="w-full bg-brand-light text-white py-3 rounded-lg font-semibold hover:opacity-90 transition">Sign In</button>
@@ -627,9 +628,9 @@
               <div id="cal-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
               <!-- Legend -->
               <div class="mt-4 pt-3 border-t text-xs text-gray-500 dark:text-gray-400 space-y-1">
-                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-green-100 border-2 border-green-500"></div> Has appointments</div>
-                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded ring-2 ring-amber-500"></div> Today</div>
-                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-brand"></div> Selected</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-green-100 border-2 border-green-500"></div> <span data-t="apptCalHasAppts">Has appointments</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded ring-2 ring-amber-500"></div> <span data-t="apptCalToday">Today</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-brand"></div> <span data-t="apptCalSelected">Selected</span></div>
                 <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-red-100 border-2 border-red-400"></div> <span data-t="schedShopClosed">Shop Closed</span></div>
               </div>
             </div>
@@ -655,10 +656,10 @@
               <option value="all" data-t="apptStatusAll">All Status</option><option value="new" data-t="apptStatusNew">New</option><option value="confirmed" data-t="apptStatusConfirmed">Confirmed</option><option value="completed" data-t="apptStatusCompleted">Completed</option><option value="cancelled" data-t="apptStatusCancelled">Cancelled</option>
             </select>
             <select id="appt-month" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
-              <option value="all">All Months</option>
+              <option value="all" data-t="apptAllMonths">All Months</option>
             </select>
             <select id="appt-per-page" onchange="apptPage=1;renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
-              <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="all">All</option>
+              <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="all" data-t="apptPerPageAll">All</option>
             </select>
           </div>
           <!-- Bulk Action Toolbar -->
@@ -725,22 +726,22 @@
           <div class="flex justify-between items-center mb-4">
             <div class="flex gap-2 flex-wrap">
               <select id="conv-status-filter" onchange="loadConversations()" class="border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
-                <option value="">All Status</option>
-                <option value="open">Open</option>
-                <option value="waiting_reply">Waiting Reply</option>
-                <option value="resolved">Resolved</option>
-                <option value="closed">Closed</option>
+                <option value="" data-t="msgAllStatus">All Status</option>
+                <option value="open" data-t="msgOpen">Open</option>
+                <option value="waiting_reply" data-t="msgWaitingReply">Waiting Reply</option>
+                <option value="resolved" data-t="msgResolved">Resolved</option>
+                <option value="closed" data-t="msgClosed">Closed</option>
               </select>
               <select id="conv-source-filter" onchange="loadConversations()" class="border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
                 <option value="" data-t="allSources">All Sources</option>
-                <option value="web">Web</option>
-                <option value="email">Email</option>
+                <option value="web" data-t="msgWeb">Web</option>
+                <option value="email" data-t="msgEmail">Email</option>
               </select>
-              <label class="flex items-center gap-1 text-sm"><input type="checkbox" id="conv-unread-filter" onchange="loadConversations()"> Unread only</label>
+              <label class="flex items-center gap-1 text-sm"><input type="checkbox" id="conv-unread-filter" onchange="loadConversations()"> <span data-t="msgUnreadOnly">Unread only</span></label>
             </div>
             <div class="flex gap-2">
               <button onclick="checkEmail()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="checkEmail">Check Email</button>
-              <button onclick="loadConversations()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">↻ Refresh</button>
+              <button onclick="loadConversations()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="msgRefresh">↻ Refresh</button>
             </div>
           </div>
           <div id="conversations-list" class="space-y-3"></div>
@@ -750,14 +751,14 @@
             <div id="conv-detail-messages" class="space-y-3 mb-4 max-h-96 overflow-y-auto"></div>
             <div id="conv-email-info" class="hidden mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm dark:bg-blue-900/30 dark:border-blue-700"></div>
             <div class="flex gap-2">
-              <textarea id="conv-reply-input" rows="3" class="flex-1 border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" placeholder="Type your reply..."></textarea>
+              <textarea id="conv-reply-input" rows="3" class="flex-1 border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" data-t="msgReplyPlaceholder" placeholder="Type your reply..."></textarea>
               <div class="flex flex-col gap-2">
-                <button onclick="sendAdminReply()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">Send</button>
+                <button onclick="sendAdminReply()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="msgSend">Send</button>
                 <select id="conv-status-select" onchange="updateConvStatus()" class="border rounded-lg px-2 py-1 text-xs dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
-                  <option value="">Status...</option>
-                  <option value="resolved">Resolve</option>
-                  <option value="closed">Close</option>
-                  <option value="open">Reopen</option>
+                  <option value="" data-t="msgStatusPlaceholder">Status...</option>
+                  <option value="resolved" data-t="msgResolve">Resolve</option>
+                  <option value="closed" data-t="msgClose">Close</option>
+                  <option value="open" data-t="msgReopen">Reopen</option>
                 </select>
               </div>
             </div>
@@ -789,10 +790,10 @@
             <thead><tr class="bg-amber-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
               <th class="p-3" data-t="thCustomer">Customer</th>
               <th class="p-3" data-t="thContact">Contact</th>
-              <th class="p-3">Vehicle</th>
+              <th class="p-3" data-t="custVehicle">Vehicle</th>
               <th class="p-3" data-t="totalVisits">Visits</th>
               <th class="p-3" data-t="lastVisit">Last Visit</th>
-              <th class="p-3">Services</th>
+              <th class="p-3" data-t="custServices">Services</th>
               <th class="p-3" data-t="thActions">Actions</th>
             </tr></thead>
             <tbody id="customers-table"></tbody>
@@ -806,9 +807,9 @@
       <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
         <div><h2 class="text-2xl font-bold">🔧 <span data-t="repairOrders">Repair Orders</span></h2><p class="text-green-100" data-t="roSubtitle">Manage repair orders, inspections, and estimates</p></div>
         <div class="flex items-center gap-3">
-          <button onclick="roShowCreateModal()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30">+ New RO</button>
+          <button onclick="roShowCreateModal()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30" data-t="roNewRo">+ New RO</button>
           <button onclick="exportRepairOrdersCsv()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30" data-t="exportCsv">Export CSV</button>
-          <button onclick="loadRepairOrders()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30">↻ Refresh</button>
+          <button onclick="loadRepairOrders()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30" data-t="roRefresh">↻ Refresh</button>
         </div>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
@@ -858,9 +859,9 @@
         <div id="add-employee-form" class="hidden mb-6 p-4 border rounded-lg bg-gray-50 dark:bg-gray-700">
           <h4 class="font-medium mb-3" data-t="addNewEmployee">Add New Employee</h4>
           <div class="grid md:grid-cols-4 gap-3">
-            <div><label class="text-sm font-medium dark:text-gray-300" data-t="nameRequired">Name *</label><input id="new-emp-name" class="w-full p-2 border rounded mt-1" placeholder="Employee name"></div>
-            <div><label class="text-sm font-medium dark:text-gray-300" data-t="emailLabel2">Email</label><input id="new-emp-email" type="email" class="w-full p-2 border rounded mt-1" placeholder="email@example.com"></div>
-            <div><label class="text-sm font-medium dark:text-gray-300" data-t="phone">Phone</label><input id="new-emp-phone" class="w-full p-2 border rounded mt-1" placeholder="(555) 123-4567"></div>
+            <div><label class="text-sm font-medium dark:text-gray-300" data-t="nameRequired">Name *</label><input id="new-emp-name" class="w-full p-2 border rounded mt-1" data-t="empNamePlaceholder" placeholder="Employee name"></div>
+            <div><label class="text-sm font-medium dark:text-gray-300" data-t="emailLabel2">Email</label><input id="new-emp-email" type="email" class="w-full p-2 border rounded mt-1" data-t="empEmailPlaceholder" placeholder="email@example.com"></div>
+            <div><label class="text-sm font-medium dark:text-gray-300" data-t="phone">Phone</label><input id="new-emp-phone" class="w-full p-2 border rounded mt-1" data-t="empPhonePlaceholder" placeholder="(555) 123-4567"></div>
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="role">Role</label><select id="new-emp-role" class="w-full p-2 border rounded mt-1"><option value="Employee" data-t="roleEmployee">Employee</option><option value="Manager" data-t="roleManager">Manager</option></select></div>
           </div>
           <div class="flex gap-2 mt-3">
@@ -872,26 +873,26 @@
         <div id="add-admin-form" class="hidden mb-6 p-4 border rounded-lg bg-blue-50 dark:bg-blue-900/30">
           <h4 class="font-medium mb-3" data-t="createAdminAccount">Create Admin Account</h4>
           <div class="grid md:grid-cols-2 gap-3 mb-3">
-            <div><label class="text-sm font-medium dark:text-gray-300">Email Address *</label><input id="new-admin-email" type="email" class="w-full p-2 border rounded mt-1" placeholder="admin@company.com"></div>
-            <div><label class="text-sm font-medium dark:text-gray-300">Display Name *</label><input id="new-admin-name" class="w-full p-2 border rounded mt-1" placeholder="Full name"></div>
-            <div><label class="text-sm font-medium dark:text-gray-300">Role</label>
+            <div><label class="text-sm font-medium dark:text-gray-300" data-t="empEmailLabel">Email Address *</label><input id="new-admin-email" type="email" class="w-full p-2 border rounded mt-1" placeholder="admin@company.com"></div>
+            <div><label class="text-sm font-medium dark:text-gray-300" data-t="empDisplayName">Display Name *</label><input id="new-admin-name" class="w-full p-2 border rounded mt-1" placeholder="Full name"></div>
+            <div><label class="text-sm font-medium dark:text-gray-300" data-t="empRoleLabel">Role</label>
               <select id="new-admin-role" class="w-full p-2 border rounded mt-1">
-                <option value="admin">Admin</option>
-                <option value="superadmin">Super Admin</option>
+                <option value="admin" data-t="empAdminRole">Admin</option>
+                <option value="superadmin" data-t="empSuperAdmin">Super Admin</option>
               </select>
             </div>
-            <div><label class="text-sm font-medium dark:text-gray-300">Language Preference / Idioma</label>
+            <div><label class="text-sm font-medium dark:text-gray-300" data-t="empLangPref">Language Preference / Idioma</label>
               <select id="new-admin-language" class="w-full p-2 border rounded mt-1">
-                <option value="es">🇲🇽 Español (Primary)</option>
-                <option value="en">🇺🇸 English (Primary)</option>
-                <option value="both" selected>🌐 Both / Ambos</option>
+                <option value="es" data-t="empLangEs">🇲🇽 Español (Primary)</option>
+                <option value="en" data-t="empLangEn">🇺🇸 English (Primary)</option>
+                <option value="both" selected data-t="empLangBoth">🌐 Both / Ambos</option>
               </select>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Primary language appears first in bilingual emails</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" data-t="empLangHelp">Primary language appears first in bilingual emails</p>
             </div>
           </div>
           <div class="flex gap-2">
-            <button onclick="addAdmin()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">🛡 Create & Send Invite</button>
-            <button onclick="toggleAddAdminForm()" class="border px-4 py-2 rounded-lg text-sm">Cancel</button>
+            <button onclick="addAdmin()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm" data-t="empCreateInvite">🛡 Create & Send Invite</button>
+            <button onclick="toggleAddAdminForm()" class="border px-4 py-2 rounded-lg text-sm" data-t="empCancelAdmin">Cancel</button>
           </div>
         </div>
         <div id="employees-content"></div>
@@ -901,9 +902,9 @@
           <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
             <h2 class="text-xl font-bold" data-t="schedWorkSchedules">Work Schedules</h2>
             <div class="flex gap-2">
-              <button onclick="showScheduleView('weekly')" id="sched-btn-weekly" class="bg-white text-brand-light px-3 py-1.5 rounded-lg text-sm font-medium">Weekly</button>
-              <button onclick="showScheduleView('daily')" id="sched-btn-daily" class="border border-white/40 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/10">Daily</button>
-              <button onclick="showScheduleView('overrides')" id="sched-btn-overrides" class="border border-white/40 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/10">Overrides</button>
+              <button onclick="showScheduleView('weekly')" id="sched-btn-weekly" class="bg-white text-brand-light px-3 py-1.5 rounded-lg text-sm font-medium" data-t="schedWeekly">Weekly</button>
+              <button onclick="showScheduleView('daily')" id="sched-btn-daily" class="border border-white/40 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/10" data-t="schedDaily">Daily</button>
+              <button onclick="showScheduleView('overrides')" id="sched-btn-overrides" class="border border-white/40 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/10" data-t="schedOverridesBtn">Overrides</button>
             </div>
           </div>
           <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
@@ -932,17 +933,17 @@
             <div class="space-y-3">
               <div id="gallery-drop-zone" class="drop-zone">
                 <div class="text-gray-500 dark:text-gray-400 mb-2"><svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                  <span>Drag & drop images here, or click to browse</span><br><span class="text-xs text-gray-400 dark:text-gray-500">Supports multiple files. Images over 200KB will be auto-compressed.</span></div>
+                  <span data-t="galleryDropText">Drag & drop images here, or click to browse</span><br><span class="text-xs text-gray-400 dark:text-gray-500" data-t="galleryDropHint">Supports multiple files. Images over 200KB will be auto-compressed.</span></div>
                 <input type="file" id="gallery-file" accept="image/*" multiple class="w-full p-2 border rounded mt-1">
               </div>
               <div id="gallery-compression-info" class="text-xs text-gray-500 dark:text-gray-400 hidden"><span id="compression-details"></span></div>
               <div class="grid md:grid-cols-2 gap-3">
-                <div><label class="text-sm font-medium dark:text-gray-300">Title (EN)</label><input id="gallery-title-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Image title in English"></div>
-                <div><label class="text-sm font-medium dark:text-gray-300">Title (ES)</label><input id="gallery-title-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Titulo de la imagen en Español"></div>
+                <div><label class="text-sm font-medium dark:text-gray-300" data-t="galleryTitleEn">Title (EN)</label><input id="gallery-title-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="galleryTitleEnPh" placeholder="Image title in English"></div>
+                <div><label class="text-sm font-medium dark:text-gray-300" data-t="galleryTitleEs">Title (ES)</label><input id="gallery-title-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="galleryTitleEsPh" placeholder="Titulo de la imagen en Español"></div>
               </div>
               <div class="grid md:grid-cols-2 gap-3">
-                <div><label class="text-sm font-medium dark:text-gray-300">Description (EN)</label><textarea id="gallery-desc-en" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Image description"></textarea></div>
-                <div><label class="text-sm font-medium dark:text-gray-300">Description (ES)</label><textarea id="gallery-desc-es" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Descripcion de la imagen"></textarea></div>
+                <div><label class="text-sm font-medium dark:text-gray-300" data-t="galleryDescEn">Description (EN)</label><textarea id="gallery-desc-en" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="galleryDescEnPh" placeholder="Image description"></textarea></div>
+                <div><label class="text-sm font-medium dark:text-gray-300" data-t="galleryDescEs">Description (ES)</label><textarea id="gallery-desc-es" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="galleryDescEsPh" placeholder="Descripcion de la imagen"></textarea></div>
               </div>
               <div id="gallery-upload-progress" class="hidden space-y-2"></div>
               <div class="flex gap-2">
@@ -954,7 +955,7 @@
           <div id="gallery-grid" class="space-y-3"></div>
         </div>
         <div id="gal-subtab-serviceimgs" class="hidden">
-          <div class="flex justify-between items-center mb-4"><div><h2 class="text-2xl font-bold text-brand dark:text-green-400">Service Images Manager</h2><p class="text-gray-600 dark:text-gray-400 mt-1">Manage the hero background and 7 service images displayed on the home page</p></div></div>
+          <div class="flex justify-between items-center mb-4"><div><h2 class="text-2xl font-bold text-brand dark:text-green-400" data-t="svcImagesTitle">Service Images Manager</h2><p class="text-gray-600 dark:text-gray-400 mt-1" data-t="svcImagesDesc">Manage the hero background and 7 service images displayed on the home page</p></div></div>
           <div id="service-images-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
       </div>
@@ -964,12 +965,12 @@
     <div id="tab-blog" class="tab-content hidden fade-in" role="tabpanel">
       <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
         <div><h2 class="text-2xl font-bold" data-t="blogManagement">Blog Management</h2><p class="text-green-100" data-t="blogManagementDesc">Create and manage blog posts</p></div>
-        <button onclick="openBlogEditor()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition">+ New Post</button>
+        <button onclick="openBlogEditor()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition" data-t="blogNewPostBtn">+ New Post</button>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
         <!-- Filters -->
         <div class="flex flex-wrap gap-3 mb-4 items-center">
-          <input type="text" id="blog-search" placeholder="Search posts..." oninput="blogSearchDebounce()" class="px-3 py-2 border rounded-lg text-sm w-full md:w-64 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+          <input type="text" id="blog-search" data-t="blogSearchPlaceholder" placeholder="Search posts..." oninput="blogSearchDebounce()" class="px-3 py-2 border rounded-lg text-sm w-full md:w-64 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
           <select id="blog-status-filter" onchange="loadBlogPosts(1)" class="px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
             <option value="" data-t="roStatusAll">All Statuses</option>
             <option value="published" data-t="blogPublished">Published</option>
@@ -999,73 +1000,73 @@
       <div id="blog-editor-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-8 overflow-y-auto">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl mx-4 mb-8">
           <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
-            <h3 id="blog-form-title" class="text-lg font-bold">New Blog Post</h3>
+            <h3 id="blog-form-title" class="text-lg font-bold" data-t="blogNewPost">New Blog Post</h3>
             <button onclick="closeBlogEditor()" class="text-white/70 hover:text-white text-2xl leading-none">&times;</button>
           </div>
           <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
             <!-- Title EN -->
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Title (English) *</label>
-              <input id="blog-title-en" oninput="blogAutoSlug()" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Article title in English">
+              <label class="text-sm font-medium dark:text-gray-300" data-t="blogTitleEn">Title (English) *</label>
+              <input id="blog-title-en" oninput="blogAutoSlug()" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" data-t="blogTitleEnPh" placeholder="Article title in English">
             </div>
             <!-- Title ES -->
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Title (Spanish)</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="blogTitleEs">Title (Spanish)</label>
               <input id="blog-title-es" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Titulo del articulo en Espanol">
             </div>
             <!-- Slug -->
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Slug (URL)</label>
-              <input id="blog-slug" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="auto-generated-from-title">
+              <label class="text-sm font-medium dark:text-gray-300" data-t="blogSlug">Slug (URL)</label>
+              <input id="blog-slug" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" data-t="blogSlugPlaceholder" placeholder="auto-generated-from-title">
             </div>
             <!-- Excerpt EN / ES -->
             <div class="grid md:grid-cols-2 gap-4">
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Excerpt (EN)</label>
-                <textarea id="blog-excerpt-en" rows="2" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Short description for cards"></textarea>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="blogExcerptEn">Excerpt (EN)</label>
+                <textarea id="blog-excerpt-en" rows="2" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" data-t="blogExcerptEnPh" placeholder="Short description for cards"></textarea>
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Excerpt (ES)</label>
-                <textarea id="blog-excerpt-es" rows="2" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Descripcion corta"></textarea>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="blogExcerptEs">Excerpt (ES)</label>
+                <textarea id="blog-excerpt-es" rows="2" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" data-t="blogExcerptEsPh" placeholder="Descripcion corta"></textarea>
               </div>
             </div>
             <!-- Body EN -->
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Body (English) * <span class="text-xs text-gray-400">HTML supported</span></label>
+              <label class="text-sm font-medium dark:text-gray-300"><span data-t="blogBodyEn">Body (English) *</span> <span class="text-xs text-gray-400" data-t="blogHtmlSupported">HTML supported</span></label>
               <textarea id="blog-body-en" rows="10" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="<h2>Title</h2><p>Content...</p>"></textarea>
             </div>
             <!-- Body ES -->
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Body (Spanish) <span class="text-xs text-gray-400">HTML supported</span></label>
+              <label class="text-sm font-medium dark:text-gray-300"><span data-t="blogBodyEs">Body (Spanish)</span> <span class="text-xs text-gray-400" data-t="blogHtmlSupported">HTML supported</span></label>
               <textarea id="blog-body-es" rows="8" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="<h2>Titulo</h2><p>Contenido...</p>"></textarea>
             </div>
             <!-- Featured Image + Author + Status -->
             <div class="grid md:grid-cols-3 gap-4">
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Featured Image URL</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="blogFeaturedImage">Featured Image URL</label>
                 <input id="blog-image" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="/uploads/blog/image.jpg">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Author</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="blogAuthor">Author</label>
                 <input id="blog-author" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" value="Oregon Tires">
               </div>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Status</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="blogStatusLabel">Status</label>
                 <select id="blog-status" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600">
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
+                  <option value="draft" data-t="blogEditorDraft">Draft</option>
+                  <option value="published" data-t="blogEditorPublished">Published</option>
                 </select>
               </div>
             </div>
             <!-- Categories -->
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Categories</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="blogCategories">Categories</label>
               <div id="blog-categories-list" class="flex flex-wrap gap-4 mt-2"></div>
             </div>
           </div>
           <div class="px-6 py-4 border-t dark:border-gray-700 flex justify-end gap-3">
-            <button onclick="closeBlogEditor()" class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
-            <button onclick="saveBlogPost()" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-800 transition">Save Post</button>
+            <button onclick="closeBlogEditor()" class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700" data-t="actionCancel">Cancel</button>
+            <button onclick="saveBlogPost()" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-800 transition" data-t="blogSavePost">Save Post</button>
           </div>
         </div>
       </div>
@@ -1268,47 +1269,47 @@
     <div id="tab-faq" class="tab-content hidden fade-in" role="tabpanel">
       <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-bold">❓ Frequently Asked Questions</h2>
-          <p class="text-green-100">Manage FAQ items displayed on the homepage</p>
+          <h2 class="text-2xl font-bold" data-t="faqHeading">❓ Frequently Asked Questions</h2>
+          <p class="text-green-100" data-t="faqSubheading">Manage FAQ items displayed on the homepage</p>
         </div>
-        <button onclick="toggleFaqForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ New FAQ</button>
+        <button onclick="toggleFaqForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium" data-t="faqNewFaqBtn">+ New FAQ</button>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
 
         <!-- Inline form (hidden by default) -->
         <div id="faq-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-          <h4 id="faq-form-title" class="font-bold text-lg mb-4 dark:text-gray-200">New FAQ</h4>
+          <h4 id="faq-form-title" class="font-bold text-lg mb-4 dark:text-gray-200" data-t="faqFormTitle">New FAQ</h4>
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Question (EN) *</label>
-              <input id="faq-question-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Question in English">
+              <label class="text-sm font-medium dark:text-gray-300" data-t="faqQuestionEnLabel">Question (EN) *</label>
+              <input id="faq-question-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="faqQuestionEnPh" placeholder="Question in English">
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Question (ES)</label>
-              <input id="faq-question-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Pregunta en Español">
+              <label class="text-sm font-medium dark:text-gray-300" data-t="faqQuestionEsLabel">Question (ES)</label>
+              <input id="faq-question-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="faqQuestionEsPh" placeholder="Pregunta en Español">
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Answer (EN) *</label>
-              <textarea id="faq-answer-en" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Answer in English"></textarea>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="faqAnswerEnLabel">Answer (EN) *</label>
+              <textarea id="faq-answer-en" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="faqAnswerEnPh" placeholder="Answer in English"></textarea>
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Answer (ES)</label>
-              <textarea id="faq-answer-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Respuesta en Español"></textarea>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="faqAnswerEsLabel">Answer (ES)</label>
+              <textarea id="faq-answer-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="faqAnswerEsPh" placeholder="Respuesta en Español"></textarea>
             </div>
             <div class="flex items-center gap-6">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input id="faq-active" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
-                <span class="text-sm font-medium dark:text-gray-300">Active</span>
+                <span class="text-sm font-medium dark:text-gray-300" data-t="faqActiveLabel">Active</span>
               </label>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Sort Order</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="faqSortLabel">Sort Order</label>
                 <input id="faq-sort" type="number" value="0" min="0" class="w-20 p-2 border rounded mt-1 ml-2 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
               </div>
             </div>
           </div>
           <div class="flex gap-2 mt-4">
-            <button onclick="saveFaq()" id="faq-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">Create FAQ</button>
-            <button onclick="toggleFaqForm()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300">Cancel</button>
+            <button onclick="saveFaq()" id="faq-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition" data-t="faqCreateBtn">Create FAQ</button>
+            <button onclick="toggleFaqForm()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300" data-t="faqCancelBtn">Cancel</button>
           </div>
         </div>
 
@@ -1324,7 +1325,7 @@
               </tr>
             </thead>
             <tbody id="faq-table-body">
-              <tr><td colspan="4" class="text-center py-8 text-gray-400">Loading...</td></tr>
+              <tr><td colspan="4" class="text-center py-8 text-gray-400" data-t="faqLoadingTd">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1335,37 +1336,37 @@
     <div id="tab-reviews" class="tab-content hidden fade-in" role="tabpanel">
       <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center flex-wrap gap-3">
         <div>
-          <h2 class="text-2xl font-bold">Customer Reviews</h2>
-          <p class="text-green-100">Manage testimonials &amp; Google reviews</p>
+          <h2 class="text-2xl font-bold" data-t="reviewHeading">Customer Reviews</h2>
+          <p class="text-green-100" data-t="reviewSubheading">Manage testimonials &amp; Google reviews</p>
         </div>
         <div class="flex items-center gap-3">
           <div class="text-right">
-            <button id="btn-fetch-google" onclick="fetchFromGoogle()" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition">Fetch from Google</button>
-            <div id="google-last-synced" class="text-xs text-green-200 mt-1">Never synced</div>
+            <button id="btn-fetch-google" onclick="fetchFromGoogle()" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition" data-t="reviewFetchGoogle">Fetch from Google</button>
+            <div id="google-last-synced" class="text-xs text-green-200 mt-1" data-t="reviewNeverSynced">Never synced</div>
           </div>
-          <button onclick="toggleReviewForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ New Review</button>
+          <button onclick="toggleReviewForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium" data-t="reviewNewBtn">+ New Review</button>
         </div>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
 
         <!-- Filter bar -->
         <div class="flex flex-wrap gap-2 mb-4">
-          <button onclick="setReviewFilter('all')" data-filter="all" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-brand text-white">All</button>
-          <button onclick="setReviewFilter('google')" data-filter="google" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-gray-100 dark:bg-gray-600">Google</button>
-          <button onclick="setReviewFilter('manual')" data-filter="manual" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-gray-100 dark:bg-gray-600">Manual</button>
-          <button onclick="setReviewFilter('homepage')" data-filter="homepage" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-gray-100 dark:bg-gray-600">On Homepage</button>
+          <button onclick="setReviewFilter('all')" data-filter="all" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-brand text-white" data-t="reviewFilterAll">All</button>
+          <button onclick="setReviewFilter('google')" data-filter="google" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-gray-100 dark:bg-gray-600" data-t="reviewFilterGoogle">Google</button>
+          <button onclick="setReviewFilter('manual')" data-filter="manual" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-gray-100 dark:bg-gray-600" data-t="reviewFilterManual">Manual</button>
+          <button onclick="setReviewFilter('homepage')" data-filter="homepage" class="review-filter-btn px-3 py-1.5 text-sm rounded-lg border transition bg-gray-100 dark:bg-gray-600" data-t="reviewFilterHomepage">On Homepage</button>
         </div>
 
         <!-- Inline form (hidden by default) -->
         <div id="review-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-          <h4 id="review-form-title" class="font-bold text-lg mb-4 dark:text-gray-200">New Review</h4>
+          <h4 id="review-form-title" class="font-bold text-lg mb-4 dark:text-gray-200" data-t="reviewFormTitle">New Review</h4>
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Customer Name *</label>
-              <input id="review-name" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Customer name">
+              <label class="text-sm font-medium dark:text-gray-300" data-t="reviewCustName">Customer Name *</label>
+              <input id="review-name" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="reviewCustPh" placeholder="Customer name">
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Rating</label>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="reviewRating">Rating</label>
               <select id="review-rating" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
                 <option value="5">&#9733;&#9733;&#9733;&#9733;&#9733; (5)</option>
                 <option value="4">&#9733;&#9733;&#9733;&#9733;&#9734; (4)</option>
@@ -1375,31 +1376,31 @@
               </select>
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Review Text (EN) *</label>
-              <textarea id="review-text-en" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Review text in English"></textarea>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="reviewTextEnLabel">Review Text (EN) *</label>
+              <textarea id="review-text-en" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="reviewTextEnPh" placeholder="Review text in English"></textarea>
             </div>
             <div>
-              <label class="text-sm font-medium dark:text-gray-300">Review Text (ES)</label>
-              <textarea id="review-text-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Texto de la rese&ntilde;a en Espa&ntilde;ol"></textarea>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="reviewTextEsLabel">Review Text (ES)</label>
+              <textarea id="review-text-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="reviewTextEsPh" placeholder="Texto de la rese&ntilde;a en Espa&ntilde;ol"></textarea>
             </div>
             <div class="flex items-center gap-6 flex-wrap">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input id="review-active" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
-                <span class="text-sm font-medium dark:text-gray-300">Active</span>
+                <span class="text-sm font-medium dark:text-gray-300" data-t="reviewActiveLabel">Active</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input id="review-homepage" type="checkbox" class="w-5 h-5 text-amber-500 rounded">
-                <span class="text-sm font-medium dark:text-gray-300">Show on Homepage</span>
+                <span class="text-sm font-medium dark:text-gray-300" data-t="reviewShowOnHomepage">Show on Homepage</span>
               </label>
               <div>
-                <label class="text-sm font-medium dark:text-gray-300">Sort Order</label>
+                <label class="text-sm font-medium dark:text-gray-300" data-t="reviewSortLabel">Sort Order</label>
                 <input id="review-sort" type="number" value="0" min="0" class="w-20 p-2 border rounded mt-1 ml-2 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
               </div>
             </div>
           </div>
           <div class="flex gap-2 mt-4">
-            <button onclick="saveReview()" id="review-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">Create Review</button>
-            <button onclick="toggleReviewForm()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300">Cancel</button>
+            <button onclick="saveReview()" id="review-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition" data-t="reviewCreateBtn">Create Review</button>
+            <button onclick="toggleReviewForm()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300" data-t="reviewCancelBtn">Cancel</button>
           </div>
         </div>
 
@@ -1408,17 +1409,17 @@
           <table class="w-full responsive-table">
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
-                <th class="px-4 py-3 font-medium">Source</th>
+                <th class="px-4 py-3 font-medium" data-t="reviewThSource">Source</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThName">Name</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThRating">Rating</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThPreview">Preview</th>
-                <th class="px-4 py-3 font-medium text-center">Homepage</th>
+                <th class="px-4 py-3 font-medium text-center" data-t="reviewThHomepage">Homepage</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThStatus">Status</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThActions">Actions</th>
               </tr>
             </thead>
             <tbody id="testimonials-table-body">
-              <tr><td colspan="7" class="text-center py-8 text-gray-400">Loading...</td></tr>
+              <tr><td colspan="7" class="text-center py-8 text-gray-400" data-t="reviewLoadingTd">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1452,16 +1453,22 @@
         <div><h2 class="text-2xl font-bold">📖 <span data-t="documentation">Documentation</span></h2><p class="text-green-50" data-t="docsSubtitle">Instruction manual, feature list, and roadmap</p></div>
       </div>
       <div class="bg-white rounded-b-xl shadow dark:bg-gray-800">
-        <!-- Sub-tabs: Manual / Features / Improvements (superadmin) / Roadmap -->
+        <!-- Sub-tabs: Overview / Manual / Features / Improvements (superadmin) / Roadmap -->
         <div class="flex flex-wrap gap-2 p-4 border-b dark:border-gray-700">
-          <button onclick="switchDocsView('manual')" id="docs-view-manual" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">📋 <span data-t="docsManual">Manual</span></button>
+          <button onclick="switchDocsView('overview')" id="docs-view-overview" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">🏗️ <span data-t="docsOverview">Overview</span></button>
+          <button onclick="switchDocsView('manual')" id="docs-view-manual" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">📋 <span data-t="docsManual">Manual</span></button>
           <button onclick="switchDocsView('features')" id="docs-view-features" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">✅ <span data-t="docsFeatures">Features</span></button>
           <button onclick="switchDocsView('improvements')" id="docs-view-improvements" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700" style="display:none">🔧 <span data-t="docsImprovements">Improvements</span></button>
           <button onclick="switchDocsView('vision')" id="docs-view-vision" class="px-4 py-2 rounded-lg text-sm font-medium border text-gray-700 hover:bg-gray-50 bg-gradient-to-r from-green-50 to-amber-50 border-green-300 dark:from-green-900/30 dark:to-amber-900/30 dark:border-green-700 dark:text-green-300 dark:hover:from-green-900/50 dark:hover:to-amber-900/50">🚀 <span data-t="docsRoadmap">Roadmap</span></button>
         </div>
 
+        <!-- Overview Sub-Tab -->
+        <div id="docs-subtab-overview" class="p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
+          <div id="overview-content"></div>
+        </div>
+
         <!-- Manual Sub-Tab -->
-        <div id="docs-subtab-manual" class="p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
+        <div id="docs-subtab-manual" class="hidden p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
 <div class="doc-lang-es hidden">
 <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 pb-3 border-b-2 border-gray-300 dark:border-gray-600">Oregon Tires Auto Care &mdash; Manual de Instrucciones del Sitio Web</h1>
 
@@ -4614,10 +4621,30 @@ const adminT = {
     // Docs
     documentation: 'Documentation',
     docsSubtitle: 'Instruction manual, feature list, and improvement roadmap',
+    docsOverview: 'Overview',
     docsManual: 'Manual',
     docsFeatures: 'Features',
     docsImprovements: 'Improvements',
     docsRoadmap: 'Roadmap',
+    overviewTitle: 'Oregon Tires Auto Care \u2014 Project Overview',
+    overviewSubtitle: 'Complete website platform built for your business',
+    overviewClientSection: 'Client Requested Features',
+    overviewClientDesc: 'All included in your investment.',
+    overviewNewSection: 'Bonus Features Added',
+    overviewNewDesc: 'These bonus features were built to maximize your website\'s value.',
+    overviewTotalFeatures: 'Total Features',
+    overviewApiEndpoints: 'API Endpoints',
+    overviewPages: 'Pages',
+    overviewMigrations: 'DB Migrations',
+    overviewCronJobs: 'Cron Jobs',
+    overviewComplete: 'Complete',
+    overviewBonusValue: 'Total Bonus Value Added',
+    overviewAllIncluded: 'All {count} bonus features included at no additional cost',
+    overviewViewLive: 'View Live',
+    overviewMarketPrice: 'Market Price',
+    overviewIncluded: 'Included',
+    overviewFeaturesIn: 'features in',
+    overviewCategories: 'Feature Categories',
     // Notes Modal
     adminNotes: 'Admin Notes',
     notesPlaceholder: 'Add notes about this appointment...',
@@ -5033,6 +5060,499 @@ const adminT = {
     analyticsConversionFunnel: 'Conversion Funnel (30d)',
     analyticsServiceDuration: 'Avg Service Duration (days)',
     analyticsCustomerRetention: 'Customer Retention',
+    // Shared Actions
+    actionCancel: 'Cancel',
+    actionSave: 'Save',
+    actionClose: 'Close',
+    // Tire Quotes
+    tqLoadFail: 'Failed to load tire quotes',
+    tqFilterStatus: 'Status:',
+    tqNoQuotes: 'No tire quote requests found.',
+    tqDate: 'Date',
+    tqCustomer: 'Customer',
+    tqVehicle: 'Vehicle',
+    tqTireSize: 'Tire Size',
+    tqQty: 'Qty',
+    tqStatus: 'Status',
+    tqActions: 'Actions',
+    tqView: 'View',
+    tqRespond: 'Quote',
+    tqAccept: 'Accept',
+    tqDecline: 'Decline',
+    tqDetails: 'Quote Request Details',
+    tqEmail: 'Email',
+    tqPhone: 'Phone',
+    tqNotes: 'Notes',
+    tqPrice: 'Price/Tire',
+    tqBrand: 'Brand/Model',
+    tqAvail: 'Availability',
+    tqQuoteNotes: 'Quote Notes',
+    tqRespondTitle: 'Respond with Quote',
+    tqPricePerTire: 'Price per Tire ($)',
+    tqBrandModel: 'Brand / Model',
+    tqAvailability: 'Availability',
+    tqCancel: 'Cancel',
+    tqSendQuote: 'Send Quote',
+    tqPriceReq: 'Price is required',
+    tqQuoteSent: 'Quote sent',
+    tqAccepted: 'Marked as accepted',
+    tqDeclined: 'Marked as declined',
+    tqNetworkError: 'Network error',
+    // Service Reminders
+    reminderLoadFail: 'Failed to load service reminders.',
+    reminderAllStatuses: 'All Statuses',
+    reminderOverdueOnly: 'Overdue Only',
+    reminderCreate: 'Create Reminder',
+    reminderNone: 'No service reminders found.',
+    reminderCustomer: 'Customer Search',
+    reminderVehicle: 'Vehicle',
+    reminderServiceType: 'Service Type',
+    reminderDueDate: 'Due Date',
+    reminderDueMileage: 'Due Mileage',
+    reminderSave: 'Save Reminder',
+    reminderEdit: 'Edit Reminder',
+    reminderRequired: 'Customer and service type are required.',
+    reminderUpdated: 'Reminder updated',
+    reminderCreated: 'Reminder created',
+    reminderSendNow: 'Send Now',
+    reminderComplete: 'Complete',
+    reminderSent: 'Reminder sent',
+    reminderCompleted: 'Marked as completed',
+    reminderDeleteConfirm: 'Delete this reminder? This cannot be undone.',
+    reminderDeleted: 'Reminder deleted',
+    reminderNetworkError: 'Network error',
+    // Labor Tracker
+    laborTime: 'Labor Time',
+    laborTotal: 'Total',
+    laborBillable: 'Billable',
+    laborClockIn: 'Clock In',
+    laborEmployee: 'Employee',
+    laborTask: 'Task',
+    laborClockInTime: 'Clock In',
+    laborClockOutTime: 'Clock Out',
+    laborDuration: 'Duration',
+    laborBillableCol: 'Bill.',
+    laborNoEntries: 'No labor entries yet...',
+    laborStarted: 'Started',
+    laborBillableTag: 'Billable',
+    laborClockOut: 'Clock Out',
+    laborClockedOut: 'Clocked out successfully',
+    laborClockOutFail: 'Failed to clock out',
+    laborDelete: 'Delete',
+    laborDeleteConfirm: 'Delete this labor entry?',
+    laborDeleted: 'Labor entry deleted',
+    laborDeleteFail: 'Failed to delete entry',
+    laborNotBillable: 'Not billable',
+    laborClockInTitle: 'Clock In Technician',
+    laborSelectEmployee: 'Select employee...',
+    laborOptional: 'optional',
+    laborTaskPlaceholder: 'e.g. Brake pad replacement',
+    laborStartClock: 'Start',
+    laborSelectEmployeeFirst: 'Please select an employee',
+    laborClockedIn: 'Clocked in successfully',
+    laborClockInFail: 'Failed to clock in',
+    laborCancel: 'Cancel',
+    laborEmployeeNum: 'Employee #',
+    laborSummaryLoading: 'Loading labor summary...',
+    laborSummaryEmployee: 'Employee',
+    laborSummaryTotalHrs: 'Total Hours',
+    laborSummaryBillableHrs: 'Billable Hours',
+    laborSummaryActiveClocks: 'Active Clocks',
+    laborSummaryRoCount: 'RO Count',
+    laborSummaryNoData: 'No labor data available.',
+    laborSummaryPeriod: 'Period:',
+    laborSummaryThisWeek: 'This Week',
+    laborSummaryThisMonth: 'This Month',
+    laborSummaryAllTime: 'All Time',
+    laborSummaryError: 'Error loading labor summary',
+    // Loyalty
+    loyaltyMembers: 'Total Members',
+    loyaltyOutstanding: 'Points Outstanding',
+    loyaltyRedeemed: 'Redeemed This Month',
+    loyaltyPointsLedger: 'Points Ledger',
+    loyaltyAdjustPoints: 'Add / Deduct Points',
+    loyaltyCustomer: 'Customer',
+    loyaltyBalance: 'Balance',
+    loyaltyLastActivity: 'Last Activity',
+    loyaltyActions: 'Actions',
+    loyaltyNoMembers: 'No loyalty members yet.',
+    loyaltyAdd: 'Add',
+    loyaltyDeduct: 'Deduct',
+    loyaltyAdjustTitle: 'Adjust Points',
+    loyaltySearchCustomer: 'Search customer name or email...',
+    loyaltyAmount: 'Points Amount',
+    loyaltyReason: 'Reason',
+    loyaltyAddPoints: 'Add Points',
+    loyaltyDeductPoints: 'Deduct Points',
+    loyaltySelectCustomer: 'Select a customer',
+    loyaltyEnterAmount: 'Enter a valid amount',
+    loyaltyPointsAdded: 'Points added',
+    loyaltyPointsDeducted: 'Points deducted',
+    loyaltyRewardsCatalog: 'Rewards Catalog',
+    loyaltyNewReward: 'New Reward',
+    loyaltyNoRewards: 'No rewards yet. Click "New Reward" to create one.',
+    loyaltyActive: 'Active',
+    loyaltyInactive: 'Inactive',
+    loyaltyEditReward: 'Edit Reward',
+    loyaltyCost: 'Points Cost',
+    loyaltyDescription: 'Description',
+    loyaltyRewardUpdated: 'Reward updated',
+    loyaltyRewardCreated: 'Reward created',
+    loyaltyRewardDeactivated: 'Reward deactivated',
+    loyaltyRewardActivated: 'Reward activated',
+    loyaltyDeleteConfirm: 'Delete this reward? This cannot be undone.',
+    loyaltyRewardDeleted: 'Reward deleted',
+    loyaltyNameEn: 'Name (EN)',
+    loyaltyNameEs: 'Name (ES)',
+    loyaltyNameRequired: 'Name (EN) is required',
+    loyaltyLoadFail: 'Failed to load loyalty data',
+    loyaltySaveFail: 'Save failed',
+    loyaltyNetworkError: 'Network error',
+    // Repair Orders (missing keys)
+    roMileageIn: 'Mileage In',
+    roPromisedDate: 'Promised Date',
+    roUpdated: 'Updated',
+    roCustomerIdRequired: 'Customer ID is required',
+    roCreatedMsg: 'Repair order created!',
+    roCreatingFor: 'Creating RO for',
+    roFailedMsg: 'Failed',
+    roNetworkError: 'Network error',
+    // Kanban (missing)
+    kanbanFailedUpdate: 'Failed to update status',
+    kanbanTimeJustNow: 'just now',
+    kanbanTimeMinAgo: 'm ago',
+    kanbanTimeHrAgo: 'h ago',
+    kanbanTimeDayAgo: 'd ago',
+    // Promotions (missing)
+    promoSidebar: 'Sidebar',
+    promoInline: 'Inline',
+    promoLoadFail: 'Failed to load promotions',
+    promoTitleRequired: 'Title (EN) is required',
+    promoSaveFail: 'Save failed',
+    promoNetworkError: 'Network error',
+    promoDeleteConfirm: 'Delete this promotion? This cannot be undone.',
+    promoAlways: 'Always',
+    promoNever: 'Never',
+    // FAQ (missing)
+    faqLoadFail: 'Failed to load FAQs',
+    faqQuestionRequired: 'Question (EN) is required',
+    faqSaveFail: 'Save failed',
+    faqNetworkError: 'Network error',
+    faqDeleteConfirm: 'Delete this FAQ? This cannot be undone.',
+    // Testimonials (hardcoded strings)
+    testimLoadFail: 'Failed to load reviews',
+    testimNeverSynced: 'Never synced',
+    testimSyncedJustNow: 'Synced just now',
+    testimSyncedMinAgo: 'Synced {n} min ago',
+    testimSyncedHrAgo: 'Synced {n}h ago',
+    testimSyncedDayAgo: 'Synced {n}d ago',
+    testimImported: 'Imported {n} new Google review(s)',
+    testimFetchFailed: 'Fetch failed',
+    testimNetworkError: 'Network error',
+    testimFetching: 'Fetching...',
+    testimFetchFromGoogle: 'Fetch from Google',
+    testimRemoveHomepage: 'Remove from homepage',
+    testimShowHomepage: 'Show on homepage',
+    testimAddedHomepage: 'Added to homepage',
+    testimRemovedHomepage: 'Removed from homepage',
+    testimNameRequired: 'Customer name is required',
+    testimSaveFailed: 'Save failed',
+    testimDeleteConfirm: 'Delete this review? This cannot be undone.',
+    // Blog (hardcoded strings)
+    blogLoadFail: 'Failed to load blog posts',
+    blogLoadError: 'Error loading blog posts',
+    blogTitleRequired: 'Title (EN) is required',
+    blogBodyRequired: 'Body (EN) is required',
+    blogPostUpdated: 'Post updated!',
+    blogPostCreated: 'Post created!',
+    blogSaveFail: 'Failed to save',
+    blogSaveError: 'Error saving post',
+    blogDeleteConfirm: 'Delete "{title}"? This cannot be undone.',
+    blogPostDeleted: 'Post deleted',
+    blogDeleteFail: 'Failed to delete',
+    blogDeleteError: 'Error deleting post',
+    // Subscribers (hardcoded)
+    subscriberConfirmUnsub: 'Are you sure you want to unsubscribe this subscriber?',
+    // Visit Tracker (migrated from local T)
+    visitVehiclesInShop: 'vehicles in shop',
+    visitCheckIn: '+ Check In',
+    visitBayLabel: 'Bay',
+    visitInUse: '(In Use)',
+    visitOpen: '(Open)',
+    visitNoActive: 'No active visits',
+    visitNoBay: 'No bay',
+    visitInService: 'In Service',
+    visitWaiting: 'Waiting',
+    visitStartService: 'Start Service',
+    visitStart: 'Start',
+    visitEndService: 'End Service',
+    visitDone: 'Done',
+    visitCheckOut: 'Check Out',
+    visitOut: 'Out',
+    visitEnterCustomerId: 'Enter Customer ID:',
+    visitBayPrompt: 'Bay number (1-4, or leave blank):',
+    visitBaysInUse: 'Bays In Use',
+    visitTodayTotal: 'Today Total',
+    visitAvgWait: 'Avg Wait',
+    visitLoadError: 'Error loading visit data',
+    visitWaitLabel: 'Wait:',
+    visitServiceLabel: 'Service:',
+    // Invoices (migrated from local T)
+    invInvoiceNum: 'Invoice #',
+    invCustomer: 'Customer',
+    invRoNum: 'RO #',
+    invTotal: 'Total',
+    invStatus: 'Status',
+    invDate: 'Date',
+    invActions: 'Actions',
+    invAllStatuses: 'All Statuses',
+    invDraft: 'Draft',
+    invSent: 'Sent',
+    invPaid: 'Paid',
+    invVoid: 'Void',
+    invSearchPlaceholder: 'Search invoices…',
+    invView: 'View',
+    invSend: 'Send',
+    invMarkPaid: 'Mark Paid',
+    invVoidBtn: 'Void',
+    invCreateFromRo: '+ Create from RO',
+    invEnterRoId: 'Enter Repair Order number (e.g. RO-00000001):',
+    invNoInvoices: 'No invoices found.',
+    invConfirmSend: 'Send this invoice to the customer?',
+    invConfirmPaid: 'Mark this invoice as paid?',
+    invConfirmVoid: 'Void this invoice? This cannot be undone.',
+    invCreateSuccess: 'Invoice created.',
+    invSendSuccess: 'Invoice sent to customer.',
+    invPaidSuccess: 'Invoice marked as paid.',
+    invVoidSuccess: 'Invoice voided.',
+    invError: 'Something went wrong. Please try again.',
+    invPrev: '← Prev',
+    invNext: 'Next →',
+    invPageOf: 'Page {page} of {total}',
+    // Waitlist (migrated from local L)
+    wlPosition: '#',
+    wlName: 'Customer',
+    wlPhone: 'Phone',
+    wlVehicle: 'Vehicle',
+    wlService: 'Service Needed',
+    wlWait: 'Wait Time',
+    wlStatus: 'Status',
+    wlActions: 'Actions',
+    wlAddWalkin: '+ Add Walk-in',
+    wlCallNext: 'Call',
+    wlStartService: 'Start',
+    wlComplete: 'Complete',
+    wlNoShow: 'No-Show',
+    wlNoEntries: 'No one on the waitlist.',
+    wlFormName: 'Name',
+    wlFormPhone: 'Phone',
+    wlFormVehicle: 'Vehicle Description',
+    wlFormService: 'Service Type',
+    wlSave: 'Add to Waitlist',
+    wlCancel: 'Cancel',
+    wlWaiting: 'Waiting',
+    wlCalled: 'Called',
+    wlInService: 'In Service',
+    wlCompleted: 'Completed',
+    wlNoShowStatus: 'No-Show',
+    wlJustNow: 'just now',
+    wlMinAgo: 'm ago',
+    wlHrAgo: 'h ago',
+    wlAdded: 'Walk-in added',
+    wlUpdated: 'Status updated',
+    wlFailed: 'Action failed',
+    wlNameRequired: 'Customer name is required',
+    // Referrals (migrated from local labels)
+    refCode: 'Referral Code',
+    refReferrer: 'Referrer',
+    refReferred: 'Referred Customer',
+    refStatus: 'Status',
+    refPoints: 'Bonus Points',
+    refCreated: 'Created',
+    refActions: 'Actions',
+    refTotal: 'Total Referrals',
+    refCompleted: 'Completed',
+    refAwarded: 'Points Awarded',
+    refAll: 'All',
+    refPending: 'Pending',
+    refRewarded: 'Rewarded',
+    refExpired: 'Expired',
+    refMarkComplete: 'Mark Complete',
+    refAwardPoints: 'Award Points',
+    refNoResults: 'No referrals found.',
+    refLoadError: 'Failed to load referrals.',
+    refCompleteOk: 'Referral marked complete.',
+    refAwardOk: 'Points awarded successfully.',
+    refFail: 'Action failed. Please try again.',
+    // Google Business (migrated from local labels)
+    gbTitle: 'Google Business Profile Sync',
+    gbLastSync: 'Last Sync',
+    gbNextSync: 'Next Scheduled Sync',
+    gbStatus: 'Status',
+    gbReviewsSynced: 'Reviews Synced',
+    gbSyncNow: 'Sync Now',
+    gbSyncing: 'Syncing...',
+    gbSuccess: 'Success',
+    gbPending: 'Pending',
+    gbError: 'Error',
+    gbLogTitle: 'Recent Sync Log',
+    gbDate: 'Date',
+    gbType: 'Type',
+    gbDetails: 'Details',
+    gbSettingsTitle: 'Sync Settings',
+    gbFrequency: 'Frequency',
+    gbAutoSync: 'Auto-Sync',
+    gbSave: 'Save Settings',
+    gbSaved: 'Settings saved',
+    gbSaveFailed: 'Failed to save settings',
+    gbSyncSuccess: 'Sync completed',
+    gbSyncFailed: 'Sync failed',
+    gbNoLogs: 'No sync logs yet.',
+    gbDaily: 'Daily',
+    gbWeekly: 'Weekly',
+    gbMonthly: 'Monthly',
+    gbNever: 'Never',
+    // Calendar Retry
+    calSyncRetried: 'Calendar sync retried successfully',
+    calRetryFailed: 'Retry failed',
+    calNetworkError: 'Network error',
+    // HTML Translation Gap Fixes
+    passwordShow: 'Show',
+    loading: 'Loading...',
+    active: 'Active',
+    sortOrder: 'Sort Order',
+    actionCancel: 'Cancel',
+    // Appointments - calendar legend
+    apptAllMonths: 'All Months',
+    apptPerPageAll: 'All',
+    apptCalHasAppts: 'Has appointments',
+    apptCalToday: 'Today',
+    apptCalSelected: 'Selected',
+    // Messages
+    msgAllStatus: 'All Status',
+    msgOpen: 'Open',
+    msgWaitingReply: 'Waiting Reply',
+    msgResolved: 'Resolved',
+    msgClosed: 'Closed',
+    msgWeb: 'Web',
+    msgEmail: 'Email',
+    msgUnreadOnly: 'Unread only',
+    msgReplyPlaceholder: 'Type your reply...',
+    msgStatusPlaceholder: 'Status...',
+    msgResolve: 'Resolve',
+    msgClose: 'Close',
+    msgReopen: 'Reopen',
+    msgRefresh: '\u21BB Refresh',
+    msgSend: 'Send',
+    // Customers
+    custVehicle: 'Vehicle',
+    custServices: 'Services',
+    // Repair Orders
+    roNewRo: '+ New RO',
+    roRefresh: '\u21BB Refresh',
+    // Employees
+    empNamePlaceholder: 'Employee name',
+    empEmailPlaceholder: 'email@example.com',
+    empPhonePlaceholder: '(555) 123-4567',
+    empEmailLabel: 'Email Address *',
+    empDisplayName: 'Display Name *',
+    empRoleLabel: 'Role',
+    empAdminRole: 'Admin',
+    empSuperAdmin: 'Super Admin',
+    empLangPref: 'Language Preference / Idioma',
+    empLangEs: '\uD83C\uDDF2\uD83C\uDDFD Espa\u00F1ol (Primary)',
+    empLangEn: '\uD83C\uDDFA\uD83C\uDDF8 English (Primary)',
+    empLangBoth: '\uD83C\uDF10 Both / Ambos',
+    empLangHelp: 'Primary language appears first in bilingual emails',
+    empCreateInvite: '\uD83D\uDEE1 Create & Send Invite',
+    empCancelAdmin: 'Cancel',
+    // Schedule
+    schedWeekly: 'Weekly',
+    schedDaily: 'Daily',
+    schedOverridesBtn: 'Overrides',
+    // Gallery
+    galleryDropText: 'Drag & drop images here, or click to browse',
+    galleryDropHint: 'Supports multiple files. Images over 200KB will be auto-compressed.',
+    galleryTitleEn: 'Title (EN)',
+    galleryTitleEs: 'Title (ES)',
+    galleryDescEn: 'Description (EN)',
+    galleryDescEs: 'Description (ES)',
+    galleryTitleEnPh: 'Image title in English',
+    galleryTitleEsPh: 'Titulo de la imagen en Espa\u00F1ol',
+    galleryDescEnPh: 'Image description',
+    galleryDescEsPh: 'Descripcion de la imagen',
+    // Service Images
+    svcImagesTitle: 'Service Images Manager',
+    svcImagesDesc: 'Manage the hero background and 7 service images displayed on the home page',
+    // Blog Editor
+    blogSearchPlaceholder: 'Search posts...',
+    blogNewPost: 'New Blog Post',
+    blogNewPostBtn: '+ New Post',
+    blogTitleEn: 'Title (English) *',
+    blogTitleEs: 'Title (Spanish)',
+    blogSlug: 'Slug (URL)',
+    blogSlugPlaceholder: 'auto-generated-from-title',
+    blogTitleEnPh: 'Article title in English',
+    blogTitleEsPh: 'Titulo del articulo en Espanol',
+    blogExcerptEn: 'Excerpt (EN)',
+    blogExcerptEs: 'Excerpt (ES)',
+    blogExcerptEnPh: 'Short description for cards',
+    blogExcerptEsPh: 'Descripci\u00F3n corta',
+    blogBodyEn: 'Body (English) *',
+    blogBodyEs: 'Body (Spanish)',
+    blogHtmlSupported: 'HTML supported',
+    blogFeaturedImage: 'Featured Image URL',
+    blogImagePlaceholder: '/uploads/blog/image.jpg',
+    blogAuthor: 'Author',
+    blogStatusLabel: 'Status',
+    blogCategories: 'Categories',
+    blogSavePost: 'Save Post',
+    blogEditorDraft: 'Draft',
+    blogEditorPublished: 'Published',
+    // FAQ Form
+    faqHeading: '\u2753 Frequently Asked Questions',
+    faqSubheading: 'Manage FAQ items displayed on the homepage',
+    faqNewFaqBtn: '+ New FAQ',
+    faqFormTitle: 'New FAQ',
+    faqQuestionEnLabel: 'Question (EN) *',
+    faqQuestionEsLabel: 'Question (ES)',
+    faqAnswerEnLabel: 'Answer (EN) *',
+    faqAnswerEsLabel: 'Answer (ES)',
+    faqQuestionEnPh: 'Question in English',
+    faqQuestionEsPh: 'Pregunta en Espa\u00F1ol',
+    faqAnswerEnPh: 'Answer in English',
+    faqAnswerEsPh: 'Respuesta en Espa\u00F1ol',
+    faqCreateBtn: 'Create FAQ',
+    faqCancelBtn: 'Cancel',
+    faqActiveLabel: 'Active',
+    faqSortLabel: 'Sort Order',
+    // Reviews/Testimonials Form
+    reviewHeading: 'Customer Reviews',
+    reviewSubheading: 'Manage testimonials & Google reviews',
+    reviewFetchGoogle: 'Fetch from Google',
+    reviewNeverSynced: 'Never synced',
+    reviewNewBtn: '+ New Review',
+    reviewFilterAll: 'All',
+    reviewFilterGoogle: 'Google',
+    reviewFilterManual: 'Manual',
+    reviewFilterHomepage: 'On Homepage',
+    reviewFormTitle: 'New Review',
+    reviewCustName: 'Customer Name *',
+    reviewCustPh: 'Customer name',
+    reviewRating: 'Rating',
+    reviewTextEnLabel: 'Review Text (EN) *',
+    reviewTextEsLabel: 'Review Text (ES)',
+    reviewTextEnPh: 'Review text in English',
+    reviewTextEsPh: 'Texto de la rese\u00F1a en Espa\u00F1ol',
+    reviewActiveLabel: 'Active',
+    reviewShowOnHomepage: 'Show on Homepage',
+    reviewSortLabel: 'Sort Order',
+    reviewCreateBtn: 'Create Review',
+    reviewCancelBtn: 'Cancel',
+    reviewThSource: 'Source',
+    reviewThHomepage: 'Homepage',
+    reviewLoadingTd: 'Loading...',
+    faqLoadingTd: 'Loading...',
     shopFloor: 'Shop Floor',
   },
   es: {
@@ -5243,10 +5763,30 @@ const adminT = {
     // Docs
     documentation: 'Documentaci\u00F3n',
     docsSubtitle: 'Manual de instrucciones, lista de funciones y mejoras',
+    docsOverview: 'Resumen',
     docsManual: 'Manual',
     docsFeatures: 'Caracter\u00EDsticas',
     docsImprovements: 'Mejoras',
     docsRoadmap: 'Hoja de Ruta',
+    overviewTitle: 'Oregon Tires Auto Care \u2014 Resumen del Proyecto',
+    overviewSubtitle: 'Plataforma web completa construida para su negocio',
+    overviewClientSection: 'Funciones Solicitadas por el Cliente',
+    overviewClientDesc: 'Todo incluido en su inversi\u00F3n.',
+    overviewNewSection: 'Funciones Bonus Agregadas',
+    overviewNewDesc: 'Estas funciones bonus fueron construidas para maximizar el valor de su sitio web.',
+    overviewTotalFeatures: 'Total de Funciones',
+    overviewApiEndpoints: 'Endpoints de API',
+    overviewPages: 'P\u00E1ginas',
+    overviewMigrations: 'Migraciones de BD',
+    overviewCronJobs: 'Tareas Cron',
+    overviewComplete: 'Completas',
+    overviewBonusValue: 'Valor Total de Bonus Agregado',
+    overviewAllIncluded: 'Las {count} funciones bonus incluidas sin costo adicional',
+    overviewViewLive: 'Ver en Vivo',
+    overviewMarketPrice: 'Precio de Mercado',
+    overviewIncluded: 'Incluido',
+    overviewFeaturesIn: 'funciones en',
+    overviewCategories: 'Categor\u00EDas de Funciones',
     // Notes Modal
     adminNotes: 'Notas de Administraci\u00F3n',
     notesPlaceholder: 'Agregar notas sobre esta cita...',
@@ -5662,6 +6202,499 @@ const adminT = {
     analyticsConversionFunnel: 'Embudo de Conversión (30d)',
     analyticsServiceDuration: 'Duración Promedio del Servicio (días)',
     analyticsCustomerRetention: 'Retención de Clientes',
+    // Shared Actions
+    actionCancel: 'Cancelar',
+    actionSave: 'Guardar',
+    actionClose: 'Cerrar',
+    // Tire Quotes
+    tqLoadFail: 'Error al cargar cotizaciones de llantas',
+    tqFilterStatus: 'Estado:',
+    tqNoQuotes: 'No se encontraron solicitudes de cotización.',
+    tqDate: 'Fecha',
+    tqCustomer: 'Cliente',
+    tqVehicle: 'Vehículo',
+    tqTireSize: 'Medida de Llanta',
+    tqQty: 'Cant.',
+    tqStatus: 'Estado',
+    tqActions: 'Acciones',
+    tqView: 'Ver',
+    tqRespond: 'Cotizar',
+    tqAccept: 'Aceptar',
+    tqDecline: 'Rechazar',
+    tqDetails: 'Detalles de la Cotización',
+    tqEmail: 'Correo',
+    tqPhone: 'Teléfono',
+    tqNotes: 'Notas',
+    tqPrice: 'Precio/Llanta',
+    tqBrand: 'Marca/Modelo',
+    tqAvail: 'Disponibilidad',
+    tqQuoteNotes: 'Notas de Cotización',
+    tqRespondTitle: 'Responder con Cotización',
+    tqPricePerTire: 'Precio por Llanta ($)',
+    tqBrandModel: 'Marca / Modelo',
+    tqAvailability: 'Disponibilidad',
+    tqCancel: 'Cancelar',
+    tqSendQuote: 'Enviar Cotización',
+    tqPriceReq: 'El precio es requerido',
+    tqQuoteSent: 'Cotización enviada',
+    tqAccepted: 'Marcado como aceptado',
+    tqDeclined: 'Marcado como rechazado',
+    tqNetworkError: 'Error de red',
+    // Service Reminders
+    reminderLoadFail: 'Error al cargar recordatorios de servicio.',
+    reminderAllStatuses: 'Todos los Estados',
+    reminderOverdueOnly: 'Solo Vencidos',
+    reminderCreate: 'Crear Recordatorio',
+    reminderNone: 'No se encontraron recordatorios.',
+    reminderCustomer: 'Buscar Cliente',
+    reminderVehicle: 'Vehículo',
+    reminderServiceType: 'Tipo de Servicio',
+    reminderDueDate: 'Fecha de Vencimiento',
+    reminderDueMileage: 'Millaje de Vencimiento',
+    reminderSave: 'Guardar Recordatorio',
+    reminderEdit: 'Editar Recordatorio',
+    reminderRequired: 'Cliente y tipo de servicio son requeridos.',
+    reminderUpdated: 'Recordatorio actualizado',
+    reminderCreated: 'Recordatorio creado',
+    reminderSendNow: 'Enviar Ahora',
+    reminderComplete: 'Completar',
+    reminderSent: 'Recordatorio enviado',
+    reminderCompleted: 'Marcado como completado',
+    reminderDeleteConfirm: '¿Eliminar este recordatorio? No se puede deshacer.',
+    reminderDeleted: 'Recordatorio eliminado',
+    reminderNetworkError: 'Error de red',
+    // Labor Tracker
+    laborTime: 'Tiempo de Trabajo',
+    laborTotal: 'Total',
+    laborBillable: 'Facturable',
+    laborClockIn: 'Registrar Entrada',
+    laborEmployee: 'Empleado',
+    laborTask: 'Tarea',
+    laborClockInTime: 'Entrada',
+    laborClockOutTime: 'Salida',
+    laborDuration: 'Duración',
+    laborBillableCol: 'Fact.',
+    laborNoEntries: 'Sin registros de trabajo...',
+    laborStarted: 'Iniciado',
+    laborBillableTag: 'Facturable',
+    laborClockOut: 'Registrar Salida',
+    laborClockedOut: 'Salida registrada exitosamente',
+    laborClockOutFail: 'Error al registrar salida',
+    laborDelete: 'Eliminar',
+    laborDeleteConfirm: '¿Eliminar este registro de trabajo?',
+    laborDeleted: 'Registro eliminado',
+    laborDeleteFail: 'Error al eliminar registro',
+    laborNotBillable: 'No facturable',
+    laborClockInTitle: 'Registrar Entrada de Técnico',
+    laborSelectEmployee: 'Seleccionar empleado...',
+    laborOptional: 'opcional',
+    laborTaskPlaceholder: 'ej. Cambio de pastillas de freno',
+    laborStartClock: 'Iniciar',
+    laborSelectEmployeeFirst: 'Seleccione un empleado',
+    laborClockedIn: 'Entrada registrada exitosamente',
+    laborClockInFail: 'Error al registrar entrada',
+    laborCancel: 'Cancelar',
+    laborEmployeeNum: 'Empleado #',
+    laborSummaryLoading: 'Cargando resumen de trabajo...',
+    laborSummaryEmployee: 'Empleado',
+    laborSummaryTotalHrs: 'Horas Totales',
+    laborSummaryBillableHrs: 'Horas Facturables',
+    laborSummaryActiveClocks: 'Relojes Activos',
+    laborSummaryRoCount: 'Cant. OT',
+    laborSummaryNoData: 'Sin datos de trabajo disponibles.',
+    laborSummaryPeriod: 'Periodo:',
+    laborSummaryThisWeek: 'Esta Semana',
+    laborSummaryThisMonth: 'Este Mes',
+    laborSummaryAllTime: 'Todo el Tiempo',
+    laborSummaryError: 'Error al cargar resumen de trabajo',
+    // Loyalty
+    loyaltyMembers: 'Total de Miembros',
+    loyaltyOutstanding: 'Puntos Pendientes',
+    loyaltyRedeemed: 'Canjeados Este Mes',
+    loyaltyPointsLedger: 'Libro de Puntos',
+    loyaltyAdjustPoints: 'Agregar / Deducir Puntos',
+    loyaltyCustomer: 'Cliente',
+    loyaltyBalance: 'Saldo',
+    loyaltyLastActivity: 'Última Actividad',
+    loyaltyActions: 'Acciones',
+    loyaltyNoMembers: 'Sin miembros de lealtad aún.',
+    loyaltyAdd: 'Agregar',
+    loyaltyDeduct: 'Deducir',
+    loyaltyAdjustTitle: 'Ajustar Puntos',
+    loyaltySearchCustomer: 'Buscar nombre o correo del cliente...',
+    loyaltyAmount: 'Cantidad de Puntos',
+    loyaltyReason: 'Razón',
+    loyaltyAddPoints: 'Agregar Puntos',
+    loyaltyDeductPoints: 'Deducir Puntos',
+    loyaltySelectCustomer: 'Seleccione un cliente',
+    loyaltyEnterAmount: 'Ingrese una cantidad válida',
+    loyaltyPointsAdded: 'Puntos agregados',
+    loyaltyPointsDeducted: 'Puntos deducidos',
+    loyaltyRewardsCatalog: 'Catálogo de Recompensas',
+    loyaltyNewReward: 'Nueva Recompensa',
+    loyaltyNoRewards: 'Sin recompensas aún. Haga clic en "Nueva Recompensa" para crear una.',
+    loyaltyActive: 'Activo',
+    loyaltyInactive: 'Inactivo',
+    loyaltyEditReward: 'Editar Recompensa',
+    loyaltyCost: 'Costo en Puntos',
+    loyaltyDescription: 'Descripción',
+    loyaltyRewardUpdated: 'Recompensa actualizada',
+    loyaltyRewardCreated: 'Recompensa creada',
+    loyaltyRewardDeactivated: 'Recompensa desactivada',
+    loyaltyRewardActivated: 'Recompensa activada',
+    loyaltyDeleteConfirm: '¿Eliminar esta recompensa? No se puede deshacer.',
+    loyaltyRewardDeleted: 'Recompensa eliminada',
+    loyaltyNameEn: 'Nombre (EN)',
+    loyaltyNameEs: 'Nombre (ES)',
+    loyaltyNameRequired: 'Nombre (EN) es requerido',
+    loyaltyLoadFail: 'Error al cargar datos de lealtad',
+    loyaltySaveFail: 'Error al guardar',
+    loyaltyNetworkError: 'Error de red',
+    // Repair Orders (missing keys)
+    roMileageIn: 'Millaje de Entrada',
+    roPromisedDate: 'Fecha Prometida',
+    roUpdated: 'Actualizado',
+    roCustomerIdRequired: 'El ID del cliente es requerido',
+    roCreatedMsg: '¡Orden de reparación creada!',
+    roCreatingFor: 'Creando OT para',
+    roFailedMsg: 'Error',
+    roNetworkError: 'Error de red',
+    // Kanban (missing)
+    kanbanFailedUpdate: 'Error al actualizar estado',
+    kanbanTimeJustNow: 'ahora',
+    kanbanTimeMinAgo: 'min',
+    kanbanTimeHrAgo: 'h',
+    kanbanTimeDayAgo: 'd',
+    // Promotions (missing)
+    promoSidebar: 'Barra Lateral',
+    promoInline: 'En Línea',
+    promoLoadFail: 'Error al cargar promociones',
+    promoTitleRequired: 'Título (EN) es requerido',
+    promoSaveFail: 'Error al guardar',
+    promoNetworkError: 'Error de red',
+    promoDeleteConfirm: '¿Eliminar esta promoción? No se puede deshacer.',
+    promoAlways: 'Siempre',
+    promoNever: 'Nunca',
+    // FAQ (missing)
+    faqLoadFail: 'Error al cargar preguntas frecuentes',
+    faqQuestionRequired: 'Pregunta (EN) es requerida',
+    faqSaveFail: 'Error al guardar',
+    faqNetworkError: 'Error de red',
+    faqDeleteConfirm: '¿Eliminar esta pregunta? No se puede deshacer.',
+    // Testimonials (hardcoded strings)
+    testimLoadFail: 'Error al cargar reseñas',
+    testimNeverSynced: 'Nunca sincronizado',
+    testimSyncedJustNow: 'Sincronizado ahora',
+    testimSyncedMinAgo: 'Sincronizado hace {n} min',
+    testimSyncedHrAgo: 'Sincronizado hace {n}h',
+    testimSyncedDayAgo: 'Sincronizado hace {n}d',
+    testimImported: '{n} nueva(s) reseña(s) de Google importada(s)',
+    testimFetchFailed: 'Error en la búsqueda',
+    testimNetworkError: 'Error de red',
+    testimFetching: 'Buscando...',
+    testimFetchFromGoogle: 'Buscar de Google',
+    testimRemoveHomepage: 'Quitar de la página principal',
+    testimShowHomepage: 'Mostrar en la página principal',
+    testimAddedHomepage: 'Agregado a la página principal',
+    testimRemovedHomepage: 'Quitado de la página principal',
+    testimNameRequired: 'El nombre del cliente es requerido',
+    testimSaveFailed: 'Error al guardar',
+    testimDeleteConfirm: '¿Eliminar esta reseña? No se puede deshacer.',
+    // Blog (hardcoded strings)
+    blogLoadFail: 'Error al cargar publicaciones',
+    blogLoadError: 'Error al cargar publicaciones',
+    blogTitleRequired: 'Título (EN) es requerido',
+    blogBodyRequired: 'Contenido (EN) es requerido',
+    blogPostUpdated: '¡Publicación actualizada!',
+    blogPostCreated: '¡Publicación creada!',
+    blogSaveFail: 'Error al guardar',
+    blogSaveError: 'Error al guardar publicación',
+    blogDeleteConfirm: '¿Eliminar "{title}"? No se puede deshacer.',
+    blogPostDeleted: 'Publicación eliminada',
+    blogDeleteFail: 'Error al eliminar',
+    blogDeleteError: 'Error al eliminar publicación',
+    // Subscribers (hardcoded)
+    subscriberConfirmUnsub: '¿Está seguro de que desea cancelar la suscripción?',
+    // Visit Tracker (migrated from local T)
+    visitVehiclesInShop: 'vehículos en taller',
+    visitCheckIn: '+ Registrar',
+    visitBayLabel: 'Bahía',
+    visitInUse: '(En Uso)',
+    visitOpen: '(Libre)',
+    visitNoActive: 'No hay visitas activas',
+    visitNoBay: 'Sin bahía',
+    visitInService: 'En Servicio',
+    visitWaiting: 'Esperando',
+    visitStartService: 'Iniciar Servicio',
+    visitStart: 'Iniciar',
+    visitEndService: 'Finalizar Servicio',
+    visitDone: 'Listo',
+    visitCheckOut: 'Salida',
+    visitOut: 'Salir',
+    visitEnterCustomerId: 'Ingrese ID del Cliente:',
+    visitBayPrompt: 'Número de bahía (1-4, o dejar vacío):',
+    visitBaysInUse: 'Bahías en Uso',
+    visitTodayTotal: 'Total Hoy',
+    visitAvgWait: 'Espera Promedio',
+    visitLoadError: 'Error al cargar datos de visitas',
+    visitWaitLabel: 'Espera:',
+    visitServiceLabel: 'Servicio:',
+    // Invoices (migrated from local T)
+    invInvoiceNum: 'Factura #',
+    invCustomer: 'Cliente',
+    invRoNum: 'OT #',
+    invTotal: 'Total',
+    invStatus: 'Estado',
+    invDate: 'Fecha',
+    invActions: 'Acciones',
+    invAllStatuses: 'Todos',
+    invDraft: 'Borrador',
+    invSent: 'Enviada',
+    invPaid: 'Pagada',
+    invVoid: 'Anulada',
+    invSearchPlaceholder: 'Buscar facturas…',
+    invView: 'Ver',
+    invSend: 'Enviar',
+    invMarkPaid: 'Marcar Pagada',
+    invVoidBtn: 'Anular',
+    invCreateFromRo: '+ Crear desde OT',
+    invEnterRoId: 'Ingrese número de Orden de Trabajo (ej. RO-00000001):',
+    invNoInvoices: 'No se encontraron facturas.',
+    invConfirmSend: '¿Enviar esta factura al cliente?',
+    invConfirmPaid: '¿Marcar esta factura como pagada?',
+    invConfirmVoid: '¿Anular esta factura? No se puede deshacer.',
+    invCreateSuccess: 'Factura creada.',
+    invSendSuccess: 'Factura enviada al cliente.',
+    invPaidSuccess: 'Factura marcada como pagada.',
+    invVoidSuccess: 'Factura anulada.',
+    invError: 'Algo salió mal. Intente de nuevo.',
+    invPrev: '← Anterior',
+    invNext: 'Siguiente →',
+    invPageOf: 'Página {page} de {total}',
+    // Waitlist (migrated from local L)
+    wlPosition: '#',
+    wlName: 'Cliente',
+    wlPhone: 'Tel.',
+    wlVehicle: 'Vehículo',
+    wlService: 'Servicio',
+    wlWait: 'Espera',
+    wlStatus: 'Estado',
+    wlActions: 'Acciones',
+    wlAddWalkin: '+ Agregar',
+    wlCallNext: 'Llamar',
+    wlStartService: 'Iniciar',
+    wlComplete: 'Completar',
+    wlNoShow: 'No vino',
+    wlNoEntries: 'No hay nadie en la lista.',
+    wlFormName: 'Nombre',
+    wlFormPhone: 'Teléfono',
+    wlFormVehicle: 'Descripción del vehículo',
+    wlFormService: 'Tipo de servicio',
+    wlSave: 'Agregar a lista',
+    wlCancel: 'Cancelar',
+    wlWaiting: 'Esperando',
+    wlCalled: 'Llamado',
+    wlInService: 'En servicio',
+    wlCompleted: 'Completado',
+    wlNoShowStatus: 'No vino',
+    wlJustNow: 'ahora',
+    wlMinAgo: 'min',
+    wlHrAgo: 'h',
+    wlAdded: 'Agregado a la lista',
+    wlUpdated: 'Estado actualizado',
+    wlFailed: 'Error',
+    wlNameRequired: 'El nombre es requerido',
+    // Referrals (migrated from local labels)
+    refCode: 'Código de Referencia',
+    refReferrer: 'Referente',
+    refReferred: 'Cliente Referido',
+    refStatus: 'Estado',
+    refPoints: 'Puntos Bonus',
+    refCreated: 'Creado',
+    refActions: 'Acciones',
+    refTotal: 'Total de Referencias',
+    refCompleted: 'Completadas',
+    refAwarded: 'Puntos Otorgados',
+    refAll: 'Todos',
+    refPending: 'Pendiente',
+    refRewarded: 'Recompensado',
+    refExpired: 'Expirado',
+    refMarkComplete: 'Marcar Completo',
+    refAwardPoints: 'Otorgar Puntos',
+    refNoResults: 'No se encontraron referencias.',
+    refLoadError: 'Error al cargar referencias.',
+    refCompleteOk: 'Referencia marcada como completa.',
+    refAwardOk: 'Puntos otorgados exitosamente.',
+    refFail: 'Acción fallida. Intente de nuevo.',
+    // Google Business (migrated from local labels)
+    gbTitle: 'Sincronización de Google Business Profile',
+    gbLastSync: 'Última sincronización',
+    gbNextSync: 'Próxima sincronización',
+    gbStatus: 'Estado',
+    gbReviewsSynced: 'Reseñas sincronizadas',
+    gbSyncNow: 'Sincronizar ahora',
+    gbSyncing: 'Sincronizando...',
+    gbSuccess: 'Exitoso',
+    gbPending: 'Pendiente',
+    gbError: 'Error',
+    gbLogTitle: 'Registro de sincronización',
+    gbDate: 'Fecha',
+    gbType: 'Tipo',
+    gbDetails: 'Detalles',
+    gbSettingsTitle: 'Configuración de sincronización',
+    gbFrequency: 'Frecuencia',
+    gbAutoSync: 'Auto-sincronizar',
+    gbSave: 'Guardar',
+    gbSaved: 'Configuración guardada',
+    gbSaveFailed: 'Error al guardar',
+    gbSyncSuccess: 'Sincronización completada',
+    gbSyncFailed: 'Error en sincronización',
+    gbNoLogs: 'Sin registros.',
+    gbDaily: 'Diario',
+    gbWeekly: 'Semanal',
+    gbMonthly: 'Mensual',
+    gbNever: 'Nunca',
+    // Calendar Retry
+    calSyncRetried: 'Sincronización de calendario reintentada exitosamente',
+    calRetryFailed: 'Error al reintentar',
+    calNetworkError: 'Error de red',
+    // HTML Translation Gap Fixes
+    passwordShow: 'Mostrar',
+    loading: 'Cargando...',
+    active: 'Activo',
+    sortOrder: 'Orden',
+    actionCancel: 'Cancelar',
+    // Appointments - calendar legend
+    apptAllMonths: 'Todos los Meses',
+    apptPerPageAll: 'Todos',
+    apptCalHasAppts: 'Tiene citas',
+    apptCalToday: 'Hoy',
+    apptCalSelected: 'Seleccionado',
+    // Messages
+    msgAllStatus: 'Todos',
+    msgOpen: 'Abierto',
+    msgWaitingReply: 'Esperando Respuesta',
+    msgResolved: 'Resuelto',
+    msgClosed: 'Cerrado',
+    msgWeb: 'Web',
+    msgEmail: 'Correo',
+    msgUnreadOnly: 'Solo sin leer',
+    msgReplyPlaceholder: 'Escribe tu respuesta...',
+    msgStatusPlaceholder: 'Estado...',
+    msgResolve: 'Resolver',
+    msgClose: 'Cerrar',
+    msgReopen: 'Reabrir',
+    msgRefresh: '\u21BB Actualizar',
+    msgSend: 'Enviar',
+    // Customers
+    custVehicle: 'Veh\u00EDculo',
+    custServices: 'Servicios',
+    // Repair Orders
+    roNewRo: '+ Nueva OT',
+    roRefresh: '\u21BB Actualizar',
+    // Employees
+    empNamePlaceholder: 'Nombre del empleado',
+    empEmailPlaceholder: 'correo@ejemplo.com',
+    empPhonePlaceholder: '(555) 123-4567',
+    empEmailLabel: 'Correo Electr\u00F3nico *',
+    empDisplayName: 'Nombre *',
+    empRoleLabel: 'Rol',
+    empAdminRole: 'Admin',
+    empSuperAdmin: 'Super Admin',
+    empLangPref: 'Preferencia de Idioma',
+    empLangEs: '\uD83C\uDDF2\uD83C\uDDFD Espa\u00F1ol (Principal)',
+    empLangEn: '\uD83C\uDDFA\uD83C\uDDF8 English (Principal)',
+    empLangBoth: '\uD83C\uDF10 Ambos',
+    empLangHelp: 'El idioma principal aparece primero en correos biling\u00FCes',
+    empCreateInvite: '\uD83D\uDEE1 Crear y Enviar Invitaci\u00F3n',
+    empCancelAdmin: 'Cancelar',
+    // Schedule
+    schedWeekly: 'Semanal',
+    schedDaily: 'Diario',
+    schedOverridesBtn: 'Excepciones',
+    // Gallery
+    galleryDropText: 'Arrastra im\u00E1genes aqu\u00ED, o haz clic para buscar',
+    galleryDropHint: 'Soporta m\u00FAltiples archivos. Im\u00E1genes de m\u00E1s de 200KB se comprimir\u00E1n.',
+    galleryTitleEn: 'T\u00EDtulo (EN)',
+    galleryTitleEs: 'T\u00EDtulo (ES)',
+    galleryDescEn: 'Descripci\u00F3n (EN)',
+    galleryDescEs: 'Descripci\u00F3n (ES)',
+    galleryTitleEnPh: 'T\u00EDtulo de la imagen en Ingl\u00E9s',
+    galleryTitleEsPh: 'T\u00EDtulo de la imagen en Espa\u00F1ol',
+    galleryDescEnPh: 'Descripci\u00F3n de la imagen',
+    galleryDescEsPh: 'Descripci\u00F3n de la imagen',
+    // Service Images
+    svcImagesTitle: 'Administrador de Im\u00E1genes',
+    svcImagesDesc: 'Administrar el fondo y las 7 im\u00E1genes de servicio de la p\u00E1gina principal',
+    // Blog Editor
+    blogSearchPlaceholder: 'Buscar publicaciones...',
+    blogNewPost: 'Nueva Publicaci\u00F3n',
+    blogNewPostBtn: '+ Nueva Publicaci\u00F3n',
+    blogTitleEn: 'T\u00EDtulo (Ingl\u00E9s) *',
+    blogTitleEs: 'T\u00EDtulo (Espa\u00F1ol)',
+    blogSlug: 'Slug (URL)',
+    blogSlugPlaceholder: 'auto-generado-del-titulo',
+    blogTitleEnPh: 'T\u00EDtulo del art\u00EDculo en Ingl\u00E9s',
+    blogTitleEsPh: 'T\u00EDtulo del art\u00EDculo en Espa\u00F1ol',
+    blogExcerptEn: 'Extracto (EN)',
+    blogExcerptEs: 'Extracto (ES)',
+    blogExcerptEnPh: 'Descripci\u00F3n corta para tarjetas',
+    blogExcerptEsPh: 'Descripci\u00F3n corta',
+    blogBodyEn: 'Contenido (Ingl\u00E9s) *',
+    blogBodyEs: 'Contenido (Espa\u00F1ol)',
+    blogHtmlSupported: 'HTML soportado',
+    blogFeaturedImage: 'URL de Imagen Destacada',
+    blogImagePlaceholder: '/uploads/blog/imagen.jpg',
+    blogAuthor: 'Autor',
+    blogStatusLabel: 'Estado',
+    blogCategories: 'Categor\u00EDas',
+    blogSavePost: 'Guardar Publicaci\u00F3n',
+    blogEditorDraft: 'Borrador',
+    blogEditorPublished: 'Publicado',
+    // FAQ Form
+    faqHeading: '\u2753 Preguntas Frecuentes',
+    faqSubheading: 'Administrar preguntas frecuentes de la p\u00E1gina principal',
+    faqNewFaqBtn: '+ Nueva Pregunta',
+    faqFormTitle: 'Nueva Pregunta',
+    faqQuestionEnLabel: 'Pregunta (EN) *',
+    faqQuestionEsLabel: 'Pregunta (ES)',
+    faqAnswerEnLabel: 'Respuesta (EN) *',
+    faqAnswerEsLabel: 'Respuesta (ES)',
+    faqQuestionEnPh: 'Pregunta en Ingl\u00E9s',
+    faqQuestionEsPh: 'Pregunta en Espa\u00F1ol',
+    faqAnswerEnPh: 'Respuesta en Ingl\u00E9s',
+    faqAnswerEsPh: 'Respuesta en Espa\u00F1ol',
+    faqCreateBtn: 'Crear Pregunta',
+    faqCancelBtn: 'Cancelar',
+    faqActiveLabel: 'Activo',
+    faqSortLabel: 'Orden',
+    // Reviews/Testimonials Form
+    reviewHeading: 'Rese\u00F1as de Clientes',
+    reviewSubheading: 'Administrar testimonios y rese\u00F1as de Google',
+    reviewFetchGoogle: 'Buscar en Google',
+    reviewNeverSynced: 'Nunca sincronizado',
+    reviewNewBtn: '+ Nueva Rese\u00F1a',
+    reviewFilterAll: 'Todas',
+    reviewFilterGoogle: 'Google',
+    reviewFilterManual: 'Manual',
+    reviewFilterHomepage: 'En P\u00E1gina Principal',
+    reviewFormTitle: 'Nueva Rese\u00F1a',
+    reviewCustName: 'Nombre del Cliente *',
+    reviewCustPh: 'Nombre del cliente',
+    reviewRating: 'Calificaci\u00F3n',
+    reviewTextEnLabel: 'Texto de Rese\u00F1a (EN) *',
+    reviewTextEsLabel: 'Texto de Rese\u00F1a (ES)',
+    reviewTextEnPh: 'Texto de la rese\u00F1a en Ingl\u00E9s',
+    reviewTextEsPh: 'Texto de la rese\u00F1a en Espa\u00F1ol',
+    reviewActiveLabel: 'Activo',
+    reviewShowOnHomepage: 'Mostrar en P\u00E1gina Principal',
+    reviewSortLabel: 'Orden',
+    reviewCreateBtn: 'Crear Rese\u00F1a',
+    reviewCancelBtn: 'Cancelar',
+    reviewThSource: 'Fuente',
+    reviewThHomepage: 'P\u00E1gina Principal',
+    reviewLoadingTd: 'Cargando...',
+    faqLoadingTd: 'Cargando...',
     shopFloor: 'Taller',
   }
 };
@@ -5700,6 +6733,7 @@ function applyAdminTranslations() {
     el.classList.toggle('hidden', currentLang !== 'es');
   });
   if (typeof renderFeatures === 'function') renderFeatures();
+  if (typeof renderOverviewTab === 'function') renderOverviewTab();
 }
 
 function refreshActiveTab() {
@@ -7530,8 +8564,10 @@ async function openConversation(id) {
       msgsDiv.appendChild(bubble);
     });
 
-    // Mark as read
-    api('conversations.php?id=' + id, { method: 'POST', body: JSON.stringify({ action: 'mark_read' }) }).catch(function() {});
+    // Mark as read and refresh badge immediately
+    api('conversations.php?id=' + id, { method: 'POST', body: JSON.stringify({ action: 'mark_read' }) })
+      .then(function() { refreshConvUnreadBadge(); })
+      .catch(function() {});
   } catch(e) { console.error('openConversation failed:', e); }
 }
 
@@ -9894,6 +10930,25 @@ function switchTab(tab) {
   if(tab==='gbsync' && typeof loadGoogleBusinessSync === 'function') loadGoogleBusinessSync();
 }
 
+// Nav dropdown click-to-toggle
+document.querySelectorAll('.nav-group-btn').forEach(function(btn) {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var group = btn.closest('.nav-group');
+    var wasOpen = group.classList.contains('open');
+    document.querySelectorAll('.nav-group').forEach(function(g) { g.classList.remove('open'); });
+    if (!wasOpen) group.classList.add('open');
+  });
+});
+document.querySelectorAll('.nav-dropdown-item').forEach(function(item) {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.nav-group').forEach(function(g) { g.classList.remove('open'); });
+  });
+});
+document.addEventListener('click', function() {
+  document.querySelectorAll('.nav-group').forEach(function(g) { g.classList.remove('open'); });
+});
+
 // Sub-tab switching for Appointments (Calendar vs List)
 function switchApptView(view) {
   document.getElementById('appt-subtab-calendar').classList.toggle('hidden', view !== 'calendar');
@@ -9906,7 +10961,7 @@ function switchApptView(view) {
 
 // Sub-tab switching for Documentation
 function switchDocsView(view) {
-  var tabs = ['manual','features','improvements','vision'];
+  var tabs = ['overview','manual','features','improvements','vision'];
   var active = 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white';
   var inactive = 'px-4 py-2 rounded-lg text-sm font-medium border text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
   var visionActive = 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white';
@@ -9918,6 +10973,7 @@ function switchDocsView(view) {
     else btn.className = view === t ? active : inactive;
   });
   if (view === 'features' && typeof renderFeatures === 'function') renderFeatures();
+  if (view === 'overview' && typeof renderOverviewTab === 'function') renderOverviewTab();
 }
 
 // ===== FEATURE STATUS DASHBOARD =====
@@ -10146,6 +11202,220 @@ function renderFeatures() {
     : 'Showing ' + filtered.length + ' of ' + FEATURE_DATA.length + ' features';
   summary.textContent = showingText;
   listEl.appendChild(summary);
+}
+
+// ===== PROJECT OVERVIEW TAB =====
+function renderOverviewTab() {
+  if (typeof FEATURE_DATA === 'undefined') return;
+  var lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
+  var t = adminT[lang] || adminT.en;
+  var container = document.getElementById('overview-content');
+  if (!container) return;
+  container.textContent = '';
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text) e.textContent = text;
+    return e;
+  }
+
+  // Compute data
+  var clientFeatures = FEATURE_DATA.filter(function(f) { return f.source === 'client'; });
+  var newFeatures = FEATURE_DATA.filter(function(f) { return f.source === 'new'; });
+  var completeCount = FEATURE_DATA.filter(function(f) { return f.status === 'complete'; }).length;
+  var totalPrice = 0;
+  newFeatures.forEach(function(f) { totalPrice += (f.price || 0); });
+  var pct = Math.round((completeCount / FEATURE_DATA.length) * 100);
+
+  // ─── 1. Hero Stats Banner ───
+  var hero = el('div', 'rounded-2xl p-6 md:p-8 mb-8 text-white bg-gradient-to-br from-green-600 to-green-800');
+  var heroTitle = el('h2', 'text-2xl md:text-3xl font-bold mb-1', t.overviewTitle);
+  hero.appendChild(heroTitle);
+  var heroSub = el('p', 'text-green-100 text-sm mb-6', t.overviewSubtitle);
+  hero.appendChild(heroSub);
+
+  var statsGrid = el('div', 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4');
+  var stats = [
+    { val: FEATURE_DATA.length, label: t.overviewTotalFeatures },
+    { val: 119, label: t.overviewApiEndpoints },
+    { val: 36, label: t.overviewPages },
+    { val: 53, label: t.overviewMigrations },
+    { val: 7, label: t.overviewCronJobs },
+    { val: completeCount, label: t.overviewComplete }
+  ];
+  stats.forEach(function(s) {
+    var card = el('div', 'bg-white/15 rounded-xl p-3 text-center backdrop-blur-sm');
+    card.appendChild(el('div', 'text-2xl md:text-3xl font-bold', String(s.val)));
+    card.appendChild(el('div', 'text-xs text-green-100 mt-1', s.label));
+    statsGrid.appendChild(card);
+  });
+  hero.appendChild(statsGrid);
+  container.appendChild(hero);
+
+  // ─── 2. Completion Progress ───
+  var progWrap = el('div', 'flex items-center gap-6 mb-8 p-5 rounded-xl bg-white dark:bg-gray-800 shadow border border-gray-100 dark:border-gray-700');
+  var ringSize = 80;
+  var ringSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  ringSvg.setAttribute('width', String(ringSize));
+  ringSvg.setAttribute('height', String(ringSize));
+  ringSvg.setAttribute('viewBox', '0 0 80 80');
+  ringSvg.style.flexShrink = '0';
+  var bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  bgCircle.setAttribute('cx', '40'); bgCircle.setAttribute('cy', '40'); bgCircle.setAttribute('r', '34');
+  bgCircle.setAttribute('fill', 'none'); bgCircle.setAttribute('stroke', '#e5e7eb'); bgCircle.setAttribute('stroke-width', '8');
+  ringSvg.appendChild(bgCircle);
+  var fgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  fgCircle.setAttribute('cx', '40'); fgCircle.setAttribute('cy', '40'); fgCircle.setAttribute('r', '34');
+  fgCircle.setAttribute('fill', 'none'); fgCircle.setAttribute('stroke', '#16a34a'); fgCircle.setAttribute('stroke-width', '8');
+  fgCircle.setAttribute('stroke-linecap', 'round');
+  var circumference = 2 * Math.PI * 34;
+  fgCircle.setAttribute('stroke-dasharray', String(circumference));
+  fgCircle.setAttribute('stroke-dashoffset', String(circumference - (pct / 100) * circumference));
+  fgCircle.setAttribute('transform', 'rotate(-90 40 40)');
+  ringSvg.appendChild(fgCircle);
+  var pctText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  pctText.setAttribute('x', '40'); pctText.setAttribute('y', '44');
+  pctText.setAttribute('text-anchor', 'middle'); pctText.setAttribute('font-size', '16'); pctText.setAttribute('font-weight', 'bold');
+  pctText.setAttribute('fill', '#16a34a');
+  pctText.textContent = pct + '%';
+  ringSvg.appendChild(pctText);
+  progWrap.appendChild(ringSvg);
+  var progInfo = el('div', '');
+  progInfo.appendChild(el('div', 'text-lg font-bold text-gray-800 dark:text-gray-100', completeCount + ' / ' + FEATURE_DATA.length + ' ' + t.overviewComplete));
+  var progBar = el('div', 'w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-2');
+  var progFill = el('div', 'bg-green-500 h-2.5 rounded-full');
+  progFill.style.width = pct + '%';
+  progBar.appendChild(progFill);
+  progInfo.appendChild(progBar);
+  progWrap.appendChild(progInfo);
+  container.appendChild(progWrap);
+
+  // ─── 3. Category Summary Grid ───
+  var catTitle = el('h3', 'text-xl font-bold text-gray-800 dark:text-gray-100 mb-4', t.overviewCategories);
+  container.appendChild(catTitle);
+  var catGrid = el('div', 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8');
+  var catOrder = ['A','B','C','D','E','F','G','H','I','X'];
+  catOrder.forEach(function(catKey) {
+    var catItems = FEATURE_DATA.filter(function(f) { return f.cat === catKey; });
+    if (catItems.length === 0) return;
+    var catComplete = catItems.filter(function(f) { return f.status === 'complete'; }).length;
+    var catPct = Math.round((catComplete / catItems.length) * 100);
+    var card = el('div', 'p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow');
+    card.addEventListener('click', function() {
+      var target = document.getElementById('overview-cat-' + catKey);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    var cardTop = el('div', 'flex items-center gap-2 mb-2');
+    var icon = typeof FEATURE_ICONS !== 'undefined' ? (FEATURE_ICONS[catKey] || '') : '';
+    cardTop.appendChild(el('span', 'text-xl', icon));
+    var catName = FEATURE_CATS[catKey] ? FEATURE_CATS[catKey][lang] : catKey;
+    cardTop.appendChild(el('span', 'font-semibold text-sm text-gray-800 dark:text-gray-200', catName));
+    card.appendChild(cardTop);
+    card.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400 mb-2', catComplete + '/' + catItems.length + ' ' + t.overviewComplete));
+    var bar = el('div', 'w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5');
+    var fill = el('div', 'h-1.5 rounded-full ' + (catPct === 100 ? 'bg-green-500' : 'bg-yellow-500'));
+    fill.style.width = catPct + '%';
+    bar.appendChild(fill);
+    card.appendChild(bar);
+    catGrid.appendChild(card);
+  });
+  container.appendChild(catGrid);
+
+  // ─── Helper: render feature card ───
+  function renderFeatureCard(f, showPrice) {
+    var card = el('div', 'p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+    var topRow = el('div', 'flex items-start justify-between gap-2 mb-2');
+    var statusDot = el('span', 'inline-block w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ' + (f.status === 'complete' ? 'bg-green-500' : f.status === 'in_progress' ? 'bg-yellow-500' : f.status === 'planned' ? 'bg-blue-500' : 'bg-gray-400'));
+    var nameEl = el('span', 'font-medium text-sm text-gray-800 dark:text-gray-200 flex-1', f['name_' + lang] || f.name_en);
+    var leftGroup = el('div', 'flex items-start gap-2 flex-1');
+    leftGroup.appendChild(statusDot);
+    leftGroup.appendChild(nameEl);
+    topRow.appendChild(leftGroup);
+    if (showPrice && f.price) {
+      var priceBadge = el('span', 'text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '$' + f.price.toLocaleString());
+      topRow.appendChild(priceBadge);
+    } else {
+      var inclBadge = el('span', 'text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '\u2713 ' + t.overviewIncluded);
+      topRow.appendChild(inclBadge);
+    }
+    card.appendChild(topRow);
+    card.appendChild(el('p', 'text-xs text-gray-500 dark:text-gray-400 leading-relaxed', f['desc_' + lang] || f.desc_en));
+    if (typeof FEATURE_LINKS !== 'undefined' && FEATURE_LINKS[f.id]) {
+      var link = document.createElement('a');
+      link.href = FEATURE_LINKS[f.id];
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.className = 'inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium mt-2 hover:underline';
+      link.textContent = t.overviewViewLive + ' \u2192';
+      card.appendChild(link);
+    }
+    return card;
+  }
+
+  // ─── Helper: render section with categories ───
+  function renderSection(title, desc, features, accentColor, showPrice) {
+    var section = el('div', 'mb-10');
+    var header = el('div', 'flex items-center gap-3 mb-2 pb-3 border-b-2 border-' + accentColor + '-500');
+    header.appendChild(el('h3', 'text-xl font-bold text-gray-800 dark:text-gray-100', title));
+    header.appendChild(el('span', 'text-sm font-medium px-2.5 py-0.5 rounded-full bg-' + accentColor + '-100 text-' + accentColor + '-700 dark:bg-' + accentColor + '-900/30 dark:text-' + accentColor + '-300', String(features.length)));
+    section.appendChild(header);
+    section.appendChild(el('p', 'text-sm text-gray-500 dark:text-gray-400 mb-5', desc));
+
+    // Group by category
+    var groups = {};
+    features.forEach(function(f) {
+      if (!groups[f.cat]) groups[f.cat] = [];
+      groups[f.cat].push(f);
+    });
+
+    catOrder.forEach(function(catKey) {
+      if (!groups[catKey]) return;
+      var catDiv = el('div', 'mb-6');
+      catDiv.id = 'overview-cat-' + catKey;
+      var catHeader = el('div', 'flex items-center gap-2 mb-3');
+      var icon = typeof FEATURE_ICONS !== 'undefined' ? (FEATURE_ICONS[catKey] || '') : '';
+      catHeader.appendChild(el('span', 'text-lg', icon));
+      var catName = FEATURE_CATS[catKey] ? FEATURE_CATS[catKey][lang] : catKey;
+      catHeader.appendChild(el('span', 'font-semibold text-gray-700 dark:text-gray-300', catName));
+      catHeader.appendChild(el('span', 'text-xs text-gray-400', '(' + groups[catKey].length + ' ' + t.overviewFeaturesIn + ' ' + catKey + ')'));
+      catDiv.appendChild(catHeader);
+      var grid = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-3');
+      groups[catKey].forEach(function(f) {
+        grid.appendChild(renderFeatureCard(f, showPrice));
+      });
+      catDiv.appendChild(grid);
+      section.appendChild(catDiv);
+    });
+
+    return section;
+  }
+
+  // ─── 4. Client Requested Features ───
+  container.appendChild(renderSection(
+    t.overviewClientSection, t.overviewClientDesc,
+    clientFeatures, 'green', false
+  ));
+
+  // ─── 5. New Features Section ───
+  var newSectionTitle = t.overviewNewSection + '  \u2014  $' + totalPrice.toLocaleString();
+  container.appendChild(renderSection(
+    newSectionTitle, t.overviewNewDesc,
+    newFeatures, 'indigo', true
+  ));
+
+  // ─── 6. Total Value Summary Card ───
+  var summary = el('div', 'rounded-2xl p-6 md:p-8 text-white bg-gradient-to-br from-green-600 to-green-800 text-center');
+  summary.appendChild(el('div', 'text-lg font-medium mb-1 text-green-100', t.overviewBonusValue));
+  summary.appendChild(el('div', 'text-4xl md:text-5xl font-bold mb-3', '$' + totalPrice.toLocaleString()));
+  var allInclText = t.overviewAllIncluded.replace('{count}', String(newFeatures.length));
+  summary.appendChild(el('p', 'text-green-100 text-sm', '\u2713 ' + allInclText));
+  container.appendChild(summary);
+}
+
+// Initial render of overview on page load
+if (typeof FEATURE_DATA !== 'undefined') {
+  setTimeout(function() { if (typeof renderOverviewTab === 'function') renderOverviewTab(); }, 100);
 }
 
 // ===== MY SCHEDULE / MY WORK (staff tabs) =====
@@ -10771,6 +12041,10 @@ function closeNotifPanel() {
 function clearNotifications() {
   notifItems = [];
   renderNotifications();
+  // Mark all conversations read in DB and refresh the Messages tab badge
+  api('conversations.php', { method: 'POST', body: JSON.stringify({ action: 'mark_read_all' }) })
+    .then(function() { refreshConvUnreadBadge(); })
+    .catch(function(e) { console.error('mark_read_all failed:', e); });
 }
 
 // Close dropdown when clicking outside

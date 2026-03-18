@@ -52,7 +52,9 @@ try {
                    a.vehicle_year, a.vehicle_make, a.vehicle_model, a.status, a.language,
                    a.created_at, e.name as employee_name,
                    insp.customer_view_token,
-                   (SELECT COUNT(*) FROM oretir_inspection_photos ip WHERE ip.inspection_id = insp.id) as photo_count
+                   (SELECT COUNT(*) FROM oretir_inspection_photos ip
+                    JOIN oretir_inspection_items ii ON ip.inspection_item_id = ii.id
+                    WHERE ii.inspection_id = insp.id) as photo_count
             FROM oretir_appointments a
             LEFT JOIN oretir_customers c ON a.customer_id = c.id
             LEFT JOIN oretir_employees e ON a.assigned_employee_id = e.id
