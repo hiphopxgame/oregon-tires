@@ -33,7 +33,7 @@ if (($_SESSION['google_oauth_mode'] ?? '') === 'connect') {
             exit;
         }
         $memberId = (int) $_SESSION['member_id'];
-        MemberGoogle::linkAccount($memberId, $result['profile']['sub'], $result['profile']['email'] ?? null);
+        MemberGoogle::linkAccount($memberId, $result['profile']['sub'], $result['profile']['email'] ?? null, $result['profile']['picture'] ?? null);
         $redirect = $result['return_url'] ?? '/members?tab=settings';
         $sep = str_contains($redirect, '?') ? '&' : '?';
         header('Location: ' . $redirect . $sep . 'success=' . urlencode('Google account connected!'));

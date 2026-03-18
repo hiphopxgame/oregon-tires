@@ -38,7 +38,7 @@ try {
             exit;
         }
         $memberId = (int) $_SESSION['member_id'];
-        MemberGoogle::linkAccount($memberId, $profile['sub'], $profile['email'] ?? null);
+        MemberGoogle::linkAccount($memberId, $profile['sub'], $profile['email'] ?? null, $profile['picture'] ?? null);
 
         $redirect = $returnUrl ?? '/members?tab=settings';
         $sep = str_contains($redirect, '?') ? '&' : '?';
