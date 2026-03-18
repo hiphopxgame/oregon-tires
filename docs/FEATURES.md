@@ -1,6 +1,6 @@
 # Oregon Tires Auto Care — Feature Inventory
 
-> **Last updated:** 2026-03-03
+> **Last updated:** 2026-03-17
 > **Stack:** PHP + MySQL + Tailwind CSS v4 + PHPMailer | cPanel/Apache
 > **Live:** https://oregon.tires
 > **Admin:** https://oregon.tires/admin/
@@ -18,7 +18,7 @@
 | Content & Marketing | 6 systems | P2 |
 | Public Website | 4 systems | P2 |
 | Infrastructure | 7 systems | P3 |
-| **Total** | **~30 systems, 70+ API endpoints, 29 pages** | |
+| **Total** | **~32 systems, 90+ API endpoints, 36 pages** | |
 
 ---
 
@@ -32,6 +32,8 @@
 - 15-minute slot granularity with multi-bay capacity
 - Employee schedule-aware availability (blocks booked slots per technician)
 - VIN decode built into booking form (auto-populates vehicle details)
+- License plate lookup integration (plate → vehicle → tire sizes via `api/plate-lookup.php`)
+- "Find My Tire Size" helper for tire-related services (dynamic display from plate/VIN decode)
 - SMS opt-in checkbox during booking
 - Auto-creates customer + vehicle records on first booking
 - Service type selection (tire, brake, oil change, alignment, inspection, other)
@@ -133,17 +135,24 @@
 ### Member Portal
 
 **Page:** `/members`
-**API:** `/api/member/*` (17 endpoints)
+**API:** `/api/member/*` (21 endpoints)
 
 - Customer login/register via Member Kit integration
 - Google OAuth sign-in option (`/api/member/google.php`, `/api/member/google-callback.php`)
 - Password reset flow (`/api/member/forgot-password.php`, `/api/member/reset-password.php`)
+- Bilingual auth pages (EN/ES) with local template overrides
+- Unified auth flow: admin login redirects to `/members` for single entry point
 - **Dashboard tabs:**
   - **Appointments:** View upcoming and past bookings (`/api/member/my-bookings.php`)
   - **Vehicles:** View/manage linked vehicles (`/api/member/my-vehicles.php`)
   - **Estimates:** View sent estimates, approve/decline (`/api/member/my-estimates.php`)
   - **Messages:** Contact history (`/api/member/my-messages.php`)
+  - **Conversations:** Member conversation threads (`/api/member/conversations.php`)
   - **Care Plan:** Current plan status and benefits (`/api/member/my-care-plan.php`)
+- **Employee role-based tabs** (visible only to employee/admin roles):
+  - **My Schedule:** Employee work schedule (`/api/member/my-schedule.php`)
+  - **My Assigned Work:** Employee's assigned ROs (`/api/member/my-assigned-work.php`)
+  - **My Customers:** Employee's customer list (`/api/member/my-customers.php`)
 - Profile management (`/api/member/profile.php`, `/api/member/password.php`)
 - Google account linking/unlinking
 
@@ -316,7 +325,7 @@
 
 ## Group 6: Public Website (P2)
 
-### Service Detail Pages (8 pages)
+### Service Detail Pages (10 pages)
 
 Each page is bilingual with pricing info, FAQ section, and Schema.org markup.
 
@@ -329,7 +338,9 @@ Each page is bilingual with pricing info, FAQ section, and Schema.org markup.
 | Engine Diagnostics | `/engine-diagnostics` |
 | Wheel Alignment | `/wheel-alignment` |
 | Suspension Repair | `/suspension-repair` |
+| Mobile Service | `/mobile-service` |
 | Fleet Services | `/fleet-services` |
+| Roadside Assistance | `/roadside-assistance` |
 
 ### Location Pages (8 pages)
 
@@ -367,13 +378,13 @@ Local SEO targeting for Portland neighborhoods.
 - Gallery section (language-filtered)
 - Contact section with form + Google Maps embed
 - Sticky header with smooth scroll navigation
-- **Footer** links to all 8 service pages
+- **Footer** links to all 10 service pages
 
 ### Site-Wide Features
 
-- **Bilingual system:** EN/ES toggle via globe icon, `data-t` attribute translations, `currentLang` JS variable, language persisted across pages
+- **Bilingual system:** EN/ES toggle via globe icon, `data-t` attribute translations, `currentLang` JS variable, language persisted across pages — includes bilingual auth pages (login/register/reset)
 - **Dark mode:** System preference detection + manual toggle, Tailwind v4 `@variant dark` strategy
-- **PWA:** Service worker (`sw.js` v16) with versioned caching, offline fallback, network-first HTML, cache-first images, all 8 service pages precached
+- **PWA (Enhanced):** Service worker (`sw.js` v21) with versioned caching, bilingual offline fallback page (`offline.html`), network-first HTML, cache-first images, all 8 service pages + booking page precached. **Push notifications** via Web Push API (VAPID) with bilingual payloads — booking confirmations, appointment reminders, RO status updates, admin broadcast promotions. **Offline booking** via IndexedDB queue + Background Sync replay (`assets/js/offline-booking.js`). **Install prompt** for Android (deferred prompt) + iOS (share sheet instructions) via `assets/js/pwa-manager.js`. Online/offline indicator with bilingual toast. Notification preferences (4 toggles) per subscription. Manifest with scope, split icons (any/maskable), shortcuts (Book, My Bookings, Call Us), share_target
 - **Responsive:** Mobile-first design with Tailwind breakpoints (320px+)
 - **Accessibility:** ARIA labels, focus management, skip-to-content link, WCAG AA contrast
 - **SEO:** OG tags, Twitter Cards, canonical URLs, hreflang (en/es), JSON-LD AutomotiveBusiness schema, robots.txt, sitemap.xml
@@ -400,10 +411,13 @@ Local SEO targeting for Portland neighborhoods.
 - Bcrypt password hashing (cost 12)
 - Session hardening with `session_regenerate_id(true)` on login
 - Account lockout after 5 failed attempts (15-minute cooldown)
-- Rate limiting on public API endpoints (VIN decode, tire fitment: 10/hr)
+- Rate limiting on public API endpoints (VIN decode, tire fitment, plate lookup: 10/hr)
 - `.htaccess` blocks sensitive files (.env, config.php, composer.*, includes/)
 - No innerHTML — DOM manipulation via createElement/textContent
 - API error handling: catch `\Throwable` in all endpoints
+- Unified auth flow: admin login redirects to `/members` — single auth entry point
+- Admin session recovery with fallback session vars (prevents redirect loops)
+- Bilingual auth template overrides for login/register/reset pages
 
 ### Clean URLs
 
@@ -494,6 +508,7 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/service-images.php` | GET | Service card images |
 | `/api/vin-decode.php` | GET | VIN decode (rate limited) |
 | `/api/tire-fitment.php` | GET | Tire fitment (rate limited) |
+| `/api/plate-lookup.php` | GET | License plate lookup (rate limited) |
 | `/api/inspection-view.php` | GET | Customer DVI report (token) |
 | `/api/estimate-approve.php` | GET/POST | Estimate view + approval (token) |
 | `/api/blog.php` | GET | Blog posts |
@@ -550,7 +565,7 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/admin/calendar-retry-sync.php` | Retry calendar sync |
 | `/api/admin/calendar-test-sync.php` | Test calendar sync |
 
-### Member Endpoints (~17, member auth)
+### Member Endpoints (21, member auth)
 
 | Endpoint | Purpose |
 |----------|---------|
@@ -560,7 +575,8 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/member/profile.php` | Profile management |
 | `/api/member/password.php` | Password change |
 | `/api/member/forgot-password.php` | Password reset request |
-| `/api/member/reset-password.php` | Password reset |
+| `/api/member/password-reset.php` | Password reset handler |
+| `/api/member/reset-password.php` | Complete password reset |
 | `/api/member/google.php` | Google OAuth initiate |
 | `/api/member/google-callback.php` | Google OAuth callback |
 | `/api/member/google-unlink.php` | Unlink Google account |
@@ -569,8 +585,11 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/member/my-vehicles.php` | Customer vehicles |
 | `/api/member/my-estimates.php` | Customer estimates |
 | `/api/member/my-messages.php` | Customer messages |
+| `/api/member/conversations.php` | Member conversation threads |
 | `/api/member/my-care-plan.php` | Care plan status |
-| `/api/member/my-customers.php` | Customer data |
+| `/api/member/my-schedule.php` | Employee schedule |
+| `/api/member/my-assigned-work.php` | Employee assigned ROs |
+| `/api/member/my-customers.php` | Employee's customers |
 
 ### Commerce Endpoints (6)
 
@@ -586,4 +605,4 @@ Local SEO targeting for Portland neighborhoods.
 
 ---
 
-*Generated from codebase review. Last updated 2026-03-03.*
+*Generated from codebase review. Last updated 2026-03-17.*

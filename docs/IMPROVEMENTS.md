@@ -159,9 +159,9 @@ Skip-to-content link added as part of accessibility improvements (#7).
 ---
 
 ### ~~21. Add Service Worker for Offline Support~~ COMPLETED
-**Status:** Done (2026-02-15)
+**Status:** Done (2026-02-15), Enhanced (2026-03-17)
 
-`sw.js` with versioned caching, pre-caches critical assets, offline fallback page.
+`sw.js` v21 with versioned caching, pre-caches critical assets + booking page, bilingual offline fallback page (`offline.html`). **Enhanced (2026-03-17):** Push notifications (Web Push API + VAPID), offline booking via IndexedDB + Background Sync, install prompt (Android + iOS), notification click routing, online/offline indicator, notification preferences, admin broadcast.
 
 ---
 
@@ -260,24 +260,43 @@ Currently single-location. If the shop expands, the system would need multi-loca
 
 ---
 
+### 33. Customer Vehicle History Timeline
+**Confidence:** 85% | **Priority:** Medium
+
+No unified view of a vehicle's full service history. ROs, inspections, and estimates are separate views.
+
+**Fix:** Add timeline view in member portal showing all RO/inspection/estimate history per vehicle in chronological order. Include status badges, cost summaries, and links to inspection/estimate detail pages.
+
+---
+
+### 34. Automated Follow-Up Sequences
+**Confidence:** 85% | **Priority:** Medium
+
+Currently only single-touch emails (reminder, review request). No multi-step follow-up sequences.
+
+**Fix:** Add multi-step email sequences after service completion: thank you (day 0) → review request (day 3) → return reminder with promotion (day 30). Configurable per service type. Unsubscribe support.
+
+---
+
 ## Completion Summary
 
-**23 of 32 items completed** as of 2026-03-03.
+**23 of 34 items completed** as of 2026-03-17.
 
 | Status | Count | Items |
 |--------|-------|-------|
-| Completed | 21 | #1–11, #13, #14, #17–23 |
-| Remaining (original) | 3 | #12 (Bulk ops), #15 (Lazy maps), #16 (Gallery skeletons), #24 (Password logging) |
+| Completed | 23 | #1–11, #13, #14, #17–23 |
+| Remaining (original) | 4 | #12 (Bulk ops), #15 (Lazy maps), #16 (Gallery skeletons), #24 (Password logging) |
 | New (2026-03-03) | 8 | #25–32 |
+| New (2026-03-17) | 2 | #33–34 |
 
 ### Priority Matrix
 
 | Priority | Items | Description |
 |----------|-------|-------------|
 | **High** | #28, #30 | Online estimate payment, SMS reminders |
-| **Medium** | #12, #15, #16, #25, #26, #27, #29 | Bulk ops, lazy maps, skeletons, WhatsApp, calendar sync, loyalty, inventory |
+| **Medium** | #12, #15, #16, #25, #26, #27, #29, #33, #34 | Bulk ops, lazy maps, skeletons, WhatsApp, calendar sync, loyalty, inventory, vehicle timeline, follow-up sequences |
 | **Low** | #24, #31, #32 | Password logging, customer photos, multi-location |
 
 ---
 
-*Generated from code reviews. Last updated 2026-03-03.*
+*Generated from code reviews. Last updated 2026-03-17.*
