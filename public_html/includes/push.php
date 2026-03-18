@@ -20,11 +20,11 @@ function generateVapidKeys(): array
     $db = getDB();
 
     $db->prepare(
-        "UPDATE oretir_site_settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = 'vapid_public_key'"
+        "UPDATE oretir_site_settings SET value_en = ?, updated_at = NOW() WHERE setting_key = 'vapid_public_key'"
     )->execute([$keys['publicKey']]);
 
     $db->prepare(
-        "UPDATE oretir_site_settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = 'vapid_private_key'"
+        "UPDATE oretir_site_settings SET value_en = ?, updated_at = NOW() WHERE setting_key = 'vapid_private_key'"
     )->execute([$keys['privateKey']]);
 
     return $keys;
@@ -39,7 +39,7 @@ function getVapidPublicKey(): string
     if ($key !== null) return $key;
 
     $db = getDB();
-    $stmt = $db->prepare("SELECT setting_value FROM oretir_site_settings WHERE setting_key = 'vapid_public_key' LIMIT 1");
+    $stmt = $db->prepare("SELECT value_en FROM oretir_site_settings WHERE setting_key = 'vapid_public_key' LIMIT 1");
     $stmt->execute();
     $key = (string) $stmt->fetchColumn();
     return $key;
@@ -54,7 +54,7 @@ function getVapidPrivateKey(): string
     if ($key !== null) return $key;
 
     $db = getDB();
-    $stmt = $db->prepare("SELECT setting_value FROM oretir_site_settings WHERE setting_key = 'vapid_private_key' LIMIT 1");
+    $stmt = $db->prepare("SELECT value_en FROM oretir_site_settings WHERE setting_key = 'vapid_private_key' LIMIT 1");
     $stmt->execute();
     $key = (string) $stmt->fetchColumn();
     return $key;
