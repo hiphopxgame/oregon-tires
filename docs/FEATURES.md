@@ -1,6 +1,6 @@
 # Oregon Tires Auto Care — Feature Inventory
 
-> **Last updated:** 2026-03-17
+> **Last updated:** 2026-03-18
 > **Stack:** PHP + MySQL + Tailwind CSS v4 + PHPMailer | cPanel/Apache
 > **Live:** https://oregon.tires
 > **Admin:** https://oregon.tires/admin/
@@ -11,15 +11,15 @@
 
 | Category | Features | Priority |
 |----------|----------|----------|
-| Core Shop Operations | 4 systems | P0 |
-| Customer Management | 3 systems | P0 |
-| Customer Communication | 4 systems | P1 |
-| Revenue & Subscriptions | 2 systems | P1 |
+| Core Shop Operations | 8 systems | P0 |
+| Customer Management | 4 systems | P0 |
+| Customer Communication | 6 systems | P1 |
+| Revenue & Subscriptions | 4 systems | P1 |
 | Content & Marketing | 6 systems | P2 |
 | Public Website | 4 systems | P2 |
-| Infrastructure | 7 systems | P3 |
-| Roadmap Features (2026-03-17) | 10 systems | P1–P2 |
-| **Total** | **~42 systems, 110+ API endpoints, 36 pages** | |
+| Infrastructure | 8 systems | P3 |
+| Roadmap (2026 Q2–Q3) | 12 items | P1–P3 |
+| **Total** | **~52 systems, 115+ API endpoints, 36 pages** | |
 
 ---
 
@@ -107,6 +107,52 @@
 - Admin receives notification on customer approval/decline
 - Approval confirmation email sent to customer
 
+### Digital Invoices
+
+**API:** `/api/admin/invoices.php` (admin CRUD), `/api/invoice-view.php` (customer token-based view)
+**Admin JS:** `admin/js/invoices.js`
+
+- Generate invoices from completed repair orders
+- Token-based customer view (bilingual, no login required)
+- Invoice number auto-generation
+- Line items carried from estimate/RO
+- Print-friendly layout
+- Table: `oretir_invoices` (migration 042)
+
+### Labor Tracking
+
+**API:** `/api/admin/labor.php`
+**Admin JS:** `admin/js/labor-tracker.js`
+
+- Log technician hours per repair order
+- Track labor type (diagnosis, repair, inspection)
+- Efficiency reporting (hours logged vs estimated)
+- Employee performance metrics
+- Table: `oretir_labor_entries` (migration 045)
+
+### Waitlist / Walk-In Queue
+
+**API:** `/api/admin/waitlist.php` (admin), `/api/waitlist.php` (public)
+**Admin JS:** `admin/js/waitlist.js`
+
+- Walk-in customer queue management
+- Estimated wait time tracking
+- SMS notification when ready (via Twilio)
+- Queue position display
+- Admin drag-and-drop queue reordering
+- Table: `oretir_waitlist` (migration 047)
+
+### Tire Quote Requests
+
+**API:** `/api/admin/tire-quotes.php` (admin), `/api/tire-quote.php` (public)
+**Admin JS:** `admin/js/tire-quotes.js`
+
+- Customer-facing tire quote request form
+- Captures vehicle info + desired tire specs
+- Admin quote response workflow
+- Quote status tracking (pending, quoted, accepted, expired)
+- Table: `oretir_tire_quotes` (migration 048)
+
 ---
 
 ## Group 2: Customer Management (P0)
@@ -157,6 +203,16 @@
 - Profile management (`/api/member/profile.php`, `/api/member/password.php`)
 - Google account linking/unlinking
 
+### Visit Tracking
+
+**API:** `/api/admin/visit-log.php`
+**Admin JS:** `admin/js/visit-tracker.js`
+
+- Log customer walk-in visits
+- Track visit purpose and outcome
+- Visit history per customer
+- Admin dashboard widget for daily visit count
+
 ---
 
 ## Group 3: Customer Communication (P1)
@@ -173,6 +229,7 @@
   - `sendEstimateEmail()` — estimate link with approval token
   - `sendApprovalConfirmationEmail()` — confirms customer's estimate decision
   - `sendReadyEmail()` — vehicle ready for pickup notification
+  - `sendEmailReply()` — reply to inbound customer emails
   - `notifyOwner()` — internal notification to shop owner
 - **Template features:**
   - DB-stored templates editable via Settings tab
@@ -181,6 +238,21 @@
   - Template variable reference in admin
 - Email audit trail: every sent email logged to `oretir_email_logs`
 - SMTP debug level configurable via `.env` (`SMTP_DEBUG=0|1|2`)
+
+### Email Inbox Integration
+
+**Core:** `includes/email-fetcher.php`
+**API:** `/api/admin/conversations.php`, `/api/admin/email-check.php`
+
+- IMAP inbound email fetching (webklex/php-imap)
+- Emails threaded into admin conversations via Message-ID / In-Reply-To / References headers
+- Automatic conversation matching by customer email
+- New conversations auto-created for unknown threads
+- Attachment metadata stored as JSON
+- Message source tracking (web, email, system)
+- Admin can reply to email threads from the Messages tab
+- Cron: `cli/fetch-inbound-emails.php` runs every 2 minutes
+- Tables: `oretir_email_message_ids` (migration 053), enhanced `oretir_conversations` + `oretir_conversation_messages`
 
 ### SMS System
 
@@ -204,9 +276,22 @@
 | Daily 10:00 AM | `send-estimate-reminders.php` | Estimate expiry reminders (2 days before valid_until) |
 | Daily 6:00 AM | `fetch-google-reviews.php` | Refresh Google Reviews cache |
 | Every 5 min | `send-push-notifications.php` | Push notification queue processor |
+| Every 2 min | `fetch-inbound-emails.php` | IMAP inbound email fetch |
 | Mon 9:00 AM | `send-service-reminders.php` | Automated service due date reminders |
 | Mon 7:00 AM | `sync-google-business.php` | Google Business Profile sync |
 | On demand | `send-welcome-emails.php` | Onboarding/welcome emails |
+
+### Automated Service Reminders
+
+**API:** `/api/admin/service-reminders.php`
+**Admin JS:** `admin/js/service-reminders.js`
+**CLI:** `cli/send-service-reminders.php` (weekly cron, Mon 9AM)
+
+- Track service due dates per vehicle (oil change, tire rotation, brake check, etc.)
+- Automated email reminders when service is due
+- Admin can create/edit/delete reminders per customer+vehicle
+- Bilingual reminder emails via branded template system
+- Table: `oretir_service_reminders` (migration 043)
 
 ### Appointment Self-Service
 
@@ -244,6 +329,29 @@
 - Post-checkout return flow (`/api/commerce/checkout-return.php`)
 - Commerce analytics (`/api/commerce/stats.php`)
 - Webhook handling for payment events (`/api/commerce/webhook.php`)
+
+### Loyalty & Rewards
+
+**API:** `/api/admin/loyalty.php`, `/api/admin/loyalty-rewards.php`
+**Admin JS:** `admin/js/loyalty.js`
+
+- Points-per-dollar on completed ROs
+- Redeemable rewards catalog (admin-managed)
+- Points balance visible in member portal
+- Tier bonuses for care plan members
+- Points ledger with transaction history
+- Tables: `oretir_loyalty_points` (enhanced via migration 044), `oretir_loyalty_rewards` (migration 044)
+
+### Customer Referrals
+
+**API:** `/api/referral-lookup.php` (public), `/api/admin/referrals.php`
+**Admin JS:** `admin/js/referrals.js`
+
+- Referral code generation per customer
+- Track referral source on new bookings
+- Referral bonus points for referring customer
+- Referral status tracking (pending, completed, rewarded)
+- Table: `oretir_referrals` (migration 046)
 
 ---
 
@@ -456,94 +564,9 @@ Local SEO targeting for Portland neighborhoods.
 - Cache rules for static assets
 - Pending: DNS migration
 
-### Deploy Pipeline
-
-- `./deploy.sh`: Tailwind CSS build → rsync changed files → OPcache reset → health check → git tag
-- `.last-deploy` timestamp tracking
-- Health check endpoint (`/api/health.php`)
-
----
-
-## Group 8: Roadmap Features (shipped 2026-03-17)
-
-### Digital Invoices
-
-**API:** `/api/admin/invoices.php` (admin CRUD), `/api/invoice-view.php` (customer token-based view)
-
-- Generate invoices from completed repair orders
-- Token-based customer view (bilingual, no login required)
-- Invoice number auto-generation
-- Line items carried from estimate/RO
-- Print-friendly layout
-- Table: `oretir_invoices` (migration 042)
-
-### Automated Service Reminders
-
-**API:** `/api/admin/service-reminders.php`
-**CLI:** `cli/send-service-reminders.php` (weekly cron, Mon 9AM)
-
-- Track service due dates per vehicle (oil change, tire rotation, brake check, etc.)
-- Automated email reminders when service is due
-- Admin can create/edit/delete reminders per customer+vehicle
-- Bilingual reminder emails via branded template system
-- Table: `oretir_service_reminders` (migration 043)
-
-### Loyalty & Rewards (Enhanced)
-
-**API:** `/api/admin/loyalty.php`, `/api/admin/loyalty-rewards.php`
-
-- Points-per-dollar on completed ROs
-- Redeemable rewards catalog (admin-managed)
-- Points balance visible in member portal
-- Tier bonuses for care plan members
-- Points ledger with transaction history
-- Tables: `oretir_loyalty_points` (enhanced via migration 044), `oretir_loyalty_rewards` (migration 044)
-
-### Labor Tracking
-
-**API:** `/api/admin/labor.php`
-**Admin JS:** `admin/js/labor-tracker.js`
-
-- Log technician hours per repair order
-- Track labor type (diagnosis, repair, inspection)
-- Efficiency reporting (hours logged vs estimated)
-- Employee performance metrics
-- Table: `oretir_labor_entries` (migration 045)
-
-### Customer Referrals
-
-**API:** `/api/referral-lookup.php` (public), `/api/admin/referrals.php` (if wired)
-
-- Referral code generation per customer
-- Track referral source on new bookings
-- Referral bonus points for referring customer
-- Referral status tracking (pending, completed, rewarded)
-- Table: `oretir_referrals` (migration 046)
-
-### Waitlist / Walk-In Queue
-
-**API:** `/api/admin/waitlist.php` (admin), `/api/waitlist.php` (public)
-
-- Walk-in customer queue management
-- Estimated wait time tracking
-- SMS notification when ready (via Twilio)
-- Queue position display
-- Admin drag-and-drop queue reordering
-- Table: `oretir_waitlist` (migration 047)
-
-### Tire Quote Requests
-
-**API:** `/api/admin/tire-quotes.php` (admin), `/api/tire-quote.php` (public)
-
-- Customer-facing tire quote request form
-- Captures vehicle info + desired tire specs
-- Admin quote response workflow
-- Quote status tracking (pending, quoted, accepted, expired)
-- Table: `oretir_tire_quotes` (migration 048)
-
 ### Enhanced Analytics
 
-**API:** `/api/admin/analytics.php` (enhanced)
+**API:** `/api/admin/analytics.php`
 **Admin JS:** `admin/js/admin-analytics.js`
 
 - Revenue tracking and trends
@@ -556,6 +579,7 @@ Local SEO targeting for Portland neighborhoods.
 ### Google Business Sync
 
 **API:** `/api/admin/google-business-sync.php`
+**Admin JS:** `admin/js/google-business.js`
 **CLI:** `cli/sync-google-business.php` (weekly cron, Mon 7AM)
 
 - Sync business hours, services, and info to Google Business Profile
@@ -563,21 +587,151 @@ Local SEO targeting for Portland neighborhoods.
 - Track sync status and errors
 - Manual sync trigger from admin panel
 
-### Visit Tracking
+### Deploy Pipeline
 
-**API:** `/api/admin/visit-log.php`
-**Admin JS:** `admin/js/visit-tracker.js`
+- `./deploy.sh`: Tailwind CSS build → rsync changed files → OPcache reset → health check → git tag
+- `.last-deploy` timestamp tracking
+- Health check endpoint (`/api/health.php`)
 
-- Log customer walk-in visits
-- Track visit purpose and outcome
-- Visit history per customer
-- Admin dashboard widget for daily visit count
+---
+
+## Group 8: Roadmap (2026 Q2–Q3)
+
+### R1. Online Estimate Payment (P1 — High)
+
+Customers can approve estimates but cannot pay online. Must pay in-person.
+
+- Add "Approve & Pay" button on estimate approval page
+- Integrate with existing commerce-kit checkout flow (PayPal + card)
+- Support deposit (50%) or full prepayment
+- Send digital receipt via email
+- Update RO status to `approved` + `paid` flag on successful payment
+
+### R2. Parts & Inventory Management (P1 — High)
+
+No parts inventory system. Technicians track parts manually.
+
+- New table `oretir_inventory` (part_number, name, qty, cost, supplier, reorder_point, location)
+- Link estimate line items (type=parts/tire) to inventory records
+- Auto-deduct stock when RO moves to `in_progress`
+- Low-stock alerts on admin dashboard (configurable threshold per item)
+- Supplier contact list with last-order tracking
+- Reorder report: items below reorder point grouped by supplier
+
+### R3. WhatsApp Business Integration (P1 — High)
+
+Many Spanish-speaking customers prefer WhatsApp over SMS/email.
+
+- Integrate WhatsApp Business API (via Twilio or Meta Cloud API)
+- Send inspection reports, estimate links, ready notifications, appointment reminders via WhatsApp
+- Add WhatsApp opt-in to booking form alongside SMS opt-in
+- WhatsApp message templates (bilingual, pre-approved by Meta)
+- Fallback chain: WhatsApp → SMS → Email (try preferred channel first)
+
+### R4. Google Calendar Sync (P2 — Medium)
+
+Admin calendar endpoints exist but full sync is not wired up.
+
+- Complete Google Calendar API integration (OAuth2 service account)
+- Auto-create calendar events for confirmed appointments
+- Sync RO status changes to calendar event descriptions
+- Technicians see their schedule on their phones via shared Google Calendar
+- Two-way sync: calendar edits reflect in admin panel
+
+### R5. Customer Vehicle History Timeline (P2 — Medium)
+
+No unified view of a vehicle's full service history across ROs, inspections, and estimates.
+
+- Timeline view in member portal: all RO/inspection/estimate history per vehicle in chronological order
+- Status badges, cost summaries, and links to detail pages
+- Mileage progression chart (track odometer readings over time)
+- Service interval indicators (show when next oil change / tire rotation is due)
+- Print-friendly vehicle history report (useful for resale)
+
+### R6. Automated Follow-Up Sequences (P2 — Medium)
+
+Currently only single-touch emails (reminder, review request). No multi-step follow-up.
+
+- Multi-step email sequences after service completion:
+  - Day 0: Thank you + digital receipt
+  - Day 3: Review request (Google + internal)
+  - Day 30: Return reminder with seasonal promotion
+  - Day 90: Service check-in (are you due for maintenance?)
+- Configurable per service type (e.g., tire install gets different sequence than oil change)
+- Unsubscribe link per sequence
+- Admin UI to view/pause/edit sequences
+
+### R7. Technician Mobile View (P2 — Medium)
+
+Technicians use the full admin panel on their phones, which is clunky for field work.
+
+- Simplified mobile-optimized view for techs (separate route: `/tech/`)
+- See assigned ROs for today with swipe-to-update-status
+- Quick photo capture for inspections (camera → upload → done)
+- Clock in/out for labor tracking (start/stop timer per RO)
+- View customer vehicle info and notes
+- No admin-level access (employee role only)
+
+### R8. QR Code Check-In (P2 — Medium)
+
+Walk-in customers wait in line to check in manually.
+
+- Generate unique QR code poster for shop entrance
+- Customer scans QR → lands on check-in page (no app needed)
+- Check-in form: name, phone, service needed, vehicle (optional VIN scan)
+- Auto-adds to waitlist with estimated wait time
+- Push notification when their turn is next
+- Repeat customers auto-detected by phone number → pre-fills info
+
+### R9. Seasonal Tire Storage Tracking (P2 — Medium)
+
+Portland customers swap between all-season and winter tires. No way to track stored sets.
+
+- New table `oretir_tire_storage` (customer_id, vehicle_id, tire_set, location, stored_date, condition)
+- Track tire brand/model/size/tread depth for each stored set
+- Storage location labels (rack/bin number in shop)
+- Automated reminder when swap season arrives (Oct for winter, Apr for summer)
+- Customer portal view of stored tires
+- Admin search by storage location
+
+### R10. Customer Satisfaction Surveys (P2 — Medium)
+
+No structured feedback beyond Google reviews and the generic feedback form.
+
+- Post-service CSAT survey (1-5 stars + optional comment) sent 24 hours after RO completion
+- NPS question: "How likely are you to recommend us?" (0-10 scale)
+- Admin dashboard: CSAT trend, NPS score, response rate
+- Auto-flag low scores (≤2) for manager follow-up
+- Bilingual survey page (token-based, no login)
+- Link negative respondents to direct contact (phone/email) instead of public review
+
+### R11. Appointment Deposit / No-Show Reduction (P3 — Low)
+
+No-shows waste technician time and bay capacity.
+
+- Optional deposit requirement for high-value services (configurable per service type)
+- Deposit amount: flat fee ($25) or percentage (10%)
+- Deposit collected at booking via commerce-kit checkout
+- Refundable if cancelled 24+ hours before appointment
+- No-show tracking per customer (flag repeat offenders)
+- SMS + push reminder sequence: 24hr → 2hr → 30min before appointment
+
+### R12. Video Inspections (P3 — Low)
+
+Photos don't always capture the full picture of a vehicle issue.
+
+- Short video capture (15-30 sec) per inspection item alongside photos
+- Upload from tech's phone camera during inspection
+- Video playback in customer inspection report (inline player)
+- Storage in `uploads/inspections/{ro_number}/` alongside photos
+- Bandwidth-conscious: compress to 720p, lazy-load on customer view
+- Fallback to photo-only for slow connections
 
 ---
 
 ## Database Tables
 
-**Prefix:** `oretir_` | **52 migration files** | **~45 tables**
+**Prefix:** `oretir_` | **53 migration files** | **~46 tables**
 
 ### Core Tables
 
@@ -610,8 +764,12 @@ Local SEO targeting for Portland neighborhoods.
 | `oretir_inspection_photos` | Photos per inspection item |
 | `oretir_estimates` | Estimates with approval tokens (8 statuses) |
 | `oretir_estimate_items` | Estimate line items (6 types) |
+| `oretir_invoices` | Digital invoices from completed ROs |
+| `oretir_labor_entries` | Technician labor hours per RO |
+| `oretir_waitlist` | Walk-in queue management |
+| `oretir_tire_quotes` | Tire quote requests and responses |
 
-### Features Tables (migrations 017–036)
+### Features Tables (migrations 017–048)
 
 | Table | Purpose |
 |-------|---------|
@@ -625,35 +783,27 @@ Local SEO targeting for Portland neighborhoods.
 | `oretir_employee_schedules` | Employee work schedules |
 | `oretir_employee_skills` | Employee skill/certification tracking |
 | `oretir_task_summary` | Daily task summaries for employee dashboard |
-| `oretir_conversations` | Messaging threads (admin↔customer) |
-| `oretir_messages` | Individual messages within conversations |
+| `oretir_conversations` | Messaging threads (admin↔customer, source: web/email/contact_form) |
+| `oretir_messages` | Individual messages (source: web/email/system, attachments_json) |
 | `oretir_loyalty_points` | Customer loyalty point ledger |
-
-### Roadmap Tables (migrations 037–048)
-
-| Table | Purpose |
-|-------|---------|
-| `oretir_invoices` | Digital invoices from completed ROs |
-| `oretir_service_reminders` | Automated service due date tracking |
 | `oretir_loyalty_rewards` | Redeemable loyalty rewards catalog |
-| `oretir_labor_entries` | Technician labor hours per RO |
+| `oretir_service_reminders` | Automated service due date tracking |
 | `oretir_referrals` | Customer referral tracking |
-| `oretir_waitlist` | Walk-in queue management |
-| `oretir_tire_quotes` | Tire quote requests and responses |
 
-### PWA & Push Notifications (migrations 049–052)
+### PWA & Communication (migrations 049–053)
 
 | Table | Purpose |
 |-------|---------|
 | `oretir_push_subscriptions` | Web Push subscription storage |
 | `oretir_notification_queue` | Bilingual notification queue with targeting + retry |
 | `oretir_offline_sync_log` | Offline form submission deduplication |
+| `oretir_email_message_ids` | Email Message-ID tracking for dedup + threading |
 
 ---
 
 ## API Endpoint Summary
 
-### Public Endpoints (~33)
+### Public Endpoints (~34)
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
@@ -690,7 +840,7 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/offline-sync.php` | POST | Offline form replay |
 | `/api/health.php` | GET | Health check |
 
-### Admin Endpoints (~47, session auth + CSRF)
+### Admin Endpoints (~48, session auth + CSRF)
 
 | Endpoint | Purpose |
 |----------|---------|
@@ -708,7 +858,7 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/admin/loyalty.php` | Loyalty points management |
 | `/api/admin/loyalty-rewards.php` | Loyalty rewards catalog |
 | `/api/admin/service-reminders.php` | Service reminder management |
-| `/api/admin/referrals.php` | Referral tracking (if wired) |
+| `/api/admin/referrals.php` | Referral tracking |
 | `/api/admin/waitlist.php` | Walk-in queue management |
 | `/api/admin/tire-quotes.php` | Tire quote request management |
 | `/api/admin/visit-log.php` | Visit tracking log |
@@ -721,7 +871,8 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/admin/subscribers.php` | Subscriber list |
 | `/api/admin/employees.php` | Employee CRUD |
 | `/api/admin/schedules.php` | Employee schedules |
-| `/api/admin/conversations.php` | Messaging management |
+| `/api/admin/conversations.php` | Messaging management (web + email threads) |
+| `/api/admin/email-check.php` | Manual IMAP fetch trigger |
 | `/api/admin/gallery.php` | Gallery image management |
 | `/api/admin/service-images.php` | Service image slots |
 | `/api/admin/messages.php` | Contact message management |
@@ -769,7 +920,7 @@ Local SEO targeting for Portland neighborhoods.
 | `/api/member/my-assigned-work.php` | Employee assigned ROs |
 | `/api/member/my-customers.php` | Employee's customers |
 
-### Commerce Endpoints (6)
+### Commerce Endpoints (7)
 
 | Endpoint | Purpose |
 |----------|---------|

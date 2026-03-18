@@ -4,88 +4,47 @@
 
 ---
 
-## Critical (Fix Immediately)
+## Completed (34 of 43 original items)
 
-### ~~1. Add Rate Limiting / Brute-Force Protection on Admin Login~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-Account lockout after 5 failed attempts for 15 minutes (`locked_until` column). Generic error messages. DB-backed rate limiting. No hardcoded emails in client-side code.
-
----
-
-### ~~2. Force HTTPS Redirect~~ COMPLETED
-**Status:** Done (2026-02-15)
-
-HTTPS redirect configured in `.htaccess` with `RewriteCond %{HTTPS} off` rule.
-
----
-
-## High Priority (Fix This Week)
-
-### ~~3. Add Missing SEO Meta Tags~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-Full OG tags, Twitter Card, canonical URL, robots meta, hreflang tags, JSON-LD schema all added.
-
----
-
-### ~~4. Create robots.txt and sitemap.xml~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-Both created with proper entries. Updated 2026-02-22 to include blog and privacy pages.
-
----
-
-### ~~5. Add Image Lazy Loading~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-Gallery images use `loading="lazy"`. Maps iframe uses `loading="lazy"`. WebP images created for core assets.
-
----
-
-### ~~6. Fix Render-Blocking CDN Scripts~~ COMPLETED
-**Status:** Done (2026-02-15)
-
-Tailwind CSS built at compile time. No CDN dependencies. JS loaded with `defer`.
+| # | Item | Completed |
+|---|------|-----------|
+| 1 | Rate limiting / brute-force protection on admin login | 2026-02-19 |
+| 2 | Force HTTPS redirect | 2026-02-15 |
+| 3 | SEO meta tags (OG, Twitter, canonical, hreflang, JSON-LD) | 2026-02-19 |
+| 4 | robots.txt and sitemap.xml | 2026-02-19 |
+| 5 | Image lazy loading | 2026-02-19 |
+| 6 | Fix render-blocking CDN scripts | 2026-02-15 |
+| 7 | ARIA labels and focus management | 2026-02-19 |
+| 8 | Color contrast WCAG AA | 2026-02-19 |
+| 9 | Form validation feedback + loading state | 2026-02-19 |
+| 10 | Extract inline JS to separate files | 2026-02-22 |
+| 11 | Complete Spanish translations | 2026-02-15 |
+| 13 | Analytics and error tracking | 2026-03-01 |
+| 14 | Structured data (Schema.org) | 2026-02-19 |
+| 17 | Block sensitive files via .htaccess | 2026-02-15 |
+| 18 | Standardize database table naming | 2026-02-22 |
+| 19 | Click-to-call phone numbers | 2026-02-19 |
+| 20 | Skip-to-content link | 2026-02-19 |
+| 21 | Service worker + PWA (enhanced 2026-03-17 with push, offline, install) | 2026-02-15 |
+| 22 | Dark mode support | 2026-02-19 |
+| 23 | Web Vitals monitoring | 2026-02-19 |
+| 27 | Loyalty points system | 2026-03-17 |
+| 30 | Appointment text/push reminders | 2026-03-17 |
+| 35 | Digital invoices | 2026-03-17 |
+| 36 | Automated service reminders | 2026-03-17 |
+| 37 | Labor tracking | 2026-03-17 |
+| 38 | Customer referral program | 2026-03-17 |
+| 39 | Waitlist / walk-in queue | 2026-03-17 |
+| 40 | Tire quote requests | 2026-03-17 |
+| 41 | Enhanced admin analytics | 2026-03-17 |
+| 42 | Google Business sync | 2026-03-17 |
+| 43 | PWA push notifications + offline booking | 2026-03-17 |
+| 44 | Email inbox integration (IMAP fetch + threading) | 2026-03-18 |
+| 45 | Admin nav dropdown fix (CSS gap + JS click-to-toggle) | 2026-03-18 |
 
 ---
 
-### ~~7. Fix Accessibility: ARIA Labels and Focus Management~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-ARIA labels on interactive elements. `role="dialog"` and `aria-modal` on modals. Escape key closes modals. Skip-to-content link added.
-
----
-
-### ~~8. Fix Color Contrast Failures~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-Accessible color palette with WCAG AA compliance. Dark mode properly themed.
-
----
-
-### ~~9. Add Form Validation Feedback and Loading State~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-Submit button disables with "Sending..." during submission. HTML5 validation attributes. Auto-dismiss banners.
-
----
-
-## Medium Priority (Fix This Month)
-
-### ~~10. Extract Inline JavaScript to Separate Files~~ COMPLETED
-**Status:** Done (2026-02-22)
-
-Main site JS extracted to `/js/main.js`. Admin JS extracted to `/js/admin.js`. Loaded with `defer`.
-
----
-
-### ~~11. Complete Spanish Translations~~ COMPLETED
-**Status:** Done (2026-02-15)
-
-All strings have `data-t` attributes. Public site: 90+ keys. Admin panel: full bilingual system with 60+ keys.
-
----
+## Remaining (Original Items)
 
 ### 12. Add Bulk Operations to Admin Panel
 **Confidence:** 85% | **Priority:** Medium
@@ -93,20 +52,6 @@ All strings have `data-t` attributes. Public site: 90+ keys. Admin panel: full b
 Admins must update each appointment individually. No bulk select, bulk assign, bulk status change, or CSV export.
 
 **Fix:** Add checkbox column to appointments table, bulk action toolbar with assign/status/export buttons.
-
----
-
-### ~~13. Add Analytics and Error Tracking~~ COMPLETED
-**Status:** Done (2026-03-01)
-
-GA4 tracking events for booking funnel. Web Vitals monitoring (LCP, FID, CLS). Admin analytics dashboard. Error tracking via engine-kit (3-tier: Sentry → DB → error_log). Admin error log API deployed.
-
----
-
-### ~~14. Enhance Structured Data (Schema.org)~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-Full AutomotiveBusiness schema with geo coordinates, aggregate rating, opening hours, social profiles, service offerings, and price range.
 
 ---
 
@@ -128,57 +73,6 @@ Gallery shows plain "Loading gallery..." text during API fetch. No visual feedba
 
 ---
 
-### ~~17. Block Access to Sensitive Files via .htaccess~~ COMPLETED
-**Status:** Done (2026-02-15)
-
-`.htaccess` blocks access to `.sql`, `.env`, `.git`, `package.json`, `.bak`, `.tmp`, and `includes/` directory.
-
----
-
-## Low Priority (Nice to Have)
-
-### ~~18. Standardize Database Table Naming~~ COMPLETED
-**Status:** Done (2026-02-22)
-
-All tables standardized to `oretir_` prefix during Phase 1 shop management build.
-
----
-
-### ~~19. Make All Phone Numbers Click-to-Call~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-All phone numbers wrapped in `<a href="tel:...">`.
-
----
-
-### ~~20. Add Skip-to-Content Link~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-Skip-to-content link added as part of accessibility improvements (#7).
-
----
-
-### ~~21. Add Service Worker for Offline Support~~ COMPLETED
-**Status:** Done (2026-02-15), Enhanced (2026-03-17)
-
-`sw.js` v21 with versioned caching, pre-caches critical assets + booking page, bilingual offline fallback page (`offline.html`). **Enhanced (2026-03-17):** Push notifications (Web Push API + VAPID), offline booking via IndexedDB + Background Sync, install prompt (Android + iOS), notification click routing, online/offline indicator, notification preferences, admin broadcast.
-
----
-
-### ~~22. Consider Dark Mode Support~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-Full dark mode via Tailwind v4 class strategy. System preference detection.
-
----
-
-### ~~23. Add Web Vitals Monitoring~~ COMPLETED
-**Status:** Done (2026-02-19)
-
-PerformanceObserver tracking LCP, FID, and CLS.
-
----
-
 ### 24. Prevent Password Logging on Auth Errors
 **Confidence:** 80% | **Priority:** Low
 
@@ -186,57 +80,19 @@ Login error handling could inadvertently log credentials. Use generic error mess
 
 ---
 
-## New Improvements (Added 2026-03-03)
+## Remaining (Added 2026-03-03)
 
 ### 25. WhatsApp Integration
-**Confidence:** 90% | **Priority:** Medium
-
-Many Spanish-speaking customers prefer WhatsApp over SMS/email. Currently no WhatsApp channel.
-
-**Fix:** Integrate WhatsApp Business API (via Twilio or Meta) for inspection reports, estimate links, ready notifications, and appointment reminders. Add WhatsApp opt-in to booking form alongside SMS.
-
----
+**Confidence:** 90% | **Priority:** High — See Roadmap R3
 
 ### 26. Google Calendar Sync
-**Confidence:** 85% | **Priority:** Medium
-
-Admin calendar endpoints exist (`calendar-health.php`, `calendar-test-sync.php`, `calendar-retry-sync.php`) but full Google Calendar sync is not yet wired up.
-
-**Fix:** Complete Google Calendar API integration so appointments auto-sync to a shared Google Calendar. Technicians can see their schedule on their phones.
-
----
-
-### ~~27. Loyalty Points System~~ COMPLETED
-**Status:** Done (2026-03-17)
-
-Points-per-dollar on completed ROs. Redeemable rewards catalog (admin-managed via `api/admin/loyalty.php` + `api/admin/loyalty-rewards.php`). Points balance visible in member portal. Tier bonuses for care plan members. Tables: `oretir_loyalty_points` (enhanced), `oretir_loyalty_rewards`. Migration 044.
-
----
+**Confidence:** 85% | **Priority:** Medium — See Roadmap R4
 
 ### 28. Online Payment for Estimates
-**Confidence:** 90% | **Priority:** High
-
-Customers can approve estimates but cannot pay online. Must pay in-person.
-
-**Fix:** Add "Approve & Pay" option on estimate approval page. Integrate with existing commerce-kit checkout flow. Allow deposit or full payment. Send receipt via email.
-
----
+**Confidence:** 90% | **Priority:** High — See Roadmap R1
 
 ### 29. Inventory / Parts Tracking
-**Confidence:** 80% | **Priority:** Medium
-
-No parts inventory system. Technicians and service writers track parts manually.
-
-**Fix:** Add `oretir_inventory` table (part number, name, quantity, cost, supplier, reorder point). Link parts from estimates to inventory. Low-stock alerts. Supplier order integration.
-
----
-
-### ~~30. Appointment Text Message Reminders~~ COMPLETED
-**Status:** Done (2026-03-17)
-
-SMS reminders added to `send-reminders.php` cron job (6 PM daily) for customers who opted into SMS. Uses existing Twilio integration. Push notifications also added for subscribed users.
-
----
+**Confidence:** 80% | **Priority:** Medium — See Roadmap R2
 
 ### 31. Customer Photo Upload in Portal
 **Confidence:** 75% | **Priority:** Low
@@ -248,7 +104,7 @@ Customers sometimes want to show the shop what issue they're experiencing before
 ---
 
 ### 32. Multi-Location Support
-**Confidence:** 70% | **Priority:** Low (future)
+**Confidence:** 70% | **Priority:** Deferred (future)
 
 Currently single-location. If the shop expands, the system would need multi-location awareness.
 
@@ -257,107 +113,78 @@ Currently single-location. If the shop expands, the system would need multi-loca
 ---
 
 ### 33. Customer Vehicle History Timeline
-**Confidence:** 85% | **Priority:** Medium
-
-No unified view of a vehicle's full service history. ROs, inspections, and estimates are separate views.
-
-**Fix:** Add timeline view in member portal showing all RO/inspection/estimate history per vehicle in chronological order. Include status badges, cost summaries, and links to inspection/estimate detail pages.
-
----
+**Confidence:** 85% | **Priority:** Medium — See Roadmap R5
 
 ### 34. Automated Follow-Up Sequences
-**Confidence:** 85% | **Priority:** Medium
-
-Currently only single-touch emails (reminder, review request). No multi-step follow-up sequences.
-
-**Fix:** Add multi-step email sequences after service completion: thank you (day 0) → review request (day 3) → return reminder with promotion (day 30). Configurable per service type. Unsubscribe support.
+**Confidence:** 85% | **Priority:** Medium — See Roadmap R6
 
 ---
 
-## New Improvements (Shipped 2026-03-17 — Roadmap Features)
+## New Improvements (2026-03-18)
 
-### ~~35. Digital Invoices~~ COMPLETED
-**Status:** Done (2026-03-17)
+### 46. Technician Mobile View
+**Confidence:** 90% | **Priority:** Medium — See Roadmap R7
 
-Generate invoices from completed ROs. Token-based customer view (bilingual). Admin CRUD via `api/admin/invoices.php`, customer view via `api/invoice-view.php`. Table: `oretir_invoices`. Migration 042.
-
----
-
-### ~~36. Automated Service Reminders~~ COMPLETED
-**Status:** Done (2026-03-17)
-
-Track service due dates per vehicle. Automated email reminders via `cli/send-service-reminders.php` (weekly cron Mon 9AM). Admin management via `api/admin/service-reminders.php`. Table: `oretir_service_reminders`. Migration 043.
+Technicians use the full admin panel on phones, which is clunky for field work. A simplified mobile-first tech view would improve efficiency for inspections, photo capture, and status updates.
 
 ---
 
-### ~~37. Labor Tracking~~ COMPLETED
-**Status:** Done (2026-03-17)
+### 47. QR Code Walk-In Check-In
+**Confidence:** 85% | **Priority:** Medium — See Roadmap R8
 
-Log technician hours per RO. Efficiency reporting. Admin UI via `admin/js/labor-tracker.js`, API via `api/admin/labor.php`. Table: `oretir_labor_entries`. Migration 045.
-
----
-
-### ~~38. Customer Referral Program~~ COMPLETED
-**Status:** Done (2026-03-17)
-
-Referral code generation, tracking, and bonus points. Public lookup via `api/referral-lookup.php`. Table: `oretir_referrals`. Migration 046.
+Walk-in customers wait to be manually checked in. A QR code at the entrance lets them self-register to the waitlist from their phone.
 
 ---
 
-### ~~39. Waitlist / Walk-In Queue~~ COMPLETED
-**Status:** Done (2026-03-17)
+### 48. Seasonal Tire Storage Tracking
+**Confidence:** 85% | **Priority:** Medium — See Roadmap R9
 
-Walk-in queue management with estimated wait times. Public queue join via `api/waitlist.php`, admin management via `api/admin/waitlist.php`. Table: `oretir_waitlist`. Migration 047.
-
----
-
-### ~~40. Tire Quote Requests~~ COMPLETED
-**Status:** Done (2026-03-17)
-
-Customer-facing tire quote form. Admin response workflow via `api/admin/tire-quotes.php`, public submission via `api/tire-quote.php`. Table: `oretir_tire_quotes`. Migration 048.
+Portland customers swap tires seasonally but there's no system to track stored tire sets, locations, or swap reminders.
 
 ---
 
-### ~~41. Enhanced Admin Analytics~~ COMPLETED
-**Status:** Done (2026-03-17)
+### 49. Customer Satisfaction Surveys (CSAT/NPS)
+**Confidence:** 90% | **Priority:** Medium — See Roadmap R10
 
-Revenue tracking, service breakdown, customer acquisition, employee utilization. Enhanced `api/admin/analytics.php` + new `admin/js/admin-analytics.js`.
-
----
-
-### ~~42. Google Business Sync~~ COMPLETED
-**Status:** Done (2026-03-17)
-
-Sync business info to Google Business Profile. Weekly cron via `cli/sync-google-business.php` (Mon 7AM). Admin trigger via `api/admin/google-business-sync.php`.
+No structured feedback mechanism beyond Google reviews. Post-service surveys with scoring would provide actionable data and catch unhappy customers before they leave bad public reviews.
 
 ---
 
-### ~~43. PWA Push Notifications & Offline Booking~~ COMPLETED
-**Status:** Done (2026-03-17)
+### 50. Appointment Deposit / No-Show Reduction
+**Confidence:** 80% | **Priority:** Low — See Roadmap R11
 
-Web Push API (VAPID) with bilingual payloads. Booking confirmations, reminders, RO status, admin broadcast. Offline booking via IndexedDB + Background Sync. Install prompt (Android + iOS). 4 migrations (049–052). Admin broadcast via `api/admin/push-broadcast.php`.
+No-shows waste bay capacity. Deposit requirements for high-value services would reduce no-shows and protect revenue.
+
+---
+
+### 51. Video Inspections
+**Confidence:** 75% | **Priority:** Low — See Roadmap R12
+
+Photos sometimes don't convey the full issue (e.g., suspension noise, engine vibration). Short video clips alongside DVI photos would improve customer understanding and trust.
 
 ---
 
 ## Completion Summary
 
-**34 of 43 items completed** as of 2026-03-18.
+**35 of 51 items completed** as of 2026-03-18.
 
 | Status | Count | Items |
 |--------|-------|-------|
-| Completed | 34 | #1–11, #13, #14, #17–23, #27, #30, #35–43 |
-| Remaining (original) | 4 | #12 (Bulk ops), #15 (Lazy maps), #16 (Gallery skeletons), #24 (Password logging) |
-| Remaining (2026-03-03) | 5 | #25 (WhatsApp), #26 (Calendar sync), #28 (Online payment), #29 (Inventory), #31 (Customer photos) |
-| Remaining (2026-03-17) | 2 | #33 (Vehicle timeline), #34 (Follow-up sequences) |
-| Deferred | 1 | #32 (Multi-location — future) |
+| Completed | 35 | #1–11, #13, #14, #17–23, #27, #30, #35–45 |
+| Remaining (original) | 4 | #12, #15, #16, #24 |
+| Remaining (2026-03-03) | 3 | #25, #28, #29 (→ Roadmap R1–R3) |
+| Remaining (2026-03-03, standalone) | 2 | #31 (customer photos), #32 (multi-location) |
+| Remaining (2026-03-03, → Roadmap) | 2 | #33 (→ R5), #34 (→ R6) |
+| New (2026-03-18, → Roadmap) | 6 | #46–51 (→ R7–R12) |
 
 ### Priority Matrix (Remaining)
 
 | Priority | Items | Description |
 |----------|-------|-------------|
-| **High** | #28 | Online estimate payment |
-| **Medium** | #12, #15, #16, #25, #26, #29, #33, #34 | Bulk ops, lazy maps, skeletons, WhatsApp, calendar sync, inventory, vehicle timeline, follow-up sequences |
-| **Low** | #24, #31, #32 | Password logging, customer photos, multi-location |
+| **High** | #25, #28, #29 | WhatsApp, online estimate payment, inventory |
+| **Medium** | #12, #15, #16, #26, #33, #34, #46, #47, #48, #49 | Bulk ops, lazy maps, skeletons, calendar sync, vehicle timeline, follow-ups, tech mobile, QR check-in, tire storage, CSAT |
+| **Low** | #24, #31, #50, #51 | Password logging, customer photos, deposits, video inspections |
+| **Deferred** | #32 | Multi-location (future expansion) |
 
 ---
 
