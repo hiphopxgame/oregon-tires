@@ -186,7 +186,7 @@ function buildDateData(PDO $db, string $date, array $skillMap): array
         "SELECT a.id, a.preferred_time, a.service, a.first_name, a.last_name,
                 a.status, a.assigned_employee_id, a.phone, a.email
          FROM oretir_appointments a
-         WHERE a.preferred_date = ? AND a.status NOT IN ('cancelled')
+         WHERE a.preferred_date = ? AND a.status NOT IN ('cancelled', 'completed')
          ORDER BY a.preferred_time ASC"
     );
     $stmt->execute([$date]);
@@ -213,14 +213,14 @@ function buildDateData(PDO $db, string $date, array $skillMap): array
 
     // Hourly breakdown by service type
     $hourlyBreakdown = [];
-    for ($h = 8; $h <= 17; $h++) {
+    for ($h = 8; $h <= 16; $h++) {
         $hourlyBreakdown[$h] = ['hour' => $h, 'total' => 0, 'services' => []];
     }
 
     foreach ($appointments as $apt) {
         if (!$apt['preferred_time'] || $apt['status'] === 'completed') continue;
         $hour = (int)substr($apt['preferred_time'], 0, 2);
-        if ($hour < 8 || $hour > 17) continue;
+        if ($hour < 8 || $hour > 16) continue;
 
         $svc = $apt['service'] ?: 'other';
         $hourlyBreakdown[$hour]['total']++;
@@ -229,13 +229,13 @@ function buildDateData(PDO $db, string $date, array $skillMap): array
 
     // Calculate capacity per hour (how many employees available)
     $hourlyCapacity = [];
-    for ($h = 8; $h <= 17; $h++) {
+    for ($h = 8; $h <= 16; $h++) {
         $hourlyCapacity[$h] = 0;
     }
     foreach ($workingEmployees as $we) {
         $startH = (int)substr($we['start_time'], 0, 2);
         $endH = (int)substr($we['end_time'], 0, 2);
-        for ($h = $startH; $h < $endH && $h <= 17; $h++) {
+        for ($h = $startH; $h < $endH && $h <= 16; $h++) {
             if ($h >= 8) $hourlyCapacity[$h]++;
         }
     }

@@ -152,8 +152,8 @@
 
     var todayStr = getDateStr('today');
     var tomorrowStr = getDateStr('tomorrow');
-    var todayData = rpData.dates[todayStr];
-    var tomorrowData = rpData.dates[tomorrowStr];
+    var todayData = rpData.dates[todayStr] || null;
+    var tomorrowData = rpData.dates[tomorrowStr] || null;
 
     var grid = ce('div', 'grid grid-cols-2 lg:grid-cols-4 gap-4');
 
@@ -220,7 +220,7 @@
       });
     });
 
-    if (chartData.some(function(d) { var t = 0; d.segments.forEach(function(s){ t += s.value; }); return t > 0; })) {
+    if (chartData.some(function(d) { var t = 0; (d.segments || []).forEach(function(s){ t += s.value; }); return t > 0; })) {
       OTCharts.stackedHorizontalBars(container, chartData, { capacityLabel: T('rpCapacity') });
     } else {
       container.appendChild(ce('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T('rpNoAppts')));
@@ -618,7 +618,7 @@
     // Find current skills for this employee
     var allEmps = (rpData.all_employees || []).concat(rpData.inactive_employees || []);
     var emp = allEmps.find(function(e) { return e.id === empId; });
-    if (!emp) return;
+    if (!emp) { showToast(T('rpSkillUpdateFailed'), true); return; }
 
     var newSkills = (emp.skills || []).slice();
     if (currentlyHas) {
@@ -824,7 +824,7 @@
       });
     }
 
-    if (chartData.some(function(d) { var t = 0; d.segments.forEach(function(s){ t += s.value; }); return t > 0; })) {
+    if (chartData.some(function(d) { var t = 0; (d.segments || []).forEach(function(s){ t += s.value; }); return t > 0; })) {
       OTCharts.stackedHorizontalBars(bayEl, chartData, { capacityLabel: T('rpCapacity') || 'Staff' });
     } else {
       bayEl.appendChild(ce('p', 'text-sm text-gray-400 dark:text-gray-500 text-center py-8',

@@ -276,7 +276,7 @@ var OTCharts = (function() {
       segWrap.style.width = totalPct + '%';
 
       (row.segments || []).forEach(function(seg) {
-        if (!seg.value || seg.value <= 0) return;
+        if (!seg.value || seg.value <= 0 || rowTotal <= 0) return;
         var segPct = (seg.value / rowTotal) * 100;
         var segEl = document.createElement('div');
         segEl.className = 'h-full transition-all relative group';
@@ -308,8 +308,9 @@ var OTCharts = (function() {
       // Value label
       var val = document.createElement('span');
       val.className = 'text-xs w-8 text-right shrink-0';
-      val.style.color = rowTotal > (row.capacity || 999) ? TOKENS.colors.series[4] : t.textSecondary;
-      val.style.fontWeight = rowTotal > (row.capacity || 999) ? 'bold' : 'normal';
+      var effectiveCap = row.capacity != null ? row.capacity : Infinity;
+      val.style.color = rowTotal > effectiveCap ? TOKENS.colors.series[4] : t.textSecondary;
+      val.style.fontWeight = rowTotal > effectiveCap ? 'bold' : 'normal';
       val.textContent = String(rowTotal);
       rowEl.appendChild(val);
 
