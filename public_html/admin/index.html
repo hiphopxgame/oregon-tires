@@ -3954,6 +3954,9 @@ const adminT = {
     overviewBonusValue2: 'Additional Features Value',
     overviewSavingsVsFreelancer: 'Savings vs Freelancer',
     overviewYourPrice: 'Your Price',
+    overviewIncludesSoftware: 'Full ownership of all software & source code',
+    overviewIncludesMarketing: '3 months of marketing & management included',
+    overviewIncludesDomain: 'oregon.tires domain transfer included',
     overviewTotalValue: 'Platform Value',
     overviewPricingMethodology: 'Pricing Methodology',
     overviewPricingMethodologyText: 'Priced at a freelancer rate of $50/hr for custom web development, compared against equivalent SaaS subscriptions and agency quotes. Each feature is scoped as a standalone deliverable at what it would cost to build from scratch.',
@@ -5215,6 +5218,9 @@ const adminT = {
     overviewBonusValue2: 'Valor de Funciones Adicionales',
     overviewSavingsVsFreelancer: 'Ahorro vs Freelancer',
     overviewYourPrice: 'Su Precio',
+    overviewIncludesSoftware: 'Propiedad total del software y c\u00F3digo fuente',
+    overviewIncludesMarketing: '3 meses de marketing y gesti\u00F3n incluidos',
+    overviewIncludesDomain: 'Transferencia del dominio oregon.tires incluida',
     overviewTotalValue: 'Valor de la Plataforma',
     overviewPricingMethodology: 'Metodolog\u00EDa de Precios',
     overviewPricingMethodologyText: 'Valorado a tarifa freelancer de $50/hr para desarrollo web personalizado, comparado con suscripciones SaaS equivalentes y cotizaciones de agencia. Cada funci\u00F3n se valora como un entregable independiente al costo de construirla desde cero.',
@@ -10989,6 +10995,21 @@ function renderPlatformTab() {
     var priceRow = summaryRow(t.overviewYourPrice, '$' + clientPrice.toLocaleString(), 'text-lg');
     priceRow.querySelector('span:last-child').className = 'font-bold text-lg';
     summaryGrid.appendChild(priceRow);
+
+    // What's included breakdown
+    var includesDiv = el('div', 'mt-1 space-y-1');
+    var includes = [
+      t.overviewIncludesSoftware,
+      t.overviewIncludesMarketing,
+      t.overviewIncludesDomain
+    ];
+    includes.forEach(function(item) {
+      var row = el('div', 'flex items-center gap-2');
+      row.appendChild(el('span', 'text-green-300 text-xs', '\u2713'));
+      row.appendChild(el('span', 'text-xs text-green-100', item));
+      includesDiv.appendChild(row);
+    });
+    summaryGrid.appendChild(includesDiv);
 
     var divider2 = el('div', 'border-t border-white/20 my-2');
     summaryGrid.appendChild(divider2);

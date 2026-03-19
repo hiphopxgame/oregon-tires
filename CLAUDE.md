@@ -14,6 +14,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - **Bilingual**: EN/ES — inline JS `t` object with `data-t` attributes, `currentLang` variable
 
 ## Client Service Offerings
+- **Client Price**: $5,000 — full software ownership + 3 months marketing & management + domain transfer
 - **Domain**: `oregon.tires` — transfers to client with payment
 - **Managed Hosting**: $50/mo — server management, SSL, backups, uptime monitoring, security patches, Cloudflare CDN
 - **Marketing & Management**: Starting at $500/mo — SEO, content updates, blog, social media, Google Business management, analytics, platform enhancements

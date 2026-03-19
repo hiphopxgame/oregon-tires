@@ -3,7 +3,7 @@
 // Base prices are internal scope estimates; displayed values use FREELANCER_RATE.
 // Source of truth: synced with project-value report (March 2026).
 
-var CLIENT_PRICE = 0;
+var CLIENT_PRICE = 5000;
 var FREELANCER_RATE = 1/3;
 
 var FEATURE_CATS = {
