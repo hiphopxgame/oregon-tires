@@ -239,6 +239,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `/api/admin/calendar-test-sync.php` — test calendar sync
 - `POST /api/admin/push-broadcast.php` — admin push broadcast to opted-in subscribers (5/day limit)
 - `GET /api/admin/email-check.php` — manual IMAP fetch trigger, returns count of new emails
+- `GET /api/admin/resource-planner.php?dates=` — multi-date resource planning (employees, skill gaps, hourly breakdown, recommendations)
 
 ## Public Pages (36 pages)
 
@@ -331,7 +332,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 ```
 
 ## Admin Panel
-- **Tabs**: Dashboard, Appointments, Customers, Repair Orders, Messages, Employees, Blog, FAQ, Promotions, Testimonials, Subscribers, Feedback, Gallery, Settings
+- **Tabs**: Dashboard, Appointments, Customers, Repair Orders, Messages, Employees, Blog, FAQ, Promotions, Testimonials, Subscribers, Feedback, Gallery, Settings, Resource Planner
 - **RO Tab**: Table view + kanban board (drag-and-drop), status timeline, create from appointment or walk-in
 - **Employee Dashboard**: My Schedule, My Assigned Work, My Customers (via member portal)
 
@@ -343,7 +344,8 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `admin/js/promotions.js` — promotion management
 - `admin/js/testimonials.js` — testimonial management
 - `admin/js/subscribers.js` — subscriber management
-- `admin/js/ot-charts.js` — dashboard charts (Chart.js)
+- `admin/js/ot-charts.js` — dashboard charts (includes stackedHorizontalBars)
+- `admin/js/resource-planner.js` — resource planner tab (grid, heatmap, skills matrix, recommendations)
 - `admin/js/brand-toast.js` — branded toast notifications
 - `admin/js/admin-analytics.js` — enhanced analytics dashboard
 - `admin/js/labor-tracker.js` — labor hours tracking UI

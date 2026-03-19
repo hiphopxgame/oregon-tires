@@ -215,6 +215,156 @@ var OTCharts = (function() {
   }
 
   /**
+   * Stacked horizontal bar chart with capacity marker
+   * @param {HTMLElement} container - Target element
+   * @param {Array} data - [{label, segments: [{key, value, color, name}], capacity}]
+   * @param {Object} opts - {maxValue, showCapacity: true, capacityLabel: 'Staff', barHeight: 28}
+   */
+  function stackedHorizontalBars(container, data, opts) {
+    opts = opts || {};
+    var t = theme();
+    var barHeight = opts.barHeight || 28;
+    var showCapacity = opts.showCapacity !== false;
+    var capacityLabel = opts.capacityLabel || 'Staff';
+
+    // Calculate max value across all rows (sum of segments or capacity, whichever is higher)
+    var maxVal = opts.maxValue || 1;
+    if (!opts.maxValue) {
+      data.forEach(function(row) {
+        var rowTotal = 0;
+        (row.segments || []).forEach(function(s) { rowTotal += (parseInt(s.value) || 0); });
+        var cap = parseInt(row.capacity) || 0;
+        maxVal = Math.max(maxVal, rowTotal, cap);
+      });
+      if (maxVal < 1) maxVal = 1;
+    }
+
+    var list = document.createElement('div');
+    list.className = 'space-y-1';
+    list.setAttribute('role', 'list');
+    list.setAttribute('aria-label', 'Stacked horizontal bar chart');
+
+    data.forEach(function(row) {
+      var rowEl = document.createElement('div');
+      rowEl.className = 'flex items-center gap-3';
+      rowEl.setAttribute('role', 'listitem');
+
+      // Label
+      var label = document.createElement('span');
+      label.className = 'w-14 text-xs font-medium text-right shrink-0';
+      label.style.color = t.textPrimary;
+      label.textContent = row.label;
+      rowEl.appendChild(label);
+
+      // Bar container (relative for capacity marker)
+      var barContainer = document.createElement('div');
+      barContainer.className = 'flex-1 relative';
+      barContainer.style.height = barHeight + 'px';
+
+      // Bar background
+      var barBg = document.createElement('div');
+      barBg.className = 'absolute inset-0 rounded';
+      barBg.style.backgroundColor = t.barBg;
+      barContainer.appendChild(barBg);
+
+      // Stacked segments
+      var segWrap = document.createElement('div');
+      segWrap.className = 'absolute inset-y-0 left-0 flex rounded overflow-hidden';
+      var rowTotal = 0;
+      (row.segments || []).forEach(function(s) { rowTotal += (parseInt(s.value) || 0); });
+      var totalPct = Math.round((rowTotal / maxVal) * 100);
+      segWrap.style.width = totalPct + '%';
+
+      (row.segments || []).forEach(function(seg) {
+        if (!seg.value || seg.value <= 0) return;
+        var segPct = (seg.value / rowTotal) * 100;
+        var segEl = document.createElement('div');
+        segEl.className = 'h-full transition-all relative group';
+        segEl.style.width = segPct + '%';
+        segEl.style.backgroundColor = seg.color || TOKENS.colors.brandMid;
+        segEl.style.opacity = '0.85';
+        segEl.title = (seg.name || seg.key) + ': ' + seg.value;
+        segEl.addEventListener('mouseenter', function() { segEl.style.opacity = '1'; });
+        segEl.addEventListener('mouseleave', function() { segEl.style.opacity = '0.85'; });
+        segWrap.appendChild(segEl);
+      });
+      barContainer.appendChild(segWrap);
+
+      // Capacity marker line
+      if (showCapacity && row.capacity > 0) {
+        var capPct = Math.min(Math.round((row.capacity / maxVal) * 100), 100);
+        var capLine = document.createElement('div');
+        capLine.className = 'absolute top-0 bottom-0';
+        capLine.style.left = capPct + '%';
+        capLine.style.width = '2px';
+        capLine.style.backgroundColor = isDark() ? '#fff' : '#1F2937';
+        capLine.style.opacity = '0.6';
+        capLine.title = capacityLabel + ': ' + row.capacity;
+        barContainer.appendChild(capLine);
+      }
+
+      rowEl.appendChild(barContainer);
+
+      // Value label
+      var val = document.createElement('span');
+      val.className = 'text-xs w-8 text-right shrink-0';
+      val.style.color = rowTotal > (row.capacity || 999) ? TOKENS.colors.series[4] : t.textSecondary;
+      val.style.fontWeight = rowTotal > (row.capacity || 999) ? 'bold' : 'normal';
+      val.textContent = String(rowTotal);
+      rowEl.appendChild(val);
+
+      list.appendChild(rowEl);
+    });
+
+    container.appendChild(list);
+
+    // Legend from first row with segments (collect unique keys)
+    var legendKeys = {};
+    data.forEach(function(row) {
+      (row.segments || []).forEach(function(s) {
+        if (s.value > 0 && !legendKeys[s.key]) {
+          legendKeys[s.key] = { name: s.name || s.key, color: s.color };
+        }
+      });
+    });
+    var keys = Object.keys(legendKeys);
+    if (keys.length > 0) {
+      var legend = document.createElement('div');
+      legend.className = 'flex flex-wrap gap-3 mt-3 text-xs';
+      keys.forEach(function(k) {
+        var item = document.createElement('span');
+        item.className = 'flex items-center gap-1';
+        var dot = document.createElement('span');
+        dot.className = 'w-2.5 h-2.5 rounded-sm inline-block';
+        dot.style.backgroundColor = legendKeys[k].color;
+        item.appendChild(dot);
+        var lbl = document.createElement('span');
+        lbl.style.color = t.textSecondary;
+        lbl.textContent = legendKeys[k].name;
+        item.appendChild(lbl);
+        legend.appendChild(item);
+      });
+      // Capacity marker legend
+      if (showCapacity) {
+        var capItem = document.createElement('span');
+        capItem.className = 'flex items-center gap-1';
+        var capDash = document.createElement('span');
+        capDash.className = 'inline-block';
+        capDash.style.width = '10px';
+        capDash.style.height = '2px';
+        capDash.style.backgroundColor = isDark() ? '#fff' : '#1F2937';
+        capItem.appendChild(capDash);
+        var capLbl = document.createElement('span');
+        capLbl.style.color = t.textSecondary;
+        capLbl.textContent = capacityLabel;
+        capItem.appendChild(capLbl);
+        legend.appendChild(capItem);
+      }
+      container.appendChild(legend);
+    }
+  }
+
+  /**
    * Service popularity bars (replaces inline service bar rendering)
    * @param {HTMLElement} container - Target element
    * @param {Array} data - [{service, count}]
@@ -575,6 +725,7 @@ var OTCharts = (function() {
     TOKENS: TOKENS,
     barChart: barChart,
     horizontalBars: horizontalBars,
+    stackedHorizontalBars: stackedHorizontalBars,
     stackedBar: stackedBar,
     serviceBars: serviceBars,
     pieChart: pieChart,
