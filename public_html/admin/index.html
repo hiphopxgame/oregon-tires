@@ -334,6 +334,24 @@
     /* ── Spin Animation ── */
     @keyframes spin { to { transform: rotate(360deg); } }
     .animate-spin { animation: spin 1s linear infinite; }
+
+    /* ── Print styles for Project Value Report ── */
+    @media print {
+      body { background: #fff !important; color: #1a1a1a !important; }
+      nav, .tab-btn, #mobile-tab-select, .nav-group, .no-print { display: none !important; }
+      .tab-content { display: none !important; }
+      #tab-docs { display: block !important; }
+      #docs-subtab-platform { display: block !important; }
+      #docs-subtab-coming, #docs-subtab-manual { display: none !important; }
+      [id^="docs-view-"] { display: none !important; }
+      .dark\:bg-gray-800 { background: #f9fafb !important; }
+      .dark\:bg-gray-700 { background: #e5e7eb !important; }
+      .dark\:text-gray-100, .dark\:text-gray-200, .dark\:text-gray-300, .dark\:text-white { color: #1f2937 !important; }
+      .shadow, .shadow-sm { box-shadow: none !important; }
+      .rounded-xl, .rounded-2xl { border: 1px solid #e5e7eb !important; }
+      .bg-gradient-to-br { background: #15803d !important; }
+      * { break-inside: avoid; }
+    }
   </style>
 
   <!-- Dark mode init (prevent FOUC) -->
@@ -508,8 +526,6 @@
             <button onclick="switchTab('analytics')" data-tab="analytics" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📈 <span data-t="tabAnalytics">Analytics</span></button>
             <button onclick="switchTab('sitecontent')" data-tab="sitecontent" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📝 <span data-t="tabSiteContent">Site Content</span></button>
             <button onclick="switchTab('docs')" data-tab="docs" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📖 <span data-t="tabDocs">Docs</span></button>
-            <button onclick="switchTab('gbsync')" data-tab="gbsync" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔄 <span data-t="tabGbSync">Google Business</span></button>
-            <a href="/admin/project-value" class="tab-btn nav-dropdown-item block text-left" style="text-decoration:none;color:inherit">📊 <span>Project Value Report</span></a>
           </div>
         </div>
       </nav>
@@ -547,8 +563,6 @@
           <option value="analytics" data-t="tabAnalytics">Analytics</option>
           <option value="sitecontent" data-t="tabSiteContent">Site Content</option>
           <option value="docs" data-t="tabDocs">Docs</option>
-          <option value="gbsync" data-t="tabGbSync">Google Business</option>
-          <option value="_projectvalue" data-t="tabProjectValue">📊 Project Value Report</option>
         </optgroup>
       </select>
     </div>
@@ -3373,17 +3387,6 @@
       <div id="reminders-container"></div>
     </div>
 
-    <!-- GOOGLE BUSINESS SYNC TAB -->
-    <div id="tab-gbsync" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
-        <div>
-          <h2 class="text-2xl font-bold">🔄 <span data-t="tabGbSync">Google Business</span></h2>
-          <p class="text-green-100" data-t="gbSyncSubtitle">Google Business Profile sync status</p>
-        </div>
-        <button onclick="loadGoogleBusinessSync()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
-      </div>
-      <div id="gbsync-container"></div>
-    </div>
 
     <!-- RESOURCE PLANNER TAB -->
     <div id="tab-resourceplanner" class="tab-content hidden fade-in" role="tabpanel">
@@ -3736,7 +3739,6 @@ const adminT = {
     tabLoyalty: 'Loyalty & Rewards',
     tabReferrals: 'Referrals',
     tabReminders: 'Service Reminders',
-    tabGbSync: 'Google Business',
     navShop: '\uD83D\uDD27 Shop \u25BE',
     navTeam: '\uD83D\uDC65 Team \u25BE',
     navMarketing: '\uD83D\uDCE3 Marketing \u25BE',
@@ -3749,7 +3751,6 @@ const adminT = {
     loyaltySubtitle: 'Customer loyalty points and rewards catalog',
     referralsSubtitle: 'Customer referral codes and tracking',
     remindersSubtitle: 'Automated service due date tracking per vehicle',
-    gbSyncSubtitle: 'Google Business Profile sync status',
     // Overview
     dashboardOverview: 'Dashboard Overview',
     totalAppointments: 'Total Appointments',
@@ -3955,6 +3956,20 @@ const adminT = {
     overviewSavingsVsAgency: 'Savings vs Agency',
     overviewSavingsVsFreelancer: 'Savings vs Freelancer',
     overviewYourPrice: 'Your Price',
+    overviewTotalValue: 'Total Platform Value',
+    overviewPricingMethodology: 'Pricing Methodology',
+    overviewPricingMethodologyText: 'Based on US market rates for custom web development ($125\u2013175/hr senior developer), compared against equivalent SaaS subscriptions and agency quotes. Each feature is priced as a standalone deliverable at what it would cost to build from scratch by a professional development team.',
+    overviewMarketComparison: 'Comparable Market Context',
+    overviewSaasReplacement: 'What This Replaces',
+    overviewSaasReplacementDesc: 'Monthly SaaS equivalents you would otherwise be paying for:',
+    overviewSaasTotal: 'Estimated total SaaS replacement cost',
+    overviewKeyDifferentiators: 'Key Differentiators',
+    overviewKeyDifferentiatorsDesc: 'Features not available in off-the-shelf solutions:',
+    overviewPlatformScale: 'Platform Scale',
+    overviewDbTables: 'Database Tables',
+    overviewPrintPdf: 'Print / PDF',
+    overviewOregonTiresPlatform: 'Oregon Tires platform (current value)',
+    overviewPerYear: 'per year',
     // Notes Modal
     adminNotes: 'Admin Notes',
     notesPlaceholder: 'Add notes about this appointment...',
@@ -4697,34 +4712,6 @@ const adminT = {
     refCompleteOk: 'Referral marked complete.',
     refAwardOk: 'Points awarded successfully.',
     refFail: 'Action failed. Please try again.',
-    // Google Business (migrated from local labels)
-    gbTitle: 'Google Business Profile Sync',
-    gbLastSync: 'Last Sync',
-    gbNextSync: 'Next Scheduled Sync',
-    gbStatus: 'Status',
-    gbReviewsSynced: 'Reviews Synced',
-    gbSyncNow: 'Sync Now',
-    gbSyncing: 'Syncing...',
-    gbSuccess: 'Success',
-    gbPending: 'Pending',
-    gbError: 'Error',
-    gbLogTitle: 'Recent Sync Log',
-    gbDate: 'Date',
-    gbType: 'Type',
-    gbDetails: 'Details',
-    gbSettingsTitle: 'Sync Settings',
-    gbFrequency: 'Frequency',
-    gbAutoSync: 'Auto-Sync',
-    gbSave: 'Save Settings',
-    gbSaved: 'Settings saved',
-    gbSaveFailed: 'Failed to save settings',
-    gbSyncSuccess: 'Sync completed',
-    gbSyncFailed: 'Sync failed',
-    gbNoLogs: 'No sync logs yet.',
-    gbDaily: 'Daily',
-    gbWeekly: 'Weekly',
-    gbMonthly: 'Monthly',
-    gbNever: 'Never',
     // Calendar Retry
     calSyncRetried: 'Calendar sync retried successfully',
     calRetryFailed: 'Retry failed',
@@ -5011,7 +4998,6 @@ const adminT = {
     tabLoyalty: 'Lealtad y Recompensas',
     tabReferrals: 'Referidos',
     tabReminders: 'Recordatorios de Servicio',
-    tabGbSync: 'Google Business',
     navShop: '\uD83D\uDD27 Taller \u25BE',
     navTeam: '\uD83D\uDC65 Equipo \u25BE',
     navMarketing: '\uD83D\uDCE3 Marketing \u25BE',
@@ -5024,7 +5010,6 @@ const adminT = {
     loyaltySubtitle: 'Puntos de lealtad y cat\u00E1logo de recompensas',
     referralsSubtitle: 'C\u00F3digos de referido y seguimiento',
     remindersSubtitle: 'Seguimiento autom\u00E1tico de fechas de servicio por veh\u00EDculo',
-    gbSyncSubtitle: 'Estado de sincronizaci\u00F3n con Google Business Profile',
     // Overview
     dashboardOverview: 'Resumen del Panel',
     totalAppointments: 'Total de Citas',
@@ -5230,6 +5215,20 @@ const adminT = {
     overviewSavingsVsAgency: 'Ahorro vs Agencia',
     overviewSavingsVsFreelancer: 'Ahorro vs Freelancer',
     overviewYourPrice: 'Su Precio',
+    overviewTotalValue: 'Valor Total de la Plataforma',
+    overviewPricingMethodology: 'Metodolog\u00EDa de Precios',
+    overviewPricingMethodologyText: 'Basado en tarifas de mercado de EE.UU. para desarrollo web personalizado ($125\u2013175/hr desarrollador senior), comparado con suscripciones SaaS equivalentes y cotizaciones de agencia. Cada funci\u00F3n se valora como un entregable independiente al costo de construirla desde cero por un equipo profesional.',
+    overviewMarketComparison: 'Contexto Comparable de Mercado',
+    overviewSaasReplacement: 'Lo Que Esto Reemplaza',
+    overviewSaasReplacementDesc: 'Equivalentes mensuales de SaaS que de otro modo estar\u00EDa pagando:',
+    overviewSaasTotal: 'Costo total estimado de reemplazo SaaS',
+    overviewKeyDifferentiators: 'Diferenciadores Clave',
+    overviewKeyDifferentiatorsDesc: 'Funciones no disponibles en soluciones est\u00E1ndar:',
+    overviewPlatformScale: 'Escala de la Plataforma',
+    overviewDbTables: 'Tablas de Base de Datos',
+    overviewPrintPdf: 'Imprimir / PDF',
+    overviewOregonTiresPlatform: 'Plataforma Oregon Tires (valor actual)',
+    overviewPerYear: 'por a\u00F1o',
     // Notes Modal
     adminNotes: 'Notas de Administraci\u00F3n',
     notesPlaceholder: 'Agregar notas sobre esta cita...',
@@ -5972,34 +5971,6 @@ const adminT = {
     refCompleteOk: 'Referencia marcada como completa.',
     refAwardOk: 'Puntos otorgados exitosamente.',
     refFail: 'Acción fallida. Intente de nuevo.',
-    // Google Business (migrated from local labels)
-    gbTitle: 'Sincronización de Google Business Profile',
-    gbLastSync: 'Última sincronización',
-    gbNextSync: 'Próxima sincronización',
-    gbStatus: 'Estado',
-    gbReviewsSynced: 'Reseñas sincronizadas',
-    gbSyncNow: 'Sincronizar ahora',
-    gbSyncing: 'Sincronizando...',
-    gbSuccess: 'Exitoso',
-    gbPending: 'Pendiente',
-    gbError: 'Error',
-    gbLogTitle: 'Registro de sincronización',
-    gbDate: 'Fecha',
-    gbType: 'Tipo',
-    gbDetails: 'Detalles',
-    gbSettingsTitle: 'Configuración de sincronización',
-    gbFrequency: 'Frecuencia',
-    gbAutoSync: 'Auto-sincronizar',
-    gbSave: 'Guardar',
-    gbSaved: 'Configuración guardada',
-    gbSaveFailed: 'Error al guardar',
-    gbSyncSuccess: 'Sincronización completada',
-    gbSyncFailed: 'Error en sincronización',
-    gbNoLogs: 'Sin registros.',
-    gbDaily: 'Diario',
-    gbWeekly: 'Semanal',
-    gbMonthly: 'Mensual',
-    gbNever: 'Nunca',
     // Calendar Retry
     calSyncRetried: 'Sincronización de calendario reintentada exitosamente',
     calRetryFailed: 'Error al reintentar',
@@ -6738,7 +6709,7 @@ function showDashboard(user) {
 
 
   // ── Role-based tab visibility ──────────────────────────────────
-  var adminOnlyTabs = ['customers', 'messages', 'gallery', 'blog', 'promotions', 'faq', 'reviews', 'analytics', 'sitecontent', 'subscribers', 'invoices', 'waitlist', 'tirequotes', 'visits', 'labor', 'loyalty', 'referrals', 'reminders', 'gbsync'];
+  var adminOnlyTabs = ['customers', 'messages', 'gallery', 'blog', 'promotions', 'faq', 'reviews', 'analytics', 'sitecontent', 'subscribers', 'invoices', 'waitlist', 'tirequotes', 'visits', 'labor', 'loyalty', 'referrals', 'reminders'];
   var staffTabs = ['myschedule', 'mywork'];
 
   // Hide admin-only tabs for employees
@@ -10519,7 +10490,6 @@ function switchTab(tab) {
   if(tab==='loyalty' && typeof loadLoyalty === 'function') loadLoyalty();
   if(tab==='referrals' && typeof loadReferrals === 'function') loadReferrals();
   if(tab==='reminders' && typeof loadServiceReminders === 'function') loadServiceReminders();
-  if(tab==='gbsync' && typeof loadGoogleBusinessSync === 'function') loadGoogleBusinessSync();
   if(tab==='resourceplanner' && typeof loadResourcePlanner === 'function') loadResourcePlanner();
 }
 
@@ -10591,23 +10561,37 @@ function renderPlatformTab() {
   }
 
   // Compute data
-  var clientFeatures = FEATURE_DATA.filter(function(f) { return f.source === 'client' && f.status === 'complete'; });
-  var newFeatures = FEATURE_DATA.filter(function(f) { return f.source === 'new' && f.status === 'complete'; });
-  var completeCount = FEATURE_DATA.filter(function(f) { return f.status === 'complete'; }).length;
-  var totalPrice = 0;
-  newFeatures.forEach(function(f) { totalPrice += (f.price || 0); });
-  var pct = Math.round((completeCount / FEATURE_DATA.length) * 100);
+  var activeFeatures = FEATURE_DATA;
+  var incompleteFeatures = activeFeatures.filter(function(f) { return f.status !== 'complete'; });
+  var completeCount = activeFeatures.filter(function(f) { return f.status === 'complete'; }).length;
+  var agencyTotal = 0;
+  activeFeatures.forEach(function(f) { agencyTotal += (f.price || 0); });
+  var frRate = typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6;
+  var freelancerTotal = Math.round(agencyTotal * frRate);
+  var pct = Math.round((completeCount / activeFeatures.length) * 100);
+  var catOrder = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17'];
 
   // ─── 1. Hero Stats Banner ───
   var hero = el('div', 'rounded-2xl p-6 md:p-8 mb-8 text-white bg-gradient-to-br from-green-600 to-green-800');
-  var heroTitle = el('h2', 'text-2xl md:text-3xl font-bold mb-1', t.overviewTitle);
-  hero.appendChild(heroTitle);
-  var heroSub = el('p', 'text-green-100 text-sm mb-6', t.overviewSubtitle);
-  hero.appendChild(heroSub);
+  var heroTop = el('div', 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6');
+  var heroLeft = el('div', '');
+  heroLeft.appendChild(el('h2', 'text-2xl md:text-3xl font-bold mb-1', t.overviewTitle));
+  heroLeft.appendChild(el('p', 'text-green-100 text-sm', t.overviewSubtitle));
+  heroTop.appendChild(heroLeft);
+  var heroRight = el('div', 'flex items-center gap-3');
+  var totalBadge = el('div', 'text-right');
+  totalBadge.appendChild(el('div', 'text-3xl md:text-4xl font-bold', '$' + agencyTotal.toLocaleString()));
+  totalBadge.appendChild(el('div', 'text-xs text-green-200', t.overviewTotalValue));
+  heroRight.appendChild(totalBadge);
+  var printBtn = el('button', 'bg-white/15 hover:bg-white/25 text-white px-3 py-2 rounded-lg text-sm transition no-print cursor-pointer', t.overviewPrintPdf);
+  printBtn.addEventListener('click', function() { window.print(); });
+  heroRight.appendChild(printBtn);
+  heroTop.appendChild(heroRight);
+  hero.appendChild(heroTop);
 
   var statsGrid = el('div', 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4');
   var stats = [
-    { val: FEATURE_DATA.length, label: t.overviewTotalFeatures },
+    { val: activeFeatures.length, label: t.overviewTotalFeatures },
     { val: 119, label: t.overviewApiEndpoints },
     { val: 36, label: t.overviewPages },
     { val: 53, label: t.overviewMigrations },
@@ -10652,7 +10636,7 @@ function renderPlatformTab() {
   ringSvg.appendChild(pctText);
   progWrap.appendChild(ringSvg);
   var progInfo = el('div', '');
-  progInfo.appendChild(el('div', 'text-lg font-bold text-gray-800 dark:text-gray-100', completeCount + ' / ' + FEATURE_DATA.length + ' ' + t.overviewComplete));
+  progInfo.appendChild(el('div', 'text-lg font-bold text-gray-800 dark:text-gray-100', completeCount + ' / ' + activeFeatures.length + ' ' + t.overviewComplete));
   var progBar = el('div', 'w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-2');
   var progFill = el('div', 'bg-green-500 h-2.5 rounded-full');
   progFill.style.width = pct + '%';
@@ -10661,17 +10645,56 @@ function renderPlatformTab() {
   progWrap.appendChild(progInfo);
   container.appendChild(progWrap);
 
+  // ─── 2b. Incomplete Features Callout ───
+  if (incompleteFeatures.length > 0) {
+    var incWrap = el('div', 'mb-8 rounded-xl border-2 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/20 p-5');
+    var incHeader = el('div', 'flex items-center gap-3 mb-3');
+    incHeader.appendChild(el('span', 'text-2xl', '\u26A0\uFE0F'));
+    var incTitleText = lang === 'es' ? 'Funciones Incompletas' : 'Incomplete Features';
+    incHeader.appendChild(el('h3', 'text-lg font-bold text-amber-800 dark:text-amber-300', incTitleText));
+    var incBadge = el('span', 'text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-800 dark:bg-amber-800 dark:text-amber-200', String(incompleteFeatures.length));
+    incHeader.appendChild(incBadge);
+    incWrap.appendChild(incHeader);
+    var incSubtext = lang === 'es' ? 'Estas funciones a\u00fan no est\u00e1n terminadas:' : 'These features are not yet complete:';
+    incWrap.appendChild(el('p', 'text-sm text-amber-700 dark:text-amber-400 mb-3', incSubtext));
+    var incList = el('div', 'space-y-2');
+    incompleteFeatures.forEach(function(f) {
+      var statusLabels = {
+        not_started: { en: 'Not Started', es: 'No Iniciado', cls: 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300' },
+        planned: { en: 'Planned', es: 'Planificado', cls: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' },
+        in_progress: { en: 'In Progress', es: 'En Progreso', cls: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300' },
+        scaffold_ready: { en: 'Scaffold Ready', es: 'Estructura Lista', cls: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' }
+      };
+      var si = statusLabels[f.status] || statusLabels.not_started;
+      var row = el('div', 'flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-gray-800 border border-amber-200 dark:border-amber-700');
+      var catIcon = typeof FEATURE_ICONS !== 'undefined' ? (FEATURE_ICONS[f.cat] || '') : '';
+      row.appendChild(el('span', 'text-base flex-shrink-0', catIcon));
+      var info = el('div', 'flex-1 min-w-0');
+      info.appendChild(el('div', 'font-semibold text-sm text-gray-800 dark:text-gray-200', f['name_' + lang] || f.name_en));
+      info.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400 truncate', f['desc_' + lang] || f.desc_en));
+      row.appendChild(info);
+      row.appendChild(el('span', 'text-[11px] font-bold px-2 py-1 rounded-full whitespace-nowrap ' + si.cls, si[lang]));
+      row.appendChild(el('span', 'text-xs font-mono text-gray-400 flex-shrink-0', f.id));
+      incList.appendChild(row);
+    });
+    incWrap.appendChild(incList);
+    container.appendChild(incWrap);
+  }
+
   // ─── 3. Category Summary Grid ───
   var catTitle = el('h3', 'text-xl font-bold text-gray-800 dark:text-gray-100 mb-4', t.overviewCategories);
   container.appendChild(catTitle);
   var catGrid = el('div', 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8');
-  var catOrder = ['A','B','C','D','E','F','G','H','I','X'];
   catOrder.forEach(function(catKey) {
-    var catItems = FEATURE_DATA.filter(function(f) { return f.cat === catKey; });
+    var catItems = activeFeatures.filter(function(f) { return f.cat === catKey; });
     if (catItems.length === 0) return;
     var catComplete = catItems.filter(function(f) { return f.status === 'complete'; }).length;
+    var catIncomplete = catItems.length - catComplete;
+    var catTotal = 0;
+    catItems.forEach(function(f) { catTotal += (f.price || 0); });
     var catPct = Math.round((catComplete / catItems.length) * 100);
-    var card = el('div', 'p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow');
+    var borderClass = catIncomplete > 0 ? 'border-amber-300 dark:border-amber-600' : 'border-gray-100 dark:border-gray-700';
+    var card = el('div', 'p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm border ' + borderClass + ' cursor-pointer hover:shadow-md transition-shadow');
     card.addEventListener('click', function() {
       var target = document.getElementById('overview-cat-' + catKey);
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -10682,7 +10705,10 @@ function renderPlatformTab() {
     var catName = FEATURE_CATS[catKey] ? FEATURE_CATS[catKey][lang] : catKey;
     cardTop.appendChild(el('span', 'font-semibold text-sm text-gray-800 dark:text-gray-200', catName));
     card.appendChild(cardTop);
-    card.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400 mb-2', catComplete + '/' + catItems.length + ' ' + t.overviewComplete));
+    var infoRow = el('div', 'flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2');
+    infoRow.appendChild(el('span', '', catComplete + '/' + catItems.length + ' ' + t.overviewComplete));
+    infoRow.appendChild(el('span', 'font-semibold text-green-600 dark:text-green-400', '$' + catTotal.toLocaleString()));
+    card.appendChild(infoRow);
     var bar = el('div', 'w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5');
     var fill = el('div', 'h-1.5 rounded-full ' + (catPct === 100 ? 'bg-green-500' : 'bg-yellow-500'));
     fill.style.width = catPct + '%';
@@ -10693,26 +10719,36 @@ function renderPlatformTab() {
   container.appendChild(catGrid);
 
   // ─── Helper: render feature card ───
-  function renderFeatureCard(f, showPrice) {
-    var card = el('div', 'p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+  var statusStyles = {
+    complete: { dot: 'bg-green-500', border: 'border-gray-100 dark:border-gray-700', bg: 'bg-white dark:bg-gray-800' },
+    not_started: { dot: 'bg-gray-400', border: 'border-amber-300 dark:border-amber-600', bg: 'bg-amber-50/50 dark:bg-amber-900/10', label: { en: 'Not Started', es: 'No Iniciado' }, badgeCls: 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300' },
+    planned: { dot: 'bg-blue-500', border: 'border-blue-300 dark:border-blue-600', bg: 'bg-blue-50/50 dark:bg-blue-900/10', label: { en: 'Planned', es: 'Planificado' }, badgeCls: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' },
+    in_progress: { dot: 'bg-yellow-500', border: 'border-yellow-300 dark:border-yellow-600', bg: 'bg-yellow-50/50 dark:bg-yellow-900/10', label: { en: 'In Progress', es: 'En Progreso' }, badgeCls: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300' },
+    scaffold_ready: { dot: 'bg-purple-500', border: 'border-purple-300 dark:border-purple-600', bg: 'bg-purple-50/50 dark:bg-purple-900/10', label: { en: 'Scaffold Ready', es: 'Estructura Lista' }, badgeCls: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' }
+  };
+
+  function renderFeatureCard(f) {
+    var ss = statusStyles[f.status] || statusStyles.complete;
+    var card = el('div', 'p-4 rounded-xl ' + ss.bg + ' border ' + ss.border + ' shadow-sm');
     var topRow = el('div', 'flex items-start justify-between gap-2 mb-2');
-    var statusDot = el('span', 'inline-block w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ' + (f.status === 'complete' ? 'bg-green-500' : f.status === 'in_progress' ? 'bg-yellow-500' : f.status === 'planned' ? 'bg-blue-500' : 'bg-gray-400'));
+    var statusDot = el('span', 'inline-block w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ' + ss.dot);
     var nameEl = el('span', 'font-medium text-sm text-gray-800 dark:text-gray-200 flex-1', f['name_' + lang] || f.name_en);
     var leftGroup = el('div', 'flex items-start gap-2 flex-1');
     leftGroup.appendChild(statusDot);
     leftGroup.appendChild(nameEl);
     topRow.appendChild(leftGroup);
-    if (showPrice && f.price) {
-      var frRate = typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6;
-      var frVal = Math.round(f.price * frRate);
-      var priceGroup = el('div', 'flex flex-col items-end gap-0.5 flex-shrink-0');
-      priceGroup.appendChild(el('span', 'text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '$' + f.price.toLocaleString()));
-      priceGroup.appendChild(el('span', 'text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap', '$' + frVal.toLocaleString() + ' freelancer'));
-      topRow.appendChild(priceGroup);
-    } else {
-      var inclBadge = el('span', 'text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '\u2713 ' + t.overviewIncluded);
-      topRow.appendChild(inclBadge);
+
+    var rightGroup = el('div', 'flex flex-col items-end gap-0.5 flex-shrink-0');
+    if (f.status !== 'complete' && ss.label) {
+      rightGroup.appendChild(el('span', 'text-[11px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ' + ss.badgeCls, ss.label[lang]));
     }
+    if (f.price) {
+      var frVal = Math.round(f.price * frRate);
+      rightGroup.appendChild(el('span', 'text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '$' + f.price.toLocaleString()));
+      rightGroup.appendChild(el('span', 'text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap', '$' + frVal.toLocaleString() + ' freelancer'));
+    }
+    topRow.appendChild(rightGroup);
+
     card.appendChild(topRow);
     card.appendChild(el('p', 'text-xs text-gray-500 dark:text-gray-400 leading-relaxed', f['desc_' + lang] || f.desc_en));
     if (typeof FEATURE_LINKS !== 'undefined' && FEATURE_LINKS[f.id]) {
@@ -10727,58 +10763,13 @@ function renderPlatformTab() {
     return card;
   }
 
-  // ─── Helper: render section with categories ───
-  function renderSection(title, desc, features, accentColor, showPrice) {
-    var section = el('div', 'mb-10');
-    var header = el('div', 'flex items-center gap-3 mb-2 pb-3 border-b-2 border-' + accentColor + '-500');
-    header.appendChild(el('h3', 'text-xl font-bold text-gray-800 dark:text-gray-100', title));
-    header.appendChild(el('span', 'text-sm font-medium px-2.5 py-0.5 rounded-full bg-' + accentColor + '-100 text-' + accentColor + '-700 dark:bg-' + accentColor + '-900/30 dark:text-' + accentColor + '-300', String(features.length)));
-    section.appendChild(header);
-    section.appendChild(el('p', 'text-sm text-gray-500 dark:text-gray-400 mb-5', desc));
-
-    // Group by category
-    var groups = {};
-    features.forEach(function(f) {
-      if (!groups[f.cat]) groups[f.cat] = [];
-      groups[f.cat].push(f);
-    });
-
-    catOrder.forEach(function(catKey) {
-      if (!groups[catKey]) return;
-      var catDiv = el('div', 'mb-6');
-      catDiv.id = 'overview-cat-' + catKey;
-      var catHeader = el('div', 'flex items-center gap-2 mb-3');
-      var icon = typeof FEATURE_ICONS !== 'undefined' ? (FEATURE_ICONS[catKey] || '') : '';
-      catHeader.appendChild(el('span', 'text-lg', icon));
-      var catName = FEATURE_CATS[catKey] ? FEATURE_CATS[catKey][lang] : catKey;
-      catHeader.appendChild(el('span', 'font-semibold text-gray-700 dark:text-gray-300', catName));
-      catHeader.appendChild(el('span', 'text-xs text-gray-400', '(' + groups[catKey].length + ' ' + t.overviewFeaturesIn + ' ' + catKey + ')'));
-      catDiv.appendChild(catHeader);
-      var grid = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-3');
-      groups[catKey].forEach(function(f) {
-        grid.appendChild(renderFeatureCard(f, showPrice));
-      });
-      catDiv.appendChild(grid);
-      section.appendChild(catDiv);
-    });
-
-    return section;
-  }
-
-  // Compute totals for summary
-  var agencyTotal = 0;
-  FEATURE_DATA.forEach(function(f) { agencyTotal += (f.price || 0); });
-  var freelancerTotal = Math.round(agencyTotal * (typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6));
-  var clientPrice = typeof CLIENT_PRICE !== 'undefined' ? CLIENT_PRICE : 0;
-
   // ─── 4. Value Breakdown Bar Chart ───
   var breakdownWrap = el('div', 'mb-8');
   breakdownWrap.appendChild(el('h3', 'text-xl font-bold text-gray-800 dark:text-gray-100 mb-4', t.overviewValueBreakdown));
 
-  // Build per-category totals
   var catTotals = [];
   catOrder.forEach(function(catKey) {
-    var catItems = FEATURE_DATA.filter(function(f) { return f.cat === catKey; });
+    var catItems = activeFeatures.filter(function(f) { return f.cat === catKey; });
     if (catItems.length === 0) return;
     var catTotal = 0;
     catItems.forEach(function(f) { catTotal += (f.price || 0); });
@@ -10798,20 +10789,17 @@ function renderPlatformTab() {
       var target = document.getElementById('overview-cat-' + cat.key);
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-
     var labelRow = el('div', 'flex items-center justify-between mb-1');
     var labelLeft = el('div', 'flex items-center gap-2');
     labelLeft.appendChild(el('span', 'text-sm', cat.icon));
     labelLeft.appendChild(el('span', 'text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors', cat.name + ' (' + cat.count + ')'));
     labelRow.appendChild(labelLeft);
-
     var labelRight = el('div', 'flex items-center gap-3 text-xs');
     labelRight.appendChild(el('span', 'font-semibold text-gray-700 dark:text-gray-300', '$' + cat.total.toLocaleString()));
-    var frCatVal = Math.round(cat.total * (typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6));
+    var frCatVal = Math.round(cat.total * frRate);
     labelRight.appendChild(el('span', 'text-gray-400', '$' + frCatVal.toLocaleString()));
     labelRow.appendChild(labelRight);
     row.appendChild(labelRow);
-
     var barOuter = el('div', 'w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden');
     var barInner = el('div', 'h-3 rounded-full bg-green-500 dark:bg-green-600 transition-all');
     barInner.style.width = Math.round((cat.total / maxCatVal) * 100) + '%';
@@ -10820,11 +10808,9 @@ function renderPlatformTab() {
     barFr.style.width = Math.round((frCatVal / maxCatVal) * 100) + '%';
     barOuter.appendChild(barFr);
     row.appendChild(barOuter);
-
     barContainer.appendChild(row);
   });
 
-  // Legend
   var legend = el('div', 'flex items-center gap-4 mt-3 text-xs text-gray-400');
   var legAg = el('div', 'flex items-center gap-1');
   legAg.appendChild(el('span', 'w-3 h-3 rounded-full bg-green-500 inline-block'));
@@ -10835,36 +10821,117 @@ function renderPlatformTab() {
   legFr.appendChild(el('span', '', t.overviewFreelancer));
   legend.appendChild(legFr);
   barContainer.appendChild(legend);
-
   breakdownWrap.appendChild(barContainer);
   container.appendChild(breakdownWrap);
 
-  // ─── 6. Client Features Section (with prices) ───
-  var clientSectionTotal = 0;
-  clientFeatures.forEach(function(f) { clientSectionTotal += (f.price || 0); });
-  var clientSectionFr = Math.round(clientSectionTotal * (typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6));
-  container.appendChild(renderSection(
-    t.overviewClientSection + '  —  $' + clientSectionFr.toLocaleString() + ' – $' + clientSectionTotal.toLocaleString(), t.overviewClientDesc,
-    clientFeatures, 'green', true
-  ));
+  // ─── 5. All Features by Category ───
+  catOrder.forEach(function(catKey) {
+    var catItems = activeFeatures.filter(function(f) { return f.cat === catKey; });
+    if (catItems.length === 0) return;
+    var catTotal = 0;
+    catItems.forEach(function(f) { catTotal += (f.price || 0); });
+    var catDiv = el('div', 'mb-8');
+    catDiv.id = 'overview-cat-' + catKey;
+    var catHeader = el('div', 'flex items-center justify-between mb-3 pb-2 border-b-2 border-green-500');
+    var catLeft = el('div', 'flex items-center gap-2');
+    var icon = typeof FEATURE_ICONS !== 'undefined' ? (FEATURE_ICONS[catKey] || '') : '';
+    catLeft.appendChild(el('span', 'text-lg', icon));
+    var catName = FEATURE_CATS[catKey] ? FEATURE_CATS[catKey][lang] : catKey;
+    catLeft.appendChild(el('span', 'font-bold text-gray-800 dark:text-gray-100', catName));
+    catLeft.appendChild(el('span', 'text-xs text-gray-400 ml-1', '(' + catItems.length + ')'));
+    catHeader.appendChild(catLeft);
+    catHeader.appendChild(el('span', 'text-sm font-semibold text-green-600 dark:text-green-400', '$' + catTotal.toLocaleString()));
+    catDiv.appendChild(catHeader);
+    var grid = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-3');
+    catItems.forEach(function(f) { grid.appendChild(renderFeatureCard(f)); });
+    catDiv.appendChild(grid);
+    container.appendChild(catDiv);
+  });
 
-  // ─── 7. Additional Features Section ───
-  var newFrTotal = Math.round(totalPrice * (typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6));
-  container.appendChild(renderSection(
-    t.overviewNewSection + '  \u2014  $' + newFrTotal.toLocaleString() + ' \u2013 $' + totalPrice.toLocaleString(), t.overviewNewDesc,
-    newFeatures, 'indigo', true
-  ));
+  // ─── 6. Pricing Methodology ───
+  var methWrap = el('div', 'mb-8 p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+  methWrap.appendChild(el('h3', 'font-bold text-lg text-gray-800 dark:text-gray-100 mb-2', t.overviewPricingMethodology));
+  methWrap.appendChild(el('p', 'text-sm text-gray-500 dark:text-gray-400 leading-relaxed', t.overviewPricingMethodologyText));
+  container.appendChild(methWrap);
 
-  // ─── 8. Platform Investment Summary ───
-  var clientTotal = 0;
-  clientFeatures.forEach(function(f) { clientTotal += (f.price || 0); });
-  var bonusTotal = totalPrice;
-  var frRate = typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6;
-  var clientTotalFr = Math.round(clientTotal * frRate);
-  var bonusTotalFr = Math.round(bonusTotal * frRate);
-  var grandTotal = clientTotal + bonusTotal;
-  var grandTotalFr = Math.round(grandTotal * frRate);
+  // ─── 7. Market Comparison ───
+  if (typeof MARKET_COMPARISONS !== 'undefined') {
+    var mcWrap = el('div', 'mb-8 p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+    mcWrap.appendChild(el('h3', 'font-bold text-lg text-gray-800 dark:text-gray-100 mb-4', t.overviewMarketComparison));
+    var mcList = el('div', 'space-y-3');
+    MARKET_COMPARISONS.forEach(function(mc) {
+      var row = el('div', 'flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600');
+      row.appendChild(el('span', 'text-sm text-gray-700 dark:text-gray-300', mc[lang] || mc.en));
+      row.appendChild(el('span', 'text-sm font-medium text-gray-500 dark:text-gray-400', mc.value));
+      mcList.appendChild(row);
+    });
+    // Oregon Tires highlight row
+    var otRow = el('div', 'flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700');
+    otRow.appendChild(el('span', 'text-sm font-bold text-gray-800 dark:text-gray-100', t.overviewOregonTiresPlatform));
+    otRow.appendChild(el('span', 'text-lg font-bold text-green-600 dark:text-green-400', '$' + agencyTotal.toLocaleString()));
+    mcList.appendChild(otRow);
+    mcWrap.appendChild(mcList);
+    container.appendChild(mcWrap);
+  }
 
+  // ─── 8. SaaS Replacement Costs ───
+  if (typeof SAAS_REPLACEMENTS !== 'undefined') {
+    var saasWrap = el('div', 'mb-8 p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+    saasWrap.appendChild(el('h3', 'font-bold text-lg text-gray-800 dark:text-gray-100 mb-2', t.overviewSaasReplacement));
+    saasWrap.appendChild(el('p', 'text-sm text-gray-500 dark:text-gray-400 mb-4', t.overviewSaasReplacementDesc));
+    var saasList = el('div', 'space-y-2 mb-4');
+    SAAS_REPLACEMENTS.forEach(function(s) {
+      var row = el('div', 'flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600');
+      row.appendChild(el('span', 'text-sm text-gray-700 dark:text-gray-300', s[lang] || s.en));
+      row.appendChild(el('span', 'text-sm font-medium text-gray-500 dark:text-gray-400', s.cost));
+      saasList.appendChild(row);
+    });
+    saasWrap.appendChild(saasList);
+    var saasTotal = el('div', 'p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 text-center');
+    saasTotal.appendChild(el('p', 'text-sm text-gray-500 dark:text-gray-400', t.overviewSaasTotal));
+    saasTotal.appendChild(el('p', 'text-2xl font-bold text-green-600 dark:text-green-400 mt-1', '~$650\u2013850/mo'));
+    saasTotal.appendChild(el('p', 'text-sm text-gray-400 mt-1', '($7,800\u2013$10,200 ' + t.overviewPerYear + ')'));
+    saasWrap.appendChild(saasTotal);
+    container.appendChild(saasWrap);
+  }
+
+  // ─── 9. Key Differentiators ───
+  if (typeof KEY_DIFFERENTIATORS !== 'undefined') {
+    var diffWrap = el('div', 'mb-8 p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+    diffWrap.appendChild(el('h3', 'font-bold text-lg text-gray-800 dark:text-gray-100 mb-2', t.overviewKeyDifferentiators));
+    diffWrap.appendChild(el('p', 'text-sm text-gray-500 dark:text-gray-400 mb-4', t.overviewKeyDifferentiatorsDesc));
+    var diffList = el('ol', 'space-y-2');
+    KEY_DIFFERENTIATORS.forEach(function(d, i) {
+      var li = el('li', 'flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600');
+      var num = el('span', 'flex-shrink-0 w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold text-xs flex items-center justify-center border border-green-300 dark:border-green-700', String(i + 1));
+      li.appendChild(num);
+      li.appendChild(el('span', 'text-sm text-gray-700 dark:text-gray-300 leading-relaxed', d[lang] || d.en));
+      diffList.appendChild(li);
+    });
+    diffWrap.appendChild(diffList);
+    container.appendChild(diffWrap);
+  }
+
+  // ─── 10. Platform Scale ───
+  var scaleWrap = el('div', 'mb-8 p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+  scaleWrap.appendChild(el('h3', 'font-bold text-lg text-gray-800 dark:text-gray-100 mb-4', t.overviewPlatformScale));
+  var scaleGrid = el('div', 'grid grid-cols-2 md:grid-cols-4 gap-4');
+  var scaleStats = [
+    { val: 53, label: t.overviewDbTables },
+    { val: 53, label: t.overviewMigrations },
+    { val: 119, label: t.overviewApiEndpoints },
+    { val: 7, label: t.overviewCronJobs }
+  ];
+  scaleStats.forEach(function(s) {
+    var card = el('div', 'rounded-lg p-4 text-center bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600');
+    card.appendChild(el('p', 'text-3xl font-bold text-green-600 dark:text-green-400', String(s.val)));
+    card.appendChild(el('p', 'text-xs text-gray-500 dark:text-gray-400 mt-1', s.label));
+    scaleGrid.appendChild(card);
+  });
+  scaleWrap.appendChild(scaleGrid);
+  container.appendChild(scaleWrap);
+
+  // ─── 11. Platform Investment Summary ───
   var summary = el('div', 'rounded-2xl p-6 md:p-8 bg-gradient-to-br from-green-600 to-green-800 text-white');
   summary.appendChild(el('h3', 'text-xl md:text-2xl font-bold mb-5 text-center', t.overviewPlatformSummary));
 
@@ -10877,7 +10944,6 @@ function renderPlatformTab() {
     return row;
   }
 
-  // Column headers
   var headerRow = el('div', 'flex justify-between items-center mb-1');
   headerRow.appendChild(el('span', 'text-xs text-green-200 font-semibold uppercase tracking-wider', ''));
   var headerRight = el('div', 'flex items-center gap-2 text-[10px] text-green-200 uppercase tracking-wider font-semibold');
@@ -10886,18 +10952,15 @@ function renderPlatformTab() {
   headerRight.appendChild(el('span', '', t.overviewAgency));
   summaryGrid.appendChild(headerRow);
 
-  // Client features row
-  var clientRow = summaryRow(clientFeatures.length + ' ' + t.overviewClientValue, '$' + clientTotalFr.toLocaleString() + ' \u2013 $' + clientTotal.toLocaleString());
-  summaryGrid.appendChild(clientRow);
+  var totalRow = summaryRow(activeFeatures.length + ' ' + t.overviewTotalFeatures, '$' + freelancerTotal.toLocaleString() + ' \u2013 $' + agencyTotal.toLocaleString(), 'text-lg');
+  totalRow.querySelector('span:last-child').className = 'font-bold text-lg text-green-200';
+  summaryGrid.appendChild(totalRow);
 
-  // Bonus features row
-  var bonusRow = summaryRow(newFeatures.length + ' ' + t.overviewBonusValue2, '$' + bonusTotalFr.toLocaleString() + ' \u2013 $' + bonusTotal.toLocaleString());
-  summaryGrid.appendChild(bonusRow);
-
-  var divider0 = el('div', 'border-t border-white/20 my-2');
-  summaryGrid.appendChild(divider0);
-
+  var clientPrice = typeof CLIENT_PRICE !== 'undefined' ? CLIENT_PRICE : 0;
   if (clientPrice > 0) {
+    var divider0 = el('div', 'border-t border-white/20 my-2');
+    summaryGrid.appendChild(divider0);
+
     var priceRow = summaryRow(t.overviewYourPrice, '$' + clientPrice.toLocaleString(), 'text-lg');
     priceRow.querySelector('span:last-child').className = 'font-bold text-lg';
     summaryGrid.appendChild(priceRow);
@@ -10917,17 +10980,13 @@ function renderPlatformTab() {
     savFrRow.querySelector('span:last-child').className = 'font-bold text-green-200';
     summaryGrid.appendChild(savFrRow);
   } else {
-    var deliveredRow = summaryRow(t.overviewValueDelivered, '$' + grandTotalFr.toLocaleString() + ' \u2013 $' + grandTotal.toLocaleString(), 'text-lg');
-    deliveredRow.querySelector('span:last-child').className = 'font-bold text-lg text-green-200';
-    summaryGrid.appendChild(deliveredRow);
     summaryGrid.appendChild(summaryRow(t.overviewYourPrice, t.overviewPriceTbd));
   }
 
   summary.appendChild(summaryGrid);
 
-  // Bottom features list
   var bottomInfo = el('div', 'mt-6 pt-4 border-t border-white/20 text-center text-sm text-green-100 space-y-1');
-  bottomInfo.appendChild(el('div', '', '\u2713 ' + FEATURE_DATA.length + ' features \u00B7 119 APIs \u00B7 36 pages'));
+  bottomInfo.appendChild(el('div', '', '\u2713 ' + activeFeatures.length + ' features \u00B7 119 APIs \u00B7 36 pages'));
   bottomInfo.appendChild(el('div', '', '\u2713 Bilingual (EN/ES) \u00B7 Dark mode \u00B7 PWA'));
   bottomInfo.appendChild(el('div', '', '\u2713 7 automated cron jobs \u00B7 53 DB migrations'));
   summary.appendChild(bottomInfo);
