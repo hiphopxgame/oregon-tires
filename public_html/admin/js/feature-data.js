@@ -1,9 +1,10 @@
 // Oregon Tires Admin — Feature Categories & Data
-// 17 categories, 113 features. Total value: $157,200.
+// 17 categories, 113 features. Freelancer value: ~$52,400 ($50/hr).
+// Base prices are internal scope estimates; displayed values use FREELANCER_RATE.
 // Source of truth: synced with project-value report (March 2026).
 
 var CLIENT_PRICE = 0;
-var FREELANCER_RATE = 0.6;
+var FREELANCER_RATE = 1/3;
 
 var FEATURE_CATS = {
   '1':  { en: 'Website Foundation', es: 'Fundación del Sitio Web' },

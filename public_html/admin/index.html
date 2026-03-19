@@ -3936,7 +3936,7 @@ const adminT = {
     overviewCategories: 'Feature Categories',
     overviewWhatDoesItCost: 'What Does This Platform Cost?',
     overviewAgencyEstimate: 'Portland Web Agency',
-    overviewFreelancerEstimate: 'Mid-Tier Freelancer',
+    overviewFreelancerEstimate: 'Freelancer Rate',
     overviewOurPrice: 'Your Investment',
     overviewBestValue: 'Best Value',
     overviewYouSave: 'You Save',
@@ -3946,19 +3946,17 @@ const adminT = {
     overviewContactPricing: 'Contact for Pricing',
     overviewPriceTbd: 'Price — TBD',
     overviewValueDelivered: 'Value Delivered',
-    overviewAtAgencyRates: 'at agency rates',
+    overviewAtFreelancerRates: 'at freelancer rates ($50/hr)',
     overviewValueBreakdown: 'Value Breakdown by Category',
-    overviewAgency: 'Agency',
-    overviewFreelancer: 'Freelancer',
+    overviewFreelancer: 'Freelancer ($50/hr)',
     overviewPlatformSummary: 'Platform Investment Summary',
     overviewClientValue: 'Client Features Value',
     overviewBonusValue2: 'Additional Features Value',
-    overviewSavingsVsAgency: 'Savings vs Agency',
     overviewSavingsVsFreelancer: 'Savings vs Freelancer',
     overviewYourPrice: 'Your Price',
-    overviewTotalValue: 'Total Platform Value',
+    overviewTotalValue: 'Platform Value',
     overviewPricingMethodology: 'Pricing Methodology',
-    overviewPricingMethodologyText: 'Based on US market rates for custom web development ($125\u2013175/hr senior developer), compared against equivalent SaaS subscriptions and agency quotes. Each feature is priced as a standalone deliverable at what it would cost to build from scratch by a professional development team.',
+    overviewPricingMethodologyText: 'Priced at a freelancer rate of $50/hr for custom web development, compared against equivalent SaaS subscriptions and agency quotes. Each feature is scoped as a standalone deliverable at what it would cost to build from scratch.',
     overviewMarketComparison: 'Comparable Market Context',
     overviewSaasReplacement: 'What This Replaces',
     overviewSaasReplacementDesc: 'Monthly SaaS equivalents you would otherwise be paying for:',
@@ -5199,7 +5197,7 @@ const adminT = {
     overviewCategories: 'Categor\u00EDas de Funciones',
     overviewWhatDoesItCost: '\u00BFCu\u00E1nto Cuesta Esta Plataforma?',
     overviewAgencyEstimate: 'Agencia Web Portland',
-    overviewFreelancerEstimate: 'Freelancer Nivel Medio',
+    overviewFreelancerEstimate: 'Tarifa Freelancer',
     overviewOurPrice: 'Su Inversi\u00F3n',
     overviewBestValue: 'Mejor Valor',
     overviewYouSave: 'Usted Ahorra',
@@ -5209,19 +5207,17 @@ const adminT = {
     overviewContactPricing: 'Cont\u00E1ctenos para Precios',
     overviewPriceTbd: 'Precio — Por Definir',
     overviewValueDelivered: 'Valor Entregado',
-    overviewAtAgencyRates: 'a tarifas de agencia',
+    overviewAtFreelancerRates: 'a tarifa freelancer ($50/hr)',
     overviewValueBreakdown: 'Desglose de Valor por Categor\u00EDa',
-    overviewAgency: 'Agencia',
-    overviewFreelancer: 'Freelancer',
+    overviewFreelancer: 'Freelancer ($50/hr)',
     overviewPlatformSummary: 'Resumen de Inversi\u00F3n de la Plataforma',
     overviewClientValue: 'Valor de Funciones del Cliente',
     overviewBonusValue2: 'Valor de Funciones Adicionales',
-    overviewSavingsVsAgency: 'Ahorro vs Agencia',
     overviewSavingsVsFreelancer: 'Ahorro vs Freelancer',
     overviewYourPrice: 'Su Precio',
-    overviewTotalValue: 'Valor Total de la Plataforma',
+    overviewTotalValue: 'Valor de la Plataforma',
     overviewPricingMethodology: 'Metodolog\u00EDa de Precios',
-    overviewPricingMethodologyText: 'Basado en tarifas de mercado de EE.UU. para desarrollo web personalizado ($125\u2013175/hr desarrollador senior), comparado con suscripciones SaaS equivalentes y cotizaciones de agencia. Cada funci\u00F3n se valora como un entregable independiente al costo de construirla desde cero por un equipo profesional.',
+    overviewPricingMethodologyText: 'Valorado a tarifa freelancer de $50/hr para desarrollo web personalizado, comparado con suscripciones SaaS equivalentes y cotizaciones de agencia. Cada funci\u00F3n se valora como un entregable independiente al costo de construirla desde cero.',
     overviewMarketComparison: 'Contexto Comparable de Mercado',
     overviewSaasReplacement: 'Lo Que Esto Reemplaza',
     overviewSaasReplacementDesc: 'Equivalentes mensuales de SaaS que de otro modo estar\u00EDa pagando:',
@@ -10588,7 +10584,7 @@ function renderPlatformTab() {
   heroTop.appendChild(heroLeft);
   var heroRight = el('div', 'flex items-center gap-3');
   var totalBadge = el('div', 'text-right');
-  totalBadge.appendChild(el('div', 'text-3xl md:text-4xl font-bold', '$' + agencyTotal.toLocaleString()));
+  totalBadge.appendChild(el('div', 'text-3xl md:text-4xl font-bold', '$' + freelancerTotal.toLocaleString()));
   totalBadge.appendChild(el('div', 'text-xs text-green-200', t.overviewTotalValue));
   heroRight.appendChild(totalBadge);
   var printBtn = el('button', 'bg-white/15 hover:bg-white/25 text-white px-3 py-2 rounded-lg text-sm transition no-print cursor-pointer', t.overviewPrintPdf);
@@ -10715,7 +10711,7 @@ function renderPlatformTab() {
     card.appendChild(cardTop);
     var infoRow = el('div', 'flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2');
     infoRow.appendChild(el('span', '', catComplete + '/' + catItems.length + ' ' + t.overviewComplete));
-    infoRow.appendChild(el('span', 'font-semibold text-green-600 dark:text-green-400', '$' + catTotal.toLocaleString()));
+    infoRow.appendChild(el('span', 'font-semibold text-green-600 dark:text-green-400', '$' + Math.round(catTotal * frRate).toLocaleString()));
     card.appendChild(infoRow);
     var bar = el('div', 'w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5');
     var fill = el('div', 'h-1.5 rounded-full ' + (catPct === 100 ? 'bg-green-500' : 'bg-yellow-500'));
@@ -10752,8 +10748,7 @@ function renderPlatformTab() {
     }
     if (f.price) {
       var frVal = Math.round(f.price * frRate);
-      rightGroup.appendChild(el('span', 'text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '$' + f.price.toLocaleString()));
-      rightGroup.appendChild(el('span', 'text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap', '$' + frVal.toLocaleString() + ' freelancer'));
+      rightGroup.appendChild(el('span', 'text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '$' + frVal.toLocaleString()));
     }
     topRow.appendChild(rightGroup);
 
@@ -10802,33 +10797,18 @@ function renderPlatformTab() {
     labelLeft.appendChild(el('span', 'text-sm', cat.icon));
     labelLeft.appendChild(el('span', 'text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors', cat.name + ' (' + cat.count + ')'));
     labelRow.appendChild(labelLeft);
-    var labelRight = el('div', 'flex items-center gap-3 text-xs');
-    labelRight.appendChild(el('span', 'font-semibold text-gray-700 dark:text-gray-300', '$' + cat.total.toLocaleString()));
     var frCatVal = Math.round(cat.total * frRate);
-    labelRight.appendChild(el('span', 'text-gray-400', '$' + frCatVal.toLocaleString()));
+    var labelRight = el('div', 'flex items-center gap-3 text-xs');
+    labelRight.appendChild(el('span', 'font-semibold text-gray-700 dark:text-gray-300', '$' + frCatVal.toLocaleString()));
     labelRow.appendChild(labelRight);
     row.appendChild(labelRow);
-    var barOuter = el('div', 'w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden');
+    var barOuter = el('div', 'w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 overflow-hidden');
     var barInner = el('div', 'h-3 rounded-full bg-green-500 dark:bg-green-600 transition-all');
-    barInner.style.width = Math.round((cat.total / maxCatVal) * 100) + '%';
+    barInner.style.width = Math.round((frCatVal / Math.round(maxCatVal * frRate)) * 100) + '%';
     barOuter.appendChild(barInner);
-    var barFr = el('div', 'h-3 rounded-full bg-gray-300 dark:bg-gray-500 absolute top-0 left-0 opacity-40');
-    barFr.style.width = Math.round((frCatVal / maxCatVal) * 100) + '%';
-    barOuter.appendChild(barFr);
     row.appendChild(barOuter);
     barContainer.appendChild(row);
   });
-
-  var legend = el('div', 'flex items-center gap-4 mt-3 text-xs text-gray-400');
-  var legAg = el('div', 'flex items-center gap-1');
-  legAg.appendChild(el('span', 'w-3 h-3 rounded-full bg-green-500 inline-block'));
-  legAg.appendChild(el('span', '', t.overviewAgency));
-  legend.appendChild(legAg);
-  var legFr = el('div', 'flex items-center gap-1');
-  legFr.appendChild(el('span', 'w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-500 inline-block'));
-  legFr.appendChild(el('span', '', t.overviewFreelancer));
-  legend.appendChild(legFr);
-  barContainer.appendChild(legend);
   breakdownWrap.appendChild(barContainer);
   container.appendChild(breakdownWrap);
 
@@ -10848,7 +10828,7 @@ function renderPlatformTab() {
     catLeft.appendChild(el('span', 'font-bold text-gray-800 dark:text-gray-100', catName));
     catLeft.appendChild(el('span', 'text-xs text-gray-400 ml-1', '(' + catItems.length + ')'));
     catHeader.appendChild(catLeft);
-    catHeader.appendChild(el('span', 'text-sm font-semibold text-green-600 dark:text-green-400', '$' + catTotal.toLocaleString()));
+    catHeader.appendChild(el('span', 'text-sm font-semibold text-green-600 dark:text-green-400', '$' + Math.round(catTotal * frRate).toLocaleString()));
     catDiv.appendChild(catHeader);
     var grid = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-3');
     catItems.forEach(function(f) { grid.appendChild(renderFeatureCard(f)); });
@@ -10876,7 +10856,7 @@ function renderPlatformTab() {
     // Oregon Tires highlight row
     var otRow = el('div', 'flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700');
     otRow.appendChild(el('span', 'text-sm font-bold text-gray-800 dark:text-gray-100', t.overviewOregonTiresPlatform));
-    otRow.appendChild(el('span', 'text-lg font-bold text-green-600 dark:text-green-400', '$' + agencyTotal.toLocaleString()));
+    otRow.appendChild(el('span', 'text-lg font-bold text-green-600 dark:text-green-400', '$' + freelancerTotal.toLocaleString()));
     mcList.appendChild(otRow);
     mcWrap.appendChild(mcList);
     container.appendChild(mcWrap);
@@ -10994,13 +10974,10 @@ function renderPlatformTab() {
 
   var headerRow = el('div', 'flex justify-between items-center mb-1');
   headerRow.appendChild(el('span', 'text-xs text-green-200 font-semibold uppercase tracking-wider', ''));
-  var headerRight = el('div', 'flex items-center gap-2 text-[10px] text-green-200 uppercase tracking-wider font-semibold');
-  headerRight.appendChild(el('span', '', t.overviewFreelancer));
-  headerRight.appendChild(el('span', 'text-green-300', '\u2013'));
-  headerRight.appendChild(el('span', '', t.overviewAgency));
+  headerRow.appendChild(el('span', 'text-[10px] text-green-200 uppercase tracking-wider font-semibold', t.overviewFreelancer));
   summaryGrid.appendChild(headerRow);
 
-  var totalRow = summaryRow(activeFeatures.length + ' ' + t.overviewTotalFeatures, '$' + freelancerTotal.toLocaleString() + ' \u2013 $' + agencyTotal.toLocaleString(), 'text-lg');
+  var totalRow = summaryRow(activeFeatures.length + ' ' + t.overviewTotalFeatures, '$' + freelancerTotal.toLocaleString(), 'text-lg');
   totalRow.querySelector('span:last-child').className = 'font-bold text-lg text-green-200';
   summaryGrid.appendChild(totalRow);
 
@@ -11015,12 +10992,6 @@ function renderPlatformTab() {
 
     var divider2 = el('div', 'border-t border-white/20 my-2');
     summaryGrid.appendChild(divider2);
-
-    var savAg = agencyTotal - clientPrice;
-    var savAgPct = Math.round((savAg / agencyTotal) * 100);
-    var savAgRow = summaryRow(t.overviewSavingsVsAgency, '$' + savAg.toLocaleString() + ' (' + savAgPct + '%)');
-    savAgRow.querySelector('span:last-child').className = 'font-bold text-green-200';
-    summaryGrid.appendChild(savAgRow);
 
     var savFr = freelancerTotal - clientPrice;
     var savFrPct = Math.round((savFr / freelancerTotal) * 100);
