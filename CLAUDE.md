@@ -170,6 +170,10 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `GET /api/member/my-vehicles.php` — member's vehicles
 - `GET /api/member/my-estimates.php` — member's estimates
 - `GET /api/member/my-care-plan.php` — member's care plan
+- `GET /api/member/my-invoices.php` — member's invoices (HTML tab)
+- `GET /api/member/my-loyalty.php` — loyalty points dashboard (HTML tab)
+- `GET /api/member/my-referral.php` — referral code + stats (JSON)
+- `GET /api/member/my-referral-ui.php` — referral dashboard (HTML tab)
 - `GET /api/member/my-messages.php` — member's messages
 - `GET /api/member/conversations.php` — member's conversations
 - `GET /api/member/my-schedule.php` — employee schedule
@@ -194,7 +198,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `GET /api/form/stats.php` — form stats
 - `POST /api/form/mark-read.php` — mark submission read
 
-### Admin (session auth + CSRF — 47 endpoints)
+### Admin (session auth + CSRF — 48 endpoints)
 - `/api/admin/login.php`, `logout.php`, `session.php` — auth
 - `/api/admin/forgot-password.php`, `setup-password.php`, `verify-token.php` — password management
 - `/api/admin/account.php` — admin account settings
@@ -228,6 +232,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `/api/admin/labor.php` — labor hours tracking per RO
 - `/api/admin/loyalty.php` — loyalty points management
 - `/api/admin/loyalty-rewards.php` — loyalty rewards catalog
+- `/api/admin/referrals.php` — referral management (list, mark complete, award points)
 - `/api/admin/service-reminders.php` — service reminder management
 - `/api/admin/waitlist.php` — walk-in queue management
 - `/api/admin/tire-quotes.php` — tire quote request management
@@ -329,8 +334,9 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 ```
 
 ## Admin Panel
-- **Tabs**: Dashboard, Appointments, Customers, Repair Orders, Messages, Employees, Blog, FAQ, Promotions, Testimonials, Subscribers, Feedback, Gallery, Settings, Resource Planner
+- **Tabs**: Dashboard, Appointments, Customers, Repair Orders, Messages, Employees, Blog, FAQ, Promotions, Testimonials, Subscribers, Feedback, Gallery, Settings, Resource Planner, Referrals
 - **RO Tab**: Table view + kanban board (drag-and-drop), status timeline, create from appointment or walk-in
+- **Member Dashboard** (`/members`): 8 tabs — Appointments, Vehicles, Estimates, Messages, Care Plan, Invoices, Loyalty Points, Refer a Friend
 - **Employee Dashboard**: My Schedule, My Assigned Work, My Customers (via member portal)
 
 ### Admin JS
@@ -347,6 +353,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `admin/js/admin-analytics.js` — enhanced analytics dashboard
 - `admin/js/labor-tracker.js` — labor hours tracking UI
 - `admin/js/visit-tracker.js` — visit tracking UI
+- `admin/js/referrals.js` — referral management tab (list, filter, mark complete, award points)
 - `admin/js/feature-data.js` — feature configuration data
 
 ### Frontend JS

@@ -163,6 +163,17 @@ function memberT(string $key, string $lang = ''): string
         'security'          => ['en' => 'Security', 'es' => 'Seguridad'],
         'change_password'   => ['en' => 'Change Password', 'es' => "Cambiar Contrase\u{00f1}a"],
 
+        // Invoices
+        'my_invoices'       => ['en' => 'Invoices', 'es' => 'Facturas'],
+        'invoices'          => ['en' => 'Invoices', 'es' => 'Facturas'],
+        'invoices_subtitle' => ['en' => 'Your invoices and receipts', 'es' => 'Sus facturas y recibos'],
+
+        // Loyalty tab
+        'my_loyalty'        => ['en' => 'Loyalty Points', 'es' => 'Puntos de Lealtad'],
+
+        // Referrals tab
+        'my_referrals'      => ['en' => 'Refer a Friend', 'es' => 'Referir un Amigo'],
+
         // Loyalty
         'valued_customer'   => ['en' => 'Valued Customer', 'es' => 'Cliente Valioso'],
         'regular_customer'  => ['en' => 'Regular Customer', 'es' => 'Cliente Frecuente'],

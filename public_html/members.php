@@ -3,7 +3,7 @@
  * Oregon Tires — Unified Dashboard
  *
  * Role-based dashboard for members, employees, and admins.
- * - Members:   appointments, vehicles, estimates, messages, care plan
+ * - Members:   appointments, vehicles, estimates, messages, care plan, invoices, loyalty, referrals
  * - Employees: + my schedule, assigned work
  * - Admins:    + admin panel access, all employee tabs
  */
@@ -169,6 +169,24 @@ $memberDashboardTabs = [
         'label'        => memberT('care_plan', $lang),
         'icon'         => '🛡️',
         'api_endpoint' => '/api/member/my-care-plan.php',
+    ],
+    [
+        'id'           => 'invoices',
+        'label'        => memberT('my_invoices', $lang),
+        'icon'         => '🧾',
+        'api_endpoint' => '/api/member/my-invoices.php',
+    ],
+    [
+        'id'           => 'loyalty',
+        'label'        => memberT('my_loyalty', $lang),
+        'icon'         => '⭐',
+        'api_endpoint' => '/api/member/my-loyalty.php',
+    ],
+    [
+        'id'           => 'referrals',
+        'label'        => memberT('my_referrals', $lang),
+        'icon'         => '🤝',
+        'api_endpoint' => '/api/member/my-referral-ui.php',
     ],
 ];
 

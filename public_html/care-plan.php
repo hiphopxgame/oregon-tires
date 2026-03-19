@@ -202,8 +202,39 @@ $canonicalUrl = 'https://oregon.tires/care-plan';
       </div>
     </section>
 
-    <!-- FAQ -->
+    <!-- Loyalty & Referral Perks -->
     <section class="py-16 bg-gray-50 dark:bg-gray-800">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <h2 class="text-2xl md:text-3xl font-bold text-brand dark:text-green-400 text-center mb-4" data-t="perksTitle">Earn Even More with Loyalty &amp; Referrals</h2>
+        <p class="text-center text-gray-600 dark:text-gray-300 mb-10 max-w-xl mx-auto" data-t="perksSubtitle">Every visit earns loyalty points. Refer friends for bonus rewards.</p>
+        <div class="grid sm:grid-cols-2 gap-6">
+          <div class="bg-white dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+            <div class="text-3xl mb-3" aria-hidden="true">&#11088;</div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2" data-t="loyaltyTitle">Loyalty Points</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-3" data-t="loyaltyDesc">Earn points on every service visit based on your invoice total. Redeem them for discounts, free services, and exclusive rewards.</p>
+            <ul class="space-y-1.5 text-sm text-gray-600 dark:text-gray-300">
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> <span data-t="loyaltyPerk1">Points earned automatically on every visit</span></li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> <span data-t="loyaltyPerk2">Track your balance in your member dashboard</span></li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> <span data-t="loyaltyPerk3">Redeem for discounts and free services</span></li>
+            </ul>
+          </div>
+          <div class="bg-white dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+            <div class="text-3xl mb-3" aria-hidden="true">&#129309;</div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2" data-t="referralTitle">Refer a Friend</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-3" data-t="referralDesc">Share your unique referral code. When a friend books and completes their first service, you both earn bonus loyalty points.</p>
+            <ul class="space-y-1.5 text-sm text-gray-600 dark:text-gray-300">
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> <span data-t="referralPerk1">You earn 100 bonus points per referral</span></li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> <span data-t="referralPerk2">Your friend earns 50 welcome points</span></li>
+              <li class="flex items-start gap-2"><span class="text-green-600 dark:text-green-400 mt-0.5">&#10003;</span> <span data-t="referralPerk3">No limit on referrals — keep sharing!</span></li>
+            </ul>
+          </div>
+        </div>
+        <p class="text-center mt-6 text-sm text-gray-500 dark:text-gray-400" data-t="perksCta">Sign in to your <a href="/members?tab=loyalty" class="text-brand dark:text-green-400 font-semibold hover:underline" data-t="perksDashboard">member dashboard</a> to view your points and get your referral code.</p>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="py-16 bg-white dark:bg-gray-900">
       <div class="container mx-auto px-4 max-w-2xl">
         <h2 class="text-2xl md:text-3xl font-bold text-brand dark:text-green-400 text-center mb-10" data-t="faqTitle">Frequently Asked Questions</h2>
         <div class="space-y-4">
@@ -380,7 +411,21 @@ $canonicalUrl = 'https://oregon.tires/care-plan';
       errName: { en: 'Please enter your full name.', es: 'Por favor ingrese su nombre completo.' },
       errEmail: { en: 'Please enter a valid email address.', es: 'Por favor ingrese un correo electr\u00f3nico v\u00e1lido.' },
       errGeneric: { en: 'Something went wrong. Please try again.', es: 'Algo sali\u00f3 mal. Por favor intente de nuevo.' },
-      errNetwork: { en: 'Network error. Please check your connection and try again.', es: 'Error de red. Por favor verifique su conexi\u00f3n e intente de nuevo.' }
+      errNetwork: { en: 'Network error. Please check your connection and try again.', es: 'Error de red. Por favor verifique su conexi\u00f3n e intente de nuevo.' },
+      perksTitle: { en: 'Earn Even More with Loyalty & Referrals', es: 'Gane A\u00fan M\u00e1s con Lealtad y Referencias' },
+      perksSubtitle: { en: 'Every visit earns loyalty points. Refer friends for bonus rewards.', es: 'Cada visita acumula puntos de lealtad. Refiera amigos para recompensas adicionales.' },
+      loyaltyTitle: { en: 'Loyalty Points', es: 'Puntos de Lealtad' },
+      loyaltyDesc: { en: 'Earn points on every service visit based on your invoice total. Redeem them for discounts, free services, and exclusive rewards.', es: 'Gane puntos en cada visita de servicio basado en el total de su factura. Canj\u00e9elos por descuentos, servicios gratis y recompensas exclusivas.' },
+      loyaltyPerk1: { en: 'Points earned automatically on every visit', es: 'Puntos ganados autom\u00e1ticamente en cada visita' },
+      loyaltyPerk2: { en: 'Track your balance in your member dashboard', es: 'Consulte su saldo en su panel de miembro' },
+      loyaltyPerk3: { en: 'Redeem for discounts and free services', es: 'Canjee por descuentos y servicios gratis' },
+      referralTitle: { en: 'Refer a Friend', es: 'Referir un Amigo' },
+      referralDesc: { en: 'Share your unique referral code. When a friend books and completes their first service, you both earn bonus loyalty points.', es: 'Comparta su c\u00f3digo de referencia. Cuando un amigo reserva y completa su primer servicio, ambos ganan puntos de lealtad adicionales.' },
+      referralPerk1: { en: 'You earn 100 bonus points per referral', es: 'Usted gana 100 puntos de bonificaci\u00f3n por referencia' },
+      referralPerk2: { en: 'Your friend earns 50 welcome points', es: 'Su amigo gana 50 puntos de bienvenida' },
+      referralPerk3: { en: 'No limit on referrals \u2014 keep sharing!', es: '\u00a1Sin l\u00edmite de referencias \u2014 siga compartiendo!' },
+      perksCta: { en: 'Sign in to your member dashboard to view your points and get your referral code.', es: 'Inicie sesi\u00f3n en su panel de miembro para ver sus puntos y obtener su c\u00f3digo de referencia.' },
+      perksDashboard: { en: 'member dashboard', es: 'panel de miembro' }
     };
     var params = new URLSearchParams(window.location.search);
     var lang = params.get('lang');
