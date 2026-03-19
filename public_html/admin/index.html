@@ -472,6 +472,7 @@
             <button onclick="switchTab('waitlist')" data-tab="waitlist" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">⏳ <span data-t="tabWaitlist">Waitlist</span></button>
             <button onclick="switchTab('tirequotes')" data-tab="tirequotes" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🛞 <span data-t="tabTireQuotes">Tire Quotes</span></button>
             <button onclick="switchTab('visits')" data-tab="visits" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">👣 <span data-t="tabVisits">Visit Tracking</span></button>
+            <button onclick="switchTab('resourceplanner')" data-tab="resourceplanner" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📋 <span data-t="tabResourcePlanner">Resource Planner</span></button>
           </div>
         </div>
 
@@ -522,6 +523,7 @@
           <option value="waitlist" data-t="tabWaitlist">Waitlist</option>
           <option value="tirequotes" data-t="tabTireQuotes">Tire Quotes</option>
           <option value="visits" data-t="tabVisits">Visit Tracking</option>
+          <option value="resourceplanner" data-t="tabResourcePlanner">Resource Planner</option>
         </optgroup>
         <optgroup label="👥 Team" data-t-label="navTeam">
           <option value="employees" data-t="tabEmployees">Employees</option>
@@ -557,12 +559,13 @@
     <!-- OVERVIEW TAB -->
     <div id="tab-overview" class="tab-content fade-in" role="tabpanel">
       <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-6" data-t="dashboardOverview">Dashboard Overview</h2>
-      <div class="grid md:grid-cols-5 gap-4 mb-4">
+      <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
         <div class="bg-white rounded-xl shadow p-6 border-l-4 border-red-500 dark:bg-gray-800 dark:border-l-red-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="actionRequired">Action Required</div><div class="text-3xl font-bold text-red-600 dark:text-red-400" id="stat-action">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-action-detail" data-t="awaitingConfirmation">Needs attention</p></div>
         <div class="bg-white rounded-xl shadow p-6 border-l-4 border-amber-500 dark:bg-gray-800 dark:border-l-amber-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="todaySchedule">Today</div><div class="text-3xl font-bold text-amber-600 dark:text-amber-400" id="stat-today">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-today-detail"></p></div>
         <div class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-500 dark:bg-gray-800 dark:border-l-blue-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="thisWeek">This Week</div><div class="text-3xl font-bold text-blue-600 dark:text-blue-400" id="stat-week">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-week-detail"></p></div>
         <div class="bg-white rounded-xl shadow p-6 border-l-4 border-green-500 dark:bg-gray-800 dark:border-l-green-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="upcoming">Upcoming</div><div class="text-3xl font-bold text-green-600 dark:text-green-400" id="stat-upcoming">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-upcoming-detail"></p></div>
         <div class="bg-white rounded-xl shadow p-6 border-l-4 border-gray-400 dark:bg-gray-800 dark:border-l-gray-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="completedLabel">Completed</div><div class="text-3xl font-bold text-gray-600 dark:text-gray-300" id="stat-completed">0</div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="allTime">All time</p></div>
+        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-purple-500 dark:bg-gray-800 dark:border-l-purple-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="rpTomorrow">Tomorrow</div><div class="text-3xl font-bold text-purple-600 dark:text-purple-400" id="stat-tomorrow">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-tomorrow-detail"></p></div>
       </div>
       <div id="overview-alerts" class="mb-8 space-y-3"></div>
       <!-- Shop Floor -->
@@ -3395,6 +3398,59 @@
       <div id="gbsync-container"></div>
     </div>
 
+    <!-- RESOURCE PLANNER TAB -->
+    <div id="tab-resourceplanner" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">📋 <span data-t="tabResourcePlanner">Resource Planner</span></h2>
+          <p class="text-green-100" data-t="rpSubtitle">Service demand, staffing, and skill gap analysis</p>
+        </div>
+        <button onclick="loadResourcePlanner()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+
+      <!-- Date Toggle -->
+      <div id="rp-date-toggle" class="mb-6"></div>
+
+      <!-- Command Center -->
+      <div id="rp-command-center" class="mb-6"></div>
+
+      <!-- Skill Gap Alerts -->
+      <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 mb-6">
+        <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="rpSkillGaps">Skill Gap Alerts</h3>
+        <div id="rp-skill-gaps"></div>
+      </div>
+
+      <!-- Heatmap + Unassigned -->
+      <div class="grid lg:grid-cols-3 gap-6 mb-6">
+        <div class="lg:col-span-2 bg-white rounded-xl shadow p-6 dark:bg-gray-800">
+          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="rpHourlyHeatmap">Hourly Service Heatmap</h3>
+          <div id="rp-heatmap"></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
+          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="rpUnassignedTitle">Unassigned Appointments</h3>
+          <div id="rp-unassigned" class="max-h-[400px] overflow-y-auto"></div>
+        </div>
+      </div>
+
+      <!-- Resource Grid -->
+      <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 mb-6">
+        <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="rpResourceGrid">Resource Grid</h3>
+        <div id="rp-resource-grid" class="overflow-x-auto"></div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 mb-6">
+        <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="rpRecommendations">Staffing Recommendations</h3>
+        <div id="rp-recommendations"></div>
+      </div>
+
+      <!-- Skills Matrix -->
+      <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 mb-6">
+        <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="rpSkillsMatrix">Employee Skills Matrix</h3>
+        <div id="rp-skills-matrix"></div>
+      </div>
+    </div>
+
   </div>
 
 <!-- NOTES MODAL -->
@@ -4821,6 +4877,54 @@ const adminT = {
     reviewLoadingTd: 'Loading...',
     faqLoadingTd: 'Loading...',
     shopFloor: 'Shop Floor',
+    // Resource Planner
+    tabResourcePlanner: 'Resource Planner',
+    rpSubtitle: 'Service demand, staffing, and skill gap analysis',
+    rpToday: 'Today',
+    rpTomorrow: 'Tomorrow',
+    rpTodayAppts: 'Today Appointments',
+    rpTomorrowAppts: 'Tomorrow Appointments',
+    rpTodayStaff: 'Today Staff',
+    rpTomorrowStaff: 'Tomorrow Staff',
+    rpPeak: 'Peak',
+    rpUnassigned: 'unassigned',
+    rpShopClosed: 'Closed',
+    rpCapacity: 'Staff',
+    rpNoData: 'No data available',
+    rpNoAppts: 'No appointments',
+    rpNoStaff: 'No staff scheduled',
+    rpTime: 'Time',
+    rpOffHours: 'Off hours',
+    rpSkillMismatch: 'Skill mismatch — employee not certified for this service',
+    rpAllAssigned: 'All appointments assigned',
+    rpSkillGaps: 'Skill Gap Alerts',
+    rpAt: 'at',
+    rpCertifiedAvail: 'certified techs available',
+    rpNoGaps: 'No skill gaps detected',
+    rpCallIn: 'Call in',
+    rpCertifiedFor: 'certified for',
+    rpUnassignedJobs: 'unassigned jobs',
+    rpConsiderMoving: 'Consider moving',
+    rpApptsFrom: 'appointments from',
+    rpTo: 'to',
+    rpToBalance: 'to balance load',
+    rpNoRecommendations: 'No staffing recommendations — capacity looks good',
+    rpHourlyHeatmap: 'Hourly Service Heatmap',
+    rpUnassignedTitle: 'Unassigned Appointments',
+    rpResourceGrid: 'Resource Grid',
+    rpRecommendations: 'Staffing Recommendations',
+    rpSkillsMatrix: 'Employee Skills Matrix',
+    rpEmployee: 'Employee',
+    rpTotal: 'Total',
+    rpInactive: 'inactive',
+    rpCertifiedTotal: 'Certified',
+    rpNoCoverage: 'No techs certified for',
+    rpCannotStaff: 'this service cannot be staffed',
+    rpSingleCoverage: 'Only 1 tech certified for',
+    rpConsiderTraining: 'consider cross-training',
+    rpSkillUpdated: 'Skill updated',
+    rpSkillUpdateFailed: 'Failed to update skill',
+    rpNoEmployees: 'No employees found',
     // Account Settings Placeholders
     acctNotifEmailPh: 'notification@email.com',
     acctNamePh: 'Your name',
@@ -6045,6 +6149,54 @@ const adminT = {
     reviewLoadingTd: 'Cargando...',
     faqLoadingTd: 'Cargando...',
     shopFloor: 'Taller',
+    // Resource Planner
+    tabResourcePlanner: 'Planificador de Recursos',
+    rpSubtitle: 'Demanda de servicio, personal y an\u00E1lisis de brechas',
+    rpToday: 'Hoy',
+    rpTomorrow: 'Ma\u00F1ana',
+    rpTodayAppts: 'Citas Hoy',
+    rpTomorrowAppts: 'Citas Ma\u00F1ana',
+    rpTodayStaff: 'Personal Hoy',
+    rpTomorrowStaff: 'Personal Ma\u00F1ana',
+    rpPeak: 'Pico',
+    rpUnassigned: 'sin asignar',
+    rpShopClosed: 'Cerrado',
+    rpCapacity: 'Personal',
+    rpNoData: 'Sin datos disponibles',
+    rpNoAppts: 'Sin citas',
+    rpNoStaff: 'Sin personal programado',
+    rpTime: 'Hora',
+    rpOffHours: 'Fuera de horario',
+    rpSkillMismatch: 'Desajuste — empleado no certificado para este servicio',
+    rpAllAssigned: 'Todas las citas asignadas',
+    rpSkillGaps: 'Alertas de Brecha de Habilidades',
+    rpAt: 'a las',
+    rpCertifiedAvail: 't\u00E9cnicos certificados disponibles',
+    rpNoGaps: 'Sin brechas de habilidades detectadas',
+    rpCallIn: 'Llamar a',
+    rpCertifiedFor: 'certificado(a) para',
+    rpUnassignedJobs: 'trabajos sin asignar',
+    rpConsiderMoving: 'Considerar mover',
+    rpApptsFrom: 'citas de',
+    rpTo: 'a',
+    rpToBalance: 'para balancear la carga',
+    rpNoRecommendations: 'Sin recomendaciones — la capacidad se ve bien',
+    rpHourlyHeatmap: 'Mapa de Calor por Hora',
+    rpUnassignedTitle: 'Citas Sin Asignar',
+    rpResourceGrid: 'Cuadr\u00EDcula de Recursos',
+    rpRecommendations: 'Recomendaciones de Personal',
+    rpSkillsMatrix: 'Matriz de Habilidades',
+    rpEmployee: 'Empleado',
+    rpTotal: 'Total',
+    rpInactive: 'inactivo',
+    rpCertifiedTotal: 'Certificados',
+    rpNoCoverage: 'Ning\u00FAn t\u00E9cnico certificado para',
+    rpCannotStaff: 'este servicio no puede ser atendido',
+    rpSingleCoverage: 'Solo 1 t\u00E9cnico certificado para',
+    rpConsiderTraining: 'considerar capacitaci\u00F3n cruzada',
+    rpSkillUpdated: 'Habilidad actualizada',
+    rpSkillUpdateFailed: 'Error al actualizar habilidad',
+    rpNoEmployees: 'No se encontraron empleados',
     // Account Settings Placeholders
     acctNotifEmailPh: 'correo@notificacion.com',
     acctNamePh: 'Tu nombre',
@@ -6955,6 +7107,8 @@ function renderOverview() {
   document.getElementById('stat-completed').textContent = stats.completed.length;
 
   renderOverviewAlerts(stats);
+  if (typeof renderOverviewSkillGapAlerts === 'function') renderOverviewSkillGapAlerts();
+  if (typeof renderTomorrowStat === 'function') renderTomorrowStat();
   renderUpcomingSchedule(stats);
   renderEmployeeSchedule(stats);
   renderOverviewCharts();
@@ -7014,26 +7168,30 @@ function renderOverviewCharts() {
     showNoData(svcEl);
   }
 
-  // 3) Bay Utilization Today — horizontal bars by hour
-  var bayEl = clearEl('chart-bay-utilization');
-  var todayStr = new Date().toISOString().split('T')[0];
-  var todayApts = appointments.filter(function(a) { return a.preferred_date === todayStr && a.status !== 'cancelled'; });
-  var hourMap = {};
-  todayApts.forEach(function(a) {
-    if (a.preferred_time) {
-      var h = parseInt(a.preferred_time.substring(0, 2));
-      hourMap[h] = (hourMap[h] || 0) + 1;
-    }
-  });
-  var bayData = [];
-  for (var h = 8; h <= 17; h++) {
-    var hLabel = (h > 12 ? (h - 12) : h) + (h >= 12 ? 'pm' : 'am');
-    bayData.push({ label: hLabel, value: hourMap[h] || 0 });
-  }
-  if (bayData.some(function(d) { return d.value > 0; })) {
-    OTCharts.horizontalBars(bayEl, bayData, { color: OTCharts.TOKENS.colors.amber, maxValue: 2 });
+  // 3) Bay Utilization Today — stacked horizontal bars by hour + service type
+  if (typeof renderEnhancedBayUtilization === 'function') {
+    renderEnhancedBayUtilization();
   } else {
-    showNoData(bayEl);
+    var bayEl = clearEl('chart-bay-utilization');
+    var todayStr = new Date().toISOString().split('T')[0];
+    var todayApts = appointments.filter(function(a) { return a.preferred_date === todayStr && a.status !== 'cancelled'; });
+    var hourMap = {};
+    todayApts.forEach(function(a) {
+      if (a.preferred_time) {
+        var h = parseInt(a.preferred_time.substring(0, 2));
+        hourMap[h] = (hourMap[h] || 0) + 1;
+      }
+    });
+    var bayData = [];
+    for (var h = 8; h <= 17; h++) {
+      var hLabel = (h > 12 ? (h - 12) : h) + (h >= 12 ? 'pm' : 'am');
+      bayData.push({ label: hLabel, value: hourMap[h] || 0 });
+    }
+    if (bayData.some(function(d) { return d.value > 0; })) {
+      OTCharts.horizontalBars(bayEl, bayData, { color: OTCharts.TOKENS.colors.amber, maxValue: 2 });
+    } else {
+      showNoData(bayEl);
+    }
   }
 
   // 4) Booking Trend (30 Days) — line chart with area fill
@@ -10382,6 +10540,7 @@ function switchTab(tab) {
   if(tab==='referrals' && typeof loadReferrals === 'function') loadReferrals();
   if(tab==='reminders' && typeof loadServiceReminders === 'function') loadServiceReminders();
   if(tab==='gbsync' && typeof loadGoogleBusinessSync === 'function') loadGoogleBusinessSync();
+  if(tab==='resourceplanner' && typeof loadResourcePlanner === 'function') loadResourcePlanner();
 }
 
 // Nav dropdown click-to-toggle
@@ -10564,8 +10723,12 @@ function renderPlatformTab() {
     leftGroup.appendChild(nameEl);
     topRow.appendChild(leftGroup);
     if (showPrice && f.price) {
-      var priceBadge = el('span', 'text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '$' + f.price.toLocaleString());
-      topRow.appendChild(priceBadge);
+      var frRate = typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6;
+      var frVal = Math.round(f.price * frRate);
+      var priceGroup = el('div', 'flex flex-col items-end gap-0.5 flex-shrink-0');
+      priceGroup.appendChild(el('span', 'text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '$' + f.price.toLocaleString()));
+      priceGroup.appendChild(el('span', 'text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap', '$' + frVal.toLocaleString() + ' freelancer'));
+      topRow.appendChild(priceGroup);
     } else {
       var inclBadge = el('span', 'text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '\u2713 ' + t.overviewIncluded);
       topRow.appendChild(inclBadge);
@@ -10669,10 +10832,10 @@ function renderPlatformTab() {
     var savingsPctAg = Math.round((savingsAg / agencyTotal) * 100);
     ourCol.appendChild(el('div', 'text-xs font-semibold text-green-600 dark:text-green-400', t.overviewYouSave + ' ' + savingsPctAg + '% ' + t.overviewVsAgency));
   } else {
-    var deliveredEl = el('div', 'text-3xl md:text-4xl font-bold text-green-700 dark:text-green-400 mb-1');
-    deliveredEl.textContent = '$' + agencyTotal.toLocaleString();
+    var deliveredEl = el('div', 'text-2xl md:text-3xl font-bold text-green-700 dark:text-green-400 mb-1');
+    deliveredEl.textContent = '$' + freelancerTotal.toLocaleString() + ' \u2013 $' + agencyTotal.toLocaleString();
     ourCol.appendChild(deliveredEl);
-    ourCol.appendChild(el('div', 'text-xs font-semibold text-green-600 dark:text-green-400', t.overviewValueDelivered + ' ' + t.overviewAtAgencyRates));
+    ourCol.appendChild(el('div', 'text-xs font-semibold text-green-600 dark:text-green-400', t.overviewValueDelivered));
     ourCol.appendChild(el('div', 'text-xs text-green-500 dark:text-green-300 mt-1 italic', t.overviewPriceTbd));
   }
   cols.appendChild(ourCol);
@@ -10759,8 +10922,9 @@ function renderPlatformTab() {
   ));
 
   // ─── 7. Additional Features Section ───
+  var newFrTotal = Math.round(totalPrice * (typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6));
   container.appendChild(renderSection(
-    t.overviewNewSection + '  \u2014  $' + totalPrice.toLocaleString(), t.overviewNewDesc,
+    t.overviewNewSection + '  \u2014  $' + newFrTotal.toLocaleString() + ' \u2013 $' + totalPrice.toLocaleString(), t.overviewNewDesc,
     newFeatures, 'indigo', true
   ));
 
@@ -10768,6 +10932,11 @@ function renderPlatformTab() {
   var clientTotal = 0;
   clientFeatures.forEach(function(f) { clientTotal += (f.price || 0); });
   var bonusTotal = totalPrice;
+  var frRate = typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6;
+  var clientTotalFr = Math.round(clientTotal * frRate);
+  var bonusTotalFr = Math.round(bonusTotal * frRate);
+  var grandTotal = clientTotal + bonusTotal;
+  var grandTotalFr = Math.round(grandTotal * frRate);
 
   var summary = el('div', 'rounded-2xl p-6 md:p-8 bg-gradient-to-br from-green-600 to-green-800 text-white');
   summary.appendChild(el('h3', 'text-xl md:text-2xl font-bold mb-5 text-center', t.overviewPlatformSummary));
@@ -10781,33 +10950,41 @@ function renderPlatformTab() {
     return row;
   }
 
-  summaryGrid.appendChild(summaryRow(clientFeatures.length + ' ' + t.overviewClientValue, '$' + clientTotal.toLocaleString()));
-  summaryGrid.appendChild(summaryRow(newFeatures.length + ' ' + t.overviewBonusValue2, '$' + bonusTotal.toLocaleString()));
+  // Column headers
+  var headerRow = el('div', 'flex justify-between items-center mb-1');
+  headerRow.appendChild(el('span', 'text-xs text-green-200 font-semibold uppercase tracking-wider', ''));
+  var headerRight = el('div', 'flex items-center gap-2 text-[10px] text-green-200 uppercase tracking-wider font-semibold');
+  headerRight.appendChild(el('span', '', t.overviewFreelancer));
+  headerRight.appendChild(el('span', 'text-green-300', '\u2013'));
+  headerRight.appendChild(el('span', '', t.overviewAgency));
+  summaryGrid.appendChild(headerRow);
+
+  // Client features row
+  var clientRow = summaryRow(clientFeatures.length + ' ' + t.overviewClientValue, '$' + clientTotalFr.toLocaleString() + ' \u2013 $' + clientTotal.toLocaleString());
+  summaryGrid.appendChild(clientRow);
+
+  // Bonus features row
+  var bonusRow = summaryRow(newFeatures.length + ' ' + t.overviewBonusValue2, '$' + bonusTotalFr.toLocaleString() + ' \u2013 $' + bonusTotal.toLocaleString());
+  summaryGrid.appendChild(bonusRow);
 
   var divider0 = el('div', 'border-t border-white/20 my-2');
   summaryGrid.appendChild(divider0);
-  var grandTotal = clientTotal + bonusTotal;
-  var grandRow = summaryRow(t.overviewBonusValue, '$' + grandTotal.toLocaleString(), 'text-lg');
+
+  // Grand total row
+  var grandRow = summaryRow(t.overviewBonusValue, '$' + grandTotalFr.toLocaleString() + ' \u2013 $' + grandTotal.toLocaleString(), 'text-lg');
   grandRow.querySelector('span:last-child').className = 'font-bold text-lg';
   summaryGrid.appendChild(grandRow);
 
   var divider1 = el('div', 'border-t border-white/20 my-2');
   summaryGrid.appendChild(divider1);
 
-  summaryGrid.appendChild(summaryRow(t.overviewAgencyEstimate, '$' + agencyTotal.toLocaleString()));
-  var frTotalRow = summaryRow(t.overviewFreelancerEstimate, '$' + freelancerTotal.toLocaleString());
-  summaryGrid.appendChild(frTotalRow);
-
-  var divider2 = el('div', 'border-t border-white/20 my-2');
-  summaryGrid.appendChild(divider2);
-
   if (clientPrice > 0) {
     var priceRow = summaryRow(t.overviewYourPrice, '$' + clientPrice.toLocaleString(), 'text-lg');
     priceRow.querySelector('span:last-child').className = 'font-bold text-lg';
     summaryGrid.appendChild(priceRow);
 
-    var divider3 = el('div', 'border-t border-white/20 my-2');
-    summaryGrid.appendChild(divider3);
+    var divider2 = el('div', 'border-t border-white/20 my-2');
+    summaryGrid.appendChild(divider2);
 
     var savAg = agencyTotal - clientPrice;
     var savAgPct = Math.round((savAg / agencyTotal) * 100);
@@ -10821,7 +10998,7 @@ function renderPlatformTab() {
     savFrRow.querySelector('span:last-child').className = 'font-bold text-green-200';
     summaryGrid.appendChild(savFrRow);
   } else {
-    var deliveredRow = summaryRow(t.overviewValueDelivered, '$' + grandTotal.toLocaleString(), 'text-lg');
+    var deliveredRow = summaryRow(t.overviewValueDelivered, '$' + grandTotalFr.toLocaleString() + ' \u2013 $' + grandTotal.toLocaleString(), 'text-lg');
     deliveredRow.querySelector('span:last-child').className = 'font-bold text-lg text-green-200';
     summaryGrid.appendChild(deliveredRow);
     summaryGrid.appendChild(summaryRow(t.overviewYourPrice, t.overviewPriceTbd));
@@ -11894,6 +12071,7 @@ loadMessages = async function() {
 <script src="/admin/js/referrals.js"></script>
 <script src="/admin/js/service-reminders.js"></script>
 <script src="/admin/js/google-business.js"></script>
+<script src="/admin/js/resource-planner.js"></script>
 <script src="/admin/js/calendar-retry.js"></script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';
