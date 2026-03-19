@@ -1,5 +1,5 @@
 // Bump version on each deploy to bust stale caches
-const CACHE_VERSION = '24';
+const CACHE_VERSION = '25';
 const CACHE_NAME = 'oregon-tires-v' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
