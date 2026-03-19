@@ -10785,69 +10785,13 @@ function renderPlatformTab() {
     return section;
   }
 
-  // ─── 4. Price Comparison Hero Card ───
+  // Compute totals for summary
   var agencyTotal = 0;
   FEATURE_DATA.forEach(function(f) { agencyTotal += (f.price || 0); });
   var freelancerTotal = Math.round(agencyTotal * (typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6));
   var clientPrice = typeof CLIENT_PRICE !== 'undefined' ? CLIENT_PRICE : 0;
 
-  var priceCard = el('div', 'rounded-2xl p-6 md:p-8 mb-8 bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700');
-  priceCard.appendChild(el('h3', 'text-xl md:text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6', t.overviewWhatDoesItCost));
-
-  var cols = el('div', 'grid grid-cols-1 md:grid-cols-3 gap-4 mb-6');
-
-  // Agency column
-  var agCol = el('div', 'rounded-xl p-5 text-center border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 opacity-75');
-  agCol.appendChild(el('div', 'text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3', t.overviewAgencyEstimate));
-  var agPrice = el('div', 'text-3xl md:text-4xl font-bold text-gray-400 dark:text-gray-500 mb-1 line-through decoration-2');
-  agPrice.textContent = '$' + agencyTotal.toLocaleString();
-  agCol.appendChild(agPrice);
-  agCol.appendChild(el('div', 'text-xs text-gray-400 dark:text-gray-500', t.overviewAgencyEstimate));
-  cols.appendChild(agCol);
-
-  // Freelancer column
-  var frCol = el('div', 'rounded-xl p-5 text-center border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 opacity-80');
-  frCol.appendChild(el('div', 'text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3', t.overviewFreelancerEstimate));
-  var frPrice = el('div', 'text-3xl md:text-4xl font-bold text-gray-400 dark:text-gray-500 mb-1 line-through decoration-2');
-  frPrice.textContent = '$' + freelancerTotal.toLocaleString();
-  frCol.appendChild(frPrice);
-  frCol.appendChild(el('div', 'text-xs text-gray-400 dark:text-gray-500', t.overviewFreelancerEstimate));
-  cols.appendChild(frCol);
-
-  // Our price column
-  var ourCol = el('div', 'rounded-xl p-5 text-center border-2 border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/20 relative');
-  var bestBadge = el('span', 'absolute -top-3 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-0.5 rounded-full');
-  bestBadge.textContent = '\u2605 ' + t.overviewBestValue;
-  bestBadge.style.transform = 'translateX(-50%)';
-  bestBadge.style.position = 'absolute';
-  bestBadge.style.top = '-12px';
-  bestBadge.style.left = '50%';
-  ourCol.appendChild(bestBadge);
-  ourCol.appendChild(el('div', 'text-xs font-semibold uppercase tracking-wider text-green-600 dark:text-green-400 mb-3 mt-1', t.overviewOurPrice));
-  if (clientPrice > 0) {
-    var ourPriceEl = el('div', 'text-3xl md:text-4xl font-bold text-green-700 dark:text-green-400 mb-1');
-    ourPriceEl.textContent = '$' + clientPrice.toLocaleString();
-    ourCol.appendChild(ourPriceEl);
-    var savingsAg = agencyTotal - clientPrice;
-    var savingsPctAg = Math.round((savingsAg / agencyTotal) * 100);
-    ourCol.appendChild(el('div', 'text-xs font-semibold text-green-600 dark:text-green-400', t.overviewYouSave + ' ' + savingsPctAg + '% ' + t.overviewVsAgency));
-  } else {
-    var deliveredEl = el('div', 'text-2xl md:text-3xl font-bold text-green-700 dark:text-green-400 mb-1');
-    deliveredEl.textContent = '$' + freelancerTotal.toLocaleString() + ' \u2013 $' + agencyTotal.toLocaleString();
-    ourCol.appendChild(deliveredEl);
-    ourCol.appendChild(el('div', 'text-xs font-semibold text-green-600 dark:text-green-400', t.overviewValueDelivered));
-    ourCol.appendChild(el('div', 'text-xs text-green-500 dark:text-green-300 mt-1 italic', t.overviewPriceTbd));
-  }
-  cols.appendChild(ourCol);
-  priceCard.appendChild(cols);
-
-  // Bottom tagline
-  var tagline = el('p', 'text-center text-sm text-gray-500 dark:text-gray-400');
-  tagline.textContent = '\u2713 ' + t.overviewSameFeatures.replace('{count}', String(FEATURE_DATA.length));
-  priceCard.appendChild(tagline);
-  container.appendChild(priceCard);
-
-  // ─── 5. Value Breakdown Bar Chart ───
+  // ─── 4. Value Breakdown Bar Chart ───
   var breakdownWrap = el('div', 'mb-8');
   breakdownWrap.appendChild(el('h3', 'text-xl font-bold text-gray-800 dark:text-gray-100 mb-4', t.overviewValueBreakdown));
 
@@ -10969,14 +10913,6 @@ function renderPlatformTab() {
 
   var divider0 = el('div', 'border-t border-white/20 my-2');
   summaryGrid.appendChild(divider0);
-
-  // Grand total row
-  var grandRow = summaryRow(t.overviewBonusValue, '$' + grandTotalFr.toLocaleString() + ' \u2013 $' + grandTotal.toLocaleString(), 'text-lg');
-  grandRow.querySelector('span:last-child').className = 'font-bold text-lg';
-  summaryGrid.appendChild(grandRow);
-
-  var divider1 = el('div', 'border-t border-white/20 my-2');
-  summaryGrid.appendChild(divider1);
 
   if (clientPrice > 0) {
     var priceRow = summaryRow(t.overviewYourPrice, '$' + clientPrice.toLocaleString(), 'text-lg');
