@@ -3970,6 +3970,10 @@ const adminT = {
     overviewPrintPdf: 'Print / PDF',
     overviewOregonTiresPlatform: 'Oregon Tires platform (current value)',
     overviewPerYear: 'per year',
+    overviewDomainConsultation: 'Domain Consultation & Transfer',
+    overviewDomainIncluded: 'Domain ownership transfers to client with payment',
+    overviewOngoingServices: 'Ongoing Services',
+    overviewOngoingServicesDesc: 'Optional managed services to keep your platform running and growing:',
     // Notes Modal
     adminNotes: 'Admin Notes',
     notesPlaceholder: 'Add notes about this appointment...',
@@ -5229,6 +5233,10 @@ const adminT = {
     overviewPrintPdf: 'Imprimir / PDF',
     overviewOregonTiresPlatform: 'Plataforma Oregon Tires (valor actual)',
     overviewPerYear: 'por a\u00F1o',
+    overviewDomainConsultation: 'Consulta y Transferencia de Dominio',
+    overviewDomainIncluded: 'La propiedad del dominio se transfiere al cliente con el pago',
+    overviewOngoingServices: 'Servicios Continuos',
+    overviewOngoingServicesDesc: 'Servicios administrados opcionales para mantener y hacer crecer su plataforma:',
     // Notes Modal
     adminNotes: 'Notas de Administraci\u00F3n',
     notesPlaceholder: 'Agregar notas sobre esta cita...',
@@ -10931,7 +10939,47 @@ function renderPlatformTab() {
   scaleWrap.appendChild(scaleGrid);
   container.appendChild(scaleWrap);
 
-  // ─── 11. Platform Investment Summary ───
+  // ─── 11. Domain Consultation & Transfer ───
+  if (typeof DOMAIN_CONSULTATION !== 'undefined') {
+    var domWrap = el('div', 'mb-8 p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+    domWrap.appendChild(el('h3', 'font-bold text-lg text-gray-800 dark:text-gray-100 mb-4', t.overviewDomainConsultation));
+    var domCard = el('div', 'p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700');
+    var domTop = el('div', 'flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2');
+    var domLeft = el('div', '');
+    domLeft.appendChild(el('p', 'font-bold text-gray-800 dark:text-gray-100', DOMAIN_CONSULTATION[lang] || DOMAIN_CONSULTATION.en));
+    domLeft.appendChild(el('p', 'text-2xl font-bold text-green-600 dark:text-green-400 mt-1', DOMAIN_CONSULTATION.domain));
+    domTop.appendChild(domLeft);
+    domTop.appendChild(el('span', 'text-lg font-bold text-green-600 dark:text-green-400', '$' + DOMAIN_CONSULTATION.value.toLocaleString()));
+    domCard.appendChild(domTop);
+    domCard.appendChild(el('p', 'text-sm text-gray-600 dark:text-gray-400 mt-2', DOMAIN_CONSULTATION['desc_' + lang] || DOMAIN_CONSULTATION.desc_en));
+    var domNote = el('p', 'text-xs text-green-700 dark:text-green-400 font-medium mt-3 flex items-center gap-1');
+    domNote.appendChild(el('span', '', '\u2713'));
+    domNote.appendChild(document.createTextNode(' ' + t.overviewDomainIncluded));
+    domCard.appendChild(domNote);
+    domWrap.appendChild(domCard);
+    container.appendChild(domWrap);
+  }
+
+  // ─── 12. Ongoing Services ───
+  if (typeof SERVICE_OFFERINGS !== 'undefined') {
+    var svcWrap = el('div', 'mb-8 p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+    svcWrap.appendChild(el('h3', 'font-bold text-lg text-gray-800 dark:text-gray-100 mb-2', t.overviewOngoingServices));
+    svcWrap.appendChild(el('p', 'text-sm text-gray-500 dark:text-gray-400 mb-4', t.overviewOngoingServicesDesc));
+    var svcGrid = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-4');
+    SERVICE_OFFERINGS.forEach(function(svc) {
+      var card = el('div', 'p-5 rounded-xl border-2 border-green-200 dark:border-green-700 bg-green-50/50 dark:bg-green-900/10');
+      var cardTop = el('div', 'flex items-center justify-between mb-2');
+      cardTop.appendChild(el('h4', 'font-bold text-gray-800 dark:text-gray-100', svc[lang] || svc.en));
+      cardTop.appendChild(el('span', 'text-sm font-bold text-green-600 dark:text-green-400 whitespace-nowrap', svc.price));
+      card.appendChild(cardTop);
+      card.appendChild(el('p', 'text-sm text-gray-600 dark:text-gray-400 leading-relaxed', svc['desc_' + lang] || svc.desc_en));
+      svcGrid.appendChild(card);
+    });
+    svcWrap.appendChild(svcGrid);
+    container.appendChild(svcWrap);
+  }
+
+  // ─── 13. Platform Investment Summary ───
   var summary = el('div', 'rounded-2xl p-6 md:p-8 bg-gradient-to-br from-green-600 to-green-800 text-white');
   summary.appendChild(el('h3', 'text-xl md:text-2xl font-bold mb-5 text-center', t.overviewPlatformSummary));
 

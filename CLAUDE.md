@@ -5,12 +5,19 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 ## Quick Reference
 - **Stack**: Static HTML + Tailwind CSS v4 + PHP API + MySQL
 - **Live**: https://oregon.tires
+- **Domain**: `oregon.tires` — premium .tires TLD, selected via domain consultation, ownership transfers to client with payment
 - **Google Place ID**: `ChIJLSxZDQyflVQRWXEi9LpJGxs`
 - **Site type**: `client` (independent mode, `MEMBER_MODE=independent`)
 - **Deploy**: `./deploy.sh` (builds CSS, stages changed files, SCPs to server)
 - **Server**: `ssh hiphopworld` → `/home/hiphopwo/public_html/---oregon.tires/`
 - **DB**: `hiphopwo_oregon_tires`, prefix `oretir_`
 - **Bilingual**: EN/ES — inline JS `t` object with `data-t` attributes, `currentLang` variable
+
+## Client Service Offerings
+- **Domain**: `oregon.tires` — transfers to client with payment
+- **Managed Hosting**: $50/mo — server management, SSL, backups, uptime monitoring, security patches, Cloudflare CDN
+- **Marketing & Management**: Starting at $500/mo — SEO, content updates, blog, social media, Google Business management, analytics, platform enhancements
+- **Platform Value**: $157,200 (agency rate) / $94,320 (freelancer rate) — 113 features across 17 categories
 
 ## Kit Usage
 - **member-kit** — customer/employee accounts, Google OAuth, password reset (`MEMBER_KIT_PATH`)
