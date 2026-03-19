@@ -88,6 +88,28 @@ try {
         }
     }
 
+    // ─── Helper: validate activation requirements ─────────────────
+    function validateActivationRequirements(string $placement, int $isActive, array $data): void {
+        if ($isActive !== 1) return;
+
+        $titleEn = trim((string)($data['title_en'] ?? ''));
+        if ($titleEn === '') {
+            jsonError('Title (EN) is required to activate a promotion', 400);
+        }
+
+        if ($placement === 'exit_intent') {
+            $subtitleEn = trim((string)($data['subtitle_en'] ?? ''));
+            if ($subtitleEn === '') {
+                jsonError('Subtitle (EN) is required to activate an exit-intent promotion', 400);
+            }
+        } else {
+            $bodyEn = trim((string)($data['body_en'] ?? ''));
+            if ($bodyEn === '') {
+                jsonError('Body (EN) is required to activate a banner/sidebar/inline promotion', 400);
+            }
+        }
+    }
+
     // ─── POST: Create new promotion ───────────────────────────────
     if ($method === 'POST') {
         $imageUrl = handlePromoImage();
@@ -95,7 +117,9 @@ try {
         $validPlacements = ['banner', 'exit_intent', 'sidebar', 'inline'];
         $placement = in_array($_POST['placement'] ?? 'banner', $validPlacements, true)
             ? $_POST['placement'] : 'banner';
-        $isActive = (int)($_POST['is_active'] ?? 1);
+        $isActive = (int)($_POST['is_active'] ?? 0);
+
+        validateActivationRequirements($placement, $isActive, $_POST);
 
         $stmt = $db->prepare(
             'INSERT INTO oretir_promotions
@@ -181,7 +205,9 @@ try {
         $validPlacements = ['banner', 'exit_intent', 'sidebar', 'inline'];
         $placement = in_array($_POST['placement'] ?? 'banner', $validPlacements, true)
             ? $_POST['placement'] : 'banner';
-        $isActive = (int)($_POST['is_active'] ?? 1);
+        $isActive = (int)($_POST['is_active'] ?? 0);
+
+        validateActivationRequirements($placement, $isActive, $_POST);
 
         $stmt = $db->prepare(
             'UPDATE oretir_promotions SET

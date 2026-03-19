@@ -12,9 +12,12 @@ $db = getDB();
 // ── Single promotion detail ─────────────────────────────────────────────────
 if ($id > 0) {
     $stmt = $db->prepare(
-        'SELECT id, image_url, title_en, title_es, description_en, description_es, display_order, created_at
-         FROM oretir_gallery_images
+        'SELECT id, image_url, title_en, title_es, body_en, body_es, badge_text_en, badge_text_es,
+                bg_color, text_color, cta_url, cta_text_en, cta_text_es, sort_order, created_at
+         FROM oretir_promotions
          WHERE id = ? AND is_active = 1
+           AND (starts_at IS NULL OR starts_at <= NOW())
+           AND (ends_at IS NULL OR ends_at >= NOW())
          LIMIT 1'
     );
     $stmt->execute([$id]);
@@ -28,10 +31,12 @@ if ($id > 0) {
 
     // Fetch other promotions for sidebar
     $otherStmt = $db->prepare(
-        'SELECT id, image_url, title_en, title_es, description_en, description_es
-         FROM oretir_gallery_images
+        'SELECT id, image_url, title_en, title_es, body_en, body_es, badge_text_en, bg_color, text_color
+         FROM oretir_promotions
          WHERE is_active = 1 AND id != ?
-         ORDER BY display_order ASC
+           AND (starts_at IS NULL OR starts_at <= NOW())
+           AND (ends_at IS NULL OR ends_at >= NOW())
+         ORDER BY sort_order ASC, id DESC
          LIMIT 4'
     );
     $otherStmt->execute([$id]);
@@ -40,8 +45,8 @@ if ($id > 0) {
     $canonicalUrl = 'https://oregon.tires/promotions/' . $promo['id'];
     $titleEn = htmlspecialchars($promo['title_en'] ?? 'Promotion');
     $titleEs = htmlspecialchars($promo['title_es'] ?? $promo['title_en'] ?? 'Promocion');
-    $descEn = htmlspecialchars($promo['description_en'] ?? '');
-    $descEs = htmlspecialchars($promo['description_es'] ?? $promo['description_en'] ?? '');
+    $descEn = htmlspecialchars($promo['body_en'] ?? '');
+    $descEs = htmlspecialchars($promo['body_es'] ?? $promo['body_en'] ?? '');
     $ogImage = $promo['image_url'] ? htmlspecialchars($promo['image_url']) : 'https://oregon.tires/assets/og-image.jpg';
 
     header('Content-Type: text/html; charset=utf-8');
@@ -134,12 +139,24 @@ if ($id > 0) {
             </div>
             <?php endif; ?>
 
+            <?php if ($promo['badge_text_en']): ?>
+            <div class="mb-4">
+              <span class="inline-block px-3 py-1 rounded-full text-sm font-bold" style="background-color: <?= htmlspecialchars($promo['bg_color'] ?? '#f59e0b') ?>; color: <?= htmlspecialchars($promo['text_color'] ?? '#000') ?>" id="promo-badge" data-badge-es="<?= htmlspecialchars($promo['badge_text_es'] ?? '') ?>"><?= htmlspecialchars($promo['badge_text_en']) ?></span>
+            </div>
+            <?php endif; ?>
+
             <div class="prose dark:prose-invert max-w-none">
               <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed" id="promo-desc-en"><?= nl2br($descEn) ?></p>
-              <?php if ($promo['description_es']): ?>
+              <?php if ($promo['body_es']): ?>
               <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed hidden" id="promo-desc-es"><?= nl2br($descEs) ?></p>
               <?php endif; ?>
             </div>
+
+            <?php if ($promo['cta_url']): ?>
+            <div class="mt-6">
+              <a href="<?= htmlspecialchars($promo['cta_url']) ?>" class="inline-block px-6 py-3 rounded-lg font-semibold text-lg transition shadow-lg hover:shadow-xl" style="background-color: <?= htmlspecialchars($promo['bg_color'] ?? '#15803d') ?>; color: <?= htmlspecialchars($promo['text_color'] ?? '#fff') ?>" id="promo-cta" data-cta-es="<?= htmlspecialchars($promo['cta_text_es'] ?? '') ?>"><?= htmlspecialchars($promo['cta_text_en'] ?? 'Book Now') ?></a>
+            </div>
+            <?php endif; ?>
 
             <!-- Share + Back -->
             <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-4 items-center justify-between">
@@ -250,6 +267,10 @@ if ($id > 0) {
       document.querySelectorAll('[data-sidebar-es]').forEach(function(el) {
         if (el.dataset.sidebarEs) el.textContent = el.dataset.sidebarEs;
       });
+      var badgeEl = document.getElementById('promo-badge');
+      if (badgeEl && badgeEl.dataset.badgeEs) badgeEl.textContent = badgeEl.dataset.badgeEs;
+      var ctaEl = document.getElementById('promo-cta');
+      if (ctaEl && ctaEl.dataset.ctaEs) ctaEl.textContent = ctaEl.dataset.ctaEs;
       var pageTitleEl = document.getElementById('page-title');
       if (pageTitleEl) pageTitleEl.textContent = '<?= addslashes($titleEs) ?> | Oregon Tires Promociones';
       var pageDescEl = document.getElementById('page-desc');
@@ -276,10 +297,13 @@ if ($id > 0) {
 
 // ── Promotions listing ──────────────────────────────────────────────────────
 $stmt = $db->query(
-    'SELECT id, image_url, title_en, title_es, description_en, description_es, display_order, created_at
-     FROM oretir_gallery_images
+    'SELECT id, image_url, title_en, title_es, body_en, body_es, badge_text_en, badge_text_es,
+            bg_color, text_color, cta_url, cta_text_en, cta_text_es, sort_order, created_at
+     FROM oretir_promotions
      WHERE is_active = 1
-     ORDER BY display_order ASC'
+       AND (starts_at IS NULL OR starts_at <= NOW())
+       AND (ends_at IS NULL OR ends_at >= NOW())
+     ORDER BY sort_order ASC, id DESC'
 );
 $promotions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -381,14 +405,17 @@ header('Content-Type: text/html; charset=utf-8');
               <img src="<?= htmlspecialchars($promo['image_url']) ?>" alt="<?= htmlspecialchars($promo['title_en'] ?? '') ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
             </div>
             <?php else: ?>
-            <div class="h-56 bg-gradient-to-br from-green-700 to-green-900 flex items-center justify-center">
-              <span class="text-white/30 text-5xl">&#127873;</span>
+            <div class="h-56 flex items-center justify-center" style="background-color: <?= htmlspecialchars($promo['bg_color'] ?? '#15803d') ?>">
+              <span style="color: <?= htmlspecialchars($promo['text_color'] ?? '#fff') ?>; opacity: 0.4" class="text-5xl">&#127873;</span>
             </div>
             <?php endif; ?>
             <div class="p-5">
+              <?php if ($promo['badge_text_en']): ?>
+              <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold mb-2" style="background-color: <?= htmlspecialchars($promo['bg_color'] ?? '#f59e0b') ?>; color: <?= htmlspecialchars($promo['text_color'] ?? '#000') ?>"><?= htmlspecialchars($promo['badge_text_en']) ?></span>
+              <?php endif; ?>
               <h2 class="text-lg font-bold text-brand dark:text-green-400 mb-2 group-hover:underline" data-card-es="<?= htmlspecialchars($promo['title_es'] ?? '') ?>"><?= htmlspecialchars($promo['title_en'] ?? '') ?></h2>
-              <?php if ($promo['description_en']): ?>
-              <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2" data-card-desc-es="<?= htmlspecialchars($promo['description_es'] ?? '') ?>"><?= htmlspecialchars($promo['description_en']) ?></p>
+              <?php if ($promo['body_en']): ?>
+              <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2" data-card-desc-es="<?= htmlspecialchars($promo['body_es'] ?? '') ?>"><?= htmlspecialchars($promo['body_en']) ?></p>
               <?php endif; ?>
               <span class="inline-block mt-3 text-sm font-semibold text-brand dark:text-green-400" data-t="viewDetails">View Details &rarr;</span>
             </div>

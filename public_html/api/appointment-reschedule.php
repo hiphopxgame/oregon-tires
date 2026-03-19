@@ -132,50 +132,6 @@ try {
          WHERE id = ?'
     )->execute([$newDate, $newTime, 'new', $newCancelToken, $newCancelExpires, $appointment['id']]);
 
-    // Update Google Calendar event if exists
-    if (!empty($appointment['google_event_id']) && !empty($_ENV['GOOGLE_CALENDAR_CREDENTIALS'])) {
-        try {
-            $formKitPath = $_ENV['FORM_KIT_PATH'] ?? __DIR__ . '/../../---form-kit';
-            require_once $formKitPath . '/loader.php';
-            require_once $formKitPath . '/actions/google-calendar.php';
-
-            FormManager::init($db, ['site_key' => 'oregon.tires']);
-            GoogleCalendarAction::register([
-                'credentials_path' => $_ENV['GOOGLE_CALENDAR_CREDENTIALS'],
-                'calendar_id'      => $_ENV['GOOGLE_CALENDAR_ID'] ?? 'primary',
-                'send_invites'     => true,
-                'timezone'         => 'America/Los_Angeles',
-                'default_duration' => 60,
-            ]);
-
-            // Build updated event data
-            $tz = new \DateTimeZone('America/Los_Angeles');
-            $start = new \DateTime("{$newDate} {$newTime}", $tz);
-            $end = clone $start;
-            $end->modify('+1 hour');
-
-            GoogleCalendarAction::updateEvent($appointment['google_event_id'], [
-                'start' => [
-                    'dateTime' => $start->format('c'),
-                    'timeZone' => 'America/Los_Angeles',
-                ],
-                'end' => [
-                    'dateTime' => $end->format('c'),
-                    'timeZone' => 'America/Los_Angeles',
-                ],
-            ]);
-
-            $db->prepare("INSERT INTO oretir_email_logs (log_type, description, admin_email, created_at) VALUES (?, ?, ?, NOW())")
-               ->execute([
-                   'calendar_sync',
-                   "Calendar: event_rescheduled for {$appointment['reference_number']} ({$appointment['preferred_date']} -> {$newDate})",
-                   $appointment['email'],
-               ]);
-        } catch (\Throwable $e) {
-            error_log("appointment-reschedule.php: Google Calendar update error for #{$appointment['id']}: " . $e->getMessage());
-        }
-    }
-
     // Send reschedule confirmation email
     try {
         $customerName = $appointment['first_name'] . ' ' . $appointment['last_name'];

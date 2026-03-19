@@ -95,35 +95,6 @@ try {
          WHERE id = ?'
     )->execute(['cancelled', $cancelReason, $appointment['id']]);
 
-    // Delete Google Calendar event if exists
-    if (!empty($appointment['google_event_id']) && !empty($_ENV['GOOGLE_CALENDAR_CREDENTIALS'])) {
-        try {
-            $formKitPath = $_ENV['FORM_KIT_PATH'] ?? __DIR__ . '/../../---form-kit';
-            require_once $formKitPath . '/loader.php';
-            require_once $formKitPath . '/actions/google-calendar.php';
-
-            FormManager::init($db, ['site_key' => 'oregon.tires']);
-            GoogleCalendarAction::register([
-                'credentials_path' => $_ENV['GOOGLE_CALENDAR_CREDENTIALS'],
-                'calendar_id'      => $_ENV['GOOGLE_CALENDAR_ID'] ?? 'primary',
-                'send_invites'     => true,
-                'timezone'         => 'America/Los_Angeles',
-            ]);
-
-            GoogleCalendarAction::deleteEvent($appointment['google_event_id']);
-
-            // Audit trail
-            $db->prepare("INSERT INTO oretir_email_logs (log_type, description, admin_email, created_at) VALUES (?, ?, ?, NOW())")
-               ->execute([
-                   'calendar_sync',
-                   "Calendar: event_deleted for {$appointment['reference_number']} (customer cancellation)",
-                   $appointment['email'],
-               ]);
-        } catch (\Throwable $e) {
-            error_log("appointment-cancel.php: Google Calendar delete error for #{$appointment['id']}: " . $e->getMessage());
-        }
-    }
-
     // Send cancellation confirmation email to customer
     try {
         $customerName = $appointment['first_name'] . ' ' . $appointment['last_name'];

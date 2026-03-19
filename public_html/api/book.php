@@ -471,66 +471,6 @@ try {
         }
     }
 
-    // ─── Google Calendar Integration ────────────────────────────────────────
-    $googleEventId = null;
-    if (!empty($_ENV['GOOGLE_CALENDAR_CREDENTIALS'])) {
-        try {
-            $formKitPath = $_ENV['FORM_KIT_PATH'] ?? __DIR__ . '/../../../---form-kit';
-            require_once $formKitPath . '/loader.php';
-            require_once $formKitPath . '/actions/google-calendar.php';
-
-            FormManager::init($db, ['site_key' => 'oregon.tires']);
-            GoogleCalendarAction::register([
-                'credentials_path' => $_ENV['GOOGLE_CALENDAR_CREDENTIALS'],
-                'calendar_id'      => $_ENV['GOOGLE_CALENDAR_ID'] ?? 'primary',
-                'send_invites'     => true,
-                'timezone'         => 'America/Los_Angeles',
-                'default_duration' => 60,
-                'service_colors'   => [
-                    'tire-installation'     => '9',  // blue
-                    'tire-repair'           => '9',
-                    'oil-change'            => '6',  // orange
-                    'brake-service'         => '11', // red
-                    'wheel-alignment'       => '3',  // purple
-                    'tuneup'                => '2',  // green
-                    'mechanical-inspection' => '7',  // cyan
-                    'mobile-service'        => '5',  // yellow
-                    'roadside-assistance'   => '4',  // pink/rose
-                ],
-            ]);
-
-            $appointmentData = [
-                'id'               => $appointmentId,
-                'reference_number' => $referenceNumber,
-                'service'          => $service,
-                'preferred_date'   => $preferredDate,
-                'preferred_time'   => $preferredTime,
-                'first_name'       => $firstName,
-                'last_name'        => $lastName,
-                'email'            => $email,
-                'phone'            => $phone,
-                'vehicle_year'     => $vehicleYear,
-                'vehicle_make'     => $vehicleMake,
-                'vehicle_model'    => $vehicleModel,
-                'notes'            => $notes,
-            ];
-
-            $calEvent = GoogleCalendarAction::buildEventFromAppointment($appointmentData);
-            $calResult = GoogleCalendarAction::createEvent($calEvent);
-            $googleEventId = $calResult['id'] ?? null;
-
-            if ($googleEventId) {
-                $db->prepare('UPDATE oretir_appointments SET google_event_id = ?, calendar_sync_status = ?, calendar_synced_at = NOW() WHERE id = ?')
-                   ->execute([$googleEventId, 'success', $appointmentId]);
-            }
-        } catch (\Throwable $e) {
-            // Calendar failure should never break the booking — track the error
-            $db->prepare('UPDATE oretir_appointments SET calendar_sync_status = ?, calendar_sync_error = ? WHERE id = ?')
-               ->execute(['failed', substr($e->getMessage(), 0, 500), $appointmentId]);
-            error_log("Oregon Tires book.php: Google Calendar error for appointment #{$appointmentId}: " . $e->getMessage());
-        }
-    }
-
     // ─── Email notification to shop owner (branded template) ────────────────
     $vehicleInfo = '';
     if ($vehicleYear || $vehicleMake || $vehicleModel) {

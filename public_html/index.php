@@ -128,7 +128,7 @@ if (ob_get_level() === 0) {
   </script>
   <!-- Dark mode init (prevent FOUC) -->
   <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
-  <script src="https://hiphop.world/sdk/hiphopworld.js" data-site-key="oregontires" data-auto></script>
+
 </head>
 <body>
   <!-- Include the rest of the HTML from index.html -->

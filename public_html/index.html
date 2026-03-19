@@ -16,7 +16,7 @@
 
   <!-- Performance: Preconnect & Preload -->
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-  <link rel="preconnect" href="https://hiphop.world" crossorigin>
+
   <link rel="preload" href="assets/styles.css" as="style">
   <link rel="preload" href="assets/logo.webp" as="image" type="image/webp">
   <link rel="preload" href="assets/hero-bg.webp" as="image" type="image/webp">
@@ -447,7 +447,7 @@
 
   <!-- Dark mode init (prevent FOUC) -->
   <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
-  <script defer src="https://hiphop.world/sdk/hiphopworld.js" data-site-key="oregontires" data-auto></script>
+
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
@@ -1778,12 +1778,13 @@ fetch(API_BASE + '/testimonials.php?scope=stats', { credentials: 'include' })
   .catch(function() {});
 
 // ===== DYNAMIC FAQ FROM API =====
+var _faqData = [];
 async function loadFaqs() {
   try {
     var res = await fetch(API_BASE + '/faq.php', { credentials: 'include' });
     var json = await res.json();
-    var faqs = (json.success && json.data) ? json.data : [];
-    renderFaqs(faqs);
+    _faqData = (json.success && json.data) ? json.data : [];
+    renderFaqs(_faqData);
   } catch (e) {
     console.error('Error loading FAQs:', e);
   }
@@ -2135,6 +2136,7 @@ function toggleLanguage() {
   const emailInput = document.querySelector('input[name="email"]');
   if (emailInput) emailInput.placeholder = t[currentLang].emailPlaceholder;
   renderReviews();
+  renderFaqs(_faqData);
   loadGalleryForSite();
   applySiteSettings();
 }

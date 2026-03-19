@@ -2850,19 +2850,6 @@
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
-<!-- Section 33 -->
-<h2 id="google-business-sync" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">33. Google Business Profile Sync</h2>
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Keep your Google Business Profile up to date automatically with your shop hours and holiday closures.</p>
-<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
-  <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Google Business</strong> tab in the admin panel.</li>
-  <li>Connect your Google Business account (one-time setup).</li>
-  <li>Business hours from the admin Settings tab are automatically synced weekly (Monday 7 AM).</li>
-  <li>Holidays from the Holiday Calendar are synced as special hours / closed dates.</li>
-  <li>View sync status and manually trigger a sync if you made recent changes.</li>
-</ol>
-
-<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
-
 <!-- Section 34 -->
 <h2 id="push-notifications" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">34. Push Notifications (PWA)</h2>
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Send push notifications to customers who have installed the Oregon Tires app on their phone or enabled browser notifications.</p>
@@ -4551,6 +4538,9 @@ const adminT = {
     promoInline: 'Inline',
     promoLoadFail: 'Failed to load promotions',
     promoTitleRequired: 'Title (EN) is required',
+    promoSubtitleRequired: 'Subtitle (EN) is required to activate an exit-intent promotion',
+    promoBodyRequired: 'Body (EN) is required to activate a banner/sidebar/inline promotion',
+    actionPreview: 'Preview',
     promoSaveFail: 'Save failed',
     promoNetworkError: 'Network error',
     promoDeleteConfirm: 'Delete this promotion? This cannot be undone.',
@@ -5823,6 +5813,9 @@ const adminT = {
     promoInline: 'En Línea',
     promoLoadFail: 'Error al cargar promociones',
     promoTitleRequired: 'Título (EN) es requerido',
+    promoSubtitleRequired: 'El subtítulo (EN) es requerido para activar una promoción de intención de salida',
+    promoBodyRequired: 'El cuerpo (EN) es requerido para activar una promoción de banner/barra lateral/en línea',
+    actionPreview: 'Vista Previa',
     promoSaveFail: 'Error al guardar',
     promoNetworkError: 'Error de red',
     promoDeleteConfirm: '¿Eliminar esta promoción? No se puede deshacer.',
@@ -6603,20 +6596,7 @@ function showToast(msg, isError) {
   setTimeout(() => t.classList.add('hidden'), 3000);
 }
 function statusBadge(s) { return `<span class="px-2 py-1 rounded-full text-xs font-medium status-${s||'new'}">${(s||'new').charAt(0).toUpperCase()+(s||'new').slice(1)}</span>`; }
-function calSyncBadge(a) {
-  if (!a) return '';
-  if (a.google_event_id && a.calendar_sync_status === 'success') {
-    var syncDate = a.calendar_synced_at ? new Date(a.calendar_synced_at).toLocaleString() : '';
-    return `<span class="cal-sync-badge cal-sync-success" title="Synced to Google Calendar${syncDate ? ' on ' + syncDate : ''}">&#x1F4C5; Synced</span>`;
-  }
-  if (a.calendar_sync_status === 'failed') {
-    return `<span class="cal-sync-badge cal-sync-failed" title="${esc(a.calendar_sync_error || 'Sync failed')}">&#x1F4C5; Failed <button onclick="retryCalendarSync(${a.id});event.stopPropagation();" class="ml-1 text-blue-500 underline text-xs">Retry</button></span>`;
-  }
-  if (a.calendar_sync_status === 'pending') {
-    return `<span class="cal-sync-badge cal-sync-pending" title="Calendar sync pending">&#x1F4C5; Syncing...</span>`;
-  }
-  return '';
-}
+function calSyncBadge() { return ''; }
 function fmtDate(d) { if(!d) return '—'; return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
 function fmtTime(t) { if(!t) return '—'; const [h,m]=t.split(':'); const hr=parseInt(h); return `${hr%12||12}:${m} ${hr>=12?'PM':'AM'}`; }
 function fmtDateTime(d) { return new Date(d).toLocaleString(); }
@@ -10860,8 +10840,11 @@ function renderPlatformTab() {
   container.appendChild(breakdownWrap);
 
   // ─── 6. Client Features Section (with prices) ───
+  var clientSectionTotal = 0;
+  clientFeatures.forEach(function(f) { clientSectionTotal += (f.price || 0); });
+  var clientSectionFr = Math.round(clientSectionTotal * (typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6));
   container.appendChild(renderSection(
-    t.overviewClientSection, t.overviewClientDesc,
+    t.overviewClientSection + '  —  $' + clientSectionFr.toLocaleString() + ' – $' + clientSectionTotal.toLocaleString(), t.overviewClientDesc,
     clientFeatures, 'green', true
   ));
 
@@ -12006,9 +11989,7 @@ loadMessages = async function() {
 <script src="/admin/js/loyalty.js"></script>
 <script src="/admin/js/referrals.js"></script>
 <script src="/admin/js/service-reminders.js"></script>
-<script src="/admin/js/google-business.js"></script>
 <script src="/admin/js/resource-planner.js"></script>
-<script src="/admin/js/calendar-retry.js"></script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';
   // Override global showToast — handles legacy (msg, isError: bool) and new (msg, type: string)

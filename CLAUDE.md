@@ -234,9 +234,6 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `/api/admin/visit-log.php` — visit tracking log
 - `/api/admin/google-business-sync.php` — Google Business Profile sync
 - `/api/admin/business-hours.php` — business hours configuration
-- `/api/admin/calendar-health.php` — calendar sync status
-- `/api/admin/calendar-retry-sync.php` — retry failed syncs
-- `/api/admin/calendar-test-sync.php` — test calendar sync
 - `POST /api/admin/push-broadcast.php` — admin push broadcast to opted-in subscribers (5/day limit)
 - `GET /api/admin/email-check.php` — manual IMAP fetch trigger, returns count of new emails
 - `GET /api/admin/resource-planner.php?dates=` — multi-date resource planning (employees, skill gaps, hourly breakdown, recommendations)
@@ -351,7 +348,6 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `admin/js/labor-tracker.js` — labor hours tracking UI
 - `admin/js/visit-tracker.js` — visit tracking UI
 - `admin/js/feature-data.js` — feature configuration data
-- `admin/js/calendar-retry.js` — calendar sync retry UI
 
 ### Frontend JS
 - `assets/js/pwa-manager.js` — PWA install prompt (Android + iOS), push subscription, online/offline indicator

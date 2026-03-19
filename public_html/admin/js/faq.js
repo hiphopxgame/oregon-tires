@@ -65,9 +65,18 @@
       tdQ.className = 'px-4 py-3';
       const qText = document.createElement('div');
       qText.className = 'font-medium text-sm dark:text-gray-200';
-      const question = faq.question_en || '(untitled)';
+      const primaryField = 'question_' + currentLang;
+      const secondaryField = currentLang === 'en' ? 'question_es' : 'question_en';
+      const question = faq[primaryField] || faq[secondaryField] || '(untitled)';
       qText.textContent = question.length > 80 ? question.substring(0, 80) + '...' : question;
       tdQ.appendChild(qText);
+      const secondaryQuestion = faq[secondaryField];
+      if (secondaryQuestion) {
+        var qTextSec = document.createElement('div');
+        qTextSec.className = 'text-xs text-gray-400 dark:text-gray-500 mt-0.5';
+        qTextSec.textContent = secondaryQuestion.length > 80 ? secondaryQuestion.substring(0, 80) + '...' : secondaryQuestion;
+        tdQ.appendChild(qTextSec);
+      }
       tr.appendChild(tdQ);
 
       // Status cell

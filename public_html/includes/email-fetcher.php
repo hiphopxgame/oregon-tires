@@ -103,12 +103,11 @@ class EmailFetcher
                     if ($this->processEmail($message)) {
                         $processed++;
                     }
-                    // Mark as seen regardless (prevents re-processing of unparseable emails)
+                    // Only mark as seen after successful processing (or intentional skip)
                     $message->setFlag('Seen');
                 } catch (\Throwable $e) {
                     error_log('EmailFetcher: Error processing email: ' . $e->getMessage());
-                    // Mark as seen to avoid infinite retry
-                    try { $message->setFlag('Seen'); } catch (\Throwable $ignore) {}
+                    // Do NOT mark as seen — will retry on next cron run
                 }
             }
         } catch (\Throwable $e) {
@@ -140,7 +139,7 @@ class EmailFetcher
         $fromAddress = '';
         $fromName = '';
         $from = $message->getFrom();
-        if ($from && count($from) > 0) {
+        if ($from && $from->count() > 0) {
             $first = $from->first();
             $fromAddress = strtolower(trim($first->mail ?? ''));
             $fromName = trim($first->personal ?? '');
@@ -192,6 +191,11 @@ class EmailFetcher
         // Move attachments to correct directory if we saved any with temp conv_id
         if (!empty($attachments)) {
             $attachments = $this->moveAttachments($attachments, $conversationId);
+        }
+
+        // Rewrite CID references in HTML body to point to saved attachment paths
+        if ($htmlBody && !empty($attachments)) {
+            $body = $this->rewriteCidReferences($body, $attachments);
         }
 
         // Insert the message into conversation
@@ -409,7 +413,10 @@ class EmailFetcher
     /**
      * Save email attachments to disk.
      *
-     * @return array Array of attachment metadata [{name, size, mime, path}]
+     * Captures Content-ID for inline images (CID rewriting) and deduplicates
+     * attachments that appear as both inline and regular.
+     *
+     * @return array Array of attachment metadata [{name, size, mime, path, inline, content_id}]
      */
     private function saveAttachments(Message $message, int $conversationId): array
     {
@@ -423,10 +430,51 @@ class EmailFetcher
         // Use a temp directory, will be moved once we have the conversation ID
         $dir = rtrim($_ENV['UPLOAD_PATH'] ?? dirname(__DIR__) . '/uploads') . '/email-attachments/tmp-' . bin2hex(random_bytes(8));
 
+        // Track saved Content-IDs for dedup (cid => index in $saved)
+        $cidMap = [];
+        // Track saved files by name+size for dedup without CID
+        $fileMap = [];
+
         foreach ($attachments as $attachment) {
             $size = $attachment->getSize() ?? 0;
             $mime = strtolower($attachment->getMimeType() ?? '');
             $name = $attachment->getName() ?? 'attachment';
+
+            // Capture Content-ID and disposition
+            $contentId = '';
+            try {
+                $rawId = (string) $attachment->getId();
+                $contentId = trim($rawId, '<> ');
+            } catch (\Throwable $e) {
+                // getId() not available — leave empty
+            }
+
+            $disposition = '';
+            try {
+                $disposition = strtolower((string) $attachment->getDisposition());
+            } catch (\Throwable $e) {
+                // getDisposition() not available
+            }
+
+            $isInline = ($disposition === 'inline' && $contentId !== '');
+
+            // Dedup: if this Content-ID was already saved, skip the duplicate
+            if ($contentId !== '' && isset($cidMap[$contentId])) {
+                continue;
+            }
+
+            // Dedup: same filename + size already saved (common with inline + regular copies)
+            $fileKey = $name . ':' . $size;
+            if (isset($fileMap[$fileKey])) {
+                // Mark the existing entry as inline if this copy is inline
+                if ($isInline && !empty($contentId)) {
+                    $existingIdx = $fileMap[$fileKey];
+                    $saved[$existingIdx]['inline'] = true;
+                    $saved[$existingIdx]['content_id'] = $contentId;
+                    $cidMap[$contentId] = $existingIdx;
+                }
+                continue;
+            }
 
             // Skip oversized files
             if ($size > self::MAX_ATTACHMENT_SIZE) {
@@ -461,17 +509,55 @@ class EmailFetcher
             if ($content !== false) {
                 file_put_contents($filePath, $content);
 
-                $saved[] = [
+                $idx = count($saved);
+                $entry = [
                     'name' => $name,
                     'size' => $size,
                     'mime' => $mime,
                     'path' => $filePath,
                     'temp_dir' => $dir,
                 ];
+
+                if ($contentId !== '') {
+                    $entry['content_id'] = $contentId;
+                    $cidMap[$contentId] = $idx;
+                }
+                if ($isInline) {
+                    $entry['inline'] = true;
+                }
+
+                $saved[] = $entry;
+                $fileMap[$fileKey] = $idx;
             }
         }
 
         return $saved;
+    }
+
+    /**
+     * Rewrite CID references in email HTML to point to saved attachment paths.
+     *
+     * Replaces `src="cid:image001.png@..."` with `src="/uploads/email-attachments/5/..."`.
+     */
+    private function rewriteCidReferences(string $html, array $attachments): string
+    {
+        foreach ($attachments as $att) {
+            if (empty($att['content_id']) || empty($att['path'])) {
+                continue;
+            }
+
+            $cid = $att['content_id'];
+            $path = '/' . ltrim($att['path'], '/');
+
+            // Replace both with and without angle brackets
+            $html = str_replace(
+                ['cid:' . $cid, 'cid:<' . $cid . '>', 'cid:' . '<' . $cid . '>'],
+                [$path, $path, $path],
+                $html
+            );
+        }
+
+        return $html;
     }
 
     /**

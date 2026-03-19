@@ -81,6 +81,12 @@
       titleText.className = 'font-medium text-sm dark:text-gray-200';
       titleText.textContent = promo.title_en || '(untitled)';
       tdTitle.appendChild(titleText);
+      if (promo.title_es) {
+        var titleEs = document.createElement('div');
+        titleEs.className = 'text-xs text-gray-400 dark:text-gray-500 mt-0.5';
+        titleEs.textContent = promo.title_es.length > 60 ? promo.title_es.substring(0, 60) + '...' : promo.title_es;
+        tdTitle.appendChild(titleEs);
+      }
       var badgeText = promo.badge_text_en || promo.badge_text || '';
       if (badgeText) {
         const badge = document.createElement('span');
@@ -187,6 +193,12 @@
       const actionsWrap = document.createElement('div');
       actionsWrap.className = 'flex gap-2';
 
+      const previewBtn = document.createElement('button');
+      previewBtn.className = 'text-purple-600 hover:text-purple-800 text-sm font-medium dark:text-purple-400';
+      previewBtn.textContent = t('actionPreview', 'Preview');
+      previewBtn.addEventListener('click', function() { openPromoPreviewModal(promo); });
+      actionsWrap.appendChild(previewBtn);
+
       const editBtn = document.createElement('button');
       editBtn.className = 'text-blue-600 hover:text-blue-800 text-sm font-medium dark:text-blue-400';
       editBtn.textContent = t('actionEdit', 'Edit');
@@ -243,7 +255,7 @@
     document.getElementById('promo-text-color').value = '#000000';
     document.getElementById('promo-badge-en').value = '';
     document.getElementById('promo-badge-es').value = '';
-    document.getElementById('promo-active').checked = true;
+    document.getElementById('promo-active').checked = false;
     document.getElementById('promo-starts').value = '';
     document.getElementById('promo-ends').value = '';
     document.getElementById('promo-sort').value = '0';
@@ -369,12 +381,38 @@
     return fd;
   }
 
+  // ─── Activation validation ───────────────────────────────────
+  function validateActivation(placement, titleEn, bodyEn, subtitleEn) {
+    if (!titleEn) {
+      return t('promoTitleRequired', 'Title (EN) is required to activate a promotion');
+    }
+    if (placement === 'exit_intent') {
+      if (!subtitleEn) return t('promoSubtitleRequired', 'Subtitle (EN) is required to activate an exit-intent promotion');
+    } else {
+      if (!bodyEn) return t('promoBodyRequired', 'Body (EN) is required to activate a banner/sidebar/inline promotion');
+    }
+    return null;
+  }
+
   // ─── Save (create or update) ──────────────────────────────────
   async function savePromotion() {
     const titleEn = document.getElementById('promo-title-en').value.trim();
     if (!titleEn) {
       if (typeof showToast === 'function') showToast(t('promoTitleRequired', 'Title (EN) is required'), true);
       return;
+    }
+
+    // Validate required fields if activating
+    var isActiveChecked = document.getElementById('promo-active').checked;
+    if (isActiveChecked) {
+      var placement = document.getElementById('promo-placement').value;
+      var bodyEn = document.getElementById('promo-body-en').value.trim();
+      var subtitleEn = document.getElementById('promo-subtitle-en').value.trim();
+      var validationError = validateActivation(placement, titleEn, bodyEn, subtitleEn);
+      if (validationError) {
+        if (typeof showToast === 'function') showToast(validationError, true);
+        return;
+      }
     }
 
     const fd = buildFormData();
@@ -408,6 +446,20 @@
 
   // ─── Toggle active status ─────────────────────────────────────
   async function toggleActive(promo) {
+    var activating = Number(promo.is_active) !== 1;
+    if (activating) {
+      var validationError = validateActivation(
+        promo.placement || 'banner',
+        promo.title_en || '',
+        promo.body_en || '',
+        promo.subtitle_en || ''
+      );
+      if (validationError) {
+        if (typeof showToast === 'function') showToast(validationError, true);
+        return;
+      }
+    }
+
     const fd = new FormData();
     fd.append('_method', 'PUT');
     fd.append('id', String(promo.id));
@@ -491,98 +543,238 @@
     removeFlag.value = '1';
   }
 
-  // ─── Live preview ─────────────────────────────────────────────
-  function updatePreview() {
-    const preview = document.getElementById('promo-live-preview');
-    if (!preview) return;
+  // ─── Render preview into a container ──────────────────────────
+  function renderPromoPreview(container, data, lang) {
+    lang = lang || 'en';
+    container.textContent = '';
 
-    const placement = document.getElementById('promo-placement').value;
-    const bgColor = document.getElementById('promo-bg-color').value;
-    const textColor = document.getElementById('promo-text-color').value;
-    const titleEn = document.getElementById('promo-title-en').value || 'Your Promotion Title';
-    const bodyEn = document.getElementById('promo-body-en').value || '';
-    const badge = document.getElementById('promo-badge-en').value;
-    const ctaText = document.getElementById('promo-cta-text-en').value || 'Book Now';
+    var placement = data.placement || 'banner';
+    var bgColor = data.bg_color || '#f59e0b';
+    var textColor = data.text_color || '#000000';
+    var title = (lang === 'es' ? (data.title_es || data.title_en) : data.title_en) || 'Your Promotion Title';
+    var body = (lang === 'es' ? (data.body_es || data.body_en) : data.body_en) || '';
+    var subtitle = (lang === 'es' ? (data.subtitle_es || data.subtitle_en) : data.subtitle_en) || '';
+    var badge = (lang === 'es' ? (data.badge_text_es || data.badge_text_en) : data.badge_text_en) || '';
+    var ctaText = (lang === 'es' ? (data.cta_text_es || data.cta_text_en) : data.cta_text_en) || 'Book Now';
+    var icon = data.popup_icon || '';
+    var imageUrl = data.image_url || '';
 
-    preview.style.backgroundColor = bgColor;
-    preview.style.color = textColor;
-    preview.style.maxWidth = '';
-    preview.textContent = '';
-
-    // Placement type label
-    var placementLabel = document.createElement('div');
-    placementLabel.className = 'text-xs opacity-60 mb-1 uppercase tracking-wide';
-    var placementNames = { banner: 'Banner', exit_intent: 'Exit-Intent Popup', sidebar: 'Sidebar', inline: 'Inline' };
-    placementLabel.textContent = placementNames[placement] || 'Banner';
-    preview.appendChild(placementLabel);
+    // Placement label
+    var label = document.createElement('div');
+    label.className = 'text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2 px-1';
+    var placementNames = { banner: 'Banner Preview', exit_intent: 'Exit-Intent Popup Preview', sidebar: 'Sidebar Preview', inline: 'Inline Preview' };
+    label.textContent = placementNames[placement] || 'Banner Preview';
+    container.appendChild(label);
 
     if (placement === 'exit_intent') {
-      // Exit-intent preview: icon + title + subtitle
-      var icon = document.getElementById('promo-popup-icon').value;
+      // Exit-intent: centered card on dark overlay
+      var overlay = document.createElement('div');
+      overlay.className = 'rounded-xl p-6 flex items-center justify-center min-h-[280px]';
+      overlay.style.backgroundColor = 'rgba(0,0,0,0.65)';
+
+      var card = document.createElement('div');
+      card.className = 'rounded-xl p-6 text-center max-w-sm w-full shadow-2xl relative';
+      card.style.backgroundColor = bgColor;
+      card.style.color = textColor;
+
+      // Close X
+      var closeX = document.createElement('span');
+      closeX.className = 'absolute top-3 right-4 text-lg opacity-50 cursor-default';
+      closeX.textContent = '\u2715';
+      card.appendChild(closeX);
+
       if (icon) {
-        var iconEl = document.createElement('span');
-        iconEl.className = 'text-2xl mr-2';
+        var iconEl = document.createElement('div');
+        iconEl.className = 'text-3xl mb-2';
         iconEl.textContent = icon;
-        preview.appendChild(iconEl);
+        card.appendChild(iconEl);
+      }
+      var h3 = document.createElement('div');
+      h3.className = 'font-bold text-xl mb-1';
+      h3.textContent = title;
+      card.appendChild(h3);
+      if (subtitle) {
+        var sub = document.createElement('div');
+        sub.className = 'text-sm opacity-80 mb-3';
+        sub.textContent = subtitle;
+        card.appendChild(sub);
+      }
+      if (body) {
+        var bodyP = document.createElement('div');
+        bodyP.className = 'text-sm opacity-70 mb-4';
+        bodyP.textContent = body.length > 120 ? body.substring(0, 120) + '...' : body;
+        card.appendChild(bodyP);
+      }
+      // Email input (visual only)
+      var emailRow = document.createElement('div');
+      emailRow.className = 'flex gap-2 mb-3';
+      var emailInput = document.createElement('input');
+      emailInput.type = 'email';
+      emailInput.disabled = true;
+      emailInput.placeholder = data.placeholder_en || 'your@email.com';
+      emailInput.className = 'flex-1 px-3 py-2 rounded text-sm text-gray-800 bg-white/90 border-0';
+      emailRow.appendChild(emailInput);
+      var ctaBtn = document.createElement('button');
+      ctaBtn.className = 'px-4 py-2 rounded font-bold text-sm whitespace-nowrap';
+      ctaBtn.style.backgroundColor = textColor;
+      ctaBtn.style.color = bgColor;
+      ctaBtn.textContent = ctaText;
+      emailRow.appendChild(ctaBtn);
+      card.appendChild(emailRow);
+      // No spam line
+      var nospam = document.createElement('div');
+      nospam.className = 'text-xs opacity-50';
+      nospam.textContent = data.nospam_en || 'No spam. Unsubscribe anytime.';
+      card.appendChild(nospam);
+
+      overlay.appendChild(card);
+      container.appendChild(overlay);
+
+    } else if (placement === 'sidebar') {
+      // Sidebar: compact card
+      var wrap = document.createElement('div');
+      wrap.className = 'max-w-[260px] rounded-lg overflow-hidden shadow';
+      wrap.style.backgroundColor = bgColor;
+      wrap.style.color = textColor;
+
+      if (imageUrl) {
+        var img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = '';
+        img.className = 'w-full h-28 object-cover';
+        wrap.appendChild(img);
+      }
+      var content = document.createElement('div');
+      content.className = 'p-3';
+      if (badge) {
+        var badgeEl = document.createElement('span');
+        badgeEl.className = 'inline-block px-2 py-0.5 rounded-full text-xs font-bold mb-1 border';
+        badgeEl.style.borderColor = textColor;
+        badgeEl.textContent = badge;
+        content.appendChild(badgeEl);
       }
       var titleEl = document.createElement('div');
-      titleEl.className = 'font-bold text-base';
-      titleEl.textContent = titleEn;
-      preview.appendChild(titleEl);
-      var subtitle = document.getElementById('promo-subtitle-en').value;
-      if (subtitle) {
-        var subEl = document.createElement('div');
-        subEl.className = 'text-sm opacity-80 mt-1';
-        subEl.textContent = subtitle;
-        preview.appendChild(subEl);
-      }
-      var ctaEl = document.createElement('div');
-      ctaEl.className = 'mt-2 inline-block px-3 py-1 rounded font-bold text-sm';
-      ctaEl.style.backgroundColor = textColor;
-      ctaEl.style.color = bgColor;
-      ctaEl.textContent = ctaText;
-      preview.appendChild(ctaEl);
-    } else if (placement === 'sidebar') {
-      // Sidebar preview: compact card
-      preview.style.maxWidth = '240px';
-      if (badge) {
-        var badgeEl2 = document.createElement('span');
-        badgeEl2.className = 'inline-block px-2 py-0.5 rounded-full text-xs font-bold mb-1 border';
-        badgeEl2.style.borderColor = textColor;
-        badgeEl2.textContent = badge;
-        preview.appendChild(badgeEl2);
-      }
-      var titleEl2 = document.createElement('div');
-      titleEl2.className = 'font-semibold text-sm';
-      titleEl2.textContent = titleEn;
-      preview.appendChild(titleEl2);
-      if (bodyEn) {
+      titleEl.className = 'font-semibold text-sm';
+      titleEl.textContent = title;
+      content.appendChild(titleEl);
+      if (body) {
         var bodyEl = document.createElement('div');
         bodyEl.className = 'text-xs opacity-80 mt-1';
-        bodyEl.textContent = bodyEn.substring(0, 80) + (bodyEn.length > 80 ? '...' : '');
-        preview.appendChild(bodyEl);
+        bodyEl.textContent = body.length > 80 ? body.substring(0, 80) + '...' : body;
+        content.appendChild(bodyEl);
       }
-      var ctaEl2 = document.createElement('div');
-      ctaEl2.className = 'mt-2 underline font-bold text-xs';
-      ctaEl2.textContent = ctaText + ' \u2192';
-      preview.appendChild(ctaEl2);
+      var cta = document.createElement('div');
+      cta.className = 'mt-2 underline font-bold text-xs';
+      cta.textContent = ctaText + ' \u2192';
+      content.appendChild(cta);
+      wrap.appendChild(content);
+      container.appendChild(wrap);
+
     } else {
-      // Banner / Inline preview
+      // Banner / Inline
+      var bar = document.createElement('div');
+      bar.className = 'px-4 py-3 flex items-center justify-between gap-3 flex-wrap' + (placement === 'banner' ? '' : ' rounded-lg');
+      bar.style.backgroundColor = bgColor;
+      bar.style.color = textColor;
+
+      var left = document.createElement('div');
+      left.className = 'flex items-center gap-3 flex-wrap';
       if (badge) {
-        var badgeEl3 = document.createElement('span');
-        badgeEl3.className = 'inline-block px-2 py-0.5 rounded-full text-xs font-bold mr-2 border';
-        badgeEl3.style.borderColor = textColor;
-        badgeEl3.textContent = badge;
-        preview.appendChild(badgeEl3);
+        var badgeEl2 = document.createElement('span');
+        badgeEl2.className = 'inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border';
+        badgeEl2.style.borderColor = textColor;
+        badgeEl2.textContent = badge;
+        left.appendChild(badgeEl2);
       }
       var titleSpan = document.createElement('span');
       titleSpan.className = 'font-semibold';
-      titleSpan.textContent = titleEn;
-      preview.appendChild(titleSpan);
-      var ctaSpan = document.createElement('span');
-      ctaSpan.className = 'ml-3 underline font-bold';
-      ctaSpan.textContent = ctaText + ' \u2192';
-      preview.appendChild(ctaSpan);
+      titleSpan.textContent = title;
+      left.appendChild(titleSpan);
+      if (body) {
+        var sep = document.createElement('span');
+        sep.className = 'opacity-60 hidden sm:inline';
+        sep.textContent = ' — ';
+        left.appendChild(sep);
+        var bodySnip = document.createElement('span');
+        bodySnip.className = 'text-sm opacity-80 hidden sm:inline';
+        bodySnip.textContent = body.length > 60 ? body.substring(0, 60) + '...' : body;
+        left.appendChild(bodySnip);
+      }
+      bar.appendChild(left);
+
+      var right = document.createElement('div');
+      right.className = 'flex items-center gap-3';
+      var ctaBtn2 = document.createElement('span');
+      ctaBtn2.className = 'px-3 py-1 rounded font-bold text-sm whitespace-nowrap';
+      ctaBtn2.style.backgroundColor = textColor;
+      ctaBtn2.style.color = bgColor;
+      ctaBtn2.textContent = ctaText;
+      right.appendChild(ctaBtn2);
+      var dismissX = document.createElement('span');
+      dismissX.className = 'opacity-50 cursor-default text-lg';
+      dismissX.textContent = '\u2715';
+      right.appendChild(dismissX);
+      bar.appendChild(right);
+
+      container.appendChild(bar);
+    }
+  }
+
+  // ─── Live preview (form) ────────────────────────────────────
+  function updatePreview() {
+    var preview = document.getElementById('promo-live-preview');
+    if (!preview) return;
+
+    var data = {
+      placement: document.getElementById('promo-placement').value,
+      bg_color: document.getElementById('promo-bg-color').value,
+      text_color: document.getElementById('promo-text-color').value,
+      title_en: document.getElementById('promo-title-en').value || 'Your Promotion Title',
+      body_en: document.getElementById('promo-body-en').value,
+      badge_text_en: document.getElementById('promo-badge-en').value,
+      cta_text_en: document.getElementById('promo-cta-text-en').value || 'Book Now',
+      subtitle_en: document.getElementById('promo-subtitle-en').value,
+      popup_icon: document.getElementById('promo-popup-icon').value,
+      placeholder_en: document.getElementById('promo-placeholder-en').value,
+      nospam_en: document.getElementById('promo-nospam-en').value
+    };
+
+    renderPromoPreview(preview, data, 'en');
+  }
+
+  // ─── Preview modal ──────────────────────────────────────────
+  var previewModalLang = 'en';
+
+  function openPromoPreviewModal(promo) {
+    previewModalLang = 'en';
+    var modal = document.getElementById('promo-preview-modal');
+    if (!modal) return;
+    var body = document.getElementById('promo-preview-modal-body');
+    body.textContent = '';
+
+    var langBtn = document.getElementById('promo-preview-lang-toggle');
+    langBtn.textContent = 'EN / ES';
+
+    // Render EN preview
+    renderPromoPreview(body, promo, 'en');
+
+    // Lang toggle
+    langBtn.onclick = function() {
+      previewModalLang = previewModalLang === 'en' ? 'es' : 'en';
+      langBtn.textContent = previewModalLang === 'en' ? 'EN / ES' : 'ES / EN';
+      body.textContent = '';
+      renderPromoPreview(body, promo, previewModalLang);
+    };
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closePromoPreviewModal() {
+    var modal = document.getElementById('promo-preview-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
     }
   }
 
@@ -631,4 +823,6 @@
   window.updatePromoPreview = updatePreview;
   window.removePromoImage = removePromoImage;
   window.toggleExitIntentFields = toggleExitIntentFields;
+  window.openPromoPreviewModal = openPromoPreviewModal;
+  window.closePromoPreviewModal = closePromoPreviewModal;
 })();

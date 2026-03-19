@@ -31,7 +31,6 @@ $orderRef = $_GET['ref'] ?? '';
     <title>Commerce — Oregon Tires Admin</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="/assets/styles.css">
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 </head>
 <body class="bg-[#0A0A0A] min-h-screen">
     <!-- Nav -->
