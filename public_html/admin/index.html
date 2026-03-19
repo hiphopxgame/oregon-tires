@@ -233,8 +233,6 @@
       background: #1f2937;
       box-shadow: 0 10px 25px rgba(0,0,0,0.4);
     }
-    .nav-group:hover > .nav-dropdown,
-    .nav-group:focus-within > .nav-dropdown,
     .nav-group.open > .nav-dropdown { display: block; }
     .nav-dropdown-item {
       display: block;
@@ -493,8 +491,8 @@
           <div class="nav-dropdown">
             <button onclick="switchTab('blog')" data-tab="blog" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📝 <span data-t="tabBlog">Blog</span></button>
             <button onclick="switchTab('promotions')" data-tab="promotions" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🏷 <span data-t="tabPromotions">Promotions</span></button>
-            <button onclick="switchTab('faq')" data-tab="faq" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">❓ FAQ</button>
-            <button onclick="switchTab('reviews')" data-tab="reviews" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">⭐ Reviews</button>
+            <button onclick="switchTab('faq')" data-tab="faq" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">❓ <span data-t="tabFaq">FAQ</span></button>
+            <button onclick="switchTab('reviews')" data-tab="reviews" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">⭐ <span data-t="tabReviews">Reviews</span></button>
             <button onclick="switchTab('gallery')" data-tab="gallery" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🖼 <span data-t="tabGallery">Gallery</span></button>
             <button onclick="switchTab('subscribers')" data-tab="subscribers" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📧 <span data-t="tabSubscribers">Subscribers</span> <span id="subscribers-badge" class="ml-1 bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full hidden"></span></button>
             <button onclick="switchTab('loyalty')" data-tab="loyalty" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🎁 <span data-t="tabLoyalty">Loyalty &amp; Rewards</span></button>
@@ -510,6 +508,7 @@
             <button onclick="switchTab('sitecontent')" data-tab="sitecontent" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📝 <span data-t="tabSiteContent">Site Content</span></button>
             <button onclick="switchTab('docs')" data-tab="docs" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📖 <span data-t="tabDocs">Docs</span></button>
             <button onclick="switchTab('gbsync')" data-tab="gbsync" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔄 <span data-t="tabGbSync">Google Business</span></button>
+            <a href="/admin/project-value" class="tab-btn nav-dropdown-item block text-left" style="text-decoration:none;color:inherit">📊 <span>Project Value Report</span></a>
           </div>
         </div>
       </nav>
@@ -534,8 +533,8 @@
         <optgroup label="📣 Marketing" data-t-label="navMarketing">
           <option value="blog" data-t="tabBlog">Blog</option>
           <option value="promotions" data-t="tabPromotions">Promotions</option>
-          <option value="faq">FAQ</option>
-          <option value="reviews">Reviews</option>
+          <option value="faq" data-t="tabFaq">FAQ</option>
+          <option value="reviews" data-t="tabReviews">Reviews</option>
           <option value="gallery" data-t="tabGallery">Gallery</option>
           <option value="subscribers" data-t="tabSubscribers">Subscribers</option>
           <option value="loyalty" data-t="tabLoyalty">Loyalty &amp; Rewards</option>
@@ -547,6 +546,7 @@
           <option value="sitecontent" data-t="tabSiteContent">Site Content</option>
           <option value="docs" data-t="tabDocs">Docs</option>
           <option value="gbsync" data-t="tabGbSync">Google Business</option>
+          <option value="_projectvalue" data-t="tabProjectValue">📊 Project Value Report</option>
         </optgroup>
       </select>
     </div>
@@ -1012,7 +1012,7 @@
             <!-- Title ES -->
             <div>
               <label class="text-sm font-medium dark:text-gray-300" data-t="blogTitleEs">Title (Spanish)</label>
-              <input id="blog-title-es" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Titulo del articulo en Espanol">
+              <input id="blog-title-es" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" data-t="blogTitleEsPh" placeholder="Article title in Spanish">
             </div>
             <!-- Slug -->
             <div>
@@ -1033,18 +1033,18 @@
             <!-- Body EN -->
             <div>
               <label class="text-sm font-medium dark:text-gray-300"><span data-t="blogBodyEn">Body (English) *</span> <span class="text-xs text-gray-400" data-t="blogHtmlSupported">HTML supported</span></label>
-              <textarea id="blog-body-en" rows="10" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="<h2>Title</h2><p>Content...</p>"></textarea>
+              <textarea id="blog-body-en" rows="10" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" data-t="blogBodyEnPh" placeholder="<h2>Title</h2><p>Content...</p>"></textarea>
             </div>
             <!-- Body ES -->
             <div>
               <label class="text-sm font-medium dark:text-gray-300"><span data-t="blogBodyEs">Body (Spanish)</span> <span class="text-xs text-gray-400" data-t="blogHtmlSupported">HTML supported</span></label>
-              <textarea id="blog-body-es" rows="8" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="<h2>Titulo</h2><p>Contenido...</p>"></textarea>
+              <textarea id="blog-body-es" rows="8" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" data-t="blogBodyEsPh" placeholder="<h2>Title</h2><p>Content...</p>"></textarea>
             </div>
             <!-- Featured Image + Author + Status -->
             <div class="grid md:grid-cols-3 gap-4">
               <div>
                 <label class="text-sm font-medium dark:text-gray-300" data-t="blogFeaturedImage">Featured Image URL</label>
-                <input id="blog-image" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="/uploads/blog/image.jpg">
+                <input id="blog-image" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" data-t="blogImagePh" placeholder="/uploads/blog/image.jpg">
               </div>
               <div>
                 <label class="text-sm font-medium dark:text-gray-300" data-t="blogAuthor">Author</label>
@@ -1212,7 +1212,7 @@
             </div>
             <div class="flex items-center gap-6">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input id="promo-active" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
+                <input id="promo-active" type="checkbox" class="w-5 h-5 text-green-600 rounded">
                 <span class="text-sm font-medium dark:text-gray-300" data-t="promoLabelActive">Active</span>
               </label>
               <div class="banner-only-field">
@@ -1231,10 +1231,7 @@
           </div>
           <div class="mt-4">
             <label class="text-sm font-medium text-gray-500 dark:text-gray-400" data-t="promoLabelPreview">Live Preview</label>
-            <div id="promo-live-preview" class="mt-1 px-4 py-3 rounded-lg text-sm" style="background-color: #f59e0b; color: #000;">
-              <span class="font-semibold" data-t="promoPreviewTitle">Your Promotion Title</span>
-              <span class="ml-3 underline font-bold" data-t="promoPreviewCta">Book Now →</span>
-            </div>
+            <div id="promo-live-preview" class="mt-2 border rounded-xl overflow-hidden dark:border-gray-600"></div>
           </div>
           <div class="flex gap-2 mt-4">
             <button onclick="savePromotion()" id="promo-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition" data-t="promoCreatePromo">Create Promotion</button>
@@ -1262,6 +1259,20 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- Promotion Preview Modal -->
+    <div id="promo-preview-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60" role="dialog" aria-modal="true" aria-label="Promotion Preview">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto mx-4">
+        <div class="flex items-center justify-between px-6 py-4 border-b dark:border-gray-700">
+          <h3 class="font-bold text-lg dark:text-gray-200">Promotion Preview</h3>
+          <div class="flex items-center gap-3">
+            <button id="promo-preview-lang-toggle" class="text-sm px-3 py-1 rounded-full border dark:border-gray-600 dark:text-gray-300 font-medium">EN / ES</button>
+            <button onclick="closePromoPreviewModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl leading-none">&times;</button>
+          </div>
+        </div>
+        <div id="promo-preview-modal-body" class="p-6"></div>
       </div>
     </div>
 
@@ -1453,18 +1464,16 @@
         <div><h2 class="text-2xl font-bold">📖 <span data-t="documentation">Documentation</span></h2><p class="text-green-50" data-t="docsSubtitle">Instruction manual, feature list, and roadmap</p></div>
       </div>
       <div class="bg-white rounded-b-xl shadow dark:bg-gray-800">
-        <!-- Sub-tabs: Overview / Manual / Features / Improvements (superadmin) / Roadmap -->
+        <!-- Sub-tabs: Your Platform / Coming Soon / Manual -->
         <div class="flex flex-wrap gap-2 p-4 border-b dark:border-gray-700">
-          <button onclick="switchDocsView('overview')" id="docs-view-overview" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">🏗️ <span data-t="docsOverview">Overview</span></button>
+          <button onclick="switchDocsView('platform')" id="docs-view-platform" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">🏠 <span data-t="docsYourPlatform">Your Platform</span></button>
+          <button onclick="switchDocsView('coming')" id="docs-view-coming" class="px-4 py-2 rounded-lg text-sm font-medium border text-gray-700 hover:bg-gray-50 bg-gradient-to-r from-green-50 to-amber-50 border-green-300 dark:from-green-900/30 dark:to-amber-900/30 dark:border-green-700 dark:text-green-300">🚀 <span data-t="docsComingSoon">Coming Soon</span></button>
           <button onclick="switchDocsView('manual')" id="docs-view-manual" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">📋 <span data-t="docsManual">Manual</span></button>
-          <button onclick="switchDocsView('features')" id="docs-view-features" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">✅ <span data-t="docsFeatures">Features</span></button>
-          <button onclick="switchDocsView('improvements')" id="docs-view-improvements" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700" style="display:none">🔧 <span data-t="docsImprovements">Improvements</span></button>
-          <button onclick="switchDocsView('vision')" id="docs-view-vision" class="px-4 py-2 rounded-lg text-sm font-medium border text-gray-700 hover:bg-gray-50 bg-gradient-to-r from-green-50 to-amber-50 border-green-300 dark:from-green-900/30 dark:to-amber-900/30 dark:border-green-700 dark:text-green-300 dark:hover:from-green-900/50 dark:hover:to-amber-900/50">🚀 <span data-t="docsRoadmap">Roadmap</span></button>
         </div>
 
-        <!-- Overview Sub-Tab -->
-        <div id="docs-subtab-overview" class="p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
-          <div id="overview-content"></div>
+        <!-- Platform Sub-Tab -->
+        <div id="docs-subtab-platform" class="p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
+          <div id="platform-content"></div>
         </div>
 
         <!-- Manual Sub-Tab -->
@@ -1523,6 +1532,18 @@
   <li>Planes de Cuidado</li>
   <li>Cuentas de Miembros</li>
   <li>Pagos y Checkout</li>
+  <li>Facturas y Recibos Digitales</li>
+  <li>Lealtad y Recompensas de Clientes</li>
+  <li>Programa de Referidos</li>
+  <li>Lista de Espera y Cola de Walk-In</li>
+  <li>Solicitudes de Cotizaci&oacute;n de Llantas</li>
+  <li>Seguimiento de Trabajo de T&eacute;cnicos</li>
+  <li>Recordatorios Autom&aacute;ticos de Servicio</li>
+  <li>Rastreo de Visitas (Entrada/Salida)</li>
+  <li>Mensajer&iacute;a Admin-Cliente</li>
+  <li>Sincronizaci&oacute;n Google Business Profile</li>
+  <li>Notificaciones Push (PWA)</li>
+  <li>Integraci&oacute;n de Email Entrante</li>
 </ol>
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
@@ -1768,6 +1789,130 @@
 </ul>
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Desde cualquier cita, puede crear una <strong class="font-semibold text-gray-800 dark:text-gray-200">Orden de Reparaci&oacute;n (OR)</strong> para seguir el ciclo completo de servicio incluyendo inspecci&oacute;n, presupuesto y aprobaci&oacute;n del cliente.</p>
 
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Secci&oacute;n 24 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">24. Facturas y Recibos Digitales</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Genere facturas profesionales desde &oacute;rdenes de reparaci&oacute;n completadas con vista de cliente basada en token y entrega por email.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Abra una Orden de Reparaci&oacute;n con estado <strong class="font-semibold text-gray-800 dark:text-gray-200">Completada</strong>.</li>
+  <li>Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Generar Factura</strong> para crear una factura desde el presupuesto aprobado.</li>
+  <li>Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Enviar Factura</strong> para enviar al cliente un enlace seguro.</li>
+  <li>Los clientes pueden ver e imprimir su factura en cualquier momento usando el enlace.</li>
+</ol>
+
+<!-- Secci&oacute;n 25 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">25. Lealtad y Recompensas de Clientes</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Sistema de puntos de lealtad que recompensa a clientes frecuentes.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Vaya a la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Lealtad</strong> en el panel de admin.</li>
+  <li>Los clientes ganan puntos autom&aacute;ticamente cuando se completan &oacute;rdenes de reparaci&oacute;n.</li>
+  <li>Gestione el <strong class="font-semibold text-gray-800 dark:text-gray-200">Cat&aacute;logo de Recompensas</strong> &mdash; establezca costos en puntos para recompensas.</li>
+  <li>Ajuste puntos manualmente si es necesario.</li>
+</ol>
+
+<!-- Secci&oacute;n 26 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">26. Programa de Referidos</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Permita que sus clientes existentes refieran amigos y ganen puntos de lealtad.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Vaya a la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Referidos</strong> en el panel de admin.</li>
+  <li>Cada cliente recibe un c&oacute;digo de referido &uacute;nico visible en su Portal de Miembro.</li>
+  <li>Cuando un nuevo cliente reserva usando un c&oacute;digo de referido, ambos ganan puntos bonus.</li>
+  <li>Rastree el estado del referido: <strong class="font-semibold text-gray-800 dark:text-gray-200">Pendiente</strong>, <strong class="font-semibold text-gray-800 dark:text-gray-200">Completado</strong> o <strong class="font-semibold text-gray-800 dark:text-gray-200">Expirado</strong>.</li>
+</ol>
+
+<!-- Secci&oacute;n 27 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">27. Lista de Espera y Cola de Walk-In</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Gestione clientes walk-in con un sistema de cola organizado.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Vaya a la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Lista de Espera</strong> en el panel de admin.</li>
+  <li>Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Agregar Walk-In</strong> para a&ntilde;adir un cliente a la cola.</li>
+  <li>El sistema calcula tiempos de espera estimados.</li>
+  <li>Actualice el estado: <strong class="font-semibold text-gray-800 dark:text-gray-200">Esperando &rarr; En Servicio &rarr; Completado</strong>.</li>
+  <li>Los clientes pueden verificar su posici&oacute;n en l&iacute;nea.</li>
+</ol>
+
+<!-- Secci&oacute;n 28 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">28. Solicitudes de Cotizaci&oacute;n de Llantas</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Los clientes pueden solicitar cotizaciones de llantas en l&iacute;nea.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Vaya a la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Cotizaciones de Llantas</strong> en el panel de admin.</li>
+  <li>Vea solicitudes entrantes con informaci&oacute;n del cliente y veh&iacute;culo.</li>
+  <li>Responda con precios y programe la instalaci&oacute;n directamente.</li>
+  <li>Rastree el estado: <strong class="font-semibold text-gray-800 dark:text-gray-200">Nueva &rarr; Cotizada &rarr; Aceptada &rarr; Programada</strong>.</li>
+</ol>
+
+<!-- Secci&oacute;n 29 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">29. Seguimiento de Trabajo de T&eacute;cnicos</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Rastree horas de trabajo de t&eacute;cnicos por orden de reparaci&oacute;n.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Abra una Orden de Reparaci&oacute;n y vaya a la secci&oacute;n <strong class="font-semibold text-gray-800 dark:text-gray-200">Trabajo</strong>.</li>
+  <li>Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Registrar Entrada</strong> cuando un t&eacute;cnico comience a trabajar.</li>
+  <li>Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Registrar Salida</strong> cuando termine.</li>
+  <li>El sistema calcula autom&aacute;ticamente las horas facturables totales.</li>
+</ol>
+
+<!-- Secci&oacute;n 30 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">30. Recordatorios Autom&aacute;ticos de Servicio</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Recuerde autom&aacute;ticamente a los clientes cuando sus veh&iacute;culos necesitan mantenimiento programado.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Vaya a la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Recordatorios</strong> en el panel de admin.</li>
+  <li>El sistema calcula fechas de servicio basado en el historial de &oacute;rdenes completadas.</li>
+  <li>Un trabajo cron semanal (lunes 9 AM) env&iacute;a emails de recordatorio biling&uuml;es.</li>
+  <li>Vea recordatorios pr&oacute;ximos y env&iacute;e recordatorios manualmente si es necesario.</li>
+</ol>
+
+<!-- Secci&oacute;n 31 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">31. Rastreo de Visitas (Entrada/Salida)</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Registre visitas de clientes al taller con marcas de tiempo de entrada y salida.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Vaya a la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Visitas</strong> en el panel de admin.</li>
+  <li>Cuando llegue un cliente, haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Registrar Entrada</strong>.</li>
+  <li>Cuando el servicio est&eacute; completo, haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Registrar Salida</strong>.</li>
+  <li>El sistema rastrea visitas totales, duraci&oacute;n promedio y frecuencia por cliente.</li>
+</ol>
+
+<!-- Secci&oacute;n 32 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">32. Mensajer&iacute;a Admin-Cliente</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Env&iacute;e y reciba mensajes con hilos con clientes directamente desde el panel de admin.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Vaya a la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Mensajes</strong> en el panel de admin.</li>
+  <li>Vea conversaciones existentes o inicie una nueva seleccionando un cliente.</li>
+  <li>Escriba su mensaje y haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Enviar</strong>. El cliente recibe notificaci&oacute;n por email.</li>
+  <li>Los clientes pueden responder desde su Portal de Miembro.</li>
+</ol>
+
+<!-- Secci&oacute;n 33 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">33. Sincronizaci&oacute;n Google Business Profile</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Mantenga su Perfil de Google Business actualizado autom&aacute;ticamente.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Vaya a la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Google Business</strong> en el panel de admin.</li>
+  <li>Conecte su cuenta de Google Business (configuraci&oacute;n &uacute;nica).</li>
+  <li>Los horarios de negocio se sincronizan autom&aacute;ticamente cada semana (lunes 7 AM).</li>
+  <li>Los d&iacute;as festivos del Calendario se sincronizan como horarios especiales.</li>
+</ol>
+
+<!-- Secci&oacute;n 34 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">34. Notificaciones Push (PWA)</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Env&iacute;e notificaciones push a clientes que instalaron la app Oregon Tires o habilitaron notificaciones del navegador.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Los clientes optan por notificaciones push al visitar el sitio o instalar la PWA.</li>
+  <li>Se env&iacute;an notificaciones autom&aacute;ticas para: recordatorios de cita, veh&iacute;culo listo, presupuesto enviado.</li>
+  <li>Para enviar un broadcast, vaya a <strong class="font-semibold text-gray-800 dark:text-gray-200">Configuraci&oacute;n &rarr; Push Broadcast</strong>.</li>
+  <li>Los broadcasts est&aacute;n limitados a 5 por d&iacute;a.</li>
+</ol>
+
+<!-- Secci&oacute;n 35 -->
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">35. Integraci&oacute;n de Email Entrante</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Las respuestas por email de los clientes se importan autom&aacute;ticamente al sistema de mensajer&iacute;a.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Cuando un cliente responde a cualquier email de notificaci&oacute;n, su respuesta se captura autom&aacute;ticamente.</li>
+  <li>Los emails entrantes se vinculan a conversaciones existentes usando hilos de Message-ID.</li>
+  <li>Emails de remitentes desconocidos crean una nueva conversaci&oacute;n en la pesta&ntilde;a Mensajes.</li>
+  <li>Los archivos adjuntos se preservan y son visibles en el hilo de la conversaci&oacute;n.</li>
+  <li>Un trabajo cron se ejecuta cada 2 minutos para obtener nuevos emails v&iacute;a IMAP.</li>
+</ol>
+
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed italic">Este manual fue escrito para el equipo de administraci&oacute;n de Oregon Tires Auto Care. Para soporte t&eacute;cnico, contacte a Tyrone Norris en <a class="text-green-600 hover:text-green-800 underline" href="mailto:tyronenorris@gmail.com">tyronenorris@gmail.com</a> o (774) 277-9202. Para soporte en espa&ntilde;ol, contacte a Margarita Escalante en <a class="text-green-600 hover:text-green-800 underline" href="mailto:growwithmagi@gmail.com">growwithmagi@gmail.com</a> o (541) 936-1884.</p>
 </div>
 <div class="doc-lang-en">
@@ -1822,6 +1967,18 @@
   <li>Care Plans</li>
   <li>Member Accounts</li>
   <li>Checkout &amp; Payments</li>
+  <li>Digital Invoices &amp; Receipts</li>
+  <li>Customer Loyalty &amp; Rewards</li>
+  <li>Customer Referral Program</li>
+  <li>Waitlist &amp; Walk-In Queue</li>
+  <li>Tire Quote Requests</li>
+  <li>Technician Labor Tracking</li>
+  <li>Automated Service Reminders</li>
+  <li>Visit Tracking (Check-in/out)</li>
+  <li>Admin-Customer Messaging</li>
+  <li>Google Business Profile Sync</li>
+  <li>Push Notifications (PWA)</li>
+  <li>Inbound Email Integration</li>
 </ol>
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
@@ -2568,6 +2725,167 @@
   <li>Admins can view order history in the dashboard.</li>
 </ul>
 
+<!-- Section 24 -->
+<h2 id="digital-invoices" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">24. Digital Invoices &amp; Receipts</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Generate professional invoices from completed repair orders with token-based customer viewing and email delivery.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Open a Repair Order that has reached <strong class="font-semibold text-gray-800 dark:text-gray-200">Completed</strong> status.</li>
+  <li>Click <strong class="font-semibold text-gray-800 dark:text-gray-200">Generate Invoice</strong> to create an invoice from the approved estimate.</li>
+  <li>The invoice is automatically numbered and linked to the RO.</li>
+  <li>Click <strong class="font-semibold text-gray-800 dark:text-gray-200">Send Invoice</strong> to email the customer a secure link to view and print their invoice.</li>
+  <li>Customers can view their invoice anytime using the token link (no login required).</li>
+</ol>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Pro tip:</strong> Invoices include all approved estimate line items, labor, parts, and totals. The print layout is optimized for clean paper output.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 25 -->
+<h2 id="loyalty-rewards" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">25. Customer Loyalty &amp; Rewards</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">A points-based loyalty system that rewards repeat customers.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Loyalty</strong> tab in the admin panel.</li>
+  <li>Customers earn points automatically when repair orders are completed.</li>
+  <li>View each customer's point balance and transaction history.</li>
+  <li>Manage the <strong class="font-semibold text-gray-800 dark:text-gray-200">Rewards Catalog</strong> &mdash; set point costs for rewards like free oil changes or discounts.</li>
+  <li>Manually adjust points if needed (e.g., bonus points for special promotions).</li>
+</ol>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Pro tip:</strong> Customers can view their points balance in the Member Portal under their dashboard.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 26 -->
+<h2 id="referral-program" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">26. Customer Referral Program</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Let your existing customers refer friends and earn loyalty points as a reward.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Referrals</strong> tab in the admin panel.</li>
+  <li>Each customer gets a unique referral code visible in their Member Portal.</li>
+  <li>When a new customer books using a referral code, both the referrer and referred customer earn bonus loyalty points.</li>
+  <li>Track referral status: <strong class="font-semibold text-gray-800 dark:text-gray-200">Pending</strong> (booked), <strong class="font-semibold text-gray-800 dark:text-gray-200">Completed</strong> (service done), or <strong class="font-semibold text-gray-800 dark:text-gray-200">Expired</strong>.</li>
+  <li>View top referrers and referral conversion rates.</li>
+</ol>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 27 -->
+<h2 id="waitlist-queue" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">27. Waitlist &amp; Walk-In Queue</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Manage walk-in customers with an organized queue system.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Waitlist</strong> tab in the admin panel.</li>
+  <li>Click <strong class="font-semibold text-gray-800 dark:text-gray-200">Add Walk-In</strong> to add a customer to the queue with their name, phone, service type, and vehicle info.</li>
+  <li>The system calculates estimated wait times based on current queue length.</li>
+  <li>Update status as customers move through: <strong class="font-semibold text-gray-800 dark:text-gray-200">Waiting &rarr; In Service &rarr; Completed</strong>.</li>
+  <li>Customers can check their position online using a phone number lookup.</li>
+</ol>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Pro tip:</strong> Customers receive automatic notifications when their turn is approaching.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 28 -->
+<h2 id="tire-quotes" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">28. Tire Quote Requests</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Customers can request tire quotes online with their vehicle and tire size information.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Tire Quotes</strong> tab in the admin panel.</li>
+  <li>View incoming quote requests with customer info, vehicle details, and desired tire size.</li>
+  <li>The tire fitment lookup is integrated &mdash; customers can search by year/make/model.</li>
+  <li>Respond to quotes with pricing and schedule installation directly from the quote.</li>
+  <li>Track quote status: <strong class="font-semibold text-gray-800 dark:text-gray-200">New &rarr; Quoted &rarr; Accepted &rarr; Scheduled</strong>.</li>
+</ol>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 29 -->
+<h2 id="labor-tracking" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">29. Technician Labor Tracking</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Track technician labor hours per repair order for billing accuracy and productivity reporting.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Open a Repair Order and go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Labor</strong> section.</li>
+  <li>Click <strong class="font-semibold text-gray-800 dark:text-gray-200">Clock In</strong> when a technician starts working on the RO.</li>
+  <li>Click <strong class="font-semibold text-gray-800 dark:text-gray-200">Clock Out</strong> when they finish or take a break.</li>
+  <li>The system automatically calculates total billable hours.</li>
+  <li>View labor summaries in the <strong class="font-semibold text-gray-800 dark:text-gray-200">Labor</strong> tab for reports on technician productivity.</li>
+</ol>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Pro tip:</strong> Labor hours are included in invoice calculations when generating invoices from repair orders.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 30 -->
+<h2 id="service-reminders" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">30. Automated Service Reminders</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Automatically remind customers when their vehicles are due for scheduled maintenance.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Reminders</strong> tab in the admin panel.</li>
+  <li>The system calculates service due dates based on completed RO history and configurable intervals (e.g., oil change every 5,000 miles or 6 months).</li>
+  <li>A weekly cron job (Monday 9 AM) sends bilingual reminder emails to customers with upcoming service dates.</li>
+  <li>View upcoming reminders and manually trigger reminders if needed.</li>
+  <li>Customers see their upcoming service schedule in the Member Portal.</li>
+</ol>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 31 -->
+<h2 id="visit-tracking" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">31. Visit Tracking (Check-in/out)</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Log customer visits to the shop with check-in and check-out timestamps.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Visits</strong> tab in the admin panel.</li>
+  <li>When a customer arrives, click <strong class="font-semibold text-gray-800 dark:text-gray-200">Check In</strong> and search for their name or phone number.</li>
+  <li>When service is complete, click <strong class="font-semibold text-gray-800 dark:text-gray-200">Check Out</strong>.</li>
+  <li>The system tracks total visits per customer, average visit duration, and visit frequency.</li>
+  <li>Visit data feeds into the customer CRM for tracking returning customers.</li>
+</ol>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 32 -->
+<h2 id="admin-messaging" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">32. Admin-Customer Messaging</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Send and receive threaded messages with customers directly from the admin panel.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Messages</strong> tab in the admin panel.</li>
+  <li>View existing conversations or start a new one by selecting a customer.</li>
+  <li>Type your message and click <strong class="font-semibold text-gray-800 dark:text-gray-200">Send</strong>. The customer receives an email notification.</li>
+  <li>Customers can reply from their Member Portal, and you will see the response in the thread.</li>
+  <li>Conversations are organized by customer with unread message indicators.</li>
+</ol>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Pro tip:</strong> Contact form submissions automatically create conversation threads, so you can follow up directly.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 33 -->
+<h2 id="google-business-sync" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">33. Google Business Profile Sync</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Keep your Google Business Profile up to date automatically with your shop hours and holiday closures.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Google Business</strong> tab in the admin panel.</li>
+  <li>Connect your Google Business account (one-time setup).</li>
+  <li>Business hours from the admin Settings tab are automatically synced weekly (Monday 7 AM).</li>
+  <li>Holidays from the Holiday Calendar are synced as special hours / closed dates.</li>
+  <li>View sync status and manually trigger a sync if you made recent changes.</li>
+</ol>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 34 -->
+<h2 id="push-notifications" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">34. Push Notifications (PWA)</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Send push notifications to customers who have installed the Oregon Tires app on their phone or enabled browser notifications.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Customers opt in to push notifications when they visit the website or install the PWA.</li>
+  <li>Automatic notifications are sent for: appointment reminders, vehicle ready, estimate sent.</li>
+  <li>To send a broadcast, go to <strong class="font-semibold text-gray-800 dark:text-gray-200">Settings &rarr; Push Broadcast</strong> and compose your message (bilingual).</li>
+  <li>Broadcasts are limited to 5 per day to prevent notification fatigue.</li>
+  <li>Customers can manage their notification preferences from the Member Portal.</li>
+</ol>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Pro tip:</strong> Push notifications work even when the browser is closed. Customers on Android can install the site as an app from the install prompt.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<!-- Section 35 -->
+<h2 id="inbound-email" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">35. Inbound Email Integration</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Customer email replies are automatically imported into the messaging system.</p>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>When a customer replies to any notification email (appointment confirmation, estimate, invoice), their reply is automatically captured.</li>
+  <li>Inbound emails are matched to existing conversations using Message-ID threading.</li>
+  <li>New emails from unknown senders create a new conversation in the Messages tab.</li>
+  <li>Attachments are preserved and viewable in the conversation thread.</li>
+  <li>A cron job runs every 2 minutes to fetch new inbound emails via IMAP.</li>
+</ol>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Pro tip:</strong> You can manually trigger an email fetch from the Messages tab by clicking the refresh button.</p>
+
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
 <!-- Quick Reference: Admin Dashboard Tabs -->
@@ -2643,687 +2961,12 @@
 </div>
         </div>
 
-        <div id="docs-subtab-features" class="hidden p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
-<!-- Feature Status Dashboard — JS-driven, bilingual -->
-<div id="feat-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
-
-<div class="flex flex-wrap gap-2 mb-4 border-b border-gray-200 dark:border-gray-600 pb-3">
-  <button onclick="switchFeatureTab('all')" id="feat-tab-all" class="px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white">All Features</button>
-  <button onclick="switchFeatureTab('client')" id="feat-tab-client" class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Client Requested</button>
-  <button onclick="switchFeatureTab('new')" id="feat-tab-new" class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">New Features</button>
-</div>
-
-<div class="flex flex-wrap gap-3 mb-4">
-  <input id="feat-search" oninput="renderFeatures()" placeholder="Search features..." class="flex-1 min-w-[180px] px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none">
-  <select id="feat-cat-filter" onchange="renderFeatures()" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm"></select>
-  <select id="feat-status-filter" onchange="renderFeatures()" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm"></select>
-</div>
-
-<div class="flex flex-wrap gap-4 mb-4 text-xs text-gray-500 dark:text-gray-400">
-  <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span> Complete</span>
-  <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span> In Progress</span>
-  <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span> Planned</span>
-  <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span> Not Started</span>
-</div>
-
-<div id="feat-list"></div>
-
-<script src="/admin/js/feature-data.js"></script>
+        <!-- Coming Soon Sub-Tab -->
+        <div id="docs-subtab-coming" class="hidden p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
+          <div id="coming-content"></div>
         </div>
 
-        <div id="docs-subtab-improvements" class="hidden p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
-<div class="doc-lang-es hidden">
-<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">Oregon Tires Auto Care - Mejoras Futuras</h2>
-
-<blockquote class="border-l-4 border-green-500 pl-4 py-2 mb-4 bg-green-50 dark:bg-green-900/30 rounded-r-lg text-gray-600 dark:text-gray-400">
-  <p class="text-gray-600 dark:text-gray-400 mb-0 leading-relaxed">Todas las 25 mejoras originales de la revisi&oacute;n de c&oacute;digo han sido completadas. Esta lista muestra las mejoras futuras pendientes.</p>
-</blockquote>
-
-<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Mejoras Pendientes</h3>
-<div class="grid md:grid-cols-2 gap-4 mb-6">
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Notificaciones SMS (Twilio)</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Estructura lista. Necesita credenciales de Twilio para activar recordatorios SMS biling&uuml;es.</p>
-    <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded mt-2 inline-block">Estructura Lista - Necesita Configuraci&oacute;n</span>
-  </div>
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Integraci&oacute;n WhatsApp</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Estructura de API WhatsApp de Twilio lista. Env&iacute;a notificaciones de citas por WhatsApp.</p>
-    <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded mt-2 inline-block">Estructura Lista - Necesita Configuraci&oacute;n</span>
-  </div>
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Integraci&oacute;n Stripe</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Agregar Stripe como opci&oacute;n de pago junto con PayPal.</p>
-  </div>
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Gesti&oacute;n de Inventario</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Seguimiento de inventario de llantas, niveles de partes y alertas de reorden.</p>
-  </div>
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Pedidos de Llantas en L&iacute;nea</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Cat&aacute;logo de llantas con compatibilidad, precios y pedidos en l&iacute;nea con programaci&oacute;n de instalaci&oacute;n.</p>
-  </div>
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Soporte Multi-Ubicaci&oacute;n</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Soporte para m&uacute;ltiples ubicaciones con horarios, inventario e informes por sucursal.</p>
-  </div>
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Campa&ntilde;as de Seguimiento Automatizadas</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Emails personalizados basados en historial de servicio: rotaci&oacute;n de llantas, cambio de aceite, inspecciones de frenos.</p>
-  </div>
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Motor de Recomendaci&oacute;n de Llantas</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Mostrar opciones de llantas compatibles con precios cuando el veh&iacute;culo del cliente est&aacute; en archivo.</p>
-  </div>
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Automatizaci&oacute;n de Promociones</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Activar/desactivar promociones autom&aacute;ticamente por rangos de fecha programados.</p>
-  </div>
-</div>
-
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><em>&Uacute;ltima actualizaci&oacute;n: marzo 2026.</em></p>
-</div>
-<div class="doc-lang-en">
-<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">Oregon Tires Auto Care - Future Improvements</h2>
-
-<blockquote class="border-l-4 border-green-500 pl-4 py-2 mb-4 bg-green-50 dark:bg-green-900/30 rounded-r-lg text-gray-600 dark:text-gray-400">
-  <p class="text-gray-600 dark:text-gray-400 mb-0 leading-relaxed">All 25 original code review improvements have been completed. This list shows remaining future enhancements.</p>
-</blockquote>
-
-<div class="grid md:grid-cols-2 gap-4 mb-6">
-
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">SMS Notifications (Twilio)</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Twilio scaffold ready. Needs Twilio credentials to activate bilingual SMS appointment reminders and status updates.</p>
-    <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded mt-2 inline-block">Scaffold Ready &mdash; Needs Config</span>
-  </div>
-
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">WhatsApp Integration</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Twilio WhatsApp API scaffold ready. Send appointment notifications via WhatsApp.</p>
-    <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded mt-2 inline-block">Scaffold Ready &mdash; Needs Config</span>
-  </div>
-
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Stripe Payment Integration</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Add Stripe as a payment option alongside PayPal for broader payment method support.</p>
-  </div>
-
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Inventory Management</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Track tire inventory, parts stock levels, and automated reorder alerts.</p>
-  </div>
-
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Online Tire Ordering</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Customer-facing tire catalog with fitment lookup, pricing, and online ordering with installation scheduling.</p>
-  </div>
-
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Multi-Location Support</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Support for multiple shop locations with location-specific scheduling, inventory, and reporting.</p>
-  </div>
-
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Automated Follow-Up Campaigns</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Send personalized email campaigns based on service history: tire rotation reminders, oil change reminders, brake inspection follow-ups, and seasonal tire swap notifications.</p>
-  </div>
-
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Fleet Management Dashboard</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Dedicated portal for fleet customers to manage multiple vehicles, schedule bulk services, view fleet-wide maintenance reports, and track spending.</p>
-  </div>
-
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Tire Size &amp; Fitment Recommendation Engine</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">When a customer's vehicle is on file, proactively show compatible tire options with pricing during the booking flow or on the member dashboard.</p>
-  </div>
-
-  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-    <h4 class="font-bold text-gray-800 dark:text-white mb-2">Seasonal Promotion Automation</h4>
-    <p class="text-sm text-gray-600 dark:text-gray-400">Automatically activate and deactivate promotions based on date ranges. Schedule winter tire deals, summer A/C checks, and back-to-school specials in advance.</p>
-  </div>
-
-</div>
-
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><em>Last updated: March 2026.</em></p>
-</div>
-        </div>
-
-        <!-- Roadmap Sub-Tab -->
-        <div id="docs-subtab-vision" class="hidden p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
-
-<!-- ===== SPANISH VERSION ===== -->
-<div class="doc-lang-es hidden">
-<div class="max-w-5xl">
-
-    <!-- Header -->
-    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 mb-8">
-        <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-            </div>
-            <div>
-                <p class="font-bold text-gray-900 dark:text-white text-lg tracking-tight">Oregon Tires &mdash; Hoja de Ruta</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Pr&oacute;ximas funciones y mejoras &middot; Actualizado marzo 2026</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- What We've Built -->
-    <div class="relative bg-white dark:bg-gray-800 border border-green-500/20 rounded-2xl p-8 mb-8 overflow-hidden">
-        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 via-green-500/60 to-green-500/20 rounded-l-2xl"></div>
-        <div class="relative">
-            <h2 class="font-bold text-2xl text-green-700 dark:text-green-400 mb-2">Lo Que Hemos Construido</h2>
-            <div class="h-1 w-12 bg-green-500/30 rounded mb-6"></div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Reservas en L&iacute;nea</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Formulario biling&uuml;e con decodificaci&oacute;n VIN, horarios disponibles, SMS y sincronizaci&oacute;n con Google Calendar</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Sistema de &Oacute;rdenes de Reparaci&oacute;n</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Ciclo completo desde recepci&oacute;n hasta factura, tablero kanban, inspecciones digitales, presupuestos</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Portal del Cliente</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Cuentas de miembros, historial de veh&iacute;culos, reportes de inspecci&oacute;n, aprobaci&oacute;n de presupuestos</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Panel de Administraci&oacute;n</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">10 pesta&ntilde;as: citas, clientes, &oacute;rdenes, blog, FAQ, testimonios, promociones, galer&iacute;a</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Sistema de Correos</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Plantillas biling&uuml;es en base de datos, recordatorios autom&aacute;ticos, solicitudes de rese&ntilde;a</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">SEO y Contenido</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Blog, 8 p&aacute;ginas de &aacute;reas de servicio, 7 p&aacute;ginas de servicios, FAQ, rese&ntilde;as, esquema JSON-LD</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Sitio Biling&uuml;e</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">243+ elementos traducidos, cambio ingl&eacute;s/espa&ntilde;ol en cada p&aacute;gina</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Planes de Cuidado</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Planes de membres&iacute;a mensual con inscripci&oacute;n en l&iacute;nea y pago por PayPal</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Rendimiento y Seguridad</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Modo oscuro, im&aacute;genes WebP/AVIF, service worker, cabeceras CSP, l&iacute;mite de intentos</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Upcoming Features -->
-    <div class="relative bg-white dark:bg-gray-800 border border-green-500/20 rounded-2xl p-8 lg:p-10 mb-8 overflow-hidden">
-        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 via-green-500/60 to-green-500/20 rounded-l-2xl"></div>
-        <div class="relative">
-            <p class="text-xs uppercase tracking-[0.2em] text-green-600/60 dark:text-green-400/60 font-semibold mb-2">Pr&oacute;ximamente</p>
-            <h2 class="font-bold text-2xl text-green-700 dark:text-green-400 mb-2">Pr&oacute;ximas Funciones</h2>
-            <div class="h-1 w-12 bg-green-500/30 rounded mb-6"></div>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">Estas funciones est&aacute;n planificadas para la pr&oacute;xima fase de desarrollo. Cada una se construye sobre la base existente para ayudar a crecer el negocio, mejorar la experiencia del cliente y optimizar las operaciones del taller.</p>
-
-            <div class="space-y-6">
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128242;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Recordatorios por SMS</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Env&iacute;o autom&aacute;tico de mensajes de texto antes de las citas. Biling&uuml;e (ingl&eacute;s/espa&ntilde;ol). Reduce las ausencias.</p>
-                            <span class="inline-block mt-2 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-2 py-0.5 rounded">Listo &mdash; Necesita Configuraci&oacute;n Twilio</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128172;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Notificaciones por WhatsApp</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Env&iacute;o de confirmaciones y actualizaciones de estado por WhatsApp. Popular entre clientes hispanohablantes.</p>
-                            <span class="inline-block mt-2 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-2 py-0.5 rounded">Listo &mdash; Necesita Configuraci&oacute;n Twilio</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128179;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Pagos con Stripe</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Aceptar tarjetas de cr&eacute;dito/d&eacute;bito directamente en el sitio web junto con PayPal. Soporte para Apple Pay y Google Pay.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128200;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Panel de Reportes Avanzado</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Gr&aacute;ficos de ingresos, tendencias de citas, retenci&oacute;n de clientes y productividad de t&eacute;cnicos. Exportar a CSV o PDF.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#11088;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Programa de Lealtad</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Puntos por cada visita. Gane cambios de aceite gratis, rotaciones de llantas o descuentos en servicios mayores.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#129309;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Programa de Referidos</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">D&eacute; a los clientes un enlace de referencia personal. Cuando un amigo reserva, ambos reciben un descuento.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128230;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Gesti&oacute;n de Inventario</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Rastrear stock de llantas, partes y suministros. Alertas de bajo stock. Vincular inventario a &oacute;rdenes de reparaci&oacute;n.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128722;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Pedidos de Llantas en L&iacute;nea</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Los clientes ingresan su veh&iacute;culo y ven llantas compatibles con precios. Pedir en l&iacute;nea y programar la instalaci&oacute;n.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128231;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Recordatorios Autom&aacute;ticos de Servicio</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Correos basados en historial de servicio: rotaci&oacute;n de llantas cada 6 meses, cambios de aceite, inspecciones de frenos.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128666;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Portal de Gesti&oacute;n de Flotillas</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Panel dedicado para clientes de flotilla: gestionar m&uacute;ltiples veh&iacute;culos, programar servicios masivos y rastrear gastos.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128451;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Facturas y Recibos Digitales</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Env&iacute;o autom&aacute;tico de facturas detalladas cuando se completa una orden de reparaci&oacute;n. Adjuntos PDF.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128736;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Seguimiento de T&eacute;cnicos</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Asignar t&eacute;cnicos a &oacute;rdenes, registrar tiempo por trabajo y generar reportes de productividad.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128195;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Lista de Espera y Cola de Walk-In</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Cuando todos los horarios est&aacute;n ocupados, los clientes pueden unirse a una lista de espera y recibir notificaci&oacute;n cuando se abra un espacio.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#127759;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Sincronizaci&oacute;n con Google Business</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Sincronizar autom&aacute;ticamente horarios, cierres por d&iacute;as festivos y fotos nuevas con su perfil de Google Business.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planificado</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128205;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Soporte Multi-Ubicaci&oacute;n</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Preparado para cuando el negocio crezca. Programaci&oacute;n, inventario y reportes separados por ubicaci&oacute;n.</p>
-                            <span class="inline-block mt-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded">Futuro</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128241;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Experiencia de App M&oacute;vil</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">App Web Progresiva mejorada con notificaciones push, reservas sin conexi&oacute;n y experiencia tipo app nativa.</p>
-                            <span class="inline-block mt-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded">Futuro</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="text-center py-4">
-        <p class="text-xs text-gray-400 dark:text-gray-500">&Uacute;ltima actualizaci&oacute;n: marzo 2026</p>
-    </div>
-</div>
-</div>
-<!-- END SPANISH ROADMAP -->
-
-<!-- ===== ENGLISH VERSION ===== -->
-<div class="doc-lang-en">
-<div class="max-w-5xl">
-
-    <!-- ===== HEADER ===== -->
-    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-            </div>
-            <div>
-                <p class="font-bold text-gray-900 dark:text-white text-lg tracking-tight">Oregon Tires &mdash; Feature Roadmap</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Upcoming features &amp; improvements &middot; Updated March 2026</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== WHAT WE'VE BUILT ===== -->
-    <div class="relative bg-white dark:bg-gray-800 border border-green-500/20 rounded-2xl p-8 mb-8 overflow-hidden">
-        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 via-green-500/60 to-green-500/20 rounded-l-2xl"></div>
-        <div class="relative">
-            <h2 class="font-bold text-2xl text-green-700 dark:text-green-400 mb-2">What We've Built So Far</h2>
-            <div class="h-1 w-12 bg-green-500/30 rounded mb-6"></div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Online Booking</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Bilingual form with VIN decode, time slots, SMS opt-in, Google Calendar sync</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Repair Order System</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Full lifecycle from intake to invoice, kanban board, digital inspections, estimates</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Customer Portal</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Member accounts, vehicle history, inspection reports, estimate approval</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Admin Dashboard</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">10 tabs: appointments, customers, ROs, blog, FAQ, testimonials, promos, gallery</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Email System</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">DB-driven bilingual templates, auto reminders, review requests, estimate emails</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">SEO &amp; Content</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Blog, 8 service area pages, 7 service detail pages, FAQ, reviews, JSON-LD schema</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Bilingual Site</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">243+ translated elements, English/Spanish toggle on every page</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Care Plans</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Monthly membership plans with online enrollment and PayPal checkout</p>
-                </div>
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Performance &amp; Security</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Dark mode, WebP/AVIF images, service worker, CSP headers, rate limiting</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ============================================================ -->
-    <!-- SECTION: UPCOMING FEATURES                                   -->
-    <!-- ============================================================ -->
-    <div class="relative bg-white dark:bg-gray-800 border border-green-500/20 rounded-2xl p-8 lg:p-10 mb-8 overflow-hidden">
-        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 via-green-500/60 to-green-500/20 rounded-l-2xl"></div>
-
-        <div class="relative">
-            <p class="text-xs uppercase tracking-[0.2em] text-green-600/60 dark:text-green-400/60 font-semibold mb-2">Coming Soon</p>
-            <h2 class="font-bold text-2xl text-green-700 dark:text-green-400 mb-2">Upcoming Features</h2>
-            <div class="h-1 w-12 bg-green-500/30 rounded mb-6"></div>
-
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">These features are planned for the next phase of development. Each one builds on the foundation already in place to help grow the business, improve customer experience, and streamline shop operations.</p>
-
-            <div class="space-y-6">
-
-                <!-- Feature: SMS Notifications -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128242;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">SMS Appointment Reminders</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Send automatic text message reminders before appointments. Bilingual (English/Spanish). Reduces no-shows and keeps customers informed.</p>
-                            <span class="inline-block mt-2 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-2 py-0.5 rounded">Ready &mdash; Needs Twilio Setup</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: WhatsApp -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128172;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">WhatsApp Notifications</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Send appointment confirmations and status updates via WhatsApp. Popular with Spanish-speaking customers.</p>
-                            <span class="inline-block mt-2 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-2 py-0.5 rounded">Ready &mdash; Needs Twilio Setup</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Stripe -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128179;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Stripe Payments</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Accept credit/debit cards directly on the website alongside PayPal. Apple Pay and Google Pay support included.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Reporting -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128200;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Advanced Reporting Dashboard</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Revenue charts, appointment trends, customer retention rates, and technician productivity. Export reports to CSV or PDF.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Loyalty -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#11088;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Customer Loyalty &amp; Rewards</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Points for every visit. Earn free oil changes, tire rotations, or discounts on major services. Encourages repeat business.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Referral -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#129309;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Customer Referral Program</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Give customers a personal referral link. When a friend books, both get a discount. Word-of-mouth made easy.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Inventory -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128230;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Inventory Management</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Track tire stock, parts, and supplies. Get low-stock alerts. Link inventory to repair orders so parts are automatically deducted.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Online Tire Ordering -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128722;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Online Tire Ordering</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Customers enter their vehicle and see compatible tires with pricing. Order online and schedule installation in one step.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Follow-Up Campaigns -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128231;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Automated Service Reminders</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Email reminders based on service history: tire rotations every 6 months, oil changes, brake inspections, seasonal tire swaps.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Fleet Dashboard -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128666;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Fleet Management Portal</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Dedicated dashboard for fleet customers to manage multiple vehicles, schedule bulk services, and track spending.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Invoice Emailing -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128451;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Digital Invoices &amp; Receipts</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Automatically email itemized invoices when a repair order is completed. PDF attachments for customer records.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Technician Tracking -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128736;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Technician Job Tracking</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Assign technicians to repair orders, track time per job, and generate productivity reports.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Waitlist -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128195;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Waitlist &amp; Walk-In Queue</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">When all slots are booked, customers can join a waitlist and get notified when a spot opens. Walk-in overflow management.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Google Business -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#127759;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Google Business Profile Sync</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Automatically sync business hours, holiday closures, and new photos to your Google Business listing.</p>
-                            <span class="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Planned</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Multi-Location -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128205;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Multi-Location Support</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Ready for when the business grows. Separate scheduling, inventory, and reporting per location from a single admin dashboard.</p>
-                            <span class="inline-block mt-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded">Future</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature: Mobile PWA -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">&#128241;</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">Mobile App Experience</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Enhanced Progressive Web App with push notifications, offline booking, and an app-like feel. No app store download needed.</p>
-                            <span class="inline-block mt-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded">Future</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="text-center py-4">
-        <p class="text-xs text-gray-400 dark:text-gray-500">Last updated March 2026</p>
-    </div>
-
-</div>
-</div>
-<!-- END ENGLISH ROADMAP -->
-
-        </div>
+        <script src="/admin/js/feature-data.js"></script>
 
         </div>
 
@@ -4216,30 +3859,59 @@ const adminT = {
     // Docs
     documentation: 'Documentation',
     docsSubtitle: 'Instruction manual, feature list, and improvement roadmap',
-    docsOverview: 'Overview',
+    docsYourPlatform: 'Your Platform',
+    docsComingSoon: 'Coming Soon',
     docsManual: 'Manual',
-    docsFeatures: 'Features',
-    docsImprovements: 'Improvements',
-    docsRoadmap: 'Roadmap',
+    platformAlaCarteTitle: 'Available Upgrades',
+    platformAlaCarteDesc: 'Additional features ready to be built for your platform.',
+    comingSoonTitle: "What's Next for Oregon Tires",
+    comingSoonSubtitle: 'Upcoming features and enhancements',
+    comingSoonReadyToActivate: 'Ready to Activate',
+    comingSoonPlanned: 'Planned',
+    comingSoonFuture: 'Future',
+    comingSoonTotalEstimate: 'Estimated investment for all upcoming features',
+    comingSoonNote: 'Note',
     overviewTitle: 'Oregon Tires Auto Care \u2014 Project Overview',
     overviewSubtitle: 'Complete website platform built for your business',
     overviewClientSection: 'Client Requested Features',
-    overviewClientDesc: 'All included in your investment.',
-    overviewNewSection: 'Bonus Features Added',
-    overviewNewDesc: 'These bonus features were built to maximize your website\'s value.',
+    overviewClientDesc: 'Features requested in the original project scope.',
+    overviewNewSection: 'Additional Features',
+    overviewNewDesc: 'Additional features built to expand the platform\'s capabilities.',
     overviewTotalFeatures: 'Total Features',
     overviewApiEndpoints: 'API Endpoints',
     overviewPages: 'Pages',
     overviewMigrations: 'DB Migrations',
     overviewCronJobs: 'Cron Jobs',
     overviewComplete: 'Complete',
-    overviewBonusValue: 'Total Bonus Value Added',
-    overviewAllIncluded: 'All {count} bonus features included at no additional cost',
+    overviewBonusValue: 'Total Platform Value',
+    overviewAllIncluded: '{count} additional features expanding the platform',
     overviewViewLive: 'View Live',
     overviewMarketPrice: 'Market Price',
-    overviewIncluded: 'Included',
+    overviewIncluded: 'Built',
     overviewFeaturesIn: 'features in',
     overviewCategories: 'Feature Categories',
+    overviewWhatDoesItCost: 'What Does This Platform Cost?',
+    overviewAgencyEstimate: 'Portland Web Agency',
+    overviewFreelancerEstimate: 'Mid-Tier Freelancer',
+    overviewOurPrice: 'Your Investment',
+    overviewBestValue: 'Best Value',
+    overviewYouSave: 'You Save',
+    overviewVsAgency: 'vs agency',
+    overviewVsFreelancer: 'vs freelancer',
+    overviewSameFeatures: 'Same {count} features \u00B7 Same quality \u00B7 Fraction of the cost',
+    overviewContactPricing: 'Contact for Pricing',
+    overviewPriceTbd: 'Price — TBD',
+    overviewValueDelivered: 'Value Delivered',
+    overviewAtAgencyRates: 'at agency rates',
+    overviewValueBreakdown: 'Value Breakdown by Category',
+    overviewAgency: 'Agency',
+    overviewFreelancer: 'Freelancer',
+    overviewPlatformSummary: 'Platform Investment Summary',
+    overviewClientValue: 'Client Features Value',
+    overviewBonusValue2: 'Additional Features Value',
+    overviewSavingsVsAgency: 'Savings vs Agency',
+    overviewSavingsVsFreelancer: 'Savings vs Freelancer',
+    overviewYourPrice: 'Your Price',
     // Notes Modal
     adminNotes: 'Admin Notes',
     notesPlaceholder: 'Add notes about this appointment...',
@@ -5183,6 +4855,23 @@ const adminT = {
     etplFooterNote: 'Footer Note',
     etplAvailableVars: 'Available variables:',
     etplSaveBtn: 'Save Email Templates',
+    // Marketing tabs
+    tabBlog: 'Blog',
+    tabFaq: 'FAQ',
+    tabSubscribers: 'Subscribers',
+    tabReviews: 'Reviews',
+    blogManagement: 'Blog Management',
+    blogManagementDesc: 'Create and manage blog posts',
+    promotionsHeading: 'Seasonal Promotions',
+    promotionsSubtitle: 'Manage homepage banner promotions with date scheduling',
+    galleryOrder: 'Order',
+    galleryActive: 'Active',
+    galleryInactive: 'Inactive',
+    galleryNoImages: 'No gallery images found. Add your first image above.',
+    blogTitleEsPh: 'Article title in Spanish',
+    blogBodyEnPh: '<h2>Title</h2><p>Content...</p>',
+    blogBodyEsPh: '<h2>Title</h2><p>Content...</p>',
+    blogImagePh: '/uploads/blog/image.jpg',
     // Refresh
     refresh: '\u21BB Refresh',
   },
@@ -5394,30 +5083,59 @@ const adminT = {
     // Docs
     documentation: 'Documentaci\u00F3n',
     docsSubtitle: 'Manual de instrucciones, lista de funciones y mejoras',
-    docsOverview: 'Resumen',
+    docsYourPlatform: 'Su Plataforma',
+    docsComingSoon: 'Pr\u00F3ximamente',
     docsManual: 'Manual',
-    docsFeatures: 'Caracter\u00EDsticas',
-    docsImprovements: 'Mejoras',
-    docsRoadmap: 'Hoja de Ruta',
+    platformAlaCarteTitle: 'Mejoras Disponibles',
+    platformAlaCarteDesc: 'Funciones adicionales listas para construir en su plataforma.',
+    comingSoonTitle: 'Lo Que Viene para Oregon Tires',
+    comingSoonSubtitle: 'Pr\u00F3ximas funciones y mejoras',
+    comingSoonReadyToActivate: 'Listo para Activar',
+    comingSoonPlanned: 'Planificado',
+    comingSoonFuture: 'Futuro',
+    comingSoonTotalEstimate: 'Inversi\u00F3n estimada para todas las pr\u00F3ximas funciones',
+    comingSoonNote: 'Nota',
     overviewTitle: 'Oregon Tires Auto Care \u2014 Resumen del Proyecto',
     overviewSubtitle: 'Plataforma web completa construida para su negocio',
     overviewClientSection: 'Funciones Solicitadas por el Cliente',
-    overviewClientDesc: 'Todo incluido en su inversi\u00F3n.',
-    overviewNewSection: 'Funciones Bonus Agregadas',
-    overviewNewDesc: 'Estas funciones bonus fueron construidas para maximizar el valor de su sitio web.',
+    overviewClientDesc: 'Funciones solicitadas en el alcance original del proyecto.',
+    overviewNewSection: 'Funciones Adicionales',
+    overviewNewDesc: 'Funciones adicionales construidas para expandir las capacidades de la plataforma.',
     overviewTotalFeatures: 'Total de Funciones',
     overviewApiEndpoints: 'Endpoints de API',
     overviewPages: 'P\u00E1ginas',
     overviewMigrations: 'Migraciones de BD',
     overviewCronJobs: 'Tareas Cron',
     overviewComplete: 'Completas',
-    overviewBonusValue: 'Valor Total de Bonus Agregado',
-    overviewAllIncluded: 'Las {count} funciones bonus incluidas sin costo adicional',
+    overviewBonusValue: 'Valor Total de la Plataforma',
+    overviewAllIncluded: '{count} funciones adicionales expandiendo la plataforma',
     overviewViewLive: 'Ver en Vivo',
     overviewMarketPrice: 'Precio de Mercado',
-    overviewIncluded: 'Incluido',
+    overviewIncluded: 'Construido',
     overviewFeaturesIn: 'funciones en',
     overviewCategories: 'Categor\u00EDas de Funciones',
+    overviewWhatDoesItCost: '\u00BFCu\u00E1nto Cuesta Esta Plataforma?',
+    overviewAgencyEstimate: 'Agencia Web Portland',
+    overviewFreelancerEstimate: 'Freelancer Nivel Medio',
+    overviewOurPrice: 'Su Inversi\u00F3n',
+    overviewBestValue: 'Mejor Valor',
+    overviewYouSave: 'Usted Ahorra',
+    overviewVsAgency: 'vs agencia',
+    overviewVsFreelancer: 'vs freelancer',
+    overviewSameFeatures: 'Las mismas {count} funciones \u00B7 Misma calidad \u00B7 Fracci\u00F3n del costo',
+    overviewContactPricing: 'Cont\u00E1ctenos para Precios',
+    overviewPriceTbd: 'Precio — Por Definir',
+    overviewValueDelivered: 'Valor Entregado',
+    overviewAtAgencyRates: 'a tarifas de agencia',
+    overviewValueBreakdown: 'Desglose de Valor por Categor\u00EDa',
+    overviewAgency: 'Agencia',
+    overviewFreelancer: 'Freelancer',
+    overviewPlatformSummary: 'Resumen de Inversi\u00F3n de la Plataforma',
+    overviewClientValue: 'Valor de Funciones del Cliente',
+    overviewBonusValue2: 'Valor de Funciones Adicionales',
+    overviewSavingsVsAgency: 'Ahorro vs Agencia',
+    overviewSavingsVsFreelancer: 'Ahorro vs Freelancer',
+    overviewYourPrice: 'Su Precio',
     // Notes Modal
     adminNotes: 'Notas de Administraci\u00F3n',
     notesPlaceholder: 'Agregar notas sobre esta cita...',
@@ -6361,6 +6079,23 @@ const adminT = {
     etplFooterNote: 'Nota de Pie de P\u00E1gina',
     etplAvailableVars: 'Variables disponibles:',
     etplSaveBtn: 'Guardar Plantillas de Correo',
+    // Marketing tabs
+    tabBlog: 'Blog',
+    tabFaq: 'Preguntas Frecuentes',
+    tabSubscribers: 'Suscriptores',
+    tabReviews: 'Rese\u00F1as',
+    blogManagement: 'Gesti\u00F3n del Blog',
+    blogManagementDesc: 'Crear y administrar publicaciones del blog',
+    promotionsHeading: 'Promociones de Temporada',
+    promotionsSubtitle: 'Administrar promociones del banner con programaci\u00F3n por fecha',
+    galleryOrder: 'Orden',
+    galleryActive: 'Activa',
+    galleryInactive: 'Inactiva',
+    galleryNoImages: 'No se encontraron im\u00E1genes. Agregue su primera imagen arriba.',
+    blogTitleEsPh: 'T\u00EDtulo del art\u00EDculo en Espa\u00F1ol',
+    blogBodyEnPh: '<h2>T\u00EDtulo</h2><p>Contenido...</p>',
+    blogBodyEsPh: '<h2>T\u00EDtulo</h2><p>Contenido...</p>',
+    blogImagePh: '/uploads/blog/imagen.jpg',
     // Refresh
     refresh: '\u21BB Actualizar',
   }
@@ -6399,8 +6134,8 @@ function applyAdminTranslations() {
   document.querySelectorAll('.doc-lang-es').forEach(function(el) {
     el.classList.toggle('hidden', currentLang !== 'es');
   });
-  if (typeof renderFeatures === 'function') renderFeatures();
-  if (typeof renderOverviewTab === 'function') renderOverviewTab();
+  if (typeof renderPlatformTab === 'function') renderPlatformTab();
+  if (typeof renderComingSoonTab === 'function') renderComingSoonTab();
 }
 
 function refreshActiveTab() {
@@ -6425,6 +6160,9 @@ function refreshActiveTab() {
       break;
     case 'gallery':
       renderGallery();
+      break;
+    case 'blog':
+      if (typeof loadBlogPosts === 'function') loadBlogPosts();
       break;
     case 'repairorders':
       if (typeof loadRepairOrders === 'function') loadRepairOrders();
@@ -6866,12 +6604,9 @@ function showDashboard(user) {
   }
   document.getElementById('admin-role').textContent = roleLabel;
 
-  // Show Improvements tab only for superadmins
-  var improvBtn = document.getElementById('docs-view-improvements');
-  if (improvBtn) improvBtn.style.display = user.role === 'superadmin' || user.role === 'super_admin' ? '' : 'none';
 
   // ── Role-based tab visibility ──────────────────────────────────
-  var adminOnlyTabs = ['customers', 'messages', 'gallery', 'blog', 'promotions', 'faq', 'reviews', 'analytics', 'docs', 'sitecontent', 'subscribers', 'invoices', 'waitlist', 'tirequotes', 'visits', 'labor', 'loyalty', 'referrals', 'reminders', 'gbsync'];
+  var adminOnlyTabs = ['customers', 'messages', 'gallery', 'blog', 'promotions', 'faq', 'reviews', 'analytics', 'sitecontent', 'subscribers', 'invoices', 'waitlist', 'tirequotes', 'visits', 'labor', 'loyalty', 'referrals', 'reminders', 'gbsync'];
   var staffTabs = ['myschedule', 'mywork'];
 
   // Hide admin-only tabs for employees
@@ -6892,6 +6627,15 @@ function showDashboard(user) {
       var opt = document.querySelector('#mobile-tab-select option[value="' + tab + '"]');
       if (opt) opt.style.display = '';
     });
+  }
+
+  // Employees: only show Manual sub-tab in Docs
+  if (isEmployee) {
+    var platformBtn = document.getElementById('docs-view-platform');
+    var comingBtn = document.getElementById('docs-view-coming');
+    if (platformBtn) platformBtn.style.display = 'none';
+    if (comingBtn) comingBtn.style.display = 'none';
+    if (typeof switchDocsView === 'function') switchDocsView('manual');
   }
 
   applyAdminTranslations();
@@ -8039,7 +7783,7 @@ async function loadConversations() {
     if (source) url += 'source=' + encodeURIComponent(source) + '&';
     if (unread) url += 'unread=1&';
     const json = await api(url);
-    conversations = json.data || [];
+    conversations = (json.data && json.data.conversations) || json.data || [];
   } catch(e) { console.error('loadConversations failed:', e); conversations = []; }
   renderConversations();
 }
@@ -8196,36 +7940,65 @@ async function openConversation(id) {
       }
       bubble.appendChild(bodyP);
 
-      // Render attachments if present
+      // Render attachments if present (skip inline-only images — they show in the email body)
       if (m.attachments && m.attachments.length > 0) {
-        var attDiv = document.createElement('div');
-        attDiv.className = 'mt-2 pt-2 border-t border-gray-200 dark:border-gray-600';
-        m.attachments.forEach(function(att) {
-          var attRow = document.createElement('div');
-          attRow.className = 'flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 py-1';
-          var icon = document.createElement('span');
-          icon.textContent = '\uD83D\uDCCE';
-          attRow.appendChild(icon);
-          var fname = document.createElement('span');
-          fname.textContent = att.name + ' (' + formatFileSize(att.size) + ')';
-          attRow.appendChild(fname);
-          if (att.path && !att.skipped) {
-            var dl = document.createElement('a');
-            dl.href = '/' + att.path;
-            dl.target = '_blank';
-            dl.className = 'text-blue-600 hover:underline dark:text-blue-400';
-            dl.textContent = adminT[currentLang] && adminT[currentLang].download ? adminT[currentLang].download : 'Download';
-            attRow.appendChild(dl);
-          }
-          if (att.skipped) {
-            var skipNote = document.createElement('span');
-            skipNote.className = 'text-red-500';
-            skipNote.textContent = '(' + att.skipped + ')';
-            attRow.appendChild(skipNote);
-          }
-          attDiv.appendChild(attRow);
+        var visibleAtts = m.attachments.filter(function(att) {
+          return att.inline !== true;
         });
-        bubble.appendChild(attDiv);
+        if (visibleAtts.length > 0) {
+          var attDiv = document.createElement('div');
+          attDiv.className = 'mt-2 pt-2 border-t border-gray-200 dark:border-gray-600';
+          visibleAtts.forEach(function(att) {
+            var isImage = att.mime && att.mime.indexOf('image/') === 0 && att.path && !att.skipped;
+            if (isImage) {
+              // Image thumbnail preview
+              var imgWrap = document.createElement('div');
+              imgWrap.className = 'py-1';
+              var imgLink = document.createElement('a');
+              imgLink.href = '/' + att.path;
+              imgLink.target = '_blank';
+              imgLink.title = att.name + ' (' + formatFileSize(att.size) + ')';
+              var img = document.createElement('img');
+              img.src = '/' + att.path;
+              img.alt = att.name;
+              img.className = 'max-w-xs max-h-48 rounded border border-gray-300 dark:border-gray-600 cursor-pointer hover:opacity-80 transition-opacity';
+              img.loading = 'lazy';
+              imgLink.appendChild(img);
+              imgWrap.appendChild(imgLink);
+              var imgLabel = document.createElement('div');
+              imgLabel.className = 'text-xs text-gray-500 dark:text-gray-400 mt-1';
+              imgLabel.textContent = att.name + ' (' + formatFileSize(att.size) + ')';
+              imgWrap.appendChild(imgLabel);
+              attDiv.appendChild(imgWrap);
+            } else {
+              // Non-image: paperclip + filename + download link
+              var attRow = document.createElement('div');
+              attRow.className = 'flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 py-1';
+              var icon = document.createElement('span');
+              icon.textContent = '\uD83D\uDCCE';
+              attRow.appendChild(icon);
+              var fname = document.createElement('span');
+              fname.textContent = att.name + ' (' + formatFileSize(att.size) + ')';
+              attRow.appendChild(fname);
+              if (att.path && !att.skipped) {
+                var dl = document.createElement('a');
+                dl.href = '/' + att.path;
+                dl.target = '_blank';
+                dl.className = 'text-blue-600 hover:underline dark:text-blue-400';
+                dl.textContent = adminT[currentLang] && adminT[currentLang].download ? adminT[currentLang].download : 'Download';
+                attRow.appendChild(dl);
+              }
+              if (att.skipped) {
+                var skipNote = document.createElement('span');
+                skipNote.className = 'text-red-500';
+                skipNote.textContent = '(' + att.skipped + ')';
+                attRow.appendChild(skipNote);
+              }
+              attDiv.appendChild(attRow);
+            }
+          });
+          bubble.appendChild(attDiv);
+        }
       }
 
       msgsDiv.appendChild(bubble);
@@ -9274,24 +9047,37 @@ function toggleAddGalleryForm() {
 
 function renderGallery() {
   const container = document.getElementById('gallery-grid');
+  var tOrder = (adminT[currentLang] && adminT[currentLang].galleryOrder) || 'Order';
+  var tActive = (adminT[currentLang] && adminT[currentLang].galleryActive) || 'Active';
+  var tInactive = (adminT[currentLang] && adminT[currentLang].galleryInactive) || 'Inactive';
+  var tNoImages = (adminT[currentLang] && adminT[currentLang].galleryNoImages) || 'No gallery images found. Add your first image above.';
+  if (!galleryImages.length) {
+    container.textContent = '';
+    var emptyDiv = document.createElement('div');
+    emptyDiv.className = 'text-center py-8 text-gray-500';
+    emptyDiv.textContent = tNoImages;
+    container.appendChild(emptyDiv);
+    return;
+  }
   // Note: all values are escaped via esc() before insertion — this is safe admin-only content
-  container.innerHTML = galleryImages.length ? galleryImages.map(function(img) {
+  container.innerHTML = galleryImages.map(function(img) {
     var titleDisplay = esc(img.title_en || '(untitled)');
     var esLine = img.title_es ? '<p class="text-xs text-gray-500 dark:text-gray-400">ES: ' + esc(img.title_es) + '</p>' : '';
     var descLine = img.description_en ? '<p class="text-sm text-gray-500 mt-1">' + esc(img.description_en) + '</p>' : '';
+    var descEsLine = img.description_es ? '<p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">ES: ' + esc(img.description_es) + '</p>' : '';
     return '<div class="border rounded-lg bg-white dark:bg-gray-700 p-3 flex items-start gap-4">'
       + '<img src="' + esc(img.image_url) + '" alt="' + esc(img.title_en || '') + '" class="w-20 h-20 object-cover rounded">'
       + '<div class="flex-1"><div class="flex justify-between items-start">'
       + '<div><h4 class="font-medium dark:text-gray-200">' + titleDisplay + '</h4>' + esLine
-      + '<p class="text-sm text-gray-600 dark:text-gray-400">Order: ' + (img.display_order || 0) + ' &bull; ' + (img.is_active !== false ? 'Active' : 'Inactive') + '</p>'
-      + descLine + '</div>'
+      + '<p class="text-sm text-gray-600 dark:text-gray-400">' + esc(tOrder) + ': ' + (img.display_order || 0) + ' &bull; ' + (img.is_active !== false ? esc(tActive) : esc(tInactive)) + '</p>'
+      + descLine + descEsLine + '</div>'
       + '<div class="flex gap-1">'
       + '<button onclick="reorderGallery(' + img.id + ',\'up\')" class="text-gray-600 border border-gray-200 px-2 py-1 rounded text-xs hover:bg-gray-50 dark:text-gray-400 dark:border-gray-600" title="Move up">&#9650;</button>'
       + '<button onclick="reorderGallery(' + img.id + ',\'down\')" class="text-gray-600 border border-gray-200 px-2 py-1 rounded text-xs hover:bg-gray-50 dark:text-gray-400 dark:border-gray-600" title="Move down">&#9660;</button>'
       + '<button onclick="editGalleryImage(' + img.id + ')" class="text-blue-600 border border-blue-200 px-2 py-1 rounded text-xs hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700">&#9998;</button>'
       + '<button onclick="deleteGalleryImage(\'' + img.id + '\',\'' + esc(img.image_url) + '\')" class="text-red-600 border border-red-200 px-2 py-1 rounded text-xs hover:bg-red-50 dark:text-red-400 dark:border-red-700">&#128465;</button>'
       + '</div></div></div></div>';
-  }).join('') : '<div class="text-center py-8 text-gray-500">No gallery images found. Add your first image above.</div>';
+  }).join('');
 }
 
 // ===== IMAGE COMPRESSION =====
@@ -10551,6 +10337,7 @@ async function saveEmailTemplates() {
 
 // ===== TAB SWITCHING =====
 function switchTab(tab) {
+  if (tab === '_projectvalue') { window.location.href = '/admin/project-value'; return; }
   document.querySelectorAll('.tab-content').forEach(function(el) {
     el.classList.add('hidden');
     el.classList.remove('tab-visible', 'tab-entering');
@@ -10605,6 +10392,9 @@ document.querySelectorAll('.nav-group-btn').forEach(function(btn) {
     var wasOpen = group.classList.contains('open');
     document.querySelectorAll('.nav-group').forEach(function(g) { g.classList.remove('open'); });
     if (!wasOpen) group.classList.add('open');
+    // Close other overlays
+    document.getElementById('notif-dropdown').classList.add('hidden');
+    document.getElementById('global-search-results').classList.add('hidden');
   });
 });
 document.querySelectorAll('.nav-dropdown-item').forEach(function(item) {
@@ -10628,255 +10418,29 @@ function switchApptView(view) {
 
 // Sub-tab switching for Documentation
 function switchDocsView(view) {
-  var tabs = ['overview','manual','features','improvements','vision'];
+  var tabs = ['platform','coming','manual'];
   var active = 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white';
-  var inactive = 'px-4 py-2 rounded-lg text-sm font-medium border text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
-  var visionActive = 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white';
-  var visionInactive = 'px-4 py-2 rounded-lg text-sm font-medium border text-gray-700 hover:bg-gray-50 bg-gradient-to-r from-green-50 to-amber-50 border-green-300 dark:from-green-900/30 dark:to-amber-900/30 dark:border-green-700 dark:text-green-300 dark:hover:from-green-900/50 dark:hover:to-amber-900/50';
+  var inactive = 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
+  var comingInactive = 'px-4 py-2 rounded-lg text-sm font-medium border text-gray-700 hover:bg-gray-50 bg-gradient-to-r from-green-50 to-amber-50 border-green-300 dark:from-green-900/30 dark:to-amber-900/30 dark:border-green-700 dark:text-green-300';
   tabs.forEach(function(t) {
     document.getElementById('docs-subtab-'+t).classList.toggle('hidden', view !== t);
     var btn = document.getElementById('docs-view-'+t);
-    if (t === 'vision') btn.className = view === t ? visionActive : visionInactive;
+    if (t === 'coming') btn.className = view === t ? active : comingInactive;
     else btn.className = view === t ? active : inactive;
   });
-  if (view === 'features' && typeof renderFeatures === 'function') renderFeatures();
-  if (view === 'overview' && typeof renderOverviewTab === 'function') renderOverviewTab();
+  if (view === 'platform' && typeof renderPlatformTab === 'function') renderPlatformTab();
+  if (view === 'coming' && typeof renderComingSoonTab === 'function') renderComingSoonTab();
 }
 
-// ===== FEATURE STATUS DASHBOARD =====
-window.__featTab = 'all';
 
-function switchFeatureTab(tab) {
-  window.__featTab = tab;
-  var activeClass = 'px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white';
-  var inactiveClass = 'px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700';
-  ['all','client','new'].forEach(function(t) {
-    document.getElementById('feat-tab-' + t).className = t === tab ? activeClass : inactiveClass;
-  });
-  renderFeatures();
-}
 
-function getFeatureStatusBadge(status) {
-  var lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
-  var map = {
-    complete:    { dot: 'bg-green-500', en: 'Complete', es: 'Completo' },
-    in_progress: { dot: 'bg-yellow-500', en: 'In Progress', es: 'En Progreso' },
-    planned:     { dot: 'bg-blue-500', en: 'Planned', es: 'Planeado' },
-    not_started: { dot: 'bg-gray-400', en: 'Not Started', es: 'No Iniciado' }
-  };
-  var s = map[status] || map.not_started;
-  var span = document.createElement('span');
-  span.className = 'inline-flex items-center gap-1 text-xs font-medium';
-  var dot = document.createElement('span');
-  dot.className = 'w-2 h-2 rounded-full inline-block ' + s.dot;
-  span.appendChild(dot);
-  var label = document.createTextNode(s[lang]);
-  span.appendChild(label);
-  return span;
-}
 
-function renderFeatures() {
-  if (typeof FEATURE_DATA === 'undefined') return;
-  var lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
-  var tab = window.__featTab || 'all';
-  var search = (document.getElementById('feat-search') || {}).value || '';
-  search = search.toLowerCase();
-  var catFilter = (document.getElementById('feat-cat-filter') || {}).value || '';
-  var statusFilter = (document.getElementById('feat-status-filter') || {}).value || '';
-
-  // Update tab button labels
-  var tabLabels = {
-    all:    { en: 'All Features', es: 'Todas las Funciones' },
-    client: { en: 'Client Requested', es: 'Solicitadas por Cliente' },
-    'new':  { en: 'New Features', es: 'Funciones Nuevas' }
-  };
-  ['all','client','new'].forEach(function(t) {
-    var btn = document.getElementById('feat-tab-' + t);
-    if (btn) btn.textContent = tabLabels[t][lang];
-  });
-
-  // Update search placeholder
-  var searchEl = document.getElementById('feat-search');
-  if (searchEl) searchEl.placeholder = lang === 'es' ? 'Buscar funciones...' : 'Search features...';
-
-  // Filter data
-  var filtered = FEATURE_DATA.filter(function(f) {
-    if (tab === 'client' && f.source !== 'client') return false;
-    if (tab === 'new' && f.source !== 'new') return false;
-    if (catFilter && f.cat !== catFilter) return false;
-    if (statusFilter && f.status !== statusFilter) return false;
-    if (search) {
-      var name = (f['name_' + lang] || f.name_en).toLowerCase();
-      var desc = (f['desc_' + lang] || f.desc_en).toLowerCase();
-      if (name.indexOf(search) === -1 && desc.indexOf(search) === -1) return false;
-    }
-    return true;
-  });
-
-  // Populate category filter
-  var catSel = document.getElementById('feat-cat-filter');
-  if (catSel) {
-    var prevCat = catSel.value;
-    catSel.textContent = '';
-    var allOpt = document.createElement('option');
-    allOpt.value = '';
-    allOpt.textContent = lang === 'es' ? 'Todas las Categor\u00edas' : 'All Categories';
-    catSel.appendChild(allOpt);
-    Object.keys(FEATURE_CATS).forEach(function(k) {
-      var opt = document.createElement('option');
-      opt.value = k;
-      opt.textContent = k + '. ' + FEATURE_CATS[k][lang];
-      catSel.appendChild(opt);
-    });
-    catSel.value = prevCat;
-  }
-
-  // Populate status filter
-  var statusSel = document.getElementById('feat-status-filter');
-  if (statusSel) {
-    var prevStatus = statusSel.value;
-    statusSel.textContent = '';
-    var statusAllOpt = document.createElement('option');
-    statusAllOpt.value = '';
-    statusAllOpt.textContent = lang === 'es' ? 'Todos los Estados' : 'All Statuses';
-    statusSel.appendChild(statusAllOpt);
-    var statuses = [
-      { v: 'complete', en: 'Complete', es: 'Completo' },
-      { v: 'in_progress', en: 'In Progress', es: 'En Progreso' },
-      { v: 'planned', en: 'Planned', es: 'Planeado' },
-      { v: 'not_started', en: 'Not Started', es: 'No Iniciado' }
-    ];
-    statuses.forEach(function(s) {
-      var opt = document.createElement('option');
-      opt.value = s.v;
-      opt.textContent = s[lang];
-      statusSel.appendChild(opt);
-    });
-    statusSel.value = prevStatus;
-  }
-
-  // Compute stats
-  var counts = { complete: 0, in_progress: 0, planned: 0, not_started: 0 };
-  filtered.forEach(function(f) { counts[f.status] = (counts[f.status] || 0) + 1; });
-
-  // Render stats
-  var statsEl = document.getElementById('feat-stats');
-  if (statsEl) {
-    statsEl.textContent = '';
-    var statsConfig = [
-      { key: 'complete', color: 'green', en: 'Complete', es: 'Completo' },
-      { key: 'in_progress', color: 'yellow', en: 'In Progress', es: 'En Progreso' },
-      { key: 'planned', color: 'blue', en: 'Planned', es: 'Planeado' },
-      { key: 'not_started', color: 'gray', en: 'Not Started', es: 'No Iniciado' }
-    ];
-    statsConfig.forEach(function(sc) {
-      var card = document.createElement('div');
-      card.className = 'rounded-xl p-4 text-center bg-' + sc.color + '-50 dark:bg-' + sc.color + '-900/20 border border-' + sc.color + '-200 dark:border-' + sc.color + '-800';
-      var num = document.createElement('div');
-      num.className = 'text-2xl font-bold text-' + sc.color + '-600 dark:text-' + sc.color + '-400';
-      num.textContent = counts[sc.key] || 0;
-      card.appendChild(num);
-      var lbl = document.createElement('div');
-      lbl.className = 'text-xs text-' + sc.color + '-700 dark:text-' + sc.color + '-300 mt-1';
-      lbl.textContent = sc[lang];
-      card.appendChild(lbl);
-      statsEl.appendChild(card);
-    });
-  }
-
-  // Update legend labels
-  var legendLabels = { en: ['Complete', 'In Progress', 'Planned', 'Not Started'], es: ['Completo', 'En Progreso', 'Planeado', 'No Iniciado'] };
-  var legendSpans = statsEl ? statsEl.parentElement.querySelectorAll('.flex.flex-wrap.gap-4.mb-4.text-xs > span') : [];
-  legendSpans.forEach(function(sp, i) {
-    if (legendLabels[lang][i]) {
-      var dot = sp.querySelector('span');
-      sp.textContent = '';
-      sp.appendChild(dot);
-      sp.appendChild(document.createTextNode(' ' + legendLabels[lang][i]));
-    }
-  });
-
-  // Group by category
-  var groups = {};
-  filtered.forEach(function(f) {
-    if (!groups[f.cat]) groups[f.cat] = [];
-    groups[f.cat].push(f);
-  });
-
-  // Render feature list
-  var listEl = document.getElementById('feat-list');
-  if (!listEl) return;
-  listEl.textContent = '';
-
-  var catOrder = ['A','B','C','D','E','F','G','H','I','X'];
-  catOrder.forEach(function(catKey) {
-    if (!groups[catKey]) return;
-    var section = document.createElement('div');
-    section.className = 'mb-6';
-
-    var header = document.createElement('h3');
-    header.className = 'text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 pb-2 border-b border-gray-200 dark:border-gray-700';
-    var catLabel = FEATURE_CATS[catKey] ? FEATURE_CATS[catKey][lang] : catKey;
-    header.textContent = catKey + '. ' + catLabel + ' (' + groups[catKey].length + ')';
-    if (catKey === 'X') {
-      var badge = document.createElement('span');
-      badge.className = 'ml-2 text-xs px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium';
-      badge.textContent = lang === 'es' ? 'Bonus' : 'Bonus';
-      header.appendChild(badge);
-    }
-    section.appendChild(header);
-
-    var grid = document.createElement('div');
-    grid.className = 'grid gap-2';
-
-    groups[catKey].forEach(function(f) {
-      var card = document.createElement('div');
-      card.className = 'flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50';
-
-      var statusBadge = getFeatureStatusBadge(f.status);
-      statusBadge.className += ' mt-0.5 min-w-[90px]';
-      card.appendChild(statusBadge);
-
-      var content = document.createElement('div');
-      content.className = 'flex-1 min-w-0';
-      var title = document.createElement('div');
-      title.className = 'font-medium text-sm text-gray-800 dark:text-gray-200';
-      title.textContent = f['name_' + lang] || f.name_en;
-      content.appendChild(title);
-      var desc = document.createElement('div');
-      desc.className = 'text-xs text-gray-500 dark:text-gray-400 mt-0.5';
-      desc.textContent = f['desc_' + lang] || f.desc_en;
-      content.appendChild(desc);
-      card.appendChild(content);
-
-      var idTag = document.createElement('span');
-      idTag.className = 'text-[10px] font-mono text-gray-400 dark:text-gray-500 mt-0.5';
-      idTag.textContent = f.id;
-      card.appendChild(idTag);
-
-      grid.appendChild(card);
-    });
-
-    section.appendChild(grid);
-    listEl.appendChild(section);
-  });
-
-  // Show count summary
-  var summary = document.createElement('div');
-  summary.className = 'mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400 text-center';
-  var showingText = lang === 'es'
-    ? 'Mostrando ' + filtered.length + ' de ' + FEATURE_DATA.length + ' funciones'
-    : 'Showing ' + filtered.length + ' of ' + FEATURE_DATA.length + ' features';
-  summary.textContent = showingText;
-  listEl.appendChild(summary);
-}
-
-// ===== PROJECT OVERVIEW TAB =====
-function renderOverviewTab() {
+// ===== YOUR PLATFORM TAB =====
+function renderPlatformTab() {
   if (typeof FEATURE_DATA === 'undefined') return;
   var lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
   var t = adminT[lang] || adminT.en;
-  var container = document.getElementById('overview-content');
+  var container = document.getElementById('platform-content');
   if (!container) return;
   container.textContent = '';
 
@@ -10888,8 +10452,8 @@ function renderOverviewTab() {
   }
 
   // Compute data
-  var clientFeatures = FEATURE_DATA.filter(function(f) { return f.source === 'client'; });
-  var newFeatures = FEATURE_DATA.filter(function(f) { return f.source === 'new'; });
+  var clientFeatures = FEATURE_DATA.filter(function(f) { return f.source === 'client' && f.status === 'complete'; });
+  var newFeatures = FEATURE_DATA.filter(function(f) { return f.source === 'new' && f.status === 'complete'; });
   var completeCount = FEATURE_DATA.filter(function(f) { return f.status === 'complete'; }).length;
   var totalPrice = 0;
   newFeatures.forEach(function(f) { totalPrice += (f.price || 0); });
@@ -11058,31 +10622,331 @@ function renderOverviewTab() {
     return section;
   }
 
-  // ─── 4. Client Requested Features ───
+  // ─── 4. Price Comparison Hero Card ───
+  var agencyTotal = 0;
+  FEATURE_DATA.forEach(function(f) { agencyTotal += (f.price || 0); });
+  var freelancerTotal = Math.round(agencyTotal * (typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6));
+  var clientPrice = typeof CLIENT_PRICE !== 'undefined' ? CLIENT_PRICE : 0;
+
+  var priceCard = el('div', 'rounded-2xl p-6 md:p-8 mb-8 bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700');
+  priceCard.appendChild(el('h3', 'text-xl md:text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6', t.overviewWhatDoesItCost));
+
+  var cols = el('div', 'grid grid-cols-1 md:grid-cols-3 gap-4 mb-6');
+
+  // Agency column
+  var agCol = el('div', 'rounded-xl p-5 text-center border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 opacity-75');
+  agCol.appendChild(el('div', 'text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3', t.overviewAgencyEstimate));
+  var agPrice = el('div', 'text-3xl md:text-4xl font-bold text-gray-400 dark:text-gray-500 mb-1 line-through decoration-2');
+  agPrice.textContent = '$' + agencyTotal.toLocaleString();
+  agCol.appendChild(agPrice);
+  agCol.appendChild(el('div', 'text-xs text-gray-400 dark:text-gray-500', t.overviewAgencyEstimate));
+  cols.appendChild(agCol);
+
+  // Freelancer column
+  var frCol = el('div', 'rounded-xl p-5 text-center border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 opacity-80');
+  frCol.appendChild(el('div', 'text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3', t.overviewFreelancerEstimate));
+  var frPrice = el('div', 'text-3xl md:text-4xl font-bold text-gray-400 dark:text-gray-500 mb-1 line-through decoration-2');
+  frPrice.textContent = '$' + freelancerTotal.toLocaleString();
+  frCol.appendChild(frPrice);
+  frCol.appendChild(el('div', 'text-xs text-gray-400 dark:text-gray-500', t.overviewFreelancerEstimate));
+  cols.appendChild(frCol);
+
+  // Our price column
+  var ourCol = el('div', 'rounded-xl p-5 text-center border-2 border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/20 relative');
+  var bestBadge = el('span', 'absolute -top-3 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-0.5 rounded-full');
+  bestBadge.textContent = '\u2605 ' + t.overviewBestValue;
+  bestBadge.style.transform = 'translateX(-50%)';
+  bestBadge.style.position = 'absolute';
+  bestBadge.style.top = '-12px';
+  bestBadge.style.left = '50%';
+  ourCol.appendChild(bestBadge);
+  ourCol.appendChild(el('div', 'text-xs font-semibold uppercase tracking-wider text-green-600 dark:text-green-400 mb-3 mt-1', t.overviewOurPrice));
+  if (clientPrice > 0) {
+    var ourPriceEl = el('div', 'text-3xl md:text-4xl font-bold text-green-700 dark:text-green-400 mb-1');
+    ourPriceEl.textContent = '$' + clientPrice.toLocaleString();
+    ourCol.appendChild(ourPriceEl);
+    var savingsAg = agencyTotal - clientPrice;
+    var savingsPctAg = Math.round((savingsAg / agencyTotal) * 100);
+    ourCol.appendChild(el('div', 'text-xs font-semibold text-green-600 dark:text-green-400', t.overviewYouSave + ' ' + savingsPctAg + '% ' + t.overviewVsAgency));
+  } else {
+    var deliveredEl = el('div', 'text-3xl md:text-4xl font-bold text-green-700 dark:text-green-400 mb-1');
+    deliveredEl.textContent = '$' + agencyTotal.toLocaleString();
+    ourCol.appendChild(deliveredEl);
+    ourCol.appendChild(el('div', 'text-xs font-semibold text-green-600 dark:text-green-400', t.overviewValueDelivered + ' ' + t.overviewAtAgencyRates));
+    ourCol.appendChild(el('div', 'text-xs text-green-500 dark:text-green-300 mt-1 italic', t.overviewPriceTbd));
+  }
+  cols.appendChild(ourCol);
+  priceCard.appendChild(cols);
+
+  // Bottom tagline
+  var tagline = el('p', 'text-center text-sm text-gray-500 dark:text-gray-400');
+  tagline.textContent = '\u2713 ' + t.overviewSameFeatures.replace('{count}', String(FEATURE_DATA.length));
+  priceCard.appendChild(tagline);
+  container.appendChild(priceCard);
+
+  // ─── 5. Value Breakdown Bar Chart ───
+  var breakdownWrap = el('div', 'mb-8');
+  breakdownWrap.appendChild(el('h3', 'text-xl font-bold text-gray-800 dark:text-gray-100 mb-4', t.overviewValueBreakdown));
+
+  // Build per-category totals
+  var catTotals = [];
+  catOrder.forEach(function(catKey) {
+    var catItems = FEATURE_DATA.filter(function(f) { return f.cat === catKey; });
+    if (catItems.length === 0) return;
+    var catTotal = 0;
+    catItems.forEach(function(f) { catTotal += (f.price || 0); });
+    if (catTotal === 0) return;
+    var catName = FEATURE_CATS[catKey] ? FEATURE_CATS[catKey][lang] : catKey;
+    var icon = typeof FEATURE_ICONS !== 'undefined' ? (FEATURE_ICONS[catKey] || '') : '';
+    catTotals.push({ key: catKey, name: catName, icon: icon, total: catTotal, count: catItems.length });
+  });
+  catTotals.sort(function(a, b) { return b.total - a.total; });
+
+  var maxCatVal = catTotals.length > 0 ? catTotals[0].total : 1;
+  var barContainer = el('div', 'space-y-3');
+
+  catTotals.forEach(function(cat) {
+    var row = el('div', 'cursor-pointer group');
+    row.addEventListener('click', function() {
+      var target = document.getElementById('overview-cat-' + cat.key);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    var labelRow = el('div', 'flex items-center justify-between mb-1');
+    var labelLeft = el('div', 'flex items-center gap-2');
+    labelLeft.appendChild(el('span', 'text-sm', cat.icon));
+    labelLeft.appendChild(el('span', 'text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors', cat.name + ' (' + cat.count + ')'));
+    labelRow.appendChild(labelLeft);
+
+    var labelRight = el('div', 'flex items-center gap-3 text-xs');
+    labelRight.appendChild(el('span', 'font-semibold text-gray-700 dark:text-gray-300', '$' + cat.total.toLocaleString()));
+    var frCatVal = Math.round(cat.total * (typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 0.6));
+    labelRight.appendChild(el('span', 'text-gray-400', '$' + frCatVal.toLocaleString()));
+    labelRow.appendChild(labelRight);
+    row.appendChild(labelRow);
+
+    var barOuter = el('div', 'w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden');
+    var barInner = el('div', 'h-3 rounded-full bg-green-500 dark:bg-green-600 transition-all');
+    barInner.style.width = Math.round((cat.total / maxCatVal) * 100) + '%';
+    barOuter.appendChild(barInner);
+    var barFr = el('div', 'h-3 rounded-full bg-gray-300 dark:bg-gray-500 absolute top-0 left-0 opacity-40');
+    barFr.style.width = Math.round((frCatVal / maxCatVal) * 100) + '%';
+    barOuter.appendChild(barFr);
+    row.appendChild(barOuter);
+
+    barContainer.appendChild(row);
+  });
+
+  // Legend
+  var legend = el('div', 'flex items-center gap-4 mt-3 text-xs text-gray-400');
+  var legAg = el('div', 'flex items-center gap-1');
+  legAg.appendChild(el('span', 'w-3 h-3 rounded-full bg-green-500 inline-block'));
+  legAg.appendChild(el('span', '', t.overviewAgency));
+  legend.appendChild(legAg);
+  var legFr = el('div', 'flex items-center gap-1');
+  legFr.appendChild(el('span', 'w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-500 inline-block'));
+  legFr.appendChild(el('span', '', t.overviewFreelancer));
+  legend.appendChild(legFr);
+  barContainer.appendChild(legend);
+
+  breakdownWrap.appendChild(barContainer);
+  container.appendChild(breakdownWrap);
+
+  // ─── 6. Client Features Section (with prices) ───
   container.appendChild(renderSection(
     t.overviewClientSection, t.overviewClientDesc,
-    clientFeatures, 'green', false
+    clientFeatures, 'green', true
   ));
 
-  // ─── 5. New Features Section ───
-  var newSectionTitle = t.overviewNewSection + '  \u2014  $' + totalPrice.toLocaleString();
+  // ─── 7. Additional Features Section ───
   container.appendChild(renderSection(
-    newSectionTitle, t.overviewNewDesc,
+    t.overviewNewSection + '  \u2014  $' + totalPrice.toLocaleString(), t.overviewNewDesc,
     newFeatures, 'indigo', true
   ));
 
-  // ─── 6. Total Value Summary Card ───
-  var summary = el('div', 'rounded-2xl p-6 md:p-8 text-white bg-gradient-to-br from-green-600 to-green-800 text-center');
-  summary.appendChild(el('div', 'text-lg font-medium mb-1 text-green-100', t.overviewBonusValue));
-  summary.appendChild(el('div', 'text-4xl md:text-5xl font-bold mb-3', '$' + totalPrice.toLocaleString()));
-  var allInclText = t.overviewAllIncluded.replace('{count}', String(newFeatures.length));
-  summary.appendChild(el('p', 'text-green-100 text-sm', '\u2713 ' + allInclText));
+  // ─── 8. Platform Investment Summary ───
+  var clientTotal = 0;
+  clientFeatures.forEach(function(f) { clientTotal += (f.price || 0); });
+  var bonusTotal = totalPrice;
+
+  var summary = el('div', 'rounded-2xl p-6 md:p-8 bg-gradient-to-br from-green-600 to-green-800 text-white');
+  summary.appendChild(el('h3', 'text-xl md:text-2xl font-bold mb-5 text-center', t.overviewPlatformSummary));
+
+  var summaryGrid = el('div', 'max-w-lg mx-auto space-y-3');
+
+  function summaryRow(label, value, cls) {
+    var row = el('div', 'flex justify-between items-center ' + (cls || ''));
+    row.appendChild(el('span', 'text-sm text-green-100', label));
+    row.appendChild(el('span', 'font-semibold', value));
+    return row;
+  }
+
+  summaryGrid.appendChild(summaryRow(clientFeatures.length + ' ' + t.overviewClientValue, '$' + clientTotal.toLocaleString()));
+  summaryGrid.appendChild(summaryRow(newFeatures.length + ' ' + t.overviewBonusValue2, '$' + bonusTotal.toLocaleString()));
+
+  var divider0 = el('div', 'border-t border-white/20 my-2');
+  summaryGrid.appendChild(divider0);
+  var grandTotal = clientTotal + bonusTotal;
+  var grandRow = summaryRow(t.overviewBonusValue, '$' + grandTotal.toLocaleString(), 'text-lg');
+  grandRow.querySelector('span:last-child').className = 'font-bold text-lg';
+  summaryGrid.appendChild(grandRow);
+
+  var divider1 = el('div', 'border-t border-white/20 my-2');
+  summaryGrid.appendChild(divider1);
+
+  summaryGrid.appendChild(summaryRow(t.overviewAgencyEstimate, '$' + agencyTotal.toLocaleString()));
+  var frTotalRow = summaryRow(t.overviewFreelancerEstimate, '$' + freelancerTotal.toLocaleString());
+  summaryGrid.appendChild(frTotalRow);
+
+  var divider2 = el('div', 'border-t border-white/20 my-2');
+  summaryGrid.appendChild(divider2);
+
+  if (clientPrice > 0) {
+    var priceRow = summaryRow(t.overviewYourPrice, '$' + clientPrice.toLocaleString(), 'text-lg');
+    priceRow.querySelector('span:last-child').className = 'font-bold text-lg';
+    summaryGrid.appendChild(priceRow);
+
+    var divider3 = el('div', 'border-t border-white/20 my-2');
+    summaryGrid.appendChild(divider3);
+
+    var savAg = agencyTotal - clientPrice;
+    var savAgPct = Math.round((savAg / agencyTotal) * 100);
+    var savAgRow = summaryRow(t.overviewSavingsVsAgency, '$' + savAg.toLocaleString() + ' (' + savAgPct + '%)');
+    savAgRow.querySelector('span:last-child').className = 'font-bold text-green-200';
+    summaryGrid.appendChild(savAgRow);
+
+    var savFr = freelancerTotal - clientPrice;
+    var savFrPct = Math.round((savFr / freelancerTotal) * 100);
+    var savFrRow = summaryRow(t.overviewSavingsVsFreelancer, '$' + savFr.toLocaleString() + ' (' + savFrPct + '%)');
+    savFrRow.querySelector('span:last-child').className = 'font-bold text-green-200';
+    summaryGrid.appendChild(savFrRow);
+  } else {
+    var deliveredRow = summaryRow(t.overviewValueDelivered, '$' + grandTotal.toLocaleString(), 'text-lg');
+    deliveredRow.querySelector('span:last-child').className = 'font-bold text-lg text-green-200';
+    summaryGrid.appendChild(deliveredRow);
+    summaryGrid.appendChild(summaryRow(t.overviewYourPrice, t.overviewPriceTbd));
+  }
+
+  summary.appendChild(summaryGrid);
+
+  // Bottom features list
+  var bottomInfo = el('div', 'mt-6 pt-4 border-t border-white/20 text-center text-sm text-green-100 space-y-1');
+  bottomInfo.appendChild(el('div', '', '\u2713 ' + FEATURE_DATA.length + ' features \u00B7 119 APIs \u00B7 36 pages'));
+  bottomInfo.appendChild(el('div', '', '\u2713 Bilingual (EN/ES) \u00B7 Dark mode \u00B7 PWA'));
+  bottomInfo.appendChild(el('div', '', '\u2713 7 automated cron jobs \u00B7 53 DB migrations'));
+  summary.appendChild(bottomInfo);
   container.appendChild(summary);
 }
 
-// Initial render of overview on page load
+// Initial render of platform tab on page load
 if (typeof FEATURE_DATA !== 'undefined') {
-  setTimeout(function() { if (typeof renderOverviewTab === 'function') renderOverviewTab(); }, 100);
+  setTimeout(function() {
+    if (typeof renderPlatformTab === 'function') renderPlatformTab();
+    if (typeof renderComingSoonTab === 'function') renderComingSoonTab();
+  }, 100);
+}
+
+// ===== COMING SOON TAB =====
+function renderComingSoonTab() {
+  if (typeof COMING_SOON_DATA === 'undefined') return;
+  var lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
+  var t = adminT[lang] || adminT.en;
+  var container = document.getElementById('coming-content');
+  if (!container) return;
+  container.textContent = '';
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text) e.textContent = text;
+    return e;
+  }
+
+  // ─── 1. Header Card ───
+  var header = el('div', 'rounded-2xl p-6 md:p-8 mb-8 text-white bg-gradient-to-br from-green-600 to-green-800');
+  header.appendChild(el('h2', 'text-2xl md:text-3xl font-bold mb-1', t.comingSoonTitle));
+  header.appendChild(el('p', 'text-green-100 text-sm', t.comingSoonSubtitle));
+  container.appendChild(header);
+
+  // ─── 2. Status Legend ───
+  var legend = el('div', 'flex flex-wrap gap-4 mb-6 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+  var tiers = [
+    { status: 'scaffold_ready', dot: 'bg-yellow-500', label: t.comingSoonReadyToActivate },
+    { status: 'planned', dot: 'bg-blue-500', label: t.comingSoonPlanned },
+    { status: 'future', dot: 'bg-gray-400', label: t.comingSoonFuture }
+  ];
+  tiers.forEach(function(tier) {
+    var item = el('span', 'flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400');
+    item.appendChild(el('span', 'w-3 h-3 rounded-full inline-block ' + tier.dot));
+    item.appendChild(document.createTextNode(tier.label));
+    legend.appendChild(item);
+  });
+  container.appendChild(legend);
+
+  // ─── 3. Feature Cards by Status Tier ───
+  var tierOrder = ['scaffold_ready', 'planned', 'future'];
+  var tierLabels = {
+    scaffold_ready: { label: t.comingSoonReadyToActivate, color: 'yellow' },
+    planned: { label: t.comingSoonPlanned, color: 'blue' },
+    future: { label: t.comingSoonFuture, color: 'gray' }
+  };
+  var totalEstimate = 0;
+
+  tierOrder.forEach(function(tierKey) {
+    var items = COMING_SOON_DATA.filter(function(f) { return f.status === tierKey; });
+    if (!items.length) return;
+    var tierInfo = tierLabels[tierKey];
+
+    var section = el('div', 'mb-8');
+    var sectionHeader = el('div', 'flex items-center gap-3 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700');
+    sectionHeader.appendChild(el('span', 'w-3 h-3 rounded-full bg-' + tierInfo.color + '-500'));
+    sectionHeader.appendChild(el('h3', 'text-lg font-bold text-gray-800 dark:text-gray-100', tierInfo.label));
+    sectionHeader.appendChild(el('span', 'text-sm font-medium px-2.5 py-0.5 rounded-full bg-' + tierInfo.color + '-100 text-' + tierInfo.color + '-700 dark:bg-' + tierInfo.color + '-900/30 dark:text-' + tierInfo.color + '-300', String(items.length)));
+    section.appendChild(sectionHeader);
+
+    var grid = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-4');
+    items.forEach(function(f) {
+      totalEstimate += (f.price || 0);
+      var card = el('div', 'border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition bg-white dark:bg-gray-800');
+
+      var topRow = el('div', 'flex items-start justify-between gap-2 mb-2');
+      var leftGroup = el('div', 'flex items-start gap-3 flex-1');
+      leftGroup.appendChild(el('span', 'text-2xl', f.emoji));
+      var nameEl = el('div', 'font-bold text-sm text-gray-900 dark:text-white', f['name_' + lang] || f.name_en);
+      leftGroup.appendChild(nameEl);
+      topRow.appendChild(leftGroup);
+
+      var priceBadge = el('span', 'text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '$' + (f.price || 0).toLocaleString());
+      topRow.appendChild(priceBadge);
+      card.appendChild(topRow);
+
+      card.appendChild(el('p', 'text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-2', f['desc_' + lang] || f.desc_en));
+
+      var badges = el('div', 'flex flex-wrap gap-2');
+      var statusBadgeColor = tierKey === 'scaffold_ready' ? 'yellow' : tierKey === 'planned' ? 'blue' : 'gray';
+      badges.appendChild(el('span', 'inline-block text-xs bg-' + statusBadgeColor + '-100 dark:bg-' + statusBadgeColor + '-900/30 text-' + statusBadgeColor + '-700 dark:text-' + statusBadgeColor + '-400 px-2 py-0.5 rounded', tierInfo.label));
+      card.appendChild(badges);
+
+      if (f['note_' + lang] || f.note_en) {
+        var note = el('p', 'text-xs text-amber-600 dark:text-amber-400 mt-2 italic', (t.comingSoonNote || 'Note') + ': ' + (f['note_' + lang] || f.note_en));
+        card.appendChild(note);
+      }
+
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    container.appendChild(section);
+  });
+
+  // ─── 4. Total Estimate Card ───
+  var totalCard = el('div', 'rounded-2xl p-6 md:p-8 text-white bg-gradient-to-br from-green-600 to-green-800 text-center mb-6');
+  totalCard.appendChild(el('div', 'text-lg font-medium mb-1 text-green-100', t.comingSoonTotalEstimate));
+  totalCard.appendChild(el('div', 'text-4xl md:text-5xl font-bold mb-3', '$' + totalEstimate.toLocaleString()));
+  totalCard.appendChild(el('p', 'text-green-100 text-sm', COMING_SOON_DATA.length + ' ' + (lang === 'es' ? 'funciones' : 'features')));
+  container.appendChild(totalCard);
+
+  // ─── 5. Footer ───
+  container.appendChild(el('p', 'text-center text-xs text-gray-400 dark:text-gray-500 italic', lang === 'es' ? '\u00DAltima actualizaci\u00F3n: marzo 2026' : 'Last updated: March 2026'));
 }
 
 // ===== MY SCHEDULE / MY WORK (staff tabs) =====
@@ -11697,6 +11561,9 @@ function timeAgo(ts) {
 }
 
 function toggleNotifPanel() {
+  // Close nav dropdowns + search
+  document.querySelectorAll('.nav-group').forEach(function(g) { g.classList.remove('open'); });
+  document.getElementById('global-search-results').classList.add('hidden');
   var dd = document.getElementById('notif-dropdown');
   dd.classList.toggle('hidden');
 }
@@ -11808,6 +11675,12 @@ function downloadCsvBlob(csv, filename) {
 
   var debounceTimer = null;
   var selectedIdx = -1;
+
+  searchInput.addEventListener('focus', function() {
+    // Close nav dropdowns + notification panel
+    document.querySelectorAll('.nav-group').forEach(function(g) { g.classList.remove('open'); });
+    document.getElementById('notif-dropdown').classList.add('hidden');
+  });
 
   searchInput.addEventListener('input', function() {
     clearTimeout(debounceTimer);
