@@ -97,18 +97,36 @@ try {
 
         $json = json_decode($response, true);
 
+        // Handle API-level errors (auth failure, rate limit, etc.)
+        if (isset($json['status']) && (int) $json['status'] >= 400) {
+            $apiErr = $json['error']['message'] ?? 'API error';
+            error_log("Oregon Tires plate-lookup: Auto.dev API error ({$json['status']}): {$apiErr}");
+            $msg = $lang === 'es'
+                ? 'Servicio de búsqueda de placas no disponible en este momento. Intente con el VIN.'
+                : 'Plate lookup service temporarily unavailable. Try entering your VIN instead.';
+            if (isHtmxRequest()) {
+                header('Content-Type: text/html; charset=utf-8');
+                header('Vary: HX-Request');
+                echo '<p class="text-xs mt-1 text-amber-600 dark:text-amber-400">' . htmlspecialchars($msg) . '</p>';
+                exit;
+            }
+            jsonError($msg, 503);
+        }
+
         // Extract VIN from response
         $vin = $json['vin'] ?? null;
 
-        // Cache the result (even if VIN is null, to avoid re-hitting API)
-        try {
-            $db->prepare(
-                'INSERT INTO oretir_plate_cache (license_plate, state, vin, raw_json, cached_at)
-                 VALUES (?, ?, ?, ?, NOW())
-                 ON DUPLICATE KEY UPDATE vin = VALUES(vin), raw_json = VALUES(raw_json), cached_at = NOW()'
-            )->execute([$plate, $state, $vin, $response]);
-        } catch (\Throwable $e) {
-            error_log("Oregon Tires plate cache error: " . $e->getMessage());
+        // Cache the result only if we got a valid VIN
+        if (!empty($vin)) {
+            try {
+                $db->prepare(
+                    'INSERT INTO oretir_plate_cache (license_plate, state, vin, raw_json, cached_at)
+                     VALUES (?, ?, ?, ?, NOW())
+                     ON DUPLICATE KEY UPDATE vin = VALUES(vin), raw_json = VALUES(raw_json), cached_at = NOW()'
+                )->execute([$plate, $state, $vin, $response]);
+            } catch (\Throwable $e) {
+                error_log("Oregon Tires plate cache error: " . $e->getMessage());
+            }
         }
     }
 
