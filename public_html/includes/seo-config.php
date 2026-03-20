@@ -39,16 +39,29 @@ function getBusinessConfig(): array {
         ],
         'googlePlaceId' => 'ChIJLSxZDQyflVQRWXEi9LpJGxs',
         'gaId' => 'G-CHYMTNB6LH',
-        'services' => [
-            ['name' => 'Tire Installation', 'nameEs' => 'Instalación de Llantas', 'slug' => 'tire-installation'],
-            ['name' => 'Tire Repair', 'nameEs' => 'Reparación de Llantas', 'slug' => 'tire-repair'],
-            ['name' => 'Wheel Alignment', 'nameEs' => 'Alineación de Ruedas', 'slug' => 'wheel-alignment'],
-            ['name' => 'Brake Service', 'nameEs' => 'Servicio de Frenos', 'slug' => 'brake-service'],
-            ['name' => 'Oil Change', 'nameEs' => 'Cambio de Aceite', 'slug' => 'oil-change'],
-            ['name' => 'Engine Diagnostics', 'nameEs' => 'Diagnóstico de Motor', 'slug' => 'engine-diagnostics'],
-            ['name' => 'Suspension Repair', 'nameEs' => 'Reparación de Suspensión', 'slug' => 'suspension-repair'],
-            ['name' => 'Roadside Assistance', 'nameEs' => 'Asistencia en Carretera', 'slug' => 'roadside-assistance'],
-        ],
+        'services' => (function() {
+            try {
+                $db = getDB();
+                return $db->query(
+                    'SELECT name_en AS name, name_es AS nameEs, slug
+                     FROM oretir_services
+                     WHERE is_active = 1 AND has_detail_page = 1
+                     ORDER BY sort_order ASC'
+                )->fetchAll(\PDO::FETCH_ASSOC);
+            } catch (\Throwable $e) {
+                // Fallback if table doesn't exist yet
+                return [
+                    ['name' => 'Tire Installation', 'nameEs' => 'Instalación de Llantas', 'slug' => 'tire-installation'],
+                    ['name' => 'Tire Repair', 'nameEs' => 'Reparación de Llantas', 'slug' => 'tire-repair'],
+                    ['name' => 'Wheel Alignment', 'nameEs' => 'Alineación de Ruedas', 'slug' => 'wheel-alignment'],
+                    ['name' => 'Brake Service', 'nameEs' => 'Servicio de Frenos', 'slug' => 'brake-service'],
+                    ['name' => 'Oil Change', 'nameEs' => 'Cambio de Aceite', 'slug' => 'oil-change'],
+                    ['name' => 'Engine Diagnostics', 'nameEs' => 'Diagnóstico de Motor', 'slug' => 'engine-diagnostics'],
+                    ['name' => 'Suspension Repair', 'nameEs' => 'Reparación de Suspensión', 'slug' => 'suspension-repair'],
+                    ['name' => 'Roadside Assistance', 'nameEs' => 'Asistencia en Carretera', 'slug' => 'roadside-assistance'],
+                ];
+            }
+        })(),
         'serviceAreas' => [
             ['name' => 'SE Portland', 'nameEs' => 'SE Portland', 'slug' => 'tires-se-portland'],
             ['name' => 'Clackamas', 'nameEs' => 'Clackamas', 'slug' => 'tires-clackamas'],

@@ -189,77 +189,9 @@
           <fieldset>
             <legend class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3" data-t="selectServices">Select Services</legend>
             <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 text-center" data-t="maxServices">Select up to 5 services per appointment</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              <div class="service-card">
-                <input type="checkbox" name="services[]" value="tire-installation" id="svc-tire-installation" class="sr-only">
-                <label for="svc-tire-installation" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                  <span class="block font-semibold text-brand dark:text-green-400" data-t="tireInstallation">Tire Installation</span>
-                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tire-installation"></span>
-                </label>
-              </div>
-              <div class="service-card">
-                <input type="checkbox" name="services[]" value="tire-repair" id="svc-tire-repair" class="sr-only">
-                <label for="svc-tire-repair" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                  <span class="block font-semibold text-brand dark:text-green-400" data-t="tireRepair">Tire Repair</span>
-                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tire-repair"></span>
-                </label>
-              </div>
-              <div class="service-card">
-                <input type="checkbox" name="services[]" value="wheel-alignment" id="svc-wheel-alignment" class="sr-only">
-                <label for="svc-wheel-alignment" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                  <span class="block font-semibold text-brand dark:text-green-400" data-t="wheelAlignment">Wheel Alignment</span>
-                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="wheel-alignment"></span>
-                </label>
-              </div>
-              <div class="service-card">
-                <input type="checkbox" name="services[]" value="oil-change" id="svc-oil-change" class="sr-only">
-                <label for="svc-oil-change" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                  <span class="block font-semibold text-brand dark:text-green-400" data-t="oilChange">Oil Change</span>
-                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="oil-change"></span>
-                </label>
-              </div>
-              <div class="service-card">
-                <input type="checkbox" name="services[]" value="brake-service" id="svc-brake-service" class="sr-only">
-                <label for="svc-brake-service" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                  <span class="block font-semibold text-brand dark:text-green-400" data-t="brakeService">Brake Service</span>
-                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="brake-service"></span>
-                </label>
-              </div>
-              <div class="service-card">
-                <input type="checkbox" name="services[]" value="tuneup" id="svc-tuneup" class="sr-only">
-                <label for="svc-tuneup" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                  <span class="block font-semibold text-brand dark:text-green-400" data-t="tuneup">Tuneup</span>
-                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tuneup"></span>
-                </label>
-              </div>
-              <div class="service-card">
-                <input type="checkbox" name="services[]" value="mechanical-inspection" id="svc-mechanical-inspection" class="sr-only">
-                <label for="svc-mechanical-inspection" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                  <span class="block font-semibold text-brand dark:text-green-400" data-t="mechanicalInspection">Mechanical Inspection</span>
-                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="mechanical-inspection"></span>
-                </label>
-              </div>
-              <div class="service-card">
-                <input type="checkbox" name="services[]" value="mobile-service" id="svc-mobile-service" class="sr-only">
-                <label for="svc-mobile-service" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                  <span class="block font-semibold text-brand dark:text-green-400" data-t="mobileService">Mobile Service</span>
-                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="mobile-service"></span>
-                </label>
-              </div>
-              <div class="service-card">
-                <input type="checkbox" name="services[]" value="roadside-assistance" id="svc-roadside-assistance" class="sr-only">
-                <label for="svc-roadside-assistance" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                  <span class="block font-semibold text-brand dark:text-green-400" data-t="roadsideAssistance">Roadside Assistance</span>
-                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="roadside-assistance"></span>
-                </label>
-              </div>
-              <div class="service-card">
-                <input type="checkbox" name="services[]" value="other" id="svc-other" class="sr-only">
-                <label for="svc-other" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
-                  <span class="block font-semibold text-brand dark:text-green-400" data-t="otherService">Other</span>
-                  <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="other"></span>
-                </label>
-              </div>
+            <div id="services-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <!-- Services loaded dynamically from API -->
+              <div class="col-span-full text-center py-4 text-gray-400 dark:text-gray-500 text-sm">Loading services...</div>
             </div>
             <!-- Selected services summary chips -->
             <div id="selected-services-summary" class="hidden mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
@@ -821,47 +753,12 @@ const t = {
   }
 };
 
-// ===== SERVICE LABELS FOR CONFIRMATION =====
-const serviceLabels = {
-  en: {
-    'tire-installation': 'Tire Installation',
-    'tire-repair': 'Tire Repair',
-    'wheel-alignment': 'Wheel Alignment',
-    'oil-change': 'Oil Change',
-    'brake-service': 'Brake Service',
-    'tuneup': 'Tuneup',
-    'mechanical-inspection': 'Mechanical Inspection',
-    'mobile-service': 'Mobile Service',
-    'roadside-assistance': 'Roadside Assistance',
-    'other': 'Other'
-  },
-  es: {
-    'tire-installation': 'Instalación de Llantas',
-    'tire-repair': 'Reparación de Llantas',
-    'wheel-alignment': 'Alineación de Ruedas',
-    'oil-change': 'Cambio de Aceite',
-    'brake-service': 'Servicio de Frenos',
-    'tuneup': 'Afinación',
-    'mechanical-inspection': 'Inspección Mecánica',
-    'mobile-service': 'Servicio Móvil',
-    'roadside-assistance': 'Asistencia en Carretera',
-    'other': 'Otro'
-  }
-};
+// ===== SERVICE LABELS FOR CONFIRMATION (populated from API) =====
+var serviceLabels = { en: {}, es: {} };
 
-// ===== SERVICE DURATION =====
-var serviceInfo = {
-  'tire-installation': { duration: '45-90' },
-  'tire-repair':       { duration: '20-40' },
-  'wheel-alignment':   { duration: '45-60' },
-  'oil-change':        { duration: '20-30' },
-  'brake-service':     { duration: '60-120' },
-  'tuneup':            { duration: '30-60' },
-  'mechanical-inspection': { duration: '30-60' },
-  'mobile-service':    { duration: '60-120' },
-  'roadside-assistance': { duration: '30-60' },
-  'other':             { duration: '' }
-};
+// ===== SERVICE DURATION (populated from API) =====
+var serviceInfo = {};
+
 function updateServiceMeta() {
   document.querySelectorAll('.service-meta').forEach(function(el) {
     var svc = el.getAttribute('data-service');
@@ -869,6 +766,74 @@ function updateServiceMeta() {
     if (!info) { el.textContent = ''; return; }
     el.textContent = info.duration ? info.duration + ' min' : '';
   });
+}
+
+// ===== LOAD SERVICES FROM API =====
+function loadBookingServices() {
+  var grid = document.getElementById('services-grid');
+  if (!grid) return;
+
+  fetch('/api/services.php?bookable=1', { credentials: 'include' })
+    .then(function(res) { return res.json(); })
+    .then(function(json) {
+      if (!json.success || !json.data || !json.data.length) return;
+      grid.textContent = '';
+      json.data.forEach(function(svc) {
+        // Populate labels and info maps
+        serviceLabels.en[svc.slug] = svc.name_en;
+        serviceLabels.es[svc.slug] = svc.name_es || svc.name_en;
+        serviceInfo[svc.slug] = { duration: svc.duration_estimate || '' };
+
+        // Build service card
+        var card = document.createElement('div');
+        card.className = 'service-card';
+
+        var input = document.createElement('input');
+        input.type = 'checkbox';
+        input.name = 'services[]';
+        input.value = svc.slug;
+        input.id = 'svc-' + svc.slug;
+        input.className = 'sr-only';
+        card.appendChild(input);
+
+        var label = document.createElement('label');
+        label.setAttribute('for', 'svc-' + svc.slug);
+        label.className = 'block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center';
+
+        var nameSpan = document.createElement('span');
+        nameSpan.className = 'block font-semibold text-brand dark:text-green-400';
+        nameSpan.textContent = currentLang === 'es' ? (svc.name_es || svc.name_en) : svc.name_en;
+        label.appendChild(nameSpan);
+
+        var metaSpan = document.createElement('span');
+        metaSpan.className = 'block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta';
+        metaSpan.setAttribute('data-service', svc.slug);
+        metaSpan.textContent = svc.duration_estimate ? svc.duration_estimate + ' min' : '';
+        label.appendChild(metaSpan);
+
+        card.appendChild(label);
+        grid.appendChild(card);
+      });
+
+      // Re-attach checkbox listeners after dynamic render
+      setupServiceCheckboxListeners();
+      // Update TIRE_SERVICES and TIRE_OPTION_SERVICES from API data
+      updateTireServiceLists(json.data);
+    })
+    .catch(function(err) {
+      console.error('loadBookingServices error:', err);
+      grid.textContent = '';
+      var errP = document.createElement('p');
+      errP.className = 'col-span-full text-center text-red-500 py-4 text-sm';
+      errP.textContent = 'Failed to load services. Please refresh.';
+      grid.appendChild(errP);
+    });
+}
+
+function updateTireServiceLists(svcs) {
+  // Services in the 'tires' category trigger tire size fields
+  TIRE_SERVICES = svcs.filter(function(s) { return s.category === 'tires'; }).map(function(s) { return s.slug; });
+  TIRE_OPTION_SERVICES = svcs.filter(function(s) { return s.category === 'tires' && s.slug !== 'wheel-alignment'; }).map(function(s) { return s.slug; });
 }
 
 // ===== DATE CONSTRAINTS =====
@@ -1463,27 +1428,16 @@ document.querySelectorAll('#mobile-menu a').forEach(function(link) {
 
 // ===== BOOKING FUNNEL TRACKING (GA4) =====
 // Track service selection + show/hide tire size section
+// These are populated dynamically from the API via loadBookingServices()
 var TIRE_SERVICES = ['tire-installation', 'tire-repair', 'wheel-alignment'];
 var TIRE_OPTION_SERVICES = ['tire-installation', 'tire-repair'];
 var MAX_SERVICES = 5;
 
-// Service duration estimates (minutes) for combined duration display
-var SERVICE_DURATIONS = {
-  'tire-installation': [45, 90], 'tire-repair': [20, 45], 'wheel-alignment': [30, 60],
-  'oil-change': [20, 45], 'brake-service': [60, 120], 'tuneup': [60, 120],
-  'mechanical-inspection': [30, 60], 'mobile-service': [30, 90], 'roadside-assistance': [30, 60], 'other': [30, 60]
-};
+// Service duration estimates (minutes) for combined duration display — populated from API
+var SERVICE_DURATIONS = {};
 
-var SERVICE_LABELS = {
-  en: { 'tire-installation': 'Tire Installation', 'tire-repair': 'Tire Repair', 'wheel-alignment': 'Wheel Alignment',
-        'oil-change': 'Oil Change', 'brake-service': 'Brake Service', 'tuneup': 'Tuneup',
-        'mechanical-inspection': 'Mechanical Inspection', 'mobile-service': 'Mobile Service',
-        'roadside-assistance': 'Roadside Assistance', 'other': 'Other' },
-  es: { 'tire-installation': 'Instalación de Llantas', 'tire-repair': 'Reparación de Llantas', 'wheel-alignment': 'Alineación',
-        'oil-change': 'Cambio de Aceite', 'brake-service': 'Frenos', 'tuneup': 'Afinación',
-        'mechanical-inspection': 'Inspección', 'mobile-service': 'Servicio Móvil',
-        'roadside-assistance': 'Asistencia en Carretera', 'other': 'Otro' }
-};
+// SERVICE_LABELS populated from API via serviceLabels
+var SERVICE_LABELS = serviceLabels;
 
 function updateServiceSummary() {
   var checked = Array.from(document.querySelectorAll('input[name="services[]"]:checked'));
@@ -1521,10 +1475,16 @@ function updateServiceSummary() {
     chipsEl.appendChild(chip);
   });
 
-  // Combined duration
+  // Combined duration (parse from serviceInfo duration_estimate "45-90" format)
   var minTotal = 0, maxTotal = 0;
   values.forEach(function(svc) {
-    var d = SERVICE_DURATIONS[svc] || [30, 60];
+    var info = serviceInfo[svc];
+    var d = [30, 60]; // fallback
+    if (info && info.duration) {
+      var parts = info.duration.split('-');
+      if (parts.length === 2) d = [parseInt(parts[0], 10) || 30, parseInt(parts[1], 10) || 60];
+      else if (parts.length === 1) { var v = parseInt(parts[0], 10) || 30; d = [v, v]; }
+    }
     minTotal += d[0];
     maxTotal += d[1];
   });
@@ -1549,23 +1509,27 @@ function updateServiceSummary() {
   }
 }
 
-document.querySelectorAll('input[name="services[]"]').forEach(function(cb) {
-  cb.addEventListener('change', function() {
-    // Enforce max services
-    var checked = document.querySelectorAll('input[name="services[]"]:checked');
-    if (checked.length > MAX_SERVICES) {
-      this.checked = false;
-      showStatus(currentLang === 'es' ? 'Máximo 5 servicios por cita.' : 'Maximum 5 services per appointment.', 'orange');
-      return;
-    }
+function setupServiceCheckboxListeners() {
+  document.querySelectorAll('input[name="services[]"]').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      // Enforce max services
+      var checked = document.querySelectorAll('input[name="services[]"]:checked');
+      if (checked.length > MAX_SERVICES) {
+        this.checked = false;
+        showStatus(currentLang === 'es' ? 'Máximo 5 servicios por cita.' : 'Maximum 5 services per appointment.', 'orange');
+        return;
+      }
 
-    if (typeof gtag === 'function') gtag('event', 'booking_step', {
-      event_category: 'booking_funnel', step: 'service_selected', service: this.value
+      if (typeof gtag === 'function') gtag('event', 'booking_step', {
+        event_category: 'booking_funnel', step: 'service_selected', service: this.value
+      });
+
+      updateServiceSummary();
     });
-
-    updateServiceSummary();
   });
-});
+}
+// Load services from API on page load, then attach listeners
+loadBookingServices();
 
 // Track time selection (delegated since slots are dynamically generated)
 document.getElementById('time-slots-grid').addEventListener('click', function(e) {

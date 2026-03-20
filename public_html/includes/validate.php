@@ -136,21 +136,31 @@ function formatTimeDisplay(string $time): string
 
 /**
  * Validate service type.
- * Accepts frontend values (tire-installation, brake-service, etc.)
- * and legacy backend values (tires, brakes, etc.).
+ * Checks against active bookable services in oretir_services table.
+ * Falls back to legacy hardcoded list if DB is unavailable.
  */
 function isValidService(string $service): bool
 {
-    $validServices = [
-        // Frontend values (book-appointment form)
-        'tire-installation', 'tire-repair', 'wheel-alignment',
-        'oil-change', 'brake-service', 'tuneup',
-        'mechanical-inspection', 'mobile-service', 'roadside-assistance', 'other',
-        // Legacy backend values
-        'tires', 'brakes', 'alignment', 'suspension',
-        'diagnostics', 'ac-service', 'general-repair',
-    ];
-    return in_array($service, $validServices, true);
+    static $valid = null;
+    if ($valid === null) {
+        try {
+            $db = getDB();
+            $stmt = $db->query('SELECT slug FROM oretir_services WHERE is_bookable = 1 AND is_active = 1');
+            $valid = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        } catch (\Throwable $e) {
+            // Fallback if DB unavailable or table doesn't exist yet
+            $valid = [
+                'tire-installation', 'tire-repair', 'wheel-alignment',
+                'oil-change', 'brake-service', 'tuneup',
+                'mechanical-inspection', 'mobile-service', 'roadside-assistance', 'other',
+            ];
+        }
+        // Always accept legacy backend values
+        $legacy = ['tires', 'brakes', 'alignment', 'suspension',
+                   'diagnostics', 'ac-service', 'general-repair'];
+        $valid = array_unique(array_merge($valid, $legacy));
+    }
+    return in_array($service, $valid, true);
 }
 
 /**

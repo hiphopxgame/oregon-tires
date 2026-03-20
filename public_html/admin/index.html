@@ -6562,6 +6562,9 @@ function refreshActiveTab() {
     case 'faq':
       if (typeof loadFaqs === 'function') loadFaqs();
       break;
+    case 'services':
+      if (typeof loadServices === 'function') loadServices();
+      break;
     case 'reviews':
       if (typeof loadTestimonials === 'function') loadTestimonials();
       break;
@@ -6617,6 +6620,28 @@ var SERVICE_COLORS = {
   'roadside-assistance':    { bg:'bg-rose-100', text:'text-rose-800', darkBg:'dark:bg-rose-900/30', darkText:'dark:text-rose-300', dot:'bg-rose-500', hex:'#F43F5E', label:'Roadside', labelEs:'Carretera' },
   'other':                  { bg:'bg-gray-100', text:'text-gray-700', darkBg:'dark:bg-gray-700', darkText:'dark:text-gray-300', dot:'bg-gray-400', hex:'#9CA3AF', label:'Other', labelEs:'Otro' },
 };
+
+// Merge DB-driven service colors on load (enhances hardcoded fallback above)
+(function() {
+  fetch('/api/services.php', { credentials: 'include' })
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      if (!json.success || !json.data) return;
+      json.data.forEach(function(svc) {
+        SERVICE_COLORS[svc.slug] = {
+          bg: svc.color_bg || 'bg-gray-100',
+          text: svc.color_text || 'text-gray-700',
+          darkBg: svc.color_dark_bg || 'dark:bg-gray-700',
+          darkText: svc.color_dark_text || 'dark:text-gray-300',
+          dot: svc.color_dot || 'bg-gray-400',
+          hex: svc.color_hex || '#9CA3AF',
+          label: svc.name_en,
+          labelEs: svc.name_es || svc.name_en,
+        };
+      });
+    })
+    .catch(function() { /* keep hardcoded fallback */ });
+})();
 
 function serviceColorBadge(serviceType) {
   var c = SERVICE_COLORS[serviceType] || SERVICE_COLORS['other'];
