@@ -1176,11 +1176,13 @@ document.body.addEventListener('htmx:beforeRequest', function(e) {
   }
 
   var phone = form.phone.value.trim();
+  var phoneDigits = phone.replace(/\D/g, '');
+  if (phoneDigits.length === 11 && phoneDigits[0] === '1') phoneDigits = phoneDigits.substring(1);
   if (!phone) {
     showFieldError('booking-phone', currentLang === 'es' ? 'El telefono es obligatorio.' : 'Phone number is required.');
     hasErrors = true;
-  } else if (phone.replace(/\D/g, '').length < 7 || phone.replace(/\D/g, '').length > 15) {
-    showFieldError('booking-phone', currentLang === 'es' ? 'Ingrese un numero de telefono valido.' : 'Please enter a valid phone number.');
+  } else if (phoneDigits.length !== 10) {
+    showFieldError('booking-phone', currentLang === 'es' ? 'Ingrese un numero de 10 digitos.' : 'Please enter a 10-digit phone number.');
     hasErrors = true;
   }
 
@@ -1955,11 +1957,25 @@ updateServiceMeta();
     else clearErr(this);
   });
   var phone = document.getElementById('booking-phone');
-  if (phone) phone.addEventListener('blur', function() {
-    var v = this.value.replace(/\D/g, '');
-    if (this.value.trim() && (v.length < 7 || v.length > 15)) showErr(this, 'Please enter a valid phone number.');
-    else clearErr(this);
-  });
+  if (phone) {
+    // Auto-format phone as (XXX) XXX-XXXX on input
+    phone.addEventListener('input', function() {
+      var d = this.value.replace(/\D/g, '');
+      if (d.length > 0 && d[0] === '1' && d.length > 1) d = d.substring(1);
+      if (d.length > 10) d = d.substring(0, 10);
+      var formatted = '';
+      if (d.length > 0) formatted = '(' + d.substring(0, 3);
+      if (d.length >= 3) formatted += ') ' + d.substring(3, 6);
+      if (d.length >= 6) formatted += '-' + d.substring(6);
+      this.value = formatted;
+    });
+    phone.addEventListener('blur', function() {
+      var d = this.value.replace(/\D/g, '');
+      if (d.length === 11 && d[0] === '1') d = d.substring(1);
+      if (this.value.trim() && d.length !== 10) showErr(this, currentLang === 'es' ? 'Ingrese un numero de 10 digitos.' : 'Please enter a 10-digit phone number.');
+      else clearErr(this);
+    });
+  }
 })();
 
 // ===== UPDATE GA ID FROM SETTINGS =====

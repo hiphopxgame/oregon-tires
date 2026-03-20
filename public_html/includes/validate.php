@@ -40,12 +40,33 @@ function isValidEmail(string $email): bool
 }
 
 /**
- * Validate a phone number (allows digits, spaces, dashes, parens, plus).
+ * Validate a US phone number (must be exactly 10 digits).
+ * Strips all non-digit characters first, then strips leading '1' country code.
  */
 function isValidPhone(string $phone): bool
 {
     $digits = preg_replace('/\D/', '', $phone);
-    return strlen($digits) >= 7 && strlen($digits) <= 15;
+    // Strip leading US country code
+    if (strlen($digits) === 11 && $digits[0] === '1') {
+        $digits = substr($digits, 1);
+    }
+    return strlen($digits) === 10;
+}
+
+/**
+ * Format a phone number as (XXX) XXX-XXXX.
+ * Returns original string if not a valid 10-digit number.
+ */
+function formatPhone(string $phone): string
+{
+    $digits = preg_replace('/\D/', '', $phone);
+    if (strlen($digits) === 11 && $digits[0] === '1') {
+        $digits = substr($digits, 1);
+    }
+    if (strlen($digits) !== 10) {
+        return $phone;
+    }
+    return '(' . substr($digits, 0, 3) . ') ' . substr($digits, 3, 3) . '-' . substr($digits, 6);
 }
 
 /**

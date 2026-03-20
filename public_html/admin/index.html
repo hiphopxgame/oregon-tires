@@ -3437,14 +3437,21 @@
 
   </div>
 
-<!-- NOTES MODAL -->
+<!-- APPOINTMENT DETAILS + NOTES MODAL -->
 <div id="notes-modal" role="dialog" aria-modal="true" aria-labelledby="notes-modal-title" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
-  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4 dark:bg-gray-800">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto dark:bg-gray-800">
     <div class="flex justify-between items-center mb-4">
-      <h3 id="notes-modal-title" class="text-lg font-bold text-gray-800 dark:text-gray-200" data-t="adminNotes">Admin Notes</h3>
+      <h3 id="notes-modal-title" class="text-lg font-bold text-gray-800 dark:text-gray-200" data-t="appointmentDetails">Appointment Details</h3>
       <button onclick="closeModal('notes-modal')" aria-label="Close" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
     </div>
-    <textarea id="notes-text" rows="5" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" data-t="notesPlaceholder" placeholder="Add notes about this appointment..."></textarea>
+
+    <!-- Booking Details (read-only, populated by JS) -->
+    <div id="notes-booking-details" class="mb-4 space-y-3"></div>
+
+    <hr class="border-gray-200 dark:border-gray-700 my-4">
+
+    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2" data-t="adminNotes">Admin Notes</label>
+    <textarea id="notes-text" rows="4" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" data-t="notesPlaceholder" placeholder="Add notes about this appointment..."></textarea>
     <div class="flex justify-end gap-3 mt-4">
       <button onclick="closeModal('notes-modal')" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800" data-t="cancelNotes">Cancel</button>
       <button onclick="saveNotes()" class="px-4 py-2 text-sm bg-brand text-white rounded-lg hover:bg-green-700" data-t="saveNotes">Save Notes</button>
@@ -3976,11 +3983,20 @@ const adminT = {
     overviewDomainIncluded: 'Domain ownership transfers to client with payment',
     overviewOngoingServices: 'Ongoing Services',
     overviewOngoingServicesDesc: 'Optional managed services to keep your platform running and growing:',
-    // Notes Modal
+    // Appointment Details Modal
+    appointmentDetails: 'Appointment Details',
     adminNotes: 'Admin Notes',
     notesPlaceholder: 'Add notes about this appointment...',
     saveNotes: 'Save Notes',
     cancelNotes: 'Cancel',
+    referenceNumber: 'Reference',
+    customerNotes: 'Customer Notes',
+    vehicleInfo: 'Vehicle',
+    vehicleLabel: 'Vehicle',
+    tireDetails: 'Tire Details',
+    tireSize: 'Size',
+    tirePreference: 'Preference',
+    tireCount: 'Count',
     // Account Settings Modal
     accountSettingsTitle: 'Account Settings',
     notificationEmail: 'Admin Notification Email',
@@ -5247,11 +5263,20 @@ const adminT = {
     overviewDomainIncluded: 'La propiedad del dominio se transfiere al cliente con el pago',
     overviewOngoingServices: 'Servicios Continuos',
     overviewOngoingServicesDesc: 'Servicios administrados opcionales para mantener y hacer crecer su plataforma:',
-    // Notes Modal
+    // Appointment Details Modal
+    appointmentDetails: 'Detalles de la Cita',
     adminNotes: 'Notas de Administraci\u00F3n',
     notesPlaceholder: 'Agregar notas sobre esta cita...',
     saveNotes: 'Guardar Notas',
     cancelNotes: 'Cancelar',
+    referenceNumber: 'Referencia',
+    customerNotes: 'Notas del Cliente',
+    vehicleInfo: 'Veh\u00EDculo',
+    vehicleLabel: 'Veh\u00EDculo',
+    tireDetails: 'Detalles de Llantas',
+    tireSize: 'Tama\u00F1o',
+    tirePreference: 'Preferencia',
+    tireCount: 'Cantidad',
     // Account Settings Modal
     accountSettingsTitle: 'Configuraci\u00F3n de Cuenta',
     notificationEmail: 'Correo de Notificaciones de Admin',
@@ -7797,7 +7822,7 @@ function renderAppointments() {
       <td class="p-3">${serviceBadgeHtml(a.service)}</td>
       <td class="p-3"><div class="font-medium">${fmtDate(a.preferred_date)}</div><div class="text-xs text-gray-500">${fmtTime(a.preferred_time)}</div>
         ${a.status==='completed'&&a.actual_duration_minutes?`<div class="text-xs text-green-700 font-medium mt-1">Completed in ${a.actual_duration_minutes}min</div>`:''}</td>
-      <td class="p-3"><div class="text-sm">${esc(a.email)}</div>${a.phone?`<div class="text-xs text-gray-500">${esc(a.phone)}</div>`:''}</td>
+      <td class="p-3"><div class="text-sm">${esc(a.email)}</div>${a.phone?`<div class="text-xs text-gray-500">${esc(fmtPhone(a.phone))}</div>`:''}</td>
       <td class="p-3 text-xs max-w-[180px]"><span class="task-summary-text cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 block truncate" onclick="editTaskSummary('${a.id}', this)" title="${esc(a.task_summary||'')}">${a.task_summary ? esc(a.task_summary) : '<span class=&quot;text-gray-400 italic&quot;>+ Add task</span>'}</span></td>
       <td class="p-3 text-sm">${a.assigned_employee_id ? esc(employees.find(e=>e.id===a.assigned_employee_id)?.name||'Unknown') : '<span class="text-gray-400">' + adminT[currentLang].unassignedLabel + '</span>'}</td>
       <td class="p-3">${statusBadge(a.status)}${calSyncBadge(a)}</td>
@@ -7834,7 +7859,7 @@ function renderMessages() {
   tbody.innerHTML = messages.length ? messages.map(m => `
     <tr class="border-b hover:bg-gray-50">
       <td class="p-3 font-medium text-brand-light">${esc(m.first_name)} ${esc(m.last_name)}</td>
-      <td class="p-3 text-sm"><div>${esc(m.email)}</div>${m.phone?`<div class="text-xs text-gray-500">${esc(m.phone)}</div>`:''}</td>
+      <td class="p-3 text-sm"><div>${esc(m.email)}</div>${m.phone?`<div class="text-xs text-gray-500">${esc(fmtPhone(m.phone))}</div>`:''}</td>
       <td class="p-3 text-sm max-w-[400px]">
         <div class="line-clamp-2">${esc(m.message)}</div>
         ${m.message && m.message.length > 80 ? `<button onclick="openMessageModal('${m.id}')" class="text-brand-light text-xs font-medium hover:underline mt-1">Read full message →</button>` : ''}
@@ -10129,10 +10154,99 @@ async function updateMsgStatus(id, status) {
   } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
+function fmtPhone(p) {
+  if (!p) return '';
+  var d = p.replace(/\D/g, '');
+  if (d.length === 11 && d[0] === '1') d = d.substring(1);
+  if (d.length === 10) return '(' + d.substring(0,3) + ') ' + d.substring(3,6) + '-' + d.substring(6);
+  return p;
+}
 function openNotesModal(id) {
   currentNotesId = id;
-  const a = appointments.find(x=>x.id===id);
+  var a = appointments.find(function(x) { return x.id === id; });
   document.getElementById('notes-text').value = a?.admin_notes || '';
+  var T = adminT[currentLang] || adminT.en;
+
+  // Build booking details
+  var container = document.getElementById('notes-booking-details');
+  container.textContent = '';
+
+  if (!a) { document.getElementById('notes-modal').classList.remove('hidden'); return; }
+
+  function detailRow(label, value, cls) {
+    if (!value) return '';
+    var row = document.createElement('div');
+    row.className = 'flex flex-col sm:flex-row sm:items-center gap-1';
+    var lbl = document.createElement('span');
+    lbl.className = 'text-xs font-semibold text-gray-500 dark:text-gray-400 sm:w-36 flex-shrink-0 uppercase tracking-wider';
+    lbl.textContent = label;
+    row.appendChild(lbl);
+    var val = document.createElement('span');
+    val.className = 'text-sm text-gray-800 dark:text-gray-200 ' + (cls || '');
+    val.textContent = value;
+    row.appendChild(val);
+    return row;
+  }
+
+  // Reference & Status
+  var refSection = document.createElement('div');
+  refSection.className = 'p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 space-y-1';
+  if (a.reference_number) refSection.appendChild(detailRow(T.referenceNumber || 'Reference', a.reference_number, 'font-mono font-bold'));
+  refSection.appendChild(detailRow(T.status || 'Status', a.status));
+  refSection.appendChild(detailRow(T.language || 'Language', a.language === 'spanish' ? 'Español' : 'English'));
+  if (a.sms_opt_in !== undefined) refSection.appendChild(detailRow('SMS Opt-in', parseInt(a.sms_opt_in) ? '✓ Yes' : '✗ No'));
+  container.appendChild(refSection);
+
+  // Vehicle info
+  var vehicle = [a.vehicle_year, a.vehicle_make, a.vehicle_model].filter(Boolean).join(' ');
+  if (vehicle || a.vehicle_vin) {
+    var vehSection = document.createElement('div');
+    vehSection.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 space-y-1';
+    var vehTitle = document.createElement('div');
+    vehTitle.className = 'text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1';
+    vehTitle.textContent = T.vehicleInfo || 'Vehicle';
+    vehSection.appendChild(vehTitle);
+    if (vehicle) vehSection.appendChild(detailRow(T.vehicleLabel || 'Vehicle', vehicle));
+    if (a.vehicle_vin) vehSection.appendChild(detailRow('VIN', a.vehicle_vin, 'font-mono'));
+    container.appendChild(vehSection);
+  }
+
+  // Tire details
+  if (a.tire_size || a.tire_preference || a.tire_count) {
+    var tireSection = document.createElement('div');
+    tireSection.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 space-y-1';
+    var tireTitle = document.createElement('div');
+    tireTitle.className = 'text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1';
+    tireTitle.textContent = T.tireDetails || 'Tire Details';
+    tireSection.appendChild(tireTitle);
+    if (a.tire_size) tireSection.appendChild(detailRow(T.tireSize || 'Size', a.tire_size));
+    if (a.tire_preference) tireSection.appendChild(detailRow(T.tirePreference || 'Preference', a.tire_preference.charAt(0).toUpperCase() + a.tire_preference.slice(1)));
+    if (a.tire_count) tireSection.appendChild(detailRow(T.tireCount || 'Count', a.tire_count));
+    container.appendChild(tireSection);
+  }
+
+  // Contact
+  var contactSection = document.createElement('div');
+  contactSection.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 space-y-1';
+  contactSection.appendChild(detailRow(T.phone || 'Phone', fmtPhone(a.phone)));
+  contactSection.appendChild(detailRow(T.email || 'Email', a.email));
+  container.appendChild(contactSection);
+
+  // Customer notes
+  if (a.notes) {
+    var notesSection = document.createElement('div');
+    notesSection.className = 'p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700';
+    var notesTitle = document.createElement('div');
+    notesTitle.className = 'text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-1';
+    notesTitle.textContent = T.customerNotes || 'Customer Notes';
+    notesSection.appendChild(notesTitle);
+    var notesText = document.createElement('p');
+    notesText.className = 'text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap';
+    notesText.textContent = a.notes;
+    notesSection.appendChild(notesText);
+    container.appendChild(notesSection);
+  }
+
   document.getElementById('notes-modal').classList.remove('hidden');
   trapFocus(document.getElementById('notes-modal'));
 }
@@ -11677,6 +11791,9 @@ async function createAppointment(e) {
   if (!data.first_name || !data.last_name) { errorEl.textContent = 'Name is required'; errorEl.classList.remove('hidden'); return; }
   if (!data.email) { errorEl.textContent = 'Email is required'; errorEl.classList.remove('hidden'); return; }
   if (!data.phone) { errorEl.textContent = 'Phone is required'; errorEl.classList.remove('hidden'); return; }
+  var pDigits = data.phone.replace(/\D/g, '');
+  if (pDigits.length === 11 && pDigits[0] === '1') pDigits = pDigits.substring(1);
+  if (pDigits.length !== 10) { errorEl.textContent = 'Phone must be 10 digits'; errorEl.classList.remove('hidden'); return; }
   if (!data.service) { errorEl.textContent = 'Service is required'; errorEl.classList.remove('hidden'); return; }
   if (!data.preferred_date) { errorEl.textContent = 'Date is required'; errorEl.classList.remove('hidden'); return; }
   if (!data.preferred_time) { errorEl.textContent = 'Time is required'; errorEl.classList.remove('hidden'); return; }

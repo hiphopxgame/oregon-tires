@@ -47,10 +47,11 @@ try {
         jsonError('Please provide a valid email address.');
     }
 
-    // Validate phone
+    // Validate phone — 10 digits US
     if (!isValidPhone($phone)) {
-        jsonError('Please provide a valid phone number.');
+        jsonError('Please provide a valid 10-digit US phone number.');
     }
+    $phone = formatPhone($phone);
 
     // Validate message length
     if (mb_strlen($message) < 10) {

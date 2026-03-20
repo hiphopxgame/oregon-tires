@@ -102,10 +102,11 @@ try {
         jsonError('Please provide a valid email address.');
     }
 
-    // Phone
+    // Phone — must be 10 digits (US), normalize to (XXX) XXX-XXXX
     if (!isValidPhone($phone)) {
-        jsonError('Please provide a valid phone number.');
+        jsonError('Please provide a valid 10-digit US phone number.');
     }
+    $phone = formatPhone($phone);
 
     // Vehicle year (optional but if present must be 4 digits)
     if ($vehicleYear !== '' && !preg_match('/^\d{4}$/', $vehicleYear)) {
