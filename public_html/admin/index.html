@@ -3358,6 +3358,174 @@
       <div id="tirequotes-container"></div>
     </div>
 
+    <!-- SERVICES TAB -->
+    <div id="tab-services" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold" data-t="svcHeading">🔧 Services</h2>
+          <p class="text-green-100" data-t="svcSubheading">Manage services displayed on the website and booking form</p>
+        </div>
+        <button onclick="toggleServiceForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium" data-t="svcNewBtn">+ New Service</button>
+      </div>
+      <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
+
+        <!-- Service form (hidden by default) -->
+        <div id="service-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+          <h4 id="svc-form-title" class="font-bold text-lg mb-4 dark:text-gray-200" data-t="svcFormTitle">New Service</h4>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcNameEnLabel">Name (EN) *</label>
+              <input id="svc-name-en" oninput="autoServiceSlug()" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Tire Installation">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcNameEsLabel">Name (ES)</label>
+              <input id="svc-name-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Instalación de Llantas">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcSlugLabel">URL Slug *</label>
+              <input id="svc-slug" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100 font-mono text-sm" placeholder="tire-installation">
+            </div>
+            <div class="flex gap-4">
+              <div class="flex-1">
+                <label class="text-sm font-medium dark:text-gray-300" data-t="svcIconLabel">Icon (emoji)</label>
+                <input id="svc-icon" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="🔧">
+              </div>
+              <div class="flex-1">
+                <label class="text-sm font-medium dark:text-gray-300" data-t="svcColorLabel">Color</label>
+                <input id="svc-color-hex" type="color" value="#10B981" class="w-full h-10 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 cursor-pointer">
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcCategoryLabel">Category</label>
+              <select id="svc-category" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+                <option value="tires">Tires</option>
+                <option value="maintenance" selected>Maintenance</option>
+                <option value="specialized">Specialized</option>
+              </select>
+            </div>
+            <div class="flex gap-4">
+              <div class="flex-1">
+                <label class="text-sm font-medium dark:text-gray-300" data-t="svcDurationLabel">Duration</label>
+                <input id="svc-duration" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="45-90">
+              </div>
+              <div class="flex-1">
+                <label class="text-sm font-medium dark:text-gray-300" data-t="svcSortLabel">Sort Order</label>
+                <input id="svc-sort" type="number" value="0" min="0" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcDescEnLabel">Description (EN)</label>
+              <textarea id="svc-description-en" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Short description for SEO and cards"></textarea>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcDescEsLabel">Description (ES)</label>
+              <textarea id="svc-description-es" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Descripción corta"></textarea>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcBodyEnLabel">Body HTML (EN)</label>
+              <textarea id="svc-body-en" rows="4" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100 font-mono text-xs" placeholder="<p>Service details...</p>"></textarea>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcBodyEsLabel">Body HTML (ES)</label>
+              <textarea id="svc-body-es" rows="4" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100 font-mono text-xs" placeholder="<p>Detalles del servicio...</p>"></textarea>
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcPriceEnLabel">Price Display (EN)</label>
+              <input id="svc-price-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="From $20">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcPriceEsLabel">Price Display (ES)</label>
+              <input id="svc-price-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Desde $20">
+            </div>
+            <div>
+              <label class="text-sm font-medium dark:text-gray-300" data-t="svcImageLabel">Image URL</label>
+              <input id="svc-image-url" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="/assets/img/services/tire-install.webp">
+            </div>
+            <div class="flex items-center gap-6 flex-wrap">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="svc-active" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
+                <span class="text-sm font-medium dark:text-gray-300" data-t="svcActiveLabel">Active</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="svc-bookable" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
+                <span class="text-sm font-medium dark:text-gray-300" data-t="svcBookableLabel">Bookable</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="svc-detail-page" type="checkbox" checked class="w-5 h-5 text-green-600 rounded">
+                <span class="text-sm font-medium dark:text-gray-300" data-t="svcDetailPageLabel">Detail Page</span>
+              </label>
+            </div>
+          </div>
+          <div class="flex gap-2 mt-4">
+            <button onclick="saveService()" id="svc-save-btn" class="bg-brand text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition" data-t="svcCreateBtn">Create Service</button>
+            <button onclick="toggleServiceForm()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300" data-t="svcCancelBtn">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Service FAQ sub-panel (hidden by default) -->
+        <div id="service-faq-panel" class="hidden mb-6 p-5 border rounded-xl bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800">
+          <div class="flex justify-between items-center mb-4">
+            <h4 id="service-faq-panel-title" class="font-bold text-lg dark:text-gray-200">Service FAQs</h4>
+            <div class="flex gap-2">
+              <button onclick="toggleServiceFaqForm()" class="bg-brand text-white px-3 py-1.5 rounded-lg text-sm">+ Add FAQ</button>
+              <button onclick="closeServiceFaqPanel()" class="border px-3 py-1.5 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300">Close</button>
+            </div>
+          </div>
+          <!-- FAQ inline form -->
+          <div id="service-faq-form" class="hidden mb-4 p-4 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600">
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs font-medium dark:text-gray-300">Question (EN) *</label>
+                <input id="sfaq-question-en" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+              </div>
+              <div>
+                <label class="text-xs font-medium dark:text-gray-300">Question (ES)</label>
+                <input id="sfaq-question-es" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+              </div>
+              <div>
+                <label class="text-xs font-medium dark:text-gray-300">Answer (EN)</label>
+                <textarea id="sfaq-answer-en" rows="2" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100"></textarea>
+              </div>
+              <div>
+                <label class="text-xs font-medium dark:text-gray-300">Answer (ES)</label>
+                <textarea id="sfaq-answer-es" rows="2" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100"></textarea>
+              </div>
+              <div>
+                <label class="text-xs font-medium dark:text-gray-300">Sort Order</label>
+                <input id="sfaq-sort" type="number" value="0" class="w-20 p-2 border rounded mt-1 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+              </div>
+            </div>
+            <div class="flex gap-2 mt-3">
+              <button onclick="saveServiceFaq()" class="bg-brand text-white px-4 py-1.5 rounded-lg text-sm">Save FAQ</button>
+              <button onclick="toggleServiceFaqForm()" class="border px-3 py-1.5 rounded-lg text-sm dark:border-gray-500 dark:text-gray-300">Cancel</button>
+            </div>
+          </div>
+          <div id="service-faq-list"></div>
+        </div>
+
+        <!-- Services table -->
+        <div class="overflow-x-auto">
+          <table class="w-full responsive-table">
+            <thead>
+              <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                <th class="px-3 py-3 font-medium w-12"></th>
+                <th class="px-3 py-3 font-medium" data-t="svcThName">Name</th>
+                <th class="px-3 py-3 font-medium" data-t="svcThCategory">Category</th>
+                <th class="px-3 py-3 font-medium" data-t="svcThStatus">Status</th>
+                <th class="px-3 py-3 font-medium text-center" data-t="svcThBookable">Book</th>
+                <th class="px-3 py-3 font-medium text-center" data-t="svcThPage">Page</th>
+                <th class="px-3 py-3 font-medium text-center" data-t="svcThMeta">FAQs / Order</th>
+                <th class="px-3 py-3 font-medium" data-t="svcThActions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="services-table-body">
+              <tr><td colspan="8" class="text-center py-8 text-gray-400" data-t="svcLoadingTd">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- VISIT TRACKING TAB -->
     <div id="tab-visits" class="tab-content hidden fade-in" role="tabpanel">
       <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
@@ -3775,6 +3943,7 @@ const adminT = {
     tabInvoices: 'Invoices',
     tabWaitlist: 'Waitlist',
     tabTireQuotes: 'Tire Quotes',
+    tabServices: 'Services',
     tabVisits: 'Visit Tracking',
     tabLabor: 'Labor Tracking',
     tabLoyalty: 'Loyalty & Rewards',
@@ -10711,6 +10880,7 @@ function switchTab(tab) {
   if(tab==='invoices' && typeof loadInvoices === 'function') loadInvoices();
   if(tab==='waitlist' && typeof loadWaitlist === 'function') loadWaitlist();
   if(tab==='tirequotes' && typeof loadTireQuotes === 'function') loadTireQuotes();
+  if(tab==='services' && typeof loadServices === 'function') loadServices();
   if(tab==='visits' && typeof loadVisitTracker === 'function') loadVisitTracker();
   if(tab==='labor' && typeof loadLaborSummary === 'function') loadLaborSummary();
   if(tab==='loyalty' && typeof loadLoyalty === 'function') loadLoyalty();
