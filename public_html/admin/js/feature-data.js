@@ -8,7 +8,7 @@ var FREELANCER_RATE = 1/3;
 
 // Features the client originally requested.
 // Mapped from their requirements document (Operations + Sales + Marketing).
-// Everything NOT in this list was added by the developer as bonus value.
+// Everything NOT in this list was added by the developer beyond the original scope.
 var CLIENT_SCOPE_IDS = [
   // Website Foundation — bilingual website, SSL, SEO, social links
   '1-1','1-2','1-4','1-5','1-7',

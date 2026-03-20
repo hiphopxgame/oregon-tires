@@ -3947,11 +3947,11 @@ const adminT = {
     overviewFreelancer: 'Freelancer ($50/hr)',
     overviewPlatformSummary: 'Platform Investment Summary',
     overviewClientValue: 'What You Asked For',
-    overviewBonusValue2: 'What We Added (Bonus)',
+    overviewBonusValue2: 'What We Built Beyond Scope',
     overviewClientRequested: 'Client Requested',
-    overviewDevAdded: 'Developer Added',
-    overviewClientDesc: 'Core features you originally requested for your tire shop website',
-    overviewDevDesc: 'Additional features built by the developer at no extra cost',
+    overviewDevAdded: 'Beyond Original Scope',
+    overviewClientDesc: 'Core features from your original project requirements',
+    overviewDevDesc: 'Additional features built beyond the original scope to expand platform capabilities',
     overviewScopeBreakdown: 'What You Paid For vs What You Got',
     overviewSavingsVsFreelancer: 'Savings vs Freelancer',
     overviewYourPrice: 'Your Price',
@@ -5218,11 +5218,11 @@ const adminT = {
     overviewFreelancer: 'Freelancer ($50/hr)',
     overviewPlatformSummary: 'Resumen de Inversi\u00F3n de la Plataforma',
     overviewClientValue: 'Lo Que Usted Pidi\u00F3',
-    overviewBonusValue2: 'Lo Que Agregamos (Bonus)',
+    overviewBonusValue2: 'Lo Que Construimos M\u00E1s All\u00E1 del Alcance',
     overviewClientRequested: 'Solicitado por el Cliente',
-    overviewDevAdded: 'Agregado por el Desarrollador',
-    overviewClientDesc: 'Funciones principales que usted solicit\u00F3 originalmente para su sitio web',
-    overviewDevDesc: 'Funciones adicionales construidas por el desarrollador sin costo extra',
+    overviewDevAdded: 'M\u00E1s All\u00E1 del Alcance Original',
+    overviewClientDesc: 'Funciones principales de los requisitos originales del proyecto',
+    overviewDevDesc: 'Funciones adicionales construidas m\u00E1s all\u00E1 del alcance original para expandir las capacidades de la plataforma',
     overviewScopeBreakdown: 'Lo Que Pag\u00F3 vs Lo Que Recibi\u00F3',
     overviewSavingsVsFreelancer: 'Ahorro vs Freelancer',
     overviewYourPrice: 'Su Precio',
@@ -10652,7 +10652,7 @@ function renderPlatformTab() {
     // Developer Added card
     var devCard = el('div', 'rounded-xl p-5 border-2 border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20');
     var devHeader = el('div', 'flex items-center gap-2 mb-3');
-    devHeader.appendChild(el('span', 'text-2xl', '\uD83C\uDF81'));
+    devHeader.appendChild(el('span', 'text-2xl', '\uD83D\uDE80'));
     devHeader.appendChild(el('h4', 'font-bold text-green-800 dark:text-green-300', t.overviewBonusValue2));
     devCard.appendChild(devHeader);
     devCard.appendChild(el('p', 'text-sm text-green-700 dark:text-green-400 mb-3', t.overviewDevDesc));
@@ -10741,10 +10741,10 @@ function renderPlatformTab() {
 
     scopeWrap.appendChild(clientListWrap);
 
-    // Full list of developer-added bonus features
+    // Full list of features built beyond original scope
     var devListWrap = el('div', 'mt-4 rounded-xl border-2 border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/10 overflow-hidden');
     var devListHeader = el('div', 'p-4 flex items-center justify-between cursor-pointer');
-    devListHeader.appendChild(el('h4', 'font-bold text-green-800 dark:text-green-300 flex items-center gap-2', '\uD83C\uDF81 ' + t.overviewBonusValue2 + ' \u2014 ' + devFeatures.length + ' ' + (lang === 'es' ? 'funciones' : 'features') + ' ($' + devValue.toLocaleString() + ')'));
+    devListHeader.appendChild(el('h4', 'font-bold text-green-800 dark:text-green-300 flex items-center gap-2', '\uD83D\uDE80 ' + t.overviewBonusValue2 + ' \u2014 ' + devFeatures.length + ' ' + (lang === 'es' ? 'funciones' : 'features') + ' ($' + devValue.toLocaleString() + ')'));
     var devToggle = el('span', 'text-green-600 dark:text-green-400 text-xl transition-transform', '\u25BC');
     devListHeader.appendChild(devToggle);
     devListWrap.appendChild(devListHeader);
