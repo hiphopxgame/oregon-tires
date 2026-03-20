@@ -67,6 +67,9 @@ try {
         'member_id' => $result['member']['id'] ?? null,
         'email'     => $email,
     ]);
+} catch (\RuntimeException $e) {
+    // MemberAuth throws RuntimeException for validation errors (email taken, username taken, etc.)
+    jsonError($e->getMessage(), 400);
 } catch (\Throwable $e) {
     error_log("Oregon Tires customer/register error: " . $e->getMessage());
     jsonError('Server error', 500);
