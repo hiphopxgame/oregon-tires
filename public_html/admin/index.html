@@ -835,7 +835,7 @@
               <th class="p-3" data-t="thCustomer">Customer</th>
               <th class="p-3" data-t="thContact">Contact</th>
               <th class="p-3" data-t="custVehicle">Vehicle</th>
-              <th class="p-3" data-t="totalVisits">Visits</th>
+              <th class="p-3" data-t="totalAppts">Appointments</th>
               <th class="p-3" data-t="lastVisit">Last Visit</th>
               <th class="p-3" data-t="custServices">Services</th>
               <th class="p-3" data-t="thActions">Actions</th>
@@ -4085,7 +4085,9 @@ const adminT = {
     customerDirectory: 'Customer Directory',
     customerSubtitle: 'View customer history and returning visitors',
     searchCustomers: 'Search by name, email, phone...',
-    totalVisits: 'Visits',
+    totalVisits: 'Online Bookings',
+    totalAppts: 'Appointments',
+    onlineBookings: 'online bookings',
     lastVisit: 'Last Visit',
     firstVisit: 'First Visit',
     customerHistory: 'Customer History',
@@ -4370,7 +4372,9 @@ const adminT = {
     customerDirectory: 'Customer Directory',
     customerSubtitle: 'View customer history and returning visitors',
     searchCustomers: 'Search by name, email, phone...',
-    totalVisits: 'Visits',
+    totalVisits: 'Online Bookings',
+    totalAppts: 'Appointments',
+    onlineBookings: 'online bookings',
     lastVisit: 'Last Visit',
     firstVisit: 'First Visit',
     customerHistory: 'Customer History',
@@ -5391,7 +5395,9 @@ const adminT = {
     customerDirectory: 'Directorio de Clientes',
     customerSubtitle: 'Ver historial de clientes y visitantes recurrentes',
     searchCustomers: 'Buscar por nombre, correo, tel\u00E9fono...',
-    totalVisits: 'Visitas',
+    totalVisits: 'Reservas en L\u00EDnea',
+    totalAppts: 'Citas',
+    onlineBookings: 'reservas en l\u00EDnea',
     lastVisit: '\u00DAltima Visita',
     firstVisit: 'Primera Visita',
     customerHistory: 'Historial del Cliente',
@@ -5676,7 +5682,9 @@ const adminT = {
     customerDirectory: 'Directorio de Clientes',
     customerSubtitle: 'Ver historial de clientes y visitantes recurrentes',
     searchCustomers: 'Buscar por nombre, correo, tel\u00E9fono...',
-    totalVisits: 'Visitas',
+    totalVisits: 'Reservas en L\u00EDnea',
+    totalAppts: 'Citas',
+    onlineBookings: 'reservas en l\u00EDnea',
     lastVisit: '\u00DAltima Visita',
     firstVisit: 'Primera Visita',
     customerHistory: 'Historial del Cliente',
@@ -12364,7 +12372,8 @@ function searchCustomerSuggestions(query) {
     item.className = 'px-3 py-2 cursor-pointer hover:bg-green-50 dark:hover:bg-gray-700 text-sm border-b border-gray-100 dark:border-gray-700 last:border-0';
     var nameEl = document.createElement('div');
     nameEl.className = 'font-medium text-gray-800 dark:text-gray-200';
-    nameEl.textContent = (c.first_name || '') + ' ' + (c.last_name || '') + ' (' + (c.total_visits || 1) + ' visit' + ((c.total_visits || 1) !== 1 ? 's' : '') + ')';
+    var _ac = parseInt(c.appointment_count) || 0;
+    nameEl.textContent = (c.first_name || '') + ' ' + (c.last_name || '') + ' (' + _ac + ' appt' + (_ac !== 1 ? 's' : '') + ')';
     var emailEl = document.createElement('div');
     emailEl.className = 'text-xs text-gray-500 dark:text-gray-400';
     emailEl.textContent = (c.email || '') + (c.phone ? ' \u00b7 ' + c.phone : '');
@@ -12503,7 +12512,7 @@ function renderCustomers() {
   });
 
   // Update returning customers badge
-  var returning = customers.filter(function(c) { return parseInt(c.total_visits) >= 2; }).length;
+  var returning = customers.filter(function(c) { return parseInt(c.appointment_count) >= 2; }).length;
   var badge = document.getElementById('returning-badge');
   if (badge) badge.textContent = '🔄 ' + (adminT[currentLang].returningCustomers || 'Returning') + ': ' + returning;
 
@@ -12515,15 +12524,17 @@ function renderCustomers() {
   tbody.innerHTML = filtered.map(function(c) {
     var name = esc(c.first_name) + ' ' + esc(c.last_name);
     var vehicle = [c.vehicle_year, c.vehicle_make, c.vehicle_model].filter(Boolean).join(' ');
-    var visits = parseInt(c.total_visits);
-    var visitBadge = visits >= 2
-      ? '<span class="inline-block ml-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-1.5 py-0.5 rounded-full text-xs font-medium">🔄 ' + visits + '</span>'
-      : '<span class="text-gray-600 dark:text-gray-400">' + visits + '</span>';
+    var apptCount = parseInt(c.appointment_count) || 0;
+    var onlineBookings = parseInt(c.total_visits) || 0;
+    var apptBadge = apptCount >= 2
+      ? '<span class="inline-block bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-1.5 py-0.5 rounded-full text-xs font-medium">🔄 ' + apptCount + '</span>'
+      : '<span class="text-gray-600 dark:text-gray-400">' + apptCount + '</span>';
+    if (onlineBookings > 0) apptBadge += '<div class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">' + onlineBookings + ' online</div>';
     return '<tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="showCustomerHistory(\'' + esc(c.email).replace(/'/g, "\\'") + '\')">'
       + '<td class="p-3"><div class="font-medium">' + name + '</div></td>'
       + '<td class="p-3"><div class="text-sm">' + esc(c.email) + '</div>' + (c.phone ? '<div class="text-xs text-gray-500">' + esc(c.phone) + '</div>' : '') + '</td>'
       + '<td class="p-3 text-sm">' + esc(vehicle) + '</td>'
-      + '<td class="p-3 text-center">' + visitBadge + '</td>'
+      + '<td class="p-3 text-center">' + apptBadge + '</td>'
       + '<td class="p-3 text-sm">' + fmtDate(c.last_visit) + '</td>'
       + '<td class="p-3 text-sm max-w-xs truncate">' + esc(c.services) + '</td>'
       + '<td class="p-3"><button onclick="event.stopPropagation();showCustomerHistory(\'' + esc(c.email).replace(/'/g, "\\'") + '\')" class="bg-brand text-white px-3 py-1 rounded text-xs hover:bg-green-700">' + (adminT[currentLang].viewHistory || 'View History') + '</button></td>'
@@ -12547,7 +12558,9 @@ async function showCustomerHistory(email) {
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">Email</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(customer.email) + '</div></div>'
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].phone || 'Phone') + '</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(customer.phone || '—') + '</div></div>'
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">Vehicle</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(vehicle || '—') + '</div></div>'
-    + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].totalVisits || 'Visits') + '</span><div class="font-semibold text-brand dark:text-green-400">' + esc(String(customer.total_visits)) + '</div></div>'
+    + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].totalAppts || 'Appointments') + '</span><div class="font-semibold text-brand dark:text-green-400">' + esc(String(customer.appointment_count || '0')) + '</div>'
+    + (parseInt(customer.total_visits) > 0 ? '<div class="text-[10px] text-gray-400 dark:text-gray-500">' + customer.total_visits + ' ' + (adminT[currentLang].onlineBookings || 'online bookings') + '</div>' : '')
+    + '</div>'
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].firstVisit || 'First Visit') + '</span><div class="text-sm text-gray-700 dark:text-gray-300">' + fmtDate(customer.first_visit) + '</div></div>'
     + '</div>';
 
@@ -12775,12 +12788,12 @@ function exportCustomersCsv() {
     showToast(adminT[currentLang].noCustomers || 'No customers to export', true);
     return;
   }
-  var headers = ['Customer', 'Email', 'Phone', 'Vehicle', 'Visits', 'Last Visit', 'Services'];
+  var headers = ['Customer', 'Email', 'Phone', 'Vehicle', 'Appointments', 'Online Bookings', 'Last Visit', 'Services'];
   var csv = headers.join(',') + '\n';
   customers.forEach(function(c) {
     var name = (c.first_name || '') + ' ' + (c.last_name || '');
     var vehicle = [c.vehicle_year, c.vehicle_make, c.vehicle_model].filter(Boolean).join(' ');
-    var row = [name, c.email || '', c.phone || '', vehicle, c.total_visits || '0', c.last_visit || '', c.services || ''];
+    var row = [name, c.email || '', c.phone || '', vehicle, c.appointment_count || '0', c.total_visits || '0', c.last_visit || '', c.services || ''];
     csv += row.map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',') + '\n';
   });
   downloadCsvBlob(csv, 'customers-' + new Date().toISOString().slice(0, 10) + '.csv');
