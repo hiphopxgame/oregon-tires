@@ -10,6 +10,8 @@
   var entries = [];
   var estimatedWait = 0;
   var refreshTimer = null;
+  var cachedServices = null;
+  var customerSearchTimer = null;
 
   function t(key, fb) {
     return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fb;
@@ -190,6 +192,50 @@
     } catch (err) { toast(t('wqNetworkError', 'Network error'), true); }
   }
 
+  // ─── Fetch services list (cached) ──────────────────────────
+  async function fetchServices() {
+    if (cachedServices) return cachedServices;
+    try {
+      var res = await fetch('/api/services.php', { credentials: 'include' });
+      var json = await res.json();
+      if (json.success && json.data) {
+        cachedServices = json.data;
+        return cachedServices;
+      }
+    } catch (e) { /* ignore */ }
+    return null;
+  }
+
+  // ─── Customer search for autofill ─────────────────────────
+  function searchCustomers(query, dropdown) {
+    if (customerSearchTimer) clearTimeout(customerSearchTimer);
+    if (!query || query.length < 2) { dropdown.textContent = ''; dropdown.style.display = 'none'; return; }
+    customerSearchTimer = setTimeout(async function() {
+      try {
+        var res = await fetch('/api/admin/customers.php?search=' + encodeURIComponent(query) + '&limit=5', { credentials: 'include' });
+        var json = await res.json();
+        if (!json.success || !json.data || !json.data.length) { dropdown.textContent = ''; dropdown.style.display = 'none'; return; }
+        dropdown.textContent = '';
+        dropdown.style.display = 'block';
+        json.data.forEach(function(c) {
+          var name = ((c.first_name || '') + ' ' + (c.last_name || '')).trim();
+          var detail = c.email || c.phone || '';
+          var opt = el('div', 'px-3 py-2 cursor-pointer hover:bg-green-50 dark:hover:bg-gray-700 text-sm transition');
+          opt.appendChild(el('span', 'font-medium text-gray-800 dark:text-gray-200', name));
+          if (detail) { opt.appendChild(document.createTextNode(' ')); opt.appendChild(el('span', 'text-gray-400 text-xs', detail)); }
+          opt.addEventListener('click', function() {
+            document.getElementById('wq-fname').value = c.first_name || '';
+            document.getElementById('wq-lname').value = c.last_name || '';
+            document.getElementById('wq-email').value = c.email || '';
+            document.getElementById('wq-phone').value = c.phone || '';
+            dropdown.style.display = 'none';
+          });
+          dropdown.appendChild(opt);
+        });
+      } catch (e) { dropdown.style.display = 'none'; }
+    }, 300);
+  }
+
   // ─── Add to Queue Modal ────────────────────────────────────
   function openAddToQueue() {
     var existing = document.getElementById('wq-modal-overlay');
@@ -204,45 +250,84 @@
 
     var iClass = 'w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
 
-    function addField(id, label, type, ph, req) {
-      var wrap = el('div');
-      wrap.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', label + (req ? ' *' : '')));
-      var inp = document.createElement(type === 'select' ? 'select' : 'input');
-      inp.id = id;
-      inp.className = iClass;
-      if (type !== 'select') inp.type = type;
-      if (ph) inp.placeholder = ph;
-      if (req) inp.required = true;
-      wrap.appendChild(inp);
-      pn.appendChild(wrap);
-      return inp;
+    // Customer search dropdown (shared between name fields)
+    var searchDrop = el('div', 'absolute left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto');
+    searchDrop.style.display = 'none';
+
+    function onSearchInput() {
+      var q = (document.getElementById('wq-fname').value + ' ' + document.getElementById('wq-lname').value).trim();
+      searchCustomers(q, searchDrop);
     }
 
-    // Form fields
-    var row1 = el('div', 'grid grid-cols-2 gap-3');
+    // Name row
+    var row1 = el('div', 'grid grid-cols-2 gap-3 relative');
     var fnWrap = el('div');
     fnWrap.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', t('wqFirstName', 'First Name') + ' *'));
     var fnInp = document.createElement('input'); fnInp.id = 'wq-fname'; fnInp.className = iClass; fnInp.required = true;
+    fnInp.placeholder = t('wqSearchOrType', 'Search or type...');
+    fnInp.addEventListener('input', onSearchInput);
     fnWrap.appendChild(fnInp); row1.appendChild(fnWrap);
     var lnWrap = el('div');
     lnWrap.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', t('wqLastName', 'Last Name') + ' *'));
     var lnInp = document.createElement('input'); lnInp.id = 'wq-lname'; lnInp.className = iClass; lnInp.required = true;
+    lnInp.addEventListener('input', onSearchInput);
     lnWrap.appendChild(lnInp); row1.appendChild(lnWrap);
+    row1.appendChild(searchDrop);
     pn.appendChild(row1);
 
-    var row2 = el('div', 'grid grid-cols-2 gap-3');
+    // Email & Phone row
+    var row2 = el('div', 'grid grid-cols-2 gap-3 relative');
     var emWrap = el('div');
     emWrap.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', 'Email'));
     var emInp = document.createElement('input'); emInp.id = 'wq-email'; emInp.type = 'email'; emInp.className = iClass;
+    // Also search when typing email
+    var emailDrop = el('div', 'absolute left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto');
+    emailDrop.style.display = 'none';
+    emInp.addEventListener('input', function() { searchCustomers(emInp.value.trim(), emailDrop); });
     emWrap.appendChild(emInp); row2.appendChild(emWrap);
     var phWrap = el('div');
     phWrap.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', t('wqPhone', 'Phone')));
     var phInp = document.createElement('input'); phInp.id = 'wq-phone'; phInp.type = 'tel'; phInp.className = iClass;
+    // Also search when typing phone
+    var phoneDrop = el('div', 'absolute left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto');
+    phoneDrop.style.display = 'none';
+    phInp.addEventListener('input', function() { searchCustomers(phInp.value.trim(), phoneDrop); });
     phWrap.appendChild(phInp); row2.appendChild(phWrap);
+    row2.appendChild(emailDrop);
+    row2.appendChild(phoneDrop);
     pn.appendChild(row2);
 
-    addField('wq-service', t('wqService', 'Service'), 'text', 'e.g. tire-installation, oil-change');
-    addField('wq-notes', t('wqNotes', 'Notes'), 'text', t('wqNotesPlaceholder', 'Optional notes'));
+    // Service dropdown (populated from DB)
+    var svcWrap = el('div');
+    svcWrap.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', t('wqService', 'Service')));
+    var svcSelect = document.createElement('select');
+    svcSelect.id = 'wq-service';
+    svcSelect.className = iClass;
+    var defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = t('wqSelectService', 'Select a service...');
+    svcSelect.appendChild(defaultOpt);
+    svcWrap.appendChild(svcSelect);
+    pn.appendChild(svcWrap);
+
+    // Load services into dropdown
+    fetchServices().then(function(services) {
+      if (!services || !services.length) return;
+      services.forEach(function(s) {
+        var opt = document.createElement('option');
+        opt.value = s.slug || s.name_en || s.name || '';
+        opt.textContent = isEs() ? (s.name_es || s.name_en || s.name || '') : (s.name_en || s.name || '');
+        svcSelect.appendChild(opt);
+      });
+    });
+
+    // Notes
+    var notesWrap = el('div');
+    notesWrap.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', t('wqNotes', 'Notes')));
+    var notesInp = document.createElement('input');
+    notesInp.id = 'wq-notes'; notesInp.className = iClass; notesInp.placeholder = t('wqNotesPlaceholder', 'Optional notes');
+    notesWrap.appendChild(notesInp);
+    pn.appendChild(notesWrap);
 
     // Buttons
     var btnRow = el('div', 'flex gap-3 pt-2');
@@ -253,6 +338,13 @@
     addBtn.addEventListener('click', function() { submitAddToQueue(ov, addBtn); });
     btnRow.appendChild(addBtn);
     pn.appendChild(btnRow);
+
+    // Close dropdowns when clicking elsewhere in modal
+    pn.addEventListener('click', function(e) {
+      if (!e.target.closest('#wq-fname') && !e.target.closest('#wq-lname')) searchDrop.style.display = 'none';
+      if (!e.target.closest('#wq-email')) emailDrop.style.display = 'none';
+      if (!e.target.closest('#wq-phone')) phoneDrop.style.display = 'none';
+    });
 
     ov.appendChild(pn);
     document.body.appendChild(ov);
