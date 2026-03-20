@@ -13,12 +13,11 @@ try {
 
     $email       = sanitize((string) ($data['email'] ?? ''), 254);
     $password    = (string) ($data['password'] ?? '');
-    $firstName   = sanitize((string) ($data['first_name'] ?? ''), 100);
-    $lastName    = sanitize((string) ($data['last_name'] ?? ''), 100);
-    $phone       = sanitize((string) ($data['phone'] ?? ''), 30);
+    $displayName = sanitize((string) ($data['display_name'] ?? ''), 100);
+    $username    = sanitize((string) ($data['username'] ?? ''), 50);
 
-    if (!$email || !$password || !$firstName || !$lastName) {
-        jsonError('Name, email, and password are required.');
+    if (!$email || !$password) {
+        jsonError('Email and password are required.');
     }
 
     if (!isValidEmail($email)) {
@@ -29,32 +28,33 @@ try {
         jsonError('Password must be at least 8 characters.');
     }
 
-    // Build safe username: strip non-alphanumeric, ensure 3+ chars
-    $rawUsername = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $firstName . $lastName));
-    if (strlen($rawUsername) < 3) {
-        $rawUsername = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', explode('@', $email)[0]));
-    }
-    if (strlen($rawUsername) < 3) {
-        $rawUsername = 'member';
-    }
-    $rawUsername = substr($rawUsername, 0, 40);
+    // Auto-generate username if not provided
+    if ($username === '') {
+        $rawUsername = $displayName !== ''
+            ? strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $displayName))
+            : strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', explode('@', $email)[0]));
+        if (strlen($rawUsername) < 3) {
+            $rawUsername = 'member';
+        }
+        $rawUsername = substr($rawUsername, 0, 40);
 
-    // Ensure uniqueness
-    $username = $rawUsername;
-    $suffix = 0;
-    while (true) {
-        $check = $pdo->prepare('SELECT id FROM members WHERE username = ? LIMIT 1');
-        $check->execute([$username]);
-        if (!$check->fetch()) break;
-        $suffix++;
-        $username = $rawUsername . $suffix;
-        if ($suffix > 99) { $username = $rawUsername . '_' . substr(bin2hex(random_bytes(3)), 0, 6); break; }
+        // Ensure uniqueness
+        $username = $rawUsername;
+        $suffix = 0;
+        while (true) {
+            $check = $pdo->prepare('SELECT id FROM members WHERE username = ? LIMIT 1');
+            $check->execute([$username]);
+            if (!$check->fetch()) break;
+            $suffix++;
+            $username = $rawUsername . $suffix;
+            if ($suffix > 99) { $username = $rawUsername . '_' . substr(bin2hex(random_bytes(3)), 0, 6); break; }
+        }
     }
 
     $member = MemberAuth::register([
         'email'        => $email,
         'password'     => $password,
-        'display_name' => trim($firstName . ' ' . $lastName),
+        'display_name' => $displayName ?: null,
         'username'     => $username,
     ]);
 

@@ -59,8 +59,13 @@ try {
             jsonError('Invalid status: ' . $newStatus);
         }
 
-        // Fetch existing entry
-        $stmt = $db->prepare('SELECT * FROM oretir_waitlist WHERE id = ? LIMIT 1');
+        // Fetch existing entry with customer email fallback
+        $stmt = $db->prepare(
+            'SELECT w.*, c.email AS customer_email_linked
+             FROM oretir_waitlist w
+             LEFT JOIN oretir_customers c ON c.id = w.customer_id
+             WHERE w.id = ? LIMIT 1'
+        );
         $stmt->execute([$id]);
         $entry = $stmt->fetch(PDO::FETCH_ASSOC);
 
