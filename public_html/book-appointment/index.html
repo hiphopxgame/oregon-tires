@@ -1853,18 +1853,20 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
 
   input.addEventListener('input', updateTireDisplay);
 
-  // Clear display when no tire services are checked
-  document.querySelectorAll('input[name="services[]"]').forEach(function(cb) {
-    cb.addEventListener('change', function() {
+  // Clear display when no tire services are checked (delegated for dynamic checkboxes)
+  var servicesGrid = document.getElementById('services-grid');
+  if (servicesGrid) {
+    servicesGrid.addEventListener('change', function(e) {
+      if (!e.target || e.target.name !== 'services[]') return;
       var anyTire = Array.from(document.querySelectorAll('input[name="services[]"]:checked')).some(function(c) {
-        return ['tire-installation', 'tire-repair', 'wheel-alignment'].indexOf(c.value) !== -1;
+        return TIRE_SERVICES.indexOf(c.value) !== -1;
       });
       if (!anyTire) {
         while (display.firstChild) display.removeChild(display.firstChild);
         display.classList.add('hidden');
       }
     });
-  });
+  }
 })();
 
 // ===== INIT =====
