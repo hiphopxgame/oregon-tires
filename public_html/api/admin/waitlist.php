@@ -90,8 +90,9 @@ try {
             'UPDATE oretir_waitlist SET ' . implode(', ', $updates) . ' WHERE id = ?'
         )->execute($params);
 
-        // If notifying, send email
-        if ($newStatus === 'notified' && !empty($entry['email'])) {
+        // If notifying, send email (fallback to linked customer email)
+        $notifyEmail = $entry['email'] ?: ($entry['customer_email_linked'] ?? '');
+        if ($newStatus === 'notified' && !empty($notifyEmail)) {
             try {
                 require_once __DIR__ . '/../../includes/mail.php';
 
@@ -100,7 +101,7 @@ try {
                 $waitTime = estimateWaitTime($db);
 
                 sendBrandedTemplateEmail(
-                    $entry['email'],
+                    $notifyEmail,
                     'waitlist_ready',
                     [
                         'name'      => htmlspecialchars($entry['first_name'], ENT_QUOTES, 'UTF-8'),
@@ -111,7 +112,7 @@ try {
                     $directionsUrl
                 );
 
-                logEmail('waitlist_notify', "Waitlist notification sent to {$entry['email']} (entry #{$id})");
+                logEmail('waitlist_notify', "Waitlist notification sent to {$notifyEmail} (entry #{$id})");
             } catch (\Throwable $e) {
                 error_log('admin/waitlist.php notification error: ' . $e->getMessage());
             }
