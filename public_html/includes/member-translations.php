@@ -60,7 +60,7 @@ function memberT(string $key, string $lang = ''): string
 
         // Messages
         'messages'          => ['en' => 'Messages', 'es' => 'Mensajes'],
-        'messages_subtitle' => ['en' => 'Your contact submissions', 'es' => 'Sus envíos de contacto'],
+        'messages_subtitle' => ['en' => 'Your conversations and contact history', 'es' => 'Sus conversaciones e historial de contacto'],
         'no_messages'       => ['en' => 'No messages yet. Your contact form submissions will appear here.', 'es' => 'Aún no hay mensajes. Sus envíos del formulario de contacto aparecerán aquí.'],
         'no_subject'        => ['en' => 'No Subject', 'es' => 'Sin Asunto'],
         'showing_of'        => ['en' => 'Showing %d to %d of %d messages', 'es' => 'Mostrando %d a %d de %d mensajes'],
@@ -127,6 +127,7 @@ function memberT(string $key, string $lang = ''): string
         'status_resolved'      => ['en' => 'Resolved', 'es' => 'Resuelto'],
         'status_closed'        => ['en' => 'Closed', 'es' => 'Cerrado'],
         'previous_submissions' => ['en' => 'Previous Contact Submissions', 'es' => 'Envíos de Contacto Anteriores'],
+        'contact_form'         => ['en' => 'Contact Form', 'es' => 'Formulario de Contacto'],
         'type_your_message'    => ['en' => 'Type your message...', 'es' => 'Escriba su mensaje...'],
         'message_sent'         => ['en' => 'Message sent!', 'es' => '¡Mensaje enviado!'],
 

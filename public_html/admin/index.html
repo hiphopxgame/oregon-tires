@@ -801,11 +801,12 @@
               <thead><tr class="bg-gray-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
                 <th class="p-3 w-10"></th>
                 <th class="p-3" data-t="emailLogType">Type</th>
-                <th class="p-3" data-t="emailLogDesc">Description</th>
+                <th class="p-3" data-t="emailLogDesc">Details</th>
                 <th class="p-3" data-t="emailLogDate">Date</th>
+                <th class="p-3 w-16"></th>
               </tr></thead>
               <tbody id="emaillog-table-body">
-                <tr><td colspan="4" class="text-center py-8 text-gray-400">Loading...</td></tr>
+                <tr><td colspan="5" class="text-center py-8 text-gray-400">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -3781,8 +3782,9 @@
       <button onclick="closeModal('message-modal')" aria-label="Close" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
     </div>
     <div id="message-modal-meta" class="text-sm text-gray-600 mb-4 dark:text-gray-300"></div>
-    <div id="message-modal-body" class="border rounded-lg bg-gray-50 p-4 min-h-[100px] whitespace-pre-wrap dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></div>
+    <div id="message-modal-body" class="border rounded-lg bg-gray-50 p-4 min-h-[100px] dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></div>
     <div id="message-modal-status" class="mt-4"></div>
+    <div id="message-modal-actions" class="mt-4 flex justify-end gap-2"></div>
   </div>
 </div>
 
@@ -8327,7 +8329,7 @@ function renderEmailLogs() {
   if (!emailLogs.length) {
     var tr = document.createElement('tr');
     var td = document.createElement('td');
-    td.colSpan = 4;
+    td.colSpan = 5;
     td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
     td.textContent = 'No email logs found.';
     tr.appendChild(td);
@@ -8357,10 +8359,32 @@ function renderEmailLogs() {
     tdType.appendChild(badge);
     tr.appendChild(tdType);
 
-    // Description
+    // Details: subject + recipient + description
     var tdDesc = document.createElement('td');
-    tdDesc.className = 'p-3 text-sm text-gray-700 dark:text-gray-300';
-    tdDesc.textContent = log.description || '';
+    tdDesc.className = 'p-3';
+    if (log.subject) {
+      var subLine = document.createElement('div');
+      subLine.className = 'font-medium text-sm text-gray-800 dark:text-gray-200';
+      subLine.textContent = log.subject;
+      tdDesc.appendChild(subLine);
+    }
+    if (log.recipient_email) {
+      var rcptLine = document.createElement('div');
+      rcptLine.className = 'text-xs text-gray-500 dark:text-gray-400';
+      rcptLine.textContent = 'To: ' + log.recipient_email;
+      tdDesc.appendChild(rcptLine);
+    }
+    if (log.description && !log.subject) {
+      var descLine = document.createElement('div');
+      descLine.className = 'text-sm text-gray-700 dark:text-gray-300';
+      descLine.textContent = log.description;
+      tdDesc.appendChild(descLine);
+    } else if (log.description && log.subject) {
+      var descLine2 = document.createElement('div');
+      descLine2.className = 'text-xs text-gray-400 dark:text-gray-500 mt-0.5';
+      descLine2.textContent = log.description;
+      tdDesc.appendChild(descLine2);
+    }
     tr.appendChild(tdDesc);
 
     // Date
@@ -8370,10 +8394,75 @@ function renderEmailLogs() {
     tdDate.textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     tr.appendChild(tdDate);
 
+    // Actions: View button (only if has_body or subject)
+    var tdAction = document.createElement('td');
+    tdAction.className = 'p-3 text-center';
+    if (Number(log.has_body) === 1 || log.subject || log.recipient_email) {
+      var viewBtn = document.createElement('button');
+      viewBtn.className = 'text-blue-600 hover:text-blue-800 text-sm font-medium dark:text-blue-400';
+      viewBtn.textContent = 'View';
+      viewBtn.addEventListener('click', (function(logId) { return function() { viewEmailLog(logId); }; })(log.id));
+      tdAction.appendChild(viewBtn);
+    }
+    tr.appendChild(tdAction);
+
     tbody.appendChild(tr);
   });
 
   renderEmailLogPagination();
+}
+
+async function viewEmailLog(logId) {
+  try {
+    var json = await api('email-logs.php?id=' + logId);
+    var log = json.data;
+    if (!log) { showToast('Log not found', true); return; }
+
+    document.getElementById('email-modal-subject').textContent = log.subject || log.description || '(No subject)';
+
+    var metaEl = document.getElementById('email-modal-meta');
+    metaEl.textContent = '';
+
+    var metaItems = [];
+    if (log.recipient_email) metaItems.push(['To', log.recipient_email]);
+    if (log.log_type) metaItems.push(['Type', formatLogType(log.log_type)]);
+    if (log.admin_email) metaItems.push(['Admin', log.admin_email]);
+    metaItems.push(['Sent', new Date(log.created_at).toLocaleString()]);
+
+    metaItems.forEach(function(pair) {
+      var div = document.createElement('div');
+      var strong = document.createElement('strong');
+      strong.textContent = pair[0] + ': ';
+      div.appendChild(strong);
+      div.appendChild(document.createTextNode(pair[1]));
+      metaEl.appendChild(div);
+    });
+
+    var bodyContainer = document.getElementById('email-modal-body');
+    bodyContainer.textContent = '';
+
+    if (log.body) {
+      var iframe = document.createElement('iframe');
+      iframe.sandbox = 'allow-same-origin';
+      iframe.style.cssText = 'width:100%;min-height:200px;border:none;';
+      bodyContainer.appendChild(iframe);
+      iframe.srcdoc = log.body;
+      iframe.onload = function() {
+        try { iframe.style.height = iframe.contentDocument.body.scrollHeight + 20 + 'px'; } catch(e) {}
+      };
+    } else {
+      var noBody = document.createElement('div');
+      noBody.className = 'text-gray-400 dark:text-gray-500 text-center py-8';
+      noBody.textContent = log.description || 'Email body not available (sent before audit logging was enabled).';
+      bodyContainer.appendChild(noBody);
+    }
+
+    document.getElementById('email-modal').classList.remove('hidden');
+    trapFocus(document.getElementById('email-modal'));
+  } catch(e) {
+    console.error('viewEmailLog error:', e);
+    showToast('Failed to load email details', true);
+  }
 }
 
 function renderEmailLogPagination() {
@@ -8707,23 +8796,64 @@ async function refreshConvUnreadBadge() {
 }
 
 function openMessageModal(id) {
-  const m = messages.find(msg => msg.id === id); if(!m) return;
-  document.getElementById('message-modal-meta').innerHTML = `
-    <div class="grid grid-cols-2 gap-4">
-      <div><strong>Name:</strong> ${esc(m.first_name)} ${esc(m.last_name)}</div>
-      <div><strong>Email:</strong> ${esc(m.email)}</div>
-      ${m.phone ? `<div><strong>Phone:</strong> ${esc(m.phone)}</div>` : ''}
-      <div><strong>Date:</strong> ${new Date(m.created_at).toLocaleString()}</div>
-    </div>`;
-  document.getElementById('message-modal-body').textContent = m.message;
-  document.getElementById('message-modal-status').innerHTML = `
-    <select onchange="updateMsgStatus('${m.id}',this.value)" class="border rounded px-3 py-2 text-sm">
-      <option value="new" ${m.status==='new'?'selected':''}>New</option>
-      <option value="priority" ${m.status==='priority'?'selected':''}>Priority</option>
-      <option value="completed" ${m.status==='completed'?'selected':''}>Completed</option>
-    </select>`;
+  var m = messages.find(function(msg) { return msg.id === id; }); if(!m) return;
+  var iClass = 'w-full border rounded px-2 py-1.5 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100';
+  document.getElementById('message-modal-meta').innerHTML =
+    '<div class="grid grid-cols-2 gap-3 mb-1">'
+    + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">First Name</label>'
+    + '<input id="msg-edit-fname" class="' + iClass + '" value="' + esc(m.first_name || '') + '"></div>'
+    + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">Last Name</label>'
+    + '<input id="msg-edit-lname" class="' + iClass + '" value="' + esc(m.last_name || '') + '"></div>'
+    + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">Email</label>'
+    + '<input id="msg-edit-email" type="email" class="' + iClass + '" value="' + esc(m.email || '') + '"></div>'
+    + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">Phone</label>'
+    + '<input id="msg-edit-phone" class="' + iClass + '" value="' + esc(m.phone || '') + '"></div>'
+    + '</div>'
+    + '<div class="text-xs text-gray-400 dark:text-gray-500 mt-1">Received: ' + new Date(m.created_at).toLocaleString() + '</div>';
+  var bodyEl = document.getElementById('message-modal-body');
+  bodyEl.innerHTML = '<label class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Message</label>'
+    + '<textarea id="msg-edit-body" rows="4" class="' + iClass + ' resize-y" style="min-height:80px">' + esc(m.message || '') + '</textarea>';
+  document.getElementById('message-modal-status').innerHTML =
+    '<label class="text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>'
+    + '<select id="msg-edit-status" class="' + iClass + '">'
+    + '<option value="new"' + (m.status === 'new' ? ' selected' : '') + '>New</option>'
+    + '<option value="priority"' + (m.status === 'priority' ? ' selected' : '') + '>Priority</option>'
+    + '<option value="completed"' + (m.status === 'completed' ? ' selected' : '') + '>Completed</option>'
+    + '</select>';
+  var actionsEl = document.getElementById('message-modal-actions');
+  actionsEl.innerHTML = '';
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'bg-brand text-white px-5 py-2 rounded-lg text-sm font-medium hover:opacity-90';
+  saveBtn.textContent = adminT[currentLang].save || 'Save Changes';
+  saveBtn.addEventListener('click', function() { saveMessageEdits(m.id, saveBtn); });
+  actionsEl.appendChild(saveBtn);
   document.getElementById('message-modal').classList.remove('hidden');
   trapFocus(document.getElementById('message-modal'));
+}
+
+async function saveMessageEdits(id, btn) {
+  var data = {
+    id: id,
+    first_name: document.getElementById('msg-edit-fname').value.trim(),
+    last_name: document.getElementById('msg-edit-lname').value.trim(),
+    email: document.getElementById('msg-edit-email').value.trim(),
+    phone: document.getElementById('msg-edit-phone').value.trim(),
+    message: document.getElementById('msg-edit-body').value.trim(),
+    status: document.getElementById('msg-edit-status').value
+  };
+  if (!data.email) { showToast('Email is required', true); return; }
+  btn.disabled = true;
+  btn.textContent = adminT[currentLang].saving || 'Saving...';
+  try {
+    await api('messages.php', { method: 'PUT', body: data });
+    showToast(adminT[currentLang].saved || 'Changes saved');
+    closeModal('message-modal');
+    loadMessages();
+  } catch(e) {
+    showToast((adminT[currentLang].error || 'Error') + ': ' + e.message, true);
+  }
+  btn.disabled = false;
+  btn.textContent = adminT[currentLang].save || 'Save Changes';
 }
 
 // ===== EMPLOYEES =====

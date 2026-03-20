@@ -58,6 +58,9 @@ function sendMail(string $to, string $subject, string $htmlBody, string $textBod
 
         $mail->send();
 
+        // Auto-log with full email content for audit trail
+        logEmail('email_sent', "Email sent to {$to}: {$subject}", null, $to, $subject, $htmlBody);
+
         return ['success' => true, 'error' => null];
     } catch (\Throwable $e) {
         error_log("Oregon Tires mail error: " . $e->getMessage());
@@ -80,13 +83,16 @@ function notifyOwner(string $subject, string $htmlBody, string $replyTo = ''): a
 
 /**
  * Log an email event to the database.
+ * Optional: recipient_email, subject, body for full audit trail.
  */
-function logEmail(string $type, string $description, ?string $adminEmail = null): void
+function logEmail(string $type, string $description, ?string $adminEmail = null, ?string $recipientEmail = null, ?string $subject = null, ?string $body = null): void
 {
     try {
         $db = getDB();
-        $db->prepare('INSERT INTO oretir_email_logs (log_type, description, admin_email) VALUES (?, ?, ?)')
-           ->execute([$type, $description, $adminEmail]);
+        $db->prepare(
+            'INSERT INTO oretir_email_logs (log_type, description, admin_email, recipient_email, subject, body)
+             VALUES (?, ?, ?, ?, ?, ?)'
+        )->execute([$type, $description, $adminEmail, $recipientEmail, $subject, $body]);
     } catch (\Throwable $e) {
         error_log("Oregon Tires email log error: " . $e->getMessage());
     }

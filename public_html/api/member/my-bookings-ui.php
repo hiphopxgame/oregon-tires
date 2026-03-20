@@ -29,6 +29,7 @@ try {
     }
 
     $memberId = (int) $_SESSION['member_id'];
+    session_write_close(); // release session lock for read-only request
     $status = sanitize((string) ($_GET['status'] ?? ''), 20);
 
     // Fetch member email for matching guest bookings

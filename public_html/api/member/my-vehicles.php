@@ -29,6 +29,7 @@ try {
     }
 
     $memberId = (int) $_SESSION['member_id'];
+    session_write_close(); // release session lock for read-only request
 
     // Fetch member email for matching guest-booked vehicles
     $memberStmt = $pdo->prepare('SELECT email FROM members WHERE id = ? LIMIT 1');
@@ -38,7 +39,7 @@ try {
     // Query vehicles: match by member_id OR via customer email (orphaned vehicles)
     $sql = 'SELECT DISTINCT v.id, v.year, v.make, v.model, v.vin, v.trim_level, v.engine, v.transmission,
                    v.drive_type, v.body_class, v.fuel_type, v.doors, v.tire_size_front, v.tire_size_rear,
-                   v.tire_size, v.license_plate, v.color, v.mileage, v.created_at
+                   v.license_plate, v.color, v.mileage, v.created_at
             FROM oretir_vehicles v
             LEFT JOIN oretir_customers c ON v.customer_id = c.id
             WHERE (v.member_id = :mid';
@@ -128,7 +129,7 @@ try {
                                 </p>
                             <?php endif; ?>
                             <?php
-                            $tireDisplay = $vehicle['tire_size_front'] ?: ($vehicle['tire_size'] ?? '');
+                            $tireDisplay = $vehicle['tire_size_front'] ?? '';
                             if (!empty($tireDisplay)): ?>
                                 <p style="margin: 0.25rem 0 0; font-size: 0.75rem; color: var(--member-text-muted);">
                                     <?= htmlspecialchars(memberT('tire_size', $lang)) ?>: <?= htmlspecialchars($tireDisplay) ?>

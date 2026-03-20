@@ -1,9 +1,10 @@
 <?php
 /**
  * Oregon Tires — Admin Email Logs
- * GET /api/admin/email-logs.php          — list all email logs (paginated)
+ * GET /api/admin/email-logs.php          — list all email logs (paginated, excludes body)
+ * GET /api/admin/email-logs.php?id=N     — single log with full body
  * GET /api/admin/email-logs.php?type=X   — filter by log_type
- * GET /api/admin/email-logs.php?q=X      — search description
+ * GET /api/admin/email-logs.php?q=X      — search description/subject/recipient
  */
 
 declare(strict_types=1);
@@ -17,27 +18,40 @@ try {
 
     $db = getDB();
 
+    // ─── Single record with full body ─────────────────────────
+    $id = (int) ($_GET['id'] ?? 0);
+    if ($id > 0) {
+        $stmt = $db->prepare('SELECT * FROM oretir_email_logs WHERE id = ?');
+        $stmt->execute([$id]);
+        $log = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$log) jsonError('Log not found', 404);
+        jsonSuccess($log);
+    }
+
+    // ─── List (excludes body for performance) ─────────────────
     $where = [];
     $params = [];
 
-    // Filter by log_type
     $type = trim($_GET['type'] ?? '');
     if ($type !== '') {
         $where[] = 'log_type = ?';
         $params[] = $type;
     }
 
-    // Search description
     $q = trim($_GET['q'] ?? '');
     if ($q !== '') {
-        $where[] = 'description LIKE ?';
+        $where[] = '(description LIKE ? OR subject LIKE ? OR recipient_email LIKE ?)';
+        $params[] = '%' . $q . '%';
+        $params[] = '%' . $q . '%';
         $params[] = '%' . $q . '%';
     }
 
     $limit = min((int) ($_GET['limit'] ?? 100), 500);
     $offset = max((int) ($_GET['offset'] ?? 0), 0);
 
-    $sql = 'SELECT * FROM oretir_email_logs';
+    $cols = 'id, log_type, description, admin_email, recipient_email, subject, created_at,
+             (body IS NOT NULL AND body != \'\') AS has_body';
+    $sql = "SELECT {$cols} FROM oretir_email_logs";
     if ($where) {
         $sql .= ' WHERE ' . implode(' AND ', $where);
     }
@@ -49,10 +63,10 @@ try {
     $stmt->execute($params);
     $logs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-    // Get total count
+    // Total count
     $countSql = 'SELECT COUNT(*) FROM oretir_email_logs';
     if ($where) {
-        $countSql .= ' WHERE ' . implode(' AND ', array_slice($where, 0));
+        $countSql .= ' WHERE ' . implode(' AND ', $where);
         $countStmt = $db->prepare($countSql);
         $countStmt->execute(array_slice($params, 0, count($params) - 2));
     } else {
@@ -60,7 +74,7 @@ try {
     }
     $total = (int) $countStmt->fetchColumn();
 
-    // Get available log types for filter dropdown
+    // Available log types
     $types = $db->query('SELECT DISTINCT log_type FROM oretir_email_logs ORDER BY log_type')
                 ->fetchAll(\PDO::FETCH_COLUMN);
 

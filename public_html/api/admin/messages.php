@@ -96,19 +96,56 @@ try {
     $body = getJsonBody();
 
     $id = (int) ($body['id'] ?? 0);
-    $status = $body['status'] ?? '';
-
     if ($id < 1) {
         jsonError('Missing message id.', 400);
     }
 
-    $validStatuses = ['new', 'priority', 'completed'];
-    if (!in_array($status, $validStatuses, true)) {
-        jsonError('Invalid status. Must be: new, priority, or completed.', 400);
+    $fields = [];
+    $params = [];
+
+    // Status update
+    if (isset($body['status'])) {
+        $validStatuses = ['new', 'priority', 'completed'];
+        if (!in_array($body['status'], $validStatuses, true)) {
+            jsonError('Invalid status. Must be: new, priority, or completed.', 400);
+        }
+        $fields[] = 'status = ?';
+        $params[] = $body['status'];
     }
 
-    $stmt = $db->prepare('UPDATE oretir_contact_messages SET status = ? WHERE id = ?');
-    $stmt->execute([$status, $id]);
+    // Editable fields
+    if (isset($body['first_name'])) {
+        $fields[] = 'first_name = ?';
+        $params[] = mb_substr(trim($body['first_name']), 0, 100);
+    }
+    if (isset($body['last_name'])) {
+        $fields[] = 'last_name = ?';
+        $params[] = mb_substr(trim($body['last_name']), 0, 100);
+    }
+    if (isset($body['email'])) {
+        $email = trim($body['email']);
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            jsonError('Invalid email address.', 400);
+        }
+        $fields[] = 'email = ?';
+        $params[] = mb_substr($email, 0, 255);
+    }
+    if (isset($body['phone'])) {
+        $fields[] = 'phone = ?';
+        $params[] = mb_substr(trim($body['phone']), 0, 30);
+    }
+    if (isset($body['message'])) {
+        $fields[] = 'message = ?';
+        $params[] = trim($body['message']);
+    }
+
+    if (empty($fields)) {
+        jsonError('No fields to update.', 400);
+    }
+
+    $params[] = $id;
+    $stmt = $db->prepare('UPDATE oretir_contact_messages SET ' . implode(', ', $fields) . ' WHERE id = ?');
+    $stmt->execute($params);
 
     jsonSuccess(['updated' => $id]);
 

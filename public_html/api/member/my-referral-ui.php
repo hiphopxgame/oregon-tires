@@ -31,6 +31,7 @@ try {
     }
 
     $memberId = (int) $_SESSION['member_id'];
+    session_write_close(); // release session lock for read-only request
 
     // Fetch member email for fallback customer matching
     $memberStmt = $pdo->prepare('SELECT email FROM members WHERE id = ? LIMIT 1');

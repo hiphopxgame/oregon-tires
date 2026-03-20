@@ -32,6 +32,7 @@ try {
 
     $member = MemberAuth::getCurrentMember();
     $memberEmail = $member['email'] ?? null;
+    session_write_close(); // release session lock for read-only request
 
     if (!$memberEmail) {
         http_response_code(400);
@@ -62,7 +63,7 @@ try {
 
     // Load legacy contact messages
     $legacyStmt = $pdo->prepare(
-        'SELECT id, name, email, subject, message, created_at, status
+        'SELECT id, CONCAT(first_name, " ", last_name) AS name, email, message, created_at, status
          FROM oretir_contact_messages
          WHERE email = ?
          ORDER BY created_at DESC
@@ -183,7 +184,7 @@ try {
                             <div style="padding:0.75rem;background:var(--member-surface-hover);border-radius:var(--member-radius);border-left:3px solid var(--member-border);opacity:0.8;">
                                 <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.3rem;">
                                     <h3 style="margin:0;font-size:0.875rem;color:var(--member-text-muted);">
-                                        <?= htmlspecialchars($msg['subject'] ?? memberT('no_subject', $lang)) ?>
+                                        <?= htmlspecialchars(memberT('contact_form', $lang)) ?>
                                     </h3>
                                     <span style="font-size:0.7rem;color:var(--member-text-muted);">
                                         <?= htmlspecialchars(date('M d, Y', strtotime($msg['created_at'] ?? 'now'))) ?>

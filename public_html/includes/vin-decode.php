@@ -204,14 +204,14 @@ function findOrCreateCustomer(string $email, string $firstName, string $lastName
         if ($existing) {
             $db->prepare(
                 'UPDATE oretir_customers SET first_name = ?, last_name = ?, phone = ?, language = ?,
-                 visit_count = visit_count + 1, last_visit_at = NOW(), updated_at = NOW() WHERE id = ?'
+                 updated_at = NOW() WHERE id = ?'
             )->execute([$firstName, $lastName, $phone, $language, $existing['id']]);
             return (int) $existing['id'];
         }
 
         $stmt = $db->prepare(
-            'INSERT INTO oretir_customers (first_name, last_name, email, phone, language, visit_count, last_visit_at, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW(), NOW())'
+            'INSERT INTO oretir_customers (first_name, last_name, email, phone, language, visit_count, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, 0, NOW(), NOW())'
         );
         $stmt->execute([$firstName, $lastName, $email, $phone, $language]);
         return (int) $db->lastInsertId();
