@@ -371,6 +371,7 @@ function renderRoDetailModal() {
     [t('phone', 'Phone'), ro.customer_phone || '-'],
     [t('roThVehicle', 'Vehicle'), vehicle + (ro.trim_level ? ' ' + ro.trim_level : '')],
     ['VIN', ro.vin || '-'],
+    ['Plate', ro.license_plate || '-'],
     [t('roMileageIn', 'Mileage In'), ro.mileage_in ? Number(ro.mileage_in).toLocaleString() : '-'],
   ];
   if (vehicleSpecs) infoItems.push(['Specs', vehicleSpecs]);

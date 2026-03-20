@@ -31,7 +31,8 @@ try {
                 'SELECT r.*,
                     c.first_name, c.last_name, c.email as customer_email, c.phone as customer_phone, c.language as customer_language,
                     v.vin, v.year as vehicle_year, v.make as vehicle_make, v.model as vehicle_model,
-                    v.trim_level, v.engine, v.tire_size_front, v.tire_size_rear, v.color as vehicle_color,
+                    v.trim_level, v.engine, v.transmission, v.drive_type, v.body_class, v.fuel_type, v.doors,
+                    v.tire_size_front, v.tire_size_rear, v.color as vehicle_color,
                     v.license_plate
                  FROM oretir_repair_orders r
                  JOIN oretir_customers c ON c.id = r.customer_id
@@ -107,8 +108,9 @@ try {
         $countStmt->execute($params);
         $total = (int) $countStmt->fetchColumn();
 
-        $sql = "SELECT r.*, c.first_name, c.last_name, c.email as customer_email,
+        $sql = "SELECT r.*, c.first_name, c.last_name, c.email as customer_email, c.phone as customer_phone,
                     v.year as vehicle_year, v.make as vehicle_make, v.model as vehicle_model, v.vin,
+                    v.trim_level, v.engine, v.transmission, v.drive_type, v.fuel_type, v.license_plate,
                     (SELECT COUNT(*) FROM oretir_inspections WHERE repair_order_id = r.id) as inspection_count,
                     (SELECT COUNT(*) FROM oretir_estimates WHERE repair_order_id = r.id) as estimate_count
                 FROM oretir_repair_orders r

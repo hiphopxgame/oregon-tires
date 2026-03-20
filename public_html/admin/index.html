@@ -3468,11 +3468,14 @@
 
     <hr class="border-gray-200 dark:border-gray-700 my-4">
 
-    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2" data-t="adminNotes">Admin Notes</label>
-    <textarea id="notes-text" rows="4" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" data-t="notesPlaceholder" placeholder="Add notes about this appointment..."></textarea>
+    <!-- Existing notes log (read-only) -->
+    <div id="notes-log" class="mb-3 max-h-48 overflow-y-auto"></div>
+
+    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2" data-t="addNote">Add Note</label>
+    <textarea id="notes-text" rows="3" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" placeholder="Type a new note..."></textarea>
     <div class="flex justify-end gap-3 mt-4">
       <button onclick="closeModal('notes-modal')" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800" data-t="cancelNotes">Cancel</button>
-      <button onclick="saveNotes()" class="px-4 py-2 text-sm bg-brand text-white rounded-lg hover:bg-green-700" data-t="saveNotes">Save Notes</button>
+      <button onclick="saveNotes()" class="px-4 py-2 text-sm bg-brand text-white rounded-lg hover:bg-green-700" data-t="saveNotes">Save Note</button>
     </div>
   </div>
 </div>
@@ -10180,7 +10183,7 @@ function fmtPhone(p) {
 function openNotesModal(id) {
   currentNotesId = id;
   var a = appointments.find(function(x) { return x.id === id; });
-  document.getElementById('notes-text').value = a?.admin_notes || '';
+  document.getElementById('notes-text').value = '';
   var T = adminT[currentLang] || adminT.en;
 
   // Build booking details
@@ -10209,26 +10212,45 @@ function openNotesModal(id) {
   refSection.className = 'p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 space-y-1';
   if (a.reference_number) refSection.appendChild(detailRow(T.referenceNumber || 'Reference', a.reference_number, 'font-mono font-bold'));
   refSection.appendChild(detailRow(T.status || 'Status', a.status));
+  refSection.appendChild(detailRow(T.service || 'Service', a.service ? a.service.replace(/-/g, ' ').replace(/\b\w/g, function(c){return c.toUpperCase();}) : ''));
   refSection.appendChild(detailRow(T.language || 'Language', a.language === 'spanish' ? 'Español' : 'English'));
   if (a.sms_opt_in !== undefined) refSection.appendChild(detailRow('SMS Opt-in', parseInt(a.sms_opt_in) ? '✓ Yes' : '✗ No'));
   container.appendChild(refSection);
 
-  // Vehicle info
+  // Vehicle info — combine appointment fields + joined vehicle table data
   var vehicle = [a.vehicle_year, a.vehicle_make, a.vehicle_model].filter(Boolean).join(' ');
-  if (vehicle || a.vehicle_vin) {
+  var vin = a.vehicle_vin || a.v_vin || '';
+  var plate = a.v_license_plate || '';
+  var trim = a.v_trim || '';
+  var engine = a.v_engine || '';
+  var transmission = a.v_transmission || '';
+  var driveType = a.v_drive_type || '';
+  var fuelType = a.v_fuel_type || '';
+  var bodyClass = a.v_body_class || '';
+  var color = a.v_color || '';
+  if (vehicle || vin || plate) {
     var vehSection = document.createElement('div');
-    vehSection.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 space-y-1';
+    vehSection.className = 'p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 space-y-1';
     var vehTitle = document.createElement('div');
-    vehTitle.className = 'text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1';
+    vehTitle.className = 'text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider mb-1';
     vehTitle.textContent = T.vehicleInfo || 'Vehicle';
     vehSection.appendChild(vehTitle);
-    if (vehicle) vehSection.appendChild(detailRow(T.vehicleLabel || 'Vehicle', vehicle));
-    if (a.vehicle_vin) vehSection.appendChild(detailRow('VIN', a.vehicle_vin, 'font-mono'));
+    if (vehicle) vehSection.appendChild(detailRow(T.vehicleLabel || 'Vehicle', vehicle + (trim ? ' ' + trim : '')));
+    if (vin) vehSection.appendChild(detailRow('VIN', vin, 'font-mono'));
+    if (plate) vehSection.appendChild(detailRow('Plate', plate, 'font-mono'));
+    if (engine) vehSection.appendChild(detailRow('Engine', engine));
+    if (transmission) vehSection.appendChild(detailRow('Transmission', transmission));
+    if (driveType) vehSection.appendChild(detailRow('Drive', driveType));
+    if (fuelType) vehSection.appendChild(detailRow('Fuel', fuelType));
+    if (bodyClass) vehSection.appendChild(detailRow('Body', bodyClass));
+    if (color) vehSection.appendChild(detailRow('Color', color));
     container.appendChild(vehSection);
   }
 
   // Tire details
-  if (a.tire_size || a.tire_preference || a.tire_count) {
+  var tireFront = a.v_tire_size_front || '';
+  var tireRear = a.v_tire_size_rear || '';
+  if (a.tire_size || a.tire_preference || a.tire_count || tireFront) {
     var tireSection = document.createElement('div');
     tireSection.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 space-y-1';
     var tireTitle = document.createElement('div');
@@ -10236,6 +10258,8 @@ function openNotesModal(id) {
     tireTitle.textContent = T.tireDetails || 'Tire Details';
     tireSection.appendChild(tireTitle);
     if (a.tire_size) tireSection.appendChild(detailRow(T.tireSize || 'Size', a.tire_size));
+    if (tireFront) tireSection.appendChild(detailRow('Front Tires', tireFront));
+    if (tireRear && tireRear !== tireFront) tireSection.appendChild(detailRow('Rear Tires', tireRear));
     if (a.tire_preference) tireSection.appendChild(detailRow(T.tirePreference || 'Preference', a.tire_preference.charAt(0).toUpperCase() + a.tire_preference.slice(1)));
     if (a.tire_count) tireSection.appendChild(detailRow(T.tireCount || 'Count', a.tire_count));
     container.appendChild(tireSection);
@@ -10263,14 +10287,29 @@ function openNotesModal(id) {
     container.appendChild(notesSection);
   }
 
+  // Render admin notes log (read-only, newest first)
+  var logContainer = document.getElementById('notes-log');
+  logContainer.textContent = '';
+  if (a.admin_notes && a.admin_notes.trim()) {
+    var logTitle = document.createElement('label');
+    logTitle.className = 'block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2';
+    logTitle.textContent = T.adminNotes || 'Admin Notes';
+    logContainer.appendChild(logTitle);
+    var logBox = document.createElement('div');
+    logBox.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap';
+    logBox.textContent = a.admin_notes;
+    logContainer.appendChild(logBox);
+  }
+
   document.getElementById('notes-modal').classList.remove('hidden');
   trapFocus(document.getElementById('notes-modal'));
 }
 async function saveNotes() {
   if(!currentNotesId) return;
-  const notes = document.getElementById('notes-text').value;
+  const newNote = document.getElementById('notes-text').value.trim();
+  if (!newNote) { showToast('Please enter a note.', true); return; }
   try {
-    await api('appointments.php', { method: 'PUT', body: { id: currentNotesId, admin_notes: notes } });
+    await api('appointments.php', { method: 'PUT', body: { id: currentNotesId, admin_notes: newNote, admin_note_append: true } });
     showToast(adminT[currentLang].notesSaved); closeModal('notes-modal'); loadAppointments();
   } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }

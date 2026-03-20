@@ -81,9 +81,15 @@ try {
         // ─── Fetch paginated rows ─────────────────────────────────────────
         // Sort prefix: columns on joined table need alias, rest use 'a.'
         $sortPrefix = $sortBy === 'employee_name' ? '' : 'a.';
-        $dataSQL = "SELECT a.*, e.name AS employee_name
+        $dataSQL = "SELECT a.*, e.name AS employee_name,
+                    v.vin AS v_vin, v.trim_level AS v_trim, v.engine AS v_engine,
+                    v.transmission AS v_transmission, v.drive_type AS v_drive_type,
+                    v.fuel_type AS v_fuel_type, v.body_class AS v_body_class,
+                    v.license_plate AS v_license_plate, v.tire_size_front AS v_tire_size_front,
+                    v.tire_size_rear AS v_tire_size_rear, v.color AS v_color
                     FROM oretir_appointments a
                     LEFT JOIN oretir_employees e ON a.assigned_employee_id = e.id
+                    LEFT JOIN oretir_vehicles v ON a.vehicle_id = v.id
                     {$whereSQL}
                     ORDER BY {$sortPrefix}{$sortBy} {$sortOrder}
                     LIMIT ? OFFSET ?";
@@ -185,8 +191,24 @@ try {
         }
 
         if (isset($body['admin_notes'])) {
-            $fields[] = 'admin_notes = ?';
-            $params[] = sanitize($body['admin_notes'], 2000);
+            // Append-only: prepend new note with author + timestamp
+            if (!empty($body['admin_note_append'])) {
+                $newNote = sanitize($body['admin_notes'], 2000);
+                if ($newNote !== '') {
+                    $adminName = $staff['name'] ?? $staff['email'] ?? 'Admin';
+                    $timestamp = date('M j, Y g:ia');
+                    $entry = "[{$adminName} — {$timestamp}]\n{$newNote}";
+                    // Fetch existing notes to prepend
+                    $existStmt = $db->prepare('SELECT admin_notes FROM oretir_appointments WHERE id = ?');
+                    $existStmt->execute([$id]);
+                    $existing = (string) ($existStmt->fetchColumn() ?: '');
+                    $fields[] = 'admin_notes = ?';
+                    $params[] = $existing ? $entry . "\n\n" . $existing : $entry;
+                }
+            } else {
+                $fields[] = 'admin_notes = ?';
+                $params[] = sanitize($body['admin_notes'], 5000);
+            }
         }
 
         if (isset($body['task_summary'])) {
