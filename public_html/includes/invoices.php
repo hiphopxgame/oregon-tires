@@ -152,6 +152,105 @@ function createInvoiceFromEstimate(PDO $db, int $roId): ?array
 }
 
 /**
+ * Create an invoice from any estimate (including draft) when no approved estimate exists.
+ * Used as a fallback when completing an RO without going through the approval flow.
+ *
+ * @return array{invoice_id: int, invoice_number: string}|null
+ */
+function createInvoiceFromAnyEstimate(PDO $db, int $roId): ?array
+{
+    // Check if invoice already exists
+    $existCheck = $db->prepare('SELECT id, invoice_number FROM oretir_invoices WHERE repair_order_id = ? LIMIT 1');
+    $existCheck->execute([$roId]);
+    $existing = $existCheck->fetch(PDO::FETCH_ASSOC);
+    if ($existing) {
+        return ['invoice_id' => (int) $existing['id'], 'invoice_number' => $existing['invoice_number']];
+    }
+
+    // Find the latest non-superseded estimate (any status)
+    $estStmt = $db->prepare(
+        "SELECT e.* FROM oretir_estimates e
+         WHERE e.repair_order_id = ? AND e.status NOT IN ('superseded','expired')
+         ORDER BY e.version DESC LIMIT 1"
+    );
+    $estStmt->execute([$roId]);
+    $estimate = $estStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$estimate) {
+        return null;
+    }
+
+    $roStmt = $db->prepare('SELECT customer_id FROM oretir_repair_orders WHERE id = ?');
+    $roStmt->execute([$roId]);
+    $ro = $roStmt->fetch(PDO::FETCH_ASSOC);
+    if (!$ro) return null;
+
+    // Get all items (no approval filter)
+    $itemStmt = $db->prepare(
+        'SELECT ei.* FROM oretir_estimate_items ei
+         WHERE ei.estimate_id = ?
+         ORDER BY ei.sort_order ASC, ei.id ASC'
+    );
+    $itemStmt->execute([$estimate['id']]);
+    $items = $itemStmt->fetchAll(PDO::FETCH_ASSOC);
+    if (empty($items)) return null;
+
+    $subtotal = 0.00;
+    $discountAmount = 0.00;
+    foreach ($items as $item) {
+        $lineTotal = (float) ($item['total'] ?? ((float) $item['quantity'] * (float) $item['unit_price']));
+        if ($item['item_type'] === 'discount') {
+            $discountAmount += abs($lineTotal);
+        } else {
+            $subtotal += $lineTotal;
+        }
+    }
+
+    $taxRate = (float) ($estimate['tax_rate'] ?? 0.0000);
+    $taxableAmount = $subtotal - $discountAmount;
+    $taxAmount = round($taxableAmount * $taxRate, 2);
+    $total = round($taxableAmount + $taxAmount, 2);
+
+    $invoiceNumber = generateInvoiceNumber($db);
+    $token = bin2hex(random_bytes(32));
+
+    $db->beginTransaction();
+    try {
+        $invStmt = $db->prepare(
+            'INSERT INTO oretir_invoices
+                (repair_order_id, invoice_number, estimate_id, customer_id, subtotal, tax_rate,
+                 tax_amount, discount_amount, total, status, customer_view_token, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+        );
+        $invStmt->execute([
+            $roId, $invoiceNumber, $estimate['id'], $ro['customer_id'],
+            $subtotal, $taxRate, $taxAmount, $discountAmount, $total, 'draft', $token,
+        ]);
+        $invoiceId = (int) $db->lastInsertId();
+
+        $insertItem = $db->prepare(
+            'INSERT INTO oretir_invoice_items
+                (invoice_id, estimate_item_id, item_type, description, quantity, unit_price, total, sort_order)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+        $sortOrder = 0;
+        foreach ($items as $item) {
+            $lineTotal = (float) ($item['total'] ?? ((float) $item['quantity'] * (float) $item['unit_price']));
+            $insertItem->execute([
+                $invoiceId, $item['id'], $item['item_type'], $item['description'],
+                $item['quantity'], $item['unit_price'], $lineTotal, $sortOrder++,
+            ]);
+        }
+
+        $db->commit();
+        return ['invoice_id' => $invoiceId, 'invoice_number' => $invoiceNumber];
+    } catch (\Throwable $e) {
+        $db->rollBack();
+        throw $e;
+    }
+}
+
+/**
  * Get an invoice with full details (customer, vehicle, RO) and line items.
  */
 function getInvoiceWithItems(PDO $db, int $invoiceId): ?array

@@ -334,12 +334,18 @@ try {
             }
         }
 
-        // ─── Auto-create invoice when RO status changes to 'invoiced' ────
-        if (isset($data['status']) && $data['status'] === 'invoiced') {
+        // ─── Auto-create invoice when RO status changes to 'completed' or 'invoiced' ────
+        if (isset($data['status']) && in_array($data['status'], ['completed', 'invoiced'], true)) {
             try {
                 require_once __DIR__ . '/../../includes/invoices.php';
                 require_once __DIR__ . '/../../includes/mail.php';
                 $invoiceResult = createInvoiceFromEstimate($db, $id);
+
+                // Fallback: if no approved estimate, create invoice from any estimate (even draft)
+                if (!$invoiceResult) {
+                    $invoiceResult = createInvoiceFromAnyEstimate($db, $id);
+                }
+
                 if ($invoiceResult) {
                     // Send invoice email
                     $custStmt2 = $db->prepare('SELECT first_name, last_name, email, language FROM oretir_customers WHERE id = ?');
@@ -358,6 +364,16 @@ try {
                         sendInvoiceEmail($cust2['email'], $custName2, $ro['ro_number'], $vehicle2, '$' . number_format((float)$inv2['total'], 2), $invoiceResult['invoice_number'], $viewUrl2, $lang2);
                         // Update invoice status to 'sent'
                         $db->prepare('UPDATE oretir_invoices SET status = ? WHERE id = ?')->execute(['sent', $invoiceResult['invoice_id']]);
+                    }
+
+                    // Auto-advance RO to 'invoiced' if it was set to 'completed'
+                    if ($data['status'] === 'completed') {
+                        $db->prepare("UPDATE oretir_repair_orders SET status = 'invoiced', updated_at = NOW() WHERE id = ?")->execute([$id]);
+                        try {
+                            syncAppointmentRoStatus('ro', $id, 'invoiced', $db);
+                        } catch (\Throwable $syncErr2) {
+                            error_log("repair-orders.php: sync after auto-invoice failed for RO #{$id}: " . $syncErr2->getMessage());
+                        }
                     }
                 }
             } catch (\Throwable $e) {

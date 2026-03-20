@@ -631,19 +631,23 @@ function renderRoDetailModal() {
   }
 
   // Estimates
-  if (ro.estimates && ro.estimates.length > 0) {
-    var estSection = document.createElement('div');
-    var estH = document.createElement('h3');
-    estH.className = 'font-bold text-gray-900 dark:text-white mb-3';
-    estH.textContent = t('roEstimates', 'Estimates') + ' (' + ro.estimates.length + ')';
-    estSection.appendChild(estH);
+  var estSection = document.createElement('div');
+  var estH = document.createElement('h3');
+  estH.className = 'font-bold text-gray-900 dark:text-white mb-3';
+  estH.textContent = t('roEstimates', 'Estimates') + (ro.estimates && ro.estimates.length ? ' (' + ro.estimates.length + ')' : '');
+  estSection.appendChild(estH);
 
+  if (ro.estimates && ro.estimates.length > 0) {
     ro.estimates.forEach(function(est) {
       var eCard = document.createElement('div');
-      eCard.className = 'border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-2 flex justify-between items-center';
+      eCard.className = 'border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-3';
+
+      // Header row
+      var eHeader = document.createElement('div');
+      eHeader.className = 'flex justify-between items-center mb-3';
 
       var eLeft = document.createElement('div');
-      eLeft.className = 'flex items-center gap-3';
+      eLeft.className = 'flex items-center gap-3 flex-wrap';
 
       var eNum = document.createElement('span');
       eNum.className = 'font-bold text-sm text-gray-900 dark:text-white';
@@ -660,7 +664,7 @@ function renderRoDetailModal() {
       eLeft.appendChild(eStatusBadge);
 
       var eTotal = document.createElement('span');
-      eTotal.className = 'text-sm text-gray-500';
+      eTotal.className = 'text-sm font-semibold text-gray-700 dark:text-gray-300';
       eTotal.textContent = '$' + parseFloat(est.total || 0).toFixed(2);
       eLeft.appendChild(eTotal);
 
@@ -668,16 +672,28 @@ function renderRoDetailModal() {
       eVer.className = 'text-xs text-gray-400';
       eVer.textContent = 'v' + est.version;
       eLeft.appendChild(eVer);
-
-      eCard.appendChild(eLeft);
+      eHeader.appendChild(eLeft);
 
       var eActions = document.createElement('div');
-      eActions.className = 'flex gap-2';
+      eActions.className = 'flex gap-2 flex-wrap';
+
+      // Edit items button (expand/collapse)
+      var editItemsBtn = document.createElement('button');
+      editItemsBtn.className = 'text-green-600 hover:text-green-800 text-sm font-medium';
+      editItemsBtn.textContent = t('roEditItems', 'Edit Items');
+      editItemsBtn.addEventListener('click', (function(estId, card) { return function(e) {
+        e.stopPropagation();
+        var existing = card.querySelector('.est-items-editor');
+        if (existing) { existing.remove(); editItemsBtn.textContent = t('roEditItems', 'Edit Items'); return; }
+        editItemsBtn.textContent = t('roHideItems', 'Hide Items');
+        loadEstimateItems(estId, card, ro.id);
+      }; })(est.id, eCard));
+      eActions.appendChild(editItemsBtn);
 
       if (est.status === 'draft') {
         var sendEstBtn = document.createElement('button');
         sendEstBtn.className = 'text-blue-600 hover:text-blue-800 text-sm font-medium';
-        sendEstBtn.textContent = t('roSendToCustomer', 'Send to Customer');
+        sendEstBtn.textContent = t('roSendToCustomer', 'Send');
         sendEstBtn.addEventListener('click', (function(eid) { return async function(e) {
           e.stopPropagation();
           try { await api('estimates.php', { method: 'PUT', body: { id: eid, action: 'send' } }); showToast(t('roEstimateSent', 'Estimate sent to customer')); viewRoDetail(ro.id); }
@@ -689,7 +705,7 @@ function renderRoDetailModal() {
       if (est.status === 'sent' || est.status === 'viewed' || est.status === 'approved' || est.status === 'partial') {
         var resendEstBtn = document.createElement('button');
         resendEstBtn.className = 'text-orange-600 hover:text-orange-800 text-sm font-medium';
-        resendEstBtn.textContent = t('roResendToCustomer', 'Resend to Customer');
+        resendEstBtn.textContent = t('roResendToCustomer', 'Resend');
         resendEstBtn.addEventListener('click', (function(eid) { return async function(e) {
           e.stopPropagation();
           try {
@@ -700,11 +716,17 @@ function renderRoDetailModal() {
         eActions.appendChild(resendEstBtn);
       }
 
-      eCard.appendChild(eActions);
+      eHeader.appendChild(eActions);
+      eCard.appendChild(eHeader);
       estSection.appendChild(eCard);
     });
-    body.appendChild(estSection);
+  } else {
+    var noEst = document.createElement('p');
+    noEst.className = 'text-sm text-gray-400 italic';
+    noEst.textContent = t('roNoEstimates', 'No estimates yet. Click "New Estimate" above to create one.');
+    estSection.appendChild(noEst);
   }
+  body.appendChild(estSection);
 
   // Linked appointment
   if (ro.appointment) {
@@ -726,6 +748,223 @@ function renderRoDetailModal() {
 
   modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
   document.body.appendChild(modal);
+}
+
+// ─── Inline Estimate Item Editor ─────────────────────────────────────────────
+async function loadEstimateItems(estId, container, roId) {
+  try {
+    var json = await api('estimates.php?id=' + estId);
+    var est = json.data;
+    renderEstimateItemEditor(est, container, roId);
+  } catch(err) {
+    showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true);
+  }
+}
+
+function renderEstimateItemEditor(est, container, roId) {
+  var editor = document.createElement('div');
+  editor.className = 'est-items-editor mt-3 border-t border-gray-200 dark:border-gray-700 pt-3';
+
+  var items = est.items || [];
+  var itemTypes = ['labor', 'parts', 'tire', 'fee', 'discount', 'sublet'];
+
+  // Items table
+  var table = document.createElement('div');
+  table.className = 'space-y-2 mb-3';
+
+  function buildItemRow(item, idx) {
+    var row = document.createElement('div');
+    row.className = 'flex gap-2 items-start bg-gray-50 dark:bg-gray-900/30 rounded-lg p-2';
+    row.dataset.itemId = item.id || '';
+
+    // Type select
+    var typeSelect = document.createElement('select');
+    typeSelect.className = 'border rounded px-2 py-1.5 text-xs w-20 shrink-0 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+    typeSelect.name = 'item_type';
+    itemTypes.forEach(function(tp) {
+      var opt = document.createElement('option');
+      opt.value = tp; opt.textContent = tp.charAt(0).toUpperCase() + tp.slice(1);
+      if (tp === item.item_type) opt.selected = true;
+      typeSelect.appendChild(opt);
+    });
+    row.appendChild(typeSelect);
+
+    // Description
+    var descInput = document.createElement('input');
+    descInput.type = 'text';
+    descInput.className = 'border rounded px-2 py-1.5 text-sm flex-1 min-w-0 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+    descInput.placeholder = 'Description';
+    descInput.value = item.description || '';
+    descInput.name = 'description';
+    row.appendChild(descInput);
+
+    // Qty
+    var qtyInput = document.createElement('input');
+    qtyInput.type = 'number';
+    qtyInput.className = 'border rounded px-2 py-1.5 text-sm w-16 text-center dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+    qtyInput.placeholder = 'Qty';
+    qtyInput.value = item.quantity || 1;
+    qtyInput.min = '0.01'; qtyInput.step = '0.01';
+    qtyInput.name = 'quantity';
+    qtyInput.addEventListener('input', function() { updateLineTotal(row); });
+    row.appendChild(qtyInput);
+
+    // Price
+    var priceInput = document.createElement('input');
+    priceInput.type = 'number';
+    priceInput.className = 'border rounded px-2 py-1.5 text-sm w-24 text-right dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+    priceInput.placeholder = 'Price';
+    priceInput.value = parseFloat(item.unit_price || 0).toFixed(2);
+    priceInput.min = '0'; priceInput.step = '0.01';
+    priceInput.name = 'unit_price';
+    priceInput.addEventListener('input', function() { updateLineTotal(row); });
+    row.appendChild(priceInput);
+
+    // Line total (read-only)
+    var totalSpan = document.createElement('span');
+    totalSpan.className = 'text-sm font-semibold text-gray-700 dark:text-gray-300 w-20 text-right shrink-0 pt-1.5 line-total';
+    var lineTotal = (parseFloat(item.quantity || 1) * parseFloat(item.unit_price || 0));
+    totalSpan.textContent = '$' + lineTotal.toFixed(2);
+    row.appendChild(totalSpan);
+
+    // Delete button
+    var delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'text-red-400 hover:text-red-600 text-lg font-bold shrink-0 pt-0.5';
+    delBtn.textContent = '\u00d7';
+    delBtn.title = 'Remove item';
+    delBtn.addEventListener('click', function() {
+      row.remove();
+      updateEstimateTotal(editor);
+    });
+    row.appendChild(delBtn);
+
+    return row;
+  }
+
+  function updateLineTotal(row) {
+    var qty = parseFloat(row.querySelector('[name="quantity"]').value) || 0;
+    var price = parseFloat(row.querySelector('[name="unit_price"]').value) || 0;
+    var total = qty * price;
+    row.querySelector('.line-total').textContent = '$' + total.toFixed(2);
+    updateEstimateTotal(editor);
+  }
+
+  function updateEstimateTotal(editorEl) {
+    var rows = editorEl.querySelectorAll('[data-item-id]');
+    var subtotal = 0;
+    rows.forEach(function(r) {
+      var qty = parseFloat(r.querySelector('[name="quantity"]').value) || 0;
+      var price = parseFloat(r.querySelector('[name="unit_price"]').value) || 0;
+      var type = r.querySelector('[name="item_type"]').value;
+      var line = qty * price;
+      if (type === 'discount') subtotal -= Math.abs(line);
+      else subtotal += line;
+    });
+    var taxRate = parseFloat(editorEl.querySelector('[name="tax_rate"]').value) || 0;
+    var tax = subtotal * (taxRate / 100);
+    var total = subtotal + tax;
+    var totalEl = editorEl.querySelector('.est-grand-total');
+    if (totalEl) totalEl.textContent = '$' + total.toFixed(2);
+  }
+
+  items.forEach(function(item, idx) {
+    table.appendChild(buildItemRow(item, idx));
+  });
+  editor.appendChild(table);
+
+  // Add item button
+  var addRow = document.createElement('div');
+  addRow.className = 'flex gap-2 mb-3';
+  var addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.className = 'text-sm text-green-600 hover:text-green-800 font-medium flex items-center gap-1';
+  addBtn.textContent = '+ ' + t('roAddItem', 'Add Item');
+  addBtn.addEventListener('click', function() {
+    var newItem = { id: 'new_' + Date.now(), item_type: 'labor', description: '', quantity: 1, unit_price: 0 };
+    table.appendChild(buildItemRow(newItem, table.children.length));
+    updateEstimateTotal(editor);
+  });
+  addRow.appendChild(addBtn);
+  editor.appendChild(addRow);
+
+  // Tax rate + totals
+  var totalsRow = document.createElement('div');
+  totalsRow.className = 'flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-3';
+
+  var taxWrap = document.createElement('div');
+  taxWrap.className = 'flex items-center gap-2';
+  var taxLabel = document.createElement('label');
+  taxLabel.className = 'text-sm text-gray-600 dark:text-gray-400';
+  taxLabel.textContent = 'Tax %:';
+  var taxInput = document.createElement('input');
+  taxInput.type = 'number';
+  taxInput.name = 'tax_rate';
+  taxInput.className = 'border rounded px-2 py-1 text-sm w-20 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+  taxInput.value = ((parseFloat(est.tax_rate || 0)) * 100).toFixed(2);
+  taxInput.step = '0.01'; taxInput.min = '0';
+  taxInput.addEventListener('input', function() { updateEstimateTotal(editor); });
+  taxWrap.appendChild(taxLabel);
+  taxWrap.appendChild(taxInput);
+  totalsRow.appendChild(taxWrap);
+
+  var totalWrap = document.createElement('div');
+  totalWrap.className = 'text-right';
+  var totalLabel = document.createElement('span');
+  totalLabel.className = 'text-sm text-gray-500 mr-2';
+  totalLabel.textContent = 'Total:';
+  var totalVal = document.createElement('span');
+  totalVal.className = 'est-grand-total text-lg font-bold text-gray-900 dark:text-white';
+  totalVal.textContent = '$' + parseFloat(est.total || 0).toFixed(2);
+  totalWrap.appendChild(totalLabel);
+  totalWrap.appendChild(totalVal);
+  totalsRow.appendChild(totalWrap);
+  editor.appendChild(totalsRow);
+
+  // Save button
+  var saveRow = document.createElement('div');
+  saveRow.className = 'flex justify-end gap-2 mt-3';
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition';
+  saveBtn.textContent = t('roSaveEstimate', 'Save Estimate');
+  saveBtn.addEventListener('click', async function() {
+    var rows = editor.querySelectorAll('[data-item-id]');
+    var updatedItems = [];
+    rows.forEach(function(r) {
+      updatedItems.push({
+        id: r.dataset.itemId.indexOf('new_') === 0 ? null : parseInt(r.dataset.itemId),
+        item_type: r.querySelector('[name="item_type"]').value,
+        description: r.querySelector('[name="description"]').value,
+        quantity: parseFloat(r.querySelector('[name="quantity"]').value) || 1,
+        unit_price: parseFloat(r.querySelector('[name="unit_price"]').value) || 0,
+      });
+    });
+    var taxPct = parseFloat(editor.querySelector('[name="tax_rate"]').value) || 0;
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+    try {
+      await api('estimates.php', {
+        method: 'PUT',
+        body: {
+          id: est.id,
+          tax_rate: taxPct / 100,
+          replace_items: updatedItems
+        }
+      });
+      showToast(t('roEstimateSaved', 'Estimate saved'));
+      viewRoDetail(roId);
+    } catch(err) {
+      showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true);
+      saveBtn.disabled = false;
+      saveBtn.textContent = t('roSaveEstimate', 'Save Estimate');
+    }
+  });
+  saveRow.appendChild(saveBtn);
+  editor.appendChild(saveRow);
+
+  container.appendChild(editor);
+  updateEstimateTotal(editor);
 }
 
 // ─── Create RO Modal ─────────────────────────────────────────────────────────

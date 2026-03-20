@@ -279,6 +279,31 @@ try {
             $db->prepare('DELETE FROM oretir_estimate_items WHERE id = ? AND estimate_id = ?')->execute([$removeId, $id]);
         }
 
+        // ── Replace all items (full editor save) ──
+        if (!empty($data['replace_items']) && is_array($data['replace_items'])) {
+            // Delete all existing items
+            $db->prepare('DELETE FROM oretir_estimate_items WHERE estimate_id = ?')->execute([$id]);
+
+            // Insert new items
+            $insertItem = $db->prepare(
+                'INSERT INTO oretir_estimate_items
+                    (estimate_id, item_type, description, quantity, unit_price, total, sort_order, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())'
+            );
+            $order = 0;
+            $allowedTypes = ['labor', 'parts', 'tire', 'fee', 'discount', 'sublet'];
+            foreach ($data['replace_items'] as $item) {
+                $type = sanitize((string) ($item['item_type'] ?? 'labor'), 20);
+                if (!in_array($type, $allowedTypes, true)) $type = 'labor';
+                $desc     = sanitize((string) ($item['description'] ?? ''), 500);
+                $qty      = max(0.01, (float) ($item['quantity'] ?? 1));
+                $price    = (float) ($item['unit_price'] ?? 0);
+                $lineTotal = round($qty * $price, 2);
+                if ($type === 'discount') $lineTotal = -abs($lineTotal);
+                $insertItem->execute([$id, $type, $desc, $qty, $price, $lineTotal, $order++]);
+            }
+        }
+
         // ── Update estimate-level fields ──
         $fields = [];
         $params = [];
