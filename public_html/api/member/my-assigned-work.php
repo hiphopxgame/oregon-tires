@@ -52,7 +52,7 @@ try {
         LEFT JOIN oretir_vehicles v ON ro.vehicle_id = v.id
         WHERE ro.assigned_employee_id = ?
           AND ro.status NOT IN ('completed', 'invoiced', 'cancelled')
-        ORDER BY FIELD(ro.status, 'in_progress', 'diagnosis', 'intake', 'waiting_parts', 'ready', 'approved', 'pending_approval', 'estimate_pending') ASC,
+        ORDER BY FIELD(ro.status, 'in_progress', 'diagnosis', 'intake', 'on_hold', 'waiting_parts', 'ready', 'approved', 'pending_approval', 'estimate_pending') ASC,
                  ro.created_at DESC
         LIMIT 50
     ");
@@ -77,7 +77,8 @@ try {
                 'pending_approval' => '#f97316',
                 'approved'         => '#22c55e',
                 'in_progress'      => '#3b82f6',
-                'waiting_parts'    => '#ef4444',
+                'on_hold'          => '#ef4444',
+                'waiting_parts'    => '#f59e0b',
                 'ready'            => '#10b981',
             ];
             $color = $statusColors[$ro['status']] ?? '#64748b';

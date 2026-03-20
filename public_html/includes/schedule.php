@@ -97,9 +97,13 @@ function isEmployeeAvailable(PDO $db, int $employeeId, string $date, string $tim
 /**
  * Generate a human-readable task summary from appointment data.
  */
-function generateTaskSummary(string $service, ?string $vehicleInfo, ?string $notes): string
+function generateTaskSummary(string|array $service, ?string $vehicleInfo, ?string $notes): string
 {
-    $summary = ucwords(str_replace('-', ' ', $service));
+    if (is_array($service)) {
+        $summary = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $service));
+    } else {
+        $summary = ucwords(str_replace('-', ' ', $service));
+    }
 
     if ($vehicleInfo) {
         $summary .= ' — ' . trim($vehicleInfo);

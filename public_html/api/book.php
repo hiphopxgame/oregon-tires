@@ -22,16 +22,23 @@ try {
     // Parse & validate body
     $data = getJsonBody();
 
+    // Multi-service: accept 'services' array OR 'service' string
+    $services = parseServices($data);
+    if (empty($services)) {
+        jsonError('At least one valid service is required.');
+    }
+
     $missing = requireFields($data, [
-        'service', 'preferred_date', 'preferred_time',
+        'preferred_date', 'preferred_time',
         'first_name', 'last_name', 'phone', 'email',
     ]);
     if (!empty($missing)) {
         jsonError('Missing required fields: ' . implode(', ', $missing));
     }
 
-    // Sanitize required fields
-    $service       = sanitize((string) $data['service'], 50);
+    // Primary service for backwards compat + JSON for multi-service
+    $service       = $services[0];
+    $servicesJson  = json_encode($services);
     $preferredDate = sanitize((string) $data['preferred_date'], 10);
     $preferredTime = sanitize((string) $data['preferred_time'], 20);
     $firstName     = sanitize((string) $data['first_name'], 100);
@@ -62,11 +69,6 @@ try {
     $preferredEmployeeId = !empty($data['preferred_employee_id']) ? (int) $data['preferred_employee_id'] : null;
 
     // ─── Validate ───────────────────────────────────────────────────────────
-
-    // Service type
-    if (!isValidService($service)) {
-        jsonError('Invalid service type.');
-    }
 
     // Date (not past, not Sunday)
     if (!isValidAppointmentDate($preferredDate)) {
@@ -241,15 +243,16 @@ try {
     // ─── Insert into database ───────────────────────────────────────────────
     $stmt = $db->prepare(
         'INSERT INTO oretir_appointments
-            (reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, vehicle_vin, tire_size, tire_preference, tire_count,
+            (reference_number, service, services, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, vehicle_vin, tire_size, tire_preference, tire_count,
              first_name, last_name, phone, email, notes, sms_opt_in, utm_source, utm_medium, utm_campaign, utm_content, preferred_employee_id, status, language, created_at, updated_at)
          VALUES
-            (:reference_number, :service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model, :vehicle_vin, :tire_size, :tire_preference, :tire_count,
+            (:reference_number, :service, :services, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model, :vehicle_vin, :tire_size, :tire_preference, :tire_count,
              :first_name, :last_name, :phone, :email, :notes, :sms_opt_in, :utm_source, :utm_medium, :utm_campaign, :utm_content, :preferred_employee_id, :status, :language, NOW(), NOW())'
     );
     $stmt->execute([
         ':reference_number'     => $referenceNumber,
         ':service'              => $service,
+        ':services'             => $servicesJson,
         ':preferred_date'       => $preferredDate,
         ':preferred_time'       => $preferredTime,
         ':vehicle_year'         => $vehicleYear ?: null,
@@ -292,7 +295,7 @@ try {
                 (int) $memberRow['hw_user_id'],
                 'oregon.tires',
                 'appointment_booked',
-                ['reference' => $referenceNumber, 'service' => $service]
+                ['reference' => $referenceNumber, 'service' => $service, 'services' => $services]
             );
         }
     }
@@ -422,7 +425,7 @@ try {
                 if (!isset($providers[$paymentMethod])) {
                     error_log("Oregon Tires book.php: provider '{$paymentMethod}' not available for appointment #{$appointmentId}");
                 } else {
-                    $serviceDisplay = ucwords(str_replace('-', ' ', $service));
+                    $serviceDisplay = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $services));
                     $appUrl = $_ENV['APP_URL'] ?? 'https://oregon.tires';
 
                     $paymentData = [
@@ -522,7 +525,7 @@ try {
     // ─── Send confirmation email to customer ──────────────────────────────
     $customerLang = $language === 'spanish' ? 'es' : 'en';
     $customerName = "{$firstName} {$lastName}";
-    $serviceDisplay = ucwords(str_replace('-', ' ', $service));
+    $serviceDisplay = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $services));
 
     // Format date and time for customer display
     $dateObj = new \DateTime($preferredDate);
@@ -556,7 +559,7 @@ try {
     // ─── Queue push notification for booking confirmation ────────────────
     try {
         require_once __DIR__ . '/../includes/push.php';
-        $serviceDisplay = ucwords(str_replace('-', ' ', $service));
+        $serviceDisplay = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $services));
         $displayDate = $customerLang === 'es'
             ? (new \DateTime($preferredDate))->format('d/m/Y')
             : (new \DateTime($preferredDate))->format('m/d/Y');
@@ -612,6 +615,7 @@ try {
         $lang = ($language === 'spanish') ? 'es' : 'en';
         $bookingData = [
             'service' => $service,
+            'services' => $services,
             'preferredDate' => $preferredDate,
             'preferredTime' => $preferredTime,
             'firstName' => $firstName,

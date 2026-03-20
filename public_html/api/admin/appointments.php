@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/validate.php';
 require_once __DIR__ . '/../../includes/mail.php';
 require_once __DIR__ . '/../../includes/schedule.php';
 require_once __DIR__ . '/../../includes/vin-decode.php';
@@ -14,6 +15,8 @@ try {
     $method = $_SERVER['REQUEST_METHOD'];
 
     if ($method === 'GET') {
+        session_write_close(); // release session lock early for read-only requests
+
         // ─── Pagination params ────────────────────────────────────────────
         $limit  = max(1, min(500, (int) ($_GET['limit'] ?? 50)));
         $offset = max(0, (int) ($_GET['offset'] ?? 0));
@@ -216,6 +219,17 @@ try {
             $params[] = sanitize($body['task_summary'], 500);
         }
 
+        // Multi-service update
+        if (isset($body['services']) && is_array($body['services'])) {
+            $updatedServices = parseServices($body);
+            if (!empty($updatedServices)) {
+                $fields[] = 'services = ?';
+                $params[] = json_encode($updatedServices);
+                $fields[] = 'service = ?';
+                $params[] = $updatedServices[0];
+            }
+        }
+
         if (empty($fields)) {
             jsonError('No fields to update.', 400);
         }
@@ -230,7 +244,7 @@ try {
         if (isset($body['status']) && $body['status'] === 'confirmed') {
             try {
                 $confirmStmt = $db->prepare(
-                    'SELECT id, reference_number, service, preferred_date, preferred_time,
+                    'SELECT id, reference_number, service, services, preferred_date, preferred_time,
                             first_name, last_name, email, language,
                             vehicle_year, vehicle_make, vehicle_model,
                             cancel_token, cancel_token_expires
@@ -241,7 +255,8 @@ try {
 
                 if ($row && !empty($row['email'])) {
                     $custName    = trim($row['first_name'] . ' ' . $row['last_name']);
-                    $svcDisplay  = ucwords(str_replace('-', ' ', $row['service']));
+                    $confirmSvcs = !empty($row['services']) ? (json_decode($row['services'], true) ?: [$row['service']]) : [$row['service']];
+                    $svcDisplay  = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $confirmSvcs));
                     $custLang    = ($row['language'] ?? 'english') === 'spanish' ? 'es' : 'en';
 
                     $dateObj     = new \DateTime($row['preferred_date']);
@@ -316,7 +331,9 @@ try {
 
     // ─── Create new appointment (admin walk-in / phone) ────────────────
     if ($action === 'create') {
-        $service       = sanitize((string) ($body['service'] ?? ''), 50);
+        $services = parseServices($body);
+        $service  = !empty($services) ? $services[0] : sanitize((string) ($body['service'] ?? ''), 50);
+        $servicesJson = !empty($services) ? json_encode($services) : json_encode([$service]);
         $preferredDate = sanitize((string) ($body['preferred_date'] ?? ''), 10);
         $preferredTime = sanitize((string) ($body['preferred_time'] ?? ''), 20);
         $firstName     = sanitize((string) ($body['first_name'] ?? ''), 100);
@@ -394,16 +411,16 @@ try {
 
         $stmt = $db->prepare(
             'INSERT INTO oretir_appointments
-                (reference_number, service, preferred_date, preferred_time,
+                (reference_number, service, services, preferred_date, preferred_time,
                  vehicle_year, vehicle_make, vehicle_model,
                  first_name, last_name, phone, email, notes,
                  tire_preference, tire_count,
                  status, language, assigned_employee_id, admin_notes, task_summary,
                  created_at, updated_at)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())'
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())'
         );
         $stmt->execute([
-            $referenceNumber, $service, $preferredDate, $preferredTime,
+            $referenceNumber, $service, $servicesJson, $preferredDate, $preferredTime,
             $vehicleYear ?: null, $vehicleMake ?: null, $vehicleModel ?: null,
             $firstName, $lastName, $phone, $email, $notes ?: null,
             $tirePreference ?: null, $tireCount,
@@ -419,7 +436,7 @@ try {
         // Send confirmation email to customer
         try {
             $custName    = "{$firstName} {$lastName}";
-            $svcDisplay  = ucwords(str_replace('-', ' ', $service));
+            $svcDisplay  = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $services ?: [$service]));
             $custLang    = $language === 'spanish' ? 'es' : 'en';
             $dateObj     = new \DateTime($preferredDate);
             $displayDate = $custLang === 'es' ? $dateObj->format('d/m/Y') : $dateObj->format('m/d/Y');

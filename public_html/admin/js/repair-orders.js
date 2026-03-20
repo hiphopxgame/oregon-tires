@@ -28,6 +28,7 @@ var statusColors = {
   pending_approval: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
   approved:         'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
   in_progress:      'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
+  on_hold:          'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
   waiting_parts:    'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
   ready:            'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
   completed:        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
@@ -52,7 +53,7 @@ function formatDate(dateStr) {
 }
 
 // ─── Status Timeline / Stepper ──────────────────────────────────────────────
-var timelineStatuses = ['intake', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'waiting_parts', 'ready', 'completed', 'invoiced'];
+var timelineStatuses = ['intake', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'on_hold', 'waiting_parts', 'ready', 'completed', 'invoiced'];
 function getTimelineLabels() {
   return {
     intake: t('roStatusIntake', 'Intake'),
@@ -61,6 +62,7 @@ function getTimelineLabels() {
     pending_approval: t('roTimelineApproval', 'Approval'),
     approved: t('roStatusApproved', 'Approved'),
     in_progress: t('roTimelineInProg', 'In Prog'),
+    on_hold: t('roTimelineOnHold', 'On Hold'),
     waiting_parts: t('roTimelineParts', 'Parts'),
     ready: t('roStatusReady', 'Ready'),
     completed: t('roTimelineDone', 'Done'),
@@ -267,7 +269,7 @@ function renderRoTable() {
     tdStatus.className = 'p-3 text-sm';
     var statusSelect = document.createElement('select');
     statusSelect.className = 'text-xs border rounded-lg px-2 py-1.5 font-medium dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 cursor-pointer';
-    var allStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','waiting_parts','ready','completed','invoiced','cancelled'];
+    var allStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
     allStatuses.forEach(function(s) {
       var opt = document.createElement('option');
       opt.value = s;
@@ -277,7 +279,7 @@ function renderRoTable() {
       statusSelect.appendChild(opt);
     });
     // Color the select based on current status
-    var colorMap = { intake:'#dbeafe', diagnosis:'#ede9fe', estimate_pending:'#fef3c7', pending_approval:'#ffedd5', approved:'#dcfce7', in_progress:'#e0e7ff', waiting_parts:'#fef3c7', ready:'#d1fae5', completed:'#f3f4f6', invoiced:'#ccfbf1', cancelled:'#fee2e2' };
+    var colorMap = { intake:'#dbeafe', diagnosis:'#ede9fe', estimate_pending:'#fef3c7', pending_approval:'#ffedd5', approved:'#dcfce7', in_progress:'#e0e7ff', on_hold:'#fee2e2', waiting_parts:'#fef3c7', ready:'#d1fae5', completed:'#f3f4f6', invoiced:'#ccfbf1', cancelled:'#fee2e2' };
     statusSelect.style.backgroundColor = colorMap[ro.status] || '';
     statusSelect.addEventListener('click', function(e) { e.stopPropagation(); });
     statusSelect.addEventListener('change', (function(roId, sel) { return async function(e) {
@@ -413,7 +415,7 @@ function renderRoDetailModal() {
 
   var statusSelect = document.createElement('select');
   statusSelect.className = 'bg-white/20 text-white border border-white/30 rounded-lg px-3 py-1.5 text-sm';
-  ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','waiting_parts','ready','completed','invoiced','cancelled'].forEach(function(s) {
+  ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'].forEach(function(s) {
     var opt = document.createElement('option');
     opt.value = s;
     var sKey = 'roStatus' + s.replace(/_([a-z])/g, function(m,c){ return c.toUpperCase(); }).replace(/^[a-z]/, function(c){ return c.toUpperCase(); });

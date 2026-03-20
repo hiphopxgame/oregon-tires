@@ -79,7 +79,7 @@ try {
         $sortColumn = $sortMapping[$sortBy] ?? 'r.created_at';
         if (!in_array($sortOrder, ['ASC', 'DESC'], true)) $sortOrder = 'DESC';
 
-        $allowedStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','waiting_parts','ready','completed','invoiced','cancelled'];
+        $allowedStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
 
         $where = 'WHERE 1=1';
         $params = [];
@@ -279,7 +279,7 @@ try {
         // Status transition
         if (isset($data['status'])) {
             $newStatus = sanitize((string) $data['status'], 30);
-            $allowedStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','waiting_parts','ready','completed','invoiced','cancelled'];
+            $allowedStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
             if (!in_array($newStatus, $allowedStatuses, true)) {
                 jsonError('Invalid status value.');
             }

@@ -1,47 +1,18 @@
 /**
- * Oregon Tires — Admin Walk-in Waitlist Manager
- * Handles queue display, walk-in registration, and status transitions.
+ * Oregon Tires — Admin Waitlist (Orders On Hold / Awaiting Parts)
+ * Shows repair orders with status 'on_hold' or 'waiting_parts'.
+ * Allows quick status changes (resume work, mark ready).
  */
 (function() {
   'use strict';
 
-  var API = '/api/admin/waitlist.php', refreshTimer = null;
+  var refreshTimer = null;
 
   function t(key, fb) {
     return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fb;
   }
   function getCsrf() { return (typeof csrfToken !== 'undefined') ? csrfToken : ''; }
-  function hdrs(json) {
-    var h = { 'X-CSRF-Token': getCsrf() };
-    if (json) h['Content-Type'] = 'application/json';
-    return h;
-  }
   function toast(msg, err) { if (typeof showToast === 'function') showToast(msg, err); }
-
-  function statusLabel(s) {
-    var map = { waiting: t('wlWaiting','Waiting'), called: t('wlCalled','Called'), in_service: t('wlInService','In Service'), completed: t('wlCompleted','Completed'), no_show: t('wlNoShowStatus','No-Show') };
-    return map[s] || s;
-  }
-  function actionLabel(key) {
-    var map = { callNext: t('wlCallNext','Call'), noShow: t('wlNoShow','No-Show'), startService: t('wlStartService','Start'), complete: t('wlComplete','Complete') };
-    return map[key] || key;
-  }
-
-  var SC = {
-    waiting:    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-    called:     'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-    in_service: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-    completed:  'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
-    no_show:    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-  };
-
-  function waitTime(ts) {
-    if (!ts) return '-';
-    var m = Math.floor((Date.now() - new Date(ts).getTime()) / 60000);
-    if (m < 1) return t('wlJustNow', 'just now');
-    if (m < 60) return m + t('wlMinAgo', 'm ago');
-    return Math.floor(m / 60) + t('wlHrAgo', 'h ago') + ' ' + (m % 60) + t('wlMinAgo', 'm ago');
-  }
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -50,15 +21,48 @@
     return e;
   }
 
-  // ─── Load Waitlist ───────────────────────────────────────────
+  function timeAgo(dateStr) {
+    if (!dateStr) return '';
+    var diff = Date.now() - new Date(dateStr).getTime();
+    if (diff < 0) diff = 0;
+    var minutes = Math.floor(diff / 60000);
+    var hours = Math.floor(minutes / 60);
+    var days = Math.floor(hours / 24);
+    if (days > 0) return days + t('wlDayAgo', 'd ago');
+    if (hours > 0) return hours + t('wlHrAgo', 'h ago');
+    if (minutes > 0) return minutes + t('wlMinAgo', 'm ago');
+    return t('wlJustNow', 'just now');
+  }
+
+  var SC = {
+    on_hold:       'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+    waiting_parts: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
+  };
+
+  // ─── Load waitlist (on_hold + waiting_parts ROs) ──────────────
   window.loadWaitlist = async function() {
     var box = document.getElementById('waitlist-container');
     if (!box) return;
     try {
-      var res = await fetch(API, { credentials: 'include' });
-      var json = await res.json();
-      if (!json.success) throw new Error(json.message || 'Load failed');
-      render(box, json.data || []);
+      // Fetch on_hold ROs
+      var p1 = fetch('/api/admin/repair-orders.php?status=on_hold&limit=100&sort_by=updated_at&sort_order=ASC', { credentials: 'include' });
+      // Fetch waiting_parts ROs
+      var p2 = fetch('/api/admin/repair-orders.php?status=waiting_parts&limit=100&sort_by=updated_at&sort_order=ASC', { credentials: 'include' });
+
+      var results = await Promise.all([p1, p2]);
+      var json1 = await results[0].json();
+      var json2 = await results[1].json();
+
+      var onHold = (json1.data || []);
+      var waitingParts = (json2.data || []);
+      var allOrders = onHold.concat(waitingParts);
+
+      // Sort by updated_at ascending (longest waiting first)
+      allOrders.sort(function(a, b) {
+        return new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
+      });
+
+      render(box, allOrders);
     } catch (err) {
       console.error('loadWaitlist error:', err);
       box.textContent = '';
@@ -67,66 +71,107 @@
     startAutoRefresh();
   };
 
-  // ─── Render ──────────────────────────────────────────────────
-  function render(box, entries) {
+  // ─── Render ────────────────────────────────────────────────────
+  function render(box, orders) {
     box.textContent = '';
-    var bar = el('div', 'flex justify-between items-center mb-4');
-    var addBtn = el('button', 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition', t('wlAddWalkin', '+ Add Walk-in'));
-    addBtn.addEventListener('click', toggleForm);
-    bar.appendChild(addBtn);
-    box.appendChild(bar);
-    box.appendChild(buildForm());
 
-    var active = entries.filter(function(e) { return e.status === 'waiting' || e.status === 'called' || e.status === 'in_service'; });
-    var past = entries.filter(function(e) { return e.status === 'completed' || e.status === 'no_show'; });
+    // Summary badges
+    var summary = el('div', 'flex gap-4 mb-4 flex-wrap');
+    var onHoldCount = orders.filter(function(ro) { return ro.status === 'on_hold'; }).length;
+    var partsCount = orders.filter(function(ro) { return ro.status === 'waiting_parts'; }).length;
 
-    if (!active.length && !past.length) {
-      box.appendChild(el('p', 'text-gray-500 dark:text-gray-400 text-center py-8', t('wlNoEntries', 'No one on the waitlist.')));
+    var holdBadge = el('div', 'flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg');
+    var holdDot = el('span', 'w-3 h-3 rounded-full bg-red-500 inline-block');
+    holdBadge.appendChild(holdDot);
+    holdBadge.appendChild(el('span', 'text-sm font-semibold text-red-800 dark:text-red-300', t('wlOnHold', 'On Hold') + ': ' + onHoldCount));
+    summary.appendChild(holdBadge);
+
+    var partsBadge = el('div', 'flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg');
+    var partsDot = el('span', 'w-3 h-3 rounded-full bg-amber-500 inline-block');
+    partsBadge.appendChild(partsDot);
+    partsBadge.appendChild(el('span', 'text-sm font-semibold text-amber-800 dark:text-amber-300', t('wlAwaitingParts', 'Awaiting Parts') + ': ' + partsCount));
+    summary.appendChild(partsBadge);
+
+    box.appendChild(summary);
+
+    if (!orders.length) {
+      box.appendChild(el('p', 'text-gray-500 dark:text-gray-400 text-center py-8', t('wlNoEntries', 'No orders on hold.')));
       return;
     }
-    if (active.length) box.appendChild(buildTable(active, true));
-    if (past.length) {
-      box.appendChild(el('hr', 'my-4 border-gray-200 dark:border-gray-700'));
-      box.appendChild(buildTable(past, false));
-    }
+
+    box.appendChild(buildTable(orders));
   }
 
-  // ─── Build Table ─────────────────────────────────────────────
-  function buildTable(entries, showActions) {
+  // ─── Build Table ───────────────────────────────────────────────
+  function buildTable(orders) {
     var wrap = el('div', 'overflow-x-auto');
     var tbl = el('table', 'w-full text-sm');
     var thead = el('thead', 'bg-gray-50 dark:bg-gray-700');
     var hr = document.createElement('tr');
-    var cols = [t('wlPosition','#'), t('wlName','Customer'), t('wlPhone','Phone'), t('wlVehicle','Vehicle'), t('wlService','Service Needed'), t('wlWait','Wait Time'), t('wlStatus','Status')];
-    if (showActions) cols.push(t('wlActions','Actions'));
-    cols.forEach(function(c) { hr.appendChild(el('th', 'text-left p-3 font-medium text-gray-600 dark:text-gray-300 text-xs uppercase', c)); });
+    var cols = [
+      t('wlRoNumber', 'RO #'),
+      t('wlCustomer', 'Customer'),
+      t('wlVehicle', 'Vehicle'),
+      t('wlStatus', 'Status'),
+      t('wlTimeInStatus', 'Time in Status'),
+      t('wlActions', 'Actions')
+    ];
+    cols.forEach(function(c) {
+      hr.appendChild(el('th', 'text-left p-3 font-medium text-gray-600 dark:text-gray-300 text-xs uppercase', c));
+    });
     thead.appendChild(hr);
     tbl.appendChild(thead);
 
     var tbody = el('tbody', 'divide-y divide-gray-200 dark:divide-gray-700');
-    entries.forEach(function(entry, i) {
+    orders.forEach(function(ro) {
       var tr = el('tr', 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition');
-      [String(i+1), entry.customer_name||'-', entry.phone||'-', entry.vehicle_description||'-',
-       entry.service_type||'-', waitTime(entry.check_in_at), null].forEach(function(val) {
-        var td = el('td', 'p-3 text-gray-700 dark:text-gray-300');
-        if (val !== null) td.textContent = val;
-        else {
-          var badge = el('span', 'inline-flex px-2 py-0.5 rounded-full text-xs font-medium ' + (SC[entry.status]||''), statusLabel(entry.status));
-          td.appendChild(badge);
-        }
-        tr.appendChild(td);
-      });
-      if (showActions) {
-        var tdA = el('td', 'p-3');
-        var bw = el('div', 'flex gap-1 flex-wrap');
-        getActions(entry.status).forEach(function(act) {
-          var b = el('button', act.cls + ' text-xs font-medium px-2 py-1 rounded transition', actionLabel(act.label));
-          b.addEventListener('click', function() { updateStatus(entry.id, act.next); });
-          bw.appendChild(b);
-        });
-        tdA.appendChild(bw);
-        tr.appendChild(tdA);
-      }
+
+      // RO Number
+      var tdRo = el('td', 'p-3 font-semibold text-green-700 dark:text-green-400', ro.ro_number || '-');
+      tr.appendChild(tdRo);
+
+      // Customer
+      var custName = ((ro.first_name || '') + ' ' + (ro.last_name || '')).trim() || '-';
+      tr.appendChild(el('td', 'p-3 text-gray-700 dark:text-gray-300', custName));
+
+      // Vehicle
+      var vehicle = [ro.vehicle_year, ro.vehicle_make, ro.vehicle_model].filter(Boolean).join(' ') || '-';
+      tr.appendChild(el('td', 'p-3 text-gray-700 dark:text-gray-300', vehicle));
+
+      // Status badge
+      var tdStatus = el('td', 'p-3');
+      var statusLabel = ro.status === 'on_hold' ? t('wlOnHold', 'On Hold') : t('wlAwaitingParts', 'Awaiting Parts');
+      var badge = el('span', 'inline-flex px-2.5 py-1 rounded-full text-xs font-bold ' + (SC[ro.status] || ''), statusLabel);
+      tdStatus.appendChild(badge);
+      tr.appendChild(tdStatus);
+
+      // Time in status
+      tr.appendChild(el('td', 'p-3 text-gray-500 dark:text-gray-400 text-sm', timeAgo(ro.updated_at)));
+
+      // Actions
+      var tdActions = el('td', 'p-3');
+      var btnWrap = el('div', 'flex gap-1 flex-wrap');
+
+      // Resume Work → in_progress
+      var resumeBtn = el('button', 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300 text-xs font-medium px-2 py-1 rounded transition', t('wlResumeWork', 'Resume Work'));
+      resumeBtn.addEventListener('click', (function(id) { return function() { updateRoStatus(id, 'in_progress'); }; })(ro.id));
+      btnWrap.appendChild(resumeBtn);
+
+      // Mark Ready → ready
+      var readyBtn = el('button', 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 text-xs font-medium px-2 py-1 rounded transition', t('wlMarkReady', 'Mark Ready'));
+      readyBtn.addEventListener('click', (function(id) { return function() { updateRoStatus(id, 'ready'); }; })(ro.id));
+      btnWrap.appendChild(readyBtn);
+
+      // View RO detail
+      var viewBtn = el('button', 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-600 dark:text-gray-200 text-xs font-medium px-2 py-1 rounded transition', t('wlViewRo', 'View'));
+      viewBtn.addEventListener('click', (function(id) { return function() {
+        if (typeof viewRoDetail === 'function') viewRoDetail(id);
+      }; })(ro.id));
+      btnWrap.appendChild(viewBtn);
+
+      tdActions.appendChild(btnWrap);
+      tr.appendChild(tdActions);
+
       tbody.appendChild(tr);
     });
     tbl.appendChild(tbody);
@@ -134,87 +179,32 @@
     return wrap;
   }
 
-  function getActions(s) {
-    var call = { label:'callNext', next:'called', cls:'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300' };
-    var ns = { label:'noShow', next:'no_show', cls:'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/40 dark:text-red-300' };
-    var start = { label:'startService', next:'in_service', cls:'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-300' };
-    var done = { label:'complete', next:'completed', cls:'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200' };
-    if (s === 'waiting') return [call, ns];
-    if (s === 'called') return [start, ns];
-    if (s === 'in_service') return [done];
-    return [];
-  }
-
-  // ─── Add Walk-in Form ────────────────────────────────────────
-  function buildForm() {
-    var panel = el('div', 'hidden bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-4 mb-4');
-    panel.id = 'waitlist-form-panel';
-    var grid = el('div', 'grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3');
-    [{id:'wl-name',lbl:t('wlFormName','Name'),type:'text',req:true}, {id:'wl-phone',lbl:t('wlFormPhone','Phone'),type:'tel'},
-     {id:'wl-vehicle',lbl:t('wlFormVehicle','Vehicle Description'),type:'text'}, {id:'wl-service',lbl:t('wlFormService','Service Type'),type:'text'}
-    ].forEach(function(f) {
-      var d = el('div');
-      d.appendChild(el('label', 'block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1', f.lbl));
-      var inp = el('input', 'w-full border dark:border-gray-600 rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-200');
-      inp.id = f.id; inp.type = f.type; if (f.req) inp.required = true;
-      d.appendChild(inp);
-      grid.appendChild(d);
-    });
-    panel.appendChild(grid);
-    var row = el('div', 'flex gap-2');
-    var sBtn = el('button', 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition', t('wlSave', 'Add to Waitlist'));
-    sBtn.addEventListener('click', submitWalkin);
-    var cBtn = el('button', 'px-4 py-2 border dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition', t('wlCancel', 'Cancel'));
-    cBtn.addEventListener('click', toggleForm);
-    row.appendChild(sBtn); row.appendChild(cBtn);
-    panel.appendChild(row);
-    return panel;
-  }
-
-  function toggleForm() {
-    var p = document.getElementById('waitlist-form-panel');
-    if (!p) return;
-    p.classList.toggle('hidden');
-    if (!p.classList.contains('hidden')) {
-      ['wl-name','wl-phone','wl-vehicle','wl-service'].forEach(function(id) {
-        var e = document.getElementById(id); if (e) e.value = '';
+  // ─── Update RO Status ─────────────────────────────────────────
+  async function updateRoStatus(roId, newStatus) {
+    try {
+      var res = await fetch('/api/admin/repair-orders.php', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': getCsrf() },
+        body: JSON.stringify({ id: roId, status: newStatus })
       });
-      var n = document.getElementById('wl-name'); if (n) n.focus();
-    }
-  }
-
-  // ─── Submit Walk-in ──────────────────────────────────────────
-  async function submitWalkin() {
-    var name = (document.getElementById('wl-name').value || '').trim();
-    if (!name) { toast(t('wlNameRequired', 'Customer name is required'), true); return; }
-    var payload = {
-      customer_name: name,
-      phone: (document.getElementById('wl-phone').value || '').trim(),
-      vehicle_description: (document.getElementById('wl-vehicle').value || '').trim(),
-      service_type: (document.getElementById('wl-service').value || '').trim()
-    };
-    try {
-      var res = await fetch(API, { method:'POST', credentials:'include', headers:hdrs(true), body:JSON.stringify(payload) });
-      var json = await res.json();
-      if (!json.success) throw new Error(json.message || 'Failed');
-      toast(t('wlAdded', 'Walk-in added'));
-      toggleForm();
-      loadWaitlist();
-    } catch (err) { console.error('submitWalkin:', err); toast(t('wlFailed', 'Action failed'), true); }
-  }
-
-  // ─── Update Status ───────────────────────────────────────────
-  async function updateStatus(id, newStatus) {
-    try {
-      var res = await fetch(API, { method:'PUT', credentials:'include', headers:hdrs(true), body:JSON.stringify({id:id,status:newStatus}) });
       var json = await res.json();
       if (!json.success) throw new Error(json.message || 'Failed');
       toast(t('wlUpdated', 'Status updated'));
       loadWaitlist();
-    } catch (err) { console.error('updateStatus:', err); toast(t('wlFailed', 'Action failed'), true); }
+      // Also refresh RO table/kanban if available
+      if (typeof loadRepairOrders === 'function') loadRepairOrders();
+      if (typeof loadKanban === 'function') {
+        var kanbanView = document.getElementById('ro-kanban-view');
+        if (kanbanView && kanbanView.style.display !== 'none') loadKanban();
+      }
+    } catch (err) {
+      console.error('updateRoStatus:', err);
+      toast(t('wlFailed', 'Action failed'), true);
+    }
   }
 
-  // ─── Auto-refresh (30s) ──────────────────────────────────────
+  // ─── Auto-refresh (30s) ────────────────────────────────────────
   function startAutoRefresh() {
     if (refreshTimer) clearInterval(refreshTimer);
     refreshTimer = setInterval(function() {

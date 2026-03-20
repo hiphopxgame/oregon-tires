@@ -539,13 +539,8 @@
     </div>
   </section>
 
-  <!-- New Customer Tripwire Offer -->
-  <div class="bg-amber-50 dark:bg-amber-900/20 border-b-2 border-amber-200 dark:border-amber-800 py-4">
-    <div class="container mx-auto px-4 text-center">
-      <p class="text-amber-800 dark:text-amber-300 font-bold text-lg" data-t="newCustomerSpecial">🎉 New Customer Special: $29 Oil Change + FREE Multi-Point Inspection</p>
-      <a href="/book-appointment/?promo=new-customer" class="inline-block mt-2 bg-amber-500 text-black px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition text-sm" data-t="claimOffer">Claim This Offer →</a>
-    </div>
-  </div>
+  <!-- Inline Promotion (admin-controlled via promotions API, placement=inline) -->
+  <div id="inline-promo" class="hidden"></div>
 
   <!-- Services -->
   <section id="services" class="py-16 bg-gray-50 scroll-mt-24 dark:bg-gray-800">
@@ -953,8 +948,8 @@
     </div>
   </section>
 
-  <!-- Gallery -->
-  <section id="gallery" class="py-16 bg-white scroll-mt-24 dark:bg-gray-900">
+  <!-- Promotions Gallery (hidden until admin activates promotions with images) -->
+  <section id="gallery" class="py-16 bg-white scroll-mt-24 dark:bg-gray-900 hidden">
     <div class="container mx-auto px-4">
       <div class="text-center mb-10">
         <h2 class="text-4xl font-bold text-brand dark:text-green-400 mb-4" data-t="gallery">Promotions</h2>
@@ -962,9 +957,6 @@
       </div>
       <div id="gallery-section-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="sr-only" data-t="loadingGallery" aria-live="polite">Loading promotions...</div>
-        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
-        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
-        <div class="motion-safe:animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
       </div>
       <div id="gallery-view-all" class="hidden text-center mt-8">
         <a href="/promotions" class="inline-block bg-brand text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800 transition shadow" data-t="viewAllPromotions">View All Promotions &rarr;</a>
@@ -1458,8 +1450,6 @@ const t = {
     signUpFree: 'Sign Up Free',
     noSpam: 'No spam. Unsubscribe anytime.',
     reviewVelocity: '12 new 5-star reviews this month',
-    newCustomerSpecial: '\ud83c\udf89 New Customer Special: $29 Oil Change + FREE Multi-Point Inspection',
-    claimOffer: 'Claim This Offer \u2192',
     // Pricing section
     priceTireInstall: 'Tire Installation',
     priceTireRepair: 'Tire Repair',
@@ -1628,8 +1618,6 @@ const t = {
     signUpFree: 'Reg\u00edstrate Gratis',
     noSpam: 'Sin spam. Cancela cuando quieras.',
     reviewVelocity: '12 nuevas rese\u00f1as de 5 estrellas este mes',
-    newCustomerSpecial: '\ud83c\udf89 Especial: Cambio de Aceite $29 + Inspecci\u00f3n GRATIS',
-    claimOffer: 'Reclamar Esta Oferta \u2192',
     // Pricing section
     priceTireInstall: 'Instalaci\u00f3n de Llantas',
     priceTireRepair: 'Reparaci\u00f3n de Llantas',
@@ -1917,13 +1905,14 @@ async function loadGalleryForSite() {
     const viewAllBtn = document.getElementById('gallery-view-all');
     const images = (json.success && json.data) ? json.data : [];
     if (!images.length) {
-      grid.textContent = '';
-      var empty = document.createElement('div');
-      empty.className = 'text-center py-8 text-gray-400 col-span-full';
-      empty.textContent = t[currentLang].noGalleryImages;
-      grid.appendChild(empty);
+      // Hide the entire promotions section when no active content
+      var gallerySection = grid.closest('section');
+      if (gallerySection) gallerySection.classList.add('hidden');
       return;
     }
+    // Show the section now that we have content
+    var gallerySection = grid.closest('section');
+    if (gallerySection) gallerySection.classList.remove('hidden');
     grid.textContent = '';
     var preview = images.slice(0, 3);
     preview.forEach(function(img) {
@@ -1968,12 +1957,10 @@ async function loadGalleryForSite() {
     }
   } catch (e) {
     console.error('Error loading gallery:', e);
+    // On error, keep section hidden (no promotional content shown)
     var errGrid = document.getElementById('gallery-section-grid');
-    errGrid.textContent = '';
-    var errMsg = document.createElement('div');
-    errMsg.className = 'text-center py-8 text-gray-400 col-span-full';
-    errMsg.textContent = t[currentLang].galleryLoadError;
-    errGrid.appendChild(errMsg);
+    var errSection = errGrid ? errGrid.closest('section') : null;
+    if (errSection) errSection.classList.add('hidden');
   }
 }
 
@@ -2326,27 +2313,88 @@ loadSiteSettings();
   }
 })();
 
-// ===== SCARCITY: Fetch today's remaining appointment slots =====
+// ===== INLINE PROMOTION (admin-controlled, placement=inline) =====
 (function() {
-  var today = new Date().toISOString().split('T')[0];
-  fetch('/api/available-times.php?date=' + today, { credentials: 'include' })
+  fetch(API_BASE + '/promotions.php?placement=inline', { credentials: 'include' })
     .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (!data.success || !data.data) return;
-      var slots = data.data.filter(function(s) { return s.available; }).length;
-      if (slots > 0 && slots <= 6) {
-        var container = document.getElementById('slots-remaining');
-        var text = document.getElementById('slots-text');
-        if (container && text) {
-          text.textContent = currentLang === 'es'
-            ? 'Solo ' + slots + ' citas disponibles hoy'
-            : 'Only ' + slots + ' appointment slots left today';
-          container.classList.remove('hidden');
-          if (typeof gtag === 'function') gtag('event', 'scarcity_shown', { slots_remaining: slots });
-        }
+    .then(function(json) {
+      if (!json.success || !json.data || !json.data.length) return;
+      var promo = json.data[0];
+      var container = document.getElementById('inline-promo');
+      if (!container) return;
+      var lang = currentLang || 'en';
+      var title = lang === 'es' ? (promo.title_es || promo.title_en) : promo.title_en;
+      var ctaText = lang === 'es' ? (promo.cta_text_es || promo.cta_text_en) : promo.cta_text_en;
+      var ctaUrl = promo.cta_url || '/book-appointment/';
+
+      container.className = 'bg-amber-50 dark:bg-amber-900/20 border-b-2 border-amber-200 dark:border-amber-800 py-4';
+      var inner = document.createElement('div');
+      inner.className = 'container mx-auto px-4 text-center';
+      var p = document.createElement('p');
+      p.className = 'text-amber-800 dark:text-amber-300 font-bold text-lg';
+      p.textContent = title;
+      inner.appendChild(p);
+      if (ctaText) {
+        var a = document.createElement('a');
+        a.href = ctaUrl;
+        a.className = 'inline-block mt-2 bg-amber-500 text-black px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition text-sm';
+        a.textContent = ctaText + ' \u2192';
+        a.addEventListener('click', function() {
+          if (typeof gtag === 'function') gtag('event', 'promo_cta_click', { event_category: 'conversion', event_label: title });
+        });
+        inner.appendChild(a);
       }
+      container.appendChild(inner);
+      container.classList.remove('hidden');
     })
     .catch(function() {});
+})();
+
+// ===== SCARCITY: Fetch today's remaining appointment slots (admin-gated) =====
+(function() {
+  // Only show scarcity messaging if admin enabled it via site settings
+  function checkAndShowScarcity() {
+    var enabled = false;
+    if (siteSettingsCache && siteSettingsCache['show_scarcity']) {
+      enabled = siteSettingsCache['show_scarcity'].en === '1';
+    }
+    if (!enabled) return;
+
+    var today = new Date().toISOString().split('T')[0];
+    fetch('/api/available-times.php?date=' + today, { credentials: 'include' })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.success || !data.data) return;
+        var slots = data.data.filter(function(s) { return s.available; }).length;
+        if (slots > 0 && slots <= 6) {
+          var container = document.getElementById('slots-remaining');
+          var text = document.getElementById('slots-text');
+          if (container && text) {
+            text.textContent = currentLang === 'es'
+              ? 'Solo ' + slots + ' citas disponibles hoy'
+              : 'Only ' + slots + ' appointment slots left today';
+            container.classList.remove('hidden');
+            if (typeof gtag === 'function') gtag('event', 'scarcity_shown', { slots_remaining: slots });
+          }
+        }
+      })
+      .catch(function() {});
+  }
+
+  // Wait for settings to load, then check
+  if (siteSettingsCache) {
+    checkAndShowScarcity();
+  } else {
+    // Poll briefly for settings to load (they load async)
+    var attempts = 0;
+    var interval = setInterval(function() {
+      attempts++;
+      if (siteSettingsCache || attempts > 20) {
+        clearInterval(interval);
+        checkAndShowScarcity();
+      }
+    }, 200);
+  }
 })();
 
 // ===== OPEN/CLOSED STATUS BADGE =====

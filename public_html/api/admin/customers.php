@@ -25,6 +25,8 @@ try {
 
     // ─── GET: List or single customer ──────────────────────────────────────
     if ($method === 'GET') {
+        session_write_close(); // release session lock early for read-only requests
+
         // Single customer detail
         if (!empty($_GET['id'])) {
             $id = (int) $_GET['id'];

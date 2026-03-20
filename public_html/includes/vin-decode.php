@@ -405,6 +405,19 @@ function createRoForAppointment(int $appointmentId, PDO $db): ?array
 
     $roNumber = generateRoNumber($db);
 
+    // Build customer concern from services + notes
+    $concern = $appt['notes'] ?? '';
+    $servicesJson = $appt['services'] ?? null;
+    if ($servicesJson) {
+        $servicesList = json_decode($servicesJson, true);
+        if (is_array($servicesList) && count($servicesList) > 0) {
+            $serviceLabels = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $servicesList));
+            $concern = $serviceLabels . ($concern ? "\n" . $concern : '');
+        }
+    } elseif (!empty($appt['service'])) {
+        $concern = ucwords(str_replace('-', ' ', $appt['service'])) . ($concern ? "\n" . $concern : '');
+    }
+
     $stmt = $db->prepare(
         'INSERT INTO oretir_repair_orders
             (ro_number, customer_id, vehicle_id, appointment_id, status,
@@ -417,7 +430,7 @@ function createRoForAppointment(int $appointmentId, PDO $db): ?array
         $appt['vehicle_id'] ? (int) $appt['vehicle_id'] : null,
         $appointmentId,
         'intake',
-        $appt['notes'] ?? null,
+        $concern ?: null,
         $appt['preferred_date'] ?? null,
         $appt['preferred_time'] ?? null,
         $appt['assigned_employee_id'] ?? null,

@@ -114,14 +114,15 @@
     e.stopImmediatePropagation();
 
     // Gather form data (same as book-appointment/index.html)
-    var serviceEl = form.querySelector('input[name="service"]:checked');
-    if (!serviceEl) return;
+    var checkedSvcs = Array.from(form.querySelectorAll('input[name="services[]"]:checked')).map(function(cb) { return cb.value; });
+    if (checkedSvcs.length < 1) return;
 
     var timeVal = document.getElementById('booking-time');
     if (!timeVal || !timeVal.value) return;
 
     var body = {
-      service: serviceEl.value,
+      services: checkedSvcs,
+      service: checkedSvcs[0],
       preferred_date: form.preferred_date ? form.preferred_date.value : '',
       preferred_time: timeVal.value,
       first_name: (form.first_name ? form.first_name.value.trim() : ''),

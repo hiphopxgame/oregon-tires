@@ -194,6 +194,36 @@ function validateImageUpload(array $file, int $maxSizeMB = 5): string|true
 }
 
 /**
+ * Parse and validate services from booking data.
+ * Accepts `$data['services']` (array) or `$data['service']` (string).
+ * Returns a validated array of 1-5 unique service slugs.
+ *
+ * @return array Validated service slugs
+ */
+function parseServices(array $data): array
+{
+    $raw = [];
+
+    if (!empty($data['services']) && is_array($data['services'])) {
+        $raw = $data['services'];
+    } elseif (!empty($data['service']) && is_string($data['service'])) {
+        $raw = [$data['service']];
+    }
+
+    // Sanitize and validate each slug
+    $valid = [];
+    foreach ($raw as $svc) {
+        $slug = sanitize((string) $svc, 50);
+        if ($slug !== '' && isValidService($slug) && !in_array($slug, $valid, true)) {
+            $valid[] = $slug;
+        }
+    }
+
+    // Enforce max 5 services
+    return array_slice($valid, 0, 5);
+}
+
+/**
  * Validate a VIN (Vehicle Identification Number).
  * 17 alphanumeric characters, no I, O, or Q.
  */

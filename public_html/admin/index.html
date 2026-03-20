@@ -489,6 +489,7 @@
             <button onclick="switchTab('invoices')" data-tab="invoices" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🧾 <span data-t="tabInvoices">Invoices</span></button>
             <button onclick="switchTab('waitlist')" data-tab="waitlist" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">⏳ <span data-t="tabWaitlist">Waitlist</span></button>
             <button onclick="switchTab('tirequotes')" data-tab="tirequotes" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🛞 <span data-t="tabTireQuotes">Tire Quotes</span></button>
+            <button onclick="switchTab('services')" data-tab="services" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔧 <span data-t="tabServices">Services</span></button>
             <button onclick="switchTab('visits')" data-tab="visits" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">👣 <span data-t="tabVisits">Visit Tracking</span></button>
             <button onclick="switchTab('resourceplanner')" data-tab="resourceplanner" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📋 <span data-t="tabResourcePlanner">Resource Planner</span></button>
           </div>
@@ -538,6 +539,7 @@
           <option value="invoices" data-t="tabInvoices">Invoices</option>
           <option value="waitlist" data-t="tabWaitlist">Waitlist</option>
           <option value="tirequotes" data-t="tabTireQuotes">Tire Quotes</option>
+          <option value="services" data-t="tabServices">Services</option>
           <option value="visits" data-t="tabVisits">Visit Tracking</option>
           <option value="resourceplanner" data-t="tabResourcePlanner">Resource Planner</option>
         </optgroup>
@@ -841,6 +843,7 @@
             <option value="pending_approval" data-t="roStatusPendingApproval">Pending Approval</option>
             <option value="approved" data-t="roStatusApproved">Approved</option>
             <option value="in_progress" data-t="roStatusInProgress">In Progress</option>
+            <option value="on_hold" data-t="roStatusOnHold">On Hold</option>
             <option value="waiting_parts" data-t="roStatusWaitingParts">Waiting Parts</option>
             <option value="ready" data-t="roStatusReady">Ready</option>
             <option value="completed" data-t="roStatusCompleted">Completed</option>
@@ -1839,14 +1842,14 @@
 </ol>
 
 <!-- Secci&oacute;n 27 -->
-<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">27. Lista de Espera y Cola de Walk-In</h2>
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Gestione clientes walk-in con un sistema de cola organizado.</p>
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">27. Lista de Espera &mdash; &Oacute;rdenes en Pausa</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Rastree &oacute;rdenes de reparaci&oacute;n que est&aacute;n pausadas y esperando pr&oacute;ximos pasos.</p>
 <ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
   <li>Vaya a la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Lista de Espera</strong> en el panel de admin.</li>
-  <li>Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Agregar Walk-In</strong> para a&ntilde;adir un cliente a la cola.</li>
-  <li>El sistema calcula tiempos de espera estimados.</li>
-  <li>Actualice el estado: <strong class="font-semibold text-gray-800 dark:text-gray-200">Esperando &rarr; En Servicio &rarr; Completado</strong>.</li>
-  <li>Los clientes pueden verificar su posici&oacute;n en l&iacute;nea.</li>
+  <li>Cualquier RO marcada como <strong class="font-semibold text-red-700 dark:text-red-400">En Espera</strong> o <strong class="font-semibold text-amber-700 dark:text-amber-400">Esperando Partes</strong> aparece autom&aacute;ticamente aqu&iacute;.</li>
+  <li>Las &oacute;rdenes se ordenan por tiempo en estado para que las m&aacute;s antiguas aparezcan primero.</li>
+  <li>Use acciones r&aacute;pidas para <strong class="font-semibold text-gray-800 dark:text-gray-200">Reanudar Trabajo</strong> o <strong class="font-semibold text-gray-800 dark:text-gray-200">Marcar Listo</strong>.</li>
+  <li>Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Ver</strong> para abrir el detalle completo de la RO.</li>
 </ol>
 
 <!-- Secci&oacute;n 28 -->
@@ -1987,7 +1990,7 @@
   <li>Digital Invoices &amp; Receipts</li>
   <li>Customer Loyalty &amp; Rewards</li>
   <li>Customer Referral Program</li>
-  <li>Waitlist &amp; Walk-In Queue</li>
+  <li>Waitlist &mdash; Orders On Hold</li>
   <li>Tire Quote Requests</li>
   <li>Technician Labor Tracking</li>
   <li>Automated Service Reminders</li>
@@ -2598,7 +2601,7 @@
 
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Create repair orders from existing appointments or for walk-in customers. Track work through the full service lifecycle:</p>
 
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Intake</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Diagnosis</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Estimate</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Approval</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">In Progress</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Ready</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Completed</strong></p>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Intake</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Diagnosis</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Estimate</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Approval</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">In Progress</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200 text-red-700">On Hold</strong> / <strong class="font-semibold text-gray-800 dark:text-gray-200">Waiting Parts</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Ready</strong> &rarr; <strong class="font-semibold text-gray-800 dark:text-gray-200">Completed</strong></p>
 
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Use the <strong class="font-semibold text-gray-800 dark:text-gray-200">Table View</strong> for searching and filtering orders, or the <strong class="font-semibold text-gray-800 dark:text-gray-200">Kanban Board</strong> for drag-and-drop status management.</p>
 
@@ -2784,16 +2787,16 @@
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
 <!-- Section 27 -->
-<h2 id="waitlist-queue" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">27. Waitlist &amp; Walk-In Queue</h2>
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Manage walk-in customers with an organized queue system.</p>
+<h2 id="waitlist-queue" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">27. Waitlist &mdash; Orders On Hold</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Track repair orders that are paused and awaiting next steps.</p>
 <ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
   <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Waitlist</strong> tab in the admin panel.</li>
-  <li>Click <strong class="font-semibold text-gray-800 dark:text-gray-200">Add Walk-In</strong> to add a customer to the queue with their name, phone, service type, and vehicle info.</li>
-  <li>The system calculates estimated wait times based on current queue length.</li>
-  <li>Update status as customers move through: <strong class="font-semibold text-gray-800 dark:text-gray-200">Waiting &rarr; In Service &rarr; Completed</strong>.</li>
-  <li>Customers can check their position online using a phone number lookup.</li>
+  <li>Any RO set to <strong class="font-semibold text-red-700 dark:text-red-400">On Hold</strong> or <strong class="font-semibold text-amber-700 dark:text-amber-400">Waiting Parts</strong> automatically appears here.</li>
+  <li>Orders are sorted by time in status so the longest-waiting items appear first.</li>
+  <li>Use quick actions to <strong class="font-semibold text-gray-800 dark:text-gray-200">Resume Work</strong> (move to In Progress) or <strong class="font-semibold text-gray-800 dark:text-gray-200">Mark Ready</strong> when the hold is resolved.</li>
+  <li>Click <strong class="font-semibold text-gray-800 dark:text-gray-200">View</strong> to open the full RO detail.</li>
 </ol>
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Pro tip:</strong> Customers receive automatic notifications when their turn is approaching.</p>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed"><strong class="font-semibold text-gray-800 dark:text-gray-200">Pro tip:</strong> The On Hold status is highlighted in red on both the kanban board and status dropdowns for high visibility.</p>
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
@@ -3127,6 +3130,21 @@
               <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">When enabled, desktop and mobile users will see an install prompt after visiting the site. Disabled by default.</p>
             </div>
           </div>
+
+          <!-- Scarcity Messaging Toggle -->
+          <div class="grid md:grid-cols-3 gap-4 items-start mt-4">
+            <label class="font-medium text-sm pt-2 dark:text-gray-300">Scarcity Messaging</label>
+            <div class="md:col-span-2">
+              <label class="relative inline-flex items-center cursor-pointer mt-1">
+                <input type="checkbox" id="setting-show_scarcity-toggle" class="sr-only peer" onchange="var v=this.checked?'1':'0';document.getElementById('setting-show_scarcity-en').value=v;document.getElementById('setting-show_scarcity-es').value=v;">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                <span class="ml-3 text-sm text-gray-600 dark:text-gray-400">Show "Only X slots left today" on the homepage when availability is low</span>
+              </label>
+              <input type="hidden" id="setting-show_scarcity-en" value="0">
+              <input type="hidden" id="setting-show_scarcity-es" value="0">
+              <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Displays a badge in the hero section when 6 or fewer appointment slots remain for the day. Disabled by default.</p>
+            </div>
+          </div>
         </div>
 
         <div class="mt-6 flex justify-end">
@@ -3321,7 +3339,7 @@
       <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
         <div>
           <h2 class="text-2xl font-bold">⏳ <span data-t="tabWaitlist">Waitlist</span></h2>
-          <p class="text-green-100" data-t="waitlistSubtitle">Walk-in queue management</p>
+          <p class="text-green-100" data-t="waitlistSubtitle">Orders on hold &amp; awaiting next steps</p>
         </div>
         <button onclick="loadWaitlist()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
       </div>
@@ -3767,7 +3785,7 @@ const adminT = {
     navMarketing: '\uD83D\uDCE3 Marketing \u25BE',
     navSettings: '\u2699\uFE0F Settings \u25BE',
     invoicesSubtitle: 'Generate and manage customer invoices',
-    waitlistSubtitle: 'Walk-in queue management',
+    waitlistSubtitle: 'Orders on hold & awaiting next steps',
     tireQuotesSubtitle: 'Review and respond to tire quote requests',
     visitsSubtitle: 'Customer check-ins, bay status, and service timers',
     laborSubtitle: 'Technician hours and labor summary across all ROs',
@@ -4160,6 +4178,7 @@ const adminT = {
     roStatusPendingApproval: 'Pending Approval',
     roStatusApproved: 'Approved',
     roStatusInProgress: 'In Progress',
+    roStatusOnHold: 'On Hold',
     roStatusWaitingParts: 'Waiting Parts',
     roStatusReady: 'Ready',
     roStatusCompleted: 'Completed',
@@ -4375,6 +4394,7 @@ const adminT = {
     roTimelineEst: 'Est.',
     roTimelineApproval: 'Approval',
     roTimelineInProg: 'In Prog',
+    roTimelineOnHold: 'On Hold',
     roTimelineParts: 'Parts',
     roTimelineDone: 'Done',
     // Schedules
@@ -4700,39 +4720,25 @@ const adminT = {
     invPrev: '← Prev',
     invNext: 'Next →',
     invPageOf: 'Page {page} of {total}',
-    // Waitlist (migrated from local L)
-    wlPosition: '#',
-    wlName: 'Customer',
-    wlPhone: 'Phone',
+    // Waitlist — Orders on hold / awaiting next steps
+    wlRoNumber: 'RO #',
+    wlCustomer: 'Customer',
     wlVehicle: 'Vehicle',
-    wlService: 'Service Needed',
-    wlWait: 'Wait Time',
     wlStatus: 'Status',
+    wlTimeInStatus: 'Time in Status',
     wlActions: 'Actions',
-    wlAddWalkin: '+ Add Walk-in',
-    wlCallNext: 'Call',
-    wlStartService: 'Start',
-    wlComplete: 'Complete',
-    wlNoShow: 'No-Show',
-    wlNoEntries: 'No one on the waitlist.',
-    wlFormName: 'Name',
-    wlFormPhone: 'Phone',
-    wlFormVehicle: 'Vehicle Description',
-    wlFormService: 'Service Type',
-    wlSave: 'Add to Waitlist',
-    wlCancel: 'Cancel',
-    wlWaiting: 'Waiting',
-    wlCalled: 'Called',
-    wlInService: 'In Service',
-    wlCompleted: 'Completed',
-    wlNoShowStatus: 'No-Show',
+    wlNoEntries: 'No orders on hold.',
+    wlResumeWork: 'Resume Work',
+    wlMarkReady: 'Mark Ready',
+    wlViewRo: 'View',
+    wlOnHold: 'On Hold',
+    wlAwaitingParts: 'Awaiting Parts',
     wlJustNow: 'just now',
     wlMinAgo: 'm ago',
     wlHrAgo: 'h ago',
-    wlAdded: 'Walk-in added',
+    wlDayAgo: 'd ago',
     wlUpdated: 'Status updated',
     wlFailed: 'Action failed',
-    wlNameRequired: 'Customer name is required',
     // Referrals (migrated from local labels)
     refCode: 'Referral Code',
     refReferrer: 'Referrer',
@@ -5046,7 +5052,7 @@ const adminT = {
     navMarketing: '\uD83D\uDCE3 Marketing \u25BE',
     navSettings: '\u2699\uFE0F Configuraci\u00F3n \u25BE',
     invoicesSubtitle: 'Generar y gestionar facturas de clientes',
-    waitlistSubtitle: 'Gesti\u00F3n de cola de espera',
+    waitlistSubtitle: '\u00D3rdenes en espera y pr\u00F3ximos pasos',
     tireQuotesSubtitle: 'Revisar y responder solicitudes de cotizaci\u00F3n de llantas',
     visitsSubtitle: 'Registro de clientes, estado de bah\u00EDas y temporizadores',
     laborSubtitle: 'Horas de t\u00E9cnicos y resumen de mano de obra',
@@ -5439,6 +5445,7 @@ const adminT = {
     roStatusPendingApproval: 'Pendiente de Aprobaci\u00F3n',
     roStatusApproved: 'Aprobado',
     roStatusInProgress: 'En Progreso',
+    roStatusOnHold: 'En Espera',
     roStatusWaitingParts: 'Esperando Partes',
     roStatusReady: 'Listo',
     roStatusCompleted: 'Completado',
@@ -5654,6 +5661,7 @@ const adminT = {
     roTimelineEst: 'Est.',
     roTimelineApproval: 'Aprob.',
     roTimelineInProg: 'En Prog',
+    roTimelineOnHold: 'En Espera',
     roTimelineParts: 'Partes',
     roTimelineDone: 'Hecho',
     // Schedules
@@ -5979,39 +5987,25 @@ const adminT = {
     invPrev: '← Anterior',
     invNext: 'Siguiente →',
     invPageOf: 'Página {page} de {total}',
-    // Waitlist (migrated from local L)
-    wlPosition: '#',
-    wlName: 'Cliente',
-    wlPhone: 'Tel.',
+    // Waitlist — Órdenes en espera / próximos pasos
+    wlRoNumber: 'RO #',
+    wlCustomer: 'Cliente',
     wlVehicle: 'Vehículo',
-    wlService: 'Servicio',
-    wlWait: 'Espera',
     wlStatus: 'Estado',
+    wlTimeInStatus: 'Tiempo en Estado',
     wlActions: 'Acciones',
-    wlAddWalkin: '+ Agregar',
-    wlCallNext: 'Llamar',
-    wlStartService: 'Iniciar',
-    wlComplete: 'Completar',
-    wlNoShow: 'No vino',
-    wlNoEntries: 'No hay nadie en la lista.',
-    wlFormName: 'Nombre',
-    wlFormPhone: 'Teléfono',
-    wlFormVehicle: 'Descripción del vehículo',
-    wlFormService: 'Tipo de servicio',
-    wlSave: 'Agregar a lista',
-    wlCancel: 'Cancelar',
-    wlWaiting: 'Esperando',
-    wlCalled: 'Llamado',
-    wlInService: 'En servicio',
-    wlCompleted: 'Completado',
-    wlNoShowStatus: 'No vino',
+    wlNoEntries: 'No hay órdenes en espera.',
+    wlResumeWork: 'Reanudar',
+    wlMarkReady: 'Marcar Listo',
+    wlViewRo: 'Ver',
+    wlOnHold: 'En Espera',
+    wlAwaitingParts: 'Esperando Partes',
     wlJustNow: 'ahora',
     wlMinAgo: 'min',
     wlHrAgo: 'h',
-    wlAdded: 'Agregado a la lista',
+    wlDayAgo: 'd',
     wlUpdated: 'Estado actualizado',
     wlFailed: 'Error',
-    wlNameRequired: 'El nombre es requerido',
     // Referrals (migrated from local labels)
     refCode: 'Código de Referencia',
     refReferrer: 'Referente',
@@ -10523,7 +10517,7 @@ async function revokeAdminByEmail(email) {
 }
 
 // ===== SITE SETTINGS (Editable Content) =====
-const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count', 'google_analytics_id', 'price_tire_install', 'price_tire_repair', 'price_oil_change', 'price_brake_service', 'price_alignment', 'price_tuneup', 'price_inspection', 'price_suspension', 'price_roadside', 'price_care_plan', 'founding_year', 'pwa_install_enabled'];
+const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count', 'google_analytics_id', 'price_tire_install', 'price_tire_repair', 'price_oil_change', 'price_brake_service', 'price_alignment', 'price_tuneup', 'price_inspection', 'price_suspension', 'price_roadside', 'price_care_plan', 'founding_year', 'pwa_install_enabled', 'show_scarcity'];
 const SITE_SETTINGS_DEFAULTS = {
   phone: { en: '(503) 367-9714', es: '(503) 367-9714' },
   email: { en: 'oregontirespdx@gmail.com', es: 'oregontirespdx@gmail.com' },
@@ -10580,6 +10574,9 @@ async function loadSiteSettings() {
     const pwaToggle = document.getElementById('setting-pwa_install_enabled-toggle');
     const pwaVal = document.getElementById('setting-pwa_install_enabled-en');
     if (pwaToggle && pwaVal) pwaToggle.checked = (pwaVal.value === '1');
+    const scarcityToggle = document.getElementById('setting-show_scarcity-toggle');
+    const scarcityVal = document.getElementById('setting-show_scarcity-en');
+    if (scarcityToggle && scarcityVal) scarcityToggle.checked = (scarcityVal.value === '1');
   } catch (err) {
     console.error('loadSiteSettings error:', err);
     showToast(adminT[currentLang].settingsLoadError || 'Could not load site settings', true);
@@ -12034,7 +12031,9 @@ async function showCustomerHistory(email) {
         }).join('')
       + '</tbody></table>';
   } catch(e) {
-    tableDiv.innerHTML = '<p class="text-center text-red-500 py-4">' + esc(adminT[currentLang].error || 'Error') + '</p>';
+    console.error('showCustomerHistory error:', e);
+    tableDiv.innerHTML = '<p class="text-center text-red-500 py-4">' + esc(e.message || adminT[currentLang].error || 'Error') + '</p>'
+      + '<button onclick="showCustomerHistory(\'' + esc(email).replace(/'/g, "\\'") + '\')" class="mx-auto block mt-2 bg-brand text-white px-4 py-1.5 rounded text-sm hover:bg-green-700">' + (adminT[currentLang].retry || 'Retry') + '</button>';
   }
 }
 

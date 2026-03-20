@@ -22,7 +22,7 @@ try {
     $method = $_SERVER['REQUEST_METHOD'];
 
     // Active RO statuses (not completed/cancelled/invoiced)
-    $activeStatuses = ['intake', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'waiting_parts', 'ready'];
+    $activeStatuses = ['intake', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'on_hold', 'waiting_parts', 'ready'];
 
     // ─── GET: List labor entries ────────────────────────────────────────────
     if ($method === 'GET') {

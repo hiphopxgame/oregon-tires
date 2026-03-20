@@ -187,78 +187,85 @@
             <span data-t="selectService">Select a Service</span>
           </h2>
           <fieldset>
-            <legend class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3" data-t="selectService">Select a Service</legend>
+            <legend class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3" data-t="selectServices">Select Services</legend>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 text-center" data-t="maxServices">Select up to 5 services per appointment</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div class="service-card">
-                <input type="radio" name="service" value="tire-installation" id="svc-tire-installation" aria-required="true" class="sr-only">
+                <input type="checkbox" name="services[]" value="tire-installation" id="svc-tire-installation" class="sr-only">
                 <label for="svc-tire-installation" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="tireInstallation">Tire Installation</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tire-installation"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="tire-repair" id="svc-tire-repair" aria-required="true" class="sr-only">
+                <input type="checkbox" name="services[]" value="tire-repair" id="svc-tire-repair" class="sr-only">
                 <label for="svc-tire-repair" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="tireRepair">Tire Repair</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tire-repair"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="wheel-alignment" id="svc-wheel-alignment" aria-required="true" class="sr-only">
+                <input type="checkbox" name="services[]" value="wheel-alignment" id="svc-wheel-alignment" class="sr-only">
                 <label for="svc-wheel-alignment" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="wheelAlignment">Wheel Alignment</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="wheel-alignment"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="oil-change" id="svc-oil-change" aria-required="true" class="sr-only">
+                <input type="checkbox" name="services[]" value="oil-change" id="svc-oil-change" class="sr-only">
                 <label for="svc-oil-change" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="oilChange">Oil Change</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="oil-change"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="brake-service" id="svc-brake-service" aria-required="true" class="sr-only">
+                <input type="checkbox" name="services[]" value="brake-service" id="svc-brake-service" class="sr-only">
                 <label for="svc-brake-service" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="brakeService">Brake Service</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="brake-service"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="tuneup" id="svc-tuneup" aria-required="true" class="sr-only">
+                <input type="checkbox" name="services[]" value="tuneup" id="svc-tuneup" class="sr-only">
                 <label for="svc-tuneup" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="tuneup">Tuneup</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="tuneup"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="mechanical-inspection" id="svc-mechanical-inspection" aria-required="true" class="sr-only">
+                <input type="checkbox" name="services[]" value="mechanical-inspection" id="svc-mechanical-inspection" class="sr-only">
                 <label for="svc-mechanical-inspection" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="mechanicalInspection">Mechanical Inspection</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="mechanical-inspection"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="mobile-service" id="svc-mobile-service" aria-required="true" class="sr-only">
+                <input type="checkbox" name="services[]" value="mobile-service" id="svc-mobile-service" class="sr-only">
                 <label for="svc-mobile-service" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="mobileService">Mobile Service</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="mobile-service"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="roadside-assistance" id="svc-roadside-assistance" aria-required="true" class="sr-only">
+                <input type="checkbox" name="services[]" value="roadside-assistance" id="svc-roadside-assistance" class="sr-only">
                 <label for="svc-roadside-assistance" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="roadsideAssistance">Roadside Assistance</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="roadside-assistance"></span>
                 </label>
               </div>
               <div class="service-card">
-                <input type="radio" name="service" value="other" id="svc-other" aria-required="true" class="sr-only">
+                <input type="checkbox" name="services[]" value="other" id="svc-other" class="sr-only">
                 <label for="svc-other" class="block border-2 border-gray-200 dark:border-gray-600 rounded-lg p-3 cursor-pointer hover:border-green-400 transition text-center">
                   <span class="block font-semibold text-brand dark:text-green-400" data-t="otherService">Other</span>
                   <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 service-meta" data-service="other"></span>
                 </label>
               </div>
+            </div>
+            <!-- Selected services summary chips -->
+            <div id="selected-services-summary" class="hidden mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+              <p class="text-sm font-medium text-brand dark:text-green-400 mb-2"><span data-t="selectedServices">Selected:</span> <span id="selected-count" class="font-bold">0</span>/5</p>
+              <div id="selected-chips" class="flex flex-wrap gap-2"></div>
+              <p id="combined-duration" class="text-xs text-gray-500 dark:text-gray-400 mt-2 hidden"></p>
             </div>
             <p class="text-sm text-gray-400 dark:text-gray-500 mt-3 text-center" data-t="pricingDisclaimer">Service times are estimates and may vary.</p>
           </fieldset>
@@ -618,6 +625,9 @@ const t = {
     bookAppointment: 'Book an Appointment',
     bookSubtitle: 'Schedule your service online. We will confirm your appointment shortly.',
     selectService: 'Select a Service',
+    selectServices: 'Select Services',
+    maxServices: 'Select up to 5 services per appointment',
+    selectedServices: 'Selected:',
     tireInstallation: 'Tire Installation',
     tireRepair: 'Tire Repair',
     wheelAlignment: 'Wheel Alignment',
@@ -717,6 +727,9 @@ const t = {
     bookAppointment: 'Programar una Cita',
     bookSubtitle: 'Programe su servicio en línea. Confirmaremos su cita en breve.',
     selectService: 'Seleccione un Servicio',
+    selectServices: 'Seleccionar Servicios',
+    maxServices: 'Seleccione hasta 5 servicios por cita',
+    selectedServices: 'Seleccionados:',
     tireInstallation: 'Instalación de Llantas',
     tireRepair: 'Reparación de Llantas',
     wheelAlignment: 'Alineación de Ruedas',
@@ -1071,6 +1084,16 @@ document.body.addEventListener('htmx:configRequest', function(e) {
       if (el) el.value = sessionStorage.getItem(key) || '';
     }
   } catch(err) {}
+
+  // Multi-service: collect checked services into clean array + set service for compat
+  var checkedServices = Array.from(form.querySelectorAll('input[name="services[]"]:checked')).map(function(cb) { return cb.value; });
+  if (e.detail.parameters && typeof e.detail.parameters === 'object' && !(e.detail.parameters instanceof FormData)) {
+    // json-enc mode: set services array and service string
+    delete e.detail.parameters['services[]'];
+    e.detail.parameters.services = checkedServices;
+    e.detail.parameters.service = checkedServices[0] || '';
+  }
+
   // Convert sms_opt_in from checkbox 'on' to API-compatible 1/0
   if (e.detail.parameters instanceof FormData) {
     var smsVal = e.detail.parameters.get('sms_opt_in');
@@ -1109,9 +1132,9 @@ document.body.addEventListener('htmx:beforeRequest', function(e) {
 
   var hasErrors = false;
 
-  // Service
-  var serviceEl = form.querySelector('input[name="service"]:checked');
-  if (!serviceEl) {
+  // Service(s) — at least one must be checked
+  var checkedBoxes = form.querySelectorAll('input[name="services[]"]:checked');
+  if (checkedBoxes.length < 1) {
     showStatus(t[currentLang].pleaseSelectService, 'orange');
     e.preventDefault();
     return;
@@ -1442,27 +1465,105 @@ document.querySelectorAll('#mobile-menu a').forEach(function(link) {
 // Track service selection + show/hide tire size section
 var TIRE_SERVICES = ['tire-installation', 'tire-repair', 'wheel-alignment'];
 var TIRE_OPTION_SERVICES = ['tire-installation', 'tire-repair'];
-document.querySelectorAll('input[name="service"]').forEach(function(radio) {
-  radio.addEventListener('change', function() {
+var MAX_SERVICES = 5;
+
+// Service duration estimates (minutes) for combined duration display
+var SERVICE_DURATIONS = {
+  'tire-installation': [45, 90], 'tire-repair': [20, 45], 'wheel-alignment': [30, 60],
+  'oil-change': [20, 45], 'brake-service': [60, 120], 'tuneup': [60, 120],
+  'mechanical-inspection': [30, 60], 'mobile-service': [30, 90], 'roadside-assistance': [30, 60], 'other': [30, 60]
+};
+
+var SERVICE_LABELS = {
+  en: { 'tire-installation': 'Tire Installation', 'tire-repair': 'Tire Repair', 'wheel-alignment': 'Wheel Alignment',
+        'oil-change': 'Oil Change', 'brake-service': 'Brake Service', 'tuneup': 'Tuneup',
+        'mechanical-inspection': 'Mechanical Inspection', 'mobile-service': 'Mobile Service',
+        'roadside-assistance': 'Roadside Assistance', 'other': 'Other' },
+  es: { 'tire-installation': 'Instalación de Llantas', 'tire-repair': 'Reparación de Llantas', 'wheel-alignment': 'Alineación',
+        'oil-change': 'Cambio de Aceite', 'brake-service': 'Frenos', 'tuneup': 'Afinación',
+        'mechanical-inspection': 'Inspección', 'mobile-service': 'Servicio Móvil',
+        'roadside-assistance': 'Asistencia en Carretera', 'other': 'Otro' }
+};
+
+function updateServiceSummary() {
+  var checked = Array.from(document.querySelectorAll('input[name="services[]"]:checked'));
+  var values = checked.map(function(cb) { return cb.value; });
+  var summary = document.getElementById('selected-services-summary');
+  var countEl = document.getElementById('selected-count');
+  var chipsEl = document.getElementById('selected-chips');
+  var durationEl = document.getElementById('combined-duration');
+  var labels = SERVICE_LABELS[currentLang] || SERVICE_LABELS.en;
+
+  if (values.length === 0) {
+    summary.classList.add('hidden');
+    return;
+  }
+
+  summary.classList.remove('hidden');
+  countEl.textContent = values.length;
+
+  // Build chips
+  chipsEl.textContent = '';
+  values.forEach(function(svc) {
+    var chip = document.createElement('span');
+    chip.className = 'inline-flex items-center gap-1 bg-brand/10 dark:bg-green-400/10 text-brand dark:text-green-400 text-xs font-medium px-2.5 py-1 rounded-full';
+    chip.textContent = labels[svc] || svc;
+    var removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'ml-0.5 text-brand/60 dark:text-green-400/60 hover:text-red-500 dark:hover:text-red-400 font-bold';
+    removeBtn.textContent = '\u00d7';
+    removeBtn.setAttribute('aria-label', 'Remove ' + (labels[svc] || svc));
+    removeBtn.addEventListener('click', function() {
+      var cb = document.getElementById('svc-' + svc);
+      if (cb) { cb.checked = false; cb.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
+    chip.appendChild(removeBtn);
+    chipsEl.appendChild(chip);
+  });
+
+  // Combined duration
+  var minTotal = 0, maxTotal = 0;
+  values.forEach(function(svc) {
+    var d = SERVICE_DURATIONS[svc] || [30, 60];
+    minTotal += d[0];
+    maxTotal += d[1];
+  });
+  durationEl.classList.remove('hidden');
+  durationEl.textContent = (currentLang === 'es' ? 'Tiempo estimado total: ~' : 'Estimated total time: ~') + minTotal + '-' + maxTotal + ' min';
+
+  // Show/hide tire sections based on ANY selected tire service
+  var section = document.getElementById('tire-size-section');
+  var tireOpts = document.getElementById('tire-options');
+  var hasTireService = values.some(function(v) { return TIRE_SERVICES.indexOf(v) !== -1; });
+  var hasTireOption = values.some(function(v) { return TIRE_OPTION_SERVICES.indexOf(v) !== -1; });
+
+  if (hasTireService) {
+    section.classList.remove('hidden');
+  } else {
+    section.classList.add('hidden');
+    document.getElementById('tire-size-input').value = '';
+  }
+  if (tireOpts) {
+    if (hasTireOption) tireOpts.classList.remove('hidden');
+    else tireOpts.classList.add('hidden');
+  }
+}
+
+document.querySelectorAll('input[name="services[]"]').forEach(function(cb) {
+  cb.addEventListener('change', function() {
+    // Enforce max services
+    var checked = document.querySelectorAll('input[name="services[]"]:checked');
+    if (checked.length > MAX_SERVICES) {
+      this.checked = false;
+      showStatus(currentLang === 'es' ? 'Máximo 5 servicios por cita.' : 'Maximum 5 services per appointment.', 'orange');
+      return;
+    }
+
     if (typeof gtag === 'function') gtag('event', 'booking_step', {
       event_category: 'booking_funnel', step: 'service_selected', service: this.value
     });
-    var section = document.getElementById('tire-size-section');
-    if (TIRE_SERVICES.indexOf(this.value) !== -1) {
-      section.classList.remove('hidden');
-    } else {
-      section.classList.add('hidden');
-      document.getElementById('tire-size-input').value = '';
-    }
-    // Toggle tire preference/count options
-    var tireOpts = document.getElementById('tire-options');
-    if (tireOpts) {
-      if (TIRE_OPTION_SERVICES.indexOf(this.value) !== -1) {
-        tireOpts.classList.remove('hidden');
-      } else {
-        tireOpts.classList.add('hidden');
-      }
-    }
+
+    updateServiceSummary();
   });
 });
 
@@ -1615,8 +1716,8 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
     hideStatus();
 
     // Gather form data
-    var serviceEl = form.querySelector('input[name="service"]:checked');
-    if (!serviceEl) { showStatus(t[currentLang].pleaseSelectService, 'orange'); return; }
+    var checkedSvcs = Array.from(form.querySelectorAll('input[name="services[]"]:checked')).map(function(cb) { return cb.value; });
+    if (checkedSvcs.length < 1) { showStatus(t[currentLang].pleaseSelectService, 'orange'); return; }
     var timeVal = document.getElementById('booking-time').value;
     if (!timeVal) { showStatus(t[currentLang].pleaseSelectTime, 'orange'); return; }
     if (!form.preferred_date.value) { showFieldError('booking-date', 'Required'); return; }
@@ -1631,7 +1732,8 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
     if (!document.getElementById('privacy-consent').checked) return;
 
     var body = {
-      service: serviceEl.value,
+      services: checkedSvcs,
+      service: checkedSvcs[0],
       preferred_date: form.preferred_date.value,
       preferred_time: timeVal,
       first_name: firstName,
@@ -1787,10 +1889,13 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
 
   input.addEventListener('input', updateTireDisplay);
 
-  // Clear display when service changes to non-tire type
-  document.querySelectorAll('input[name="service"]').forEach(function(radio) {
-    radio.addEventListener('change', function() {
-      if (['tire-installation', 'tire-repair', 'wheel-alignment'].indexOf(this.value) === -1) {
+  // Clear display when no tire services are checked
+  document.querySelectorAll('input[name="services[]"]').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      var anyTire = Array.from(document.querySelectorAll('input[name="services[]"]:checked')).some(function(c) {
+        return ['tire-installation', 'tire-repair', 'wheel-alignment'].indexOf(c.value) !== -1;
+      });
+      if (!anyTire) {
         while (display.firstChild) display.removeChild(display.firstChild);
         display.classList.add('hidden');
       }
@@ -1818,7 +1923,7 @@ updateServiceMeta();
     var currentStep = 1;
     var form = document.getElementById('booking-form');
     if (!form) return;
-    var serviceSelected = form.querySelector('input[name="service"]:checked');
+    var serviceSelected = form.querySelector('input[name="services[]"]:checked');
     var dateSelected = form.querySelector('input[name="preferred_date"]') && form.querySelector('input[name="preferred_date"]').value;
     var nameField = document.getElementById('booking-first-name');
     var nameFilled = nameField && nameField.value.trim().length > 0;
@@ -1895,10 +2000,10 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
   if (!serviceSlug) return;
   var validSlugs = ['tire-installation','tire-repair','wheel-alignment','oil-change','brake-service','tuneup','mechanical-inspection','mobile-service','roadside-assistance','other'];
   if (validSlugs.indexOf(serviceSlug) === -1) return;
-  var radio = document.getElementById('svc-' + serviceSlug);
-  if (!radio) return;
-  radio.checked = true;
-  radio.dispatchEvent(new Event('change', { bubbles: true }));
+  var cb = document.getElementById('svc-' + serviceSlug);
+  if (!cb) return;
+  cb.checked = true;
+  cb.dispatchEvent(new Event('change', { bubbles: true }));
   // Scroll to Step 2 (date/time) so user sees the next action
   var step2 = document.querySelector('#booking-form > div:nth-child(2)');
   if (step2) {
@@ -1920,9 +2025,10 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
 
   // Save partial form state on each meaningful change
   function saveDraft() {
-    var serviceEl = form.querySelector('input[name="service"]:checked');
+    var checkedSvcs = Array.from(form.querySelectorAll('input[name="services[]"]:checked')).map(function(cb) { return cb.value; });
     var draft = {
-      service: serviceEl ? serviceEl.value : '',
+      services: checkedSvcs,
+      service: checkedSvcs[0] || '',
       date: (document.getElementById('booking-date') || {}).value || '',
       time: (document.getElementById('booking-time') || {}).value || '',
       firstName: (document.getElementById('booking-first-name') || {}).value || '',
@@ -1934,7 +2040,7 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
       vehicleModel: (document.getElementById('vehicle-model') || {}).value || '',
       savedAt: Date.now()
     };
-    if (draft.service) {
+    if (draft.service || (draft.services && draft.services.length > 0)) {
       try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft)); } catch(e) {}
     }
   }
@@ -2005,9 +2111,15 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
 
     // Restore button handler
     restoreBtn.addEventListener('click', function() {
-      if (draft.service) {
-        var radio = document.getElementById('svc-' + draft.service);
-        if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
+      // Restore multi-service selections
+      var svcList = draft.services || (draft.service ? [draft.service] : []);
+      svcList.forEach(function(svc) {
+        var cb = document.getElementById('svc-' + svc);
+        if (cb) { cb.checked = true; }
+      });
+      if (svcList.length > 0) {
+        var lastCb = document.getElementById('svc-' + svcList[svcList.length - 1]);
+        if (lastCb) lastCb.dispatchEvent(new Event('change', { bubbles: true }));
       }
       if (draft.date) {
         var dateInput = document.getElementById('booking-date');

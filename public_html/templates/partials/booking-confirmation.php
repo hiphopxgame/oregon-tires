@@ -80,13 +80,24 @@ $displayTime = $displayHour . ':' . $min . ' ' . $suffix;
 // Build detail rows
 $details = [
     [$l['reference'], $bookingResponse['reference_number'] ?? ''],
-    [$l['service'], $sn[$bookingData['service']] ?? ucwords(str_replace('-', ' ', $bookingData['service']))],
-    [$l['date'], $displayDate],
-    [$l['time'], $displayTime],
-    [$l['name'], htmlspecialchars($bookingData['firstName'] . ' ' . $bookingData['lastName'], ENT_QUOTES, 'UTF-8')],
-    [$l['phone'], htmlspecialchars($bookingData['phone'], ENT_QUOTES, 'UTF-8')],
-    [$l['email'], htmlspecialchars($bookingData['email'], ENT_QUOTES, 'UTF-8')],
 ];
+
+// Multi-service display
+$servicesList = $bookingData['services'] ?? null;
+if (is_array($servicesList) && count($servicesList) > 1) {
+    $serviceLabels = array_map(function(string $s) use ($sn) {
+        return $sn[$s] ?? ucwords(str_replace('-', ' ', $s));
+    }, $servicesList);
+    $details[] = [$l['service'], implode(' + ', $serviceLabels)];
+} else {
+    $details[] = [$l['service'], $sn[$bookingData['service']] ?? ucwords(str_replace('-', ' ', $bookingData['service']))];
+}
+
+$details[] = [$l['date'], $displayDate];
+$details[] = [$l['time'], $displayTime];
+$details[] = [$l['name'], htmlspecialchars($bookingData['firstName'] . ' ' . $bookingData['lastName'], ENT_QUOTES, 'UTF-8')];
+$details[] = [$l['phone'], htmlspecialchars($bookingData['phone'], ENT_QUOTES, 'UTF-8')];
+$details[] = [$l['email'], htmlspecialchars($bookingData['email'], ENT_QUOTES, 'UTF-8')];
 
 // Insert vehicle row if present
 $vehicleParts = array_filter([$bookingData['vehicleYear'] ?? '', $bookingData['vehicleMake'] ?? '', $bookingData['vehicleModel'] ?? '']);

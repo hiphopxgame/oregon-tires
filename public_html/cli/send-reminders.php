@@ -39,7 +39,7 @@ try {
     // Find appointments for tomorrow that haven't been cancelled/completed
     // and haven't already received a reminder
     $stmt = $db->prepare(
-        "SELECT id, first_name, last_name, email, phone, service,
+        "SELECT id, first_name, last_name, email, phone, service, services,
                 preferred_date, preferred_time, vehicle_year, vehicle_make,
                 vehicle_model, language, notes,
                 COALESCE(sms_reminder_sent, 0) as sms_reminder_sent,
@@ -83,7 +83,8 @@ try {
 
         // Queue push notification reminder
         try {
-            $serviceDisplay = ucwords(str_replace('-', ' ', $appt['service']));
+            $svcs = !empty($appt['services']) ? (json_decode($appt['services'], true) ?: [$appt['service']]) : [$appt['service']];
+            $serviceDisplay = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $svcs));
             $pushTime = formatTimeDisplay($appt['preferred_time']);
             $subs = findPushSubscriptionsByEmail($appt['email']);
             if (!empty($subs)) {
@@ -108,7 +109,8 @@ try {
         // Send SMS reminder if enabled and not already sent
         if ($smsEnabled && empty($appt['sms_reminder_sent']) && !empty($appt['phone'])) {
             try {
-                $serviceDisplay = ucwords(str_replace('-', ' ', $appt['service']));
+                $smsSvcs = !empty($appt['services']) ? (json_decode($appt['services'], true) ?: [$appt['service']]) : [$appt['service']];
+                $serviceDisplay = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $smsSvcs));
 
                 // Format time for SMS
                 $smsTime = formatTimeDisplay($appt['preferred_time']);
@@ -156,7 +158,7 @@ try {
 
         // Get tomorrow's appointments grouped by assigned employee
         $empApptStmt = $db->prepare(
-            "SELECT a.id, a.service, a.preferred_time, a.first_name, a.last_name,
+            "SELECT a.id, a.service, a.services, a.preferred_time, a.first_name, a.last_name,
                     a.vehicle_year, a.vehicle_make, a.vehicle_model,
                     e.id as emp_id, e.name as emp_name, e.email as emp_email
              FROM oretir_appointments a
@@ -186,7 +188,8 @@ try {
                 $count = count($empAppts);
                 $lines = [];
                 foreach ($empAppts as $ea) {
-                    $svc = ucwords(str_replace('-', ' ', $ea['service']));
+                    $eaSvcs = !empty($ea['services']) ? (json_decode($ea['services'], true) ?: [$ea['service']]) : [$ea['service']];
+                    $svc = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $eaSvcs));
                     $vehicle = trim(($ea['vehicle_year'] ?? '') . ' ' . ($ea['vehicle_make'] ?? '') . ' ' . ($ea['vehicle_model'] ?? ''));
                     $lines[] = "  • " . formatTimeDisplay($ea['preferred_time']) . " — {$svc} — {$ea['first_name']} {$ea['last_name']}" . ($vehicle ? " ({$vehicle})" : '');
                 }
@@ -211,7 +214,8 @@ try {
                 $unassigned = count($byEmployee[0] ?? []);
                 $lines = [];
                 foreach ($tomorrowAppts as $a) {
-                    $svc = ucwords(str_replace('-', ' ', $a['service']));
+                    $aSvcs = !empty($a['services']) ? (json_decode($a['services'], true) ?: [$a['service']]) : [$a['service']];
+                    $svc = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $aSvcs));
                     $emp = $a['emp_name'] ?? 'Unassigned';
                     $lines[] = "  • " . formatTimeDisplay($a['preferred_time']) . " — {$svc} — {$a['first_name']} {$a['last_name']} → {$emp}";
                 }
