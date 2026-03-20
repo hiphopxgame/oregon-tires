@@ -373,3 +373,101 @@ function generateEstimateNumber(?PDO $db = null): string
 
     throw new \RuntimeException('Failed to generate unique estimate number after ' . $maxAttempts . ' attempts');
 }
+
+/**
+ * Auto-create a Repair Order for a given appointment.
+ *
+ * @return array{id: int, ro_number: string, existing: bool}|null
+ */
+function createRoForAppointment(int $appointmentId, PDO $db): ?array
+{
+    // Fetch appointment
+    $stmt = $db->prepare('SELECT * FROM oretir_appointments WHERE id = ? LIMIT 1');
+    $stmt->execute([$appointmentId]);
+    $appt = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$appt || $appt['status'] === 'cancelled') {
+        return null;
+    }
+
+    // Check if RO already exists for this appointment
+    $roCheck = $db->prepare('SELECT id, ro_number FROM oretir_repair_orders WHERE appointment_id = ? LIMIT 1');
+    $roCheck->execute([$appointmentId]);
+    $existing = $roCheck->fetch(PDO::FETCH_ASSOC);
+    if ($existing) {
+        return ['id' => (int) $existing['id'], 'ro_number' => $existing['ro_number'], 'existing' => true];
+    }
+
+    // Can't create RO without a customer
+    if (empty($appt['customer_id'])) {
+        return null;
+    }
+
+    $roNumber = generateRoNumber($db);
+
+    $stmt = $db->prepare(
+        'INSERT INTO oretir_repair_orders
+            (ro_number, customer_id, vehicle_id, appointment_id, status,
+             customer_concern, promised_date, promised_time, assigned_employee_id, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+    );
+    $stmt->execute([
+        $roNumber,
+        (int) $appt['customer_id'],
+        $appt['vehicle_id'] ? (int) $appt['vehicle_id'] : null,
+        $appointmentId,
+        'intake',
+        $appt['notes'] ?? null,
+        $appt['preferred_date'] ?? null,
+        $appt['preferred_time'] ?? null,
+        $appt['assigned_employee_id'] ?? null,
+    ]);
+
+    return ['id' => (int) $db->lastInsertId(), 'ro_number' => $roNumber, 'existing' => false];
+}
+
+/**
+ * Bidirectional status sync between appointments and repair orders.
+ *
+ * @param string $entity  'appointment' or 'ro'
+ * @param int    $entityId  The ID of the entity whose status just changed
+ * @param string $newStatus The new status value
+ */
+function syncAppointmentRoStatus(string $entity, int $entityId, string $newStatus, PDO $db): void
+{
+    try {
+        if ($entity === 'appointment') {
+            // Appointment → RO: only cascade cancellation
+            if ($newStatus === 'cancelled') {
+                $db->prepare(
+                    "UPDATE oretir_repair_orders
+                     SET status = 'cancelled', updated_at = NOW()
+                     WHERE appointment_id = ? AND status NOT IN ('completed', 'invoiced')"
+                )->execute([$entityId]);
+            }
+        } elseif ($entity === 'ro') {
+            // RO → Appointment: cascade completed/invoiced/cancelled
+            $roStmt = $db->prepare('SELECT appointment_id FROM oretir_repair_orders WHERE id = ? LIMIT 1');
+            $roStmt->execute([$entityId]);
+            $ro = $roStmt->fetch(PDO::FETCH_ASSOC);
+            if (!$ro || empty($ro['appointment_id'])) {
+                return;
+            }
+            $apptId = (int) $ro['appointment_id'];
+
+            if ($newStatus === 'completed' || $newStatus === 'invoiced') {
+                $db->prepare(
+                    "UPDATE oretir_appointments SET status = 'completed', updated_at = NOW()
+                     WHERE id = ? AND status NOT IN ('completed', 'cancelled')"
+                )->execute([$apptId]);
+            } elseif ($newStatus === 'cancelled') {
+                $db->prepare(
+                    "UPDATE oretir_appointments SET status = 'cancelled', updated_at = NOW()
+                     WHERE id = ? AND status NOT IN ('completed', 'cancelled')"
+                )->execute([$apptId]);
+            }
+        }
+    } catch (\Throwable $e) {
+        error_log("syncAppointmentRoStatus error ({$entity} #{$entityId} → {$newStatus}): " . $e->getMessage());
+    }
+}

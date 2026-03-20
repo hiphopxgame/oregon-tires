@@ -343,6 +343,16 @@ try {
         error_log("Oregon Tires book.php: customer/vehicle auto-create failed for appointment #{$appointmentId}: " . $custErr->getMessage());
     }
 
+    // ─── Auto-create Repair Order ──────────────────────────────────────
+    $roData = null;
+    if ($bookingCustomerId) {
+        try {
+            $roData = createRoForAppointment($appointmentId, $db);
+        } catch (\Throwable $roErr) {
+            error_log("book.php: auto-RO failed for appointment #{$appointmentId}: " . $roErr->getMessage());
+        }
+    }
+
     // ─── Query visit count for loyalty messaging ─────────────────────────────
     $visitCount = 0;
     $returningCustomer = false;
@@ -585,6 +595,11 @@ try {
         'returning_customer' => $returningCustomer,
         'visit_count' => $visitCount,
     ];
+
+    if ($roData) {
+        $response['ro_id']     = $roData['id'];
+        $response['ro_number'] = $roData['ro_number'];
+    }
 
     if ($paymentResponse !== null) {
         $response['payment'] = $paymentResponse;

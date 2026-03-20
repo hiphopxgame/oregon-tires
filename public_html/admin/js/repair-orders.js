@@ -694,7 +694,11 @@ window.roShowCreateModal = function(appointmentId) {
     if (!selectedApptId) { showToast(t('roSelectApptFirst', 'Select an appointment first'), true); return; }
     try {
       var json = await api('repair-orders.php', { method: 'POST', body: { appointment_id: selectedApptId } });
-      showToast(t('roCreatedMsg', 'Repair order created!'));
+      if (json.data && json.data.existing) {
+        showToast(t('roAlreadyExists', 'Repair order already exists') + ': ' + (json.data.ro_number || ''));
+      } else {
+        showToast(t('roCreatedMsg', 'Repair order created!'));
+      }
       modal.remove();
       loadRepairOrders();
     } catch(err) { showToast(err.message, true); }

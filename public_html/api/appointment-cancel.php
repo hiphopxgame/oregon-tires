@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/mail.php';
+require_once __DIR__ . '/../includes/vin-decode.php';
 
 try {
     requireMethod('GET', 'POST');
@@ -94,6 +95,13 @@ try {
          SET status = ?, cancel_reason = ?, cancel_token = NULL, cancel_token_expires = NULL, updated_at = NOW()
          WHERE id = ?'
     )->execute(['cancelled', $cancelReason, $appointment['id']]);
+
+    // ─── Cascade cancel to linked RO ──────────────────────────────────
+    try {
+        syncAppointmentRoStatus('appointment', (int) $appointment['id'], 'cancelled', $db);
+    } catch (\Throwable $syncErr) {
+        error_log("appointment-cancel.php: RO sync failed for #{$appointment['id']}: " . $syncErr->getMessage());
+    }
 
     // Send cancellation confirmation email to customer
     try {

@@ -146,7 +146,12 @@ try {
             $roCheck->execute([$appointmentId]);
             $existingRo = $roCheck->fetch(PDO::FETCH_ASSOC);
             if ($existingRo) {
-                jsonError('A repair order already exists for this appointment (RO ' . $existingRo['ro_number'] . ').', 409);
+                jsonSuccess([
+                    'id'        => (int) $existingRo['id'],
+                    'ro_number' => $existingRo['ro_number'],
+                    'existing'  => true,
+                    'message'   => 'Repair order already exists for this appointment.',
+                ]);
             }
 
             // Find or create customer
@@ -317,6 +322,15 @@ try {
         $params[] = $id;
 
         $db->prepare('UPDATE oretir_repair_orders SET ' . implode(', ', $fields) . ' WHERE id = ?')->execute($params);
+
+        // ─── Sync status to linked appointment ────────────────────────────
+        if (isset($data['status'])) {
+            try {
+                syncAppointmentRoStatus('ro', $id, $data['status'], $db);
+            } catch (\Throwable $syncErr) {
+                error_log("repair-orders.php: appointment sync failed for RO #{$id}: " . $syncErr->getMessage());
+            }
+        }
 
         // ─── Auto-create invoice when RO status changes to 'invoiced' ────
         if (isset($data['status']) && $data['status'] === 'invoiced') {

@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/mail.php';
 require_once __DIR__ . '/../../includes/schedule.php';
+require_once __DIR__ . '/../../includes/vin-decode.php';
 
 try {
     $staff = requireStaff();
@@ -276,6 +277,15 @@ try {
             }
         }
 
+        // ─── Sync status to linked RO ──────────────────────────────────
+        if (isset($body['status'])) {
+            try {
+                syncAppointmentRoStatus('appointment', $id, $body['status'], $db);
+            } catch (\Throwable $syncErr) {
+                error_log("appointments.php: RO sync failed for #{$id}: " . $syncErr->getMessage());
+            }
+        }
+
         jsonSuccess(['updated' => $id]);
     }
 
@@ -425,7 +435,27 @@ try {
             }
         }
 
-        jsonSuccess(['appointment_id' => $appointmentId, 'reference_number' => $referenceNumber]);
+        // ─── Auto-create Repair Order ──────────────────────────────────
+        $roData = null;
+        try {
+            // Auto-create customer/vehicle records first
+            $custId = findOrCreateCustomer($email, $firstName, $lastName, $phone, $language, $db);
+            if ($custId) {
+                $vehId = findOrCreateVehicle($custId, $vehicleYear ?: null, $vehicleMake ?: null, $vehicleModel ?: null, null, $db);
+                $db->prepare('UPDATE oretir_appointments SET customer_id = ?, vehicle_id = ? WHERE id = ?')
+                   ->execute([$custId, $vehId, $appointmentId]);
+                $roData = createRoForAppointment($appointmentId, $db);
+            }
+        } catch (\Throwable $roErr) {
+            error_log("appointments.php: auto-RO failed for admin-created #{$appointmentId}: " . $roErr->getMessage());
+        }
+
+        $result = ['appointment_id' => $appointmentId, 'reference_number' => $referenceNumber];
+        if ($roData) {
+            $result['ro_id']     = $roData['id'];
+            $result['ro_number'] = $roData['ro_number'];
+        }
+        jsonSuccess($result);
     }
 
     $ids = $body['ids'] ?? [];
