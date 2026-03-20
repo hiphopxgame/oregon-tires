@@ -1362,6 +1362,10 @@ function toggleLanguage() {
   if (vinInput) vinInput.placeholder = t[currentLang].vinPlaceholder;
   var tireSizeInput = document.getElementById('tire-size-input');
   if (tireSizeInput) tireSizeInput.placeholder = t[currentLang].tireSizePlaceholder;
+  // Re-render tire size display in new language
+  if (tireSizeInput && tireSizeInput.value.trim()) {
+    tireSizeInput.dispatchEvent(new Event('input'));
+  }
   updateServiceMeta();
   // Re-fetch time slots in new language if date is selected
   var dateInput = document.getElementById('booking-date');
@@ -1395,6 +1399,10 @@ if (currentLang !== 'en') {
   if (vinInput) vinInput.placeholder = t[currentLang].vinPlaceholder;
   var tireSizeInput = document.getElementById('tire-size-input');
   if (tireSizeInput) tireSizeInput.placeholder = t[currentLang].tireSizePlaceholder;
+  // Re-render tire size display in new language
+  if (tireSizeInput && tireSizeInput.value.trim()) {
+    tireSizeInput.dispatchEvent(new Event('input'));
+  }
 }
 
 // ===== MOBILE MENU =====
