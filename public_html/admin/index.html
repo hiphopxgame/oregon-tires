@@ -857,6 +857,7 @@
               <th class="p-3" data-t="roThVehicle">Vehicle</th>
               <th class="p-3" data-t="roThStatus">Status</th>
               <th class="p-3" data-t="roThCreated">Created</th>
+              <th class="p-3">DVI / Est</th>
               <th class="p-3" data-t="roThActions">Actions</th>
             </tr></thead>
             <tbody id="ro-table"></tbody>
@@ -6438,6 +6439,44 @@ function serviceBadgeHtml(svc) {
     + esc(lbl) + '</span>';
 }
 
+function servicesBadgesHtml(a) {
+  // Parse services JSON, fall back to single service
+  var svcs = [];
+  if (a.services) {
+    try { svcs = typeof a.services === 'string' ? JSON.parse(a.services) : a.services; } catch(e) {}
+  }
+  if (!Array.isArray(svcs) || svcs.length === 0) {
+    svcs = a.service ? [a.service] : [];
+  }
+  return svcs.map(function(s) { return serviceBadgeHtml(s); }).join(' ');
+}
+
+function servicesLabel(a) {
+  var svcs = [];
+  if (a.services) {
+    try { svcs = typeof a.services === 'string' ? JSON.parse(a.services) : a.services; } catch(e) {}
+  }
+  if (!Array.isArray(svcs) || svcs.length === 0) return a.service || '';
+  var labels = svcs.map(function(s) {
+    var c = SERVICE_COLORS[s] || SERVICE_COLORS['other'];
+    return currentLang === 'es' ? c.labelEs : c.label;
+  });
+  return labels.join(' + ');
+}
+
+function servicesColorBadges(a) {
+  var svcs = [];
+  if (a.services) {
+    try { svcs = typeof a.services === 'string' ? JSON.parse(a.services) : a.services; } catch(e) {}
+  }
+  if (!Array.isArray(svcs) || svcs.length === 0) {
+    svcs = a.service ? [a.service] : [];
+  }
+  var frag = document.createDocumentFragment();
+  svcs.forEach(function(s) { frag.appendChild(serviceColorBadge(s)); });
+  return frag;
+}
+
 // ===== API HELPERS =====
 async function api(endpoint, opts = {}) {
   const url = API + '/' + endpoint;
@@ -6945,7 +6984,7 @@ function renderUpcomingSchedule(stats) {
     chunk += '</div>';
     if (apts.length) {
       apts.slice(0, 3).forEach(function(a) {
-        chunk += '<div class="text-sm flex justify-between items-center bg-white dark:bg-gray-700 p-2 rounded mb-1 border dark:border-gray-600"><span><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(a.service) + ')</span></span>' + statusBadge(a.status) + (typeof calSyncBadge === 'function' ? calSyncBadge(a) : '') + '</div>';
+        chunk += '<div class="text-sm flex justify-between items-center bg-white dark:bg-gray-700 p-2 rounded mb-1 border dark:border-gray-600"><span><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(servicesLabel(a)) + ')</span></span>' + statusBadge(a.status) + (typeof calSyncBadge === 'function' ? calSyncBadge(a) : '') + '</div>';
       });
       if (apts.length > 3) chunk += '<p class="text-xs text-gray-400">+' + (apts.length - 3) + ' more</p>';
     }
@@ -7050,7 +7089,7 @@ function renderEmployeeSchedule(stats) {
         timeB.textContent = fmtTime(a.preferred_time);
         row.appendChild(timeB);
         row.appendChild(document.createTextNode(' \u2014 ' + a.first_name + ' ' + a.last_name + ' '));
-        row.appendChild(serviceColorBadge(a.service));
+        row.appendChild(servicesColorBadges(a));
         row.appendChild(document.createTextNode(' '));
         var sBadge = document.createElement('span');
         sBadge.insertAdjacentHTML('beforeend', statusBadge(a.status));
@@ -7683,9 +7722,11 @@ function renderCalDayWithSchedule(dateStr, sched) {
       nameEl.textContent = a.first_name + ' ' + a.last_name;
       leftDiv.appendChild(nameEl);
 
-      var svcEl = serviceColorBadge(a.service);
-      svcEl.classList.add('mt-0.5');
-      leftDiv.appendChild(svcEl);
+      var svcFrag = servicesColorBadges(a);
+      var svcWrap = document.createElement('div');
+      svcWrap.className = 'flex flex-wrap gap-1 mt-0.5';
+      svcWrap.appendChild(svcFrag);
+      leftDiv.appendChild(svcWrap);
 
       var contactEl = document.createElement('p');
       contactEl.className = 'text-sm text-gray-500 dark:text-gray-400';
@@ -7838,7 +7879,7 @@ function renderAppointments() {
     <tr class="border-b hover:bg-gray-50">
       <td class="px-4 py-3"><input type="checkbox" class="appt-checkbox rounded" value="${a.id}" onchange="updateBulkToolbar()"></td>
       <td class="p-3"><div class="font-medium">${esc(a.first_name)} ${esc(a.last_name)}</div><div class="text-xs text-gray-500">Created: ${new Date(a.created_at).toLocaleDateString()}</div></td>
-      <td class="p-3">${serviceBadgeHtml(a.service)}</td>
+      <td class="p-3">${servicesBadgesHtml(a)}</td>
       <td class="p-3"><div class="font-medium">${fmtDate(a.preferred_date)}</div><div class="text-xs text-gray-500">${fmtTime(a.preferred_time)}</div>
         ${a.status==='completed'&&a.actual_duration_minutes?`<div class="text-xs text-green-700 font-medium mt-1">Completed in ${a.actual_duration_minutes}min</div>`:''}</td>
       <td class="p-3"><div class="text-sm">${esc(a.email)}</div>${a.phone?`<div class="text-xs text-gray-500">${esc(fmtPhone(a.phone))}</div>`:''}</td>

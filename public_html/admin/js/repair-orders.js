@@ -184,7 +184,7 @@ function renderRoTable() {
   if (roList.length === 0) {
     var row = document.createElement('tr');
     var cell = document.createElement('td');
-    cell.colSpan = 6;
+    cell.colSpan = 7;
     cell.className = 'p-8 text-center text-gray-400';
     cell.textContent = t('roNoOrders', 'No repair orders found');
     row.appendChild(cell);
@@ -192,40 +192,131 @@ function renderRoTable() {
     return;
   }
 
+  function timeAgo(dateStr) {
+    if (!dateStr) return '';
+    var diff = Date.now() - new Date(dateStr).getTime();
+    var mins = Math.floor(diff / 60000);
+    if (mins < 60) return mins + 'm';
+    var hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + 'h';
+    var days = Math.floor(hrs / 24);
+    return days + 'd';
+  }
+
   roList.forEach(function(ro) {
     var tr = document.createElement('tr');
     tr.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-700/30 cursor-pointer transition';
     tr.addEventListener('click', function() { viewRoDetail(ro.id); });
 
-    // RO Number
+    // RO Number + age
     var tdNum = document.createElement('td');
-    tdNum.className = 'p-3 text-sm font-bold text-green-700 dark:text-green-400';
-    tdNum.textContent = ro.ro_number;
+    tdNum.className = 'p-3 text-sm';
+    var roLink = document.createElement('span');
+    roLink.className = 'font-bold text-green-700 dark:text-green-400';
+    roLink.textContent = ro.ro_number;
+    tdNum.appendChild(roLink);
+    var age = timeAgo(ro.created_at);
+    if (age) {
+      var ageBadge = document.createElement('span');
+      ageBadge.className = 'ml-1.5 text-xs text-gray-400';
+      ageBadge.textContent = age;
+      tdNum.appendChild(ageBadge);
+    }
     tr.appendChild(tdNum);
 
-    // Customer
+    // Customer + contact
     var tdCust = document.createElement('td');
     tdCust.className = 'p-3 text-sm';
-    tdCust.textContent = ((ro.first_name || '') + ' ' + (ro.last_name || '')).trim() || '-';
+    var custName = ((ro.first_name || '') + ' ' + (ro.last_name || '')).trim() || '-';
+    var nameEl = document.createElement('div');
+    nameEl.className = 'font-medium';
+    nameEl.textContent = custName;
+    tdCust.appendChild(nameEl);
+    if (ro.customer_phone) {
+      var phoneEl = document.createElement('div');
+      phoneEl.className = 'text-xs text-gray-400';
+      phoneEl.textContent = ro.customer_phone;
+      tdCust.appendChild(phoneEl);
+    }
     tr.appendChild(tdCust);
 
-    // Vehicle
+    // Vehicle + VIN
     var tdVeh = document.createElement('td');
     tdVeh.className = 'p-3 text-sm';
-    tdVeh.textContent = [ro.vehicle_year, ro.vehicle_make, ro.vehicle_model].filter(Boolean).join(' ') || '-';
+    var vehStr = [ro.vehicle_year, ro.vehicle_make, ro.vehicle_model].filter(Boolean).join(' ');
+    var vehEl = document.createElement('div');
+    vehEl.className = 'font-medium';
+    vehEl.textContent = vehStr || '-';
+    tdVeh.appendChild(vehEl);
+    if (ro.vin) {
+      var vinEl = document.createElement('div');
+      vinEl.className = 'text-xs text-gray-400 font-mono';
+      vinEl.textContent = ro.vin;
+      tdVeh.appendChild(vinEl);
+    }
+    if (ro.license_plate) {
+      var plateEl = document.createElement('div');
+      plateEl.className = 'text-xs text-gray-400';
+      plateEl.textContent = 'Plate: ' + ro.license_plate;
+      tdVeh.appendChild(plateEl);
+    }
     tr.appendChild(tdVeh);
 
-    // Status
+    // Status — inline dropdown
     var tdStatus = document.createElement('td');
     tdStatus.className = 'p-3 text-sm';
-    tdStatus.appendChild(createStatusBadge(ro.status));
+    var statusSelect = document.createElement('select');
+    statusSelect.className = 'text-xs border rounded-lg px-2 py-1.5 font-medium dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 cursor-pointer';
+    var allStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','waiting_parts','ready','completed','invoiced','cancelled'];
+    allStatuses.forEach(function(s) {
+      var opt = document.createElement('option');
+      opt.value = s;
+      var sKey = 'roStatus' + s.replace(/_([a-z])/g, function(m,c){ return c.toUpperCase(); }).replace(/^[a-z]/, function(c){ return c.toUpperCase(); });
+      opt.textContent = t(sKey, s.replace(/_/g, ' '));
+      if (s === ro.status) opt.selected = true;
+      statusSelect.appendChild(opt);
+    });
+    // Color the select based on current status
+    var colorMap = { intake:'#dbeafe', diagnosis:'#ede9fe', estimate_pending:'#fef3c7', pending_approval:'#ffedd5', approved:'#dcfce7', in_progress:'#e0e7ff', waiting_parts:'#fef3c7', ready:'#d1fae5', completed:'#f3f4f6', invoiced:'#ccfbf1', cancelled:'#fee2e2' };
+    statusSelect.style.backgroundColor = colorMap[ro.status] || '';
+    statusSelect.addEventListener('click', function(e) { e.stopPropagation(); });
+    statusSelect.addEventListener('change', (function(roId, sel) { return async function(e) {
+      e.stopPropagation();
+      var newStatus = sel.value;
+      try {
+        await api('repair-orders.php', { method: 'PUT', body: { id: roId, status: newStatus } });
+        showToast(t('roStatusUpdatedTo', 'Status updated to') + ' ' + newStatus.replace(/_/g, ' '));
+        loadRepairOrders();
+      } catch(err) {
+        showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true);
+        loadRepairOrders();
+      }
+    }; })(ro.id, statusSelect));
+    tdStatus.appendChild(statusSelect);
+    // Time in current status
+    var updatedAge = timeAgo(ro.updated_at);
+    if (updatedAge) {
+      var timeLabel = document.createElement('div');
+      timeLabel.className = 'text-xs text-gray-400 mt-0.5';
+      timeLabel.textContent = updatedAge + ' in status';
+      tdStatus.appendChild(timeLabel);
+    }
     tr.appendChild(tdStatus);
 
     // Created
     var tdDate = document.createElement('td');
-    tdDate.className = 'p-3 text-sm';
+    tdDate.className = 'p-3 text-sm text-gray-500';
     tdDate.textContent = formatDate(ro.created_at);
     tr.appendChild(tdDate);
+
+    // Inspections + Estimates counts
+    var tdCounts = document.createElement('td');
+    tdCounts.className = 'p-3 text-sm';
+    var counts = [];
+    if (ro.inspection_count > 0) counts.push(ro.inspection_count + ' DVI');
+    if (ro.estimate_count > 0) counts.push(ro.estimate_count + ' Est');
+    tdCounts.textContent = counts.join(', ') || '-';
+    tr.appendChild(tdCounts);
 
     // Actions
     var tdAct = document.createElement('td');
