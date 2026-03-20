@@ -503,6 +503,105 @@ function renderRoDetailModal() {
     body.appendChild(concernDiv);
   }
 
+  // ─── Notes section ───────────────────────────────────────────────────────
+  var notesSection = document.createElement('div');
+  notesSection.className = 'border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden';
+
+  var notesHeader = document.createElement('div');
+  notesHeader.className = 'bg-gray-50 dark:bg-gray-900/50 px-4 py-3 flex justify-between items-center';
+  var notesH = document.createElement('h3');
+  notesH.className = 'font-bold text-gray-900 dark:text-white text-sm';
+  notesH.textContent = t('roNotes', 'Notes');
+  notesHeader.appendChild(notesH);
+  notesSection.appendChild(notesHeader);
+
+  var notesBody = document.createElement('div');
+  notesBody.className = 'p-4 space-y-3';
+
+  // Existing technician notes log (read-only)
+  if (ro.technician_notes && ro.technician_notes.trim()) {
+    var techLog = document.createElement('div');
+    techLog.className = 'p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700';
+    var techLbl = document.createElement('div');
+    techLbl.className = 'text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider mb-1';
+    techLbl.textContent = t('roTechNotes', 'Technician Notes');
+    techLog.appendChild(techLbl);
+    var techTxt = document.createElement('div');
+    techTxt.className = 'text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap';
+    techTxt.textContent = ro.technician_notes;
+    techLog.appendChild(techTxt);
+    notesBody.appendChild(techLog);
+  }
+
+  // Existing admin notes log (read-only)
+  if (ro.admin_notes && ro.admin_notes.trim()) {
+    var adminLog = document.createElement('div');
+    adminLog.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600';
+    var adminLbl = document.createElement('div');
+    adminLbl.className = 'text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1';
+    adminLbl.textContent = t('roAdminNotes', 'Admin Notes');
+    adminLog.appendChild(adminLbl);
+    var adminTxt = document.createElement('div');
+    adminTxt.className = 'text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap';
+    adminTxt.textContent = ro.admin_notes;
+    adminLog.appendChild(adminTxt);
+    notesBody.appendChild(adminLog);
+  }
+
+  // Add new note form
+  var noteForm = document.createElement('div');
+  noteForm.className = 'border-t border-gray-200 dark:border-gray-700 pt-3';
+
+  var noteLabel = document.createElement('label');
+  noteLabel.className = 'block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1';
+  noteLabel.textContent = t('roAddNote', 'Add Note');
+  noteForm.appendChild(noteLabel);
+
+  var noteTextarea = document.createElement('textarea');
+  noteTextarea.className = 'w-full p-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 resize-none';
+  noteTextarea.rows = 3;
+  noteTextarea.maxLength = 2000;
+  noteTextarea.placeholder = t('roNotePlaceholder', 'Type a note...');
+  noteForm.appendChild(noteTextarea);
+
+  var noteActions = document.createElement('div');
+  noteActions.className = 'flex gap-2 mt-2';
+
+  var saveTechBtn = document.createElement('button');
+  saveTechBtn.className = 'px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition';
+  saveTechBtn.textContent = t('roSaveTechNote', 'Save as Tech Note');
+  saveTechBtn.addEventListener('click', async function() {
+    var txt = noteTextarea.value.trim();
+    if (!txt) { showToast(t('roNoteEmpty', 'Please enter a note.'), true); return; }
+    try {
+      await api('repair-orders.php', { method: 'PUT', body: { id: ro.id, technician_notes: txt, note_append: true } });
+      showToast(t('roNoteSaved', 'Note saved'));
+      modal.remove();
+      viewRoDetail(ro.id);
+    } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
+  });
+  noteActions.appendChild(saveTechBtn);
+
+  var saveAdminBtn = document.createElement('button');
+  saveAdminBtn.className = 'px-3 py-1.5 bg-gray-600 text-white rounded-lg text-xs font-medium hover:bg-gray-700 transition';
+  saveAdminBtn.textContent = t('roSaveAdminNote', 'Save as Admin Note');
+  saveAdminBtn.addEventListener('click', async function() {
+    var txt = noteTextarea.value.trim();
+    if (!txt) { showToast(t('roNoteEmpty', 'Please enter a note.'), true); return; }
+    try {
+      await api('repair-orders.php', { method: 'PUT', body: { id: ro.id, admin_notes: txt, note_append: true } });
+      showToast(t('roNoteSaved', 'Note saved'));
+      modal.remove();
+      viewRoDetail(ro.id);
+    } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
+  });
+  noteActions.appendChild(saveAdminBtn);
+
+  noteForm.appendChild(noteActions);
+  notesBody.appendChild(noteForm);
+  notesSection.appendChild(notesBody);
+  body.appendChild(notesSection);
+
   // Action buttons
   var actions = document.createElement('div');
   actions.className = 'flex flex-wrap gap-3';

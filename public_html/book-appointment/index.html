@@ -819,6 +819,8 @@ function loadBookingServices() {
       setupServiceCheckboxListeners();
       // Update TIRE_SERVICES and TIRE_OPTION_SERVICES from API data
       updateTireServiceLists(json.data);
+      // Auto-select service from URL param (e.g. ?service=tire-installation)
+      autoSelectServiceFromUrl();
     })
     .catch(function(err) {
       console.error('loadBookingServices error:', err);
@@ -1960,12 +1962,12 @@ fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json
 }).catch(function(){});
 
 // ===== URL PARAM: AUTO-SELECT SERVICE =====
-(function() {
+// Called after services are loaded from API (deferred execution)
+function autoSelectServiceFromUrl() {
   var params = new URLSearchParams(window.location.search);
   var serviceSlug = params.get('service');
   if (!serviceSlug) return;
-  var validSlugs = ['tire-installation','tire-repair','wheel-alignment','oil-change','brake-service','tuneup','mechanical-inspection','mobile-service','roadside-assistance','other'];
-  if (validSlugs.indexOf(serviceSlug) === -1) return;
+  // Validate against dynamically loaded services
   var cb = document.getElementById('svc-' + serviceSlug);
   if (!cb) return;
   cb.checked = true;

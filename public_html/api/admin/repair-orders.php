@@ -294,11 +294,9 @@ try {
             }
         }
 
-        // String fields
+        // String fields (simple replace)
         $strFields = [
             'customer_concern' => 2000,
-            'technician_notes' => 2000,
-            'admin_notes'      => 2000,
             'promised_date'    => 10,
             'promised_time'    => 10,
         ];
@@ -306,6 +304,28 @@ try {
             if (isset($data[$f])) {
                 $fields[] = "{$f} = ?";
                 $params[] = sanitize((string) $data[$f], $maxLen) ?: null;
+            }
+        }
+
+        // Notes fields — append-only when note_append flag is set
+        $noteFields = ['technician_notes' => 2000, 'admin_notes' => 2000];
+        foreach ($noteFields as $nf => $maxLen) {
+            if (!isset($data[$nf])) continue;
+            if (!empty($data['note_append'])) {
+                $newNote = sanitize((string) $data[$nf], $maxLen);
+                if ($newNote !== '') {
+                    $authorName = $staff['name'] ?? $staff['email'] ?? 'Staff';
+                    $timestamp = date('M j, Y g:ia');
+                    $entry = "[{$authorName} — {$timestamp}]\n{$newNote}";
+                    $existCol = $db->prepare("SELECT {$nf} FROM oretir_repair_orders WHERE id = ?");
+                    $existCol->execute([$id]);
+                    $existing = (string) ($existCol->fetchColumn() ?: '');
+                    $fields[] = "{$nf} = ?";
+                    $params[] = $existing ? $entry . "\n\n" . $existing : $entry;
+                }
+            } else {
+                $fields[] = "{$nf} = ?";
+                $params[] = sanitize((string) $data[$nf], $maxLen) ?: null;
             }
         }
 

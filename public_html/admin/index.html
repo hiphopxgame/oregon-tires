@@ -3833,8 +3833,9 @@
       </div>
       <div class="grid grid-cols-2 gap-4 mb-4">
         <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Service *</span>
-          <select name="appt-service" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          <select id="admin-appt-service-select" name="appt-service" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
             <option value="">Select...</option>
+            <!-- Populated dynamically from API; fallback options below -->
             <option value="tire-installation">Tire Installation</option>
             <option value="tire-repair">Tire Repair</option>
             <option value="wheel-alignment">Wheel Alignment</option>
@@ -4384,6 +4385,15 @@ const adminT = {
     roThActions: 'Actions',
     // RO Detail labels
     roCustomerConcern: 'Customer Concern',
+    roNotes: 'Notes',
+    roTechNotes: 'Technician Notes',
+    roAdminNotes: 'Admin Notes',
+    roAddNote: 'Add Note',
+    roNotePlaceholder: 'Type a note...',
+    roSaveTechNote: 'Save as Tech Note',
+    roSaveAdminNote: 'Save as Admin Note',
+    roNoteSaved: 'Note saved',
+    roNoteEmpty: 'Please enter a note.',
     roNewInspection: 'New Inspection',
     roNewEstimate: 'New Estimate',
     roInspections: 'Inspections',
@@ -4564,7 +4574,11 @@ const adminT = {
     allServices: 'All Services',
     serviceStaffing: 'Service Staffing',
     appointmentsLabel: 'appointments',
-    certifiedStaff: 'certified staff',
+    activeAppts: 'Active Appts',
+    certifiedStaff: 'Certified Staff',
+    ratio: 'Ratio',
+    noStaff: 'No Staff',
+    highLoad: 'High Load',
     workload: 'Workload',
     ofToday: 'of today',
     noSkillsAssigned: 'No skills assigned',
@@ -5674,6 +5688,15 @@ const adminT = {
     roThActions: 'Acciones',
     // RO Detail labels
     roCustomerConcern: 'Preocupaci\u00F3n del Cliente',
+    roNotes: 'Notas',
+    roTechNotes: 'Notas del T\u00E9cnico',
+    roAdminNotes: 'Notas del Admin',
+    roAddNote: 'Agregar Nota',
+    roNotePlaceholder: 'Escribir una nota...',
+    roSaveTechNote: 'Guardar como Nota T\u00E9cnica',
+    roSaveAdminNote: 'Guardar como Nota Admin',
+    roNoteSaved: 'Nota guardada',
+    roNoteEmpty: 'Por favor ingrese una nota.',
     roNewInspection: 'Nueva Inspecci\u00F3n',
     roNewEstimate: 'Nuevo Presupuesto',
     roInspections: 'Inspecciones',
@@ -5854,7 +5877,11 @@ const adminT = {
     allServices: 'Todos los Servicios',
     serviceStaffing: 'Personal por Servicio',
     appointmentsLabel: 'citas',
-    certifiedStaff: 'personal certificado',
+    activeAppts: 'Citas Activas',
+    certifiedStaff: 'Personal Certificado',
+    ratio: 'Proporci\u00F3n',
+    noStaff: 'Sin Personal',
+    highLoad: 'Carga Alta',
     workload: 'Carga de Trabajo',
     ofToday: 'del d\u00EDa',
     noSkillsAssigned: 'Sin certificaciones',
@@ -6622,6 +6649,7 @@ var SERVICE_COLORS = {
 };
 
 // Merge DB-driven service colors on load (enhances hardcoded fallback above)
+// Also dynamically populates the admin appointment service dropdown
 (function() {
   fetch('/api/services.php', { credentials: 'include' })
     .then(function(r) { return r.json(); })
@@ -6639,6 +6667,21 @@ var SERVICE_COLORS = {
           labelEs: svc.name_es || svc.name_en,
         };
       });
+      // Populate admin appointment service dropdown
+      var sel = document.getElementById('admin-appt-service-select');
+      if (sel) {
+        var bookable = json.data.filter(function(s) { return Number(s.is_bookable) === 1; });
+        if (bookable.length) {
+          // Remove fallback options (keep first "Select..." option)
+          while (sel.options.length > 1) sel.remove(1);
+          bookable.forEach(function(svc) {
+            var opt = document.createElement('option');
+            opt.value = svc.slug;
+            opt.textContent = currentLang === 'es' ? (svc.name_es || svc.name_en) : svc.name_en;
+            sel.appendChild(opt);
+          });
+        }
+      }
     })
     .catch(function() { /* keep hardcoded fallback */ });
 })();
@@ -7492,7 +7535,7 @@ function renderOverviewCharts() {
     showNoData(trendEl);
   }
 
-  // 5) Service Staffing — horizontal bars: appointments vs certified staff
+  // 5) Service Staffing — matrix table: service × appts × staff × ratio × status
   var staffEl = clearEl('chart-service-staffing');
   var allSvcTypes = Object.keys(SERVICE_COLORS);
   var staffData = [];
@@ -7501,81 +7544,93 @@ function renderOverviewCharts() {
     var apptCount = appointments.filter(function(a) {
       return a.service === svc && a.status !== 'cancelled' && a.status !== 'completed';
     }).length;
-    var certCount = employees.filter(function(e) {
+    var certNames = employees.filter(function(e) {
       return e.is_active && e.skills && e.skills.indexOf(svc) !== -1;
-    }).length;
-    if (apptCount > 0 || certCount > 0) {
-      staffData.push({ label: currentLang === 'es' ? c.labelEs : c.label, appointments: apptCount, staff: certCount, color: c.hex, svc: svc });
+    }).map(function(e) { return e.name; });
+    if (apptCount > 0 || certNames.length > 0) {
+      staffData.push({ label: currentLang === 'es' ? c.labelEs : c.label, appointments: apptCount, staff: certNames.length, staffNames: certNames, color: c.hex, svc: svc });
     }
   });
   if (staffData.length > 0) {
-    var maxVal = Math.max.apply(null, staffData.map(function(d) { return Math.max(d.appointments, d.staff); }));
-    if (maxVal < 1) maxVal = 1;
-    staffData.forEach(function(d) {
-      var row = document.createElement('div');
-      row.className = 'flex items-center gap-3 mb-2';
-      var lbl = document.createElement('span');
-      lbl.className = 'text-xs font-medium w-20 text-right text-gray-700 dark:text-gray-300 shrink-0';
-      lbl.textContent = d.label;
-      row.appendChild(lbl);
-      var barsWrap = document.createElement('div');
-      barsWrap.className = 'flex-1 flex flex-col gap-0.5';
-      var aBar = document.createElement('div');
-      aBar.className = 'flex items-center gap-1';
-      var aFill = document.createElement('div');
-      aFill.className = 'h-3 rounded-sm transition-all';
-      aFill.style.width = Math.max((d.appointments / maxVal) * 100, d.appointments > 0 ? 4 : 0) + '%';
-      aFill.style.backgroundColor = d.color;
-      aBar.appendChild(aFill);
-      var aLbl = document.createElement('span');
-      aLbl.className = 'text-[10px] text-gray-500 dark:text-gray-400';
-      aLbl.textContent = d.appointments + ' ' + (T.appointmentsLabel || 'appts');
-      aBar.appendChild(aLbl);
-      barsWrap.appendChild(aBar);
-      var sBar = document.createElement('div');
-      sBar.className = 'flex items-center gap-1';
-      var sFill = document.createElement('div');
-      sFill.className = 'h-3 rounded-sm bg-green-500 transition-all';
-      sFill.style.width = Math.max((d.staff / maxVal) * 100, d.staff > 0 ? 4 : 0) + '%';
-      sBar.appendChild(sFill);
-      var sLbl = document.createElement('span');
-      sLbl.className = 'text-[10px] text-gray-500 dark:text-gray-400';
-      sLbl.textContent = d.staff + ' ' + (T.certifiedStaff || 'staff');
-      sBar.appendChild(sLbl);
-      barsWrap.appendChild(sBar);
-      row.appendChild(barsWrap);
-      if (d.staff === 0 && d.appointments > 0) {
-        var warn = document.createElement('span');
-        warn.className = 'text-red-500 text-sm shrink-0';
-        warn.title = 'No certified staff';
-        warn.textContent = '\u26A0\uFE0F';
-        row.appendChild(warn);
-      } else if (d.appointments > d.staff * 3) {
-        var warn2 = document.createElement('span');
-        warn2.className = 'text-amber-500 text-sm shrink-0';
-        warn2.title = 'High load';
-        warn2.textContent = '\u26A0\uFE0F';
-        row.appendChild(warn2);
-      }
-      staffEl.appendChild(row);
+    staffData.sort(function(a, b) {
+      var aW = a.staff === 0 && a.appointments > 0 ? 0 : a.appointments > a.staff * 3 ? 1 : 2;
+      var bW = b.staff === 0 && b.appointments > 0 ? 0 : b.appointments > b.staff * 3 ? 1 : 2;
+      return aW !== bW ? aW - bW : b.appointments - a.appointments;
     });
-    var legend = document.createElement('div');
-    legend.className = 'flex items-center gap-4 mt-3 text-[10px] text-gray-500 dark:text-gray-400';
-    var legAppt = document.createElement('span');
-    legAppt.className = 'inline-flex items-center gap-1';
-    var legApptDot = document.createElement('span');
-    legApptDot.className = 'w-3 h-2 rounded-sm bg-gray-400 inline-block';
-    legAppt.appendChild(legApptDot);
-    legAppt.appendChild(document.createTextNode(' ' + (T.appointmentsLabel || 'appointments')));
-    legend.appendChild(legAppt);
-    var legStaff = document.createElement('span');
-    legStaff.className = 'inline-flex items-center gap-1';
-    var legStaffDot = document.createElement('span');
-    legStaffDot.className = 'w-3 h-2 rounded-sm bg-green-500 inline-block';
-    legStaff.appendChild(legStaffDot);
-    legStaff.appendChild(document.createTextNode(' ' + (T.certifiedStaff || 'certified staff')));
-    legend.appendChild(legStaff);
-    staffEl.appendChild(legend);
+    var tbl = document.createElement('table');
+    tbl.className = 'w-full text-sm';
+    var thead = document.createElement('thead');
+    var hRow = document.createElement('tr');
+    hRow.className = 'text-left text-xs text-gray-500 dark:text-gray-400 border-b dark:border-gray-600';
+    var hService = T.thService || 'Service';
+    var hAppts = T.activeAppts || 'Active Appts';
+    var hStaff = T.certifiedStaff || 'Certified Staff';
+    var hRatio = T.ratio || 'Ratio';
+    var hStatus = T.thStatus || 'Status';
+    [hService, hAppts, hStaff, hRatio, hStatus].forEach(function(txt, i) {
+      var th = document.createElement('th');
+      th.className = 'pb-2 pr-2 font-medium' + (i > 0 ? ' text-center' : '');
+      th.textContent = txt;
+      hRow.appendChild(th);
+    });
+    thead.appendChild(hRow);
+    tbl.appendChild(thead);
+    var tbody = document.createElement('tbody');
+    staffData.forEach(function(d) {
+      var tr = document.createElement('tr');
+      tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+      // Service name with color dot
+      var tdSvc = document.createElement('td');
+      tdSvc.className = 'py-2 pr-2';
+      var dot = document.createElement('span');
+      dot.className = 'inline-block w-2.5 h-2.5 rounded-full mr-1.5 align-middle';
+      dot.style.backgroundColor = d.color;
+      tdSvc.appendChild(dot);
+      var svcName = document.createElement('span');
+      svcName.className = 'font-medium text-gray-800 dark:text-gray-200 align-middle';
+      svcName.textContent = d.label;
+      tdSvc.appendChild(svcName);
+      tr.appendChild(tdSvc);
+      // Active appointments
+      var tdAppt = document.createElement('td');
+      tdAppt.className = 'py-2 pr-2 text-center font-semibold text-gray-700 dark:text-gray-300';
+      tdAppt.textContent = d.appointments;
+      tr.appendChild(tdAppt);
+      // Certified staff count + names tooltip
+      var tdStaff = document.createElement('td');
+      tdStaff.className = 'py-2 pr-2 text-center';
+      var staffBadge = document.createElement('span');
+      staffBadge.className = 'inline-flex items-center justify-center min-w-[1.5rem] px-1.5 py-0.5 rounded-full text-xs font-semibold '
+        + (d.staff === 0 ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' : 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300');
+      staffBadge.textContent = d.staff;
+      if (d.staffNames.length > 0) staffBadge.title = d.staffNames.join(', ');
+      tdStaff.appendChild(staffBadge);
+      tr.appendChild(tdStaff);
+      // Ratio
+      var tdRatio = document.createElement('td');
+      tdRatio.className = 'py-2 pr-2 text-center text-xs text-gray-500 dark:text-gray-400';
+      tdRatio.textContent = d.staff > 0 ? d.appointments + ':' + d.staff : (d.appointments > 0 ? '\u2014' : '0:0');
+      tr.appendChild(tdRatio);
+      // Status
+      var tdStatus = document.createElement('td');
+      tdStatus.className = 'py-2 text-center';
+      var badge = document.createElement('span');
+      if (d.staff === 0 && d.appointments > 0) {
+        badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300';
+        badge.textContent = T.noStaff || 'No Staff';
+      } else if (d.appointments > d.staff * 3) {
+        badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
+        badge.textContent = T.highLoad || 'High Load';
+      } else {
+        badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300';
+        badge.textContent = 'OK';
+      }
+      tdStatus.appendChild(badge);
+      tr.appendChild(tdStatus);
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    staffEl.appendChild(tbl);
   } else {
     showNoData(staffEl);
   }

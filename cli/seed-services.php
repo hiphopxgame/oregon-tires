@@ -8,7 +8,12 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../public_html/includes/bootstrap.php';
+// Server: cli/ is sibling to includes/; Local: cli/ is sibling to public_html/includes/
+$bootstrapPath = __DIR__ . '/../includes/bootstrap.php';
+if (!file_exists($bootstrapPath)) {
+    $bootstrapPath = __DIR__ . '/../public_html/includes/bootstrap.php';
+}
+require_once $bootstrapPath;
 
 $db = getDB();
 
