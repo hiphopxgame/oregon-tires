@@ -728,7 +728,7 @@
         <div class="flex gap-2 mb-6 border-b pb-3">
           <button onclick="switchMessagesSubTab('contacts')" id="msg-sub-contacts" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">💬 <span data-t="contactMessages">Contact Messages</span></button>
           <button onclick="switchMessagesSubTab('conversations')" id="msg-sub-conversations" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📧 <span data-t="conversations">Emails</span></button>
-          <button onclick="switchMessagesSubTab('emaillogs')" id="msg-sub-emaillogs" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📝 <span data-t="websiteChanges">Website Changes</span></button>
+          <button onclick="switchMessagesSubTab('emaillogs')" id="msg-sub-emaillogs" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📋 <span data-t="emailLog">Email Log</span></button>
         </div>
         <div id="msg-subtab-contacts">
           <div class="flex justify-end mb-4"><button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="refresh">↻ Refresh</button></div>
@@ -784,8 +784,32 @@
           </div>
         </div>
         <div id="msg-subtab-emaillogs" class="hidden">
-          <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-brand dark:text-green-400" data-t="websiteChanges">Website Changes</h2><button onclick="loadEmailLogs()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="refresh">↻ Refresh</button></div>
-          <div id="email-logs-list" class="space-y-3"></div>
+          <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+            <div class="flex gap-2 flex-wrap items-center">
+              <select id="emaillog-type-filter" onchange="loadEmailLogs()" class="border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+                <option value="" data-t="emailLogAllTypes">All Types</option>
+              </select>
+              <input id="emaillog-search" type="text" onkeyup="emailLogSearchDebounce()" class="border rounded-lg px-3 py-2 text-sm w-64 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600" data-t="emailLogSearchPh" placeholder="Search emails...">
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="emaillog-count" class="text-sm text-gray-500 dark:text-gray-400"></span>
+              <button onclick="loadEmailLogs()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="refresh">↻ Refresh</button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm responsive-table">
+              <thead><tr class="bg-gray-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
+                <th class="p-3 w-10"></th>
+                <th class="p-3" data-t="emailLogType">Type</th>
+                <th class="p-3" data-t="emailLogDesc">Description</th>
+                <th class="p-3" data-t="emailLogDate">Date</th>
+              </tr></thead>
+              <tbody id="emaillog-table-body">
+                <tr><td colspan="4" class="text-center py-8 text-gray-400">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="emaillog-pagination" class="flex justify-center gap-2 mt-4"></div>
         </div>
       </div>
     </div>
@@ -4049,7 +4073,10 @@ const adminT = {
     emailReplyNote: 'Reply will be sent as a branded email',
     attachments: 'Attachments',
     download: 'Download',
-    websiteChanges: 'Website Changes',
+    websiteChanges: 'Email Log',
+    emailLog: 'Email Log',
+    emailLogAllTypes: 'All Types',
+    emailLogSearchPh: 'Search emails...',
     thMessage: 'Message',
     thDate: 'Date',
     // Customers
@@ -5352,7 +5379,10 @@ const adminT = {
     emailReplyNote: 'La respuesta se enviar\u00E1 como email con marca',
     attachments: 'Archivos adjuntos',
     download: 'Descargar',
-    websiteChanges: 'Cambios del Sitio',
+    websiteChanges: 'Registro de Correos',
+    emailLog: 'Registro de Correos',
+    emailLogAllTypes: 'Todos los Tipos',
+    emailLogSearchPh: 'Buscar correos...',
     thMessage: 'Mensaje',
     thDate: 'Fecha',
     // Customers
@@ -7152,8 +7182,44 @@ async function loadEmployees() {
     bulkEmpSelect.innerHTML = optionsHtml;
   }
 }
+var emailLogPage = 0;
+var emailLogTotal = 0;
+var emailLogTypes = [];
+var emailLogSearchTimer = null;
+function emailLogSearchDebounce() {
+  clearTimeout(emailLogSearchTimer);
+  emailLogSearchTimer = setTimeout(function() { emailLogPage = 0; loadEmailLogs(); }, 300);
+}
 async function loadEmailLogs() {
-  try { const json = await api('email-logs.php'); emailLogs = json.data || []; } catch(e) { console.error('loadEmailLogs failed:', e); emailLogs = []; }
+  var type = document.getElementById('emaillog-type-filter') ? document.getElementById('emaillog-type-filter').value : '';
+  var q = document.getElementById('emaillog-search') ? document.getElementById('emaillog-search').value.trim() : '';
+  var limit = 50;
+  var offset = emailLogPage * limit;
+  var url = 'email-logs.php?limit=' + limit + '&offset=' + offset;
+  if (type) url += '&type=' + encodeURIComponent(type);
+  if (q) url += '&q=' + encodeURIComponent(q);
+  try {
+    var json = await api(url);
+    var d = json.data || {};
+    emailLogs = d.logs || [];
+    emailLogTotal = d.total || 0;
+    // Populate type filter dropdown (only once or when types change)
+    if (d.types && d.types.length && emailLogTypes.length !== d.types.length) {
+      emailLogTypes = d.types;
+      var sel = document.getElementById('emaillog-type-filter');
+      if (sel) {
+        var curVal = sel.value;
+        while (sel.options.length > 1) sel.remove(1);
+        d.types.forEach(function(t) {
+          var opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = formatLogType(t);
+          sel.appendChild(opt);
+        });
+        sel.value = curVal;
+      }
+    }
+  } catch(e) { console.error('loadEmailLogs failed:', e); emailLogs = []; emailLogTotal = 0; }
   renderEmailLogs();
 }
 async function loadGalleryImages() {
@@ -8224,46 +8290,109 @@ function renderMessages() {
 }
 
 // ===== EMAIL LOGS =====
-function renderEmailLogs() {
-  const container = document.getElementById('email-logs-list');
-  if(!emailLogs.length) { container.innerHTML = '<div class="bg-white rounded-xl shadow p-8 text-center text-gray-500">📧 No emails have been sent yet.</div>'; return; }
-  container.innerHTML = emailLogs.map(log => {
-    const typeColors = {appointment_created:'bg-blue-100 text-blue-800',appointment_assigned:'bg-amber-100 text-amber-800',appointment_completed:'bg-green-100 text-green-800'};
-    const typeLabels = {appointment_created:'Confirmation',appointment_assigned:'Assignment',appointment_completed:'Completion'};
-    return `<div class="bg-white rounded-xl shadow p-4 hover:shadow-md transition">
-      <div class="flex justify-between items-start">
-        <div class="space-y-1">
-          <div class="flex gap-2"><span class="px-2 py-1 rounded-full text-xs font-medium ${typeColors[log.email_type]||'bg-gray-100 text-gray-800'}">${typeLabels[log.email_type]||log.email_type}</span>
-          <span class="px-2 py-1 rounded-full text-xs font-medium border">${log.recipient_type}</span></div>
-          <h4 class="font-medium">${esc(log.subject)}</h4>
-        </div>
-        <button onclick="viewEmail('${log.id}')" class="border rounded px-3 py-1 text-sm hover:bg-gray-50">👁 View</button>
-      </div>
-      <div class="flex justify-between items-center text-sm text-gray-500 mt-2">
-        <div>👤 ${esc(log.recipient_name)} • 📧 ${esc(log.recipient_email)}</div>
-        <div>📅 ${new Date(log.sent_at).toLocaleDateString()} 🕐 ${new Date(log.sent_at).toLocaleTimeString()}</div>
-      </div>
-    </div>`;
-  }).join('');
+// Email log type → display label + color
+var LOG_TYPE_CONFIG = {
+  booking:                     { label: 'Booking Notify',      icon: '📅', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' },
+  booking_confirmation:        { label: 'Booking Confirm',     icon: '✅', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' },
+  appointment_confirmed:       { label: 'Appt Confirmed',      icon: '📋', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
+  appointment_assigned:        { label: 'Assigned (Customer)', icon: '👤', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300' },
+  appointment_assigned_employee:{ label: 'Assigned (Tech)',    icon: '🔧', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' },
+  contact_notification:        { label: 'Contact Form',        icon: '💬', color: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300' },
+  password_reset:              { label: 'Password Reset',      icon: '🔑', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' },
+  password_setup:              { label: 'Password Setup',      icon: '🔐', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' },
+  admin_setup:                 { label: 'Admin Setup',         icon: '🛡', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300' },
+  admin_setup_failed:          { label: 'Setup Failed',        icon: '⚠️', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' },
+  admin_invite:                { label: 'Admin Invite',        icon: '✉️', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300' },
+  welcome_credentials:         { label: 'Welcome Email',       icon: '👋', color: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300' },
+  subscriber_welcome:          { label: 'Subscriber Welcome',  icon: '📰', color: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300' },
+  platform_overview:           { label: 'Platform Overview',   icon: '📊', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' },
+  tire_quote_notify:           { label: 'Tire Quote Notify',   icon: '🛞', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
+  tire_quote_confirm:          { label: 'Tire Quote Confirm',  icon: '🛞', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
+};
+
+function formatLogType(type) {
+  var cfg = LOG_TYPE_CONFIG[type];
+  return cfg ? cfg.label : type.replace(/_/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
 }
-function viewEmail(id) {
-  const log = emailLogs.find(l=>l.id===id); if(!log) return;
-  document.getElementById('email-modal-subject').textContent = log.subject;
-  document.getElementById('email-modal-meta').innerHTML = `
-    <div><strong>To:</strong> ${esc(log.recipient_name)} (${esc(log.recipient_email)})</div>
-    <div><strong>Type:</strong> ${esc(log.email_type)}</div>
-    <div><strong>Sent:</strong> ${fmtDateTime(log.sent_at)}</div>
-    <div><strong>Message ID:</strong> ${esc(log.resend_message_id||'N/A')}</div>`;
-  const bodyContainer = document.getElementById('email-modal-body');
-  bodyContainer.textContent = '';
-  const iframe = document.createElement('iframe');
-  iframe.sandbox = 'allow-same-origin';
-  iframe.style.cssText = 'width:100%;min-height:200px;border:none;';
-  bodyContainer.appendChild(iframe);
-  iframe.srcdoc = log.body || '';
-  iframe.onload = function() { iframe.style.height = iframe.contentDocument.body.scrollHeight + 'px'; };
-  document.getElementById('email-modal').classList.remove('hidden');
-  trapFocus(document.getElementById('email-modal'));
+
+function renderEmailLogs() {
+  var tbody = document.getElementById('emaillog-table-body');
+  var countEl = document.getElementById('emaillog-count');
+  if (!tbody) return;
+
+  if (countEl) countEl.textContent = emailLogTotal + ' total';
+
+  tbody.textContent = '';
+
+  if (!emailLogs.length) {
+    var tr = document.createElement('tr');
+    var td = document.createElement('td');
+    td.colSpan = 4;
+    td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
+    td.textContent = 'No email logs found.';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    renderEmailLogPagination();
+    return;
+  }
+
+  emailLogs.forEach(function(log) {
+    var cfg = LOG_TYPE_CONFIG[log.log_type] || { label: log.log_type, icon: '📧', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' };
+
+    var tr = document.createElement('tr');
+    tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+
+    // Icon
+    var tdIcon = document.createElement('td');
+    tdIcon.className = 'p-3 text-center text-lg';
+    tdIcon.textContent = cfg.icon;
+    tr.appendChild(tdIcon);
+
+    // Type badge
+    var tdType = document.createElement('td');
+    tdType.className = 'p-3';
+    var badge = document.createElement('span');
+    badge.className = 'inline-block px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ' + cfg.color;
+    badge.textContent = cfg.label;
+    tdType.appendChild(badge);
+    tr.appendChild(tdType);
+
+    // Description
+    var tdDesc = document.createElement('td');
+    tdDesc.className = 'p-3 text-sm text-gray-700 dark:text-gray-300';
+    tdDesc.textContent = log.description || '';
+    tr.appendChild(tdDesc);
+
+    // Date
+    var tdDate = document.createElement('td');
+    tdDate.className = 'p-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap';
+    var d = new Date(log.created_at);
+    tdDate.textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    tr.appendChild(tdDate);
+
+    tbody.appendChild(tr);
+  });
+
+  renderEmailLogPagination();
+}
+
+function renderEmailLogPagination() {
+  var container = document.getElementById('emaillog-pagination');
+  if (!container) return;
+  container.textContent = '';
+  var perPage = 50;
+  var totalPages = Math.ceil(emailLogTotal / perPage);
+  if (totalPages <= 1) return;
+
+  for (var p = 0; p < totalPages && p < 10; p++) {
+    var btn = document.createElement('button');
+    btn.className = p === emailLogPage
+      ? 'px-3 py-1 rounded-lg text-sm font-medium bg-brand text-white'
+      : 'px-3 py-1 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300';
+    btn.textContent = String(p + 1);
+    btn.addEventListener('click', (function(page) { return function() { emailLogPage = page; loadEmailLogs(); }; })(p));
+    container.appendChild(btn);
+  }
 }
 
 // ===== CONVERSATIONS =====
