@@ -384,44 +384,34 @@
           </h2>
           <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 ml-10" data-t="vehicleOptional">Optional but helps us prepare for your visit</p>
 
-          <!-- License Plate Lookup -->
+          <!-- License Plate -->
           <div class="mb-4">
             <label for="plate-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-t="licensePlate">License Plate (optional)</label>
-            <div class="flex flex-col sm:flex-row gap-2">
+            <div class="flex gap-2">
               <input type="text" id="plate-input" name="license_plate" maxlength="8"
                      placeholder="e.g. ABC1234"
-                     class="w-full sm:w-32 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500 uppercase tracking-wider font-mono text-sm">
-              <select id="plate-state" class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500 text-sm">
+                     class="w-full sm:w-48 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500 uppercase tracking-wider font-mono text-sm">
+              <select id="plate-state" name="plate_state" class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500 text-sm">
                 <option value="OR" selected>OR</option>
-                <option value="WA">WA</option>
-                <option value="CA">CA</option>
-                <option value="ID">ID</option>
-                <option value="NV">NV</option>
-                <option value="AZ">AZ</option>
-                <option value="AL">AL</option><option value="AK">AK</option><option value="AR">AR</option>
-                <option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option>
-                <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option>
-                <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option>
-                <option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option>
-                <option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option>
-                <option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
-                <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option>
-                <option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option>
-                <option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option>
-                <option value="OH">OH</option><option value="OK">OK</option><option value="PA">PA</option>
-                <option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option>
-                <option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
-                <option value="VT">VT</option><option value="VA">VA</option><option value="WV">WV</option>
-                <option value="WI">WI</option><option value="WY">WY</option><option value="DC">DC</option>
+                <option value="WA">WA</option><option value="CA">CA</option><option value="ID">ID</option>
+                <option value="NV">NV</option><option value="AZ">AZ</option><option value="AL">AL</option>
+                <option value="AK">AK</option><option value="AR">AR</option><option value="CO">CO</option>
+                <option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option>
+                <option value="GA">GA</option><option value="HI">HI</option><option value="IL">IL</option>
+                <option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option>
+                <option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option>
+                <option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option>
+                <option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option>
+                <option value="MT">MT</option><option value="NE">NE</option><option value="NH">NH</option>
+                <option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
+                <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option>
+                <option value="OK">OK</option><option value="PA">PA</option><option value="RI">RI</option>
+                <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option>
+                <option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option>
+                <option value="VA">VA</option><option value="WV">WV</option><option value="WI">WI</option>
+                <option value="WY">WY</option><option value="DC">DC</option>
               </select>
-              <button type="button" id="plate-lookup-btn"
-                      hx-get="/api/plate-lookup.php"
-                      hx-target="#plate-status"
-                      hx-swap="innerHTML"
-                      class="bg-brand text-white px-4 py-2 rounded-md font-semibold hover:opacity-90 transition text-sm whitespace-nowrap disabled:opacity-50" data-t="plateLookup">Lookup</button>
             </div>
-            <div id="plate-status"></div>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1" data-t="plateOrVin">Or enter your VIN below</p>
           </div>
 
           <!-- VIN Lookup -->
@@ -706,12 +696,6 @@ const t = {
     tireSizePlaceholder: 'e.g. 225/65R17',
     tireSizeOptional: 'Optional — helps us have the right tires ready',
     licensePlate: 'License Plate (optional)',
-    plateLookup: 'Lookup',
-    plateLooking: 'Looking up...',
-    plateOrVin: 'Or enter your VIN below',
-    plateFound: 'Plate found!',
-    plateNotFound: 'No vehicle found for that plate. Try entering your VIN instead.',
-    plateInvalid: 'Enter a valid license plate (2-8 characters).',
     tireWheels: 'Wheels',
     tireWidth: 'Width',
     tireAspect: 'Aspect Ratio',
@@ -812,12 +796,6 @@ const t = {
     tireSizePlaceholder: 'ej. 225/65R17',
     tireSizeOptional: 'Opcional — nos ayuda a tener las llantas correctas',
     licensePlate: 'Placa (opcional)',
-    plateLookup: 'Buscar',
-    plateLooking: 'Buscando...',
-    plateOrVin: 'O ingrese su VIN abajo',
-    plateFound: 'Placa encontrada!',
-    plateNotFound: 'No se encontró un vehículo con esa placa. Intente con el VIN.',
-    plateInvalid: 'Ingrese una placa válida (2-8 caracteres).',
     tireWheels: 'Ruedas',
     tireWidth: 'Ancho',
     tireAspect: 'Relación de Aspecto',
@@ -1053,21 +1031,6 @@ function clearFieldErrors() {
 // ===== HTMX CONFIG — set dynamic values before request (no eval needed) =====
 document.body.addEventListener('htmx:configRequest', function(e) {
   var elt = e.detail.elt;
-  // Plate lookup requests — add plate, state, lang
-  if (elt && elt.id === 'plate-lookup-btn') {
-    var plateVal = document.getElementById('plate-input').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    var stateVal = document.getElementById('plate-state').value;
-    if (e.detail.parameters instanceof FormData) {
-      e.detail.parameters.set('plate', plateVal);
-      e.detail.parameters.set('state', stateVal);
-      e.detail.parameters.set('lang', currentLang);
-    } else {
-      e.detail.parameters.plate = plateVal;
-      e.detail.parameters.state = stateVal;
-      e.detail.parameters.lang = currentLang;
-    }
-    return;
-  }
   // VIN decode requests — add vin (uppercased) and lang
   if (elt && (elt.id === 'vehicle-vin' || elt.id === 'vin-decode-btn')) {
     var vinVal = document.getElementById('vehicle-vin').value.toUpperCase();
@@ -1743,7 +1706,7 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
   });
 })();
 
-// ===== PLATE LOOKUP — Auto-uppercase + JS Fallback =====
+// ===== PLATE INPUT — Auto-uppercase =====
 (function() {
   var plateInput = document.getElementById('plate-input');
   if (!plateInput) return;
@@ -1751,70 +1714,6 @@ document.querySelectorAll('a[href^="tel:"]').forEach(function(link) {
     var pos = this.selectionStart;
     this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     this.setSelectionRange(pos, pos);
-  });
-
-  var plateBtn = document.getElementById('plate-lookup-btn');
-  if (!plateBtn) return;
-
-  plateBtn.addEventListener('click', function() {
-    var plate = plateInput.value.trim();
-    if (plate.length < 2 || plate.length > 8) {
-      var statusEl = document.getElementById('plate-status');
-      statusEl.textContent = '';
-      var errP = document.createElement('p');
-      errP.className = 'text-xs mt-1 text-red-500 font-medium';
-      errP.textContent = t[currentLang].plateInvalid;
-      statusEl.appendChild(errP);
-      return;
-    }
-    // Wait briefly to let HTMX handle it
-    setTimeout(function() {
-      var statusEl = document.getElementById('plate-status');
-      if (statusEl.querySelector('.text-green-600, .text-green-400')) return;
-
-      plateBtn.disabled = true;
-      plateBtn.textContent = t[currentLang].plateLooking;
-      var state = document.getElementById('plate-state').value;
-
-      fetch('/api/plate-lookup.php?plate=' + encodeURIComponent(plate) + '&state=' + encodeURIComponent(state) + '&lang=' + currentLang)
-      .then(function(res) { return res.json(); })
-      .then(function(json) {
-        plateBtn.disabled = false;
-        plateBtn.textContent = t[currentLang].plateLookup;
-        if (json.success && json.data) {
-          var d = json.data;
-          // Fill VIN + vehicle fields
-          var vinInput = document.getElementById('vehicle-vin');
-          if (vinInput && d.vin) vinInput.value = d.vin;
-          var yearSel = document.getElementById('vehicle-year');
-          if (yearSel && d.year) yearSel.value = d.year;
-          var makeInput = document.getElementById('vehicle-make');
-          if (makeInput && d.make) makeInput.value = d.make;
-          var modelInput = document.getElementById('vehicle-model');
-          if (modelInput && d.model) modelInput.value = d.model;
-          statusEl.textContent = '';
-          var okP = document.createElement('p');
-          okP.className = 'text-xs mt-1 text-green-600 dark:text-green-400 font-medium';
-          okP.textContent = t[currentLang].plateFound;
-          statusEl.appendChild(okP);
-        } else {
-          statusEl.textContent = '';
-          var errP = document.createElement('p');
-          errP.className = 'text-xs mt-1 text-red-500 font-medium';
-          errP.textContent = json.error || t[currentLang].plateNotFound;
-          statusEl.appendChild(errP);
-        }
-      })
-      .catch(function() {
-        plateBtn.disabled = false;
-        plateBtn.textContent = t[currentLang].plateLookup;
-        statusEl.textContent = '';
-        var errP = document.createElement('p');
-        errP.className = 'text-xs mt-1 text-red-500 font-medium';
-        errP.textContent = t[currentLang].plateNotFound;
-        statusEl.appendChild(errP);
-      });
-    }, 500);
   });
 })();
 
