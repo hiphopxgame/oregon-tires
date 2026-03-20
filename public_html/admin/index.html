@@ -342,7 +342,7 @@
       .tab-content { display: none !important; }
       #tab-docs { display: block !important; }
       #docs-subtab-platform { display: block !important; }
-      #docs-subtab-coming, #docs-subtab-manual { display: none !important; }
+      #docs-subtab-manual { display: none !important; }
       [id^="docs-view-"] { display: none !important; }
       .dark\:bg-gray-800 { background: #f9fafb !important; }
       .dark\:bg-gray-700 { background: #e5e7eb !important; }
@@ -1481,10 +1481,9 @@
         <div><h2 class="text-2xl font-bold">📖 <span data-t="documentation">Documentation</span></h2><p class="text-green-50" data-t="docsSubtitle">Instruction manual, feature list, and roadmap</p></div>
       </div>
       <div class="bg-white rounded-b-xl shadow dark:bg-gray-800">
-        <!-- Sub-tabs: Your Platform / Coming Soon / Manual -->
+        <!-- Sub-tabs: Your Platform / Manual -->
         <div class="flex flex-wrap gap-2 p-4 border-b dark:border-gray-700">
           <button onclick="switchDocsView('platform')" id="docs-view-platform" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">🏠 <span data-t="docsYourPlatform">Your Platform</span></button>
-          <button onclick="switchDocsView('coming')" id="docs-view-coming" class="px-4 py-2 rounded-lg text-sm font-medium border text-gray-700 hover:bg-gray-50 bg-gradient-to-r from-green-50 to-amber-50 border-green-300 dark:from-green-900/30 dark:to-amber-900/30 dark:border-green-700 dark:text-green-300">🚀 <span data-t="docsComingSoon">Coming Soon</span></button>
           <button onclick="switchDocsView('manual')" id="docs-view-manual" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">📋 <span data-t="docsManual">Manual</span></button>
         </div>
 
@@ -2965,11 +2964,6 @@
 </div>
         </div>
 
-        <!-- Coming Soon Sub-Tab -->
-        <div id="docs-subtab-coming" class="hidden p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
-          <div id="coming-content"></div>
-        </div>
-
         <script src="/admin/js/feature-data.js"></script>
 
         </div>
@@ -3910,6 +3904,8 @@ const adminT = {
     platformAlaCarteDesc: 'Additional features ready to be built for your platform.',
     comingSoonTitle: "What's Next for Oregon Tires",
     comingSoonSubtitle: 'Upcoming features and enhancements',
+    futureAddonsTitle: 'Available Add-Ons',
+    futureAddonsSubtitle: 'These features are not yet integrated into your platform but can be added if you choose.',
     comingSoonReadyToActivate: 'Ready to Activate',
     comingSoonPlanned: 'Planned',
     comingSoonFuture: 'Future',
@@ -5179,6 +5175,8 @@ const adminT = {
     platformAlaCarteDesc: 'Funciones adicionales listas para construir en su plataforma.',
     comingSoonTitle: 'Lo Que Viene para Oregon Tires',
     comingSoonSubtitle: 'Pr\u00F3ximas funciones y mejoras',
+    futureAddonsTitle: 'Complementos Disponibles',
+    futureAddonsSubtitle: 'Estas funciones a\u00FAn no est\u00E1n integradas en su plataforma, pero pueden agregarse si lo desea.',
     comingSoonReadyToActivate: 'Listo para Activar',
     comingSoonPlanned: 'Planificado',
     comingSoonFuture: 'Futuro',
@@ -6271,7 +6269,6 @@ function applyAdminTranslations() {
     el.classList.toggle('hidden', currentLang !== 'es');
   });
   if (typeof renderPlatformTab === 'function') renderPlatformTab();
-  if (typeof renderComingSoonTab === 'function') renderComingSoonTab();
 }
 
 function refreshActiveTab() {
@@ -6755,9 +6752,7 @@ function showDashboard(user) {
   // Employees: only show Manual sub-tab in Docs
   if (isEmployee) {
     var platformBtn = document.getElementById('docs-view-platform');
-    var comingBtn = document.getElementById('docs-view-coming');
     if (platformBtn) platformBtn.style.display = 'none';
-    if (comingBtn) comingBtn.style.display = 'none';
     if (typeof switchDocsView === 'function') switchDocsView('manual');
   }
 
@@ -10547,18 +10542,15 @@ function switchApptView(view) {
 
 // Sub-tab switching for Documentation
 function switchDocsView(view) {
-  var tabs = ['platform','coming','manual'];
+  var tabs = ['platform','manual'];
   var active = 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white';
   var inactive = 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
-  var comingInactive = 'px-4 py-2 rounded-lg text-sm font-medium border text-gray-700 hover:bg-gray-50 bg-gradient-to-r from-green-50 to-amber-50 border-green-300 dark:from-green-900/30 dark:to-amber-900/30 dark:border-green-700 dark:text-green-300';
   tabs.forEach(function(t) {
     document.getElementById('docs-subtab-'+t).classList.toggle('hidden', view !== t);
     var btn = document.getElementById('docs-view-'+t);
-    if (t === 'coming') btn.className = view === t ? active : comingInactive;
-    else btn.className = view === t ? active : inactive;
+    btn.className = view === t ? active : inactive;
   });
   if (view === 'platform' && typeof renderPlatformTab === 'function') renderPlatformTab();
-  if (view === 'coming' && typeof renderComingSoonTab === 'function') renderComingSoonTab();
 }
 
 
@@ -11239,119 +11231,99 @@ function renderPlatformTab() {
   bottomInfo.appendChild(el('div', '', '\u2713 7 automated cron jobs \u00B7 53 DB migrations'));
   summary.appendChild(bottomInfo);
   container.appendChild(summary);
+
+  // ─── 14. Available Add-Ons (Future Features) ───
+  if (typeof COMING_SOON_DATA !== 'undefined' && COMING_SOON_DATA.length > 0) {
+    var addonsWrap = el('div', 'mt-10');
+
+    // Section header
+    var addonsHeader = el('div', 'rounded-2xl p-6 md:p-8 mb-6 bg-gradient-to-br from-amber-50 to-green-50 dark:from-amber-900/20 dark:to-green-900/20 border-2 border-amber-200 dark:border-amber-700');
+    addonsHeader.appendChild(el('h3', 'text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-1', t.futureAddonsTitle));
+    addonsHeader.appendChild(el('p', 'text-sm text-gray-600 dark:text-gray-400', t.futureAddonsSubtitle));
+
+    // Total add-on value
+    var addonsTotal = 0;
+    COMING_SOON_DATA.forEach(function(f) { addonsTotal += Math.round((f.price || 0) * frRate); });
+    var addonsStats = el('div', 'flex items-center gap-4 mt-4');
+    addonsStats.appendChild(el('span', 'text-2xl font-bold text-amber-700 dark:text-amber-400', '$' + addonsTotal.toLocaleString()));
+    addonsStats.appendChild(el('span', 'text-sm text-gray-500 dark:text-gray-400', COMING_SOON_DATA.length + ' ' + (lang === 'es' ? 'funciones disponibles' : 'features available')));
+    addonsHeader.appendChild(addonsStats);
+    addonsWrap.appendChild(addonsHeader);
+
+    // Status legend
+    var addonsLegend = el('div', 'flex flex-wrap gap-4 mb-6 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
+    var addonsTiers = [
+      { status: 'scaffold_ready', dot: 'bg-yellow-500', label: t.comingSoonReadyToActivate },
+      { status: 'planned', dot: 'bg-blue-500', label: t.comingSoonPlanned },
+      { status: 'future', dot: 'bg-gray-400', label: t.comingSoonFuture }
+    ];
+    addonsTiers.forEach(function(tier) {
+      var item = el('span', 'flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400');
+      item.appendChild(el('span', 'w-3 h-3 rounded-full inline-block ' + tier.dot));
+      item.appendChild(document.createTextNode(tier.label));
+      addonsLegend.appendChild(item);
+    });
+    addonsWrap.appendChild(addonsLegend);
+
+    // Cards by tier
+    var addonsTierOrder = ['scaffold_ready', 'planned', 'future'];
+    var addonsTierLabels = {
+      scaffold_ready: { label: t.comingSoonReadyToActivate, color: 'yellow' },
+      planned: { label: t.comingSoonPlanned, color: 'blue' },
+      future: { label: t.comingSoonFuture, color: 'gray' }
+    };
+
+    addonsTierOrder.forEach(function(tierKey) {
+      var items = COMING_SOON_DATA.filter(function(f) { return f.status === tierKey; });
+      if (!items.length) return;
+      var tierInfo = addonsTierLabels[tierKey];
+
+      var section = el('div', 'mb-6');
+      var sectionHeader = el('div', 'flex items-center gap-3 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700');
+      sectionHeader.appendChild(el('span', 'w-3 h-3 rounded-full bg-' + tierInfo.color + '-500'));
+      sectionHeader.appendChild(el('h4', 'text-lg font-bold text-gray-800 dark:text-gray-100', tierInfo.label));
+      sectionHeader.appendChild(el('span', 'text-sm font-medium px-2.5 py-0.5 rounded-full bg-' + tierInfo.color + '-100 text-' + tierInfo.color + '-700 dark:bg-' + tierInfo.color + '-900/30 dark:text-' + tierInfo.color + '-300', String(items.length)));
+      section.appendChild(sectionHeader);
+
+      var grid = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-4');
+      items.forEach(function(f) {
+        var frPrice = Math.round((f.price || 0) * frRate);
+        var card = el('div', 'border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition bg-white dark:bg-gray-800');
+
+        var topRow = el('div', 'flex items-start justify-between gap-2 mb-2');
+        var leftGroup = el('div', 'flex items-start gap-3 flex-1');
+        leftGroup.appendChild(el('span', 'text-2xl', f.emoji));
+        leftGroup.appendChild(el('div', 'font-bold text-sm text-gray-900 dark:text-white', f['name_' + lang] || f.name_en));
+        topRow.appendChild(leftGroup);
+        topRow.appendChild(el('span', 'text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '$' + frPrice.toLocaleString()));
+        card.appendChild(topRow);
+
+        card.appendChild(el('p', 'text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-2', f['desc_' + lang] || f.desc_en));
+
+        var badges = el('div', 'flex flex-wrap gap-2');
+        var statusBadgeColor = tierKey === 'scaffold_ready' ? 'yellow' : tierKey === 'planned' ? 'blue' : 'gray';
+        badges.appendChild(el('span', 'inline-block text-xs bg-' + statusBadgeColor + '-100 dark:bg-' + statusBadgeColor + '-900/30 text-' + statusBadgeColor + '-700 dark:text-' + statusBadgeColor + '-400 px-2 py-0.5 rounded', tierInfo.label));
+        card.appendChild(badges);
+
+        if (f['note_' + lang] || f.note_en) {
+          card.appendChild(el('p', 'text-xs text-amber-600 dark:text-amber-400 mt-2 italic', (t.comingSoonNote || 'Note') + ': ' + (f['note_' + lang] || f.note_en)));
+        }
+
+        grid.appendChild(card);
+      });
+      section.appendChild(grid);
+      addonsWrap.appendChild(section);
+    });
+
+    container.appendChild(addonsWrap);
+  }
 }
 
 // Initial render of platform tab on page load
 if (typeof FEATURE_DATA !== 'undefined') {
   setTimeout(function() {
     if (typeof renderPlatformTab === 'function') renderPlatformTab();
-    if (typeof renderComingSoonTab === 'function') renderComingSoonTab();
   }, 100);
-}
-
-// ===== COMING SOON TAB =====
-function renderComingSoonTab() {
-  if (typeof COMING_SOON_DATA === 'undefined') return;
-  var lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
-  var t = adminT[lang] || adminT.en;
-  var container = document.getElementById('coming-content');
-  if (!container) return;
-  container.textContent = '';
-  var frRate = typeof FREELANCER_RATE !== 'undefined' ? FREELANCER_RATE : 1/3;
-
-  function el(tag, cls, text) {
-    var e = document.createElement(tag);
-    if (cls) e.className = cls;
-    if (text) e.textContent = text;
-    return e;
-  }
-
-  // ─── 1. Header Card ───
-  var header = el('div', 'rounded-2xl p-6 md:p-8 mb-8 text-white bg-gradient-to-br from-green-600 to-green-800');
-  header.appendChild(el('h2', 'text-2xl md:text-3xl font-bold mb-1', t.comingSoonTitle));
-  header.appendChild(el('p', 'text-green-100 text-sm', t.comingSoonSubtitle));
-  container.appendChild(header);
-
-  // ─── 2. Status Legend ───
-  var legend = el('div', 'flex flex-wrap gap-4 mb-6 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm');
-  var tiers = [
-    { status: 'scaffold_ready', dot: 'bg-yellow-500', label: t.comingSoonReadyToActivate },
-    { status: 'planned', dot: 'bg-blue-500', label: t.comingSoonPlanned },
-    { status: 'future', dot: 'bg-gray-400', label: t.comingSoonFuture }
-  ];
-  tiers.forEach(function(tier) {
-    var item = el('span', 'flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400');
-    item.appendChild(el('span', 'w-3 h-3 rounded-full inline-block ' + tier.dot));
-    item.appendChild(document.createTextNode(tier.label));
-    legend.appendChild(item);
-  });
-  container.appendChild(legend);
-
-  // ─── 3. Feature Cards by Status Tier ───
-  var tierOrder = ['scaffold_ready', 'planned', 'future'];
-  var tierLabels = {
-    scaffold_ready: { label: t.comingSoonReadyToActivate, color: 'yellow' },
-    planned: { label: t.comingSoonPlanned, color: 'blue' },
-    future: { label: t.comingSoonFuture, color: 'gray' }
-  };
-  var totalEstimate = 0;
-
-  tierOrder.forEach(function(tierKey) {
-    var items = COMING_SOON_DATA.filter(function(f) { return f.status === tierKey; });
-    if (!items.length) return;
-    var tierInfo = tierLabels[tierKey];
-
-    var section = el('div', 'mb-8');
-    var sectionHeader = el('div', 'flex items-center gap-3 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700');
-    sectionHeader.appendChild(el('span', 'w-3 h-3 rounded-full bg-' + tierInfo.color + '-500'));
-    sectionHeader.appendChild(el('h3', 'text-lg font-bold text-gray-800 dark:text-gray-100', tierInfo.label));
-    sectionHeader.appendChild(el('span', 'text-sm font-medium px-2.5 py-0.5 rounded-full bg-' + tierInfo.color + '-100 text-' + tierInfo.color + '-700 dark:bg-' + tierInfo.color + '-900/30 dark:text-' + tierInfo.color + '-300', String(items.length)));
-    section.appendChild(sectionHeader);
-
-    var grid = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-4');
-    items.forEach(function(f) {
-      var frPrice = Math.round((f.price || 0) * frRate);
-      totalEstimate += frPrice;
-      var card = el('div', 'border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-green-300 dark:hover:border-green-700 transition bg-white dark:bg-gray-800');
-
-      var topRow = el('div', 'flex items-start justify-between gap-2 mb-2');
-      var leftGroup = el('div', 'flex items-start gap-3 flex-1');
-      leftGroup.appendChild(el('span', 'text-2xl', f.emoji));
-      var nameEl = el('div', 'font-bold text-sm text-gray-900 dark:text-white', f['name_' + lang] || f.name_en);
-      leftGroup.appendChild(nameEl);
-      topRow.appendChild(leftGroup);
-
-      var priceBadge = el('span', 'text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap', '$' + frPrice.toLocaleString());
-      topRow.appendChild(priceBadge);
-      card.appendChild(topRow);
-
-      card.appendChild(el('p', 'text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-2', f['desc_' + lang] || f.desc_en));
-
-      var badges = el('div', 'flex flex-wrap gap-2');
-      var statusBadgeColor = tierKey === 'scaffold_ready' ? 'yellow' : tierKey === 'planned' ? 'blue' : 'gray';
-      badges.appendChild(el('span', 'inline-block text-xs bg-' + statusBadgeColor + '-100 dark:bg-' + statusBadgeColor + '-900/30 text-' + statusBadgeColor + '-700 dark:text-' + statusBadgeColor + '-400 px-2 py-0.5 rounded', tierInfo.label));
-      card.appendChild(badges);
-
-      if (f['note_' + lang] || f.note_en) {
-        var note = el('p', 'text-xs text-amber-600 dark:text-amber-400 mt-2 italic', (t.comingSoonNote || 'Note') + ': ' + (f['note_' + lang] || f.note_en));
-        card.appendChild(note);
-      }
-
-      grid.appendChild(card);
-    });
-    section.appendChild(grid);
-    container.appendChild(section);
-  });
-
-  // ─── 4. Total Estimate Card ───
-  var totalCard = el('div', 'rounded-2xl p-6 md:p-8 text-white bg-gradient-to-br from-green-600 to-green-800 text-center mb-6');
-  totalCard.appendChild(el('div', 'text-lg font-medium mb-1 text-green-100', t.comingSoonTotalEstimate));
-  totalCard.appendChild(el('div', 'text-4xl md:text-5xl font-bold mb-3', '$' + totalEstimate.toLocaleString()));
-  totalCard.appendChild(el('p', 'text-green-100 text-sm', COMING_SOON_DATA.length + ' ' + (lang === 'es' ? 'funciones' : 'features')));
-  container.appendChild(totalCard);
-
-  // ─── 5. Footer ───
-  container.appendChild(el('p', 'text-center text-xs text-gray-400 dark:text-gray-500 italic', lang === 'es' ? '\u00DAltima actualizaci\u00F3n: marzo 2026' : 'Last updated: March 2026'));
 }
 
 // ===== MY SCHEDULE / MY WORK (staff tabs) =====
