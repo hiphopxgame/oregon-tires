@@ -6,6 +6,25 @@
 var CLIENT_PRICE = 5000;
 var FREELANCER_RATE = 1/3;
 
+// Features the client originally requested (core tire shop website).
+// Everything NOT in this list was added by the developer as bonus value.
+var CLIENT_SCOPE_IDS = [
+  // Website Foundation — core website build
+  '1-1','1-2','1-4','1-5','1-7',
+  // Public Pages — essential pages for a tire shop
+  '2-1','2-2','2-4','2-5','2-13','2-14','2-15',
+  // Regional SEO — local search visibility
+  '3-1',
+  // Booking — online appointment scheduling
+  '4-1','4-4','4-5',
+  // Customer Management — basic customer records
+  '6-1',
+  // Auth & Security — basic access control
+  '9-1','9-3','9-4','9-5',
+  // Admin Panel — essential management tools
+  '10-1','10-2','10-3','10-8'
+];
+
 var FEATURE_CATS = {
   '1':  { en: 'Website Foundation', es: 'Fundación del Sitio Web' },
   '2':  { en: 'Public Pages', es: 'Páginas Públicas' },
