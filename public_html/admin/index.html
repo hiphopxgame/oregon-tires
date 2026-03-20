@@ -10679,6 +10679,9 @@ function switchTab(tab) {
   if(tab==='referrals' && typeof loadReferrals === 'function') loadReferrals();
   if(tab==='reminders' && typeof loadServiceReminders === 'function') loadServiceReminders();
   if(tab==='resourceplanner' && typeof loadResourcePlanner === 'function') loadResourcePlanner();
+  if(tab==='blog' && typeof loadBlogPosts === 'function') loadBlogPosts();
+  if(tab==='gallery' && typeof renderGallery === 'function') renderGallery();
+  if(tab==='messages') { if(typeof loadMessages === 'function') loadMessages(); if(typeof loadConversations === 'function') loadConversations(); }
 }
 
 // Nav dropdown click-to-toggle
