@@ -58,6 +58,9 @@ try {
     $utmCampaign = sanitize((string) ($data['utm_campaign'] ?? ''), 100);
     $utmContent  = sanitize((string) ($data['utm_content'] ?? ''), 100);
 
+    // Optional technician preference
+    $preferredEmployeeId = !empty($data['preferred_employee_id']) ? (int) $data['preferred_employee_id'] : null;
+
     // ─── Validate ───────────────────────────────────────────────────────────
 
     // Service type
@@ -227,35 +230,36 @@ try {
     $stmt = $db->prepare(
         'INSERT INTO oretir_appointments
             (reference_number, service, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, vehicle_vin, tire_size, tire_preference, tire_count,
-             first_name, last_name, phone, email, notes, sms_opt_in, utm_source, utm_medium, utm_campaign, utm_content, status, language, created_at, updated_at)
+             first_name, last_name, phone, email, notes, sms_opt_in, utm_source, utm_medium, utm_campaign, utm_content, preferred_employee_id, status, language, created_at, updated_at)
          VALUES
             (:reference_number, :service, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model, :vehicle_vin, :tire_size, :tire_preference, :tire_count,
-             :first_name, :last_name, :phone, :email, :notes, :sms_opt_in, :utm_source, :utm_medium, :utm_campaign, :utm_content, :status, :language, NOW(), NOW())'
+             :first_name, :last_name, :phone, :email, :notes, :sms_opt_in, :utm_source, :utm_medium, :utm_campaign, :utm_content, :preferred_employee_id, :status, :language, NOW(), NOW())'
     );
     $stmt->execute([
-        ':reference_number' => $referenceNumber,
-        ':service'          => $service,
-        ':preferred_date'   => $preferredDate,
-        ':preferred_time'   => $preferredTime,
-        ':vehicle_year'     => $vehicleYear ?: null,
-        ':vehicle_make'     => $vehicleMake ?: null,
-        ':vehicle_model'    => $vehicleModel ?: null,
-        ':vehicle_vin'      => $vehicleVin ?: null,
-        ':tire_size'        => $tireSize ?: null,
-        ':tire_preference'  => $tirePreference ?: null,
-        ':tire_count'       => $tireCount,
-        ':first_name'       => $firstName,
-        ':last_name'        => $lastName,
-        ':phone'            => $phone,
-        ':email'            => $email,
-        ':notes'            => $notes ?: null,
-        ':sms_opt_in'       => $smsOptIn,
-        ':utm_source'       => $utmSource ?: null,
-        ':utm_medium'       => $utmMedium ?: null,
-        ':utm_campaign'     => $utmCampaign ?: null,
-        ':utm_content'      => $utmContent ?: null,
-        ':status'           => 'new',
-        ':language'         => $language,
+        ':reference_number'     => $referenceNumber,
+        ':service'              => $service,
+        ':preferred_date'       => $preferredDate,
+        ':preferred_time'       => $preferredTime,
+        ':vehicle_year'         => $vehicleYear ?: null,
+        ':vehicle_make'         => $vehicleMake ?: null,
+        ':vehicle_model'        => $vehicleModel ?: null,
+        ':vehicle_vin'          => $vehicleVin ?: null,
+        ':tire_size'            => $tireSize ?: null,
+        ':tire_preference'      => $tirePreference ?: null,
+        ':tire_count'           => $tireCount,
+        ':first_name'           => $firstName,
+        ':last_name'            => $lastName,
+        ':phone'                => $phone,
+        ':email'                => $email,
+        ':notes'                => $notes ?: null,
+        ':sms_opt_in'           => $smsOptIn,
+        ':utm_source'           => $utmSource ?: null,
+        ':utm_medium'           => $utmMedium ?: null,
+        ':utm_campaign'         => $utmCampaign ?: null,
+        ':utm_content'          => $utmContent ?: null,
+        ':preferred_employee_id'=> $preferredEmployeeId,
+        ':status'               => 'new',
+        ':language'             => $language,
     ]);
 
     $appointmentId = (int) $db->lastInsertId();

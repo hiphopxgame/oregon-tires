@@ -142,11 +142,112 @@ try {
         }
     }
 
-    echo "\nDone: Email {$emailSent} sent / {$emailFailed} failed";
+    echo "\nCustomer reminders: Email {$emailSent} sent / {$emailFailed} failed";
     if ($smsEnabled) {
         echo ", SMS {$smsSent} sent / {$smsFailed} failed";
     }
     echo ".\n";
+
+    // ─── Employee/Admin Reminders ──────────────────────────────────────────
+    // Send a daily summary to each employee with tomorrow's assigned appointments
+    // and a summary to the admin/office contact
+    try {
+        $empSent = 0;
+
+        // Get tomorrow's appointments grouped by assigned employee
+        $empApptStmt = $db->prepare(
+            "SELECT a.id, a.service, a.preferred_time, a.first_name, a.last_name,
+                    a.vehicle_year, a.vehicle_make, a.vehicle_model,
+                    e.id as emp_id, e.name as emp_name, e.email as emp_email
+             FROM oretir_appointments a
+             LEFT JOIN oretir_employees e ON a.assigned_employee_id = e.id AND e.is_active = 1
+             WHERE a.preferred_date = ?
+               AND a.status IN ('new', 'pending', 'confirmed')
+             ORDER BY a.preferred_time ASC"
+        );
+        $empApptStmt->execute([$tomorrow]);
+        $tomorrowAppts = $empApptStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (!empty($tomorrowAppts)) {
+            // Group by employee
+            $byEmployee = [];
+            foreach ($tomorrowAppts as $a) {
+                $key = $a['emp_id'] ? (int) $a['emp_id'] : 0;
+                $byEmployee[$key][] = $a;
+            }
+
+            // Send to each assigned employee
+            foreach ($byEmployee as $empId => $empAppts) {
+                if ($empId === 0) continue; // unassigned
+                $empEmail = $empAppts[0]['emp_email'] ?? '';
+                $empName  = $empAppts[0]['emp_name'] ?? 'Team Member';
+                if (empty($empEmail)) continue;
+
+                $count = count($empAppts);
+                $lines = [];
+                foreach ($empAppts as $ea) {
+                    $svc = ucwords(str_replace('-', ' ', $ea['service']));
+                    $vehicle = trim(($ea['vehicle_year'] ?? '') . ' ' . ($ea['vehicle_make'] ?? '') . ' ' . ($ea['vehicle_model'] ?? ''));
+                    $lines[] = "  • " . formatTimeDisplay($ea['preferred_time']) . " — {$svc} — {$ea['first_name']} {$ea['last_name']}" . ($vehicle ? " ({$vehicle})" : '');
+                }
+                $body = "Hi {$empName},\n\nYou have {$count} appointment(s) scheduled for tomorrow ({$tomorrow}):\n\n" . implode("\n", $lines) . "\n\nOregon Tires Auto Care";
+
+                $empMail = sendMail(
+                    $empEmail,
+                    "Tomorrow's Schedule: {$count} appointment(s) — Oregon Tires",
+                    nl2br(htmlspecialchars($body)),
+                    $body
+                );
+                if ($empMail) {
+                    $empSent++;
+                    echo "  ✓ Employee reminder sent to {$empName} ({$empEmail}) — {$count} appts\n";
+                }
+            }
+
+            // Send summary to admin/office
+            $adminEmail = $_ENV['CONTACT_EMAIL'] ?? '';
+            if ($adminEmail) {
+                $totalCount = count($tomorrowAppts);
+                $unassigned = count($byEmployee[0] ?? []);
+                $lines = [];
+                foreach ($tomorrowAppts as $a) {
+                    $svc = ucwords(str_replace('-', ' ', $a['service']));
+                    $emp = $a['emp_name'] ?? 'Unassigned';
+                    $lines[] = "  • " . formatTimeDisplay($a['preferred_time']) . " — {$svc} — {$a['first_name']} {$a['last_name']} → {$emp}";
+                }
+                $body = "Oregon Tires — Tomorrow's Schedule ({$tomorrow})\n\n{$totalCount} appointment(s)" . ($unassigned ? " ({$unassigned} unassigned)" : '') . ":\n\n" . implode("\n", $lines);
+
+                $adminMail = sendMail(
+                    $adminEmail,
+                    "Tomorrow: {$totalCount} appointment(s) — Oregon Tires",
+                    nl2br(htmlspecialchars($body)),
+                    $body
+                );
+                if ($adminMail) {
+                    $empSent++;
+                    echo "  ✓ Admin daily summary sent to {$adminEmail}\n";
+                }
+            }
+        } else {
+            // Notify admin if no appointments tomorrow
+            $adminEmail = $_ENV['CONTACT_EMAIL'] ?? '';
+            if ($adminEmail) {
+                sendMail(
+                    $adminEmail,
+                    "No appointments scheduled for {$tomorrow} — Oregon Tires",
+                    "<p>No appointments are currently scheduled for {$tomorrow}.</p>",
+                    "No appointments are currently scheduled for {$tomorrow}."
+                );
+                echo "  ✓ No-appointments notice sent to admin\n";
+                $empSent++;
+            }
+        }
+
+        echo "Employee/admin reminders: {$empSent} sent.\n";
+    } catch (\Throwable $empErr) {
+        echo "  ✗ Employee reminder error: " . $empErr->getMessage() . "\n";
+        error_log("send-reminders.php employee reminders: " . $empErr->getMessage());
+    }
 
 } catch (\Throwable $e) {
     echo "ERROR: " . $e->getMessage() . "\n";
