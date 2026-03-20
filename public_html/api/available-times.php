@@ -256,6 +256,14 @@ try {
         ]);
     }
 
+    // ─── Filter past time slots when booking for today ─────────────
+    $isToday = $date === (new DateTime('now', new DateTimeZone('America/Los_Angeles')))->format('Y-m-d');
+    $nowMinutes = null;
+    if ($isToday) {
+        $now = new DateTime('now', new DateTimeZone('America/Los_Angeles'));
+        $nowMinutes = (int) $now->format('H') * 60 + (int) $now->format('i');
+    }
+
     $allSlots = [];
     for ($h = $shopStart; $h <= $shopEnd; $h++) {
         foreach ([0, 15, 30, 45] as $m) {
@@ -264,6 +272,18 @@ try {
             $count    = $slotCounts[$time] ?? 0;
             $capacity = $useSchedules ? ($slotCapacity[$time] ?? 0) : $legacyCapacity;
             $available = $capacity > 0 && $count < $capacity;
+
+            // Block slots in the past (with 15-min buffer so nobody books "right now")
+            if ($isToday && ($h * 60 + $m) <= $nowMinutes + 15) {
+                $available = false;
+                $allSlots[$time] = [
+                    'booked'    => $count,
+                    'capacity'  => $capacity,
+                    'available' => false,
+                    'reason'    => 'past',
+                ];
+                continue;
+            }
 
             $allSlots[$time] = [
                 'booked'    => $count,

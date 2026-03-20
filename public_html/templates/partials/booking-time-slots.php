@@ -35,6 +35,8 @@ for ($h = $shopStart; $h <= $shopEnd; $h++):
     $baseClass = 'time-slot min-h-[44px] border-2 rounded-lg py-2 px-3 text-sm font-medium transition';
     if (!$available && $reason === 'closed'):
         $classes = $baseClass . ' slot-closed bg-gray-100 dark:bg-gray-800/50 border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed';
+    elseif (!$available && $reason === 'past'):
+        $classes = $baseClass . ' slot-past bg-gray-100 dark:bg-gray-800/50 border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-40';
     elseif (!$available):
         $classes = $baseClass . ' slot-full border-gray-200 dark:border-gray-600 opacity-50 cursor-not-allowed line-through';
     else:
@@ -47,11 +49,15 @@ for ($h = $shopStart; $h <= $shopEnd; $h++):
         <?= !$available ? 'disabled' : '' ?>
         <?php if (!$available && $reason === 'closed'): ?>
             title="<?= $lang === 'es' ? 'Cerrado' : 'Closed' ?>"
+        <?php elseif (!$available && $reason === 'past'): ?>
+            title="<?= $lang === 'es' ? 'Hora pasada' : 'Time has passed' ?>"
         <?php elseif (!$available): ?>
             title="<?= $lang === 'es' ? 'Horario lleno' : 'Time slot full' ?>"
         <?php endif; ?>
 ><?php if (!$available && $reason === 'closed'): ?>
 <?= $lang === 'es' ? 'Cerrado' : 'Closed' ?>
+<?php elseif (!$available && $reason === 'past'): ?>
+<?= htmlspecialchars($displayTime) ?>
 <?php elseif (!$available): ?>
 <?= htmlspecialchars($displayTime) ?><span class="slot-badge block text-xs font-normal"><?= $lang === 'es' ? 'Lleno' : 'Full' ?></span>
 <?php else: ?>

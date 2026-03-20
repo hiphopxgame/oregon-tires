@@ -78,6 +78,17 @@ try {
         jsonError('Invalid time slot. Please select a valid appointment time.');
     }
 
+    // Block past time slots for today (Portland timezone, 15-min buffer)
+    $pdxNow = new DateTime('now', new DateTimeZone('America/Los_Angeles'));
+    if ($preferredDate === $pdxNow->format('Y-m-d')) {
+        $slotParts = explode(':', $preferredTime);
+        $slotMinutes = (int) $slotParts[0] * 60 + (int) ($slotParts[1] ?? 0);
+        $nowMinutes  = (int) $pdxNow->format('H') * 60 + (int) $pdxNow->format('i');
+        if ($slotMinutes <= $nowMinutes + 15) {
+            jsonError('This time slot has already passed. Please select a later time.');
+        }
+    }
+
     // Name lengths
     if (mb_strlen($firstName) < 1 || mb_strlen($firstName) > 100) {
         jsonError('First name must be between 1 and 100 characters.');
