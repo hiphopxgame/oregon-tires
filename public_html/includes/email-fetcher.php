@@ -151,6 +151,12 @@ class EmailFetcher
             return false;
         }
 
+        // Skip bounce/system emails — these should never create customer records
+        if ($this->isSystemEmail($fromAddress, $fromName)) {
+            error_log("EmailFetcher: Skipping system/bounce email from {$fromAddress}");
+            return false;
+        }
+
         $subject = trim((string) $message->getSubject()) ?: '(No Subject)';
         $inReplyTo = trim((string) $message->getInReplyTo());
         $references = trim((string) $message->getReferences());
@@ -370,6 +376,47 @@ class EmailFetcher
         // Fall back to email local part
         $local = explode('@', $email)[0] ?? 'Unknown';
         return ['first' => ucfirst($local), 'last' => ''];
+    }
+
+    /**
+     * Check if an email address belongs to a system/bounce sender that should not create customer records.
+     */
+    private function isSystemEmail(string $email, string $name): bool
+    {
+        $email = strtolower(trim($email));
+        $name = strtolower(trim($name));
+
+        // Known system sender local parts
+        $systemLocalParts = [
+            'mailer-daemon', 'postmaster', 'noreply', 'no-reply', 'no_reply',
+            'donotreply', 'do-not-reply', 'do_not_reply',
+            'bounce', 'bounces', 'notifications', 'notification',
+            'auto-reply', 'autoreply', 'auto-confirm',
+            'mailerdaemon', 'daemon', 'devnull', 'nobody',
+        ];
+
+        $localPart = explode('@', $email)[0] ?? '';
+        if (in_array($localPart, $systemLocalParts, true)) {
+            return true;
+        }
+
+        // Known system display names
+        $systemNames = [
+            'mail delivery system', 'mail delivery subsystem',
+            'mailer-daemon', 'mailer daemon', 'postmaster',
+            'automated message', 'auto-reply', 'do not reply',
+        ];
+
+        if (in_array($name, $systemNames, true)) {
+            return true;
+        }
+
+        // Pattern matches for bounce-like addresses
+        if (preg_match('/^(bounce|return|prvs|verp|mdn|dsn)[+\-_.]/', $localPart)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
