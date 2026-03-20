@@ -17,20 +17,7 @@ try {
     $lastName    = sanitize((string) ($data['last_name'] ?? ''), 100);
     $phone       = sanitize((string) ($data['phone'] ?? ''), 30);
 
-    // Accept display_name from member-kit form and split into first/last
-    if ((!$firstName || !$lastName) && !empty($data['display_name'])) {
-        $displayName = sanitize((string) $data['display_name'], 200);
-        $parts = preg_split('/\s+/', trim($displayName), 2);
-        if (!$firstName) $firstName = $parts[0] ?? '';
-        if (!$lastName) $lastName = $parts[1] ?? $firstName;
-    }
-
-    // Also accept username-only registration (set last name to empty string if we have at least a first name)
-    if ($firstName && !$lastName) {
-        $lastName = '';
-    }
-
-    if (!$email || !$password || !$firstName) {
+    if (!$email || !$password || !$firstName || !$lastName) {
         jsonError('Name, email, and password are required.');
     }
 

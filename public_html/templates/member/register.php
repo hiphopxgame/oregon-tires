@@ -11,9 +11,9 @@
 <div class="member-page">
     <div class="member-card">
         <nav class="member-nav-tabs" aria-label="Account navigation">
-            <a href="/member/login<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('sign_in') ?? 'Sign In') ?></a>
-            <a href="/member/register<?= $langQ ?>" class="member-nav-tab active" aria-current="page"><?= htmlspecialchars(t('create_account') ?? 'Create Account') ?></a>
-            <a href="/member/forgot-password<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('reset_password_tab') ?? 'Reset Password') ?></a>
+            <a href="/members<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('sign_in') ?? 'Sign In') ?></a>
+            <a href="/members?view=register<?= $langQ ?>" class="member-nav-tab active" aria-current="page"><?= htmlspecialchars(t('create_account') ?? 'Create Account') ?></a>
+            <a href="/members?view=forgot-password<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('reset_password_tab') ?? 'Reset Password') ?></a>
         </nav>
 
         <div class="member-header">
@@ -34,22 +34,29 @@
         <form class="member-form" data-action="/api/member/register.php" data-method="POST">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken ?? MemberAuth::getCsrfToken()) ?>">
 
-            <div class="member-field">
-                <label class="member-label member-label-required" for="reg-email"><?= htmlspecialchars(t('email_label') ?? 'Email') ?></label>
-                <input class="member-input" type="email" id="reg-email" name="email"
-                       required autocomplete="email" placeholder="you@example.com">
+            <div class="member-form-row">
+                <div class="member-field">
+                    <label class="member-label member-label-required" for="reg-first-name"><?= htmlspecialchars(t('first_name_label') ?? 'First Name') ?></label>
+                    <input class="member-input" type="text" id="reg-first-name" name="first_name"
+                           required autocomplete="given-name" placeholder="<?= htmlspecialchars(t('first_name_placeholder') ?? 'First name') ?>">
+                </div>
+                <div class="member-field">
+                    <label class="member-label member-label-required" for="reg-last-name"><?= htmlspecialchars(t('last_name_label') ?? 'Last Name') ?></label>
+                    <input class="member-input" type="text" id="reg-last-name" name="last_name"
+                           required autocomplete="family-name" placeholder="<?= htmlspecialchars(t('last_name_placeholder') ?? 'Last name') ?>">
+                </div>
             </div>
 
             <div class="member-form-row">
                 <div class="member-field">
-                    <label class="member-label" for="reg-username"><?= htmlspecialchars(t('username_label') ?? 'Username') ?></label>
-                    <input class="member-input" type="text" id="reg-username" name="username"
-                           autocomplete="username" placeholder="your_username" pattern="[a-zA-Z0-9_]{3,50}">
+                    <label class="member-label member-label-required" for="reg-email"><?= htmlspecialchars(t('email_label') ?? 'Email') ?></label>
+                    <input class="member-input" type="email" id="reg-email" name="email"
+                           required autocomplete="email" placeholder="you@example.com">
                 </div>
                 <div class="member-field">
-                    <label class="member-label" for="reg-display-name"><?= htmlspecialchars(t('display_name_label') ?? 'Display Name') ?></label>
-                    <input class="member-input" type="text" id="reg-display-name" name="display_name"
-                           autocomplete="name" placeholder="Your Name">
+                    <label class="member-label" for="reg-phone"><?= htmlspecialchars(t('phone') ?? 'Phone') ?></label>
+                    <input class="member-input" type="tel" id="reg-phone" name="phone"
+                           autocomplete="tel" placeholder="(503) 555-1234">
                 </div>
             </div>
 
@@ -73,7 +80,7 @@
         </form>
 
         <div class="member-footer">
-            <a href="/member/login<?= $langQ ?>" class="member-link"><?= htmlspecialchars(t('already_have_account') ?? 'Already have an account? Sign in') ?></a>
+            <a href="/members<?= $langQ ?>" class="member-link"><?= htmlspecialchars(t('already_have_account') ?? 'Already have an account? Sign in') ?></a>
         </div>
     </div>
 </div>
