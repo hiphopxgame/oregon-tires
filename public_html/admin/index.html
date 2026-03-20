@@ -5033,6 +5033,7 @@ const adminT = {
     msgSend: 'Send',
     // Customers
     custVehicle: 'Vehicle',
+    custVehicles: 'Vehicles',
     custServices: 'Services',
     // Repair Orders
     roNewRo: '+ New RO',
@@ -6343,6 +6344,7 @@ const adminT = {
     msgSend: 'Enviar',
     // Customers
     custVehicle: 'Veh\u00EDculo',
+    custVehicles: 'Veh\u00EDculos',
     custServices: 'Servicios',
     // Repair Orders
     roNewRo: '+ Nueva OT',
@@ -12523,7 +12525,14 @@ function renderCustomers() {
 
   tbody.innerHTML = filtered.map(function(c) {
     var name = esc(c.first_name) + ' ' + esc(c.last_name);
-    var vehicle = [c.vehicle_year, c.vehicle_make, c.vehicle_model].filter(Boolean).join(' ');
+    var vehicleHtml = '—';
+    if (c.vehicles && c.vehicles.length) {
+      vehicleHtml = c.vehicles.map(function(v) {
+        var desc = [v.year, v.make, v.model].filter(Boolean).join(' ');
+        var plate = v.license_plate ? ' <span class="text-gray-400 font-mono text-[10px]">' + esc(v.license_plate) + '</span>' : '';
+        return '<div class="leading-tight">' + esc(desc || '—') + plate + '</div>';
+      }).join('');
+    }
     var apptCount = parseInt(c.appointment_count) || 0;
     var onlineBookings = parseInt(c.total_visits) || 0;
     var apptBadge = apptCount >= 2
@@ -12533,10 +12542,10 @@ function renderCustomers() {
     return '<tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="showCustomerHistory(\'' + esc(c.email).replace(/'/g, "\\'") + '\')">'
       + '<td class="p-3"><div class="font-medium">' + name + '</div></td>'
       + '<td class="p-3"><div class="text-sm">' + esc(c.email) + '</div>' + (c.phone ? '<div class="text-xs text-gray-500">' + esc(c.phone) + '</div>' : '') + '</td>'
-      + '<td class="p-3 text-sm">' + esc(vehicle) + '</td>'
+      + '<td class="p-3 text-sm">' + vehicleHtml + '</td>'
       + '<td class="p-3 text-center">' + apptBadge + '</td>'
       + '<td class="p-3 text-sm">' + fmtDate(c.last_visit) + '</td>'
-      + '<td class="p-3 text-sm max-w-xs truncate">' + esc(c.services) + '</td>'
+      + '<td class="p-3 text-sm max-w-xs truncate">' + esc((c.services || '').replace(/-/g, ' ').replace(/\b\w/g, function(l){return l.toUpperCase();})) + '</td>'
       + '<td class="p-3"><button onclick="event.stopPropagation();showCustomerHistory(\'' + esc(c.email).replace(/'/g, "\\'") + '\')" class="bg-brand text-white px-3 py-1 rounded text-xs hover:bg-green-700">' + (adminT[currentLang].viewHistory || 'View History') + '</button></td>'
       + '</tr>';
   }).join('');
@@ -12551,13 +12560,22 @@ async function showCustomerHistory(email) {
   if (!customer) { showToast(adminT[currentLang].error || 'Error', true); return; }
 
   var name = esc(customer.first_name) + ' ' + esc(customer.last_name);
-  var vehicle = [customer.vehicle_year, customer.vehicle_make, customer.vehicle_model].filter(Boolean).join(' ');
+
+  // Build vehicles HTML — support multiple
+  var vehicleHtml = '—';
+  if (customer.vehicles && customer.vehicles.length) {
+    vehicleHtml = customer.vehicles.map(function(v) {
+      var desc = [v.year, v.make, v.model].filter(Boolean).join(' ');
+      var plate = v.license_plate ? ' <span class="text-gray-400 dark:text-gray-500 font-mono text-xs">(' + esc(v.license_plate) + ')</span>' : '';
+      return '<div>' + esc(desc || 'Unknown') + plate + '</div>';
+    }).join('');
+  }
 
   infoDiv.innerHTML = '<div class="grid grid-cols-2 gap-3">'
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].thCustomer || 'Customer') + '</span><div class="font-semibold text-gray-800 dark:text-gray-200">' + name + '</div></div>'
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">Email</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(customer.email) + '</div></div>'
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].phone || 'Phone') + '</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(customer.phone || '—') + '</div></div>'
-    + '<div><span class="text-xs text-gray-500 dark:text-gray-400">Vehicle</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(vehicle || '—') + '</div></div>'
+    + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].custVehicles || 'Vehicles') + '</span><div class="text-sm text-gray-700 dark:text-gray-300">' + vehicleHtml + '</div></div>'
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].totalAppts || 'Appointments') + '</span><div class="font-semibold text-brand dark:text-green-400">' + esc(String(customer.appointment_count || '0')) + '</div>'
     + (parseInt(customer.total_visits) > 0 ? '<div class="text-[10px] text-gray-400 dark:text-gray-500">' + customer.total_visits + ' ' + (adminT[currentLang].onlineBookings || 'online bookings') + '</div>' : '')
     + '</div>'
@@ -12792,8 +12810,8 @@ function exportCustomersCsv() {
   var csv = headers.join(',') + '\n';
   customers.forEach(function(c) {
     var name = (c.first_name || '') + ' ' + (c.last_name || '');
-    var vehicle = [c.vehicle_year, c.vehicle_make, c.vehicle_model].filter(Boolean).join(' ');
-    var row = [name, c.email || '', c.phone || '', vehicle, c.appointment_count || '0', c.total_visits || '0', c.last_visit || '', c.services || ''];
+    var vehicles = (c.vehicles || []).map(function(v) { return [v.year, v.make, v.model].filter(Boolean).join(' '); }).join('; ');
+    var row = [name, c.email || '', c.phone || '', vehicles || '', c.appointment_count || '0', c.total_visits || '0', c.last_visit || '', (c.services || '').replace(/-/g, ' ')];
     csv += row.map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',') + '\n';
   });
   downloadCsvBlob(csv, 'customers-' + new Date().toISOString().slice(0, 10) + '.csv');

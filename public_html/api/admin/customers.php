@@ -83,13 +83,53 @@ try {
 
         $sql = "SELECT c.*, c.visit_count AS total_visits,
                   (SELECT COUNT(*) FROM oretir_vehicles WHERE customer_id = c.id) as vehicle_count,
-                  (SELECT COUNT(*) FROM oretir_appointments WHERE customer_id = c.id) as appointment_count
+                  (SELECT COUNT(*) FROM oretir_appointments WHERE customer_id = c.id) as appointment_count,
+                  (SELECT MIN(preferred_date) FROM oretir_appointments WHERE customer_id = c.id) as first_visit,
+                  (SELECT MAX(preferred_date) FROM oretir_appointments WHERE customer_id = c.id) as last_visit
                 FROM oretir_customers c {$where}
                 ORDER BY {$sortBy} {$sortOrder}
                 LIMIT {$limit} OFFSET {$offset}";
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
         $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch vehicles and distinct services per customer in batch
+        $customerIds = array_column($customers, 'id');
+        $vehicleMap = [];
+        $serviceMap = [];
+        if ($customerIds) {
+            $placeholders = implode(',', array_fill(0, count($customerIds), '?'));
+
+            // Vehicles grouped by customer
+            $vStmt = $db->prepare(
+                "SELECT customer_id, id, year, make, model, license_plate
+                 FROM oretir_vehicles WHERE customer_id IN ({$placeholders})
+                 ORDER BY created_at DESC"
+            );
+            $vStmt->execute($customerIds);
+            foreach ($vStmt->fetchAll(PDO::FETCH_ASSOC) as $v) {
+                $vehicleMap[(int) $v['customer_id']][] = $v;
+            }
+
+            // Distinct services per customer from appointments
+            $sStmt = $db->prepare(
+                "SELECT customer_id, GROUP_CONCAT(DISTINCT service ORDER BY service SEPARATOR ', ') as services
+                 FROM oretir_appointments WHERE customer_id IN ({$placeholders}) AND service IS NOT NULL AND service != ''
+                 GROUP BY customer_id"
+            );
+            $sStmt->execute($customerIds);
+            foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) as $s) {
+                $serviceMap[(int) $s['customer_id']] = $s['services'];
+            }
+        }
+
+        // Attach to each customer
+        foreach ($customers as &$cust) {
+            $cid = (int) $cust['id'];
+            $cust['vehicles'] = $vehicleMap[$cid] ?? [];
+            $cust['services'] = $serviceMap[$cid] ?? '';
+        }
+        unset($cust);
 
         $page = (int) floor($offset / $limit) + 1;
         jsonList($customers, $total, $page, $limit);
