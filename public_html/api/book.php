@@ -364,7 +364,7 @@ try {
         $vcStmt = $db->prepare('SELECT visit_count FROM oretir_customers WHERE id = ? LIMIT 1');
         $vcStmt->execute([$bookingCustomerId]);
         $visitCount = (int) $vcStmt->fetchColumn();
-        $returningCustomer = $visitCount > 1;
+        $returningCustomer = $visitCount > 0;
     }
 
     // ─── Smart Account Creation for guests ──────────────────────────────────

@@ -136,7 +136,7 @@ if (!empty($bookingData['tireSize'])) {
     <div class="p-4 rounded-lg border mb-6" style="background:#fef3c7;border-color:#fbbf24;">
         <p class="text-sm font-semibold" style="margin:0;color:#92400e;">
             <?php
-            $vc = (int) ($bookingData['visit_count'] ?? 0);
+            $vc = (int) ($bookingData['visit_count'] ?? 0) + 1;
             if ($lang === 'es') {
                 echo "⭐ ¡Bienvenido de nuevo! Esta es su visita #{$vc}.";
             } else {

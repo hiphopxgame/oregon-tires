@@ -33,8 +33,7 @@ function checkRateLimit(string $action, int $maxHits = 5, int $windowSeconds = 3
             EngineRateLimiter::enforce($db, 'oregon_tires', $action, $maxHits, $windowSeconds);
             return;
         } catch (\Throwable $e) {
-            // If shared table doesn't exist yet, fall through to local
-            error_log('Shared RateLimiter fallback: ' . $e->getMessage());
+            // Shared table doesn't exist yet — silently fall through to local
         }
     }
 

@@ -606,16 +606,17 @@ HTML;
 
     // Build loyalty messaging (only for returning customers)
     $loyaltyHtml = '';
-    if ($visitCount > 1) {
-        if ($visitCount >= 10) {
-            $loyaltyEn = "Thank you for being a loyal customer! This is your visit #{$visitCount}.";
-            $loyaltyEs = "¡Gracias por ser un cliente leal! Esta es su visita #{$visitCount}.";
-        } elseif ($visitCount >= 4) {
-            $loyaltyEn = "You're one of our valued regulars! Visit #{$visitCount}.";
-            $loyaltyEs = "¡Es uno de nuestros clientes frecuentes! Visita #{$visitCount}.";
+    if ($visitCount > 0) {
+        $displayVisit = $visitCount + 1; // +1 for the current booking
+        if ($displayVisit >= 10) {
+            $loyaltyEn = "Thank you for being a loyal customer! This is your visit #{$displayVisit}.";
+            $loyaltyEs = "¡Gracias por ser un cliente leal! Esta es su visita #{$displayVisit}.";
+        } elseif ($displayVisit >= 4) {
+            $loyaltyEn = "You're one of our valued regulars! Visit #{$displayVisit}.";
+            $loyaltyEs = "¡Es uno de nuestros clientes frecuentes! Visita #{$displayVisit}.";
         } else {
-            $loyaltyEn = "Thanks for coming back! Visit #{$visitCount}.";
-            $loyaltyEs = "¡Gracias por regresar! Visita #{$visitCount}.";
+            $loyaltyEn = "Thanks for coming back! Visit #{$displayVisit}.";
+            $loyaltyEs = "¡Gracias por regresar! Visita #{$displayVisit}.";
         }
         $loyaltyHtml = <<<HTML
   <tr>
