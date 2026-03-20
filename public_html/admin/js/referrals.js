@@ -78,8 +78,8 @@
     // Filter buttons
     var fd = document.createElement('div');
     fd.className = 'flex flex-wrap gap-2 mb-4';
-    var filterLabels = { all: t('refAll','All'), pending: t('refPending','Pending'), completed: t('refCompleted','Completed'), rewarded: t('refRewarded','Rewarded'), expired: t('refExpired','Expired') };
-    ['all', 'pending', 'completed', 'rewarded', 'expired'].forEach(function(f) {
+    var filterLabels = { all: t('refAll','All'), pending: t('refPending','Pending'), booked: t('refBooked','Booked'), completed: t('refCompleted','Completed'), rewarded: t('refRewarded','Rewarded'), expired: t('refExpired','Expired') };
+    ['all', 'pending', 'booked', 'completed', 'rewarded', 'expired'].forEach(function(f) {
       var btn = document.createElement('button');
       var active = currentFilter === f;
       btn.className = 'px-3 py-1.5 text-xs font-medium rounded-lg transition ' +
@@ -148,7 +148,7 @@
   function buildActions(ref) {
     var div = document.createElement('div');
     div.className = 'flex gap-2';
-    if (ref.status === 'pending') {
+    if (ref.status === 'pending' || ref.status === 'booked') {
       var b = document.createElement('button');
       b.className = 'text-blue-600 dark:text-blue-400 hover:text-blue-800 text-xs font-medium';
       b.textContent = t('refMarkComplete', 'Mark Complete');

@@ -117,7 +117,7 @@ $showDeviceVerification = isset($_GET['device_verify']);
         <!-- GROUP 1: EMAIL + PASSWORD (PRIMARY)                              -->
         <!-- ═════════════════════════════════════════════════════════════════ -->
 
-        <form class="member-form" data-action="/api/members.php" data-method="POST"
+        <form class="member-form" data-action="/api/member/login.php" data-method="POST"
               role="region" aria-label="Email login form">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken ?? MemberAuth::getCsrfToken()) ?>">
             <input type="hidden" name="session_lifetime" value="<?= htmlspecialchars((string)($_ENV['SESSION_LIFETIME'] ?? '3600')) ?>" id="session-lifetime">

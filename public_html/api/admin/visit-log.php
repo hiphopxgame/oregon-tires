@@ -163,9 +163,12 @@ try {
             $custId = (int) ($visitRow['customer_id'] ?? 0);
 
             if ($custId > 0) {
-                // 1. Auto-award loyalty points for completed visit
+                // 1. Auto-award loyalty points for completed visit (idempotent — check if already awarded)
                 try {
-                    $awarded = awardLoyaltyPoints($db, $custId, 10, 'earn_visit', 'Visit completed', 'visit', $id);
+                    $dupCheck = $db->prepare('SELECT COUNT(*) FROM oretir_loyalty_points WHERE reference_type = ? AND reference_id = ?');
+                    $dupCheck->execute(['visit', $id]);
+                    $alreadyAwarded = (int) $dupCheck->fetchColumn() > 0;
+                    $awarded = !$alreadyAwarded && awardLoyaltyPoints($db, $custId, 10, 'earn_visit', 'Visit completed', 'visit', $id);
                     if ($awarded) {
                         // Increment visit count
                         $db->prepare('UPDATE oretir_customers SET visit_count = visit_count + 1, last_visit_at = NOW() WHERE id = ?')

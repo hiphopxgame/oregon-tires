@@ -116,7 +116,7 @@ if (($isAdmin || $isEmployee) && !isset($_GET['tab'])) {
 
 // Auth view routing: /members?view=register|forgot-password|reset-password
 $authView = $_GET['view'] ?? 'login';
-$validViews = ['login', 'register', 'forgot-password', 'reset-password'];
+$validViews = ['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'resend-verification'];
 if (!in_array($authView, $validViews, true)) $authView = 'login';
 
 // Site key for branding
@@ -135,7 +135,6 @@ $memberDashboardConfig = [
         'profile'  => memberT('profile', $lang),
         'settings' => memberT('settings', $lang),
         'activity' => memberT('activity', $lang),
-        'security' => memberT('security', $lang),
     ],
     'hide_register_link'       => true,
     'hide_login_activity_link' => true,

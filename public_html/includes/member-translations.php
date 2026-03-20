@@ -161,7 +161,6 @@ function memberT(string $key, string $lang = ''): string
         'profile'           => ['en' => 'Profile', 'es' => 'Perfil'],
         'settings'          => ['en' => 'Settings', 'es' => "Configuraci\u{00f3}n"],
         'activity'          => ['en' => 'Activity', 'es' => 'Actividad'],
-        'security'          => ['en' => 'Security', 'es' => 'Seguridad'],
         'change_password'   => ['en' => 'Change Password', 'es' => "Cambiar Contrase\u{00f1}a"],
 
         // Invoices

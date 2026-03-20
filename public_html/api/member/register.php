@@ -13,11 +13,23 @@ try {
 
     $email       = sanitize((string) ($data['email'] ?? ''), 254);
     $password    = (string) ($data['password'] ?? '');
+    $firstName   = sanitize((string) ($data['first_name'] ?? ''), 100);
+    $lastName    = sanitize((string) ($data['last_name'] ?? ''), 100);
+    $phone       = sanitize((string) ($data['phone'] ?? ''), 30);
     $displayName = sanitize((string) ($data['display_name'] ?? ''), 100);
     $username    = sanitize((string) ($data['username'] ?? ''), 50);
 
+    // Build display_name from first + last if not provided directly
+    if ($displayName === '' && ($firstName !== '' || $lastName !== '')) {
+        $displayName = trim($firstName . ' ' . $lastName);
+    }
+
     if (!$email || !$password) {
         jsonError('Email and password are required.');
+    }
+
+    if ($firstName === '' && $lastName === '' && $displayName === '') {
+        jsonError('Name is required.');
     }
 
     if (!isValidEmail($email)) {
@@ -61,6 +73,10 @@ try {
     if (!$member || empty($member['id'])) {
         jsonError('Registration failed.', 500);
     }
+
+    // Auto-activate — skip email verification for local business site
+    $pdo->prepare("UPDATE members SET status = 'active', email_verified_at = NOW() WHERE id = ? AND status = 'unverified'")
+        ->execute([$member['id']]);
 
     jsonSuccess([
         'member_id' => $member['id'],

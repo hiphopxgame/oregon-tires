@@ -55,6 +55,9 @@
     # /member (bare) → /members redirect
     RewriteRule ^member/?$ /members [R=302,L,QSA]
 
+    # /member/VIEW → members.php?view=VIEW (login, register, forgot-password, verify-email, etc.)
+    RewriteRule ^member/(login|register|forgot-password|reset-password|resend-verification|verify-email)/?$ members.php?view=$1 [L,QSA]
+
     # Member password reset: /reset-password/TOKEN → member/reset-password.php?token=TOKEN
     RewriteRule ^reset-password/([a-f0-9]+)/?$ member/reset-password.php?token=$1 [L,QSA]
 

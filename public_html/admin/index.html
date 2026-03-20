@@ -487,7 +487,8 @@
             <button onclick="switchTab('customers')" data-tab="customers" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">👤 <span data-t="tabCustomers">Customers</span></button>
             <button onclick="switchTab('repairorders')" data-tab="repairorders" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔧 <span data-t="tabRepairOrders">Repair Orders</span></button>
             <button onclick="switchTab('invoices')" data-tab="invoices" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🧾 <span data-t="tabInvoices">Invoices</span></button>
-            <button onclick="switchTab('waitlist')" data-tab="waitlist" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">⏳ <span data-t="tabWaitlist">Waitlist</span></button>
+            <button onclick="switchTab('walkinqueue')" data-tab="walkinqueue" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🚶 <span data-t="tabWalkInQueue">Walk-In Queue</span></button>
+            <button onclick="switchTab('waitlist')" data-tab="waitlist" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">⏳ <span data-t="tabWaitlist">On Hold</span></button>
             <button onclick="switchTab('tirequotes')" data-tab="tirequotes" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🛞 <span data-t="tabTireQuotes">Tire Quotes</span></button>
             <button onclick="switchTab('services')" data-tab="services" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔧 <span data-t="tabServices">Services</span></button>
             <button onclick="switchTab('visits')" data-tab="visits" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">👣 <span data-t="tabVisits">Visit Tracking</span></button>
@@ -3359,12 +3360,27 @@
       <div id="invoices-container"></div>
     </div>
 
-    <!-- WAITLIST TAB -->
+    <!-- WALK-IN QUEUE TAB -->
+    <div id="tab-walkinqueue" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🚶 <span data-t="tabWalkInQueue">Walk-In Queue</span></h2>
+          <p class="text-green-100" data-t="walkInQueueSubtitle">Manage walk-in customers waiting for service</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="openAddToQueue()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-50 transition">+ Add to Queue</button>
+          <button onclick="loadWalkInQueue()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+        </div>
+      </div>
+      <div id="walkinqueue-container"></div>
+    </div>
+
+    <!-- ON HOLD TAB (ROs on hold / awaiting parts) -->
     <div id="tab-waitlist" class="tab-content hidden fade-in" role="tabpanel">
       <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-bold">⏳ <span data-t="tabWaitlist">Waitlist</span></h2>
-          <p class="text-green-100" data-t="waitlistSubtitle">Orders on hold &amp; awaiting next steps</p>
+          <h2 class="text-2xl font-bold">⏳ <span data-t="tabOnHold">On Hold</span></h2>
+          <p class="text-green-100" data-t="onHoldSubtitle">Repair orders on hold or awaiting parts</p>
         </div>
         <button onclick="loadWaitlist()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
       </div>
@@ -11273,6 +11289,7 @@ function switchTab(tab) {
   // New tab loaders
   if(tab==='invoices' && typeof loadInvoices === 'function') loadInvoices();
   if(tab==='waitlist' && typeof loadWaitlist === 'function') loadWaitlist();
+  if(tab==='walkinqueue' && typeof loadWalkInQueue === 'function') loadWalkInQueue();
   if(tab==='tirequotes' && typeof loadTireQuotes === 'function') loadTireQuotes();
   if(tab==='services' && typeof loadServices === 'function') loadServices();
   if(tab==='visits' && typeof loadVisitTracker === 'function') loadVisitTracker();
@@ -13071,6 +13088,7 @@ loadMessages = async function() {
 <script src="/admin/js/visit-tracker.js"></script>
 <script src="/admin/js/invoices.js"></script>
 <script src="/admin/js/waitlist.js"></script>
+<script src="/admin/js/walkin-queue.js"></script>
 <script src="/admin/js/tire-quotes.js"></script>
 <script src="/admin/js/loyalty.js"></script>
 <script src="/admin/js/referrals.js"></script>

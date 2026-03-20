@@ -6,6 +6,7 @@
   'use strict';
 
   var refreshInterval = null;
+  var BAY_COUNT = 4; // configurable bay count
 
   function t(key, fb) {
     return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fb;
@@ -67,7 +68,7 @@
 
     // Bay status
     var bayRow = el('div', 'flex gap-2 mb-4');
-    for (var i = 1; i <= 4; i++) {
+    for (var i = 1; i <= BAY_COUNT; i++) {
       var inUse = baysInUse.indexOf(i) !== -1;
       bayRow.appendChild(el('div', 'flex-1 text-center py-2 rounded-lg border text-xs font-medium ' +
         (inUse ? 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
@@ -137,8 +138,8 @@
       // Stats cards
       var stats = el('div', 'grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6');
       [[String(activeCount), t('visitVehiclesInShop', 'In Shop'), 'text-green-600 dark:text-green-400'],
-       [baysInUse.length + '/4', t('visitBaysInUse', 'Bays In Use'), 'text-blue-600 dark:text-blue-400'],
-       [String(4 - baysInUse.length), t('visitBaysOpen', 'Bays Open'), 'text-gray-500 dark:text-gray-400'],
+       [baysInUse.length + '/' + BAY_COUNT, t('visitBaysInUse', 'Bays In Use'), 'text-blue-600 dark:text-blue-400'],
+       [String(BAY_COUNT - baysInUse.length), t('visitBaysOpen', 'Bays Open'), 'text-gray-500 dark:text-gray-400'],
        [visits.filter(function(v) { return !v.service_start_at; }).length + '', t('visitWaiting', 'Waiting'), 'text-amber-600 dark:text-amber-400']
       ].forEach(function(s) {
         var card = el('div', 'bg-white dark:bg-gray-800 rounded-xl p-4 shadow border dark:border-gray-700 text-center');
@@ -150,7 +151,7 @@
 
       // Bay status bar
       var bayRow = el('div', 'flex gap-3 mb-6');
-      for (var i = 1; i <= 4; i++) {
+      for (var i = 1; i <= BAY_COUNT; i++) {
         var inUse = baysInUse.indexOf(i) !== -1;
         bayRow.appendChild(el('div', 'flex-1 text-center py-3 rounded-xl border-2 text-sm font-semibold ' +
           (inUse ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700'
@@ -310,7 +311,7 @@
     baySelect.id = 'visit-bay';
     baySelect.className = 'w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
     baySelect.appendChild(el('option', null, t('visitNoBay', 'No bay assigned')));
-    for (var i = 1; i <= 4; i++) {
+    for (var i = 1; i <= BAY_COUNT; i++) {
       var opt = el('option', null, t('visitBayLabel', 'Bay') + ' ' + i);
       opt.value = i;
       baySelect.appendChild(opt);
