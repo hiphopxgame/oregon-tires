@@ -50,6 +50,11 @@ function startSecureSession(): void
         return;
     }
 
+    // Can't start session after output has been sent
+    if (headers_sent()) {
+        return;
+    }
+
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
         || (int) ($_SERVER['SERVER_PORT'] ?? 0) === 443;
 
