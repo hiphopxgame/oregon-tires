@@ -10701,6 +10701,54 @@ function renderPlatformTab() {
     barWrap.appendChild(barLegend);
     scopeWrap.appendChild(barWrap);
 
+    // Full list of client-requested features
+    var clientListWrap = el('div', 'mt-4 rounded-xl border-2 border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/10 overflow-hidden');
+    var clientListHeader = el('div', 'p-4 flex items-center justify-between cursor-pointer');
+    clientListHeader.appendChild(el('h4', 'font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2', '\uD83D\uDCCB ' + t.overviewClientValue + ' \u2014 ' + clientFeatures.length + ' ' + (lang === 'es' ? 'funciones' : 'features') + ' ($' + clientValue.toLocaleString() + ')'));
+    var clientToggle = el('span', 'text-blue-600 dark:text-blue-400 text-xl transition-transform', '\u25BC');
+    clientListHeader.appendChild(clientToggle);
+    clientListWrap.appendChild(clientListHeader);
+
+    var clientListBody = el('div', 'px-4 pb-4');
+    clientListBody.appendChild(el('p', 'text-sm text-blue-700 dark:text-blue-400 mb-3', t.overviewClientDesc));
+
+    var clientByCat = {};
+    clientFeatures.forEach(function(f) {
+      if (!clientByCat[f.cat]) clientByCat[f.cat] = [];
+      clientByCat[f.cat].push(f);
+    });
+
+    catOrder.forEach(function(catKey) {
+      if (!clientByCat[catKey]) return;
+      var catName = FEATURE_CATS[catKey] ? FEATURE_CATS[catKey][lang] : catKey;
+      var icon = typeof FEATURE_ICONS !== 'undefined' ? (FEATURE_ICONS[catKey] || '') : '';
+      var catSection = el('div', 'mb-3');
+      catSection.appendChild(el('h5', 'text-xs font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider mb-1', icon + ' ' + catName));
+      var ul = el('ul', 'space-y-1');
+      clientByCat[catKey].forEach(function(f) {
+        var li = el('li', 'flex items-center justify-between py-1 px-2 rounded bg-white/60 dark:bg-gray-800/40 text-sm');
+        li.appendChild(el('span', 'text-gray-800 dark:text-gray-200', f['name_' + lang] || f.name_en));
+        var frVal = Math.round((f.price || 0) * frRate);
+        li.appendChild(el('span', 'text-xs font-semibold text-blue-700 dark:text-blue-400 whitespace-nowrap ml-2', '$' + frVal.toLocaleString()));
+        ul.appendChild(li);
+      });
+      catSection.appendChild(ul);
+      clientListBody.appendChild(catSection);
+    });
+
+    clientListWrap.appendChild(clientListBody);
+
+    var clientExpanded = false;
+    clientListBody.style.display = 'none';
+    clientToggle.style.transform = 'rotate(-90deg)';
+    clientListHeader.addEventListener('click', function() {
+      clientExpanded = !clientExpanded;
+      clientListBody.style.display = clientExpanded ? '' : 'none';
+      clientToggle.style.transform = clientExpanded ? '' : 'rotate(-90deg)';
+    });
+
+    scopeWrap.appendChild(clientListWrap);
+
     // Full list of developer-added bonus features
     var devListWrap = el('div', 'mt-4 rounded-xl border-2 border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/10 overflow-hidden');
     var devListHeader = el('div', 'p-4 flex items-center justify-between cursor-pointer');
