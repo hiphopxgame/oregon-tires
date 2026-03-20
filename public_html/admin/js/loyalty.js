@@ -198,7 +198,7 @@
     try {
       var res = await fetch(API_POINTS, {
         method: 'POST', headers: hdrs(true), credentials: 'include',
-        body: JSON.stringify({ customer_id: cid, points: mode === 'deduct' ? -amt : amt, reason: reason }),
+        body: JSON.stringify({ customer_id: cid, points: mode === 'deduct' ? -amt : amt, description: reason }),
       });
       var json = await res.json();
       if (json.success) {
