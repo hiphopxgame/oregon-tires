@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../includes/tire-fitment.php';
 
 try {
     startSecureSession();
-    requireAdmin();
+    requirePermission('shop_ops');
     requireMethod('GET');
 
     $year  = sanitize((string) ($_GET['year'] ?? ''), 4);

@@ -8,19 +8,16 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../../includes/bootstrap.php';
+require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/push.php';
 
 try {
     requireMethod('POST');
-    startSecureSession();
+    $staff = requirePermission('marketing');
 
-    // Admin auth check
-    if (empty($_SESSION['admin_id'])) {
-        jsonError('Unauthorized', 401);
-    }
-
-    requireCsrf();
-    checkRateLimit('push_broadcast_' . $_SESSION['admin_id'], 5, 86400); // 5 per day
+    verifyCsrf();
+    $staffKey = $staff['type'] === 'admin' ? ($_SESSION['admin_id'] ?? $staff['id']) : ($_SESSION['employee_id'] ?? $staff['id']);
+    checkRateLimit('push_broadcast_' . $staffKey, 5, 86400); // 5 per day
 
     $data = getJsonBody();
 

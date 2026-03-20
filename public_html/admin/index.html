@@ -909,7 +909,7 @@
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="nameRequired">Name *</label><input id="new-emp-name" class="w-full p-2 border rounded mt-1" data-t="empNamePlaceholder" placeholder="Employee name"></div>
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="emailLabel2">Email</label><input id="new-emp-email" type="email" class="w-full p-2 border rounded mt-1" data-t="empEmailPlaceholder" placeholder="email@example.com"></div>
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="phone">Phone</label><input id="new-emp-phone" class="w-full p-2 border rounded mt-1" data-t="empPhonePlaceholder" placeholder="(555) 123-4567"></div>
-            <div><label class="text-sm font-medium dark:text-gray-300" data-t="role">Role</label><select id="new-emp-role" class="w-full p-2 border rounded mt-1"><option value="Employee" data-t="roleEmployee">Employee</option><option value="Manager" data-t="roleManager">Manager</option></select></div>
+            <div><label class="text-sm font-medium dark:text-gray-300" data-t="empGroup">Group</label><select id="new-emp-group" class="w-full p-2 border rounded mt-1"></select></div>
           </div>
           <div class="flex gap-2 mt-3">
             <button onclick="addEmployee()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm" data-t="save">💾 Save</button>
@@ -943,6 +943,17 @@
           </div>
         </div>
         <div id="employees-content"></div>
+
+        <!-- User Groups Section (admin only) -->
+        <div id="group-management-section" class="mt-8">
+          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center cursor-pointer" onclick="var c=document.getElementById('group-management-wrap');c.classList.toggle('hidden');">
+            <div><h2 class="text-xl font-bold" data-t="userGroups">User Groups</h2><p class="text-green-100 text-sm" data-t="userGroupsDesc">Manage employee permission groups</p></div>
+            <span class="text-white text-lg">▾</span>
+          </div>
+          <div id="group-management-wrap" class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800 hidden">
+            <div id="group-management-content"></div>
+          </div>
+        </div>
 
         <!-- Work Schedules Section -->
         <div id="schedule-management" class="mt-8">
@@ -4339,6 +4350,35 @@ const adminT = {
     employeeDeactivated: 'Employee deactivated',
     employeeAdded: 'Employee added!',
     employeeUpdated: 'Employee updated!',
+    // Employee Groups
+    userGroups: 'User Groups',
+    userGroupsDesc: 'Manage employee permission groups',
+    addGroup: 'Add Group',
+    editGroup: 'Edit Group',
+    deleteGroup: 'Delete Group',
+    groupName: 'Group Name',
+    groupNameEn: 'Name (English)',
+    groupNameEs: 'Name (Spanish)',
+    groupDescEn: 'Description (English)',
+    groupDescEs: 'Description (Spanish)',
+    groupPermissions: 'Permissions',
+    groupEmployeeCount: 'employees',
+    groupCreated: 'Group created!',
+    groupUpdated: 'Group updated!',
+    groupDeleted: 'Group deleted!',
+    groupDeleteConfirm: 'Delete this group? Employees will be reassigned to the default group.',
+    cannotDeleteSystem: 'Cannot delete system groups.',
+    permMyWork: 'My Schedule & Work',
+    permShopOps: 'Shop Operations',
+    permCustomers: 'Customer Management',
+    permMessaging: 'Messaging',
+    permTeam: 'Team Management',
+    permMarketing: 'Marketing & Content',
+    permSettings: 'Settings & Analytics',
+    empGroup: 'Group',
+    noGroup: 'No Group',
+    systemGroup: 'System',
+    defaultGroup: 'Default',
     statusUpdated: 'Status updated',
     employeeAssigned: 'Employee assigned & confirmed',
     assignmentRemoved: 'Assignment removed',
@@ -5650,6 +5690,35 @@ const adminT = {
     employeeDeactivated: 'Empleado desactivado',
     employeeAdded: '\u00A1Empleado agregado!',
     employeeUpdated: '\u00A1Empleado actualizado!',
+    // Employee Groups
+    userGroups: 'Grupos de Usuario',
+    userGroupsDesc: 'Administrar grupos de permisos de empleados',
+    addGroup: 'Agregar Grupo',
+    editGroup: 'Editar Grupo',
+    deleteGroup: 'Eliminar Grupo',
+    groupName: 'Nombre del Grupo',
+    groupNameEn: 'Nombre (Ingl\u00E9s)',
+    groupNameEs: 'Nombre (Espa\u00F1ol)',
+    groupDescEn: 'Descripci\u00F3n (Ingl\u00E9s)',
+    groupDescEs: 'Descripci\u00F3n (Espa\u00F1ol)',
+    groupPermissions: 'Permisos',
+    groupEmployeeCount: 'empleados',
+    groupCreated: '\u00A1Grupo creado!',
+    groupUpdated: '\u00A1Grupo actualizado!',
+    groupDeleted: '\u00A1Grupo eliminado!',
+    groupDeleteConfirm: '\u00BFEliminar este grupo? Los empleados ser\u00E1n reasignados al grupo predeterminado.',
+    cannotDeleteSystem: 'No se pueden eliminar grupos del sistema.',
+    permMyWork: 'Mi Horario y Trabajo',
+    permShopOps: 'Operaciones del Taller',
+    permCustomers: 'Gesti\u00F3n de Clientes',
+    permMessaging: 'Mensajer\u00EDa',
+    permTeam: 'Gesti\u00F3n de Equipo',
+    permMarketing: 'Marketing y Contenido',
+    permSettings: 'Configuraci\u00F3n y An\u00E1lisis',
+    empGroup: 'Grupo',
+    noGroup: 'Sin Grupo',
+    systemGroup: 'Sistema',
+    defaultGroup: 'Predeterminado',
     statusUpdated: 'Estado actualizado',
     employeeAssigned: 'Empleado asignado y confirmado',
     assignmentRemoved: 'Asignaci\u00F3n eliminada',
@@ -6687,7 +6756,7 @@ const API = '/api/admin';
 let csrfToken = '';
 
 // ===== STATE =====
-let appointments = [], messages = [], employees = [], emailLogs = [], galleryImages = [], serviceImages = [], customers = [];
+let appointments = [], messages = [], employees = [], emailLogs = [], galleryImages = [], serviceImages = [], customers = [], employeeGroups = [];
 let currentNotesId = null, apptPage = 1, apptSortBy = 'created', apptSortOrder = 'desc';
 let calDate = new Date(), calSelectedDate = new Date();
 let adminUsers = [], currentUser = null;
@@ -7131,40 +7200,71 @@ function showDashboard(user) {
   var isEmployee = user.type === 'employee';
   var hasEmployeeId = !!user.employee_id;
 
-  // Role label in header
+  // Role label in header (show group name for employees)
   var roleLabel = T.roleEmployee || 'Employee';
   if (isAdmin) {
     if (user.role === 'super_admin' || user.role === 'superadmin') roleLabel = T.roleSuperAdmin || 'Super Admin';
     else roleLabel = T.roleAdmin || 'Admin';
+  } else if (user.group_name) {
+    roleLabel = currentLang === 'es' && user.group_name_es ? user.group_name_es : user.group_name;
   } else if (user.role === 'Manager') {
     roleLabel = T.roleManager || 'Manager';
   }
   document.getElementById('admin-role').textContent = roleLabel;
 
 
-  // ── Role-based tab visibility ──────────────────────────────────
-  var adminOnlyTabs = ['customers', 'messages', 'gallery', 'blog', 'promotions', 'faq', 'reviews', 'analytics', 'sitecontent', 'subscribers', 'invoices', 'waitlist', 'tirequotes', 'visits', 'labor', 'loyalty', 'referrals', 'reminders'];
-  var staffTabs = ['myschedule', 'mywork'];
+  // ── Permission-based tab visibility ──────────────────────────────
+  var BUNDLE_TABS = {
+    shop_ops: ['appointments','repairorders','invoices','walkinqueue','waitlist','tirequotes','services','visits'],
+    customers: ['customers','resourceplanner'],
+    messaging: ['messages'],
+    team: ['employees','labor'],
+    marketing: ['blog','promotions','faq','reviews','gallery','subscribers','loyalty','referrals','reminders'],
+    settings: ['analytics','sitecontent','docs'],
+    my_work: ['myschedule','mywork']
+  };
 
-  // Hide admin-only tabs for employees
-  if (isEmployee) {
-    adminOnlyTabs.forEach(function(tab) {
-      var btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
-      if (btn) btn.style.display = 'none';
-      var opt = document.querySelector('#mobile-tab-select option[value="' + tab + '"]');
-      if (opt) opt.style.display = 'none';
+  var userPerms = user.permissions || [];
+  var isWildcard = userPerms.indexOf('*') !== -1;
+
+  // Compute allowed tabs from permissions
+  var allowedTabs = ['overview']; // always visible
+  if (isWildcard) {
+    // Admin: all tabs allowed
+    Object.keys(BUNDLE_TABS).forEach(function(b) { allowedTabs = allowedTabs.concat(BUNDLE_TABS[b]); });
+  } else {
+    userPerms.forEach(function(bundle) {
+      if (BUNDLE_TABS[bundle]) allowedTabs = allowedTabs.concat(BUNDLE_TABS[bundle]);
     });
   }
 
-  // Show My Schedule / My Work for employees, or admins who are also employees
+  // Show/hide my_work tabs for employees, or admins who are also employees
   if (isEmployee || (isAdmin && hasEmployeeId)) {
-    staffTabs.forEach(function(tab) {
-      var btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
-      if (btn) btn.style.display = '';
-      var opt = document.querySelector('#mobile-tab-select option[value="' + tab + '"]');
-      if (opt) opt.style.display = '';
-    });
+    if (allowedTabs.indexOf('myschedule') === -1) allowedTabs.push('myschedule');
+    if (allowedTabs.indexOf('mywork') === -1) allowedTabs.push('mywork');
   }
+
+  // Apply tab visibility
+  document.querySelectorAll('.tab-btn[data-tab]').forEach(function(btn) {
+    var tab = btn.getAttribute('data-tab');
+    if (tab === 'overview') return; // always visible
+    btn.style.display = allowedTabs.indexOf(tab) !== -1 ? '' : 'none';
+    // Also hide/show in mobile select
+    var opt = document.querySelector('#mobile-tab-select option[value="' + tab + '"]');
+    if (opt) opt.style.display = allowedTabs.indexOf(tab) !== -1 ? '' : 'none';
+  });
+
+  // Hide empty nav groups
+  document.querySelectorAll('.nav-group').forEach(function(group) {
+    var visibleBtns = group.querySelectorAll('.tab-btn[data-tab]');
+    var hasVisible = false;
+    visibleBtns.forEach(function(btn) { if (btn.style.display !== 'none') hasVisible = true; });
+    group.style.display = hasVisible ? '' : 'none';
+  });
+
+  // Hide group management section for non-admins
+  var groupMgmtSection = document.getElementById('group-management-section');
+  if (groupMgmtSection && !isAdmin) groupMgmtSection.style.display = 'none';
 
   // Employees: only show Manual sub-tab in Docs
   if (isEmployee) {
@@ -7182,7 +7282,7 @@ function showDashboard(user) {
 // ===== DATA =====
 async function loadAllData() {
   // Load only overview-critical data initially; other tabs load on first visit (lazy)
-  await Promise.all([loadAppointments(), loadEmployees(), loadAdminUsers(), loadCustomers()]);
+  await Promise.all([loadAppointments(), loadEmployees(), loadAdminUsers(), loadCustomers(), loadEmployeeGroups()]);
   // Mark these tabs as loaded since their data was fetched
   if (typeof loadedTabs !== 'undefined') { loadedTabs.add('appointments'); loadedTabs.add('employees'); loadedTabs.add('customers'); }
   refreshConvUnreadBadge();
@@ -7210,6 +7310,171 @@ async function loadEmployees() {
     bulkEmpSelect.innerHTML = optionsHtml;
   }
 }
+
+// ===== EMPLOYEE GROUPS =====
+var PERM_BUNDLES = ['my_work','shop_ops','customers','messaging','team','marketing','settings'];
+var PERM_LABELS = {
+  en: { my_work:'My Schedule & Work', shop_ops:'Shop Operations', customers:'Customer Management', messaging:'Messaging', team:'Team Management', marketing:'Marketing & Content', settings:'Settings & Analytics' },
+  es: { my_work:'Mi Horario y Trabajo', shop_ops:'Operaciones del Taller', customers:'Gesti\u00F3n de Clientes', messaging:'Mensajer\u00EDa', team:'Gesti\u00F3n de Equipo', marketing:'Marketing y Contenido', settings:'Configuraci\u00F3n y An\u00E1lisis' }
+};
+var PERM_COLORS = { my_work:'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300', shop_ops:'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300', customers:'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300', messaging:'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300', team:'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300', marketing:'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300', settings:'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' };
+
+async function loadEmployeeGroups() {
+  try { var json = await api('employee-groups.php'); employeeGroups = json.data || []; } catch(e) { console.error('loadEmployeeGroups failed:', e); employeeGroups = []; }
+  renderGroupManagement();
+  populateGroupDropdowns();
+}
+
+function populateGroupDropdowns() {
+  // Populate all group dropdowns (new employee form, etc.)
+  var selects = document.querySelectorAll('#new-emp-group');
+  selects.forEach(function(sel) {
+    var html = '';
+    employeeGroups.forEach(function(g) {
+      var name = currentLang === 'es' && g.name_es ? g.name_es : g.name_en;
+      html += '<option value="' + g.id + '"' + (g.is_default ? ' selected' : '') + '>' + esc(name) + '</option>';
+    });
+    sel.innerHTML = html;
+  });
+}
+
+function buildGroupOptions(selectedGroupId) {
+  var html = '<option value="">' + (adminT[currentLang].noGroup || 'No Group') + '</option>';
+  employeeGroups.forEach(function(g) {
+    var name = currentLang === 'es' && g.name_es ? g.name_es : g.name_en;
+    html += '<option value="' + g.id + '"' + (selectedGroupId && parseInt(selectedGroupId) === parseInt(g.id) ? ' selected' : '') + '>' + esc(name) + '</option>';
+  });
+  return html;
+}
+
+function renderGroupManagement() {
+  var container = document.getElementById('group-management-content');
+  if (!container) return;
+  var isAdminUser = currentUser && currentUser.type === 'admin';
+  var T = adminT[currentLang];
+  var labels = PERM_LABELS[currentLang] || PERM_LABELS.en;
+
+  var html = '';
+  if (isAdminUser) {
+    html += '<div class="flex justify-end mb-4"><button onclick="openGroupModal()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">+ ' + (T.addGroup || 'Add Group') + '</button></div>';
+  }
+  html += '<div class="grid md:grid-cols-2 gap-4">';
+  employeeGroups.forEach(function(g) {
+    var name = currentLang === 'es' && g.name_es ? g.name_es : g.name_en;
+    var desc = currentLang === 'es' && g.description_es ? g.description_es : (g.description_en || '');
+    var perms = [];
+    try { perms = typeof g.permissions === 'string' ? JSON.parse(g.permissions) : (g.permissions || []); } catch(e) { perms = []; }
+    var permBadges = perms.map(function(p) {
+      var lbl = labels[p] || p;
+      var cls = PERM_COLORS[p] || 'bg-gray-100 text-gray-700';
+      return '<span class="inline-block text-[10px] px-2 py-0.5 rounded-full ' + cls + '">' + esc(lbl) + '</span>';
+    }).join(' ');
+    var badges = '';
+    if (g.is_system) badges += '<span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300">' + (T.systemGroup || 'System') + '</span> ';
+    if (g.is_default) badges += '<span class="text-[10px] px-1.5 py-0.5 rounded bg-green-200 text-green-700 dark:bg-green-900 dark:text-green-300">' + (T.defaultGroup || 'Default') + '</span> ';
+    html += '<div class="border rounded-lg p-4 dark:border-gray-600 dark:bg-gray-800">'
+      + '<div class="flex items-start justify-between mb-2">'
+      + '<div><div class="flex items-center gap-2 flex-wrap"><span class="font-semibold dark:text-white">' + esc(name) + '</span>' + badges + '</div>'
+      + (desc ? '<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">' + esc(desc) + '</p>' : '')
+      + '<div class="text-xs text-gray-400 mt-1">' + (g.employee_count || 0) + ' ' + (T.groupEmployeeCount || 'employees') + '</div></div>'
+      + (isAdminUser ? '<div class="flex gap-1 shrink-0">'
+        + '<button onclick="openGroupModal(' + g.id + ')" class="text-xs border rounded px-2 py-1 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700">' + (T.editGroup || 'Edit') + '</button>'
+        + (!g.is_system ? '<button onclick="deleteGroup(' + g.id + ')" class="text-xs border rounded px-2 py-1 text-red-600 hover:bg-red-50 dark:border-gray-600 dark:text-red-400 dark:hover:bg-red-900">' + (T.deleteGroup || 'Delete') + '</button>' : '')
+        + '</div>' : '')
+      + '</div>'
+      + '<div class="flex flex-wrap gap-1">' + permBadges + '</div>'
+      + '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function openGroupModal(groupId) {
+  var T = adminT[currentLang];
+  var labels = PERM_LABELS[currentLang] || PERM_LABELS.en;
+  var group = groupId ? employeeGroups.find(function(g) { return g.id == groupId; }) : null;
+
+  var perms = [];
+  if (group) {
+    try { perms = typeof group.permissions === 'string' ? JSON.parse(group.permissions) : (group.permissions || []); } catch(e) { perms = []; }
+  }
+
+  var checkboxes = PERM_BUNDLES.map(function(b) {
+    var checked = b === 'my_work' || perms.indexOf(b) !== -1;
+    var disabled = b === 'my_work' ? 'disabled checked' : '';
+    var cls = PERM_COLORS[b] || 'bg-gray-100 text-gray-700';
+    return '<label class="flex items-center gap-2 p-2 rounded border dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">'
+      + '<input type="checkbox" name="group-perm" value="' + b + '" ' + (checked ? 'checked' : '') + ' ' + disabled + ' class="rounded">'
+      + '<span class="inline-block text-xs px-2 py-0.5 rounded-full ' + cls + '">' + esc(labels[b] || b) + '</span>'
+      + '</label>';
+  }).join('');
+
+  var html = '<div id="group-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onclick="if(event.target===this)this.remove()">'
+    + '<div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">'
+    + '<h3 class="text-lg font-bold mb-4 dark:text-white">' + (group ? (T.editGroup || 'Edit Group') : (T.addGroup || 'Add Group')) + '</h3>'
+    + '<div class="space-y-3">'
+    + '<div><label class="text-sm font-medium dark:text-gray-300">' + (T.groupNameEn || 'Name (English)') + ' *</label><input id="group-name-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.name_en : '') + '"></div>'
+    + '<div><label class="text-sm font-medium dark:text-gray-300">' + (T.groupNameEs || 'Name (Spanish)') + '</label><input id="group-name-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.name_es : '') + '"></div>'
+    + '<div><label class="text-sm font-medium dark:text-gray-300">' + (T.groupDescEn || 'Description (English)') + '</label><input id="group-desc-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.description_en : '') + '"></div>'
+    + '<div><label class="text-sm font-medium dark:text-gray-300">' + (T.groupDescEs || 'Description (Spanish)') + '</label><input id="group-desc-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.description_es : '') + '"></div>'
+    + '<div><label class="text-sm font-medium dark:text-gray-300 mb-2 block">' + (T.groupPermissions || 'Permissions') + '</label>'
+    + '<div class="grid grid-cols-1 gap-2">' + checkboxes + '</div></div>'
+    + '</div>'
+    + '<div class="flex gap-2 mt-4">'
+    + '<button onclick="saveGroup(' + (groupId || 'null') + ')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">' + (T.save || 'Save') + '</button>'
+    + '<button onclick="document.getElementById(\'group-modal\').remove()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-600 dark:text-gray-300">' + (T.cancel || 'Cancel') + '</button>'
+    + '</div></div></div>';
+
+  // Remove existing modal if any
+  var existing = document.getElementById('group-modal');
+  if (existing) existing.remove();
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function saveGroup(groupId) {
+  var T = adminT[currentLang];
+  var nameEn = document.getElementById('group-name-en').value.trim();
+  if (!nameEn) { showToast(T.nameIsRequired || 'Name is required', true); return; }
+
+  var perms = [];
+  document.querySelectorAll('#group-modal input[name="group-perm"]:checked').forEach(function(cb) { perms.push(cb.value); });
+
+  var body = {
+    name_en: nameEn,
+    name_es: document.getElementById('group-name-es').value.trim(),
+    description_en: document.getElementById('group-desc-en').value.trim(),
+    description_es: document.getElementById('group-desc-es').value.trim(),
+    permissions: perms
+  };
+
+  try {
+    if (groupId) {
+      body.id = groupId;
+      await api('employee-groups.php', { method: 'PUT', body: body });
+      showToast(T.groupUpdated || 'Group updated!');
+    } else {
+      await api('employee-groups.php', { method: 'POST', body: body });
+      showToast(T.groupCreated || 'Group created!');
+    }
+    document.getElementById('group-modal').remove();
+    loadEmployeeGroups();
+    loadEmployees();
+  } catch(e) { showToast((T.error || 'Error') + ': ' + e.message, true); }
+}
+
+async function deleteGroup(groupId) {
+  var T = adminT[currentLang];
+  var group = employeeGroups.find(function(g) { return g.id == groupId; });
+  if (group && group.is_system) { showToast(T.cannotDeleteSystem || 'Cannot delete system groups.', true); return; }
+  if (!confirm(T.groupDeleteConfirm || 'Delete this group? Employees will be reassigned to the default group.')) return;
+  try {
+    await api('employee-groups.php?id=' + groupId, { method: 'DELETE' });
+    showToast(T.groupDeleted || 'Group deleted!');
+    loadEmployeeGroups();
+    loadEmployees();
+  } catch(e) { showToast((T.error || 'Error') + ': ' + e.message, true); }
+}
+
 var emailLogPage = 0;
 var emailLogTotal = 0;
 var emailLogTypes = [];
@@ -8951,7 +9216,8 @@ function renderEmployeeCard(emp, inactive) {
   var parts = (emp.name || '').split(' ');
   var initials = (parts[0] ? parts[0][0] : '') + (parts[1] ? parts[1][0] : '');
   initials = initials.toUpperCase();
-  var avatarBg = emp.role === 'Manager' ? 'bg-green-600' : 'bg-gray-400';
+  var empGroupName = currentLang === 'es' && emp.group_name_es ? emp.group_name_es : (emp.group_name || emp.role || 'Employee');
+  var avatarBg = emp.group_name === 'Manager' || emp.role === 'Manager' ? 'bg-green-600' : 'bg-gray-400';
 
   // Skills HTML
   var skillsHtml = '';
@@ -8991,7 +9257,7 @@ function renderEmployeeCard(emp, inactive) {
     + '<div class="flex-1 min-w-0">'
     + '<div class="flex items-center gap-2 flex-wrap">'
     + '<span class="font-semibold text-base dark:text-gray-200">' + esc(emp.name) + '</span>'
-    + '<span class="text-xs px-2 py-0.5 rounded-full ' + (emp.role === 'Manager' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300') + '">' + (emp.role || 'Employee') + '</span>'
+    + '<span class="text-xs px-2 py-0.5 rounded-full ' + (emp.group_name === 'Manager' || emp.role === 'Manager' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300') + '">' + esc(empGroupName) + '</span>'
     + (isEmpSuperAdmin ? '<span class="text-xs px-2 py-0.5 rounded-full bg-purple-600 text-white">Super Admin</span>' : isEmpAdmin ? '<span class="text-xs px-2 py-0.5 rounded-full bg-green-600 text-white">Admin Access</span>' : '<span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300">Staff Only</span>')
     + (currentUser && currentUser.email && emp.email && currentUser.email.toLowerCase() === emp.email.toLowerCase() ? '<span class="text-xs px-2 py-0.5 rounded-full bg-amber-500 text-white font-bold">' + (T.youBadge || 'YOU') + '</span>' : '')
     + (inactive ? '<span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400">Inactive</span>' : '')
@@ -9032,7 +9298,7 @@ function renderEmployeeCard(emp, inactive) {
     + '<div><label class="text-xs font-medium dark:text-gray-300">Name *</label><input id="edit-emp-name-' + emp.id + '" value="' + esc(emp.name) + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>'
     + '<div><label class="text-xs font-medium dark:text-gray-300">Email</label><input id="edit-emp-email-' + emp.id + '" value="' + esc(emp.email || '') + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>'
     + '<div><label class="text-xs font-medium dark:text-gray-300">Phone</label><input id="edit-emp-phone-' + emp.id + '" value="' + esc(emp.phone || '') + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>'
-    + '<div><label class="text-xs font-medium dark:text-gray-300">Role</label><select id="edit-emp-role-' + emp.id + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"><option value="Employee" ' + (emp.role === 'Employee' ? 'selected' : '') + '>Employee</option><option value="Manager" ' + (emp.role === 'Manager' ? 'selected' : '') + '>Manager</option></select></div>'
+    + '<div><label class="text-xs font-medium dark:text-gray-300">' + (T.empGroup || 'Group') + '</label><select id="edit-emp-group-' + emp.id + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">' + buildGroupOptions(emp.group_id) + '</select></div>'
     + '</div>'
     + '<div class="mt-3"><label class="text-xs font-medium dark:text-gray-300">' + (T.serviceCertifications || 'Service Certifications') + '</label>'
     + '<div id="edit-emp-skills-' + emp.id + '" class="flex flex-wrap gap-2 mt-2">' + skillCheckboxes + '</div></div>'
@@ -10933,10 +11199,13 @@ async function addEmployee() {
   const email = document.getElementById('new-emp-email').value || null;
   if(!name) { showToast(adminT[currentLang].nameIsRequired, true); return; }
   try {
+    var groupSel = document.getElementById('new-emp-group');
+    var groupId = groupSel ? groupSel.value : null;
     await api('employees.php', { method: 'POST', body: {
       name, email,
       phone: document.getElementById('new-emp-phone').value||null,
-      role: document.getElementById('new-emp-role').value
+      role: 'Employee',
+      group_id: groupId ? parseInt(groupId) : null
     }});
     showToast(adminT[currentLang].employeeAdded);
     toggleAddEmployeeForm();
@@ -10981,10 +11250,12 @@ async function saveEditEmployee(id) {
   var skills = [];
   skillCbs.forEach(function(cb) { if (cb.checked) skills.push(cb.value); });
   try {
+    var editGroupSel = document.getElementById('edit-emp-group-'+id);
+    var editGroupId = editGroupSel ? editGroupSel.value : null;
     await api('employees.php', { method: 'PUT', body: {
       id: id, name: name, email: document.getElementById('edit-emp-email-'+id).value || null,
       phone: document.getElementById('edit-emp-phone-'+id).value || null,
-      role: document.getElementById('edit-emp-role-'+id).value,
+      group_id: editGroupId ? parseInt(editGroupId) : null,
       skills: skills
     }});
     showToast(adminT[currentLang].employeeUpdated); loadEmployees();

@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../includes/vin-decode.php';
 
 try {
     startSecureSession();
-    requireAdmin();
+    requirePermission('shop_ops');
     requireMethod('GET');
 
     $vin = sanitize((string) ($_GET['vin'] ?? ''), 17);

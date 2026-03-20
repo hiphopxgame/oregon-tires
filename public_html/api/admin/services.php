@@ -21,7 +21,7 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 try {
-    requireAdmin();
+    requirePermission('shop_ops');
     requireMethod('GET', 'POST', 'PUT', 'DELETE');
 
     $db = getDB();

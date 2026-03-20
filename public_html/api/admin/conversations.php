@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/mail.php';
 
 try {
-    $admin = requireAdmin();
+    $admin = requirePermission('messaging');
     requireMethod('GET', 'POST', 'PUT');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];

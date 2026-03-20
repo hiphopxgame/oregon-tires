@@ -14,7 +14,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 
 try {
     startSecureSession();
-    $admin = requireAdmin();
+    $staff = requirePermission('shop_ops');
     requireMethod('GET', 'POST', 'PUT');
     $db = getDB();
 

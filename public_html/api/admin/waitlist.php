@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/waitlist.php';
 
 try {
-    $staff = requireStaff();
+    $staff = requirePermission('shop_ops');
     requireMethod('GET', 'PUT', 'DELETE');
 
     $db = getDB();

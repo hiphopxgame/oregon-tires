@@ -32,6 +32,7 @@ try {
 
     // ── PUT: Update profile fields ──
     if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+        verifyCsrf();
         $data = getJsonBody();
         MemberProfile::update($memberId, $data);
         $updated = MemberProfile::get($memberId);

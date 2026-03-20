@@ -24,10 +24,10 @@ try {
         jsonError('New password must be at least 8 characters.');
     }
 
-    $result = MemberAuth::changePassword($_SESSION['member_id'], $currentPassword, $newPassword);
+    $changed = MemberAuth::changePassword($_SESSION['member_id'], $currentPassword, $newPassword);
 
-    if (!$result['success']) {
-        jsonError($result['error'] ?? 'Password change failed.');
+    if (!$changed) {
+        jsonError('Current password is incorrect.');
     }
 
     jsonSuccess(['message' => 'Password updated successfully.']);

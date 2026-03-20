@@ -16,7 +16,7 @@ const ALLOWED_SERVICE_KEYS = [
 ];
 
 try {
-    requireAdmin();
+    requirePermission('marketing');
     requireMethod('GET', 'POST', 'PUT');
 
     $db = getDB();

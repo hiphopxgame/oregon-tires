@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 try {
-    $admin = requireAdmin();
+    $admin = requirePermission('team');
     requireMethod('GET', 'POST', 'DELETE');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];

@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../includes/loyalty.php';
 require_once __DIR__ . '/../../includes/push.php';
 
 try {
-    requireStaff();
+    requirePermission('shop_ops');
     requireMethod('GET', 'POST', 'PUT');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];

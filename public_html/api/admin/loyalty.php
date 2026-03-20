@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../includes/loyalty.php';
 
 try {
     startSecureSession();
-    $admin = requireAdmin();
+    $admin = requirePermission('marketing');
     requireMethod('GET', 'POST');
     $db = getDB();
 

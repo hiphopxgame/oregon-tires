@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 
 try {
     startSecureSession();
-    requireAdmin();
+    requirePermission('shop_ops');
     requireMethod('POST', 'DELETE');
     $db = getDB();
 

@@ -1,6 +1,7 @@
 <?php
 /**
  * Oregon Tires — Admin Labor Time Tracking
+ * GET    /api/admin/labor.php?summary=1                        — cross-RO employee labor summary
  * GET    /api/admin/labor.php?ro_id=N                         — entries for a repair order
  * GET    /api/admin/labor.php?employee_id=N&start_date=&end_date= — entries for an employee in date range
  * POST   /api/admin/labor.php                                 — clock in
@@ -15,7 +16,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 
 try {
     startSecureSession();
-    $staff = requireStaff();
+    $staff = requirePermission('team');
     requireMethod('GET', 'POST', 'PUT', 'DELETE');
     $db = getDB();
 
@@ -26,6 +27,35 @@ try {
 
     // ─── GET: List labor entries ────────────────────────────────────────────
     if ($method === 'GET') {
+
+        // Cross-RO labor summary (for the dedicated Labor tab)
+        if (!empty($_GET['summary'])) {
+            $stmt = $db->query(
+                'SELECT
+                    e.id   AS employee_id,
+                    e.name AS employee_name,
+                    ROUND(COALESCE(SUM(l.duration_minutes), 0) / 60, 2) AS total_hours,
+                    ROUND(COALESCE(SUM(CASE WHEN l.is_billable = 1 THEN l.duration_minutes ELSE 0 END), 0) / 60, 2) AS billable_hours,
+                    SUM(CASE WHEN l.clock_out_at IS NULL THEN 1 ELSE 0 END) AS active_count,
+                    COUNT(DISTINCT l.repair_order_id) AS ro_count
+                 FROM oretir_labor_entries l
+                 JOIN oretir_employees e ON e.id = l.employee_id
+                 GROUP BY e.id, e.name
+                 ORDER BY e.name'
+            );
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Cast numeric strings for clean JSON
+            foreach ($rows as &$r) {
+                $r['total_hours']    = (float) $r['total_hours'];
+                $r['billable_hours'] = (float) $r['billable_hours'];
+                $r['active_count']   = (int) $r['active_count'];
+                $r['ro_count']       = (int) $r['ro_count'];
+            }
+            unset($r);
+
+            jsonSuccess($rows);
+        }
 
         // Entries for a specific repair order
         if (!empty($_GET['ro_id'])) {

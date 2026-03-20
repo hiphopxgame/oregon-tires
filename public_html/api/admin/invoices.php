@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../includes/invoices.php';
 
 try {
     startSecureSession();
-    $staff = requireStaff();
+    $staff = requirePermission('shop_ops');
     requireMethod('GET', 'POST', 'PUT');
     $db = getDB();
 

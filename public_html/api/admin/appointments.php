@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../includes/schedule.php';
 require_once __DIR__ . '/../../includes/vin-decode.php';
 
 try {
-    $staff = requireStaff();
+    $staff = requirePermission('shop_ops');
     requireMethod('GET', 'PUT', 'POST');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];

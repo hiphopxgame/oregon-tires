@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../includes/loyalty.php';
 
 try {
     startSecureSession();
-    $admin = requireAdmin();
+    $admin = requirePermission('marketing');
     requireMethod('GET', 'PUT', 'POST');
     $db = getDB();
 

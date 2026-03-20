@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/business-hours.php';
 
 try {
-    requireAdmin();
+    requirePermission('shop_ops');
     requireMethod('GET', 'PUT', 'POST', 'DELETE');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
