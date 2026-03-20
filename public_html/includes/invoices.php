@@ -33,7 +33,7 @@ function createInvoiceFromEstimate(PDO $db, int $roId): ?array
     // Find the approved estimate for this RO
     $estStmt = $db->prepare(
         "SELECT e.* FROM oretir_estimates e
-         WHERE e.repair_order_id = ? AND e.status IN ('approved','partially_approved')
+         WHERE e.repair_order_id = ? AND e.status IN ('approved','partial')
          ORDER BY e.version DESC LIMIT 1"
     );
     $estStmt->execute([$roId]);
@@ -62,7 +62,7 @@ function createInvoiceFromEstimate(PDO $db, int $roId): ?array
     // Get approved estimate items only
     $itemStmt = $db->prepare(
         "SELECT ei.* FROM oretir_estimate_items ei
-         WHERE ei.estimate_id = ? AND (ei.approved = 1 OR ei.item_type = 'discount')
+         WHERE ei.estimate_id = ? AND (ei.is_approved = 1 OR ei.item_type = 'discount')
          ORDER BY ei.sort_order ASC, ei.id ASC"
     );
     $itemStmt->execute([$estimate['id']]);
