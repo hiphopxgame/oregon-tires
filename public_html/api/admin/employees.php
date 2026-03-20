@@ -5,13 +5,18 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 try {
-    $staff = requireStaff();
+    $staff = requirePermission('team');
     requireMethod('GET', 'POST', 'PUT');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
 
     if ($method === 'GET') {
-        $stmt = $db->query('SELECT * FROM oretir_employees ORDER BY name ASC');
+        $stmt = $db->query(
+            'SELECT e.*, g.name_en AS group_name, g.name_es AS group_name_es
+             FROM oretir_employees e
+             LEFT JOIN oretir_employee_groups g ON g.id = e.group_id
+             ORDER BY e.name ASC'
+        );
         $employees = $stmt->fetchAll();
 
         // Attach skills per employee
@@ -58,8 +63,10 @@ try {
             jsonError('Invalid email address.', 400);
         }
 
-        $stmt = $db->prepare('INSERT INTO oretir_employees (name, email, phone, role, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, 1, NOW(), NOW())');
-        $stmt->execute([$name, $email, $phone, $role]);
+        $groupId = isset($body['group_id']) ? (int) $body['group_id'] : null;
+
+        $stmt = $db->prepare('INSERT INTO oretir_employees (name, email, phone, role, group_id, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW())');
+        $stmt->execute([$name, $email, $phone, $role, $groupId]);
 
         $newEmpId = (int) $db->lastInsertId();
 
@@ -133,6 +140,11 @@ try {
     if (array_key_exists('is_active', $body)) {
         $fields[] = 'is_active = ?';
         $params[] = $body['is_active'] ? 1 : 0;
+    }
+
+    if (array_key_exists('group_id', $body)) {
+        $fields[] = 'group_id = ?';
+        $params[] = $body['group_id'] ? (int) $body['group_id'] : null;
     }
 
     if (isset($body['max_daily_appointments'])) {

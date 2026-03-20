@@ -9,6 +9,103 @@ const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_MINUTES    = 15;
 const BCRYPT_COST        = 12;
 
+// ─── Permission Bundles ─────────────────────────────────────────────────────
+// Maps each admin API endpoint filename to the required permission bundle.
+// 'my_work' is always granted. Admins bypass all checks.
+const ENDPOINT_PERMISSIONS = [
+    // Shop Operations
+    'appointments.php'       => 'shop_ops',
+    'repair-orders.php'      => 'shop_ops',
+    'inspections.php'        => 'shop_ops',
+    'inspection-photos.php'  => 'shop_ops',
+    'estimates.php'          => 'shop_ops',
+    'invoices.php'           => 'shop_ops',
+    'waitlist.php'           => 'shop_ops',
+    'tire-quotes.php'        => 'shop_ops',
+    'services.php'           => 'shop_ops',
+    'visit-log.php'          => 'shop_ops',
+    'vehicles.php'           => 'shop_ops',
+    'vin-decode.php'         => 'shop_ops',
+    'tire-fitment.php'       => 'shop_ops',
+    'business-hours.php'     => 'shop_ops',
+    'service-reminders.php'  => 'shop_ops',
+    // Customers
+    'customers.php'          => 'customers',
+    'resource-planner.php'   => 'customers',
+    // Messaging
+    'conversations.php'      => 'messaging',
+    'messages.php'           => 'messaging',
+    'email-check.php'        => 'messaging',
+    // Team
+    'employees.php'          => 'team',
+    'employee-groups.php'    => 'team',
+    'schedules.php'          => 'team',
+    'labor.php'              => 'team',
+    // Marketing
+    'blog.php'               => 'marketing',
+    'promotions.php'         => 'marketing',
+    'faq.php'                => 'marketing',
+    'testimonials.php'       => 'marketing',
+    'gallery.php'            => 'marketing',
+    'service-images.php'     => 'marketing',
+    'subscribers.php'        => 'marketing',
+    'loyalty.php'            => 'marketing',
+    'loyalty-rewards.php'    => 'marketing',
+    'referrals.php'          => 'marketing',
+    'push-broadcast.php'     => 'marketing',
+    // Settings & Analytics
+    'analytics.php'          => 'settings',
+    'site-settings.php'      => 'settings',
+    'email-logs.php'         => 'settings',
+    'email-template-vars.php'=> 'settings',
+    'export.php'             => 'settings',
+    'admins.php'             => 'settings',
+    'account.php'            => 'settings',
+];
+
+/**
+ * Check if current staff member has the required permission bundle.
+ * Admins bypass all checks. Employees must have the bundle in their group.
+ */
+function requirePermission(string $bundle): array
+{
+    $staff = requireStaff();
+
+    // Admins bypass permission checks
+    if ($staff['type'] === 'admin') {
+        return $staff;
+    }
+
+    // my_work is always granted for employees
+    if ($bundle === 'my_work') {
+        return $staff;
+    }
+
+    $perms = $_SESSION['employee_permissions'] ?? [];
+    if (!in_array($bundle, $perms, true)) {
+        jsonError('You do not have permission to access this feature.', 403);
+    }
+
+    return $staff;
+}
+
+/**
+ * Resolve permission bundle for the current admin endpoint file.
+ * Uses the ENDPOINT_PERMISSIONS map with the current script filename.
+ */
+function requireEndpointPermission(): array
+{
+    $file = basename($_SERVER['SCRIPT_FILENAME'] ?? $_SERVER['SCRIPT_NAME'] ?? '');
+    $bundle = ENDPOINT_PERMISSIONS[$file] ?? null;
+
+    // If no mapping exists, require admin (safe default)
+    if ($bundle === null) {
+        return requireAdmin();
+    }
+
+    return requirePermission($bundle);
+}
+
 /**
  * Attempt admin login. Returns admin row on success, error string on failure.
  */

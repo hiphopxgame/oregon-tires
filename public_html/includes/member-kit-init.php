@@ -96,12 +96,12 @@ function initMemberKit(PDO $pdo): void
 
         // 3. Check oretir_employees (set employee_id for employees AND admins who are also employees)
         try {
-            $stmt = $pdo->prepare('SELECT id, name, role FROM oretir_employees WHERE member_id = ? AND is_active = 1 LIMIT 1');
+            $stmt = $pdo->prepare('SELECT id, name, role, group_id FROM oretir_employees WHERE member_id = ? AND is_active = 1 LIMIT 1');
             $stmt->execute([$memberId]);
             $employee = $stmt->fetch();
             if (!$employee && $email !== '') {
                 // Fallback: match by email if member_id not linked yet
-                $stmt = $pdo->prepare('SELECT id, name, role FROM oretir_employees WHERE email = ? AND is_active = 1 LIMIT 1');
+                $stmt = $pdo->prepare('SELECT id, name, role, group_id FROM oretir_employees WHERE email = ? AND is_active = 1 LIMIT 1');
                 $stmt->execute([$email]);
                 $employee = $stmt->fetch();
                 // Auto-link employee to member account
@@ -116,6 +116,27 @@ function initMemberKit(PDO $pdo): void
                 $_SESSION['employee_role'] = $employee['role']; // Employee or Manager
                 if ($detectedRole !== 'admin') {
                     $detectedRole = 'employee';
+                }
+
+                // Load employee group permissions into session
+                $groupId = $employee['group_id'] ?? null;
+                if ($groupId) {
+                    try {
+                        $grpStmt = $pdo->prepare('SELECT name_en, name_es, permissions FROM oretir_employee_groups WHERE id = ? LIMIT 1');
+                        $grpStmt->execute([$groupId]);
+                        $grp = $grpStmt->fetch();
+                        if ($grp) {
+                            $_SESSION['employee_permissions'] = json_decode($grp['permissions'], true) ?: ['my_work'];
+                            $_SESSION['employee_group_id']    = (int) $groupId;
+                            $_SESSION['employee_group_name']  = $grp['name_en'];
+                            $_SESSION['employee_group_name_es'] = $grp['name_es'];
+                        }
+                    } catch (\Throwable $e) {
+                        error_log('Employee group load failed: ' . $e->getMessage());
+                        $_SESSION['employee_permissions'] = ['my_work'];
+                    }
+                } else {
+                    $_SESSION['employee_permissions'] = ['my_work'];
                 }
             }
         } catch (\Throwable $e) {
