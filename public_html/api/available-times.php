@@ -26,7 +26,8 @@ try {
     }
 
     // Check cache first (60s TTL, keyed by date)
-    if (function_exists('cacheGet')) {
+    // Skip cache for HTMX requests — they need the HTML partial, not JSON
+    if (function_exists('cacheGet') && !isHtmxRequest()) {
         $cacheKey = "available_times:{$date}";
         $cached = cacheGet($cacheKey, 60, 'oregon_tires');
         if ($cached !== null) {
