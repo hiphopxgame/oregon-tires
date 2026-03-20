@@ -38,6 +38,8 @@ try {
         'price_inspection', 'price_care_plan',
         // Business info
         'founding_year',
+        // Feature toggles
+        'pwa_install_enabled',
         // Email templates — welcome
         'email_tpl_welcome_subject', 'email_tpl_welcome_greeting',
         'email_tpl_welcome_body', 'email_tpl_welcome_button', 'email_tpl_welcome_footer',

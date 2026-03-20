@@ -40,6 +40,22 @@
   // ─── Install Prompt ───────────────────────────────────────────────────────
   var deferredPrompt = null;
   var installBannerShown = false;
+  var pwaInstallEnabled = false;
+
+  // Check if admin has enabled the install popup via site settings
+  fetch('/api/settings.php', { credentials: 'include' })
+    .then(function(res) { return res.json(); })
+    .then(function(json) {
+      if (json.success && json.data) {
+        for (var i = 0; i < json.data.length; i++) {
+          if (json.data[i].setting_key === 'pwa_install_enabled') {
+            pwaInstallEnabled = (json.data[i].value_en === '1');
+            break;
+          }
+        }
+      }
+    })
+    .catch(function() { /* leave disabled */ });
 
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
@@ -61,7 +77,7 @@
   });
 
   function showInstallBanner() {
-    if (installBannerShown || !deferredPrompt) return;
+    if (!pwaInstallEnabled || installBannerShown || !deferredPrompt) return;
     installBannerShown = true;
 
     var banner = document.createElement('div');
@@ -122,7 +138,7 @@
 
   if (isIOS && !isStandalone && !localStorage.getItem('ot_install_dismissed')) {
     setTimeout(function() {
-      showIOSInstallHint();
+      if (pwaInstallEnabled) showIOSInstallHint();
     }, 45000);
   }
 

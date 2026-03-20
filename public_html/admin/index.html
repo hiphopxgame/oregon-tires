@@ -3110,6 +3110,24 @@
           </div>
         </div>
 
+        <!-- Feature Toggles -->
+        <div class="mt-8 border-t pt-6">
+          <h4 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4">Feature Toggles</h4>
+          <div class="grid md:grid-cols-3 gap-4 items-start">
+            <label class="font-medium text-sm pt-2 dark:text-gray-300">App Install Popup</label>
+            <div class="md:col-span-2">
+              <label class="relative inline-flex items-center cursor-pointer mt-1">
+                <input type="checkbox" id="setting-pwa_install_enabled-toggle" class="sr-only peer" onchange="var v=this.checked?'1':'0';document.getElementById('setting-pwa_install_enabled-en').value=v;document.getElementById('setting-pwa_install_enabled-es').value=v;">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                <span class="ml-3 text-sm text-gray-600 dark:text-gray-400">Show the "Install Oregon Tires App" popup to visitors</span>
+              </label>
+              <input type="hidden" id="setting-pwa_install_enabled-en" value="0">
+              <input type="hidden" id="setting-pwa_install_enabled-es" value="0">
+              <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">When enabled, desktop and mobile users will see an install prompt after visiting the site. Disabled by default.</p>
+            </div>
+          </div>
+        </div>
+
         <div class="mt-6 flex justify-end">
           <button id="save-site-settings" onclick="saveSiteSettings()" class="bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition" data-t="saveSiteSettings">Save Site Settings</button>
         </div>
@@ -3953,12 +3971,12 @@ const adminT = {
     overviewValueBreakdown: 'Value Breakdown by Category',
     overviewFreelancer: 'Freelancer ($50/hr)',
     overviewPlatformSummary: 'Platform Investment Summary',
-    overviewClientValue: 'What You Asked For',
-    overviewBonusValue2: 'What We Built Beyond Scope',
-    overviewClientRequested: 'Client Requested',
-    overviewDevAdded: 'Beyond Original Scope',
-    overviewClientDesc: 'Core features from your original project requirements',
-    overviewDevDesc: 'Additional features built beyond the original scope to expand platform capabilities',
+    overviewClientValue: 'What You Paid For',
+    overviewBonusValue2: 'What You Got',
+    overviewClientRequested: 'Paid For',
+    overviewDevAdded: 'Additional Value',
+    overviewClientDesc: 'Features included in your $5,000 investment',
+    overviewDevDesc: 'Additional features we built to maximize the value of your platform',
     overviewScopeBreakdown: 'What You Paid For vs What You Got',
     overviewSavingsVsFreelancer: 'Savings vs Freelancer',
     overviewYourPrice: 'Your Price',
@@ -5233,12 +5251,12 @@ const adminT = {
     overviewValueBreakdown: 'Desglose de Valor por Categor\u00EDa',
     overviewFreelancer: 'Freelancer ($50/hr)',
     overviewPlatformSummary: 'Resumen de Inversi\u00F3n de la Plataforma',
-    overviewClientValue: 'Lo Que Usted Pidi\u00F3',
-    overviewBonusValue2: 'Lo Que Construimos M\u00E1s All\u00E1 del Alcance',
-    overviewClientRequested: 'Solicitado por el Cliente',
-    overviewDevAdded: 'M\u00E1s All\u00E1 del Alcance Original',
-    overviewClientDesc: 'Funciones principales de los requisitos originales del proyecto',
-    overviewDevDesc: 'Funciones adicionales construidas m\u00E1s all\u00E1 del alcance original para expandir las capacidades de la plataforma',
+    overviewClientValue: 'Lo Que Usted Pag\u00F3',
+    overviewBonusValue2: 'Lo Que Usted Recibi\u00F3',
+    overviewClientRequested: 'Pagado',
+    overviewDevAdded: 'Valor Adicional',
+    overviewClientDesc: 'Funciones incluidas en su inversi\u00F3n de $5,000',
+    overviewDevDesc: 'Funciones adicionales que construimos para maximizar el valor de su plataforma',
     overviewScopeBreakdown: 'Lo Que Pag\u00F3 vs Lo Que Recibi\u00F3',
     overviewSavingsVsFreelancer: 'Ahorro vs Freelancer',
     overviewYourPrice: 'Su Precio',
@@ -10427,7 +10445,7 @@ async function revokeAdminByEmail(email) {
 }
 
 // ===== SITE SETTINGS (Editable Content) =====
-const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count', 'google_analytics_id', 'price_tire_install', 'price_tire_repair', 'price_oil_change', 'price_brake_service', 'price_alignment', 'price_tuneup', 'price_inspection', 'price_suspension', 'price_roadside', 'price_care_plan', 'founding_year'];
+const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count', 'google_analytics_id', 'price_tire_install', 'price_tire_repair', 'price_oil_change', 'price_brake_service', 'price_alignment', 'price_tuneup', 'price_inspection', 'price_suspension', 'price_roadside', 'price_care_plan', 'founding_year', 'pwa_install_enabled'];
 const SITE_SETTINGS_DEFAULTS = {
   phone: { en: '(503) 367-9714', es: '(503) 367-9714' },
   email: { en: 'oregontirespdx@gmail.com', es: 'oregontirespdx@gmail.com' },
@@ -10480,6 +10498,10 @@ async function loadSiteSettings() {
     // Update GA tracking ID from loaded settings
     const gaInput = document.getElementById('setting-google_analytics_id-en');
     if (gaInput && gaInput.value && typeof window.__updateGaId === 'function') window.__updateGaId(gaInput.value);
+    // Sync feature toggle checkboxes
+    const pwaToggle = document.getElementById('setting-pwa_install_enabled-toggle');
+    const pwaVal = document.getElementById('setting-pwa_install_enabled-en');
+    if (pwaToggle && pwaVal) pwaToggle.checked = (pwaVal.value === '1');
   } catch (err) {
     console.error('loadSiteSettings error:', err);
     showToast(adminT[currentLang].settingsLoadError || 'Could not load site settings', true);
