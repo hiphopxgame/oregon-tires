@@ -11,9 +11,9 @@
 <div class="member-page">
     <div class="member-card">
         <nav class="member-nav-tabs" aria-label="Account navigation">
-            <a href="/member/login<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('sign_in') ?? 'Sign In') ?></a>
-            <a href="/member/register<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('create_account') ?? 'Create Account') ?></a>
-            <a href="/member/forgot-password<?= $langQ ?>" class="member-nav-tab active" aria-current="page"><?= htmlspecialchars(t('reset_password_tab') ?? 'Reset Password') ?></a>
+            <a href="/members<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('sign_in') ?? 'Sign In') ?></a>
+            <a href="/members?view=register<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('create_account') ?? 'Create Account') ?></a>
+            <a href="/members?view=forgot-password<?= $langQ ?>" class="member-nav-tab active" aria-current="page"><?= htmlspecialchars(t('reset_password_tab') ?? 'Reset Password') ?></a>
         </nav>
 
         <div class="member-header">
@@ -34,7 +34,7 @@
         </form>
 
         <div class="member-footer">
-            <a href="/member/login<?= $langQ ?>" class="member-link"><?= htmlspecialchars(t('back_to_sign_in') ?? 'Back to Sign In') ?></a>
+            <a href="/members<?= $langQ ?>" class="member-link"><?= htmlspecialchars(t('back_to_sign_in') ?? 'Back to Sign In') ?></a>
         </div>
     </div>
 </div>

@@ -114,6 +114,11 @@ if (($isAdmin || $isEmployee) && !isset($_GET['tab'])) {
     }
 }
 
+// Auth view routing: /members?view=register|forgot-password|reset-password
+$authView = $_GET['view'] ?? 'login';
+$validViews = ['login', 'register', 'forgot-password', 'reset-password'];
+if (!in_array($authView, $validViews, true)) $authView = 'login';
+
 // Site key for branding
 $siteKey = 'oregon_tires';
 
@@ -134,6 +139,7 @@ $memberDashboardConfig = [
     ],
     'hide_register_link'       => true,
     'hide_login_activity_link' => true,
+    'auth_view'                => $authView,
 ];
 
 // ── Build tabs based on role ─────────────────────────────────────────────

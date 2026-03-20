@@ -92,7 +92,7 @@ function savePushSubscription(
     $stmt->execute([$endpoint, $p256dh, $auth, $customerId, $memberId, $language, $userAgent]);
 
     // Return subscription ID
-    $idStmt = $db->prepare("SELECT id FROM oretir_push_subscriptions WHERE endpoint(500) = LEFT(?, 500) LIMIT 1");
+    $idStmt = $db->prepare("SELECT id FROM oretir_push_subscriptions WHERE LEFT(endpoint, 500) = LEFT(?, 500) LIMIT 1");
     $idStmt->execute([$endpoint]);
     return (int) $idStmt->fetchColumn();
 }

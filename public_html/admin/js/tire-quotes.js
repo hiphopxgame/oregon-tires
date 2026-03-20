@@ -9,10 +9,12 @@
   var quotes = [];
   var currentFilter = 'all';
   var statusMap = {
-    new:      { en: 'New',      es: 'Nuevo',    cls: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' },
-    quoted:   { en: 'Quoted',   es: 'Cotizado', cls: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' },
-    accepted: { en: 'Accepted', es: 'Aceptado', cls: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' },
-    declined: { en: 'Declined', es: 'Rechazado', cls: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' }
+    new:       { en: 'New',       es: 'Nuevo',     cls: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' },
+    quoted:    { en: 'Quoted',    es: 'Cotizado',  cls: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' },
+    accepted:  { en: 'Accepted',  es: 'Aceptado',  cls: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' },
+    ordered:   { en: 'Ordered',   es: 'Ordenado',  cls: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300' },
+    installed: { en: 'Installed', es: 'Instalado', cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' },
+    cancelled: { en: 'Cancelled', es: 'Cancelado', cls: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' }
   };
 
   function t(key, fb) {
@@ -22,10 +24,11 @@
   function getCsrf() { return (typeof csrfToken !== 'undefined' && csrfToken) ? csrfToken : ''; }
   function hdrs(json) { var h = { 'X-CSRF-Token': getCsrf() }; if (json) h['Content-Type'] = 'application/json'; return h; }
   function toast(msg, err) { if (typeof showToast === 'function') showToast(msg, !!err); }
+  function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
   function fmtDate(s) {
     if (!s) return '-';
-    return new Date(s).toLocaleDateString(isEs() ? 'es-MX' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+    return new Date(s).toLocaleDateString(isEs() ? 'es-MX' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   function el(tag, cls, text) {
@@ -33,6 +36,14 @@
     if (cls) e.className = cls;
     if (text) e.textContent = text;
     return e;
+  }
+
+  function customerName(q) {
+    return [q.first_name, q.last_name].filter(Boolean).join(' ') || q.email || '-';
+  }
+
+  function vehicleStr(q) {
+    return [q.vehicle_year, q.vehicle_make, q.vehicle_model].filter(Boolean).join(' ') || '-';
   }
 
   function removeModal() { var m = document.getElementById('tq-modal-overlay'); if (m) m.remove(); }
@@ -57,104 +68,152 @@
     if (!c) return;
     c.textContent = '';
 
+    // Stats bar
+    var newCount = quotes.filter(function(q) { return q.status === 'new'; }).length;
+    var quotedCount = quotes.filter(function(q) { return q.status === 'quoted'; }).length;
+    var acceptedCount = quotes.filter(function(q) { return q.status === 'accepted' || q.status === 'ordered'; }).length;
+    if (quotes.length > 0) {
+      var stats = el('div', 'grid grid-cols-3 gap-4 mb-4');
+      [[newCount, t('tqNewRequests', 'New Requests'), 'text-blue-600 dark:text-blue-400'],
+       [quotedCount, t('tqAwaitingResponse', 'Awaiting Response'), 'text-yellow-600 dark:text-yellow-400'],
+       [acceptedCount, t('tqAcceptedOrdered', 'Accepted / Ordered'), 'text-green-600 dark:text-green-400']
+      ].forEach(function(s) {
+        var card = el('div', 'bg-white dark:bg-gray-800 rounded-lg p-3 text-center border dark:border-gray-700');
+        card.appendChild(el('div', 'text-2xl font-bold ' + s[2], String(s[0])));
+        card.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400', s[1]));
+        stats.appendChild(card);
+      });
+      c.appendChild(stats);
+    }
+
     // Filter bar
     var bar = el('div', 'flex flex-wrap items-center gap-3 mb-4');
-    bar.appendChild(el('label', 'text-sm font-medium text-gray-600 dark:text-gray-300', t('tqFilterStatus', 'Status:')));
-    var sel = el('select', 'border rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200');
-    [['all','All','Todos'],['new','New','Nuevo'],['quoted','Quoted','Cotizado'],['accepted','Accepted','Aceptado'],['declined','Declined','Rechazado']].forEach(function(o) {
-      var opt = el('option', null, isEs() ? o[2] : o[1]);
-      opt.value = o[0];
-      if (o[0] === currentFilter) opt.selected = true;
-      sel.appendChild(opt);
+    var filterLabel = el('label', 'text-sm font-medium text-gray-600 dark:text-gray-300', t('tqFilterStatus', 'Filter:'));
+    bar.appendChild(filterLabel);
+    var allStatuses = [['all','All','Todos'],['new','New','Nuevo'],['quoted','Quoted','Cotizado'],['accepted','Accepted','Aceptado'],['ordered','Ordered','Ordenado'],['installed','Installed','Instalado'],['cancelled','Cancelled','Cancelado']];
+    allStatuses.forEach(function(o) {
+      var btn = el('button', 'px-3 py-1 rounded-full text-xs font-medium border transition ' +
+        (o[0] === currentFilter ? 'bg-brand text-white border-brand' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'),
+        isEs() ? o[2] : o[1]);
+      btn.addEventListener('click', function() { currentFilter = o[0]; loadTireQuotes(); });
+      bar.appendChild(btn);
     });
-    sel.addEventListener('change', function() { currentFilter = sel.value; loadTireQuotes(); });
-    bar.appendChild(sel);
     c.appendChild(bar);
 
-    if (!quotes.length) { c.appendChild(el('p', 'text-center py-8 text-gray-400 dark:text-gray-500', t('tqNoQuotes', 'No tire quote requests found.'))); return; }
+    if (!quotes.length) {
+      c.appendChild(el('p', 'text-center py-8 text-gray-400 dark:text-gray-500', t('tqNoQuotes', 'No tire quote requests found.')));
+      return;
+    }
 
-    var wrap = el('div', 'overflow-x-auto');
-    var tbl = el('table', 'w-full text-sm');
-    var thead = el('thead', 'bg-gray-50 dark:bg-gray-700');
-    var hr = el('tr');
-    [t('tqDate','Date'), t('tqCustomer','Customer'), t('tqVehicle','Vehicle'), t('tqTireSize','Tire Size'), t('tqQty','Qty'), t('tqStatus','Status'), t('tqActions','Actions')].forEach(function(txt) {
-      hr.appendChild(el('th', 'text-left p-3 font-medium text-gray-600 dark:text-gray-300', txt));
-    });
-    thead.appendChild(hr); tbl.appendChild(thead);
-    var tbody = el('tbody', 'divide-y divide-gray-200 dark:divide-gray-700');
-    quotes.forEach(function(q) { tbody.appendChild(buildRow(q)); });
-    tbl.appendChild(tbody); wrap.appendChild(tbl); c.appendChild(wrap);
+    // Cards layout (mobile-friendly)
+    var grid = el('div', 'space-y-3');
+    quotes.forEach(function(q) { grid.appendChild(buildCard(q)); });
+    c.appendChild(grid);
   }
 
-  function buildRow(q) {
-    var tr = el('tr', 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition');
-    tr.appendChild(el('td', 'p-3 text-gray-600 dark:text-gray-300', fmtDate(q.created_at)));
-    tr.appendChild(el('td', 'p-3 font-medium text-gray-800 dark:text-gray-200', q.customer_name || q.customer_email || '-'));
-    tr.appendChild(el('td', 'p-3 text-gray-600 dark:text-gray-300', [q.vehicle_year, q.vehicle_make, q.vehicle_model].filter(Boolean).join(' ') || '-'));
-    tr.appendChild(el('td', 'p-3 text-gray-600 dark:text-gray-300', q.tire_size || '-'));
-    tr.appendChild(el('td', 'p-3 text-gray-600 dark:text-gray-300 text-center', String(q.quantity || '-')));
+  function buildCard(q) {
+    var card = el('div', 'bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-4 hover:shadow-md transition');
 
-    var tdS = el('td', 'p-3');
+    // Header row: customer + status
+    var header = el('div', 'flex justify-between items-start mb-2');
+    var left = el('div');
+    left.appendChild(el('div', 'font-semibold text-gray-800 dark:text-gray-200', customerName(q)));
+    if (q.email) left.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400', q.email));
+    if (q.phone) left.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400', q.phone));
+    header.appendChild(left);
     var info = statusMap[q.status] || statusMap['new'];
-    tdS.appendChild(el('span', 'text-xs px-2 py-1 rounded-full ' + info.cls, isEs() ? info.es : info.en));
-    tr.appendChild(tdS);
+    header.appendChild(el('span', 'text-xs px-2.5 py-1 rounded-full font-medium ' + info.cls, isEs() ? info.es : info.en));
+    card.appendChild(header);
 
-    var tdA = el('td', 'p-3');
-    var aw = el('div', 'flex flex-wrap gap-2');
-    var viewBtn = el('button', 'text-blue-600 hover:text-blue-800 text-xs font-medium dark:text-blue-400', t('tqView', 'View'));
-    viewBtn.addEventListener('click', function() { showDetails(q); });
-    aw.appendChild(viewBtn);
+    // Details grid
+    var details = el('div', 'grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm mb-3');
+    [[t('tqVehicle','Vehicle'), vehicleStr(q)],
+     [t('tqTireSize','Tire Size'), q.tire_size || '-'],
+     [t('tqQty','Qty'), String(q.tire_count || '-')],
+     [t('tqDate','Date'), fmtDate(q.created_at)]
+    ].forEach(function(f) {
+      var d = el('div');
+      d.appendChild(el('div', 'text-[10px] text-gray-400 dark:text-gray-500 uppercase', f[0]));
+      d.appendChild(el('div', 'text-gray-700 dark:text-gray-300 font-medium', f[1]));
+      details.appendChild(d);
+    });
+    card.appendChild(details);
 
+    // Extra info
+    if (q.tire_preference) {
+      card.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400 mb-1', t('tqPreference','Preference') + ': ' + q.tire_preference));
+    }
+    if (q.budget_range) {
+      card.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400 mb-1', t('tqBudget','Budget') + ': ' + q.budget_range));
+    }
+    if (q.notes) {
+      card.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400 mb-1 italic', '"' + q.notes + '"'));
+    }
+    if (q.quote_amount) {
+      card.appendChild(el('div', 'text-sm font-semibold text-green-600 dark:text-green-400 mb-1', t('tqQuoted','Quoted') + ': $' + Number(q.quote_amount).toFixed(2)));
+    }
+    if (q.admin_notes) {
+      card.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400 mb-1', t('tqAdminNotes','Admin Notes') + ': ' + q.admin_notes));
+    }
+
+    // Action buttons
+    var actions = el('div', 'flex flex-wrap gap-2 mt-2 pt-2 border-t dark:border-gray-700');
     if (q.status === 'new') {
-      var qb = el('button', 'text-emerald-600 hover:text-emerald-800 text-xs font-medium dark:text-emerald-400', t('tqRespond', 'Quote'));
+      var qb = el('button', 'px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-700 transition', t('tqRespond', 'Send Quote'));
       qb.addEventListener('click', function() { openQuoteForm(q); });
-      aw.appendChild(qb);
+      actions.appendChild(qb);
+      var cb = el('button', 'px-3 py-1.5 bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 rounded-lg text-xs font-medium hover:bg-red-200 transition', t('tqCancel', 'Cancel'));
+      cb.addEventListener('click', function() { updateStatus(q.id, 'cancelled'); });
+      actions.appendChild(cb);
     }
     if (q.status === 'quoted') {
-      var ab = el('button', 'text-green-600 hover:text-green-800 text-xs font-medium dark:text-green-400', t('tqAccept', 'Accept'));
+      var ab = el('button', 'px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-medium hover:bg-green-700 transition', t('tqMarkAccepted', 'Mark Accepted'));
       ab.addEventListener('click', function() { updateStatus(q.id, 'accepted'); });
-      aw.appendChild(ab);
-      var db = el('button', 'text-red-600 hover:text-red-800 text-xs font-medium dark:text-red-400', t('tqDecline', 'Decline'));
-      db.addEventListener('click', function() { updateStatus(q.id, 'declined'); });
-      aw.appendChild(db);
+      actions.appendChild(ab);
     }
-    tdA.appendChild(aw); tr.appendChild(tdA);
-    return tr;
-  }
+    if (q.status === 'accepted') {
+      // Book appointment pre-filled with customer + vehicle + tire info
+      var bookBtn = el('button', 'px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition', t('tqBookAppt', 'Book Appointment'));
+      bookBtn.addEventListener('click', function() {
+        // Open the new appointment modal pre-filled if available
+        if (typeof openNewApptModal === 'function') {
+          openNewApptModal();
+          setTimeout(function() {
+            var form = document.getElementById('new-appt-form');
+            if (!form) return;
+            var fill = function(name, val) { var inp = form.querySelector('[name="' + name + '"]'); if (inp && val) inp.value = val; };
+            fill('appt-first-name', q.first_name);
+            fill('appt-last-name', q.last_name);
+            fill('appt-email', q.email);
+            fill('appt-phone', q.phone);
+            fill('appt-vehicle-year', q.vehicle_year);
+            fill('appt-vehicle-make', q.vehicle_make);
+            fill('appt-vehicle-model', q.vehicle_model);
+            var svcSel = form.querySelector('[name="appt-service"]');
+            if (svcSel) svcSel.value = 'tire-installation';
+            fill('appt-notes', 'Tire Quote: ' + (q.tire_size || '') + ' x' + (q.tire_count || '') + (q.quote_amount ? ' — Quoted $' + Number(q.quote_amount).toFixed(2) : ''));
+          }, 200);
+        } else {
+          toast(t('tqApptModalNotFound', 'Please use the Appointments tab to book'), true);
+        }
+      });
+      actions.appendChild(bookBtn);
+      var ob = el('button', 'px-3 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-medium hover:bg-purple-700 transition', t('tqMarkOrdered', 'Mark Ordered'));
+      ob.addEventListener('click', function() { updateStatus(q.id, 'ordered'); });
+      actions.appendChild(ob);
+    }
+    if (q.status === 'ordered') {
+      var ib = el('button', 'px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-700 transition', t('tqMarkInstalled', 'Mark Installed'));
+      ib.addEventListener('click', function() { updateStatus(q.id, 'installed'); });
+      actions.appendChild(ib);
+    }
+    // Edit notes button for all statuses
+    var nb = el('button', 'px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition', t('tqEditNotes', 'Notes'));
+    nb.addEventListener('click', function() { openNotesForm(q); });
+    actions.appendChild(nb);
+    card.appendChild(actions);
 
-  // ─── Detail Modal ───────────────────────────────────────────
-  function showDetails(q) {
-    removeModal();
-    var ov = el('div', 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4');
-    ov.id = 'tq-modal-overlay';
-    ov.addEventListener('click', function(e) { if (e.target === ov) removeModal(); });
-    var pn = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 space-y-3 max-h-[90vh] overflow-y-auto');
-    pn.appendChild(el('h3', 'text-lg font-bold dark:text-white', t('tqDetails', 'Quote Request Details')));
-
-    var fields = [
-      [t('tqCustomer','Customer'), q.customer_name || '-'],
-      [t('tqEmail','Email'), q.customer_email || '-'],
-      [t('tqPhone','Phone'), q.customer_phone || '-'],
-      [t('tqVehicle','Vehicle'), [q.vehicle_year, q.vehicle_make, q.vehicle_model].filter(Boolean).join(' ') || '-'],
-      [t('tqTireSize','Tire Size'), q.tire_size || '-'],
-      [t('tqQty','Quantity'), String(q.quantity || '-')],
-      [t('tqNotes','Notes'), q.notes || '-'],
-      [t('tqDate','Submitted'), fmtDate(q.created_at)]
-    ];
-    if (q.quote_price) fields.push([t('tqPrice','Price/Tire'), '$' + q.quote_price]);
-    if (q.quote_brand) fields.push([t('tqBrand','Brand/Model'), q.quote_brand]);
-    if (q.quote_availability) fields.push([t('tqAvail','Availability'), q.quote_availability]);
-    if (q.quote_notes) fields.push([t('tqQuoteNotes','Quote Notes'), q.quote_notes]);
-
-    fields.forEach(function(f) {
-      var row = el('div');
-      row.appendChild(el('span', 'text-xs font-semibold text-gray-500 dark:text-gray-400 block', f[0]));
-      row.appendChild(el('span', 'text-sm text-gray-800 dark:text-gray-200 block', f[1]));
-      pn.appendChild(row);
-    });
-    var cb = el('button', 'mt-4 w-full py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm font-medium dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition', t('tqClose','Close'));
-    cb.addEventListener('click', removeModal);
-    pn.appendChild(cb); ov.appendChild(pn); document.body.appendChild(ov);
+    return card;
   }
 
   // ─── Quote Response Form ────────────────────────────────────
@@ -164,22 +223,21 @@
     ov.id = 'tq-modal-overlay';
     ov.addEventListener('click', function(e) { if (e.target === ov) removeModal(); });
     var pn = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto');
-    pn.appendChild(el('h3', 'text-lg font-bold dark:text-white', t('tqRespondTitle', 'Respond with Quote')));
-    pn.appendChild(el('p', 'text-sm text-gray-500 dark:text-gray-400', (q.customer_name || '') + ' — ' + (q.tire_size || '') + ' x' + (q.quantity || '')));
+    pn.appendChild(el('h3', 'text-lg font-bold dark:text-white', t('tqRespondTitle', 'Send Quote')));
+    pn.appendChild(el('p', 'text-sm text-gray-500 dark:text-gray-400', customerName(q) + ' — ' + (q.tire_size || '') + ' x' + (q.tire_count || '')));
 
-    function addField(id, label, type, ph) {
+    function addField(id, label, type, ph, val) {
       pn.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300', label));
       var inp = type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
       if (type === 'textarea') inp.rows = 3; else inp.type = type;
       inp.id = id;
       inp.className = 'w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
       if (ph) inp.placeholder = ph;
+      if (val) inp.value = val;
       pn.appendChild(inp);
     }
-    addField('tq-price', t('tqPricePerTire','Price per Tire ($)'), 'number', '0.00');
-    addField('tq-brand', t('tqBrandModel','Brand / Model'), 'text', 'e.g. Michelin Defender');
-    addField('tq-avail', t('tqAvailability','Availability'), 'text', 'e.g. In stock, 2-3 days');
-    addField('tq-notes', t('tqQuoteNotes','Notes'), 'textarea', '');
+    addField('tq-amount', t('tqQuoteAmount','Quote Amount ($)'), 'number', '0.00', '');
+    addField('tq-notes', t('tqAdminNotes','Notes for customer'), 'textarea', 'e.g. Brand, availability, includes mounting + balancing...', '');
 
     var br = el('div', 'flex gap-3 pt-2');
     var canBtn = el('button', 'flex-1 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm font-medium dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition', t('tqCancel','Cancel'));
@@ -192,17 +250,17 @@
   }
 
   async function submitQuote(id, btn) {
-    var price = document.getElementById('tq-price').value.trim();
-    if (!price) { toast(t('tqPriceReq','Price is required'), true); return; }
+    var amount = document.getElementById('tq-amount').value.trim();
+    if (!amount) { toast(t('tqAmountReq','Quote amount is required'), true); return; }
     btn.disabled = true;
     try {
       var res = await fetch(API, {
         method: 'PUT', credentials: 'include', headers: hdrs(true),
         body: JSON.stringify({
-          id: id, action: 'quote', quote_price: price,
-          quote_brand: document.getElementById('tq-brand').value.trim(),
-          quote_availability: document.getElementById('tq-avail').value.trim(),
-          quote_notes: document.getElementById('tq-notes').value.trim()
+          id: id,
+          status: 'quoted',
+          quote_amount: amount,
+          admin_notes: document.getElementById('tq-notes').value.trim()
         })
       });
       var json = await res.json();
@@ -211,16 +269,53 @@
     } catch (err) { console.error('submitQuote:', err); toast(t('tqNetworkError', 'Network error'), true); btn.disabled = false; }
   }
 
+  // ─── Notes Form ────────────────────────────────────────────
+  function openNotesForm(q) {
+    removeModal();
+    var ov = el('div', 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4');
+    ov.id = 'tq-modal-overlay';
+    ov.addEventListener('click', function(e) { if (e.target === ov) removeModal(); });
+    var pn = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4');
+    pn.appendChild(el('h3', 'text-lg font-bold dark:text-white', t('tqEditNotes', 'Edit Notes')));
+    pn.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300', t('tqAdminNotes','Admin Notes')));
+    var ta = document.createElement('textarea');
+    ta.id = 'tq-edit-notes';
+    ta.rows = 4;
+    ta.className = 'w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+    ta.value = q.admin_notes || '';
+    pn.appendChild(ta);
+    var br = el('div', 'flex gap-3');
+    var canBtn = el('button', 'flex-1 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm font-medium dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition', t('tqCancel','Cancel'));
+    canBtn.addEventListener('click', removeModal);
+    br.appendChild(canBtn);
+    var saveBtn = el('button', 'flex-1 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:opacity-90 transition', t('save','Save'));
+    saveBtn.addEventListener('click', async function() {
+      saveBtn.disabled = true;
+      try {
+        var res = await fetch(API, {
+          method: 'PUT', credentials: 'include', headers: hdrs(true),
+          body: JSON.stringify({ id: q.id, admin_notes: ta.value.trim() })
+        });
+        var json = await res.json();
+        if (json.success) { toast(t('saved','Saved')); removeModal(); loadTireQuotes(); }
+        else { toast(json.error || 'Failed', true); saveBtn.disabled = false; }
+      } catch(e) { toast('Network error', true); saveBtn.disabled = false; }
+    });
+    br.appendChild(saveBtn);
+    pn.appendChild(br); ov.appendChild(pn); document.body.appendChild(ov);
+  }
+
   // ─── Update Status ──────────────────────────────────────────
   async function updateStatus(id, status) {
     try {
       var res = await fetch(API, {
         method: 'PUT', credentials: 'include', headers: hdrs(true),
-        body: JSON.stringify({ id: id, action: 'status', status: status })
+        body: JSON.stringify({ id: id, status: status })
       });
       var json = await res.json();
       if (json.success) {
-        toast(status === 'accepted' ? t('tqAccepted','Marked as accepted') : t('tqDeclined','Marked as declined'));
+        var info = statusMap[status] || {};
+        toast(t('tqStatusUpdated','Status updated') + ': ' + (isEs() ? info.es : info.en));
         loadTireQuotes();
       } else { toast(json.error || 'Update failed', true); }
     } catch (err) { console.error('updateStatus:', err); toast(t('tqNetworkError', 'Network error'), true); }

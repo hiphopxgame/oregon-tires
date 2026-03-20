@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../includes/bootstrap.php';
 require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/loyalty.php';
+require_once __DIR__ . '/../../includes/push.php';
 
 try {
     requireStaff();
@@ -52,10 +54,29 @@ try {
         );
         $baysInUse = $bayStmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Pending appointments for today (for check-in linking)
+        $pendingAppts = [];
+        if ($filter === 'active' || $filter === 'today') {
+            $apptStmt = $db->prepare(
+                "SELECT a.id, a.customer_id, a.service, a.preferred_time,
+                        a.first_name, a.last_name, a.vehicle_year, a.vehicle_make, a.vehicle_model,
+                        c.id AS cust_id
+                 FROM oretir_appointments a
+                 LEFT JOIN oretir_customers c ON a.customer_id = c.id
+                 WHERE a.preferred_date = CURDATE()
+                   AND a.status IN ('confirmed', 'new', 'pending')
+                   AND a.id NOT IN (SELECT appointment_id FROM oretir_visit_log WHERE appointment_id IS NOT NULL AND DATE(check_in_at) = CURDATE())
+                 ORDER BY a.preferred_time ASC"
+            );
+            $apptStmt->execute();
+            $pendingAppts = $apptStmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
         jsonSuccess([
             'visits' => $visits,
             'bays_in_use' => $baysInUse,
             'active_count' => count(array_filter($visits, fn($v) => empty($v['check_out_at']))),
+            'pending_appointments' => $pendingAppts,
         ]);
     }
 
@@ -132,7 +153,48 @@ try {
         $db->prepare('UPDATE oretir_visit_log SET ' . implode(', ', $fields) . ' WHERE id = ?')
            ->execute($params);
 
-        jsonSuccess(['updated' => $id]);
+        // ─── Auto-actions on check-out ──────────────────────────────
+        $autoActions = [];
+        if (isset($data['check_out_at']) && ($data['check_out_at'] === 'now' || $data['check_out_at'] === true)) {
+            // Fetch visit details for customer_id
+            $visitStmt = $db->prepare('SELECT customer_id FROM oretir_visit_log WHERE id = ?');
+            $visitStmt->execute([$id]);
+            $visitRow = $visitStmt->fetch(PDO::FETCH_ASSOC);
+            $custId = (int) ($visitRow['customer_id'] ?? 0);
+
+            if ($custId > 0) {
+                // 1. Auto-award loyalty points for completed visit
+                try {
+                    $awarded = awardLoyaltyPoints($db, $custId, 10, 'earn_visit', 'Visit completed', 'visit', $id);
+                    if ($awarded) {
+                        // Increment visit count
+                        $db->prepare('UPDATE oretir_customers SET visit_count = visit_count + 1, last_visit_at = NOW() WHERE id = ?')
+                           ->execute([$custId]);
+                        $autoActions[] = 'loyalty_awarded';
+                    }
+                } catch (\Throwable $e) {
+                    error_log('visit-log: loyalty award error: ' . $e->getMessage());
+                }
+
+                // 2. Push notification: service complete
+                try {
+                    queueNotificationForCustomer(
+                        $custId,
+                        'service_complete',
+                        'Your vehicle is ready!',
+                        '¡Su vehículo está listo!',
+                        'Your service at Oregon Tires is complete. Your vehicle is ready for pickup.',
+                        'Su servicio en Oregon Tires está completo. Su vehículo está listo para recoger.',
+                        '/members?tab=appointments'
+                    );
+                    $autoActions[] = 'notification_queued';
+                } catch (\Throwable $e) {
+                    error_log('visit-log: push notification error: ' . $e->getMessage());
+                }
+            }
+        }
+
+        jsonSuccess(['updated' => $id, 'auto_actions' => $autoActions]);
     }
 
 } catch (\Throwable $e) {

@@ -1,9 +1,4 @@
 <?php
-/**
- * Oregon Tires — Profile Redirect
- *
- * Catches member-kit default redirect to /member/profile
- * and sends to the members dashboard profile tab.
- */
-header('Location: /members?tab=profile', true, 302);
+// Redirect /member/profile → /members?tab=account
+header('Location: /members?tab=account', true, 301);
 exit;

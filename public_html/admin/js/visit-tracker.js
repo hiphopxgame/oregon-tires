@@ -5,221 +5,126 @@
 (function() {
   'use strict';
 
-  let refreshInterval = null;
+  var refreshInterval = null;
 
   function t(key, fb) {
     return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fb;
   }
+  function getCsrf() { return (typeof csrfToken !== 'undefined' && csrfToken) ? csrfToken : ''; }
+  function hdrs(json) { var h = { 'X-CSRF-Token': getCsrf() }; if (json) h['Content-Type'] = 'application/json'; return h; }
+  function toast(msg, err) { if (typeof showToast === 'function') showToast(msg, !!err); }
 
+  function formatDuration(startStr) {
+    if (!startStr) return '--';
+    var start = new Date(startStr.replace(' ', 'T'));
+    var diff = Math.floor((Date.now() - start.getTime()) / 1000 / 60);
+    if (diff < 0) return '0m';
+    if (diff < 60) return diff + 'm';
+    return Math.floor(diff / 60) + 'h ' + (diff % 60) + 'm';
+  }
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text) e.textContent = text;
+    return e;
+  }
+
+  function removeModal() { var m = document.getElementById('visit-modal-overlay'); if (m) m.remove(); }
+
+  // ─── Load (for shopFloorWidget on dashboard) ─────────────────
   async function loadVisits() {
     try {
-      const res = await fetch('/api/admin/visit-log.php?filter=active', { credentials: 'include' });
-      const json = await res.json();
+      var res = await fetch('/api/admin/visit-log.php?filter=active', { credentials: 'include' });
+      var json = await res.json();
       if (!json.success) return;
-
       renderShopFloor(json.data);
     } catch (err) {
       console.error('Visit tracker error:', err);
     }
   }
 
-  function formatDuration(startStr) {
-    if (!startStr) return '--';
-    const start = new Date(startStr);
-    const now = new Date();
-    const diff = Math.floor((now - start) / 1000 / 60);
-    if (diff < 60) return diff + 'm';
-    const h = Math.floor(diff / 60);
-    const m = diff % 60;
-    return h + 'h ' + m + 'm';
-  }
-
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
   function renderShopFloor(data) {
-    const container = document.getElementById('shopFloorWidget');
+    var container = document.getElementById('shopFloorWidget');
     if (!container) return;
-
-    // Clear existing content safely
     while (container.firstChild) container.removeChild(container.firstChild);
 
-    const visits = data.visits || [];
-    const activeCount = data.active_count || 0;
-    const baysInUse = (data.bays_in_use || []).map(b => parseInt(b.bay_number));
+    var visits = data.visits || [];
+    var activeCount = data.active_count || 0;
+    var baysInUse = (data.bays_in_use || []).map(function(b) { return parseInt(b.bay_number); });
 
-    // Header row
-    const header = document.createElement('div');
-    header.className = 'flex items-center justify-between mb-4';
-
-    const counterWrap = document.createElement('div');
-    counterWrap.className = 'flex items-center gap-2';
-
-    const badge = document.createElement('span');
-    badge.className = 'inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold text-sm';
-    badge.textContent = String(activeCount);
+    // Header
+    var header = el('div', 'flex items-center justify-between mb-4');
+    var counterWrap = el('div', 'flex items-center gap-2');
+    var badge = el('span', 'inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold text-sm', String(activeCount));
     counterWrap.appendChild(badge);
-
-    const label = document.createElement('span');
-    label.className = 'text-sm text-gray-600 dark:text-gray-400';
-    label.textContent = t('visitVehiclesInShop', 'vehicles in shop');
-    counterWrap.appendChild(label);
+    counterWrap.appendChild(el('span', 'text-sm text-gray-600 dark:text-gray-400', t('visitVehiclesInShop', 'vehicles in shop')));
     header.appendChild(counterWrap);
-
-    const checkInBtn = document.createElement('button');
-    checkInBtn.className = 'text-sm px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors';
-    checkInBtn.textContent = t('visitCheckIn', '+ Check In');
+    var checkInBtn = el('button', 'text-sm px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition', t('visitCheckIn', '+ Check In'));
     checkInBtn.addEventListener('click', showCheckIn);
     header.appendChild(checkInBtn);
     container.appendChild(header);
 
     // Bay status
-    const bayRow = document.createElement('div');
-    bayRow.className = 'flex gap-2 mb-4';
-    for (let i = 1; i <= 4; i++) {
-      const inUse = baysInUse.includes(i);
-      const bayEl = document.createElement('div');
-      bayEl.className = 'flex-1 text-center py-2 rounded-lg border text-xs font-medium ' +
-        (inUse
-          ? 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
-          : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600');
-      bayEl.textContent = t('visitBayLabel', 'Bay') + ' ' + i + ' ' + (inUse ? t('visitInUse', '(In Use)') : t('visitOpen', '(Open)'));
-      bayRow.appendChild(bayEl);
+    var bayRow = el('div', 'flex gap-2 mb-4');
+    for (var i = 1; i <= 4; i++) {
+      var inUse = baysInUse.indexOf(i) !== -1;
+      bayRow.appendChild(el('div', 'flex-1 text-center py-2 rounded-lg border text-xs font-medium ' +
+        (inUse ? 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
+               : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600'),
+        t('visitBayLabel', 'Bay') + ' ' + i + ' ' + (inUse ? t('visitInUse', '(In Use)') : t('visitOpen', '(Open)'))));
     }
     container.appendChild(bayRow);
 
-    if (visits.length === 0) {
-      const empty = document.createElement('p');
-      empty.className = 'text-center text-gray-400 dark:text-gray-500 py-8 text-sm';
-      empty.textContent = t('visitNoActive', 'No active visits');
-      container.appendChild(empty);
+    if (!visits.length) {
+      container.appendChild(el('p', 'text-center text-gray-400 dark:text-gray-500 py-8 text-sm', t('visitNoActive', 'No active visits')));
       return;
     }
 
-    const list = document.createElement('div');
-    list.className = 'space-y-3';
-
+    var list = el('div', 'space-y-3');
     visits.forEach(function(v) {
-      const name = ((v.first_name || '') + ' ' + (v.last_name || '')).trim();
-      const roLabel = v.ro_number ? 'RO: ' + v.ro_number : '';
-      const bay = v.bay_number ? t('visitBayLabel', 'Bay') + ' ' + v.bay_number : t('visitNoBay', 'No bay');
-      const waitTime = formatDuration(v.check_in_at);
-      const svcTime = v.service_start_at ? formatDuration(v.service_start_at) : null;
+      var name = ((v.first_name || '') + ' ' + (v.last_name || '')).trim();
+      var isInService = v.service_start_at && !v.service_end_at;
+      var isDone = !!v.service_end_at;
+      var statusText = isDone ? t('visitDone', 'Done') : isInService ? t('visitInService', 'In Service') + ' (' + formatDuration(v.service_start_at) + ')' : t('visitWaiting', 'Waiting') + ' (' + formatDuration(v.check_in_at) + ')';
+      var statusCls = isDone ? 'text-gray-500' : isInService ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400';
 
-      const isInService = v.service_start_at && !v.service_end_at;
-      const statusCls = isInService ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400';
-      const statusText = isInService ? t('visitInService', 'In Service') + ' (' + svcTime + ')' : t('visitWaiting', 'Waiting') + ' (' + waitTime + ')';
-
-      const row = document.createElement('div');
-      row.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg';
-
-      const info = document.createElement('div');
-
-      const nameEl = document.createElement('p');
-      nameEl.className = 'font-medium text-sm text-gray-900 dark:text-white';
-      nameEl.textContent = name;
-      info.appendChild(nameEl);
-
-      const detailEl = document.createElement('p');
-      detailEl.className = 'text-xs text-gray-500 dark:text-gray-400';
-      detailEl.textContent = [roLabel, bay].filter(Boolean).join(' \u2022 ');
-      info.appendChild(detailEl);
-
-      const statusEl = document.createElement('p');
-      statusEl.className = 'text-xs font-medium ' + statusCls;
-      statusEl.textContent = statusText;
-      info.appendChild(statusEl);
-
+      var row = el('div', 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg');
+      var info = el('div');
+      info.appendChild(el('p', 'font-medium text-sm text-gray-900 dark:text-white', name));
+      info.appendChild(el('p', 'text-xs text-gray-500 dark:text-gray-400', [v.ro_number ? 'RO: ' + v.ro_number : '', v.bay_number ? t('visitBayLabel', 'Bay') + ' ' + v.bay_number : ''].filter(Boolean).join(' \u2022 ')));
+      info.appendChild(el('p', 'text-xs font-medium ' + statusCls, statusText));
       row.appendChild(info);
 
-      const actions = document.createElement('div');
-      actions.className = 'flex gap-1';
-
+      var actions = el('div', 'flex gap-1');
       if (!v.service_start_at) {
-        const startBtn = document.createElement('button');
-        startBtn.className = 'text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700';
-        startBtn.title = t('visitStartService', 'Start Service');
-        startBtn.textContent = t('visitStart', 'Start');
-        startBtn.addEventListener('click', function() { updateVisit(v.id, { service_start_at: 'now' }); });
-        actions.appendChild(startBtn);
+        var sb = el('button', 'text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700', t('visitStart', 'Start'));
+        sb.addEventListener('click', function() { updateVisit(v.id, { service_start_at: 'now' }); });
+        actions.appendChild(sb);
       } else if (!v.service_end_at) {
-        const doneBtn = document.createElement('button');
-        doneBtn.className = 'text-xs px-2 py-1 bg-amber-600 text-white rounded hover:bg-amber-700';
-        doneBtn.title = t('visitEndService', 'End Service');
-        doneBtn.textContent = t('visitDone', 'Done');
-        doneBtn.addEventListener('click', function() { updateVisit(v.id, { service_end_at: 'now' }); });
-        actions.appendChild(doneBtn);
+        var db = el('button', 'text-xs px-2 py-1 bg-amber-600 text-white rounded hover:bg-amber-700', t('visitDone', 'Done'));
+        db.addEventListener('click', function() { updateVisit(v.id, { service_end_at: 'now' }); });
+        actions.appendChild(db);
       }
       if (!v.check_out_at) {
-        const outBtn = document.createElement('button');
-        outBtn.className = 'text-xs px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700';
-        outBtn.title = t('visitCheckOut', 'Check Out');
-        outBtn.textContent = t('visitOut', 'Out');
-        outBtn.addEventListener('click', function() { updateVisit(v.id, { check_out_at: 'now' }); });
-        actions.appendChild(outBtn);
+        var ob = el('button', 'text-xs px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700', t('visitOut', 'Out'));
+        ob.addEventListener('click', function() { updateVisit(v.id, { check_out_at: 'now' }); });
+        actions.appendChild(ob);
       }
-
       row.appendChild(actions);
       list.appendChild(row);
     });
-
     container.appendChild(list);
   }
 
-  async function updateVisit(id, data) {
-    try {
-      const csrf = document.querySelector('meta[name="csrf-token"]');
-      const headers = { 'Content-Type': 'application/json' };
-      if (csrf) headers['X-CSRF-Token'] = csrf.content;
-
-      const res = await fetch('/api/admin/visit-log.php', {
-        method: 'PUT',
-        credentials: 'include',
-        headers: headers,
-        body: JSON.stringify(Object.assign({ id: id }, data)),
-      });
-      const json = await res.json();
-      if (json.success) loadVisits();
-    } catch (err) {
-      console.error('Visit update error:', err);
-    }
-  }
-
-  function showCheckIn() {
-    // Simple prompt — in production this would be a modal with customer search
-    const customerId = prompt(t('visitEnterCustomerId', 'Enter Customer ID:'));
-    if (!customerId) return;
-    const bay = prompt(t('visitBayPrompt', 'Bay number (1-4, or leave blank):'));
-
-    const csrf = document.querySelector('meta[name="csrf-token"]');
-    const headers = { 'Content-Type': 'application/json' };
-    if (csrf) headers['X-CSRF-Token'] = csrf.content;
-
-    fetch('/api/admin/visit-log.php', {
-      method: 'POST',
-      credentials: 'include',
-      headers: headers,
-      body: JSON.stringify({
-        customer_id: parseInt(customerId),
-        bay_number: bay ? parseInt(bay) : null,
-      }),
-    })
-    .then(r => r.json())
-    .then(json => { if (json.success) loadVisits(); })
-    .catch(err => console.error('Check-in error:', err));
-  }
-
-  // Full-page Visit Tracker (for dedicated Visits tab)
+  // ─── Full Visit Tracker (dedicated Visits tab) ───────────────
   async function loadFullVisitTracker() {
     var container = document.getElementById('visits-container');
     if (!container) return;
     container.textContent = '';
 
     try {
-      var res = await fetch('/api/admin/visit-log.php', { credentials: 'include' });
+      var res = await fetch('/api/admin/visit-log.php?filter=active', { credentials: 'include' });
       var json = await res.json();
       if (!json.success) return;
 
@@ -227,150 +132,316 @@
       var visits = data.visits || [];
       var activeCount = data.active_count || 0;
       var baysInUse = (data.bays_in_use || []).map(function(b) { return parseInt(b.bay_number); });
+      pendingAppointments = data.pending_appointments || [];
 
       // Stats cards
-      var stats = document.createElement('div');
-      stats.className = 'grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6';
-
-      var statsData = [
-        { label: t('visitVehiclesInShop', 'vehicles in shop'), value: activeCount, color: 'green' },
-        { label: t('visitBaysInUse', 'Bays In Use'), value: baysInUse.length + '/4', color: 'blue' },
-        { label: t('visitTodayTotal', 'Today Total'), value: data.today_count || visits.length, color: 'gray' },
-        { label: t('visitAvgWait', 'Avg Wait'), value: data.avg_wait ? data.avg_wait + 'm' : '--', color: 'amber' }
-      ];
-      statsData.forEach(function(s) {
-        var card = document.createElement('div');
-        card.className = 'bg-white dark:bg-gray-800 rounded-xl p-4 shadow border border-gray-100 dark:border-gray-700';
-        var val = document.createElement('p');
-        val.className = 'text-2xl font-bold text-gray-900 dark:text-white';
-        val.textContent = s.value;
-        card.appendChild(val);
-        var lbl = document.createElement('p');
-        lbl.className = 'text-sm text-gray-500 dark:text-gray-400';
-        lbl.textContent = s.label;
-        card.appendChild(lbl);
+      var stats = el('div', 'grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6');
+      [[String(activeCount), t('visitVehiclesInShop', 'In Shop'), 'text-green-600 dark:text-green-400'],
+       [baysInUse.length + '/4', t('visitBaysInUse', 'Bays In Use'), 'text-blue-600 dark:text-blue-400'],
+       [String(4 - baysInUse.length), t('visitBaysOpen', 'Bays Open'), 'text-gray-500 dark:text-gray-400'],
+       [visits.filter(function(v) { return !v.service_start_at; }).length + '', t('visitWaiting', 'Waiting'), 'text-amber-600 dark:text-amber-400']
+      ].forEach(function(s) {
+        var card = el('div', 'bg-white dark:bg-gray-800 rounded-xl p-4 shadow border dark:border-gray-700 text-center');
+        card.appendChild(el('div', 'text-2xl font-bold ' + s[2], s[0]));
+        card.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400 mt-1', s[1]));
         stats.appendChild(card);
       });
       container.appendChild(stats);
 
       // Bay status bar
-      var bayRow = document.createElement('div');
-      bayRow.className = 'flex gap-3 mb-6';
+      var bayRow = el('div', 'flex gap-3 mb-6');
       for (var i = 1; i <= 4; i++) {
         var inUse = baysInUse.indexOf(i) !== -1;
-        var bayEl = document.createElement('div');
-        bayEl.className = 'flex-1 text-center py-3 rounded-xl border-2 text-sm font-semibold ' +
-          (inUse
-            ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700'
-            : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700');
-        bayEl.textContent = t('visitBayLabel', 'Bay') + ' ' + i + ' — ' + (inUse ? t('visitInUse', '(In Use)') : t('visitOpen', '(Open)'));
-        bayRow.appendChild(bayEl);
+        bayRow.appendChild(el('div', 'flex-1 text-center py-3 rounded-xl border-2 text-sm font-semibold ' +
+          (inUse ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700'
+                 : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700'),
+          t('visitBayLabel', 'Bay') + ' ' + i + ' — ' + (inUse ? t('visitOccupied', 'Occupied') : t('visitAvailable', 'Available'))));
       }
       container.appendChild(bayRow);
 
       // Check In button
-      var btnRow = document.createElement('div');
-      btnRow.className = 'flex justify-end mb-4';
-      var checkInBtn = document.createElement('button');
-      checkInBtn.className = 'px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition';
-      checkInBtn.textContent = t('visitCheckIn', '+ Check In');
+      var btnRow = el('div', 'flex justify-end mb-4');
+      var checkInBtn = el('button', 'px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition', t('visitCheckIn', '+ Check In'));
       checkInBtn.addEventListener('click', showCheckIn);
       btnRow.appendChild(checkInBtn);
       container.appendChild(btnRow);
 
-      // Visits list
-      if (visits.length === 0) {
-        var empty = document.createElement('p');
-        empty.className = 'text-center text-gray-400 dark:text-gray-500 py-8';
-        empty.textContent = t('visitNoActive', 'No active visits');
-        container.appendChild(empty);
+      if (!visits.length) {
+        var emptyCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-8 text-center');
+        emptyCard.appendChild(el('div', 'text-4xl mb-3', '🏪'));
+        emptyCard.appendChild(el('p', 'text-gray-500 dark:text-gray-400 mb-2', t('visitNoActive', 'No active visits')));
+        emptyCard.appendChild(el('p', 'text-sm text-gray-400 dark:text-gray-500', t('visitCheckInFirst', 'Check in a customer to get started')));
+        container.appendChild(emptyCard);
         return;
       }
 
-      var table = document.createElement('div');
-      table.className = 'bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden';
-
+      // Visit cards
+      var grid = el('div', 'space-y-3');
       visits.forEach(function(v) {
-        var name = ((v.first_name || '') + ' ' + (v.last_name || '')).trim();
-        var bay = v.bay_number ? t('visitBayLabel', 'Bay') + ' ' + v.bay_number : t('visitNoBay', 'No bay');
-        var waitTime = formatDuration(v.check_in_at);
-        var svcTime = v.service_start_at ? formatDuration(v.service_start_at) : null;
+        var name = ((v.first_name || '') + ' ' + (v.last_name || '')).trim() || 'Customer #' + v.customer_id;
         var isInService = v.service_start_at && !v.service_end_at;
-        var isDone = v.service_end_at;
+        var isDone = !!v.service_end_at;
+        var statusText = isDone ? t('visitServiceComplete', 'Service Complete') : isInService ? t('visitInService', 'In Service') : t('visitWaiting', 'Waiting');
+        var statusCls = isDone ? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+          : isInService ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+          : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
 
-        var row = document.createElement('div');
-        row.className = 'flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700 last:border-b-0';
+        var card = el('div', 'bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-4 flex items-center justify-between hover:shadow-md transition');
+        var info = el('div', 'flex-1 min-w-0');
 
-        var info = document.createElement('div');
-        var nameEl = document.createElement('p');
-        nameEl.className = 'font-medium text-gray-900 dark:text-white';
-        nameEl.textContent = name + (v.ro_number ? ' — RO: ' + v.ro_number : '');
-        info.appendChild(nameEl);
+        // Name + RO
+        var nameRow = el('div', 'flex items-center gap-2 flex-wrap');
+        nameRow.appendChild(el('span', 'font-semibold text-gray-800 dark:text-gray-200', name));
+        if (v.ro_number) nameRow.appendChild(el('span', 'text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded', 'RO: ' + v.ro_number));
+        nameRow.appendChild(el('span', 'text-xs px-2 py-0.5 rounded-full font-medium ' + statusCls, statusText));
+        info.appendChild(nameRow);
 
-        var detailEl = document.createElement('p');
-        detailEl.className = 'text-sm text-gray-500 dark:text-gray-400';
-        detailEl.textContent = bay + ' \u2022 ' + t('visitWaitLabel', 'Wait:') + ' ' + waitTime + (svcTime ? ' \u2022 ' + t('visitServiceLabel', 'Service:') + ' ' + svcTime : '');
-        info.appendChild(detailEl);
+        // Timing details
+        var timings = [];
+        if (v.bay_number) timings.push(t('visitBayLabel', 'Bay') + ' ' + v.bay_number);
+        timings.push(t('visitCheckedIn', 'Checked in') + ' ' + formatDuration(v.check_in_at) + ' ago');
+        if (v.service_start_at) timings.push(t('visitServiceLabel', 'Service') + ': ' + formatDuration(v.service_start_at));
+        info.appendChild(el('p', 'text-xs text-gray-500 dark:text-gray-400 mt-1', timings.join(' \u2022 ')));
 
-        var statusEl = document.createElement('span');
-        statusEl.className = 'inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full ' +
-          (isDone ? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
-            : isInService ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-            : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400');
-        statusEl.textContent = isDone ? t('visitDone', 'Done') : isInService ? t('visitInService', 'In Service') : t('visitWaiting', 'Waiting');
-        info.appendChild(statusEl);
-        row.appendChild(info);
+        if (v.phone) info.appendChild(el('p', 'text-xs text-gray-400 dark:text-gray-500 mt-0.5', v.phone));
+        card.appendChild(info);
 
-        var actions = document.createElement('div');
-        actions.className = 'flex gap-2';
+        // Actions
+        var actions = el('div', 'flex gap-2 ml-3 shrink-0');
         if (!v.service_start_at) {
-          var startBtn = document.createElement('button');
-          startBtn.className = 'text-sm px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700';
-          startBtn.textContent = t('visitStart', 'Start');
-          startBtn.addEventListener('click', function() { updateVisit(v.id, { service_start_at: 'now' }); setTimeout(loadFullVisitTracker, 500); });
-          actions.appendChild(startBtn);
+          var sb = el('button', 'px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition', t('visitStartService', 'Start Service'));
+          sb.addEventListener('click', function() { updateVisit(v.id, { service_start_at: 'now' }); setTimeout(loadFullVisitTracker, 500); });
+          actions.appendChild(sb);
         } else if (!v.service_end_at) {
-          var doneBtn = document.createElement('button');
-          doneBtn.className = 'text-sm px-3 py-1.5 bg-amber-600 text-white rounded-lg hover:bg-amber-700';
-          doneBtn.textContent = t('visitDone', 'Done');
-          doneBtn.addEventListener('click', function() { updateVisit(v.id, { service_end_at: 'now' }); setTimeout(loadFullVisitTracker, 500); });
-          actions.appendChild(doneBtn);
+          var db = el('button', 'px-3 py-1.5 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 transition', t('visitFinishService', 'Finish'));
+          db.addEventListener('click', function() { updateVisit(v.id, { service_end_at: 'now' }); setTimeout(loadFullVisitTracker, 500); });
+          actions.appendChild(db);
         }
         if (!v.check_out_at) {
-          var outBtn = document.createElement('button');
-          outBtn.className = 'text-sm px-3 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700';
-          outBtn.textContent = t('visitOut', 'Out');
-          outBtn.addEventListener('click', function() { updateVisit(v.id, { check_out_at: 'now' }); setTimeout(loadFullVisitTracker, 500); });
-          actions.appendChild(outBtn);
+          var ob = el('button', 'px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition', t('visitCheckOut', 'Check Out'));
+          ob.addEventListener('click', function() { updateVisit(v.id, { check_out_at: 'now' }); setTimeout(loadFullVisitTracker, 500); });
+          actions.appendChild(ob);
         }
-        row.appendChild(actions);
-        table.appendChild(row);
+        card.appendChild(actions);
+        grid.appendChild(card);
       });
+      container.appendChild(grid);
 
-      container.appendChild(table);
     } catch (err) {
-      console.error('Visit tracker full error:', err);
-      var errEl = document.createElement('p');
-      errEl.className = 'text-red-500 text-center py-8';
-      errEl.textContent = t('visitLoadError', 'Error loading visit data');
-      container.appendChild(errEl);
+      console.error('Visit tracker error:', err);
+      container.appendChild(el('p', 'text-red-500 text-center py-8', t('visitLoadError', 'Error loading visit data')));
     }
+  }
+
+  // ─── Update Visit ────────────────────────────────────────────
+  async function updateVisit(id, data) {
+    try {
+      var res = await fetch('/api/admin/visit-log.php', {
+        method: 'PUT', credentials: 'include', headers: hdrs(true),
+        body: JSON.stringify(Object.assign({ id: id }, data))
+      });
+      var json = await res.json();
+      if (json.success) {
+        loadVisits(); // refresh dashboard widget
+        toast(t('visitUpdated', 'Visit updated'));
+      } else { toast(json.error || 'Update failed', true); }
+    } catch (err) {
+      console.error('Visit update error:', err);
+      toast(t('visitNetworkError', 'Network error'), true);
+    }
+  }
+
+  // Store pending appointments from last API call
+  var pendingAppointments = [];
+
+  // ─── Check In Modal (replaces prompt) ────────────────────────
+  function showCheckIn() {
+    removeModal();
+    var ov = el('div', 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4');
+    ov.id = 'visit-modal-overlay';
+    ov.addEventListener('click', function(e) { if (e.target === ov) removeModal(); });
+
+    var pn = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto');
+    pn.appendChild(el('h3', 'text-lg font-bold dark:text-white', t('visitCheckInTitle', 'Check In Customer')));
+
+    // Quick check-in from today's appointments
+    if (pendingAppointments.length > 0) {
+      var apptSection = el('div', 'border dark:border-gray-700 rounded-lg p-3 bg-green-50 dark:bg-green-900/20');
+      apptSection.appendChild(el('p', 'text-xs font-semibold text-green-700 dark:text-green-400 mb-2 uppercase', t('visitTodayAppts', "Today's Appointments")));
+      pendingAppointments.forEach(function(a) {
+        var name = ((a.first_name || '') + ' ' + (a.last_name || '')).trim();
+        var vehicle = [a.vehicle_year, a.vehicle_make, a.vehicle_model].filter(Boolean).join(' ');
+        var row = el('div', 'flex items-center justify-between py-1.5 border-b dark:border-gray-700 last:border-b-0');
+        var info = el('div', 'min-w-0');
+        info.appendChild(el('div', 'text-sm font-medium text-gray-800 dark:text-gray-200 truncate', name + (vehicle ? ' — ' + vehicle : '')));
+        info.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400', (a.preferred_time || '') + ' \u2022 ' + (a.service || '')));
+        row.appendChild(info);
+        var qBtn = el('button', 'shrink-0 ml-2 text-xs px-2.5 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium', t('visitQuickCheckIn', 'Check In'));
+        qBtn.addEventListener('click', (function(appt) {
+          return function() { doQuickCheckIn(appt.cust_id || appt.customer_id, appt.id); };
+        })(a));
+        row.appendChild(qBtn);
+        apptSection.appendChild(row);
+      });
+      pn.appendChild(apptSection);
+      pn.appendChild(el('div', 'text-center text-xs text-gray-400 dark:text-gray-500', '— ' + t('visitOrSearch', 'or search manually') + ' —'));
+    }
+
+    // Customer search
+    pn.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300', t('visitSearchCustomer', 'Search Customer')));
+    var searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.id = 'visit-search';
+    searchInput.className = 'w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+    searchInput.placeholder = t('visitSearchPlaceholder', 'Name, email, or phone...');
+    pn.appendChild(searchInput);
+
+    var resultsDiv = el('div', 'max-h-40 overflow-y-auto border rounded-lg hidden dark:border-gray-600');
+    resultsDiv.id = 'visit-search-results';
+    pn.appendChild(resultsDiv);
+
+    var selectedDiv = el('div', 'hidden');
+    selectedDiv.id = 'visit-selected';
+    pn.appendChild(selectedDiv);
+
+    // Bay selector
+    pn.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mt-2', t('visitBayNumber', 'Bay Number')));
+    var baySelect = document.createElement('select');
+    baySelect.id = 'visit-bay';
+    baySelect.className = 'w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+    baySelect.appendChild(el('option', null, t('visitNoBay', 'No bay assigned')));
+    for (var i = 1; i <= 4; i++) {
+      var opt = el('option', null, t('visitBayLabel', 'Bay') + ' ' + i);
+      opt.value = i;
+      baySelect.appendChild(opt);
+    }
+    pn.appendChild(baySelect);
+
+    // Notes
+    pn.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mt-2', t('visitNotes', 'Notes (optional)')));
+    var notesInput = document.createElement('input');
+    notesInput.type = 'text';
+    notesInput.id = 'visit-notes';
+    notesInput.className = 'w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+    pn.appendChild(notesInput);
+
+    // Buttons
+    var btnRow = el('div', 'flex gap-3 pt-2');
+    var canBtn = el('button', 'flex-1 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm font-medium dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition', t('cancel', 'Cancel'));
+    canBtn.addEventListener('click', removeModal);
+    btnRow.appendChild(canBtn);
+    var submitBtn = el('button', 'flex-1 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition', t('visitCheckIn', 'Check In'));
+    submitBtn.id = 'visit-submit';
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.5';
+    submitBtn.addEventListener('click', doCheckIn);
+    btnRow.appendChild(submitBtn);
+    pn.appendChild(btnRow);
+
+    ov.appendChild(pn);
+    document.body.appendChild(ov);
+    searchInput.focus();
+
+    // Search handler
+    var searchTimer;
+    var selectedCustomerId = null;
+    searchInput.addEventListener('input', function() {
+      clearTimeout(searchTimer);
+      var q = searchInput.value.trim();
+      if (q.length < 2) { resultsDiv.classList.add('hidden'); return; }
+      searchTimer = setTimeout(function() {
+        fetch('/api/admin/customers.php?search=' + encodeURIComponent(q) + '&limit=5', { credentials: 'include', headers: hdrs() })
+          .then(function(r) { return r.json(); })
+          .then(function(json) {
+            resultsDiv.textContent = '';
+            var custs = json.data || [];
+            if (!custs.length) {
+              resultsDiv.appendChild(el('div', 'p-3 text-sm text-gray-400 dark:text-gray-500', t('visitNoResults', 'No customers found')));
+              resultsDiv.classList.remove('hidden');
+              return;
+            }
+            custs.forEach(function(c) {
+              var row = el('div', 'p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b dark:border-gray-700 last:border-b-0');
+              row.appendChild(el('div', 'font-medium text-sm text-gray-800 dark:text-gray-200', c.first_name + ' ' + c.last_name));
+              row.appendChild(el('div', 'text-xs text-gray-500 dark:text-gray-400', [c.email, c.phone].filter(Boolean).join(' \u2022 ')));
+              row.addEventListener('click', function() {
+                selectedCustomerId = c.id;
+                searchInput.value = c.first_name + ' ' + c.last_name;
+                resultsDiv.classList.add('hidden');
+                selectedDiv.className = 'p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-700 dark:text-green-400';
+                selectedDiv.textContent = t('visitSelected', 'Selected') + ': ' + c.first_name + ' ' + c.last_name + ' (' + (c.email || c.phone || '#' + c.id) + ')';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+              });
+              resultsDiv.appendChild(row);
+            });
+            resultsDiv.classList.remove('hidden');
+          })
+          .catch(function() {});
+      }, 300);
+    });
+
+    function doCheckIn() {
+      if (!selectedCustomerId) return;
+      submitBtn.disabled = true;
+      submitBtn.textContent = t('visitCheckingIn', 'Checking in...');
+      fetch('/api/admin/visit-log.php', {
+        method: 'POST', credentials: 'include', headers: hdrs(true),
+        body: JSON.stringify({
+          customer_id: selectedCustomerId,
+          bay_number: baySelect.value ? parseInt(baySelect.value) : null,
+          notes: notesInput.value.trim() || null
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(json) {
+        if (json.success) {
+          toast(t('visitCheckedInSuccess', 'Customer checked in'));
+          removeModal();
+          loadVisits();
+          loadFullVisitTracker();
+        } else {
+          toast(json.error || 'Check-in failed', true);
+          submitBtn.disabled = false;
+          submitBtn.textContent = t('visitCheckIn', 'Check In');
+        }
+      })
+      .catch(function() {
+        toast(t('visitNetworkError', 'Network error'), true);
+        submitBtn.disabled = false;
+        submitBtn.textContent = t('visitCheckIn', 'Check In');
+      });
+    }
+  }
+
+  // Quick check-in from appointment (no search needed)
+  function doQuickCheckIn(customerId, appointmentId) {
+    removeModal();
+    fetch('/api/admin/visit-log.php', {
+      method: 'POST', credentials: 'include', headers: hdrs(true),
+      body: JSON.stringify({ customer_id: customerId, appointment_id: appointmentId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      if (json.success) {
+        toast(t('visitCheckedInSuccess', 'Customer checked in'));
+        loadVisits();
+        loadFullVisitTracker();
+      } else { toast(json.error || 'Check-in failed', true); }
+    })
+    .catch(function() { toast(t('visitNetworkError', 'Network error'), true); });
   }
 
   // Public API
   window.ShopFloor = {
-    init: function() {
-      loadVisits();
-      refreshInterval = setInterval(loadVisits, 30000); // refresh every 30s
-    },
+    init: function() { loadVisits(); refreshInterval = setInterval(loadVisits, 30000); },
     refresh: loadVisits,
     startService: function(id) { updateVisit(id, { service_start_at: 'now' }); },
     endService: function(id) { updateVisit(id, { service_end_at: 'now' }); },
     checkOut: function(id) { updateVisit(id, { check_out_at: 'now' }); },
     showCheckIn: showCheckIn,
-    destroy: function() { if (refreshInterval) clearInterval(refreshInterval); },
+    destroy: function() { if (refreshInterval) clearInterval(refreshInterval); }
   };
 
-  // Global function for the dedicated Visits tab
   window.loadVisitTracker = loadFullVisitTracker;
 })();

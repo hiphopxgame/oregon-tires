@@ -112,12 +112,26 @@ try {
             }
         }
 
+        // If "serving", auto-create a visit check-in
+        $visitId = null;
+        if ($newStatus === 'serving' && !empty($entry['customer_id'])) {
+            try {
+                $db->prepare(
+                    'INSERT INTO oretir_visit_log (customer_id, check_in_at, notes)
+                     VALUES (?, NOW(), ?)'
+                )->execute([(int) $entry['customer_id'], 'Auto check-in from waitlist #' . $id]);
+                $visitId = (int) $db->lastInsertId();
+            } catch (\Throwable $e) {
+                error_log('waitlist: auto check-in error: ' . $e->getMessage());
+            }
+        }
+
         // If completed or cancelled, try to advance the queue
         if (in_array($newStatus, ['completed', 'cancelled'], true)) {
             advanceQueue($db);
         }
 
-        jsonSuccess(['id' => $id, 'status' => $newStatus]);
+        jsonSuccess(['id' => $id, 'status' => $newStatus, 'visit_id' => $visitId]);
     }
 
     // ─── DELETE: Remove from queue ──────────────────────────────────────

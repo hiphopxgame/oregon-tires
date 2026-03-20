@@ -33,7 +33,6 @@ $ssoBrand = $ssoEnabled ? MemberAuth::getSSOBranding() : null;
 
 // Determine conditional features
 $showDeviceVerification = isset($_GET['device_verify']);
-$show2FAPrompt = isset($_GET['2fa_prompt']);
 ?>
 
 <!-- Color scheme meta tag for dark mode support -->
@@ -43,9 +42,9 @@ $show2FAPrompt = isset($_GET['2fa_prompt']);
     <div class="member-card">
         <?php $langQ = (getMemberLang() !== 'en') ? '?lang=' . getMemberLang() : ''; ?>
         <nav class="member-nav-tabs" aria-label="Account navigation">
-            <a href="/member/login<?= $langQ ?>" class="member-nav-tab active" aria-current="page"><?= htmlspecialchars(t('sign_in') ?? 'Sign In') ?></a>
-            <a href="/member/register<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('create_account') ?? 'Create Account') ?></a>
-            <a href="/member/forgot-password<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('reset_password_tab') ?? 'Reset Password') ?></a>
+            <a href="/members<?= $langQ ?>" class="member-nav-tab active" aria-current="page"><?= htmlspecialchars(t('sign_in') ?? 'Sign In') ?></a>
+            <a href="/members?view=register<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('create_account') ?? 'Create Account') ?></a>
+            <a href="/members?view=forgot-password<?= $langQ ?>" class="member-nav-tab"><?= htmlspecialchars(t('reset_password_tab') ?? 'Reset Password') ?></a>
         </nav>
 
         <div class="member-header">
@@ -59,7 +58,7 @@ $show2FAPrompt = isset($_GET['2fa_prompt']);
 
         <div class="member-signup-cta" role="complementary" aria-label="Create account">
             <span class="member-signup-cta__text"><?= htmlspecialchars(t('new_here') ?? 'New here?') ?></span>
-            <a href="/member/register<?= $langQ ?><?= !empty($_GET['return']) ? ($langQ ? '&' : '?') . 'return=' . urlencode($_GET['return']) : '' ?>"
+            <a href="/members?view=register<?= $langQ ?><?= !empty($_GET['return']) ? ($langQ ? '&' : '?') . 'return=' . urlencode($_GET['return']) : '' ?>"
                class="member-signup-cta__link" data-track="signup-cta">
                 <?= htmlspecialchars(t('create_free_account') ?? 'Create your free account') ?>
             </a>
@@ -118,7 +117,7 @@ $show2FAPrompt = isset($_GET['2fa_prompt']);
         <!-- GROUP 1: EMAIL + PASSWORD (PRIMARY)                              -->
         <!-- ═════════════════════════════════════════════════════════════════ -->
 
-        <form class="member-form" data-action="/api/member/login.php" data-method="POST"
+        <form class="member-form" data-action="/api/members.php" data-method="POST"
               role="region" aria-label="Email login form">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken ?? MemberAuth::getCsrfToken()) ?>">
             <input type="hidden" name="session_lifetime" value="<?= htmlspecialchars((string)($_ENV['SESSION_LIFETIME'] ?? '3600')) ?>" id="session-lifetime">
@@ -145,7 +144,7 @@ $show2FAPrompt = isset($_GET['2fa_prompt']);
             <div class="member-field">
                 <div class="member-label-row">
                     <label class="member-label" for="login-password"><?= htmlspecialchars(t('password_label') ?? 'Password') ?></label>
-                    <a href="/member/forgot-password<?= $langQ ?>" class="member-link member-forgot-link" data-track="forgot-password"><?= htmlspecialchars(t('forgot_link') ?? 'Forgot?') ?></a>
+                    <a href="/members?view=forgot-password<?= $langQ ?>" class="member-link member-forgot-link" data-track="forgot-password"><?= htmlspecialchars(t('forgot_link') ?? 'Forgot?') ?></a>
                 </div>
                 <div class="member-password-wrap">
                     <input class="member-input" type="password" id="login-password" name="password"
@@ -246,22 +245,6 @@ $show2FAPrompt = isset($_GET['2fa_prompt']);
         <?php endif; ?>
 
         <!-- ═════════════════════════════════════════════════════════════════ -->
-        <!-- 2FA ENROLLMENT PROMPT                                            -->
-        <!-- ═════════════════════════════════════════════════════════════════ -->
-
-        <?php if ($show2FAPrompt): ?>
-            <div class="member-alert member-alert--info" style="margin-top:1rem;">
-                <strong><?= htmlspecialchars(t('secure_your_account') ?? 'Secure your account'); ?></strong>
-                <div style="margin-top:0.5rem;">
-                    <?= htmlspecialchars(t('2fa_info') ?? 'Add two-factor authentication for enhanced security.'); ?>
-                </div>
-                <a href="/member/2fa-setup" class="member-link" style="display:inline-block;margin-top:0.5rem;text-decoration:underline;">
-                    <?= htmlspecialchars(t('enable_2fa') ?? 'Enable two-factor auth'); ?>
-                </a>
-            </div>
-        <?php endif; ?>
-
-        <!-- ═════════════════════════════════════════════════════════════════ -->
         <!-- FOOTER LINKS                                                     -->
         <!-- ═════════════════════════════════════════════════════════════════ -->
 
@@ -269,10 +252,10 @@ $show2FAPrompt = isset($_GET['2fa_prompt']);
         <?php if (!$hideRegLink || !$hideActivityLink): ?>
         <div class="member-footer">
             <?php if (!$hideRegLink): ?>
-            <a href="/member/register<?= $langQ ?>" class="member-link" data-track="create-account"><?= htmlspecialchars(t('create_an_account') ?? 'Create an account') ?></a>
+            <a href="/members?view=register<?= $langQ ?>" class="member-link" data-track="create-account"><?= htmlspecialchars(t('create_an_account') ?? 'Create an account') ?></a>
             <?php endif; ?>
             <?php if (!$hideActivityLink): ?>
-            <a href="/member/login-activity" class="member-link" data-track="login-activity" style="margin-left:auto;">
+            <a href="/members-activity" class="member-link" data-track="login-activity" style="margin-left:auto;">
                 <?= htmlspecialchars(t('view_login_activity') ?? 'View login activity'); ?>
             </a>
             <?php endif; ?>

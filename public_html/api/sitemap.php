@@ -174,21 +174,21 @@ foreach ($blogPosts as $post) {
 }
 
 // Promotions from DB (bilingual)
-$galleryImages = [];
+$promotions = [];
 if ($dbConfig && isset($pdo)) {
     try {
         $stmt = $pdo->query(
-            "SELECT id, created_at FROM oretir_gallery_images WHERE is_active = 1 ORDER BY display_order ASC"
+            "SELECT id, COALESCE(updated_at, created_at) AS lastmod FROM oretir_promotions WHERE is_active = 1 ORDER BY display_order ASC"
         );
-        $galleryImages = $stmt->fetchAll();
+        $promotions = $stmt->fetchAll();
     } catch (\Throwable $e) {
-        $galleryImages = [];
+        $promotions = [];
     }
 }
 
-foreach ($galleryImages as $gi) {
-    $lastmod = !empty($gi['created_at']) ? date('Y-m-d', strtotime($gi['created_at'])) : date('Y-m-d');
-    echo sitemapUrl($baseUrl . '/promotions/' . (int) $gi['id'], $lastmod);
+foreach ($promotions as $promo) {
+    $lastmod = !empty($promo['lastmod']) ? date('Y-m-d', strtotime($promo['lastmod'])) : date('Y-m-d');
+    echo sitemapUrl($baseUrl . '/promotions/' . (int) $promo['id'], $lastmod);
 }
 
 echo '</urlset>' . "\n";

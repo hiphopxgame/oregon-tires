@@ -64,20 +64,7 @@ CREATE TABLE IF NOT EXISTS member_login_activity (
     INDEX idx_method (login_method)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 6. Create member_2fa table
-CREATE TABLE IF NOT EXISTS member_2fa (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    member_id INT UNSIGNED NOT NULL UNIQUE,
-    secret_key VARCHAR(255) NOT NULL,
-    backup_codes JSON,
-    enabled BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE,
-    INDEX idx_enabled (enabled)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 7. Create member_site_connections table
+-- 6. Create member_site_connections table
 CREATE TABLE IF NOT EXISTS member_site_connections (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     member_id INT UNSIGNED NOT NULL,

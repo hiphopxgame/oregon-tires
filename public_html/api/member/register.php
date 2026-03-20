@@ -51,20 +51,19 @@ try {
         if ($suffix > 99) { $username = $rawUsername . '_' . substr(bin2hex(random_bytes(3)), 0, 6); break; }
     }
 
-    $result = MemberAuth::register([
+    $member = MemberAuth::register([
         'email'        => $email,
         'password'     => $password,
         'display_name' => trim($firstName . ' ' . $lastName),
         'username'     => $username,
-        'phone'        => $phone,
     ]);
 
-    if (!$result['success']) {
-        jsonError($result['error'] ?? 'Registration failed.', 400);
+    if (!$member || empty($member['id'])) {
+        jsonError('Registration failed.', 500);
     }
 
     jsonSuccess([
-        'member_id' => $result['member']['id'] ?? null,
+        'member_id' => $member['id'],
         'email'     => $email,
     ]);
 } catch (\RuntimeException $e) {

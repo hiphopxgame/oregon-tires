@@ -8,7 +8,7 @@
 $token = $_GET['token'] ?? '';
 
 if ($token === '') {
-    header('Location: /member/forgot-password');
+    header('Location: /members?view=forgot-password');
     exit;
 }
 ?>
