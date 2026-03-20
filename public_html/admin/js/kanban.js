@@ -19,7 +19,8 @@ var COLUMNS = [
   { key: 'on_hold',          label: 'On Hold',     color: '#ef4444' },
   { key: 'waiting_parts',    label: 'Parts',       color: '#f97316' },
   { key: 'ready',            label: 'Ready',       color: '#14b8a6' },
-  { key: 'completed',        label: 'Done',        color: '#6b7280' }
+  { key: 'completed',        label: 'Done',        color: '#6b7280' },
+  { key: 'invoiced',         label: 'Invoiced',    color: '#0d9488' }
 ];
 
 var kanbanActive = false;
@@ -61,6 +62,23 @@ function abbreviateVehicle(year, make, model) {
     str = str.substring(0, 20) + '...';
   }
   return str;
+}
+
+// ─── Next-action logic ───────────────────────────────────────────────────────
+function getNextAction(ro) {
+  var s = ro.status || 'intake';
+  var hasInspection = (ro.inspection_count || 0) > 0;
+  var hasEstimate = (ro.estimate_count || 0) > 0;
+
+  if (s === 'intake' && !hasInspection) return { label: 'Needs DVI', bg: '#fef3c7', color: '#92400e' };
+  if (s === 'intake' && hasInspection) return { label: 'Start Diag', bg: '#ede9fe', color: '#6d28d9' };
+  if (s === 'diagnosis' && !hasEstimate) return { label: 'Needs Est.', bg: '#fef3c7', color: '#92400e' };
+  if (s === 'estimate_pending') return { label: 'Send Est.', bg: '#dbeafe', color: '#1d4ed8' };
+  if (s === 'pending_approval') return { label: 'Awaiting', bg: '#ffedd5', color: '#c2410c' };
+  if (s === 'approved') return { label: 'Start Work', bg: '#dcfce7', color: '#166534' };
+  if (s === 'ready') return { label: 'Notify', bg: '#d1fae5', color: '#065f46' };
+  if (s === 'completed') return { label: 'Invoice', bg: '#ccfbf1', color: '#0f766e' };
+  return null;
 }
 
 // ─── Build a kanban card ─────────────────────────────────────────────────────
@@ -145,13 +163,28 @@ function createCard(ro) {
   vehEl.textContent = vehicle;
   card.appendChild(vehEl);
 
-  // Time in status
+  // Bottom row: time + next-action badge
+  var bottomRow = document.createElement('div');
+  bottomRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:2px;';
+
   var timeEl = document.createElement('div');
   timeEl.style.cssText =
     'font-size:10px;' +
     'color:' + (dark ? '#6b7280' : '#9ca3af') + ';';
   timeEl.textContent = timeAgo(ro.updated_at);
-  card.appendChild(timeEl);
+  bottomRow.appendChild(timeEl);
+
+  // Next-action indicator
+  var nextAction = getNextAction(ro);
+  if (nextAction) {
+    var actionBadge = document.createElement('span');
+    actionBadge.style.cssText =
+      'font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;white-space:nowrap;' +
+      'background:' + nextAction.bg + ';color:' + nextAction.color + ';';
+    actionBadge.textContent = nextAction.label;
+    bottomRow.appendChild(actionBadge);
+  }
+  card.appendChild(bottomRow);
 
   return card;
 }
@@ -201,7 +234,8 @@ function createColumn(colDef, cards) {
     on_hold: 'roStatusOnHold',
     waiting_parts: 'roTimelineParts',
     ready: 'roStatusReady',
-    completed: 'roTimelineDone'
+    completed: 'roTimelineDone',
+    invoiced: 'roStatusInvoiced'
   };
   label.textContent = t(labelKeys[colDef.key], colDef.label);
 
@@ -340,7 +374,7 @@ function renderKanban(orders) {
     if (buckets[status]) {
       buckets[status].push(ro);
     }
-    // Skip cancelled and invoiced — they don't have columns
+    // Skip cancelled — they don't have a column
   });
 
   // Build columns

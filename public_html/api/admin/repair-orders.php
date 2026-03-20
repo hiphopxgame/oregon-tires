@@ -53,6 +53,11 @@ try {
             $eStmt->execute([$id]);
             $ro['estimates'] = $eStmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Invoices
+            $invStmt = $db->prepare('SELECT id, invoice_number, status, total, customer_view_token, created_at FROM oretir_invoices WHERE repair_order_id = ? ORDER BY created_at DESC');
+            $invStmt->execute([$id]);
+            $ro['invoices'] = $invStmt->fetchAll(PDO::FETCH_ASSOC);
+
             // Linked appointment
             if ($ro['appointment_id']) {
                 $aStmt = $db->prepare('SELECT id, reference_number, service, preferred_date, preferred_time, status FROM oretir_appointments WHERE id = ?');

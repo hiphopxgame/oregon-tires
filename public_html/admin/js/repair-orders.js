@@ -602,10 +602,43 @@ function renderRoDetailModal() {
   notesSection.appendChild(notesBody);
   body.appendChild(notesSection);
 
-  // Action buttons
+  // ─── Smart Action Bar (context-aware) ──────────────────────────────────────
+  var hasInspections = ro.inspections && ro.inspections.length > 0;
+  var hasEstimates = ro.estimates && ro.estimates.length > 0;
+  var latestEstimate = hasEstimates ? ro.estimates[0] : null;
+  var hasInvoices = ro.invoices && ro.invoices.length > 0;
+  var status = ro.status || 'intake';
+
+  // Suggested next step banner
+  var suggestion = null;
+  if (status === 'intake' && !hasInspections) suggestion = { text: t('roSuggestInspect', 'Start by creating an inspection for this vehicle'), icon: '\uD83D\uDD0D' };
+  else if (status === 'intake' && hasInspections) suggestion = { text: t('roSuggestDiag', 'Inspection exists \u2014 move to Diagnosis when ready'), icon: '\u2699\uFE0F' };
+  else if (status === 'diagnosis' && !hasEstimates) suggestion = { text: t('roSuggestEstimate', 'Create an estimate to send to the customer'), icon: '\uD83D\uDCCB' };
+  else if (status === 'estimate_pending' && latestEstimate && latestEstimate.status === 'draft') suggestion = { text: t('roSuggestSendEst', 'Estimate is ready \u2014 send it to the customer for approval'), icon: '\uD83D\uDCE7' };
+  else if (status === 'pending_approval') suggestion = { text: t('roSuggestWait', 'Waiting for customer approval. Follow up if needed.'), icon: '\u23F3' };
+  else if (status === 'approved') suggestion = { text: t('roSuggestStart', 'Customer approved \u2014 start the work!'), icon: '\uD83D\uDE80' };
+  else if (status === 'in_progress' || status === 'waiting_parts') suggestion = { text: t('roSuggestReady', 'Mark as Ready when the job is done'), icon: '\uD83D\uDD27' };
+  else if (status === 'ready') suggestion = { text: t('roSuggestComplete', 'Customer notified. Mark Completed when picked up.'), icon: '\u2705' };
+  else if (status === 'completed' && !hasInvoices) suggestion = { text: t('roSuggestInvoice', 'Invoice will be auto-generated. If not, check the estimate.'), icon: '\uD83D\uDCB0' };
+
+  if (suggestion) {
+    var suggestDiv = document.createElement('div');
+    suggestDiv.className = 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center gap-3';
+    var suggestIcon = document.createElement('span');
+    suggestIcon.className = 'text-xl shrink-0';
+    suggestIcon.textContent = suggestion.icon;
+    var suggestText = document.createElement('p');
+    suggestText.className = 'text-sm text-blue-800 dark:text-blue-300 font-medium';
+    suggestText.textContent = suggestion.text;
+    suggestDiv.appendChild(suggestIcon);
+    suggestDiv.appendChild(suggestText);
+    body.appendChild(suggestDiv);
+  }
+
   var actions = document.createElement('div');
   actions.className = 'flex flex-wrap gap-3';
 
+  // Always show core action buttons
   var inspBtn = document.createElement('button');
   inspBtn.className = 'px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition';
   inspBtn.textContent = t('roNewInspection', 'New Inspection');
@@ -633,6 +666,39 @@ function renderRoDetailModal() {
     } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
   });
   actions.appendChild(estBtn);
+
+  // Quick-send button if draft estimate exists
+  if (latestEstimate && latestEstimate.status === 'draft' && parseFloat(latestEstimate.total || 0) > 0) {
+    var quickSendBtn = document.createElement('button');
+    quickSendBtn.className = 'px-4 py-2 bg-amber-500 text-black rounded-lg text-sm font-bold hover:bg-amber-600 transition';
+    quickSendBtn.textContent = '\uD83D\uDCE7 ' + t('roQuickSendEstimate', 'Send Estimate ($' + parseFloat(latestEstimate.total).toFixed(2) + ')');
+    quickSendBtn.addEventListener('click', async function() {
+      try {
+        await api('estimates.php', { method: 'PUT', body: { id: latestEstimate.id, action: 'send' } });
+        showToast(t('roEstimateSent', 'Estimate sent to customer'));
+        viewRoDetail(ro.id);
+      } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
+    });
+    actions.appendChild(quickSendBtn);
+  }
+
+  // Quick complete button if status is ready
+  if (status === 'ready') {
+    var completeBtn = document.createElement('button');
+    completeBtn.className = 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 transition';
+    completeBtn.textContent = '\u2705 ' + t('roMarkCompleted', 'Mark Completed & Invoice');
+    completeBtn.addEventListener('click', async function() {
+      try {
+        await api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } });
+        showToast(t('roCompletedInvoiced', 'Completed \u2014 invoice generated & sent'));
+        modal.remove();
+        loadRepairOrders();
+        if (typeof loadKanban === 'function') loadKanban();
+      } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
+    });
+    actions.appendChild(completeBtn);
+  }
+
   body.appendChild(actions);
 
   // Inspections
@@ -826,6 +892,78 @@ function renderRoDetailModal() {
     estSection.appendChild(noEst);
   }
   body.appendChild(estSection);
+
+  // Invoices
+  if (ro.invoices && ro.invoices.length > 0) {
+    var invSection = document.createElement('div');
+    var invH = document.createElement('h3');
+    invH.className = 'font-bold text-gray-900 dark:text-white mb-3';
+    invH.textContent = t('roInvoices', 'Invoices') + ' (' + ro.invoices.length + ')';
+    invSection.appendChild(invH);
+
+    ro.invoices.forEach(function(inv) {
+      var iCard = document.createElement('div');
+      iCard.className = 'border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-2 flex justify-between items-center';
+
+      var iLeft = document.createElement('div');
+      iLeft.className = 'flex items-center gap-3 flex-wrap';
+
+      var iNum = document.createElement('span');
+      iNum.className = 'font-bold text-sm text-gray-900 dark:text-white';
+      iNum.textContent = inv.invoice_number;
+      iLeft.appendChild(iNum);
+
+      var invStatusCls = inv.status === 'paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+        inv.status === 'sent' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+        inv.status === 'overdue' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+        inv.status === 'void' ? 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' :
+        'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+      var iStatusBadge = document.createElement('span');
+      iStatusBadge.className = 'text-xs font-bold px-2 py-1 rounded ' + invStatusCls;
+      iStatusBadge.textContent = inv.status;
+      iLeft.appendChild(iStatusBadge);
+
+      var iTotal = document.createElement('span');
+      iTotal.className = 'text-sm font-semibold text-gray-700 dark:text-gray-300';
+      iTotal.textContent = '$' + parseFloat(inv.total || 0).toFixed(2);
+      iLeft.appendChild(iTotal);
+
+      iCard.appendChild(iLeft);
+
+      var iActions = document.createElement('div');
+      iActions.className = 'flex gap-2';
+
+      // View invoice link
+      if (inv.customer_view_token) {
+        var viewLink = document.createElement('a');
+        viewLink.href = '/invoice/' + inv.customer_view_token;
+        viewLink.target = '_blank';
+        viewLink.className = 'text-green-600 hover:text-green-800 text-sm font-medium';
+        viewLink.textContent = t('roViewInvoice', 'View');
+        iActions.appendChild(viewLink);
+      }
+
+      // Mark paid button
+      if (inv.status !== 'paid' && inv.status !== 'void') {
+        var paidBtn = document.createElement('button');
+        paidBtn.className = 'text-green-600 hover:text-green-800 text-sm font-medium';
+        paidBtn.textContent = t('roMarkPaid', 'Mark Paid');
+        paidBtn.addEventListener('click', (function(invId) { return async function(e) {
+          e.stopPropagation();
+          try {
+            await api('invoices.php', { method: 'PUT', body: { id: invId, status: 'paid' } });
+            showToast(t('roInvoicePaid', 'Invoice marked as paid'));
+            viewRoDetail(ro.id);
+          } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
+        }; })(inv.id));
+        iActions.appendChild(paidBtn);
+      }
+
+      iCard.appendChild(iActions);
+      invSection.appendChild(iCard);
+    });
+    body.appendChild(invSection);
+  }
 
   // Linked appointment
   if (ro.appointment) {

@@ -468,6 +468,14 @@ function syncAppointmentRoStatus(string $entity, int $entityId, string $newStatu
             }
             $apptId = (int) $ro['appointment_id'];
 
+            // Auto-confirm appointment when work begins on the RO
+            if (in_array($newStatus, ['diagnosis', 'estimate_pending', 'in_progress', 'approved'], true)) {
+                $db->prepare(
+                    "UPDATE oretir_appointments SET status = 'confirmed', updated_at = NOW()
+                     WHERE id = ? AND status IN ('new', 'pending')"
+                )->execute([$apptId]);
+            }
+
             if ($newStatus === 'completed' || $newStatus === 'invoiced') {
                 $db->prepare(
                     "UPDATE oretir_appointments SET status = 'completed', updated_at = NOW()

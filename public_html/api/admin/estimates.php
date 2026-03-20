@@ -176,6 +176,19 @@ try {
         // Recalculate totals
         recalculateEstimateTotals($estId, $db);
 
+        // Auto-advance RO to 'estimate_pending' if currently in intake/diagnosis
+        try {
+            $roStatusStmt = $db->prepare('SELECT status FROM oretir_repair_orders WHERE id = ?');
+            $roStatusStmt->execute([$roId]);
+            $currentRoStatus = $roStatusStmt->fetchColumn();
+            if (in_array($currentRoStatus, ['intake', 'diagnosis'], true)) {
+                $db->prepare("UPDATE oretir_repair_orders SET status = 'estimate_pending', updated_at = NOW() WHERE id = ?")
+                   ->execute([$roId]);
+            }
+        } catch (\Throwable $e) {
+            error_log("estimates.php: auto-advance RO status failed: " . $e->getMessage());
+        }
+
         jsonSuccess([
             'id'              => $estId,
             'estimate_number' => $estNumber,
