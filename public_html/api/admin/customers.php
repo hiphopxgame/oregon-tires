@@ -28,7 +28,7 @@ try {
         // Single customer detail
         if (!empty($_GET['id'])) {
             $id = (int) $_GET['id'];
-            $stmt = $db->prepare('SELECT * FROM oretir_customers WHERE id = ?');
+            $stmt = $db->prepare('SELECT *, visit_count AS total_visits FROM oretir_customers WHERE id = ?');
             $stmt->execute([$id]);
             $customer = $stmt->fetch(PDO::FETCH_ASSOC);
             if (!$customer) jsonError('Customer not found.', 404);
@@ -79,7 +79,7 @@ try {
         $countStmt->execute($params);
         $total = (int) $countStmt->fetchColumn();
 
-        $sql = "SELECT c.*,
+        $sql = "SELECT c.*, c.visit_count AS total_visits,
                   (SELECT COUNT(*) FROM oretir_vehicles WHERE customer_id = c.id) as vehicle_count,
                   (SELECT COUNT(*) FROM oretir_appointments WHERE customer_id = c.id) as appointment_count
                 FROM oretir_customers c {$where}

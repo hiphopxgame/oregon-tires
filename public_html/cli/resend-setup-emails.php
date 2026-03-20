@@ -7,17 +7,10 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
-
-// Load env for DB access
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
-
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/response.php';
-require_once __DIR__ . '/../includes/validate.php';
 
 $db = getDB();
 $baseUrl = 'https://oregon.tires';
