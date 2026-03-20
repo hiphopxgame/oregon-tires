@@ -10700,6 +10700,55 @@ function renderPlatformTab() {
     barLegend.appendChild(legDv);
     barWrap.appendChild(barLegend);
     scopeWrap.appendChild(barWrap);
+
+    // Full list of developer-added bonus features
+    var devListWrap = el('div', 'mt-4 rounded-xl border-2 border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/10 overflow-hidden');
+    var devListHeader = el('div', 'p-4 flex items-center justify-between cursor-pointer');
+    devListHeader.appendChild(el('h4', 'font-bold text-green-800 dark:text-green-300 flex items-center gap-2', '\uD83C\uDF81 ' + t.overviewBonusValue2 + ' \u2014 ' + devFeatures.length + ' ' + (lang === 'es' ? 'funciones' : 'features') + ' ($' + devValue.toLocaleString() + ')'));
+    var devToggle = el('span', 'text-green-600 dark:text-green-400 text-xl transition-transform', '\u25BC');
+    devListHeader.appendChild(devToggle);
+    devListWrap.appendChild(devListHeader);
+
+    var devListBody = el('div', 'px-4 pb-4');
+    devListBody.appendChild(el('p', 'text-sm text-green-700 dark:text-green-400 mb-3', t.overviewDevDesc));
+
+    // Group dev features by category
+    var devByCat = {};
+    devFeatures.forEach(function(f) {
+      if (!devByCat[f.cat]) devByCat[f.cat] = [];
+      devByCat[f.cat].push(f);
+    });
+
+    catOrder.forEach(function(catKey) {
+      if (!devByCat[catKey]) return;
+      var catName = FEATURE_CATS[catKey] ? FEATURE_CATS[catKey][lang] : catKey;
+      var icon = typeof FEATURE_ICONS !== 'undefined' ? (FEATURE_ICONS[catKey] || '') : '';
+      var catSection = el('div', 'mb-3');
+      catSection.appendChild(el('h5', 'text-xs font-bold text-green-800 dark:text-green-300 uppercase tracking-wider mb-1', icon + ' ' + catName));
+      var ul = el('ul', 'space-y-1');
+      devByCat[catKey].forEach(function(f) {
+        var li = el('li', 'flex items-center justify-between py-1 px-2 rounded bg-white/60 dark:bg-gray-800/40 text-sm');
+        var nameSpan = el('span', 'text-gray-800 dark:text-gray-200', f['name_' + lang] || f.name_en);
+        li.appendChild(nameSpan);
+        var frVal = Math.round((f.price || 0) * frRate);
+        li.appendChild(el('span', 'text-xs font-semibold text-green-700 dark:text-green-400 whitespace-nowrap ml-2', '$' + frVal.toLocaleString()));
+        ul.appendChild(li);
+      });
+      catSection.appendChild(ul);
+      devListBody.appendChild(catSection);
+    });
+
+    devListWrap.appendChild(devListBody);
+
+    // Toggle collapse
+    var devExpanded = true;
+    devListHeader.addEventListener('click', function() {
+      devExpanded = !devExpanded;
+      devListBody.style.display = devExpanded ? '' : 'none';
+      devToggle.style.transform = devExpanded ? '' : 'rotate(-90deg)';
+    });
+
+    scopeWrap.appendChild(devListWrap);
     container.appendChild(scopeWrap);
   }
 

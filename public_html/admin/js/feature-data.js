@@ -6,23 +6,34 @@
 var CLIENT_PRICE = 5000;
 var FREELANCER_RATE = 1/3;
 
-// Features the client originally requested (core tire shop website).
+// Features the client originally requested.
+// Mapped from their requirements document (Operations + Sales + Marketing).
 // Everything NOT in this list was added by the developer as bonus value.
 var CLIENT_SCOPE_IDS = [
-  // Website Foundation — core website build
+  // Website Foundation — bilingual website, SSL, SEO, social links
   '1-1','1-2','1-4','1-5','1-7',
-  // Public Pages — essential pages for a tire shop
-  '2-1','2-2','2-4','2-5','2-13','2-14','2-15',
+  // Public Pages — homepage, contact, about, reviews, gallery, services, areas, blog, promotions, financing, tire quote, feedback
+  '2-1','2-2','2-4','2-5','2-7','2-8','2-11','2-12','2-13','2-14','2-15','2-16',
   // Regional SEO — local search visibility
   '3-1',
-  // Booking — online appointment scheduling
-  '4-1','4-4','4-5',
-  // Customer Management — basic customer records
-  '6-1',
-  // Auth & Security — basic access control
+  // Booking — scheduling with time blocks, cancel/reschedule, confirmation emails, business hours, multi-bay
+  '4-1','4-4','4-5','4-7','4-8','4-9',
+  // Shop Management — basic RO lifecycle
+  '5-1',
+  // Customer Management — CRM database, vehicle records, language pref
+  '6-1','6-2','6-5',
+  // Employee Portal — schedule management, assigned work
+  '8-1','8-2',
+  // Auth & Security — access control, password reset, CSRF, admin setup
   '9-1','9-3','9-4','9-5',
-  // Admin Panel — essential management tools
-  '10-1','10-2','10-3','10-8'
+  // Admin Panel — dashboard with analytics, appointments, customers, employees, content, site settings, business hours, feedback
+  '10-1','10-2','10-3','10-4','10-5','10-8','10-10','10-11',
+  // Customer Engagement — roadside estimator, tire quotes, waitlist
+  '11-4','11-5','11-6',
+  // Communications — bilingual email system, email logging
+  '12-1','12-5',
+  // Automation — appointment reminders, review requests
+  '14-1','14-2'
 ];
 
 var FEATURE_CATS = {
