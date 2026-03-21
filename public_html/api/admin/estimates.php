@@ -181,7 +181,7 @@ try {
             $roStatusStmt = $db->prepare('SELECT status FROM oretir_repair_orders WHERE id = ?');
             $roStatusStmt->execute([$roId]);
             $currentRoStatus = $roStatusStmt->fetchColumn();
-            if (in_array($currentRoStatus, ['intake', 'diagnosis'], true)) {
+            if (in_array($currentRoStatus, ['intake', 'check_in', 'diagnosis'], true)) {
                 $db->prepare("UPDATE oretir_repair_orders SET status = 'estimate_pending', updated_at = NOW() WHERE id = ?")
                    ->execute([$roId]);
             }
@@ -391,7 +391,7 @@ try {
                 }
 
                 // Update RO status
-                $db->prepare("UPDATE oretir_repair_orders SET status = 'pending_approval', updated_at = NOW() WHERE id = ? AND status IN ('estimate_pending', 'diagnosis')")->execute([$est['repair_order_id']]);
+                $db->prepare("UPDATE oretir_repair_orders SET status = 'pending_approval', updated_at = NOW() WHERE id = ? AND status IN ('estimate_pending', 'check_in', 'diagnosis')")->execute([$est['repair_order_id']]);
             }
         }
 

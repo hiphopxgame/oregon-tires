@@ -91,9 +91,9 @@ try {
             unset($r);
 
             // Summary stats
-            $laborArrays = array_map(function($r) {
+            $laborArrays = array_filter(array_map(function($r) {
                 return array_column($r['active_labor'], 'employee_id');
-            }, $ros);
+            }, $ros));
             $techsWorking = count(array_unique($laborArrays ? array_merge(...$laborArrays) : []));
 
             $todayHoursStmt = $db->prepare(

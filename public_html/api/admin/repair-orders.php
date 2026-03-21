@@ -449,10 +449,10 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
                 // Create visit_log entry if table exists
                 try {
                     $vlStmt = $db->prepare(
-                        'INSERT INTO oretir_visit_log (repair_order_id, appointment_id, customer_id, check_in_at, bay_number, created_at)
-                         VALUES (?, ?, ?, NOW(), ?, NOW())'
+                        'INSERT INTO oretir_visit_log (repair_order_id, appointment_id, customer_id, check_in_at, bay_number, assigned_employee_id, created_at)
+                         VALUES (?, ?, ?, NOW(), ?, ?, NOW())'
                     );
-                    $vlStmt->execute([$roId, $ro['appointment_id'] ?: null, $ro['customer_id'], $bayNumber]);
+                    $vlStmt->execute([$roId, $ro['appointment_id'] ?: null, $ro['customer_id'], $bayNumber, $ro['assigned_employee_id'] ?? null]);
                     $visitLogId = (int) $db->lastInsertId();
                     $db->prepare('UPDATE oretir_repair_orders SET checked_in_at = NOW(), visit_log_id = ? WHERE id = ?')
                        ->execute([$visitLogId, $roId]);
@@ -485,21 +485,7 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
                 }
 
                 // Auto clock-in assigned employee if no active labor
-                $empId = $ro['assigned_employee_id'] ?? null;
-                if ($empId) {
-                    $openCheck = $db->prepare('SELECT id FROM oretir_labor_entries WHERE repair_order_id = ? AND clock_out_at IS NULL LIMIT 1');
-                    $openCheck->execute([$roId]);
-                    if (!$openCheck->fetch()) {
-                        $empCheck = $db->prepare('SELECT id FROM oretir_employees WHERE id = ? AND is_active = 1');
-                        $empCheck->execute([$empId]);
-                        if ($empCheck->fetch()) {
-                            $db->prepare(
-                                'INSERT INTO oretir_labor_entries (repair_order_id, employee_id, clock_in_at, is_billable, task_description, created_at, updated_at)
-                                 VALUES (?, ?, NOW(), 1, ?, NOW(), NOW())'
-                            )->execute([$roId, $empId, 'Diagnosis']);
-                        }
-                    }
-                }
+                autoClockInEmployee($db, $roId, $ro['assigned_employee_id'] ?? null, 'Diagnosis');
             } catch (\Throwable $e) {
                 error_log("repair-orders.php: diagnosis side effects failed for RO #{$roId}: " . $e->getMessage());
             }
@@ -508,22 +494,8 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
         case 'in_progress':
             // Auto clock-in assigned employee if no active timer (coming from approved, waiting_parts, or on_hold)
             try {
-                $empId = $ro['assigned_employee_id'] ?? null;
-                if ($empId) {
-                    $openCheck = $db->prepare('SELECT id FROM oretir_labor_entries WHERE repair_order_id = ? AND clock_out_at IS NULL LIMIT 1');
-                    $openCheck->execute([$roId]);
-                    if (!$openCheck->fetch()) {
-                        $empCheck = $db->prepare('SELECT id FROM oretir_employees WHERE id = ? AND is_active = 1');
-                        $empCheck->execute([$empId]);
-                        if ($empCheck->fetch()) {
-                            $task = in_array($oldStatus, ['waiting_parts', 'on_hold'], true) ? 'Resumed' : 'Repairs';
-                            $db->prepare(
-                                'INSERT INTO oretir_labor_entries (repair_order_id, employee_id, clock_in_at, is_billable, task_description, created_at, updated_at)
-                                 VALUES (?, ?, NOW(), 1, ?, NOW(), NOW())'
-                            )->execute([$roId, $empId, $task]);
-                        }
-                    }
-                }
+                $task = in_array($oldStatus, ['waiting_parts', 'on_hold'], true) ? 'Resumed' : 'Repairs';
+                autoClockInEmployee($db, $roId, $ro['assigned_employee_id'] ?? null, $task);
 
                 // Set service_started_at if not set (first time hitting in_progress)
                 $db->prepare('UPDATE oretir_repair_orders SET service_started_at = COALESCE(service_started_at, NOW()) WHERE id = ?')
@@ -666,4 +638,31 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
     }
 
     return $result;
+}
+
+// ─── autoClockInEmployee — safely clock in an employee if no active labor exists ──
+function autoClockInEmployee(PDO $db, int $roId, ?int $empId, string $task = 'Work'): void
+{
+    if (!$empId) return;
+
+    // Check no open clock-in already exists for this RO
+    $openCheck = $db->prepare('SELECT id FROM oretir_labor_entries WHERE repair_order_id = ? AND clock_out_at IS NULL LIMIT 1');
+    $openCheck->execute([$roId]);
+    if ($openCheck->fetch()) return;
+
+    // Verify employee is active
+    $empCheck = $db->prepare('SELECT id FROM oretir_employees WHERE id = ? AND is_active = 1');
+    $empCheck->execute([$empId]);
+    if (!$empCheck->fetch()) return;
+
+    // Insert — wrapped in try/catch to handle race condition gracefully
+    try {
+        $db->prepare(
+            'INSERT INTO oretir_labor_entries (repair_order_id, employee_id, clock_in_at, is_billable, task_description, created_at, updated_at)
+             VALUES (?, ?, NOW(), 1, ?, NOW(), NOW())'
+        )->execute([$roId, $empId, $task]);
+    } catch (\Throwable $e) {
+        // Duplicate or concurrent insert — safe to ignore
+        error_log("autoClockInEmployee: insert failed for RO #{$roId} emp #{$empId}: " . $e->getMessage());
+    }
 }

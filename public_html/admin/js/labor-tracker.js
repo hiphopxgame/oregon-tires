@@ -678,7 +678,7 @@ async function loadJobBoard() {
           timerRow.appendChild(visitWrap);
         }
         var repairStart = null;
-        if (ro.active_labor && ro.active_labor.length > 0) {
+        if (ro.active_labor && ro.active_labor.length > 0 && ro.active_labor[0].clock_in_at) {
           repairStart = ro.active_labor[0].clock_in_at;
         } else if (ro.service_started_at && !ro.service_ended_at) {
           repairStart = ro.service_started_at;
