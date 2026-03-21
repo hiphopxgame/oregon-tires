@@ -477,14 +477,24 @@
       <a href="#home">
         <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" width="781" height="275" loading="eager" fetchpriority="high"></picture>
       </a>
-      <nav class="hidden md:flex items-center gap-6">
+      <nav class="hidden md:flex items-center gap-5">
         <a href="#home" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="home">Home</a>
         <a href="#services" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="services">Services</a>
-        <a href="#about" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="about">About</a>
+        <a href="/financing" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="financing">Financing</a>
         <a href="#reviews" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="testimonials">Reviews</a>
-        <a href="/promotions" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="gallery">Promotions</a>
-        <a href="#faq" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="faqNav">FAQ</a>
-        <a href="#contact" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="contact">Contact</a>
+        <div class="relative group">
+          <button class="text-brand dark:text-green-400 font-medium hover:opacity-70 flex items-center gap-1" data-t="more">More <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+          <div class="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-xl py-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+            <a href="/why-us" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="whyUs">Why Choose Us</a>
+            <a href="/guarantee" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="guarantee">Our Guarantee</a>
+            <a href="/care-plan" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="carePlan">Care Plan</a>
+            <a href="/service-areas" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="serviceAreas">Service Areas</a>
+            <a href="/blog" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="blog">Blog</a>
+            <a href="/promotions" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="gallery">Promotions</a>
+            <a href="#faq" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="faqNav">FAQ</a>
+            <a href="#contact" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="contact">Contact</a>
+          </div>
+        </div>
         <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition" data-t="getFreeEstimate">Free Estimate</a>
       </nav>
       <!-- Mobile menu button -->
@@ -493,8 +503,13 @@
     <div id="mobile-menu" class="hidden md:hidden bg-white border-t px-4 pb-4 dark:bg-gray-800 dark:border-gray-700">
       <a href="#home" class="block py-2 text-brand dark:text-green-400" data-t="home">Home</a>
       <a href="#services" class="block py-2 text-brand dark:text-green-400" data-t="services">Services</a>
-      <a href="#about" class="block py-2 text-brand dark:text-green-400" data-t="about">About</a>
+      <a href="/financing" class="block py-2 text-brand dark:text-green-400" data-t="financing">Financing</a>
       <a href="#reviews" class="block py-2 text-brand dark:text-green-400" data-t="testimonials">Reviews</a>
+      <a href="/why-us" class="block py-2 text-brand dark:text-green-400" data-t="whyUs">Why Choose Us</a>
+      <a href="/guarantee" class="block py-2 text-brand dark:text-green-400" data-t="guarantee">Our Guarantee</a>
+      <a href="/care-plan" class="block py-2 text-brand dark:text-green-400" data-t="carePlan">Care Plan</a>
+      <a href="/service-areas" class="block py-2 text-brand dark:text-green-400" data-t="serviceAreas">Service Areas</a>
+      <a href="/blog" class="block py-2 text-brand dark:text-green-400" data-t="blog">Blog</a>
       <a href="/promotions" class="block py-2 text-brand dark:text-green-400" data-t="gallery">Promotions</a>
       <a href="#faq" class="block py-2 text-brand dark:text-green-400" data-t="faqNav">FAQ</a>
       <a href="#contact" class="block py-2 text-brand dark:text-green-400" data-t="contact">Contact</a>
@@ -1153,7 +1168,7 @@
   <!-- Footer -->
   <footer class="bg-brand text-white py-12 pb-24 md:pb-12">
     <div class="container mx-auto px-4">
-      <div class="grid md:grid-cols-3 gap-8">
+      <div class="grid md:grid-cols-4 gap-8">
         <div>
           <h3 class="text-xl font-bold mb-4" data-t="contactInfo">Contact Information</h3>
           <div class="space-y-2 text-gray-200">
@@ -1162,25 +1177,52 @@
             <p data-setting="address">📍 8536 SE 82nd Ave, Portland, OR 97266</p>
             <p>🕐 <span data-t="monSat" data-setting="hours_weekday">Mon-Sat 7AM-7PM</span></p>
           </div>
+          <div class="mt-4">
+            <a href="https://www.facebook.com/61571913202998/" target="_blank" class="inline-block text-gray-200 hover:text-amber-300 mr-3">Facebook</a>
+            <a href="https://www.instagram.com/oregontires" target="_blank" class="inline-block text-gray-200 hover:text-amber-300">Instagram</a>
+          </div>
         </div>
         <div>
           <h3 class="text-xl font-bold mb-4" data-t="services">Services</h3>
           <ul class="space-y-1 text-gray-200">
-            <li data-t="tireInstallation">Tire Installation</li>
-            <li data-t="tireRepair">Tire Repair</li>
-            <li data-t="wheelAlignment">Wheel Alignment</li>
-            <li data-t="brakeService">Brake Service</li>
-            <li data-t="oilChange">Oil Change</li>
+            <li><a href="/tire-installation" class="hover:text-amber-300 transition" data-t="tireInstallation">Tire Installation</a></li>
+            <li><a href="/tire-repair" class="hover:text-amber-300 transition" data-t="tireRepair">Tire Repair</a></li>
+            <li><a href="/wheel-alignment" class="hover:text-amber-300 transition" data-t="wheelAlignment">Wheel Alignment</a></li>
+            <li><a href="/brake-service" class="hover:text-amber-300 transition" data-t="brakeService">Brake Service</a></li>
+            <li><a href="/oil-change" class="hover:text-amber-300 transition" data-t="oilChange">Oil Change</a></li>
+            <li><a href="/engine-diagnostics" class="hover:text-amber-300 transition" data-t="engineDiagnostics">Engine Diagnostics</a></li>
+            <li><a href="/suspension-repair" class="hover:text-amber-300 transition" data-t="suspensionRepair">Suspension Repair</a></li>
+            <li><a href="/fleet-services" class="hover:text-amber-300 transition" data-t="fleetServices">Fleet Services</a></li>
           </ul>
         </div>
         <div>
-          <h3 class="text-xl font-bold mb-4" data-t="followUs">Follow Us</h3>
-          <div class="space-y-2">
-            <a href="https://www.facebook.com/61571913202998/" target="_blank" class="block text-gray-200 hover:text-amber-300">Facebook</a>
-            <a href="https://www.instagram.com/oregontires" target="_blank" class="block text-gray-200 hover:text-amber-300">Instagram</a>
-          </div>
+          <h3 class="text-xl font-bold mb-4" data-t="quickLinks">Quick Links</h3>
+          <ul class="space-y-1 text-gray-200">
+            <li><a href="/financing" class="hover:text-amber-300 transition" data-t="financing">Financing</a></li>
+            <li><a href="/guarantee" class="hover:text-amber-300 transition" data-t="guarantee">Our Guarantee</a></li>
+            <li><a href="/why-us" class="hover:text-amber-300 transition" data-t="whyUs">Why Choose Us</a></li>
+            <li><a href="/care-plan" class="hover:text-amber-300 transition" data-t="carePlan">Care Plan</a></li>
+            <li><a href="/promotions" class="hover:text-amber-300 transition" data-t="gallery">Promotions</a></li>
+            <li><a href="/blog" class="hover:text-amber-300 transition" data-t="blog">Blog</a></li>
+            <li><a href="/faq" class="hover:text-amber-300 transition" data-t="faqNav">FAQ</a></li>
+            <li><a href="/reviews" class="hover:text-amber-300 transition" data-t="testimonials">Reviews</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4" data-t="serviceAreas">Service Areas</h3>
+          <ul class="space-y-1 text-gray-200">
+            <li><a href="/service-areas" class="hover:text-amber-300 transition" data-t="allAreas">All Service Areas</a></li>
+            <li><a href="/tires-se-portland" class="hover:text-amber-300 transition">SE Portland</a></li>
+            <li><a href="/tires-foster-powell" class="hover:text-amber-300 transition">Foster-Powell</a></li>
+            <li><a href="/tires-woodstock" class="hover:text-amber-300 transition">Woodstock</a></li>
+            <li><a href="/tires-lents" class="hover:text-amber-300 transition">Lents</a></li>
+            <li><a href="/tires-mt-scott" class="hover:text-amber-300 transition">Mt. Scott</a></li>
+            <li><a href="/tires-happy-valley" class="hover:text-amber-300 transition">Happy Valley</a></li>
+            <li><a href="/tires-clackamas" class="hover:text-amber-300 transition">Clackamas</a></li>
+            <li><a href="/tires-milwaukie" class="hover:text-amber-300 transition">Milwaukie</a></li>
+          </ul>
           <div class="mt-4">
-            <button onclick="toggleLanguage()" class="text-gray-200 hover:text-amber-300" id="footer-lang-toggle" aria-label="Switch language" data-t="langToggleFooter">English | Español</button>
+            <button onclick="toggleLanguage()" class="text-gray-200 hover:text-amber-300 text-sm" id="footer-lang-toggle" aria-label="Switch language" data-t="langToggleFooter">English | Español</button>
           </div>
         </div>
       </div>
