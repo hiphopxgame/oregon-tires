@@ -588,7 +588,7 @@
     <div id="tab-overview" class="tab-content fade-in" role="tabpanel">
       <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-6" data-t="dashboardOverview">Dashboard Overview</h2>
       <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
-        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-red-500 dark:bg-gray-800 dark:border-l-red-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="actionRequired">Action Required</div><div class="text-3xl font-bold text-red-600 dark:text-red-400" id="stat-action">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-action-detail" data-t="awaitingConfirmation">Needs attention</p></div>
+        <div onclick="showOverdueAppointments()" class="bg-white rounded-xl shadow p-6 border-l-4 border-red-500 dark:bg-gray-800 dark:border-l-red-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="actionRequired">Action Required</div><div class="text-3xl font-bold text-red-600 dark:text-red-400" id="stat-action">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-action-detail" data-t="awaitingConfirmation">Needs attention</p></div>
         <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-amber-500 dark:bg-gray-800 dark:border-l-amber-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="todaySchedule">Today</div><div class="text-3xl font-bold text-amber-600 dark:text-amber-400" id="stat-today">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-today-detail"></p></div>
         <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-500 dark:bg-gray-800 dark:border-l-blue-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="thisWeek">This Week</div><div class="text-3xl font-bold text-blue-600 dark:text-blue-400" id="stat-week">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-week-detail"></p></div>
         <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-green-500 dark:bg-gray-800 dark:border-l-green-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="upcoming">Upcoming</div><div class="text-3xl font-bold text-green-600 dark:text-green-400" id="stat-upcoming">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-upcoming-detail"></p></div>
@@ -688,7 +688,7 @@
           <div class="flex flex-wrap gap-3 mb-4">
             <input type="text" id="appt-search" data-t="searchPlaceholder" placeholder="Search by name, email, service..." onkeyup="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm flex-1 min-w-0" aria-label="Search">
             <select id="appt-filter" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
-              <option value="all" data-t="apptStatusAll">All Status</option><option value="new" data-t="apptStatusNew">New</option><option value="confirmed" data-t="apptStatusConfirmed">Confirmed</option><option value="unassigned" data-t="apptStatusUnassigned">Unassigned</option><option value="completed" data-t="apptStatusCompleted">Completed</option><option value="cancelled" data-t="apptStatusCancelled">Cancelled</option>
+              <option value="all" data-t="apptStatusAll">All Status</option><option value="new" data-t="apptStatusNew">New</option><option value="confirmed" data-t="apptStatusConfirmed">Confirmed</option><option value="unassigned" data-t="apptStatusUnassigned">Unassigned</option><option value="overdue" data-t="apptStatusOverdue">Overdue</option><option value="completed" data-t="apptStatusCompleted">Completed</option><option value="cancelled" data-t="apptStatusCancelled">Cancelled</option>
             </select>
             <select id="appt-month" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
               <option value="all" data-t="apptAllMonths">All Months</option>
@@ -4954,6 +4954,8 @@ const adminT = {
     apptStatusNew: 'New',
     apptStatusConfirmed: 'Confirmed',
     apptStatusCompleted: 'Completed',
+    apptStatusOverdue: 'Overdue',
+    apptStatusUnassigned: 'Unassigned',
     apptStatusCancelled: 'Cancelled',
     // Service skills
     serviceCertifications: 'Service Certifications',
@@ -6546,6 +6548,8 @@ const adminT = {
     apptStatusNew: 'Nuevo',
     apptStatusConfirmed: 'Confirmado',
     apptStatusCompleted: 'Completado',
+    apptStatusOverdue: 'Vencidas',
+    apptStatusUnassigned: 'Sin Asignar',
     apptStatusCancelled: 'Cancelado',
     // Service skills
     serviceCertifications: 'Certificaciones de Servicio',
@@ -8507,7 +8511,7 @@ function renderOverviewAlerts(stats) {
       items.push('<div class="text-sm text-red-800 dark:text-red-300 flex items-center gap-2"><span>' + esc(a.first_name) + ' ' + esc(a.last_name) + '</span><span class="text-red-500 text-xs">' + fmtDate(a.preferred_date) + ' — ' + esc(a.service) + '</span></div>');
     });
     var extra = stats.overdue.length > 5 ? '<p class="text-xs text-red-500 mt-1">+' + (stats.overdue.length - 5) + ' ' + (T.showMore || 'more') + '</p>' : '';
-    parts.push('<div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 cursor-pointer hover:shadow-md transition" onclick="switchTab(\'appointments\')"><div class="flex items-center justify-between mb-2"><span class="text-red-600 dark:text-red-400 font-semibold">' + (T.overdueAppts || 'Overdue Appointments') + ' (' + stats.overdue.length + ')</span><span class="text-xs text-red-400 dark:text-red-500">' + (T.clickToView || 'Click to view') + ' →</span></div><div class="space-y-1">' + items.join('') + extra + '</div></div>');
+    parts.push('<div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 cursor-pointer hover:shadow-md transition" onclick="showOverdueAppointments()"><div class="flex items-center justify-between mb-2"><span class="text-red-600 dark:text-red-400 font-semibold">' + (T.overdueAppts || 'Overdue Appointments') + ' (' + stats.overdue.length + ')</span><span class="text-xs text-red-400 dark:text-red-500">' + (T.clickToView || 'Click to view') + ' →</span></div><div class="space-y-1">' + items.join('') + extra + '</div></div>');
   }
   if (stats.unassigned.length) {
     var uItems = [];
@@ -9541,14 +9545,24 @@ function showUnassignedAppointments() {
   }, 100);
 }
 
+function showOverdueAppointments() {
+  switchTab('appointments');
+  setTimeout(function() {
+    var filterEl = document.getElementById('appt-filter');
+    if (filterEl) { filterEl.value = 'overdue'; renderAppointments(); }
+  }, 100);
+}
+
 function renderAppointments() {
   const filter = document.getElementById('appt-filter').value;
   const search = document.getElementById('appt-search').value.toLowerCase();
   const month = document.getElementById('appt-month').value;
   const perPage = document.getElementById('appt-per-page').value;
 
+  var todayForFilter = localDateStr();
   let filtered = appointments.filter(a => {
     if (filter === 'unassigned') { if (a.assigned_employee_id || a.status === 'completed' || a.status === 'cancelled') return false; }
+    else if (filter === 'overdue') { if (a.status === 'completed' || a.status === 'cancelled' || a.preferred_date >= todayForFilter) return false; }
     else if (filter !== 'all' && a.status !== filter) return false;
     if (month !== 'all') { const [y,m] = month.split('-'); const ad = new Date(a.preferred_date+'T00:00:00'); if(ad.getFullYear()!==parseInt(y)||ad.getMonth()+1!==parseInt(m)) return false; }
     if (search) { const s = `${a.first_name} ${a.last_name} ${a.email} ${a.phone||''} ${a.service} ${a.status}`.toLowerCase(); if(!s.includes(search)) return false; }
