@@ -173,6 +173,76 @@ function sendJobFinishedSms(string $phone, string $customerName, string $roNumbe
 }
 
 /**
+ * Send RO status update SMS to customer.
+ * Called from handleStatusTransition() for key status changes.
+ * Silently skips if customer has no phone, no sms_opt_in, or SMS not configured.
+ *
+ * @param PDO    $db     Database connection
+ * @param array  $ro     Full RO row (includes customer_id, vehicle_id)
+ * @param string $event  Event type: 'check_in', 'estimate_sent', 'in_progress'
+ */
+function sendRoStatusSms(PDO $db, array $ro, string $event): void
+{
+    if (!isSmsConfigured()) return;
+
+    try {
+        // Get customer with sms_opt_in check
+        $custId = $ro['customer_id'] ?? null;
+        if (!$custId) return;
+
+        // Check appointment for sms_opt_in
+        $smsOptIn = false;
+        if (!empty($ro['appointment_id'])) {
+            $apptStmt = $db->prepare('SELECT sms_opt_in FROM oretir_appointments WHERE id = ?');
+            $apptStmt->execute([$ro['appointment_id']]);
+            $smsOptIn = (bool) ($apptStmt->fetchColumn() ?: 0);
+        }
+        if (!$smsOptIn) return;
+
+        $custStmt = $db->prepare('SELECT first_name, last_name, phone, language FROM oretir_customers WHERE id = ?');
+        $custStmt->execute([$custId]);
+        $cust = $custStmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$cust || empty($cust['phone'])) return;
+
+        $name = trim(($cust['first_name'] ?? '') . ' ' . ($cust['last_name'] ?? ''));
+        $lang = ($cust['language'] ?? 'english');
+        $isEs = $lang === 'spanish';
+
+        // Build vehicle string
+        $vehicle = '';
+        if (!empty($ro['vehicle_id'])) {
+            $vStmt = $db->prepare('SELECT year, make, model FROM oretir_vehicles WHERE id = ?');
+            $vStmt->execute([$ro['vehicle_id']]);
+            $v = $vStmt->fetch(\PDO::FETCH_ASSOC);
+            if ($v) $vehicle = trim(implode(' ', array_filter([$v['year'], $v['make'], $v['model']])));
+        }
+        $vehicleLabel = $vehicle ?: ($isEs ? 'su vehículo' : 'your vehicle');
+
+        $messages = [
+            'check_in' => [
+                'en' => "Oregon Tires: We've received your {$vehicleLabel}. We'll keep you updated on the progress. — Oregon Tires Auto Care",
+                'es' => "Oregon Tires: Hemos recibido su {$vehicleLabel}. Le mantendremos informado del progreso. — Oregon Tires Auto Care",
+            ],
+            'estimate_sent' => [
+                'en' => "Oregon Tires: Your estimate for {$vehicleLabel} is ready for review. Please check your email. — Oregon Tires Auto Care",
+                'es' => "Oregon Tires: Su presupuesto para {$vehicleLabel} está listo. Por favor revise su correo. — Oregon Tires Auto Care",
+            ],
+            'in_progress' => [
+                'en' => "Oregon Tires: Work has begun on your {$vehicleLabel}. We'll notify you when it's ready. — Oregon Tires Auto Care",
+                'es' => "Oregon Tires: El trabajo ha comenzado en su {$vehicleLabel}. Le avisaremos cuando esté listo. — Oregon Tires Auto Care",
+            ],
+        ];
+
+        if (!isset($messages[$event])) return;
+        $body = $isEs ? $messages[$event]['es'] : $messages[$event]['en'];
+
+        sendSms($cust['phone'], $body);
+    } catch (\Throwable $e) {
+        error_log("sendRoStatusSms error (RO #{$ro['id']}, event={$event}): " . $e->getMessage());
+    }
+}
+
+/**
  * Send approval confirmation SMS to customer.
  */
 function sendApprovalConfirmationSms(string $phone, string $name, string $language = 'english'): array
