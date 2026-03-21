@@ -404,6 +404,33 @@ try {
 
         $db->prepare('UPDATE oretir_repair_orders SET ' . implode(', ', $fields) . ' WHERE id = ?')->execute($params);
 
+        // ─── Sync RO field changes back to linked appointment ────────────
+        if (!empty($ro['appointment_id'])) {
+            $apptSync = [];
+            $apptSyncParams = [];
+
+            // RO employee change → sync to appointment
+            if (isset($data['assigned_employee_id'])) {
+                $apptSync[] = 'assigned_employee_id = ?';
+                $apptSyncParams[] = $data['assigned_employee_id'] !== '' && $data['assigned_employee_id'] !== null ? (int) $data['assigned_employee_id'] : null;
+
+                // If employee unassigned on RO → revert appointment to 'new' if still confirmed
+                if (empty($data['assigned_employee_id'])) {
+                    $apptSync[] = "status = CASE WHEN status = 'confirmed' THEN 'new' ELSE status END";
+                }
+            }
+
+            if ($apptSync) {
+                $apptSyncParams[] = (int) $ro['appointment_id'];
+                try {
+                    $db->prepare('UPDATE oretir_appointments SET ' . implode(', ', $apptSync) . ', updated_at = NOW() WHERE id = ?')
+                       ->execute($apptSyncParams);
+                } catch (\Throwable $e) {
+                    error_log("repair-orders.php: appointment field sync failed for RO #{$id}: " . $e->getMessage());
+                }
+            }
+        }
+
         // ─── Handle status transition side effects ────────────────────────
         $transitionResult = [];
         if (isset($data['status'])) {
@@ -446,25 +473,33 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
             try {
                 $bayNumber = !empty($body['bay_number']) ? (int) $body['bay_number'] : null;
 
-                // Create visit_log entry if table exists
+                // Create visit_log entry if table exists (idempotent — skip if one already exists for this RO)
                 try {
-                    $vlStmt = $db->prepare(
-                        'INSERT INTO oretir_visit_log (repair_order_id, appointment_id, customer_id, check_in_at, bay_number, assigned_employee_id, created_at)
-                         VALUES (?, ?, ?, NOW(), ?, ?, NOW())'
-                    );
-                    $vlStmt->execute([$roId, $ro['appointment_id'] ?: null, $ro['customer_id'], $bayNumber, $ro['assigned_employee_id'] ?? null]);
-                    $visitLogId = (int) $db->lastInsertId();
-                    $db->prepare('UPDATE oretir_repair_orders SET checked_in_at = NOW(), visit_log_id = ? WHERE id = ?')
-                       ->execute([$visitLogId, $roId]);
+                    $existingVisit = $db->prepare('SELECT id FROM oretir_visit_log WHERE repair_order_id = ? LIMIT 1');
+                    $existingVisit->execute([$roId]);
+                    if ($existingVisit->fetch()) {
+                        // Visit already exists — just update RO timestamp
+                        $db->prepare('UPDATE oretir_repair_orders SET checked_in_at = COALESCE(checked_in_at, NOW()) WHERE id = ?')
+                           ->execute([$roId]);
+                    } else {
+                        $vlStmt = $db->prepare(
+                            'INSERT INTO oretir_visit_log (repair_order_id, appointment_id, customer_id, check_in_at, bay_number, assigned_employee_id, created_at)
+                             VALUES (?, ?, ?, NOW(), ?, ?, NOW())'
+                        );
+                        $vlStmt->execute([$roId, $ro['appointment_id'] ?: null, $ro['customer_id'], $bayNumber, $ro['assigned_employee_id'] ?? null]);
+                        $visitLogId = (int) $db->lastInsertId();
+                        $db->prepare('UPDATE oretir_repair_orders SET checked_in_at = NOW(), visit_log_id = ? WHERE id = ?')
+                           ->execute([$visitLogId, $roId]);
+                    }
                 } catch (\Throwable $vlErr) {
                     // visit_log table may not exist yet — just set the RO timestamp
                     $db->prepare('UPDATE oretir_repair_orders SET checked_in_at = NOW() WHERE id = ?')
                        ->execute([$roId]);
                 }
 
-                // Sync check_in_at to appointment
+                // Sync check_in_at to appointment (idempotent — don't overwrite)
                 if ($ro['appointment_id']) {
-                    $db->prepare('UPDATE oretir_appointments SET check_in_at = NOW() WHERE id = ?')
+                    $db->prepare('UPDATE oretir_appointments SET check_in_at = COALESCE(check_in_at, NOW()) WHERE id = ?')
                        ->execute([$ro['appointment_id']]);
                 }
             } catch (\Throwable $e) {
@@ -580,6 +615,12 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
                 $db->prepare('UPDATE oretir_repair_orders SET checked_out_at = NOW(), service_ended_at = COALESCE(service_ended_at, NOW()) WHERE id = ?')
                    ->execute([$roId]);
 
+                // Sync check_out_at to appointment
+                if ($ro['appointment_id']) {
+                    $db->prepare('UPDATE oretir_appointments SET check_out_at = NOW() WHERE id = ?')
+                       ->execute([$ro['appointment_id']]);
+                }
+
                 require_once __DIR__ . '/../../includes/invoices.php';
                 require_once __DIR__ . '/../../includes/mail.php';
                 $invoiceResult = createInvoiceFromEstimate($db, $roId);
@@ -626,6 +667,12 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
 
                 $db->prepare('UPDATE oretir_repair_orders SET checked_out_at = COALESCE(checked_out_at, NOW()), service_ended_at = COALESCE(service_ended_at, NOW()) WHERE id = ?')
                    ->execute([$roId]);
+
+                // Sync check_out_at to appointment
+                if ($ro['appointment_id']) {
+                    $db->prepare('UPDATE oretir_appointments SET check_out_at = COALESCE(check_out_at, NOW()) WHERE id = ?')
+                       ->execute([$ro['appointment_id']]);
+                }
 
                 try {
                     $db->prepare('UPDATE oretir_visit_log SET check_out_at = NOW() WHERE repair_order_id = ? AND check_out_at IS NULL')
