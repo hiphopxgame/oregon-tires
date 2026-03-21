@@ -182,7 +182,10 @@ var LaborTracker = {
     // Completed entries table
     if (completedEntries.length > 0) {
       var table = document.createElement('div');
-      table.className = 'border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden';
+      table.className = 'border border-gray-200 dark:border-gray-700 rounded-xl overflow-x-auto -mx-1';
+
+      var tableInner = document.createElement('div');
+      tableInner.className = 'min-w-[640px]';
 
       // Table header
       var thead = document.createElement('div');
@@ -203,13 +206,14 @@ var LaborTracker = {
         th.textContent = col.text;
         thead.appendChild(th);
       });
-      table.appendChild(thead);
+      tableInner.appendChild(thead);
 
       // Table body
       completedEntries.forEach(function(entry) {
-        table.appendChild(self._renderCompletedRow(entry, containerId));
+        tableInner.appendChild(self._renderCompletedRow(entry, containerId));
       });
 
+      table.appendChild(tableInner);
       section.appendChild(table);
     }
 
@@ -592,7 +596,7 @@ async function loadJobBoard() {
     container.appendChild(viewToggle);
 
     // ── Summary Stats ──
-    var stats = _el('div', 'grid grid-cols-3 gap-4 mb-4');
+    var stats = _el('div', 'grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4');
     [
       { label: t('laborJbActiveRos', 'Active ROs'), value: summary.active_ros || 0, pulse: (summary.active_ros || 0) > 0 },
       { label: t('laborJbTechsWorking', 'Techs Working'), value: summary.techs_working || 0 },
@@ -837,7 +841,8 @@ async function loadLaborReports() {
     if (employees.length > 0) {
       var summarySection = _el('div', 'mb-6');
       summarySection.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm mb-3', t('laborEmployeeSummary', 'Employee Summary')));
-      var table = _el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700');
+      var tableWrap = _el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 overflow-x-auto');
+      var table = _el('div', 'min-w-[500px]');
       var thead = _el('div', 'grid grid-cols-6 gap-2 bg-gray-50 dark:bg-gray-900/50 px-5 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider');
       [t('laborSummaryEmployee', 'Employee'), t('laborSummaryTotalHrs', 'Total Hours'), t('laborSummaryBillableHrs', 'Billable'), t('laborEfficiency', 'Efficiency'), t('laborSummaryActiveClocks', 'Active'), t('laborSummaryRoCount', 'ROs')].forEach(function(txt) { thead.appendChild(_el('div', '', txt)); });
       table.appendChild(thead);
@@ -853,7 +858,8 @@ async function loadLaborReports() {
         tr.appendChild(_el('div', 'text-gray-600 dark:text-gray-400', String(row.ro_count || 0)));
         table.appendChild(tr);
       });
-      summarySection.appendChild(table);
+      tableWrap.appendChild(table);
+      summarySection.appendChild(tableWrap);
       container.appendChild(summarySection);
     }
 

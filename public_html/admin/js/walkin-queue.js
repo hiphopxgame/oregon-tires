@@ -260,7 +260,7 @@
     }
 
     // Name row
-    var row1 = el('div', 'grid grid-cols-2 gap-3 relative');
+    var row1 = el('div', 'grid grid-cols-1 sm:grid-cols-2 gap-3 relative');
     var fnWrap = el('div');
     fnWrap.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', t('wqFirstName', 'First Name') + ' *'));
     var fnInp = document.createElement('input'); fnInp.id = 'wq-fname'; fnInp.className = iClass; fnInp.required = true;
@@ -276,7 +276,7 @@
     pn.appendChild(row1);
 
     // Email & Phone row
-    var row2 = el('div', 'grid grid-cols-2 gap-3 relative');
+    var row2 = el('div', 'grid grid-cols-1 sm:grid-cols-2 gap-3 relative');
     var emWrap = el('div');
     emWrap.appendChild(el('label', 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', 'Email'));
     var emInp = document.createElement('input'); emInp.id = 'wq-email'; emInp.type = 'email'; emInp.className = iClass;

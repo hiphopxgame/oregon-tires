@@ -238,7 +238,7 @@
         }
 
         // ── Timing row: visual timeline ──
-        var timeRow = el('div', 'mt-3 grid grid-cols-4 gap-2 text-center');
+        var timeRow = el('div', 'mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center');
 
         // Check-in time
         var t1 = el('div', 'rounded-lg p-2 ' + (v.check_in_at ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'));

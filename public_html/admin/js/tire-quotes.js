@@ -73,7 +73,7 @@
     var quotedCount = quotes.filter(function(q) { return q.status === 'quoted'; }).length;
     var acceptedCount = quotes.filter(function(q) { return q.status === 'accepted' || q.status === 'ordered'; }).length;
     if (quotes.length > 0) {
-      var stats = el('div', 'grid grid-cols-3 gap-4 mb-4');
+      var stats = el('div', 'grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4');
       [[newCount, t('tqNewRequests', 'New Requests'), 'text-blue-600 dark:text-blue-400'],
        [quotedCount, t('tqAwaitingResponse', 'Awaiting Response'), 'text-yellow-600 dark:text-yellow-400'],
        [acceptedCount, t('tqAcceptedOrdered', 'Accepted / Ordered'), 'text-green-600 dark:text-green-400']

@@ -4047,7 +4047,7 @@
       <button onclick="closeModal('new-appt-modal')" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
     </div>
     <form id="new-appt-form" onsubmit="createAppointment(event)">
-      <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Source</span>
           <div class="flex gap-4 mt-1">
             <label class="flex items-center gap-1"><input type="radio" name="appt-source" value="walk-in" checked class="text-brand"> Walk-in</label>
@@ -4055,7 +4055,7 @@
           </div>
         </label>
       </div>
-      <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">First Name *</span>
           <input type="text" name="appt-first-name" required autocomplete="off" oninput="searchCustomerSuggestions(this.value)" class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
         </label>
@@ -4063,7 +4063,7 @@
           <input type="text" name="appt-last-name" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
         </label>
       </div>
-      <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div class="relative">
           <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Email *</span>
             <input type="email" name="appt-email" required autocomplete="off" oninput="searchCustomerSuggestions(this.value)" onblur="setTimeout(function(){var b=document.getElementById('customer-suggestions');if(b)b.classList.add('hidden');},200)" class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
@@ -4078,7 +4078,7 @@
           <input type="tel" name="appt-phone" required autocomplete="off" oninput="searchCustomerSuggestions(this.value)" class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
         </label>
       </div>
-      <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Service *</span>
           <select id="admin-appt-service-select" name="appt-service" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
             <option value="">Select...</option>
@@ -4107,7 +4107,7 @@
           </label>
         </div>
       </div>
-      <div class="grid grid-cols-3 gap-2 mb-4">
+      <div class="grid grid-cols-3 sm:grid-cols-3 gap-2 mb-4">
         <label class="block"><span class="text-xs text-gray-500 dark:text-gray-400">Year</span>
           <input type="text" name="appt-vehicle-year" maxlength="4" placeholder="2024" class="mt-1 w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
         </label>
@@ -8156,11 +8156,11 @@ function openGroupModal(groupId) {
     + '</div>'
     // Modal body
     + '<div class="px-6 py-4 space-y-4">'
-    + '<div class="grid grid-cols-2 gap-3">'
+    + '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">'
     + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">' + (T.groupNameEn || 'Name (English)') + ' *</label><input id="group-name-en" class="w-full p-2 border rounded-lg mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.name_en : '') + '" placeholder="e.g. Front Desk"></div>'
     + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">' + (T.groupNameEs || 'Name (Spanish)') + '</label><input id="group-name-es" class="w-full p-2 border rounded-lg mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.name_es : '') + '" placeholder="ej. Recepción"></div>'
     + '</div>'
-    + '<div class="grid grid-cols-2 gap-3">'
+    + '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">'
     + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">' + (T.groupDescEn || 'Description (English)') + '</label><input id="group-desc-en" class="w-full p-2 border rounded-lg mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.description_en : '') + '"></div>'
     + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">' + (T.groupDescEs || 'Description (Spanish)') + '</label><input id="group-desc-es" class="w-full p-2 border rounded-lg mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.description_es : '') + '"></div>'
     + '</div>'
@@ -9976,7 +9976,7 @@ function openMessageModal(id) {
   var m = messages.find(function(msg) { return msg.id === id; }); if(!m) return;
   var iClass = 'w-full border rounded px-2 py-1.5 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100';
   document.getElementById('message-modal-meta').innerHTML =
-    '<div class="grid grid-cols-2 gap-3 mb-1">'
+    '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-1">'
     + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">First Name</label>'
     + '<input id="msg-edit-fname" class="' + iClass + '" value="' + esc(m.first_name || '') + '"></div>'
     + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">Last Name</label>'
@@ -10711,7 +10711,7 @@ function buildDailyScheduleDOM() {
     details.appendChild(summary);
 
     var slotGrid = document.createElement('div');
-    slotGrid.className = 'grid grid-cols-4 md:grid-cols-8 gap-2 mt-3';
+    slotGrid.className = 'grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2 mt-3';
     var sortedSlots = Object.keys(data.slot_capacity).sort();
     sortedSlots.forEach(function(slot) {
       var cap = data.slot_capacity[slot];
@@ -11680,7 +11680,7 @@ async function loadAnalytics() {
     // Messages Overview
     var msgCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
     msgCard.appendChild(el('h3', 'text-lg font-bold text-gray-800 dark:text-gray-200 mb-4', T.analyticsMessagesSection));
-    var msgGrid = el('div', 'grid grid-cols-2 gap-4');
+    var msgGrid = el('div', 'grid grid-cols-1 sm:grid-cols-2 gap-4');
     var mg1 = el('div', 'bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-center');
     mg1.appendChild(el('p', 'text-sm text-gray-600 dark:text-gray-400', T.analyticsTotal));
     mg1.appendChild(el('p', 'text-2xl font-bold text-gray-800 dark:text-gray-200', String(totalMsgs)));
@@ -13438,7 +13438,7 @@ async function loadMySchedule() {
       });
 
       var statsRow = document.createElement('div');
-      statsRow.className = 'grid grid-cols-3 gap-3 mb-5';
+      statsRow.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5';
       [[String(workDays.length), T.schedWorkDays || 'Work Days', 'text-green-600 dark:text-green-400'],
        [totalHours.toFixed(0) + 'h', T.schedWeeklyHours || 'Weekly Hours', 'text-blue-600 dark:text-blue-400'],
        [String(7 - workDays.length), T.schedDaysOff || 'Days Off', 'text-gray-500 dark:text-gray-400']
@@ -13578,7 +13578,7 @@ async function loadMySchedule() {
       var todayApptCount = appointments.filter(function(a) { return a.preferred_date === todayStr && a.status !== 'cancelled'; }).length;
 
       var statsRow = document.createElement('div');
-      statsRow.className = 'grid grid-cols-3 gap-3 mb-5';
+      statsRow.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5';
       [[String(workingToday), T.schedOnDuty || 'On Duty', 'text-green-600 dark:text-green-400'],
        [String(offToday), T.off || 'Off', 'text-gray-500 dark:text-gray-400'],
        [String(todayApptCount), T.appointmentsLabel || 'Appointments', 'text-blue-600 dark:text-blue-400']
@@ -13784,7 +13784,7 @@ async function loadMyWork() {
     var overdueAppts = allAppts.filter(function(a) { return a.preferred_date < todayStr; });
 
     var statsGrid = document.createElement('div');
-    statsGrid.className = 'grid grid-cols-3 gap-3 mb-6';
+    statsGrid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6';
     [[String(todayAppts.length), T.todayLabel || 'Today', 'text-green-600 dark:text-green-400'],
      [String(upcomingAppts.length), T.upcoming || 'Upcoming', 'text-blue-600 dark:text-blue-400'],
      [String(overdueAppts.length), T.overdue || 'Overdue', overdueAppts.length ? 'text-red-600 dark:text-red-400' : 'text-gray-400']
@@ -14271,7 +14271,7 @@ async function showCustomerHistory(email) {
     }).join('');
   }
 
-  infoDiv.innerHTML = '<div class="grid grid-cols-2 gap-3">'
+  infoDiv.innerHTML = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">'
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].thCustomer || 'Customer') + '</span><div class="font-semibold text-gray-800 dark:text-gray-200">' + name + '</div></div>'
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">Email</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(customer.email) + '</div></div>'
     + '<div><span class="text-xs text-gray-500 dark:text-gray-400">' + (adminT[currentLang].phone || 'Phone') + '</span><div class="text-sm text-gray-700 dark:text-gray-300">' + esc(customer.phone || '—') + '</div></div>'
