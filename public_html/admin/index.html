@@ -27,6 +27,7 @@
     .dark .status-read, .dark .status-replied { background: #312e81; color: #c7d2fe; }
     .fade-in { animation: fadeIn 0.3s ease-in; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     .modal-overlay { background: rgba(0,0,0,0.5); }
     /* Calendar sync badges */
     .cal-sync-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 9999px; font-size: 11px; font-weight: 500; vertical-align: middle; margin-left: 4px; cursor: default; }
@@ -4564,6 +4565,10 @@ const adminT = {
     techPickerNoTechs: 'No active employees',
     techPickerAssign: 'Assign Tech',
     techPickerChange: 'Change',
+    conflictTitle: 'Schedule Conflict',
+    conflictAssignAnyway: 'Assign Anyway',
+    conflictCancel: 'Cancel',
+    conflictScheduleNote: 'This employee is outside their scheduled hours for this appointment.',
     employeeActivated: 'Employee activated',
     employeeDeactivated: 'Employee deactivated',
     employeeAdded: 'Employee added!',
@@ -6150,6 +6155,10 @@ const adminT = {
     techPickerNoTechs: 'Sin empleados activos',
     techPickerAssign: 'Asignar Técnico',
     techPickerChange: 'Cambiar',
+    conflictTitle: 'Conflicto de Horario',
+    conflictAssignAnyway: 'Asignar de Todos Modos',
+    conflictCancel: 'Cancelar',
+    conflictScheduleNote: 'Este empleado está fuera de su horario programado para esta cita.',
     employeeActivated: 'Empleado activado',
     employeeDeactivated: 'Empleado desactivado',
     employeeAdded: '\u00A1Empleado agregado!',
@@ -12152,6 +12161,109 @@ function openTechPicker(event, apptId, service, date, currentEmpId) {
   });
 }
 
+function showConflictDialog(conflictJson, onConfirm, onCancel) {
+  var T = adminT[currentLang] || {};
+  var existing = document.getElementById('conflict-dialog-overlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'conflict-dialog-overlay';
+  overlay.className = 'fixed inset-0 z-[200] flex items-center justify-center p-4';
+
+  // Backdrop
+  var backdrop = document.createElement('div');
+  backdrop.className = 'absolute inset-0 bg-black/40';
+  backdrop.addEventListener('click', function() { dismiss(false); });
+  overlay.appendChild(backdrop);
+
+  // Card
+  var card = document.createElement('div');
+  card.className = 'relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in';
+  card.style.animation = 'fadeInScale 0.2s ease-out';
+
+  // Header
+  var header = document.createElement('div');
+  header.className = 'bg-amber-50 dark:bg-amber-900/20 px-5 py-4 border-b border-amber-200 dark:border-amber-800';
+
+  var titleRow = document.createElement('div');
+  titleRow.className = 'flex items-center gap-2.5';
+
+  var icon = document.createElement('div');
+  icon.className = 'w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0';
+  icon.innerHTML = '<svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>';
+  titleRow.appendChild(icon);
+
+  var titleText = document.createElement('div');
+  var h3 = document.createElement('h3');
+  h3.className = 'font-semibold text-gray-900 dark:text-gray-100 text-sm';
+  h3.textContent = T.conflictTitle || 'Schedule Conflict';
+  titleText.appendChild(h3);
+  titleRow.appendChild(titleText);
+  header.appendChild(titleRow);
+  card.appendChild(header);
+
+  // Body
+  var body = document.createElement('div');
+  body.className = 'px-5 py-4';
+
+  var msg = document.createElement('p');
+  msg.className = 'text-sm text-gray-700 dark:text-gray-300 font-medium';
+  msg.textContent = conflictJson.error || '';
+  body.appendChild(msg);
+
+  if (conflictJson.hours) {
+    var schedBadge = document.createElement('div');
+    schedBadge.className = 'mt-3 inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2';
+    schedBadge.innerHTML = '<svg class="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+    var hoursText = document.createElement('span');
+    hoursText.className = 'text-sm font-mono text-gray-700 dark:text-gray-300';
+    hoursText.textContent = conflictJson.hours;
+    schedBadge.appendChild(hoursText);
+    body.appendChild(schedBadge);
+  }
+
+  var note = document.createElement('p');
+  note.className = 'mt-3 text-xs text-gray-400 dark:text-gray-500';
+  note.textContent = T.conflictScheduleNote || 'This employee is outside their scheduled hours for this appointment.';
+  body.appendChild(note);
+
+  card.appendChild(body);
+
+  // Footer buttons
+  var footer = document.createElement('div');
+  footer.className = 'px-5 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700 flex gap-3 justify-end';
+
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition';
+  cancelBtn.textContent = T.conflictCancel || 'Cancel';
+  cancelBtn.addEventListener('click', function() { dismiss(false); });
+  footer.appendChild(cancelBtn);
+
+  var confirmBtn = document.createElement('button');
+  confirmBtn.className = 'px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg transition shadow-sm';
+  confirmBtn.textContent = T.conflictAssignAnyway || 'Assign Anyway';
+  confirmBtn.addEventListener('click', function() { dismiss(true); });
+  footer.appendChild(confirmBtn);
+
+  card.appendChild(footer);
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  // Focus the cancel button
+  cancelBtn.focus();
+
+  // Escape to dismiss
+  function onKey(e) { if (e.key === 'Escape') dismiss(false); }
+  document.addEventListener('keydown', onKey);
+
+  function dismiss(confirmed) {
+    document.removeEventListener('keydown', onKey);
+    overlay.remove();
+    if (confirmed && typeof onConfirm === 'function') onConfirm();
+    else if (!confirmed && typeof onCancel === 'function') onCancel();
+  }
+}
+
 async function updateApptAssignment(id, empId, forceAssign) {
   const update = { id, assigned_employee_id: empId || null };
   if(empId) update.status = 'confirmed';
@@ -12163,13 +12275,11 @@ async function updateApptAssignment(id, empId, forceAssign) {
     const res = await fetch(url, { method: 'PUT', headers, body: JSON.stringify(update), credentials: 'include' });
     const json = await res.json();
     if (res.status === 409 && json.conflict) {
-      if (confirm(json.error + '\n\nAssign anyway?')) {
-        updateApptAssignment(id, empId, true);
-        return;
-      } else {
-        loadAppointments();
-        return;
-      }
+      showConflictDialog(json,
+        function() { updateApptAssignment(id, empId, true); },
+        function() { loadAppointments(); }
+      );
+      return;
     }
     if (!res.ok || !json.success) throw new Error(json.error || 'Request failed');
     showToast(empId ? adminT[currentLang].employeeAssigned : adminT[currentLang].assignmentRemoved);
@@ -14403,12 +14513,27 @@ async function createAppointment(e) {
     var res = await fetch(url, { method: 'POST', headers: hdrs, body: JSON.stringify(data), credentials: 'include' });
     var json = await res.json();
     if (res.status === 409 && json.conflict) {
-      if (confirm(json.error + '\n\nCreate anyway?')) {
-        data.force_assign = true;
-        var res2 = await fetch(url, { method: 'POST', headers: hdrs, body: JSON.stringify(data), credentials: 'include' });
-        json = await res2.json();
-        if (!res2.ok || !json.success) throw new Error(json.error || 'Request failed');
-      } else { btn.disabled = false; btn.textContent = adminT[currentLang].createAppointment || 'Create Appointment'; return; }
+      showConflictDialog(json,
+        async function() {
+          data.force_assign = true;
+          try {
+            var res2 = await fetch(url, { method: 'POST', headers: hdrs, body: JSON.stringify(data), credentials: 'include' });
+            var json2 = await res2.json();
+            if (!res2.ok || !json2.success) throw new Error(json2.error || 'Request failed');
+            showToast((adminT[currentLang].appointmentCreated || 'Appointment created!') + ' \u2014 ' + json2.data.reference_number);
+            document.getElementById('new-appt-form').reset();
+            document.getElementById('new-appt-modal').classList.add('hidden');
+            loadAppointments();
+          } catch(err) {
+            var errorEl = document.getElementById('new-appt-error');
+            errorEl.textContent = err.message || 'Error creating appointment';
+            errorEl.classList.remove('hidden');
+          }
+          btn.disabled = false; btn.textContent = adminT[currentLang].createAppointment || 'Create Appointment';
+        },
+        function() { btn.disabled = false; btn.textContent = adminT[currentLang].createAppointment || 'Create Appointment'; }
+      );
+      return;
     } else if (!res.ok || !json.success) {
       throw new Error(json.error || 'Request failed');
     }
