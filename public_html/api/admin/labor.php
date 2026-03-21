@@ -28,8 +28,10 @@ try {
     // ─── GET: List labor entries ────────────────────────────────────────────
     if ($method === 'GET') {
 
-        // Cross-RO labor summary (for the dedicated Labor tab)
+        // Cross-RO labor dashboard (for the dedicated Labor tab)
         if (!empty($_GET['summary'])) {
+
+            // 1. Per-employee summary
             $stmt = $db->query(
                 'SELECT
                     e.id   AS employee_id,
@@ -43,10 +45,8 @@ try {
                  GROUP BY e.id, e.name
                  ORDER BY e.name'
             );
-            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Cast numeric strings for clean JSON
-            foreach ($rows as &$r) {
+            $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($employees as &$r) {
                 $r['total_hours']    = (float) $r['total_hours'];
                 $r['billable_hours'] = (float) $r['billable_hours'];
                 $r['active_count']   = (int) $r['active_count'];
@@ -54,7 +54,75 @@ try {
             }
             unset($r);
 
-            jsonSuccess($rows);
+            // 2. Active clocks (currently clocked in) with full context
+            $active = $db->query(
+                'SELECT l.id, l.repair_order_id, l.employee_id, l.clock_in_at,
+                        l.task_description, l.is_billable,
+                        e.name AS employee_name, e.role AS employee_role,
+                        r.ro_number, r.status AS ro_status,
+                        c.first_name AS customer_first, c.last_name AS customer_last, c.phone AS customer_phone,
+                        v.year AS vehicle_year, v.make AS vehicle_make, v.model AS vehicle_model, v.license_plate
+                 FROM oretir_labor_entries l
+                 JOIN oretir_employees e ON e.id = l.employee_id
+                 JOIN oretir_repair_orders r ON r.id = l.repair_order_id
+                 LEFT JOIN oretir_customers c ON c.id = r.customer_id
+                 LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
+                 WHERE l.clock_out_at IS NULL
+                 ORDER BY l.clock_in_at ASC'
+            )->fetchAll(PDO::FETCH_ASSOC);
+
+            // 3. Recent completed entries (last 20) with full context
+            $recent = $db->query(
+                'SELECT l.id, l.repair_order_id, l.employee_id, l.clock_in_at, l.clock_out_at,
+                        l.duration_minutes, l.task_description, l.is_billable,
+                        e.name AS employee_name, r.ro_number, r.status AS ro_status,
+                        c.first_name AS customer_first, c.last_name AS customer_last,
+                        v.year AS vehicle_year, v.make AS vehicle_make, v.model AS vehicle_model
+                 FROM oretir_labor_entries l
+                 JOIN oretir_employees e ON e.id = l.employee_id
+                 JOIN oretir_repair_orders r ON r.id = l.repair_order_id
+                 LEFT JOIN oretir_customers c ON c.id = r.customer_id
+                 LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
+                 WHERE l.clock_out_at IS NOT NULL
+                 ORDER BY l.clock_out_at DESC
+                 LIMIT 20'
+            )->fetchAll(PDO::FETCH_ASSOC);
+
+            // 4. Active employees + active ROs for the clock-in form
+            $availableEmployees = $db->query(
+                'SELECT id, name FROM oretir_employees WHERE is_active = 1 ORDER BY name'
+            )->fetchAll(PDO::FETCH_ASSOC);
+
+            $placeholders = implode(',', array_fill(0, count($activeStatuses), '?'));
+            $roStmt = $db->prepare(
+                "SELECT id, ro_number, status FROM oretir_repair_orders
+                 WHERE status IN ($placeholders) ORDER BY created_at DESC"
+            );
+            $roStmt->execute($activeStatuses);
+            $availableROs = $roStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 5. Totals
+            $totals = $db->query(
+                'SELECT
+                    COUNT(*) AS total_entries,
+                    ROUND(COALESCE(SUM(duration_minutes), 0) / 60, 2) AS total_hours,
+                    ROUND(COALESCE(SUM(CASE WHEN is_billable = 1 THEN duration_minutes ELSE 0 END), 0) / 60, 2) AS billable_hours,
+                    SUM(CASE WHEN clock_out_at IS NULL THEN 1 ELSE 0 END) AS active_clocks
+                 FROM oretir_labor_entries'
+            )->fetch(PDO::FETCH_ASSOC);
+            $totals['total_hours']    = (float) $totals['total_hours'];
+            $totals['billable_hours'] = (float) $totals['billable_hours'];
+            $totals['active_clocks']  = (int) $totals['active_clocks'];
+            $totals['total_entries']  = (int) $totals['total_entries'];
+
+            jsonSuccess([
+                'employees'  => $employees,
+                'active'     => $active,
+                'recent'     => $recent,
+                'available_employees' => $availableEmployees,
+                'available_ros'       => $availableROs,
+                'totals'     => $totals,
+            ]);
         }
 
         // Entries for a specific repair order
@@ -104,10 +172,14 @@ try {
             }
 
             $stmt = $db->prepare(
-                'SELECT l.*, e.name as employee_name, r.ro_number
+                'SELECT l.*, e.name as employee_name, r.ro_number, r.status AS ro_status,
+                        c.first_name AS customer_first, c.last_name AS customer_last,
+                        v.year AS vehicle_year, v.make AS vehicle_make, v.model AS vehicle_model
                  FROM oretir_labor_entries l
                  JOIN oretir_employees e ON e.id = l.employee_id
                  JOIN oretir_repair_orders r ON r.id = l.repair_order_id
+                 LEFT JOIN oretir_customers c ON c.id = r.customer_id
+                 LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
                  WHERE l.employee_id = ?
                    AND DATE(l.clock_in_at) >= ?
                    AND DATE(l.clock_in_at) <= ?

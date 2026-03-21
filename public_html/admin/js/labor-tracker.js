@@ -493,94 +493,317 @@ var LaborTracker = {
 // Expose globally
 window.LaborTracker = LaborTracker;
 
-// ─── Cross-RO Labor Summary (for dedicated Labor tab) ──────────────────────
+// ─── Cross-RO Labor Dashboard (for dedicated Labor tab) ─────────────────────
+
+// Intervals for live elapsed timers
+var _laborTimers = [];
+function _clearLaborTimers() {
+  _laborTimers.forEach(function(id) { clearInterval(id); });
+  _laborTimers = [];
+}
+
+function _el(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text) e.textContent = text;
+  return e;
+}
+
 window.loadLaborSummary = async function() {
   var container = document.getElementById('labor-container');
   if (!container) return;
+  _clearLaborTimers();
   container.textContent = '';
 
-  var loadingEl = document.createElement('p');
-  loadingEl.className = 'text-gray-400 dark:text-gray-500 text-center py-8';
-  loadingEl.textContent = t('laborSummaryLoading', 'Loading labor summary...');
-  container.appendChild(loadingEl);
+  var loading = _el('div', 'text-gray-400 dark:text-gray-500 text-center py-12', t('laborSummaryLoading', 'Loading labor data...'));
+  container.appendChild(loading);
 
   try {
     var res = await fetch('/api/admin/labor.php?summary=1', { credentials: 'include' });
     var json = await res.json();
     container.textContent = '';
 
-    if (!json.success || !json.data || json.data.length === 0) {
-      var empty = document.createElement('p');
-      empty.className = 'text-gray-400 dark:text-gray-500 text-center py-8';
-      empty.textContent = t('laborSummaryNoData', 'No labor data available.');
-      container.appendChild(empty);
+    if (!json.success) {
+      container.appendChild(_el('p', 'text-red-500 text-center py-8', json.error || 'Error'));
       return;
     }
 
-    // Summary table
-    var table = document.createElement('div');
-    table.className = 'bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden';
+    var d = json.data;
+    var totals = d.totals || {};
+    var active = d.active || [];
+    var recent = d.recent || [];
+    var employees = d.employees || [];
+    var availEmps = d.available_employees || [];
+    var availROs = d.available_ros || [];
 
-    var thead = document.createElement('div');
-    thead.className = 'grid grid-cols-6 gap-2 bg-gray-50 dark:bg-gray-900/50 px-6 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider';
-    [t('laborSummaryEmployee', 'Employee'), t('laborSummaryTotalHrs', 'Total Hours'), t('laborSummaryBillableHrs', 'Billable Hours'), t('laborSummaryActiveClocks', 'Active Clocks'), t('laborSummaryRoCount', 'RO Count'), ''].forEach(function(text) {
-      var th = document.createElement('div');
-      th.textContent = text;
-      thead.appendChild(th);
-    });
-    table.appendChild(thead);
+    // ── Stat Cards ──────────────────────────────────────────────────────
+    var stats = _el('div', 'grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6');
 
-    json.data.forEach(function(row) {
-      var tr = document.createElement('div');
-      tr.className = 'grid grid-cols-6 gap-2 px-6 py-3 border-t border-gray-100 dark:border-gray-700 text-sm items-center hover:bg-gray-50 dark:hover:bg-gray-800/50 transition';
+    var cards = [
+      { label: t('laborStatActive', 'Active Clocks'), value: active.length, color: 'green', pulse: active.length > 0 },
+      { label: t('laborStatTotalHrs', 'Total Hours'), value: totals.total_hours ? totals.total_hours.toFixed(1) + 'h' : '0h', color: 'sky' },
+      { label: t('laborStatBillable', 'Billable Hours'), value: totals.billable_hours ? totals.billable_hours.toFixed(1) + 'h' : '0h', color: 'emerald' },
+      { label: t('laborStatEntries', 'Total Entries'), value: totals.total_entries || 0, color: 'gray' }
+    ];
 
-      var nameCell = document.createElement('div');
-      nameCell.className = 'font-medium text-gray-900 dark:text-white';
-      nameCell.textContent = row.employee_name || 'Unknown';
-      tr.appendChild(nameCell);
+    cards.forEach(function(c) {
+      var card = _el('div', 'bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700');
 
-      var totalCell = document.createElement('div');
-      totalCell.className = 'text-gray-700 dark:text-gray-300';
-      totalCell.textContent = (row.total_hours || 0).toFixed(1) + 'h';
-      tr.appendChild(totalCell);
-
-      var billCell = document.createElement('div');
-      billCell.className = 'text-green-600 dark:text-green-400 font-medium';
-      billCell.textContent = (row.billable_hours || 0).toFixed(1) + 'h';
-      tr.appendChild(billCell);
-
-      var activeCell = document.createElement('div');
-      if (row.active_count > 0) {
-        var dot = document.createElement('span');
-        dot.className = 'inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1';
-        activeCell.appendChild(dot);
-        var actText = document.createElement('span');
-        actText.textContent = row.active_count;
-        activeCell.appendChild(actText);
-      } else {
-        activeCell.textContent = '-';
-        activeCell.className = 'text-gray-400';
+      var labelRow = _el('div', 'flex items-center gap-2 mb-1');
+      if (c.pulse) {
+        labelRow.appendChild(_el('span', 'w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse'));
       }
-      tr.appendChild(activeCell);
+      labelRow.appendChild(_el('span', 'text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider', c.label));
+      card.appendChild(labelRow);
 
-      var roCell = document.createElement('div');
-      roCell.className = 'text-gray-600 dark:text-gray-400';
-      roCell.textContent = row.ro_count || '-';
-      tr.appendChild(roCell);
-
-      var emptyCell = document.createElement('div');
-      tr.appendChild(emptyCell);
-
-      table.appendChild(tr);
+      card.appendChild(_el('div', 'text-2xl font-bold text-gray-900 dark:text-white', String(c.value)));
+      stats.appendChild(card);
     });
+    container.appendChild(stats);
 
-    container.appendChild(table);
+    // ── Quick Clock-In ──────────────────────────────────────────────────
+    if (availEmps.length > 0 && availROs.length > 0) {
+      var clockSection = _el('div', 'bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 mb-6');
+
+      var clockHeader = _el('div', 'flex items-center justify-between mb-4');
+      clockHeader.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm', '\u23F1 ' + t('laborQuickClockIn', 'Quick Clock In')));
+      clockSection.appendChild(clockHeader);
+
+      var form = _el('div', 'grid grid-cols-1 sm:grid-cols-4 gap-3 items-end');
+
+      // Employee select
+      var empGroup = _el('div', '');
+      empGroup.appendChild(_el('label', 'block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1', t('laborEmployee', 'Employee')));
+      var empSel = _el('select', 'w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-3 py-2.5 text-sm');
+      var defOpt = _el('option', '', t('laborSelectEmployee', 'Select employee...'));
+      defOpt.value = '';
+      empSel.appendChild(defOpt);
+      availEmps.forEach(function(emp) {
+        var opt = _el('option', '', emp.name);
+        opt.value = emp.id;
+        empSel.appendChild(opt);
+      });
+      empGroup.appendChild(empSel);
+      form.appendChild(empGroup);
+
+      // RO select
+      var roGroup = _el('div', '');
+      roGroup.appendChild(_el('label', 'block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1', t('laborRo', 'Repair Order')));
+      var roSel = _el('select', 'w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-3 py-2.5 text-sm');
+      var roDefOpt = _el('option', '', t('laborSelectRo', 'Select RO...'));
+      roDefOpt.value = '';
+      roSel.appendChild(roDefOpt);
+      availROs.forEach(function(ro) {
+        var opt = _el('option', '', ro.ro_number + ' (' + ro.status + ')');
+        opt.value = ro.id;
+        roSel.appendChild(opt);
+      });
+      roGroup.appendChild(roSel);
+      form.appendChild(roGroup);
+
+      // Task input
+      var taskGroup = _el('div', '');
+      taskGroup.appendChild(_el('label', 'block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1', t('laborTask', 'Task') + ' (' + t('laborOptional', 'optional') + ')'));
+      var taskInput = _el('input', 'w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-3 py-2.5 text-sm');
+      taskInput.type = 'text';
+      taskInput.placeholder = t('laborTaskPlaceholder', 'e.g. Brake pad replacement');
+      taskInput.maxLength = 500;
+      taskGroup.appendChild(taskInput);
+      form.appendChild(taskGroup);
+
+      // Submit button
+      var btnGroup = _el('div', '');
+      var clockBtn = _el('button', 'w-full px-4 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition flex items-center justify-center gap-2');
+      clockBtn.appendChild(_el('span', '', '\u25B6'));
+      clockBtn.appendChild(_el('span', '', t('laborClockIn', 'Clock In')));
+      clockBtn.addEventListener('click', async function() {
+        var eId = parseInt(empSel.value, 10);
+        var rId = parseInt(roSel.value, 10);
+        if (!eId) { showToast(t('laborSelectEmployeeFirst', 'Select an employee'), true); return; }
+        if (!rId) { showToast(t('laborSelectRoFirst', 'Select a repair order'), true); return; }
+        clockBtn.disabled = true;
+        clockBtn.style.opacity = '0.5';
+        try {
+          await api('labor.php', { method: 'POST', body: {
+            repair_order_id: rId, employee_id: eId,
+            task_description: taskInput.value.trim(), is_billable: 1
+          }});
+          showToast(t('laborClockedIn', 'Clocked in successfully'));
+          loadLaborSummary();
+        } catch (err) {
+          showToast(t('laborClockInFail', 'Failed to clock in') + ': ' + (err.message || ''), true);
+          clockBtn.disabled = false;
+          clockBtn.style.opacity = '1';
+        }
+      });
+      btnGroup.appendChild(clockBtn);
+      form.appendChild(btnGroup);
+
+      clockSection.appendChild(form);
+      container.appendChild(clockSection);
+    }
+
+    // ── Active Clocks ───────────────────────────────────────────────────
+    if (active.length > 0) {
+      var activeSection = _el('div', 'mb-6');
+      activeSection.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm mb-3', '\uD83D\uDFE2 ' + t('laborActiveClocks', 'Active Clocks') + ' (' + active.length + ')'));
+
+      var activeGrid = _el('div', 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3');
+
+      active.forEach(function(entry) {
+        var card = _el('div', 'border-2 border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-900/20 rounded-xl p-4');
+
+        // Top row: name + RO
+        var top = _el('div', 'flex items-center justify-between mb-2');
+        var nameWrap = _el('div', 'flex items-center gap-2');
+        nameWrap.appendChild(_el('span', 'w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse'));
+        nameWrap.appendChild(_el('span', 'font-bold text-gray-900 dark:text-white text-sm', entry.employee_name));
+        top.appendChild(nameWrap);
+        top.appendChild(_el('span', 'text-xs font-mono bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded', entry.ro_number));
+        card.appendChild(top);
+
+        // Task
+        if (entry.task_description) {
+          card.appendChild(_el('p', 'text-sm text-gray-600 dark:text-gray-400 mb-2', entry.task_description));
+        }
+
+        // Elapsed time + clock out
+        var bottom = _el('div', 'flex items-center justify-between');
+        var elapsed = _el('span', 'text-sm font-medium text-green-700 dark:text-green-400');
+        var updateElapsed = function() {
+          var now = new Date();
+          var start = new Date(entry.clock_in_at);
+          var diffMin = Math.floor((now - start) / 60000);
+          var h = Math.floor(diffMin / 60);
+          var m = diffMin % 60;
+          elapsed.textContent = (h > 0 ? h + 'h ' : '') + m + 'm' + ' \u2014 ' + t('laborStarted', 'Started') + ' ' + formatDateTime(entry.clock_in_at);
+        };
+        updateElapsed();
+        _laborTimers.push(setInterval(updateElapsed, 30000));
+        bottom.appendChild(elapsed);
+
+        var outBtn = _el('button', 'px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-700 transition', t('laborClockOut', 'Clock Out'));
+        outBtn.addEventListener('click', async function() {
+          outBtn.disabled = true;
+          outBtn.textContent = '...';
+          try {
+            await api('labor.php', { method: 'PUT', body: { id: entry.id, clock_out: true } });
+            showToast(t('laborClockedOut', 'Clocked out successfully'));
+            loadLaborSummary();
+          } catch (err) {
+            showToast(t('laborClockOutFail', 'Failed to clock out') + ': ' + (err.message || ''), true);
+            outBtn.disabled = false;
+            outBtn.textContent = t('laborClockOut', 'Clock Out');
+          }
+        });
+        bottom.appendChild(outBtn);
+        card.appendChild(bottom);
+
+        activeGrid.appendChild(card);
+      });
+
+      activeSection.appendChild(activeGrid);
+      container.appendChild(activeSection);
+    }
+
+    // ── Employee Summary Table ──────────────────────────────────────────
+    if (employees.length > 0) {
+      var summarySection = _el('div', 'mb-6');
+      summarySection.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm mb-3', '\uD83D\uDCCA ' + t('laborEmployeeSummary', 'Employee Summary')));
+
+      var table = _el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700');
+
+      var thead = _el('div', 'grid grid-cols-5 gap-2 bg-gray-50 dark:bg-gray-900/50 px-5 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider');
+      [t('laborSummaryEmployee', 'Employee'), t('laborSummaryTotalHrs', 'Total Hours'), t('laborSummaryBillableHrs', 'Billable'), t('laborSummaryActiveClocks', 'Active'), t('laborSummaryRoCount', 'ROs')].forEach(function(text) {
+        thead.appendChild(_el('div', '', text));
+      });
+      table.appendChild(thead);
+
+      employees.forEach(function(row) {
+        var tr = _el('div', 'grid grid-cols-5 gap-2 px-5 py-3 border-t border-gray-100 dark:border-gray-700/50 text-sm items-center hover:bg-gray-50 dark:hover:bg-gray-800/50 transition');
+
+        tr.appendChild(_el('div', 'font-medium text-gray-900 dark:text-white', row.employee_name || 'Unknown'));
+        tr.appendChild(_el('div', 'text-gray-700 dark:text-gray-300', (row.total_hours || 0).toFixed(1) + 'h'));
+        tr.appendChild(_el('div', 'text-green-600 dark:text-green-400 font-medium', (row.billable_hours || 0).toFixed(1) + 'h'));
+
+        var activeCell = _el('div', '');
+        if (row.active_count > 0) {
+          activeCell.appendChild(_el('span', 'inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1'));
+          var actText = _el('span', 'text-green-700 dark:text-green-400 font-medium');
+          actText.textContent = row.active_count;
+          activeCell.appendChild(actText);
+        } else {
+          activeCell.className = 'text-gray-400';
+          activeCell.textContent = '-';
+        }
+        tr.appendChild(activeCell);
+
+        tr.appendChild(_el('div', 'text-gray-600 dark:text-gray-400', String(row.ro_count || 0)));
+
+        table.appendChild(tr);
+      });
+
+      summarySection.appendChild(table);
+      container.appendChild(summarySection);
+    }
+
+    // ── Recent Entries ──────────────────────────────────────────────────
+    if (recent.length > 0) {
+      var recentSection = _el('div', 'mb-6');
+      recentSection.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm mb-3', '\uD83D\uDD52 ' + t('laborRecentEntries', 'Recent Entries')));
+
+      var rTable = _el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700');
+
+      var rHead = _el('div', 'grid grid-cols-12 gap-1 bg-gray-50 dark:bg-gray-900/50 px-5 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider');
+      var rCols = [
+        { text: t('laborEmployee', 'Employee'), span: 2 },
+        { text: t('laborRo', 'RO'), span: 2 },
+        { text: t('laborTask', 'Task'), span: 3 },
+        { text: t('laborClockInTime', 'In'), span: 2 },
+        { text: t('laborClockOutTime', 'Out'), span: 2 },
+        { text: t('laborDuration', 'Dur.'), span: 1 }
+      ];
+      rCols.forEach(function(col) {
+        rHead.appendChild(_el('div', 'col-span-' + col.span, col.text));
+      });
+      rTable.appendChild(rHead);
+
+      recent.forEach(function(entry) {
+        var row = _el('div', 'grid grid-cols-12 gap-1 px-5 py-2.5 border-t border-gray-100 dark:border-gray-700/50 text-sm items-center hover:bg-gray-50 dark:hover:bg-gray-800/50 transition');
+
+        var empCell = _el('div', 'col-span-2 font-medium text-gray-900 dark:text-white truncate', entry.employee_name);
+        empCell.title = entry.employee_name;
+        row.appendChild(empCell);
+
+        row.appendChild(_el('div', 'col-span-2 text-xs font-mono text-gray-500 dark:text-gray-400', entry.ro_number));
+
+        var taskCell = _el('div', 'col-span-3 text-gray-600 dark:text-gray-400 truncate', entry.task_description || '-');
+        taskCell.title = entry.task_description || '';
+        row.appendChild(taskCell);
+
+        row.appendChild(_el('div', 'col-span-2 text-gray-500 dark:text-gray-400 text-xs', formatDateTime(entry.clock_in_at)));
+        row.appendChild(_el('div', 'col-span-2 text-gray-500 dark:text-gray-400 text-xs', formatDateTime(entry.clock_out_at)));
+        row.appendChild(_el('div', 'col-span-1 font-medium text-gray-700 dark:text-gray-300', formatDuration(entry.duration_minutes)));
+
+        rTable.appendChild(row);
+      });
+
+      recentSection.appendChild(rTable);
+      container.appendChild(recentSection);
+    }
+
+    // ── Empty State (no entries AND no active clocks) ───────────────────
+    if (employees.length === 0 && active.length === 0 && recent.length === 0) {
+      var emptyWrap = _el('div', 'text-center py-12');
+      emptyWrap.appendChild(_el('div', 'text-4xl mb-3', '\u23F1'));
+      emptyWrap.appendChild(_el('h3', 'text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2', t('laborEmptyTitle', 'No labor entries yet')));
+      emptyWrap.appendChild(_el('p', 'text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto', t('laborEmptyDesc', 'Use the clock-in form above to start tracking technician time on repair orders. You can also clock in from inside any Repair Order.')));
+      container.appendChild(emptyWrap);
+    }
+
   } catch (err) {
     container.textContent = '';
-    var errEl = document.createElement('p');
-    errEl.className = 'text-red-500 text-center py-8';
-    errEl.textContent = t('laborSummaryError', 'Error loading labor summary');
-    container.appendChild(errEl);
+    container.appendChild(_el('p', 'text-red-500 text-center py-8', t('laborSummaryError', 'Error loading labor data')));
     console.error('Labor summary error:', err);
   }
 };
