@@ -28,7 +28,7 @@ var statusColors = {
   pending_approval: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
   approved:         'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
   in_progress:      'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
-  on_hold:          'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+  on_hold:          'bg-red-700 text-white dark:bg-red-800 dark:text-red-100',
   waiting_parts:    'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
   ready:            'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
   completed:        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
@@ -279,7 +279,7 @@ function renderRoTable() {
       statusSelect.appendChild(opt);
     });
     // Color the select based on current status
-    var colorMap = { intake:'#dbeafe', diagnosis:'#ede9fe', estimate_pending:'#fef3c7', pending_approval:'#ffedd5', approved:'#dcfce7', in_progress:'#e0e7ff', on_hold:'#fee2e2', waiting_parts:'#fef3c7', ready:'#d1fae5', completed:'#f3f4f6', invoiced:'#ccfbf1', cancelled:'#fee2e2' };
+    var colorMap = { intake:'#dbeafe', diagnosis:'#ede9fe', estimate_pending:'#fef3c7', pending_approval:'#ffedd5', approved:'#dcfce7', in_progress:'#e0e7ff', on_hold:'#991b1b', waiting_parts:'#fef3c7', ready:'#d1fae5', completed:'#f3f4f6', invoiced:'#ccfbf1', cancelled:'#fee2e2' };
     statusSelect.style.backgroundColor = colorMap[ro.status] || '';
     statusSelect.addEventListener('click', function(e) { e.stopPropagation(); });
     statusSelect.addEventListener('change', (function(roId, sel) { return async function(e) {
@@ -528,7 +528,7 @@ function renderRoDetailModal() {
 
   // ── Render the guided action bar ──
   if (guide && currentStep) {
-    var colorMap = { purple: 'from-purple-600 to-purple-700', blue: 'from-blue-600 to-blue-700', amber: 'from-amber-500 to-amber-600', green: 'from-green-600 to-green-700', teal: 'from-teal-600 to-teal-700', orange: 'from-orange-500 to-orange-600' };
+    var colorMap = { purple: 'from-purple-600 to-purple-700', blue: 'from-blue-600 to-blue-700', amber: 'from-amber-500 to-amber-600', green: 'from-green-600 to-green-700', teal: 'from-teal-600 to-teal-700', orange: 'from-orange-500 to-orange-600', red: 'from-red-800 to-red-900' };
     var guideBar = document.createElement('div');
     guideBar.className = 'bg-gradient-to-r ' + (colorMap[guide.color] || colorMap.blue) + ' rounded-xl p-4 text-white';
 

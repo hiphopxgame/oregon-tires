@@ -16,7 +16,7 @@ var COLUMNS = [
   { key: 'pending_approval', label: 'Approval',    color: '#f59e0b' },
   { key: 'approved',         label: 'Approved',    color: '#22c55e' },
   { key: 'in_progress',      label: 'In Progress', color: '#16a34a' },
-  { key: 'on_hold',          label: 'On Hold',     color: '#ef4444' },
+  { key: 'on_hold',          label: 'On Hold',     color: '#991b1b' },
   { key: 'waiting_parts',    label: 'Parts',       color: '#f97316' },
   { key: 'ready',            label: 'Ready',       color: '#14b8a6' },
   { key: 'completed',        label: 'Done',        color: '#6b7280' },
