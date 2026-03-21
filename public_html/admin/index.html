@@ -8731,9 +8731,7 @@ function renderQuickActions(stats) {
   wrap.className = 'flex flex-wrap gap-2';
 
   var actions = [
-    { label: T.qaNewAppointment || 'New Appointment', icon: '📅', color: 'bg-green-600 hover:bg-green-700', action: function() { switchTab('appointments'); setTimeout(function() { if (typeof showNewApptModal === 'function') showNewApptModal(); }, 200); } },
-    { label: T.qaWalkIn || 'Walk-In', icon: '🚶', color: 'bg-blue-600 hover:bg-blue-700', action: function() { switchTab('walkinqueue'); setTimeout(function() { if (typeof openAddToQueue === 'function') openAddToQueue(); }, 200); } },
-    { label: T.qaNewRo || 'New RO', icon: '🔧', color: 'bg-purple-600 hover:bg-purple-700', action: function() { switchTab('repairorders'); } },
+    { label: T.qaNewAppointment || 'New Appointment', icon: '📅', color: 'bg-green-600 hover:bg-green-700', action: function() { showNewApptModal(); } },
     { label: T.qaMessages || 'Messages', icon: '💬', color: 'bg-amber-600 hover:bg-amber-700', action: function() { switchTab('messages'); } },
   ];
   if (stats.unassigned.length > 0) {
