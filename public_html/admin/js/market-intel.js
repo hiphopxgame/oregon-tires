@@ -129,8 +129,8 @@
     } else if (sortBy === 'name') {
       filteredShops.sort(function(a, b) { return a.name.localeCompare(b.name); });
     } else if (sortBy === 'distance') {
-      // Distance from Oregon Tires (45.4626, -122.5801)
-      var OT_LAT = 45.4626, OT_LNG = -122.5801;
+      // Distance from Oregon Tires (45.46205, -122.57893)
+      var OT_LAT = 45.46205, OT_LNG = -122.57893;
       filteredShops.sort(function(a, b) {
         var da = Math.hypot((a.lat || 0) - OT_LAT, (a.lng || 0) - OT_LNG);
         var db = Math.hypot((b.lat || 0) - OT_LAT, (b.lng || 0) - OT_LNG);
@@ -409,7 +409,7 @@
         html: '<div style="background:#007030;color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.3);">🏠</div>',
         iconSize: [32, 32], iconAnchor: [16, 16], className: '',
       });
-      L.marker([45.4626, -122.5801], { icon: otIcon })
+      L.marker([45.46205, -122.57893], { icon: otIcon })
         .addTo(map)
         .bindPopup('<strong>Oregon Tires Auto Care</strong><br>8536 SE 82nd Ave');
 
