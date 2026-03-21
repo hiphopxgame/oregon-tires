@@ -127,9 +127,8 @@
 <!-- Header -->
 <header class="sticky top-0 z-50 bg-white/90 dark:bg-[#111827]/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-3">
-            <img src="/assets/logo.webp" alt="Oregon Tires" class="h-10 w-10 rounded-lg" width="40" height="40">
-            <span class="text-lg font-bold text-gray-900 dark:text-white">Oregon Tires</span>
+        <a href="/" class="flex items-center">
+            <img src="/assets/logo.webp" alt="Oregon Tires Auto Care" class="h-10 rounded-lg" width="113" height="40">
         </a>
         <nav class="flex items-center gap-4">
             <a href="/" class="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 text-sm font-medium" data-t="backToHome">Back to Home</a>
