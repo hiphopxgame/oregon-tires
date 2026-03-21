@@ -439,31 +439,37 @@ function renderRoDetailModal() {
   var hasInvoices = ro.invoices && ro.invoices.length > 0;
   var status = ro.status || 'intake';
 
+  // 10-step workflow: intake → diagnosis → estimate → approval → approved → work → ready → complete → invoiced → done
+  var TOTAL_STEPS = 10;
   var WORKFLOW_STEPS = [
-    { status: 'intake',           step: 1, label: t('roStepIntake', 'Intake') },
-    { status: 'diagnosis',        step: 2, label: t('roStepDiagnosis', 'Diagnosis') },
-    { status: 'estimate_pending', step: 3, label: t('roStepEstimate', 'Estimate') },
-    { status: 'pending_approval', step: 4, label: t('roStepApproval', 'Approval') },
-    { status: 'approved',         step: 5, label: t('roStepApproved', 'Approved') },
-    { status: 'in_progress',      step: 6, label: t('roStepWork', 'Work') },
-    { status: 'ready',            step: 7, label: t('roStepReady', 'Ready') },
-    { status: 'completed',        step: 8, label: t('roStepDone', 'Done') },
+    { status: 'intake',           step: 1 },
+    { status: 'diagnosis',        step: 2 },
+    { status: 'estimate_pending', step: 3 },
+    { status: 'pending_approval', step: 4 },
+    { status: 'approved',         step: 5 },
+    { status: 'in_progress',      step: 6 },
+    { status: 'on_hold',          step: 6 },
+    { status: 'waiting_parts',    step: 6 },
+    { status: 'ready',            step: 7 },
+    { status: 'completed',        step: 8 },
+    { status: 'invoiced',         step: 9 },
   ];
   var currentStep = WORKFLOW_STEPS.find(function(s) { return s.status === status; });
   var stepNum = currentStep ? currentStep.step : 0;
 
   var guide = null;
-  if (status === 'intake' && !hasInspections) guide = { text: t('roSuggestInspect', 'Create an inspection for this vehicle'), btn: t('roStartInspection', 'Start Inspection'), color: 'purple', icon: '\uD83D\uDD0D', action: 'inspect' };
-  else if (status === 'intake') guide = { text: t('roSuggestDiag', 'Inspection done \u2014 advance to diagnosis'), btn: t('roBeginDiagnosis', 'Begin Diagnosis'), color: 'purple', icon: '\u2699\uFE0F', action: 'diagnosis' };
-  else if (status === 'diagnosis' && !hasEstimates) guide = { text: t('roSuggestEstimate', 'Create an estimate for the customer'), btn: t('roCreateEstimate', 'Create Estimate'), color: 'blue', icon: '\uD83D\uDCCB', action: 'estimate' };
-  else if (status === 'diagnosis') guide = { text: t('roSuggestSendEst', 'Estimate ready \u2014 send to customer'), btn: t('roSendEstimate', 'Send Estimate'), color: 'blue', icon: '\uD83D\uDCE7', action: 'send_estimate' };
-  else if (status === 'estimate_pending') guide = { text: t('roSuggestSendEst', 'Send the estimate to the customer'), btn: t('roSendToCustomer', 'Send to Customer'), color: 'amber', icon: '\uD83D\uDCE7', action: 'send_estimate' };
-  else if (status === 'pending_approval') guide = { text: t('roSuggestWait', 'Waiting for customer approval'), btn: t('roMarkApproved', 'Mark Approved'), color: 'green', icon: '\u23F3', action: 'approve' };
-  else if (status === 'approved') guide = { text: t('roSuggestStart', 'Customer approved \u2014 begin work'), btn: t('roStartWorkClockIn', 'Start Work & Clock In'), color: 'green', icon: '\uD83D\uDE80', action: 'start_work' };
-  else if (status === 'in_progress') guide = { text: t('roSuggestReady', 'Mark ready when the job is done'), btn: t('roMarkReady', 'Mark Ready'), color: 'teal', icon: '\uD83D\uDD27', action: 'ready' };
-  else if (status === 'waiting_parts') guide = { text: t('roPartsArrivedHint', 'Parts arrived? Resume work.'), btn: t('roPartsArrived', 'Parts Arrived \u2014 Resume'), color: 'orange', icon: '\uD83D\uDCE6', action: 'resume' };
-  else if (status === 'ready') guide = { text: t('roSuggestComplete', 'Customer notified. Complete when picked up.'), btn: t('roCompleteInvoice', 'Complete & Invoice'), color: 'green', icon: '\u2705', action: 'complete' };
-  else if (status === 'completed' && !hasInvoices) guide = { text: t('roSuggestInvoice', 'Generate invoice from estimate'), btn: t('roGenerateInvoice', 'Generate Invoice'), color: 'teal', icon: '\uD83D\uDCB0', action: 'invoice' };
+  if (status === 'intake' && !hasInspections) guide = { text: t('roGuideInspect', 'Inspect the vehicle \u2014 document condition, take photos'), btn: t('roStartInspection', 'Start Inspection'), color: 'purple', icon: '\uD83D\uDD0D', action: 'inspect' };
+  else if (status === 'intake') guide = { text: t('roGuideDiag', 'Inspection complete \u2014 review findings and diagnose'), btn: t('roBeginDiagnosis', 'Begin Diagnosis'), color: 'purple', icon: '\u2699\uFE0F', action: 'diagnosis' };
+  else if (status === 'diagnosis' && !hasEstimates) guide = { text: t('roGuideEstimate', 'Build an estimate from inspection findings'), btn: t('roCreateEstimate', 'Create Estimate'), color: 'blue', icon: '\uD83D\uDCCB', action: 'estimate' };
+  else if (status === 'diagnosis') guide = { text: t('roGuideSendEst', 'Estimate ready \u2014 email it to the customer'), btn: t('roSendEstimate', 'Send Estimate'), color: 'blue', icon: '\uD83D\uDCE7', action: 'send_estimate' };
+  else if (status === 'estimate_pending') guide = { text: t('roGuideSendPending', 'Send the estimate to the customer for review'), btn: t('roSendToCustomer', 'Send to Customer'), color: 'amber', icon: '\uD83D\uDCE7', action: 'send_estimate' };
+  else if (status === 'pending_approval') guide = { text: t('roGuideApproval', 'Customer is reviewing the estimate. Approve when confirmed.'), btn: t('roMarkApproved', 'Mark Approved'), color: 'amber', icon: '\u23F3', action: 'approve' };
+  else if (status === 'approved') guide = { text: t('roGuideStart', 'Customer approved! Clock in the technician and start work.'), btn: t('roStartWorkClockIn', 'Start Work & Clock In'), color: 'green', icon: '\uD83D\uDE80', action: 'start_work', sub: t('roGuideStartSub', 'This will check in the customer, clock in the tech, and start the timer') };
+  else if (status === 'in_progress') guide = { text: t('roGuideReady', 'Work in progress. Mark ready when the job is done.'), btn: t('roMarkReady', 'Mark Ready'), color: 'teal', icon: '\uD83D\uDD27', action: 'ready', sub: t('roGuideReadySub', 'This will clock out the tech and notify the customer') };
+  else if (status === 'on_hold') guide = { text: t('roGuideOnHold', 'Job is on hold. Resume when ready to continue.'), btn: t('roResumeWork', 'Resume Work'), color: 'red', icon: '\u23F8', action: 'resume' };
+  else if (status === 'waiting_parts') guide = { text: t('roGuideWaitParts', 'Waiting for parts. Resume when parts arrive.'), btn: t('roPartsArrived', 'Parts Arrived \u2014 Resume'), color: 'orange', icon: '\uD83D\uDCE6', action: 'resume' };
+  else if (status === 'ready') guide = { text: t('roGuidePickup', 'Customer notified. Complete when vehicle is picked up.'), btn: t('roCompleteInvoice', 'Complete & Check Out'), color: 'green', icon: '\uD83D\uDE97', action: 'complete', sub: t('roGuidePickupSub', 'This will check out the customer, generate invoice, and close the order') };
+  else if (status === 'completed' && !hasInvoices) guide = { text: t('roGuideInvoice', 'Order complete \u2014 generate the invoice'), btn: t('roGenerateInvoice', 'Generate Invoice'), color: 'teal', icon: '\uD83D\uDCB0', action: 'invoice' };
 
   // Guided action handler (shared by bar button)
   function executeGuideAction(a) {
@@ -528,11 +534,11 @@ function renderRoDetailModal() {
 
     var stepRow = document.createElement('div');
     stepRow.className = 'flex items-center justify-between mb-3';
-    stepRow.appendChild(function() { var s = document.createElement('span'); s.className = 'text-xs font-bold uppercase tracking-wider opacity-80'; s.textContent = t('roStep', 'Step') + ' ' + stepNum + ' ' + t('roStepOf', 'of') + ' 8'; return s; }());
+    stepRow.appendChild(function() { var s = document.createElement('span'); s.className = 'text-xs font-bold uppercase tracking-wider opacity-80'; s.textContent = t('roStep', 'Step') + ' ' + stepNum + ' ' + t('roStepOf', 'of') + ' ' + TOTAL_STEPS; return s; }());
     var dots = document.createElement('div'); dots.className = 'flex gap-1.5';
-    for (var di = 1; di <= 8; di++) {
+    for (var di = 1; di <= TOTAL_STEPS; di++) {
       var dot = document.createElement('div');
-      dot.className = 'w-2.5 h-2.5 rounded-full transition ' + (di < stepNum ? 'bg-white' : di === stepNum ? 'bg-white ring-2 ring-white/40 scale-110' : 'bg-white/25');
+      dot.className = 'w-2 h-2 rounded-full transition ' + (di < stepNum ? 'bg-white' : di === stepNum ? 'bg-white ring-2 ring-white/40 scale-110' : 'bg-white/25');
       dots.appendChild(dot);
     }
     stepRow.appendChild(dots);
@@ -541,7 +547,13 @@ function renderRoDetailModal() {
     var mainRow = document.createElement('div');
     mainRow.className = 'flex items-center gap-3';
     mainRow.appendChild(function() { var i = document.createElement('span'); i.className = 'text-3xl shrink-0'; i.textContent = guide.icon; return i; }());
-    mainRow.appendChild(function() { var p = document.createElement('p'); p.className = 'flex-1 font-medium'; p.textContent = guide.text; return p; }());
+    var textCol = document.createElement('div');
+    textCol.className = 'flex-1';
+    textCol.appendChild(function() { var p = document.createElement('p'); p.className = 'font-medium'; p.textContent = guide.text; return p; }());
+    if (guide.sub) {
+      textCol.appendChild(function() { var s = document.createElement('p'); s.className = 'text-xs opacity-70 mt-0.5'; s.textContent = guide.sub; return s; }());
+    }
+    mainRow.appendChild(textCol);
     var gBtn = document.createElement('button');
     gBtn.className = 'shrink-0 px-5 py-2.5 bg-white text-gray-900 rounded-lg font-bold text-sm hover:bg-gray-100 transition shadow-lg';
     gBtn.textContent = guide.btn;

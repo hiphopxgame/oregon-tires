@@ -9128,31 +9128,32 @@ function renderCalDayWithSchedule(dateStr, sched) {
 function sortAppts(col) { if(apptSortBy===col) apptSortOrder=apptSortOrder==='asc'?'desc':'asc'; else { apptSortBy=col; apptSortOrder='desc'; } renderAppointments(); }
 
 var RO_STEP_MAP = {
-  intake:           { step: 1, label: 'Intake',   icon: '\uD83D\uDCCB', color: 'gray',   action: 'Inspect vehicle' },
-  diagnosis:        { step: 2, label: 'Diagnosis', icon: '\uD83D\uDD0D', color: 'purple', action: 'Create estimate' },
-  estimate_pending: { step: 3, label: 'Estimate',  icon: '\uD83D\uDCE7', color: 'blue',   action: 'Send to customer' },
-  pending_approval: { step: 4, label: 'Approval',  icon: '\u23F3',       color: 'amber',  action: 'Awaiting approval' },
-  approved:         { step: 5, label: 'Approved',  icon: '\uD83D\uDE80', color: 'green',  action: 'Start work' },
-  in_progress:      { step: 6, label: 'Working',   icon: '\uD83D\uDD27', color: 'blue',   action: 'In progress' },
-  on_hold:          { step: 6, label: 'On Hold',   icon: '\u23F8',       color: 'red',    action: 'On hold' },
-  waiting_parts:    { step: 6, label: 'Parts',     icon: '\uD83D\uDCE6', color: 'orange', action: 'Waiting for parts' },
-  ready:            { step: 7, label: 'Ready',     icon: '\u2705',       color: 'teal',   action: 'Ready for pickup' },
-  completed:        { step: 8, label: 'Done',      icon: '\uD83C\uDFC1', color: 'gray',   action: 'Completed' },
-  invoiced:         { step: 8, label: 'Invoiced',  icon: '\uD83D\uDCB0', color: 'green',  action: 'Invoiced' },
+  intake:           { step: 1, total: 10, label: 'Intake',     icon: '\uD83D\uDCCB', color: 'gray',   action: 'Inspect vehicle' },
+  diagnosis:        { step: 2, total: 10, label: 'Diagnosis',  icon: '\uD83D\uDD0D', color: 'purple', action: 'Create estimate' },
+  estimate_pending: { step: 3, total: 10, label: 'Estimate',   icon: '\uD83D\uDCCB', color: 'blue',   action: 'Send to customer' },
+  pending_approval: { step: 4, total: 10, label: 'Approval',   icon: '\u23F3',       color: 'amber',  action: 'Awaiting approval' },
+  approved:         { step: 5, total: 10, label: 'Approved',   icon: '\u2705',       color: 'green',  action: 'Clock in & start' },
+  in_progress:      { step: 6, total: 10, label: 'Working',    icon: '\uD83D\uDD27', color: 'blue',   action: 'Tech clocked in' },
+  on_hold:          { step: 6, total: 10, label: 'On Hold',    icon: '\u23F8',       color: 'red',    action: 'Paused' },
+  waiting_parts:    { step: 6, total: 10, label: 'Parts',      icon: '\uD83D\uDCE6', color: 'orange', action: 'Waiting for parts' },
+  ready:            { step: 7, total: 10, label: 'Ready',      icon: '\uD83D\uDE97', color: 'teal',   action: 'Ready for pickup' },
+  completed:        { step: 8, total: 10, label: 'Complete',   icon: '\uD83C\uDFC1', color: 'gray',   action: 'Checked out' },
+  invoiced:         { step: 9, total: 10, label: 'Invoiced',   icon: '\uD83D\uDCB0', color: 'green',  action: 'Invoiced' },
+  cancelled:        { step: 0, total: 10, label: 'Cancelled',  icon: '\u274C',       color: 'red',    action: 'Cancelled' },
 };
 
 function roStepBadgeHtml(roStatus) {
   var info = RO_STEP_MAP[roStatus];
-  if (!info) return '';
-  var colors = { gray: 'bg-gray-100 text-gray-600', purple: 'bg-purple-100 text-purple-700', blue: 'bg-blue-100 text-blue-700', amber: 'bg-amber-100 text-amber-700', green: 'bg-green-100 text-green-700', teal: 'bg-teal-100 text-teal-700', red: 'bg-red-100 text-red-700', orange: 'bg-orange-100 text-orange-700' };
+  if (!info || info.step === 0) return roStatus === 'cancelled' ? '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-red-100 text-red-600">\u274C Cancelled</span>' : '';
+  var colors = { gray: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300', purple: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300', blue: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300', amber: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', green: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300', teal: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300', red: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300', orange: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' };
   var cls = colors[info.color] || colors.gray;
-  // Progress dots
+  var total = info.total || 10;
   var dots = '';
-  for (var i = 1; i <= 8; i++) {
-    dots += '<span class="inline-block w-1.5 h-1.5 rounded-full ' + (i < info.step ? 'bg-current opacity-60' : i === info.step ? 'bg-current' : 'bg-current opacity-20') + '"></span>';
+  for (var i = 1; i <= total; i++) {
+    if (i <= 9) dots += '<span class="inline-block w-1.5 h-1.5 rounded-full ' + (i < info.step ? 'bg-current opacity-60' : i === info.step ? 'bg-current' : 'bg-current opacity-20') + '"></span>';
   }
-  return '<div class="flex flex-col gap-1">' +
-    '<span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold ' + cls + '">' + info.icon + ' Step ' + info.step + '/8 \u2022 ' + info.action + '</span>' +
+  return '<div class="flex flex-col gap-0.5">' +
+    '<span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold ' + cls + '">' + info.icon + ' ' + info.step + '/' + total + ' ' + info.action + '</span>' +
     '<span class="flex gap-0.5 px-1">' + dots + '</span>' +
     '</div>';
 }
