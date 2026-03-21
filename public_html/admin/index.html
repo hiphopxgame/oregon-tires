@@ -7492,7 +7492,8 @@ function showDashboard(user) {
 // ===== DATA =====
 async function loadAllData() {
   // Load only overview-critical data initially; other tabs load on first visit (lazy)
-  await Promise.all([loadAppointments(), loadEmployees(), loadAdminUsers(), loadCustomers(), loadEmployeeGroups()]);
+  await loadEmployeeGroups(); // must resolve before loadEmployees (group dropdowns depend on it)
+  await Promise.all([loadAppointments(), loadEmployees(), loadAdminUsers(), loadCustomers()]);
   // Mark these tabs as loaded since their data was fetched
   if (typeof loadedTabs !== 'undefined') { loadedTabs.add('appointments'); loadedTabs.add('employees'); loadedTabs.add('customers'); }
   refreshConvUnreadBadge();
@@ -13592,6 +13593,7 @@ async function updateNotificationEmail() {
 }
 
 async function updateAccountName() {
+  if (!currentUser) return;
   const name = document.getElementById('settings-name').value.trim();
   if(!name) { showToast(adminT[currentLang].nameIsRequired, true); return; }
   try {
@@ -13603,6 +13605,7 @@ async function updateAccountName() {
 }
 
 async function updateAccountEmail() {
+  if (!currentUser) return;
   const email = document.getElementById('settings-email').value.trim();
   if(!email) { showToast(adminT[currentLang].emailIsRequired, true); return; }
   try {
