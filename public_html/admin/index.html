@@ -538,7 +538,8 @@
           <option value="customers" data-t="tabCustomers">Customers</option>
           <option value="repairorders" data-t="tabRepairOrders">Repair Orders</option>
           <option value="invoices" data-t="tabInvoices">Invoices</option>
-          <option value="waitlist" data-t="tabWaitlist">Waitlist</option>
+          <option value="walkinqueue" data-t="tabWalkInQueue">Walk-In Queue</option>
+          <option value="waitlist" data-t="tabWaitlist">On Hold</option>
           <option value="tirequotes" data-t="tabTireQuotes">Tire Quotes</option>
           <option value="services" data-t="tabServices">Services</option>
           <option value="visits" data-t="tabVisits">Visit Tracking</option>
@@ -3348,9 +3349,12 @@
 
     <!-- MY SCHEDULE TAB (staff) -->
     <div id="tab-myschedule" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl">
-        <h2 class="text-2xl font-bold">🕐 <span data-t="tabMySchedule">My Schedule</span></h2>
-        <p class="text-green-100" data-t="myScheduleSubtitle">Your weekly work schedule</p>
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🕐 <span data-t="tabMySchedule">My Schedule</span></h2>
+          <p class="text-green-100" data-t="myScheduleSubtitle">Your weekly work schedule</p>
+        </div>
+        <button onclick="loadMySchedule()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800" id="myschedule-content">
         <p class="text-gray-400">Loading...</p>
@@ -4012,6 +4016,17 @@ const adminT = {
     tabLoyalty: 'Loyalty & Rewards',
     tabReferrals: 'Referrals',
     tabReminders: 'Service Reminders',
+    tabWalkInQueue: 'Walk-In Queue',
+    tabOnHold: 'On Hold',
+    tabResourcePlanner: 'Resource Planner',
+    walkInQueueSubtitle: 'Manage walk-in customers waiting for service',
+    onHoldSubtitle: 'Repair orders on hold or awaiting parts',
+    visitsSubtitle: 'Customer check-ins, bay status, and service timers',
+    laborSubtitle: 'Technician hours and labor summary across all ROs',
+    loyaltySubtitle: 'Customer loyalty points and rewards catalog',
+    referralsSubtitle: 'Customer referral codes and tracking',
+    remindersSubtitle: 'Automated service due date tracking per vehicle',
+    rpSubtitle: 'Service demand, staffing, and skill gap analysis',
     navShop: '\uD83D\uDD27 Shop \u25BE',
     navTeam: '\uD83D\uDC65 Team \u25BE',
     navMarketing: '\uD83D\uDCE3 Marketing \u25BE',
@@ -4756,6 +4771,15 @@ const adminT = {
     noActiveWork: 'No active appointments.',
     moreAppointments: 'more',
     appointmentsLabel: 'appointments',
+    schedWorkDays: 'Work Days',
+    schedWeeklyHours: 'Weekly Hours',
+    schedDaysOff: 'Days Off',
+    schedJobs: 'jobs',
+    schedOnDuty: 'On Duty Today',
+    schedNoAppts: 'No appointments scheduled for today',
+    schedSunFull: 'Sunday', schedMonFull: 'Monday', schedTueFull: 'Tuesday', schedWedFull: 'Wednesday', schedThuFull: 'Thursday', schedFriFull: 'Friday', schedSatFull: 'Saturday',
+    unassigned: 'Unassigned',
+    employeeName: 'Employee',
     roleAdmin: 'Admin',
     roleSuperAdmin: 'Super Admin',
     roleEmployee: 'Employee',
@@ -5367,6 +5391,17 @@ const adminT = {
     tabLoyalty: 'Lealtad y Recompensas',
     tabReferrals: 'Referidos',
     tabReminders: 'Recordatorios de Servicio',
+    tabWalkInQueue: 'Cola de Espera',
+    tabOnHold: 'En Espera',
+    tabResourcePlanner: 'Planificador de Recursos',
+    walkInQueueSubtitle: 'Gestionar clientes sin cita esperando servicio',
+    onHoldSubtitle: '\u00D3rdenes de reparaci\u00F3n en espera o esperando piezas',
+    visitsSubtitle: 'Registros de visitas, estado de bah\u00EDas y temporizadores',
+    laborSubtitle: 'Horas de t\u00E9cnicos y resumen de trabajo en todas las \u00F3rdenes',
+    loyaltySubtitle: 'Puntos de lealtad y cat\u00E1logo de recompensas',
+    referralsSubtitle: 'C\u00F3digos de referido y seguimiento',
+    remindersSubtitle: 'Seguimiento autom\u00E1tico de fechas de servicio por veh\u00EDculo',
+    rpSubtitle: 'Demanda de servicio, dotaci\u00F3n y an\u00E1lisis de brechas',
     navShop: '\uD83D\uDD27 Taller \u25BE',
     navTeam: '\uD83D\uDC65 Equipo \u25BE',
     navMarketing: '\uD83D\uDCE3 Marketing \u25BE',
@@ -6111,6 +6146,15 @@ const adminT = {
     noActiveWork: 'No hay citas activas.',
     moreAppointments: 'm\u00E1s',
     appointmentsLabel: 'citas',
+    schedWorkDays: 'D\u00EDas Laborales',
+    schedWeeklyHours: 'Horas Semanales',
+    schedDaysOff: 'D\u00EDas Libres',
+    schedJobs: 'trabajos',
+    schedOnDuty: 'En Turno Hoy',
+    schedNoAppts: 'No hay citas programadas para hoy',
+    schedSunFull: 'Domingo', schedMonFull: 'Lunes', schedTueFull: 'Martes', schedWedFull: 'Mi\u00E9rcoles', schedThuFull: 'Jueves', schedFriFull: 'Viernes', schedSatFull: 'S\u00E1bado',
+    unassigned: 'Sin asignar',
+    employeeName: 'Empleado',
     roleAdmin: 'Admin',
     roleSuperAdmin: 'Super Admin',
     roleEmployee: 'Empleado',
@@ -12639,7 +12683,6 @@ async function loadMySchedule() {
   var empId = currentUser.employee_id;
   var isAdmin = currentUser.type === 'admin';
 
-  // Admins without employee_id see all employee schedules
   if (!empId && !isAdmin) { container.textContent = T.noScheduleFound || 'No schedule found.'; return; }
 
   try {
@@ -12647,99 +12690,330 @@ async function loadMySchedule() {
     var json = await res.json();
     if (!json.success || !json.data) throw new Error('No data');
 
+    // API returns grouped: [{employee_id, employee_name, is_active, days: [{day_of_week, start_time, end_time, is_available}]}]
+    var allEmployees = json.data;
     container.textContent = '';
     var dayLabels = [T.schedSun||'Sun', T.schedMon||'Mon', T.schedTue||'Tue', T.schedWed||'Wed', T.schedThu||'Thu', T.schedFri||'Fri', T.schedSat||'Sat'];
+    var dayLabelsFull = [T.schedSunFull||'Sunday', T.schedMonFull||'Monday', T.schedTueFull||'Tuesday', T.schedWedFull||'Wednesday', T.schedThuFull||'Thursday', T.schedFriFull||'Friday', T.schedSatFull||'Saturday'];
     var todayStr = new Date().toISOString().split('T')[0];
     var todayDow = new Date().getDay();
 
+    // Find my schedule data
+    var myEmpData = empId ? allEmployees.find(function(e) { return e.employee_id === empId; }) : null;
+
     if (empId) {
-      // ── Personal schedule view ──
-      var mySchedule = json.data.filter(function(s) { return parseInt(s.employee_id) === empId; });
-      if (!mySchedule.length) { container.textContent = T.noScheduleFound || 'No schedule found.'; return; }
-
-      var grid = document.createElement('div');
-      grid.className = 'grid gap-3 sm:grid-cols-2 lg:grid-cols-4';
-      for (var dow = 0; dow < 7; dow++) {
-        var slot = mySchedule.find(function(s) { return parseInt(s.day_of_week) === dow; });
-        var isAvail = slot && parseInt(slot.is_available);
-        var isToday = dow === todayDow;
-        var card = document.createElement('div');
-        card.className = 'border rounded-lg p-4 transition ' + (isToday ? 'ring-2 ring-green-500 ' : '') + (isAvail ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : 'bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700');
-        var dayLabel = document.createElement('div');
-        dayLabel.className = 'font-medium dark:text-gray-200' + (isToday ? ' text-green-700 dark:text-green-400' : '');
-        dayLabel.textContent = dayLabels[dow] + (isToday ? ' \u2022' : '');
-        var timeLabel = document.createElement('div');
-        timeLabel.className = 'text-sm text-gray-600 dark:text-gray-400 mt-1';
-        timeLabel.textContent = isAvail ? fmtTime(slot.start_time) + ' - ' + fmtTime(slot.end_time) : (T.off || 'Off');
-        card.appendChild(dayLabel);
-        card.appendChild(timeLabel);
-        grid.appendChild(card);
-      }
-      container.appendChild(grid);
-
-      // Show today's appointments assigned to me
-      var myAppts = appointments.filter(function(a) { return parseInt(a.assigned_employee_id) === empId && a.preferred_date === todayStr && a.status !== 'cancelled'; });
-      if (myAppts.length) {
-        var heading = document.createElement('h3');
-        heading.className = 'font-bold text-brand dark:text-green-400 mt-6 mb-3';
-        heading.textContent = (T.todayLabel || 'Today') + ' (' + myAppts.length + ')';
-        container.appendChild(heading);
-        var list = document.createElement('div');
-        list.className = 'space-y-2';
-        myAppts.forEach(function(a) {
-          var row = document.createElement('div');
-          row.className = 'flex items-center gap-3 p-3 border rounded-lg dark:border-gray-700 dark:bg-gray-800';
-          var timeEl = document.createElement('span');
-          timeEl.className = 'font-medium';
-          timeEl.textContent = fmtTime(a.preferred_time);
-          var nameEl = document.createElement('span');
-          nameEl.textContent = (a.first_name||'') + ' ' + (a.last_name||'');
-          row.appendChild(timeEl);
-          row.appendChild(nameEl);
-          list.appendChild(row);
-        });
-        container.appendChild(list);
-      }
-    } else {
-      // ── Admin overview: all employee schedules for today ──
-      var heading = document.createElement('h3');
-      heading.className = 'font-bold text-lg dark:text-white mb-4';
-      heading.textContent = (T.todayLabel || 'Today') + ' — ' + dayLabels[todayDow];
-      container.appendChild(heading);
-
-      // Group schedules by employee for today
-      var todaySlots = json.data.filter(function(s) { return parseInt(s.day_of_week) === todayDow; });
-      if (!todaySlots.length) {
-        container.appendChild(document.createTextNode(T.noScheduleFound || 'No schedules configured.'));
+      // ═══════════════════════════════════════════════════════════
+      // EMPLOYEE VIEW — Personal weekly schedule + today's work
+      // ═══════════════════════════════════════════════════════════
+      if (!myEmpData || !myEmpData.days || !myEmpData.days.length) {
+        container.textContent = T.noScheduleFound || 'No schedule found.';
         return;
       }
 
-      var grid = document.createElement('div');
-      grid.className = 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3';
-      todaySlots.forEach(function(slot) {
-        var isAvail = parseInt(slot.is_available);
-        var card = document.createElement('div');
-        card.className = 'border rounded-lg p-4 ' + (isAvail ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : 'bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700');
-        var empName = document.createElement('div');
-        empName.className = 'font-semibold dark:text-gray-200';
-        empName.textContent = slot.employee_name || ('Employee #' + slot.employee_id);
-        var timeLabel = document.createElement('div');
-        timeLabel.className = 'text-sm mt-1 ' + (isAvail ? 'text-green-700 dark:text-green-400' : 'text-gray-400');
-        timeLabel.textContent = isAvail ? fmtTime(slot.start_time) + ' - ' + fmtTime(slot.end_time) : (T.off || 'Off');
-        card.appendChild(empName);
-        card.appendChild(timeLabel);
-
-        // Count today's appointments for this employee
-        var empAppts = appointments.filter(function(a) { return parseInt(a.assigned_employee_id) === parseInt(slot.employee_id) && a.preferred_date === todayStr && a.status !== 'cancelled'; });
-        if (empAppts.length) {
-          var countEl = document.createElement('div');
-          countEl.className = 'text-xs text-gray-500 dark:text-gray-400 mt-2';
-          countEl.textContent = empAppts.length + ' ' + (T.appointmentsLabel || 'appointments');
-          card.appendChild(countEl);
-        }
-        grid.appendChild(card);
+      // Week stats
+      var workDays = myEmpData.days.filter(function(d) { return d.is_available; });
+      var totalHours = 0;
+      workDays.forEach(function(d) {
+        var start = parseInt(d.start_time.split(':')[0]) + parseInt(d.start_time.split(':')[1]) / 60;
+        var end = parseInt(d.end_time.split(':')[0]) + parseInt(d.end_time.split(':')[1]) / 60;
+        totalHours += Math.max(0, end - start);
       });
+
+      var statsRow = document.createElement('div');
+      statsRow.className = 'grid grid-cols-3 gap-3 mb-5';
+      [[String(workDays.length), T.schedWorkDays || 'Work Days', 'text-green-600 dark:text-green-400'],
+       [totalHours.toFixed(0) + 'h', T.schedWeeklyHours || 'Weekly Hours', 'text-blue-600 dark:text-blue-400'],
+       [String(7 - workDays.length), T.schedDaysOff || 'Days Off', 'text-gray-500 dark:text-gray-400']
+      ].forEach(function(s) {
+        var stat = document.createElement('div');
+        stat.className = 'bg-white dark:bg-gray-800 rounded-xl p-3 shadow border dark:border-gray-700 text-center';
+        var num = document.createElement('div'); num.className = 'text-2xl font-bold ' + s[2]; num.textContent = s[0];
+        var label = document.createElement('div'); label.className = 'text-xs text-gray-500 dark:text-gray-400 mt-1'; label.textContent = s[1];
+        stat.appendChild(num); stat.appendChild(label); statsRow.appendChild(stat);
+      });
+      container.appendChild(statsRow);
+
+      // Weekly grid
+      var grid = document.createElement('div');
+      grid.className = 'grid gap-3 grid-cols-7';
+      for (var dow = 0; dow < 7; dow++) {
+        var slot = myEmpData.days.find(function(d) { return d.day_of_week === dow; });
+        var isAvail = slot && slot.is_available;
+        var isToday = dow === todayDow;
+
+        // Get today's appointments for this day
+        var dayDate = new Date();
+        dayDate.setDate(dayDate.getDate() + (dow - todayDow));
+        var dayDateStr = dayDate.toISOString().split('T')[0];
+        var dayAppts = appointments.filter(function(a) { return parseInt(a.assigned_employee_id) === empId && a.preferred_date === dayDateStr && a.status !== 'cancelled'; });
+
+        var card = document.createElement('div');
+        card.className = 'border rounded-lg p-3 text-center transition ' + (isToday ? 'ring-2 ring-green-500 shadow-lg ' : '') + (isAvail ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : 'bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700');
+
+        var dayEl = document.createElement('div');
+        dayEl.className = 'text-xs font-bold uppercase tracking-wide mb-1 ' + (isToday ? 'text-green-700 dark:text-green-400' : 'text-gray-500 dark:text-gray-400');
+        dayEl.textContent = dayLabels[dow];
+        card.appendChild(dayEl);
+
+        var timeEl = document.createElement('div');
+        timeEl.className = 'text-sm font-medium ' + (isAvail ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400');
+        timeEl.textContent = isAvail ? fmtTime(slot.start_time) + '\n' + fmtTime(slot.end_time) : (T.off || 'Off');
+        timeEl.style.whiteSpace = 'pre-line';
+        card.appendChild(timeEl);
+
+        if (dayAppts.length && isAvail) {
+          var badge = document.createElement('div');
+          badge.className = 'mt-2 text-xs font-semibold px-2 py-0.5 rounded-full inline-block bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';
+          badge.textContent = dayAppts.length + ' ' + (T.schedJobs || 'jobs');
+          card.appendChild(badge);
+        }
+
+        grid.appendChild(card);
+      }
       container.appendChild(grid);
+
+      // ── Today's Appointments Detail ──
+      var myTodayAppts = appointments.filter(function(a) { return parseInt(a.assigned_employee_id) === empId && a.preferred_date === todayStr && a.status !== 'cancelled'; });
+      myTodayAppts.sort(function(a, b) { return (a.preferred_time || '').localeCompare(b.preferred_time || ''); });
+
+      var todaySection = document.createElement('div');
+      todaySection.className = 'mt-6';
+      var todayHeading = document.createElement('h3');
+      todayHeading.className = 'font-bold text-lg dark:text-white mb-3 flex items-center gap-2';
+      todayHeading.textContent = (T.todayLabel || 'Today') + ' — ' + dayLabelsFull[todayDow];
+      if (myTodayAppts.length) {
+        var countBadge = document.createElement('span');
+        countBadge.className = 'text-sm font-normal px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300';
+        countBadge.textContent = myTodayAppts.length + ' ' + (T.appointmentsLabel || 'appointments');
+        todayHeading.appendChild(countBadge);
+      }
+      todaySection.appendChild(todayHeading);
+
+      if (!myTodayAppts.length) {
+        var emptyEl = document.createElement('div');
+        emptyEl.className = 'text-center py-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg border dark:border-gray-700';
+        var emptyIcon = document.createElement('div'); emptyIcon.className = 'text-3xl mb-2'; emptyIcon.textContent = '\u2615';
+        var emptyText = document.createElement('p'); emptyText.className = 'text-gray-400 text-sm'; emptyText.textContent = T.schedNoAppts || 'No appointments scheduled for today';
+        emptyEl.appendChild(emptyIcon); emptyEl.appendChild(emptyText);
+        todaySection.appendChild(emptyEl);
+      } else {
+        var timeline = document.createElement('div');
+        timeline.className = 'space-y-2';
+        myTodayAppts.forEach(function(a) {
+          var vehicle = [a.vehicle_year, a.vehicle_make, a.vehicle_model].filter(Boolean).join(' ');
+          var row = document.createElement('div');
+          row.className = 'flex items-start gap-3 p-3 border rounded-lg dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition';
+
+          // Time column
+          var timeCol = document.createElement('div');
+          timeCol.className = 'text-center shrink-0 w-16';
+          var timeTop = document.createElement('div'); timeTop.className = 'font-bold text-green-700 dark:text-green-400'; timeTop.textContent = fmtTime(a.preferred_time);
+          timeCol.appendChild(timeTop);
+          row.appendChild(timeCol);
+
+          // Info column
+          var infoCol = document.createElement('div');
+          infoCol.className = 'flex-1 min-w-0';
+          var nameEl = document.createElement('div'); nameEl.className = 'font-semibold text-gray-800 dark:text-gray-200'; nameEl.textContent = (a.first_name || '') + ' ' + (a.last_name || '');
+          infoCol.appendChild(nameEl);
+
+          var detailParts = [];
+          if (a.service) detailParts.push(a.service.replace(/-/g, ' '));
+          if (vehicle) detailParts.push(vehicle);
+          if (detailParts.length) {
+            var detailEl = document.createElement('div'); detailEl.className = 'text-sm text-gray-500 dark:text-gray-400 mt-0.5'; detailEl.textContent = detailParts.join(' \u00B7 ');
+            infoCol.appendChild(detailEl);
+          }
+          row.appendChild(infoCol);
+
+          // Status
+          var statusColors = { pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300', confirmed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300', in_progress: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' };
+          var statusCls = statusColors[a.status] || 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
+          var statusEl = document.createElement('span');
+          statusEl.className = 'text-xs px-2 py-1 rounded-full font-medium shrink-0 ' + statusCls;
+          statusEl.textContent = (a.status || '').replace(/_/g, ' ');
+          row.appendChild(statusEl);
+
+          timeline.appendChild(row);
+        });
+        todaySection.appendChild(timeline);
+      }
+      container.appendChild(todaySection);
+
+    } else {
+      // ═══════════════════════════════════════════════════════════
+      // ADMIN VIEW — Full team schedule overview
+      // ═══════════════════════════════════════════════════════════
+      var activeEmployees = allEmployees.filter(function(e) { return e.is_active; });
+      if (!activeEmployees.length) {
+        container.textContent = T.noScheduleFound || 'No schedules configured.';
+        return;
+      }
+
+      // ── Stats ──
+      var workingToday = 0;
+      var offToday = 0;
+      activeEmployees.forEach(function(emp) {
+        var todaySlot = (emp.days || []).find(function(d) { return d.day_of_week === todayDow; });
+        if (todaySlot && todaySlot.is_available) workingToday++; else offToday++;
+      });
+      var todayApptCount = appointments.filter(function(a) { return a.preferred_date === todayStr && a.status !== 'cancelled'; }).length;
+
+      var statsRow = document.createElement('div');
+      statsRow.className = 'grid grid-cols-3 gap-3 mb-5';
+      [[String(workingToday), T.schedOnDuty || 'On Duty', 'text-green-600 dark:text-green-400'],
+       [String(offToday), T.off || 'Off', 'text-gray-500 dark:text-gray-400'],
+       [String(todayApptCount), T.appointmentsLabel || 'Appointments', 'text-blue-600 dark:text-blue-400']
+      ].forEach(function(s) {
+        var stat = document.createElement('div');
+        stat.className = 'bg-white dark:bg-gray-800 rounded-xl p-3 shadow border dark:border-gray-700 text-center';
+        var num = document.createElement('div'); num.className = 'text-2xl font-bold ' + s[2]; num.textContent = s[0];
+        var label = document.createElement('div'); label.className = 'text-xs text-gray-500 dark:text-gray-400 mt-1'; label.textContent = s[1];
+        stat.appendChild(num); stat.appendChild(label); statsRow.appendChild(stat);
+      });
+      container.appendChild(statsRow);
+
+      // ── Full team weekly grid (table) ──
+      var tableWrap = document.createElement('div');
+      tableWrap.className = 'overflow-x-auto rounded-lg border dark:border-gray-700';
+      var table = document.createElement('table');
+      table.className = 'w-full text-sm';
+
+      // Header
+      var thead = document.createElement('thead');
+      var headerRow = document.createElement('tr');
+      headerRow.className = 'bg-gray-50 dark:bg-gray-700/50';
+      var nameHeader = document.createElement('th');
+      nameHeader.className = 'text-left px-3 py-2 font-semibold text-gray-700 dark:text-gray-200 sticky left-0 bg-gray-50 dark:bg-gray-700/50 z-10';
+      nameHeader.textContent = T.employeeName || 'Employee';
+      headerRow.appendChild(nameHeader);
+
+      for (var d = 0; d < 7; d++) {
+        var th = document.createElement('th');
+        th.className = 'text-center px-2 py-2 font-semibold min-w-[80px] ' + (d === todayDow ? 'text-green-700 dark:text-green-400 bg-green-50/50 dark:bg-green-900/10' : 'text-gray-600 dark:text-gray-300');
+        th.textContent = dayLabels[d] + (d === todayDow ? ' \u2022' : '');
+        headerRow.appendChild(th);
+      }
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Body
+      var tbody = document.createElement('tbody');
+      activeEmployees.forEach(function(emp, idx) {
+        var tr = document.createElement('tr');
+        tr.className = idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/50 dark:bg-gray-800/50';
+
+        var nameTd = document.createElement('td');
+        nameTd.className = 'px-3 py-2.5 font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap sticky left-0 z-10 ' + (idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/50 dark:bg-gray-800/50');
+        nameTd.textContent = emp.employee_name;
+
+        // Check if this is the current user
+        if (emp.employee_id === empId) {
+          var youBadge = document.createElement('span');
+          youBadge.className = 'ml-1 text-[10px] font-bold text-green-600 dark:text-green-400';
+          youBadge.textContent = '(' + (T.youBadge || 'YOU') + ')';
+          nameTd.appendChild(youBadge);
+        }
+        tr.appendChild(nameTd);
+
+        for (var dayIdx = 0; dayIdx < 7; dayIdx++) {
+          var daySlot = (emp.days || []).find(function(dd) { return dd.day_of_week === dayIdx; });
+          var avail = daySlot && daySlot.is_available;
+          var isTodayCol = dayIdx === todayDow;
+
+          // Count appointments for this employee on this day
+          var dayDate = new Date();
+          dayDate.setDate(dayDate.getDate() + (dayIdx - todayDow));
+          var dayDateStr = dayDate.toISOString().split('T')[0];
+          var dayApptCount = appointments.filter(function(a) { return parseInt(a.assigned_employee_id) === emp.employee_id && a.preferred_date === dayDateStr && a.status !== 'cancelled'; }).length;
+
+          var td = document.createElement('td');
+          td.className = 'text-center px-2 py-2.5 ' + (isTodayCol ? 'bg-green-50/50 dark:bg-green-900/10 ' : '');
+
+          if (avail) {
+            var timeStr = document.createElement('div');
+            timeStr.className = 'text-xs text-gray-600 dark:text-gray-400';
+            timeStr.textContent = fmtTime(daySlot.start_time) + '-' + fmtTime(daySlot.end_time);
+            td.appendChild(timeStr);
+            if (dayApptCount > 0) {
+              var apptBadge = document.createElement('div');
+              apptBadge.className = 'text-[10px] mt-0.5 font-semibold text-blue-600 dark:text-blue-400';
+              apptBadge.textContent = dayApptCount + ' ' + (T.schedJobs || 'jobs');
+              td.appendChild(apptBadge);
+            }
+          } else {
+            var offEl = document.createElement('span');
+            offEl.className = 'text-xs text-gray-300 dark:text-gray-600';
+            offEl.textContent = '\u2014';
+            td.appendChild(offEl);
+          }
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrap.appendChild(table);
+      container.appendChild(tableWrap);
+
+      // ── Today's Appointment Summary (admin) ──
+      var todayAppts = appointments.filter(function(a) { return a.preferred_date === todayStr && a.status !== 'cancelled'; });
+      todayAppts.sort(function(a, b) { return (a.preferred_time || '').localeCompare(b.preferred_time || ''); });
+
+      if (todayAppts.length) {
+        var todaySection = document.createElement('div');
+        todaySection.className = 'mt-6';
+        var todayHeading = document.createElement('h3');
+        todayHeading.className = 'font-bold text-lg dark:text-white mb-3';
+        todayHeading.textContent = (T.todayLabel || 'Today') + ' — ' + todayAppts.length + ' ' + (T.appointmentsLabel || 'appointments');
+        todaySection.appendChild(todayHeading);
+
+        var timeline = document.createElement('div');
+        timeline.className = 'space-y-2';
+        todayAppts.forEach(function(a) {
+          var vehicle = [a.vehicle_year, a.vehicle_make, a.vehicle_model].filter(Boolean).join(' ');
+          var row = document.createElement('div');
+          row.className = 'flex items-center gap-3 p-3 border rounded-lg dark:border-gray-700 bg-white dark:bg-gray-800';
+
+          var timeEl = document.createElement('div');
+          timeEl.className = 'font-bold text-green-700 dark:text-green-400 w-16 text-center shrink-0';
+          timeEl.textContent = fmtTime(a.preferred_time);
+          row.appendChild(timeEl);
+
+          var infoEl = document.createElement('div');
+          infoEl.className = 'flex-1 min-w-0';
+          var nameEl = document.createElement('span');
+          nameEl.className = 'font-medium text-gray-800 dark:text-gray-200';
+          nameEl.textContent = (a.first_name || '') + ' ' + (a.last_name || '');
+          infoEl.appendChild(nameEl);
+          var parts = [];
+          if (a.service) parts.push(a.service.replace(/-/g, ' '));
+          if (vehicle) parts.push(vehicle);
+          if (parts.length) {
+            var detailEl = document.createElement('div');
+            detailEl.className = 'text-xs text-gray-500 dark:text-gray-400';
+            detailEl.textContent = parts.join(' \u00B7 ');
+            infoEl.appendChild(detailEl);
+          }
+          row.appendChild(infoEl);
+
+          // Assigned employee
+          if (a.employee_name) {
+            var assignEl = document.createElement('span');
+            assignEl.className = 'text-xs text-gray-400 shrink-0';
+            assignEl.textContent = '\u2192 ' + a.employee_name;
+            row.appendChild(assignEl);
+          } else {
+            var unassigned = document.createElement('span');
+            unassigned.className = 'text-xs text-red-400 font-medium shrink-0';
+            unassigned.textContent = T.unassigned || 'Unassigned';
+            row.appendChild(unassigned);
+          }
+
+          timeline.appendChild(row);
+        });
+        todaySection.appendChild(timeline);
+        container.appendChild(todaySection);
+      }
     }
   } catch(e) {
     container.textContent = 'Error loading schedule.';
@@ -13778,6 +14052,7 @@ loadMessages = async function() {
 <script src="/admin/js/referrals.js"></script>
 <script src="/admin/js/service-reminders.js"></script>
 <script src="/admin/js/resource-planner.js"></script>
+<script src="/admin/js/labor-tracker.js"></script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';
   // Override global showToast — handles legacy (msg, isError: bool) and new (msg, type: string)
