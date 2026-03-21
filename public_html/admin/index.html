@@ -8585,13 +8585,12 @@ function getOverviewStats() {
     var d = new Date(a.preferred_date + 'T00:00:00');
     if (a.status === 'completed') { completedAppts.push(a); return; }
     if (a.status === 'cancelled') return;
-    if (d < today && a.status !== 'completed' && a.status !== 'cancelled') { overdueAppts.push(a); return; }
+    // Unassigned: any non-completed, non-cancelled appointment without an employee
+    if (!a.assigned_employee_id) unassignedAppts.push(a);
+    if (d < today) { overdueAppts.push(a); return; }
     if (a.preferred_date === todayStr) todayAppts.push(a);
     if (d >= today && d < weekEnd) weekAppts.push(a);
-    if (d >= today) {
-      upcomingAppts.push(a);
-      if (!a.assigned_employee_id) unassignedAppts.push(a);
-    }
+    if (d >= today) upcomingAppts.push(a);
   });
   return { today: todayAppts, week: weekAppts, upcoming: upcomingAppts, completed: completedAppts, overdue: overdueAppts, unassigned: unassignedAppts, todayStr: todayStr, todayDate: today };
 }
