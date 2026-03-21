@@ -7421,6 +7421,12 @@ function showDashboard(user) {
   loadAllData();
   setupPolling();
   populateMonthFilter();
+
+  // Re-trigger hash-based deep link now that session is loaded
+  var hashTab = location.hash.replace('#', '');
+  if (hashTab && document.getElementById('tab-' + hashTab)) {
+    switchTab(hashTab);
+  }
 }
 
 // ===== DATA =====
@@ -12741,6 +12747,7 @@ if (typeof FEATURE_DATA !== 'undefined') {
 async function loadMySchedule() {
   var T = adminT[currentLang];
   var container = document.getElementById('myschedule-content');
+  if (!currentUser) { return; }
   var empId = currentUser.employee_id;
   var isAdmin = currentUser.type === 'admin';
 
@@ -13085,6 +13092,10 @@ async function loadMySchedule() {
 async function loadMyWork() {
   var T = adminT[currentLang];
   var container = document.getElementById('mywork-content');
+
+  // Guard: session not loaded yet
+  if (!currentUser) { return; }
+
   var empId = currentUser.employee_id;
   var isAdmin = currentUser.type === 'admin';
 
