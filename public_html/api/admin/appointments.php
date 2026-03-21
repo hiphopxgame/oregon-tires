@@ -140,6 +140,23 @@ try {
             }
             $fields[] = 'status = ?';
             $params[] = $body['status'];
+
+            // Status → New: auto-unassign employee and reset linked RO to intake
+            if ($body['status'] === 'new' && !array_key_exists('assigned_employee_id', $body)) {
+                $fields[] = 'assigned_employee_id = ?';
+                $params[] = null;
+                try {
+                    $roCheck = $db->prepare('SELECT id, status FROM oretir_repair_orders WHERE appointment_id = ? LIMIT 1');
+                    $roCheck->execute([$id]);
+                    $linkedRo = $roCheck->fetch(PDO::FETCH_ASSOC);
+                    if ($linkedRo && in_array($linkedRo['status'], ['check_in', 'diagnosis'], true)) {
+                        $db->prepare('UPDATE oretir_repair_orders SET status = ?, assigned_employee_id = NULL, updated_at = NOW() WHERE id = ?')
+                           ->execute(['intake', $linkedRo['id']]);
+                    }
+                } catch (\Throwable $e) {
+                    error_log("appointments.php: reset RO on status=new failed: " . $e->getMessage());
+                }
+            }
         }
 
         if (array_key_exists('assigned_employee_id', $body)) {
@@ -208,8 +225,33 @@ try {
                     error_log("appointments.php: RO auto-advance failed: " . $roErr->getMessage());
                 }
             } else {
+                // Employee unassigned → set status to 'new' (unless explicitly set otherwise)
                 $fields[] = 'assigned_employee_id = ?';
                 $params[] = null;
+
+                if (!isset($body['status']) || $body['status'] === '') {
+                    // Auto-revert to 'new' when unassigning
+                    $fields[] = 'status = ?';
+                    $params[] = 'new';
+                }
+
+                // Reset linked RO: unassign employee and revert to intake if early in workflow
+                try {
+                    $roCheck = $db->prepare('SELECT id, status FROM oretir_repair_orders WHERE appointment_id = ? LIMIT 1');
+                    $roCheck->execute([$id]);
+                    $linkedRo = $roCheck->fetch(PDO::FETCH_ASSOC);
+                    if ($linkedRo) {
+                        if (in_array($linkedRo['status'], ['check_in', 'diagnosis'], true)) {
+                            $db->prepare('UPDATE oretir_repair_orders SET status = ?, assigned_employee_id = NULL, updated_at = NOW() WHERE id = ?')
+                               ->execute(['intake', $linkedRo['id']]);
+                        } else {
+                            $db->prepare('UPDATE oretir_repair_orders SET assigned_employee_id = NULL, updated_at = NOW() WHERE id = ?')
+                               ->execute([$linkedRo['id']]);
+                        }
+                    }
+                } catch (\Throwable $roErr) {
+                    error_log("appointments.php: RO reset on unassign failed: " . $roErr->getMessage());
+                }
             }
         }
 
