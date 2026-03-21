@@ -160,6 +160,27 @@ function adminLogin(string $email, string $password): array|string
     $_SESSION['csrf_token']     = bin2hex(random_bytes(32));
     $_SESSION['dashboard_role'] = 'admin';
 
+    // Detect if admin is also an employee (for My Work / My Schedule tabs)
+    $empStmt = $db->prepare('SELECT id, name, role, group_id FROM oretir_employees WHERE email = ? AND is_active = 1 LIMIT 1');
+    $empStmt->execute([$admin['email']]);
+    $emp = $empStmt->fetch();
+    if ($emp) {
+        $_SESSION['employee_id']   = (int) $emp['id'];
+        $_SESSION['employee_name'] = $emp['name'];
+        $_SESSION['employee_role'] = $emp['role'];
+        if ($emp['group_id']) {
+            $grpStmt = $db->prepare('SELECT name_en, name_es, permissions FROM oretir_employee_groups WHERE id = ? LIMIT 1');
+            $grpStmt->execute([$emp['group_id']]);
+            $grp = $grpStmt->fetch();
+            if ($grp) {
+                $_SESSION['employee_group_id']      = (int) $emp['group_id'];
+                $_SESSION['employee_group_name']     = $grp['name_en'];
+                $_SESSION['employee_group_name_es']   = $grp['name_es'];
+                $_SESSION['employee_permissions']     = json_decode($grp['permissions'], true) ?: ['my_work'];
+            }
+        }
+    }
+
     return $admin;
 }
 
