@@ -1070,7 +1070,7 @@
       </div>
 
       <!-- Blog Editor Modal -->
-      <div id="blog-editor-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-8 overflow-y-auto">
+      <div id="blog-editor-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-8 overflow-y-auto" onclick="if(event.target===this)closeBlogEditor()">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl mx-4 mb-8">
           <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
             <h3 id="blog-form-title" class="text-lg font-bold" data-t="blogNewPost">New Blog Post</h3>
@@ -1336,7 +1336,7 @@
     </div>
 
     <!-- Promotion Preview Modal -->
-    <div id="promo-preview-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60" role="dialog" aria-modal="true" aria-label="Promotion Preview">
+    <div id="promo-preview-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60" role="dialog" aria-modal="true" aria-label="Promotion Preview" onclick="if(event.target===this)closePromoPreviewModal()">
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto mx-4">
         <div class="flex items-center justify-between px-6 py-4 border-b dark:border-gray-700">
           <h3 class="font-bold text-lg dark:text-gray-200">Promotion Preview</h3>
@@ -4876,6 +4876,9 @@ const adminT = {
     lsConversations: 'Unread Threads',
     lsEmployeesOn: 'Team On Duty',
     clickToView: 'Click to view',
+    statConfirmed: 'confirmed',
+    statNew: 'new',
+    statAssigned: 'assigned',
     // Shared Actions
     actionCancel: 'Cancel',
     actionSave: 'Save',
@@ -6366,6 +6369,9 @@ const adminT = {
     lsConversations: 'Hilos Sin Leer',
     lsEmployeesOn: 'Equipo en Turno',
     clickToView: 'Clic para ver',
+    statConfirmed: 'confirmadas',
+    statNew: 'nuevas',
+    statAssigned: 'asignadas',
     // Shared Actions
     actionCancel: 'Cancelar',
     actionSave: 'Guardar',
@@ -8155,13 +8161,13 @@ function renderUpcomingSchedule(stats) {
     if (idx === 14) pieces.push('<div id="overview-more-days" class="hidden">');
     var chunk = '<div class="border-l-4 ' + (apts.length ? 'border-green-600 bg-green-50 dark:bg-green-900/20' : 'border-gray-300') + ' pl-4 py-2 rounded-r-lg ' + (isToday ? 'ring-2 ring-amber-500 bg-amber-50 dark:bg-amber-900/20' : '') + '">';
     chunk += '<div class="flex justify-between items-center mb-1"><h4 class="font-semibold text-sm ' + (isToday ? 'text-amber-800 dark:text-amber-300' : 'dark:text-gray-200') + '">' + (isToday ? (T.todayLabel || 'Today') + ' — ' : '') + dayLabel + '</h4>';
-    chunk += apts.length ? '<span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-bold">' + apts.length + ' appt' + (apts.length > 1 ? 's' : '') + '</span>' : '<span class="text-xs text-gray-400 italic">Open</span>';
+    chunk += apts.length ? '<span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full font-bold">' + apts.length + '</span>' : '<span class="text-xs text-gray-400 italic">' + (T.schedOpen || 'Open') + '</span>';
     chunk += '</div>';
     if (apts.length) {
       apts.slice(0, 3).forEach(function(a) {
         chunk += '<div class="text-sm flex justify-between items-center bg-white dark:bg-gray-700 p-2 rounded mb-1 border dark:border-gray-600"><span><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(servicesLabel(a)) + ')</span></span>' + statusBadge(a.status) + (typeof calSyncBadge === 'function' ? calSyncBadge(a) : '') + '</div>';
       });
-      if (apts.length > 3) chunk += '<p class="text-xs text-gray-400">+' + (apts.length - 3) + ' more</p>';
+      if (apts.length > 3) chunk += '<p class="text-xs text-gray-400">+' + (apts.length - 3) + ' ' + (T.showMore || 'more') + '</p>';
     }
     chunk += '</div>';
     pieces.push(chunk);
@@ -8314,14 +8320,14 @@ function renderOverview() {
   if (todayDetail) {
     var tNew = stats.today.filter(function(a){return a.status==='new';}).length;
     var tConf = stats.today.filter(function(a){return a.status==='confirmed';}).length;
-    todayDetail.textContent = tConf + ' confirmed, ' + tNew + ' new';
+    todayDetail.textContent = tConf + ' ' + (T.statConfirmed || 'confirmed') + ', ' + tNew + ' ' + (T.statNew || 'new');
   }
 
   document.getElementById('stat-week').textContent = stats.week.length;
   var weekDetail = document.getElementById('stat-week-detail');
   if (weekDetail) {
     var assigned = stats.week.filter(function(a){return a.assigned_employee_id;}).length;
-    weekDetail.textContent = assigned + '/' + stats.week.length + ' assigned';
+    weekDetail.textContent = assigned + '/' + stats.week.length + ' ' + (T.statAssigned || 'assigned');
   }
 
   document.getElementById('stat-upcoming').textContent = stats.upcoming.length;
@@ -8407,28 +8413,22 @@ function renderLiveStatus() {
     box.appendChild(card);
   });
 
-  // Async fetch active RO count from API (not relying on lazy-loaded DOM)
-  fetch('/api/admin/repair-orders.php?count_active=1', { credentials: 'include' })
+  // Async: fetch all ROs (limit=1 for count) then subtract terminal statuses
+  fetch('/api/admin/repair-orders.php?limit=500', { credentials: 'include' })
     .then(function(r) { return r.json(); })
     .then(function(json) {
       var el = document.getElementById('ls-active-ros');
-      if (el) {
-        var count = 0;
-        if (json.success && typeof json.active_count !== 'undefined') {
-          count = json.active_count;
-        } else if (json.success && json.total) {
-          count = json.total;
-        } else if (json.data && Array.isArray(json.data)) {
-          count = json.data.length;
-        }
-        el.textContent = String(count);
-        if (count > 0) el.className = 'text-lg font-bold text-purple-600 dark:text-purple-400';
-        else el.className = 'text-lg font-bold text-gray-400 dark:text-gray-500';
-      }
+      if (!el) return;
+      var data = json.data || [];
+      var activeCount = data.filter(function(ro) {
+        return ro.status !== 'completed' && ro.status !== 'cancelled' && ro.status !== 'invoiced';
+      }).length;
+      el.textContent = String(activeCount);
+      el.className = 'text-lg font-bold ' + (activeCount > 0 ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500');
     })
     .catch(function() {
       var el = document.getElementById('ls-active-ros');
-      if (el) el.textContent = '—';
+      if (el) { el.textContent = '—'; el.className = 'text-lg font-bold text-gray-400 dark:text-gray-500'; }
     });
 }
 
