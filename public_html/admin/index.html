@@ -944,14 +944,23 @@
         </div>
         <div id="employees-content"></div>
 
-        <!-- User Groups Section (admin only) -->
+        <!-- User Groups & Permissions Section (admin only) -->
         <div id="group-management-section" class="mt-8">
-          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center cursor-pointer" onclick="var c=document.getElementById('group-management-wrap');c.classList.toggle('hidden');">
-            <div><h2 class="text-xl font-bold" data-t="userGroups">User Groups</h2><p class="text-green-100 text-sm" data-t="userGroupsDesc">Manage employee permission groups</p></div>
-            <span class="text-white text-lg">▾</span>
+          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+            <div><h2 class="text-xl font-bold" data-t="userGroups">User Groups & Permissions</h2><p class="text-green-100 text-sm" data-t="userGroupsDesc">Control what each employee role can see and do</p></div>
           </div>
-          <div id="group-management-wrap" class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800 hidden">
-            <div id="group-management-content"></div>
+          <div class="bg-white rounded-b-xl shadow dark:bg-gray-800">
+            <!-- Sub-tabs: Groups | Permission Reference -->
+            <div class="border-b dark:border-gray-700 px-6 pt-4">
+              <div class="flex gap-1">
+                <button onclick="switchGroupSubTab('groups')" id="grp-subtab-groups" class="px-4 py-2 text-sm font-medium rounded-t-lg border border-b-0 bg-white dark:bg-gray-800 dark:border-gray-600 text-brand dark:text-green-400 -mb-px" data-t="userGroups">Groups</button>
+                <button onclick="switchGroupSubTab('matrix')" id="grp-subtab-matrix" class="px-4 py-2 text-sm font-medium rounded-t-lg border border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" data-t="permRefTitle">Permission Reference</button>
+              </div>
+            </div>
+            <div class="p-6">
+              <div id="group-tab-groups"><div id="group-management-content"></div></div>
+              <div id="group-tab-matrix" class="hidden"><div id="perm-matrix-content"></div></div>
+            </div>
           </div>
         </div>
 
@@ -4351,18 +4360,18 @@ const adminT = {
     employeeAdded: 'Employee added!',
     employeeUpdated: 'Employee updated!',
     // Employee Groups
-    userGroups: 'User Groups',
-    userGroupsDesc: 'Manage employee permission groups',
+    userGroups: 'User Groups & Permissions',
+    userGroupsDesc: 'Control what each employee role can see and do',
     addGroup: 'Add Group',
     editGroup: 'Edit Group',
-    deleteGroup: 'Delete Group',
+    deleteGroup: 'Delete',
     groupName: 'Group Name',
     groupNameEn: 'Name (English)',
     groupNameEs: 'Name (Spanish)',
     groupDescEn: 'Description (English)',
     groupDescEs: 'Description (Spanish)',
     groupPermissions: 'Permissions',
-    groupEmployeeCount: 'employees',
+    groupEmployeeCount: 'members',
     groupCreated: 'Group created!',
     groupUpdated: 'Group updated!',
     groupDeleted: 'Group deleted!',
@@ -4379,6 +4388,18 @@ const adminT = {
     noGroup: 'No Group',
     systemGroup: 'System',
     defaultGroup: 'Default',
+    permRefTitle: 'Permission Reference',
+    permRefDesc: 'Each permission grants access to specific areas of the admin panel',
+    permFeatureArea: 'Feature Area',
+    permGrantsAccess: 'Grants Access To',
+    permAlwaysOn: 'Always on for all employees',
+    permAdminOnly: 'Admins always have full access to everything',
+    groupMembers: 'Members',
+    groupAccessSummary: 'Has access to',
+    groupNoMembers: 'No employees in this group',
+    groupTabCount: 'tabs',
+    groupSelectPerms: 'Select which features this group can access',
+    groupMoveEmployee: 'Move',
     statusUpdated: 'Status updated',
     employeeAssigned: 'Employee assigned & confirmed',
     assignmentRemoved: 'Assignment removed',
@@ -5694,18 +5715,18 @@ const adminT = {
     employeeAdded: '\u00A1Empleado agregado!',
     employeeUpdated: '\u00A1Empleado actualizado!',
     // Employee Groups
-    userGroups: 'Grupos de Usuario',
-    userGroupsDesc: 'Administrar grupos de permisos de empleados',
+    userGroups: 'Grupos de Usuario y Permisos',
+    userGroupsDesc: 'Controla lo que cada rol de empleado puede ver y hacer',
     addGroup: 'Agregar Grupo',
     editGroup: 'Editar Grupo',
-    deleteGroup: 'Eliminar Grupo',
+    deleteGroup: 'Eliminar',
     groupName: 'Nombre del Grupo',
     groupNameEn: 'Nombre (Ingl\u00E9s)',
     groupNameEs: 'Nombre (Espa\u00F1ol)',
     groupDescEn: 'Descripci\u00F3n (Ingl\u00E9s)',
     groupDescEs: 'Descripci\u00F3n (Espa\u00F1ol)',
     groupPermissions: 'Permisos',
-    groupEmployeeCount: 'empleados',
+    groupEmployeeCount: 'miembros',
     groupCreated: '\u00A1Grupo creado!',
     groupUpdated: '\u00A1Grupo actualizado!',
     groupDeleted: '\u00A1Grupo eliminado!',
@@ -5720,6 +5741,18 @@ const adminT = {
     permSettings: 'Configuraci\u00F3n y An\u00E1lisis',
     empGroup: 'Grupo',
     noGroup: 'Sin Grupo',
+    permRefTitle: 'Referencia de Permisos',
+    permRefDesc: 'Cada permiso otorga acceso a \u00E1reas espec\u00EDficas del panel de administraci\u00F3n',
+    permFeatureArea: '\u00C1rea de Funciones',
+    permGrantsAccess: 'Otorga Acceso A',
+    permAlwaysOn: 'Siempre activo para todos los empleados',
+    permAdminOnly: 'Los administradores siempre tienen acceso completo a todo',
+    groupMembers: 'Miembros',
+    groupAccessSummary: 'Tiene acceso a',
+    groupNoMembers: 'No hay empleados en este grupo',
+    groupTabCount: 'pesta\u00F1as',
+    groupSelectPerms: 'Selecciona a qu\u00E9 funciones puede acceder este grupo',
+    groupMoveEmployee: 'Mover',
     systemGroup: 'Sistema',
     defaultGroup: 'Predeterminado',
     statusUpdated: 'Estado actualizado',
@@ -7317,13 +7350,53 @@ async function loadEmployees() {
   }
 }
 
-// ===== EMPLOYEE GROUPS =====
+// ===== EMPLOYEE GROUPS & PERMISSIONS =====
 var PERM_BUNDLES = ['my_work','shop_ops','customers','messaging','team','marketing','settings'];
+
+// Rich permission metadata: icon, color scheme, and which tabs are included with human-readable labels
+var PERM_META = {
+  my_work:   { icon:'🕐', color:'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300', border:'border-gray-300 dark:border-gray-600', accent:'bg-gray-500',
+               tabs: { en:['My Schedule','My Work'], es:['Mi Horario','Mi Trabajo'] } },
+  shop_ops:  { icon:'🔧', color:'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300', border:'border-blue-300 dark:border-blue-700', accent:'bg-blue-500',
+               tabs: { en:['Appointments','Repair Orders','Invoices','Walk-In Queue','On Hold','Tire Quotes','Services','Visit Tracking'], es:['Citas','Órdenes de Reparación','Facturas','Cola de Espera','En Espera','Cotizaciones','Servicios','Seguimiento de Visitas'] } },
+  customers: { icon:'👤', color:'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300', border:'border-green-300 dark:border-green-700', accent:'bg-green-500',
+               tabs: { en:['Customers','Resource Planner'], es:['Clientes','Planificador de Recursos'] } },
+  messaging: { icon:'💬', color:'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300', border:'border-purple-300 dark:border-purple-700', accent:'bg-purple-500',
+               tabs: { en:['Messages'], es:['Mensajes'] } },
+  team:      { icon:'👥', color:'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300', border:'border-amber-300 dark:border-amber-700', accent:'bg-amber-500',
+               tabs: { en:['Employees','Labor Tracking'], es:['Empleados','Seguimiento de Horas'] } },
+  marketing: { icon:'📣', color:'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300', border:'border-pink-300 dark:border-pink-700', accent:'bg-pink-500',
+               tabs: { en:['Blog','Promotions','FAQ','Reviews','Gallery','Subscribers','Loyalty & Rewards','Referrals','Service Reminders'], es:['Blog','Promociones','Preguntas Frecuentes','Reseñas','Galería','Suscriptores','Lealtad y Recompensas','Referidos','Recordatorios de Servicio'] } },
+  settings:  { icon:'⚙️', color:'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300', border:'border-red-300 dark:border-red-700', accent:'bg-red-500',
+               tabs: { en:['Analytics','Site Content','Docs'], es:['Analíticas','Contenido del Sitio','Documentación'] } }
+};
 var PERM_LABELS = {
   en: { my_work:'My Schedule & Work', shop_ops:'Shop Operations', customers:'Customer Management', messaging:'Messaging', team:'Team Management', marketing:'Marketing & Content', settings:'Settings & Analytics' },
-  es: { my_work:'Mi Horario y Trabajo', shop_ops:'Operaciones del Taller', customers:'Gesti\u00F3n de Clientes', messaging:'Mensajer\u00EDa', team:'Gesti\u00F3n de Equipo', marketing:'Marketing y Contenido', settings:'Configuraci\u00F3n y An\u00E1lisis' }
+  es: { my_work:'Mi Horario y Trabajo', shop_ops:'Operaciones del Taller', customers:'Gestión de Clientes', messaging:'Mensajería', team:'Gestión de Equipo', marketing:'Marketing y Contenido', settings:'Configuración y Análisis' }
 };
-var PERM_COLORS = { my_work:'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300', shop_ops:'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300', customers:'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300', messaging:'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300', team:'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300', marketing:'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300', settings:'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' };
+
+function getPermLabel(bundle) { return (PERM_LABELS[currentLang] || PERM_LABELS.en)[bundle] || bundle; }
+function getPermMeta(bundle) { return PERM_META[bundle] || PERM_META.my_work; }
+function parsePerms(g) { try { return typeof g.permissions === 'string' ? JSON.parse(g.permissions) : (g.permissions || []); } catch(e) { return []; } }
+function grpName(g) { return currentLang === 'es' && g.name_es ? g.name_es : g.name_en; }
+function grpDesc(g) { return currentLang === 'es' && g.description_es ? g.description_es : (g.description_en || ''); }
+
+// Sub-tab switching
+function switchGroupSubTab(which) {
+  var tabs = ['groups','matrix'];
+  tabs.forEach(function(t) {
+    var panel = document.getElementById('group-tab-' + t);
+    var btn = document.getElementById('grp-subtab-' + t);
+    if (t === which) {
+      if (panel) panel.classList.remove('hidden');
+      if (btn) { btn.className = 'px-4 py-2 text-sm font-medium rounded-t-lg border border-b-0 bg-white dark:bg-gray-800 dark:border-gray-600 text-brand dark:text-green-400 -mb-px'; }
+    } else {
+      if (panel) panel.classList.add('hidden');
+      if (btn) { btn.className = 'px-4 py-2 text-sm font-medium rounded-t-lg border border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'; }
+    }
+  });
+  if (which === 'matrix') renderPermMatrix();
+}
 
 async function loadEmployeeGroups() {
   try { var json = await api('employee-groups.php'); employeeGroups = json.data || []; } catch(e) { console.error('loadEmployeeGroups failed:', e); employeeGroups = []; }
@@ -7332,13 +7405,11 @@ async function loadEmployeeGroups() {
 }
 
 function populateGroupDropdowns() {
-  // Populate all group dropdowns (new employee form, etc.)
   var selects = document.querySelectorAll('#new-emp-group');
   selects.forEach(function(sel) {
     var html = '';
     employeeGroups.forEach(function(g) {
-      var name = currentLang === 'es' && g.name_es ? g.name_es : g.name_en;
-      html += '<option value="' + g.id + '"' + (g.is_default ? ' selected' : '') + '>' + esc(name) + '</option>';
+      html += '<option value="' + g.id + '"' + (g.is_default ? ' selected' : '') + '>' + esc(grpName(g)) + '</option>';
     });
     sel.innerHTML = html;
   });
@@ -7347,94 +7418,257 @@ function populateGroupDropdowns() {
 function buildGroupOptions(selectedGroupId) {
   var html = '<option value="">' + (adminT[currentLang].noGroup || 'No Group') + '</option>';
   employeeGroups.forEach(function(g) {
-    var name = currentLang === 'es' && g.name_es ? g.name_es : g.name_en;
-    html += '<option value="' + g.id + '"' + (selectedGroupId && parseInt(selectedGroupId) === parseInt(g.id) ? ' selected' : '') + '>' + esc(name) + '</option>';
+    html += '<option value="' + g.id + '"' + (selectedGroupId && parseInt(selectedGroupId) === parseInt(g.id) ? ' selected' : '') + '>' + esc(grpName(g)) + '</option>';
   });
   return html;
 }
 
+// ── Permission Reference Matrix ──────────────────────────────────
+function renderPermMatrix() {
+  var container = document.getElementById('perm-matrix-content');
+  if (!container) return;
+  var T = adminT[currentLang];
+
+  // Info banner
+  var html = '<div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">'
+    + '<div class="flex items-start gap-3">'
+    + '<span class="text-2xl">🛡</span>'
+    + '<div><p class="font-medium text-blue-900 dark:text-blue-200">' + (T.permRefDesc || 'Each permission grants access to specific areas of the admin panel') + '</p>'
+    + '<p class="text-sm text-blue-700 dark:text-blue-300 mt-1">' + (T.permAdminOnly || 'Admins always have full access to everything') + '</p></div>'
+    + '</div></div>';
+
+  // Permission cards — each shows the bundle and the exact tabs it grants
+  html += '<div class="space-y-3">';
+  PERM_BUNDLES.forEach(function(b) {
+    var meta = getPermMeta(b);
+    var tabNames = meta.tabs[currentLang] || meta.tabs.en;
+    var isAlwaysOn = b === 'my_work';
+
+    // Count which groups have this permission
+    var groupsWithPerm = employeeGroups.filter(function(g) { return parsePerms(g).indexOf(b) !== -1; });
+
+    html += '<div class="border rounded-lg overflow-hidden ' + meta.border + '">'
+      + '<div class="flex items-center gap-3 px-4 py-3 ' + meta.color + '">'
+      + '<span class="text-xl">' + meta.icon + '</span>'
+      + '<div class="flex-1">'
+      + '<div class="flex items-center gap-2 flex-wrap">'
+      + '<span class="font-semibold">' + esc(getPermLabel(b)) + '</span>'
+      + (isAlwaysOn ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-white/50 font-medium">' + (T.permAlwaysOn || 'Always on') + '</span>' : '')
+      + '</div>'
+      + '<div class="text-xs opacity-75 mt-0.5">' + tabNames.length + ' ' + (T.groupTabCount || 'tabs') + ' &middot; '
+      + groupsWithPerm.length + ' ' + (groupsWithPerm.length === 1 ? 'group' : 'groups') + '</div>'
+      + '</div></div>'
+      + '<div class="px-4 py-3 bg-white dark:bg-gray-800">'
+      + '<div class="flex flex-wrap gap-1.5">'
+      + tabNames.map(function(tab) {
+          return '<span class="inline-flex items-center text-xs px-2.5 py-1 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border dark:border-gray-600">' + esc(tab) + '</span>';
+        }).join('')
+      + '</div>'
+      + (groupsWithPerm.length ? '<div class="mt-2 pt-2 border-t dark:border-gray-700 flex flex-wrap gap-1.5">'
+        + groupsWithPerm.map(function(g) {
+            return '<span class="inline-flex items-center text-[10px] px-2 py-0.5 rounded-full bg-brand/10 text-brand dark:bg-green-900/30 dark:text-green-400 font-medium">' + esc(grpName(g)) + '</span>';
+          }).join('')
+        + '</div>' : '')
+      + '</div></div>';
+  });
+  html += '</div>';
+
+  // Cross-reference matrix table (compact)
+  html += '<div class="mt-8"><h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-3">Quick Comparison</h4>';
+  html += '<div class="overflow-x-auto"><table class="w-full text-xs border-collapse">';
+  html += '<thead><tr><th class="text-left p-2 border-b dark:border-gray-700 font-medium text-gray-500 dark:text-gray-400">' + (T.permFeatureArea || 'Feature Area') + '</th>';
+  employeeGroups.forEach(function(g) {
+    html += '<th class="p-2 border-b dark:border-gray-700 text-center font-medium text-gray-600 dark:text-gray-300 whitespace-nowrap">' + esc(grpName(g)) + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+  PERM_BUNDLES.forEach(function(b, i) {
+    var meta = getPermMeta(b);
+    var rowBg = i % 2 === 0 ? '' : 'bg-gray-50 dark:bg-gray-800/50';
+    html += '<tr class="' + rowBg + '"><td class="p-2 border-b dark:border-gray-700"><span class="inline-flex items-center gap-1.5">' + meta.icon + ' ' + esc(getPermLabel(b)) + '</span></td>';
+    employeeGroups.forEach(function(g) {
+      var perms = parsePerms(g);
+      var has = perms.indexOf(b) !== -1;
+      html += '<td class="p-2 border-b dark:border-gray-700 text-center">';
+      html += has ? '<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 text-sm">&#10003;</span>'
+                  : '<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-300 dark:text-gray-600 text-sm">&mdash;</span>';
+      html += '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div></div>';
+
+  container.innerHTML = html;
+}
+
+// ── Group Cards ──────────────────────────────────────────────────
 function renderGroupManagement() {
   var container = document.getElementById('group-management-content');
   if (!container) return;
   var isAdminUser = currentUser && currentUser.type === 'admin';
   var T = adminT[currentLang];
-  var labels = PERM_LABELS[currentLang] || PERM_LABELS.en;
 
+  // Header row
   var html = '';
   if (isAdminUser) {
-    html += '<div class="flex justify-end mb-4"><button onclick="openGroupModal()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">+ ' + (T.addGroup || 'Add Group') + '</button></div>';
+    html += '<div class="flex items-center justify-between mb-5">'
+      + '<p class="text-sm text-gray-500 dark:text-gray-400">' + employeeGroups.length + ' groups &middot; ' + employees.filter(function(e){return e.is_active;}).length + ' active employees</p>'
+      + '<button onclick="openGroupModal()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition">+ ' + (T.addGroup || 'Add Group') + '</button>'
+      + '</div>';
   }
-  html += '<div class="grid md:grid-cols-2 gap-4">';
+
+  // Group cards
+  html += '<div class="space-y-4">';
   employeeGroups.forEach(function(g) {
-    var name = currentLang === 'es' && g.name_es ? g.name_es : g.name_en;
-    var desc = currentLang === 'es' && g.description_es ? g.description_es : (g.description_en || '');
-    var perms = [];
-    try { perms = typeof g.permissions === 'string' ? JSON.parse(g.permissions) : (g.permissions || []); } catch(e) { perms = []; }
-    var permBadges = perms.map(function(p) {
-      var lbl = labels[p] || p;
-      var cls = PERM_COLORS[p] || 'bg-gray-100 text-gray-700';
-      return '<span class="inline-block text-[10px] px-2 py-0.5 rounded-full ' + cls + '">' + esc(lbl) + '</span>';
+    var name = grpName(g);
+    var desc = grpDesc(g);
+    var perms = parsePerms(g);
+    var totalBundles = PERM_BUNDLES.length;
+    var activeBundles = perms.length;
+    var coveragePct = Math.round((activeBundles / totalBundles) * 100);
+
+    // Get members of this group
+    var members = employees.filter(function(e) { return e.is_active && parseInt(e.group_id) === parseInt(g.id); });
+
+    // Build permission pills with tab details
+    var permList = perms.map(function(p) {
+      var meta = getPermMeta(p);
+      var tabNames = meta.tabs[currentLang] || meta.tabs.en;
+      return '<div class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg ' + meta.color + '" title="' + esc(tabNames.join(', ')) + '">'
+        + '<span>' + meta.icon + '</span>'
+        + '<span class="font-medium">' + esc(getPermLabel(p)) + '</span>'
+        + '<span class="opacity-60">(' + tabNames.length + ')</span>'
+        + '</div>';
     }).join(' ');
+
+    // Build tab access list (all tabs this group can see)
+    var allTabNames = [];
+    perms.forEach(function(p) { var m = getPermMeta(p); allTabNames = allTabNames.concat(m.tabs[currentLang] || m.tabs.en); });
+
+    // Badges
     var badges = '';
-    if (g.is_system) badges += '<span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300">' + (T.systemGroup || 'System') + '</span> ';
-    if (g.is_default) badges += '<span class="text-[10px] px-1.5 py-0.5 rounded bg-green-200 text-green-700 dark:bg-green-900 dark:text-green-300">' + (T.defaultGroup || 'Default') + '</span> ';
-    html += '<div class="border rounded-lg p-4 dark:border-gray-600 dark:bg-gray-800">'
-      + '<div class="flex items-start justify-between mb-2">'
-      + '<div><div class="flex items-center gap-2 flex-wrap"><span class="font-semibold dark:text-white">' + esc(name) + '</span>' + badges + '</div>'
-      + (desc ? '<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">' + esc(desc) + '</p>' : '')
-      + '<div class="text-xs text-gray-400 mt-1">' + (g.employee_count || 0) + ' ' + (T.groupEmployeeCount || 'employees') + '</div></div>'
-      + (isAdminUser ? '<div class="flex gap-1 shrink-0">'
-        + '<button onclick="openGroupModal(' + g.id + ')" class="text-xs border rounded px-2 py-1 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700">' + (T.editGroup || 'Edit') + '</button>'
-        + (!g.is_system ? '<button onclick="deleteGroup(' + g.id + ')" class="text-xs border rounded px-2 py-1 text-red-600 hover:bg-red-50 dark:border-gray-600 dark:text-red-400 dark:hover:bg-red-900">' + (T.deleteGroup || 'Delete') + '</button>' : '')
+    if (g.is_system) badges += '<span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300 font-medium">' + (T.systemGroup || 'System') + '</span>';
+    if (g.is_default) badges += '<span class="text-[10px] px-1.5 py-0.5 rounded bg-green-200 text-green-700 dark:bg-green-900 dark:text-green-300 font-medium">' + (T.defaultGroup || 'Default') + '</span>';
+
+    html += '<div class="border rounded-xl overflow-hidden dark:border-gray-600">'
+      // Card header with coverage bar
+      + '<div class="px-5 pt-4 pb-3 bg-white dark:bg-gray-800">'
+      + '<div class="flex items-start justify-between">'
+      + '<div class="flex-1 min-w-0">'
+      + '<div class="flex items-center gap-2 flex-wrap"><h4 class="font-bold text-base dark:text-white">' + esc(name) + '</h4>' + badges + '</div>'
+      + (desc ? '<p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">' + esc(desc) + '</p>' : '')
+      + '</div>'
+      + (isAdminUser ? '<div class="flex gap-1 shrink-0 ml-3">'
+        + '<button onclick="openGroupModal(' + g.id + ')" class="text-xs border rounded-lg px-3 py-1.5 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 font-medium">' + (T.editGroup || 'Edit') + '</button>'
+        + (!g.is_system ? '<button onclick="deleteGroup(' + g.id + ')" class="text-xs border rounded-lg px-3 py-1.5 text-red-500 hover:bg-red-50 dark:border-gray-600 dark:text-red-400 dark:hover:bg-red-900/30 font-medium">' + (T.deleteGroup || 'Delete') + '</button>' : '')
         + '</div>' : '')
       + '</div>'
-      + '<div class="flex flex-wrap gap-1">' + permBadges + '</div>'
+      // Coverage progress bar
+      + '<div class="mt-3 flex items-center gap-3">'
+      + '<div class="flex-1 h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden"><div class="h-full bg-brand rounded-full transition-all" style="width:' + coveragePct + '%"></div></div>'
+      + '<span class="text-[10px] text-gray-400 whitespace-nowrap">' + activeBundles + '/' + totalBundles + ' permissions</span>'
+      + '</div></div>'
+
+      // Permissions section
+      + '<div class="px-5 py-3 border-t dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">'
+      + '<div class="flex flex-wrap gap-1.5">' + permList + '</div>'
+      + '</div>'
+
+      // Tab access list
+      + '<div class="px-5 py-3 border-t dark:border-gray-700 bg-white dark:bg-gray-800">'
+      + '<p class="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1.5">' + (T.groupAccessSummary || 'Has access to') + ' (' + allTabNames.length + ' ' + (T.groupTabCount || 'tabs') + ')</p>'
+      + '<div class="flex flex-wrap gap-1">' + allTabNames.map(function(t) {
+          return '<span class="text-[10px] px-2 py-0.5 rounded bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">' + esc(t) + '</span>';
+        }).join('') + '</div>'
+      + '</div>'
+
+      // Members row
+      + '<div class="px-5 py-3 border-t dark:border-gray-700 bg-white dark:bg-gray-800">'
+      + '<p class="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1.5">' + (T.groupMembers || 'Members') + ' (' + members.length + ')</p>'
+      + (members.length ? '<div class="flex flex-wrap gap-2">' + members.map(function(m) {
+          var parts = (m.name || '').split(' ');
+          var ini = (parts[0] ? parts[0][0] : '') + (parts[1] ? parts[1][0] : '');
+          return '<div class="flex items-center gap-1.5 text-xs bg-gray-100 dark:bg-gray-700 rounded-full pl-1 pr-2.5 py-0.5">'
+            + '<span class="w-5 h-5 rounded-full bg-brand text-white text-[9px] flex items-center justify-center font-bold">' + esc(ini.toUpperCase()) + '</span>'
+            + '<span class="text-gray-700 dark:text-gray-300">' + esc(m.name) + '</span></div>';
+        }).join('') + '</div>'
+        : '<p class="text-xs text-gray-400 italic">' + (T.groupNoMembers || 'No employees in this group') + '</p>')
+      + '</div>'
       + '</div>';
   });
   html += '</div>';
+
   container.innerHTML = html;
 }
 
+// ── Group Modal (Create/Edit) ────────────────────────────────────
 function openGroupModal(groupId) {
   var T = adminT[currentLang];
-  var labels = PERM_LABELS[currentLang] || PERM_LABELS.en;
   var group = groupId ? employeeGroups.find(function(g) { return g.id == groupId; }) : null;
+  var perms = group ? parsePerms(group) : [];
 
-  var perms = [];
-  if (group) {
-    try { perms = typeof group.permissions === 'string' ? JSON.parse(group.permissions) : (group.permissions || []); } catch(e) { perms = []; }
-  }
-
+  // Build permission checkboxes with tab previews
   var checkboxes = PERM_BUNDLES.map(function(b) {
     var checked = b === 'my_work' || perms.indexOf(b) !== -1;
     var disabled = b === 'my_work' ? 'disabled checked' : '';
-    var cls = PERM_COLORS[b] || 'bg-gray-100 text-gray-700';
-    return '<label class="flex items-center gap-2 p-2 rounded border dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">'
-      + '<input type="checkbox" name="group-perm" value="' + b + '" ' + (checked ? 'checked' : '') + ' ' + disabled + ' class="rounded">'
-      + '<span class="inline-block text-xs px-2 py-0.5 rounded-full ' + cls + '">' + esc(labels[b] || b) + '</span>'
-      + '</label>';
+    var meta = getPermMeta(b);
+    var tabNames = meta.tabs[currentLang] || meta.tabs.en;
+    var isAlwaysOn = b === 'my_work';
+
+    return '<label class="flex items-start gap-3 p-3 rounded-lg border ' + (checked ? meta.border + ' ' + meta.color : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700') + ' cursor-pointer transition-colors" data-perm-label="' + b + '">'
+      + '<input type="checkbox" name="group-perm" value="' + b + '" ' + (checked ? 'checked' : '') + ' ' + disabled + ' class="rounded mt-0.5" onchange="updatePermLabelStyle(this)">'
+      + '<div class="flex-1 min-w-0">'
+      + '<div class="flex items-center gap-2">'
+      + '<span>' + meta.icon + '</span>'
+      + '<span class="font-medium text-sm">' + esc(getPermLabel(b)) + '</span>'
+      + (isAlwaysOn ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-gray-200 text-gray-500 dark:bg-gray-600 dark:text-gray-400">' + (T.permAlwaysOn || 'Always on') + '</span>' : '')
+      + '</div>'
+      + '<div class="flex flex-wrap gap-1 mt-1.5">' + tabNames.map(function(t) {
+          return '<span class="text-[10px] px-1.5 py-0.5 rounded bg-white/60 dark:bg-gray-800/40 text-gray-600 dark:text-gray-400">' + esc(t) + '</span>';
+        }).join('') + '</div>'
+      + '</div></label>';
   }).join('');
 
   var html = '<div id="group-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onclick="if(event.target===this)this.remove()">'
-    + '<div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">'
-    + '<h3 class="text-lg font-bold mb-4 dark:text-white">' + (group ? (T.editGroup || 'Edit Group') : (T.addGroup || 'Add Group')) + '</h3>'
-    + '<div class="space-y-3">'
-    + '<div><label class="text-sm font-medium dark:text-gray-300">' + (T.groupNameEn || 'Name (English)') + ' *</label><input id="group-name-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.name_en : '') + '"></div>'
-    + '<div><label class="text-sm font-medium dark:text-gray-300">' + (T.groupNameEs || 'Name (Spanish)') + '</label><input id="group-name-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.name_es : '') + '"></div>'
-    + '<div><label class="text-sm font-medium dark:text-gray-300">' + (T.groupDescEn || 'Description (English)') + '</label><input id="group-desc-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.description_en : '') + '"></div>'
-    + '<div><label class="text-sm font-medium dark:text-gray-300">' + (T.groupDescEs || 'Description (Spanish)') + '</label><input id="group-desc-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.description_es : '') + '"></div>'
-    + '<div><label class="text-sm font-medium dark:text-gray-300 mb-2 block">' + (T.groupPermissions || 'Permissions') + '</label>'
-    + '<div class="grid grid-cols-1 gap-2">' + checkboxes + '</div></div>'
+    + '<div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">'
+    // Modal header
+    + '<div class="px-6 py-4 border-b dark:border-gray-700">'
+    + '<h3 class="text-lg font-bold dark:text-white">' + (group ? (T.editGroup || 'Edit Group') : (T.addGroup || 'Add Group')) + '</h3>'
     + '</div>'
-    + '<div class="flex gap-2 mt-4">'
-    + '<button onclick="saveGroup(' + (groupId || 'null') + ')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm">' + (T.save || 'Save') + '</button>'
+    // Modal body
+    + '<div class="px-6 py-4 space-y-4">'
+    + '<div class="grid grid-cols-2 gap-3">'
+    + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">' + (T.groupNameEn || 'Name (English)') + ' *</label><input id="group-name-en" class="w-full p-2 border rounded-lg mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.name_en : '') + '" placeholder="e.g. Front Desk"></div>'
+    + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">' + (T.groupNameEs || 'Name (Spanish)') + '</label><input id="group-name-es" class="w-full p-2 border rounded-lg mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.name_es : '') + '" placeholder="ej. Recepción"></div>'
+    + '</div>'
+    + '<div class="grid grid-cols-2 gap-3">'
+    + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">' + (T.groupDescEn || 'Description (English)') + '</label><input id="group-desc-en" class="w-full p-2 border rounded-lg mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.description_en : '') + '"></div>'
+    + '<div><label class="text-xs font-medium text-gray-500 dark:text-gray-400">' + (T.groupDescEs || 'Description (Spanish)') + '</label><input id="group-desc-es" class="w-full p-2 border rounded-lg mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="' + esc(group ? group.description_es : '') + '"></div>'
+    + '</div>'
+    + '<div>'
+    + '<label class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 block">' + (T.groupSelectPerms || 'Select which features this group can access') + '</label>'
+    + '<div class="space-y-2">' + checkboxes + '</div>'
+    + '</div>'
+    + '</div>'
+    // Modal footer
+    + '<div class="px-6 py-4 border-t dark:border-gray-700 flex justify-end gap-2 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl">'
     + '<button onclick="document.getElementById(\'group-modal\').remove()" class="border px-4 py-2 rounded-lg text-sm dark:border-gray-600 dark:text-gray-300">' + (T.cancel || 'Cancel') + '</button>'
+    + '<button onclick="saveGroup(' + (groupId || 'null') + ')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium">' + (T.save || 'Save') + '</button>'
     + '</div></div></div>';
 
-  // Remove existing modal if any
   var existing = document.getElementById('group-modal');
   if (existing) existing.remove();
   document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function updatePermLabelStyle(cb) {
+  var label = cb.closest('label');
+  var b = cb.value;
+  var meta = getPermMeta(b);
+  if (cb.checked) {
+    label.className = 'flex items-start gap-3 p-3 rounded-lg border ' + meta.border + ' ' + meta.color + ' cursor-pointer transition-colors';
+  } else {
+    label.className = 'flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors';
+  }
 }
 
 async function saveGroup(groupId) {
