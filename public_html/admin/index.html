@@ -4553,6 +4553,17 @@ const adminT = {
     emailTemplatesSaveError: 'Could not save email templates',
     unassigned: '\u2014 Unassigned \u2014',
     unassignedLabel: 'Unassigned',
+    techPickerTitle: 'Assign Technician',
+    techPickerRecommended: 'Best fit',
+    techPickerCertified: 'Certified',
+    techPickerNotCertified: 'Not certified',
+    techPickerToday: 'today',
+    techPickerOff: 'Off',
+    techPickerCurrent: 'Current',
+    techPickerViewPlanner: 'Open Resource Planner',
+    techPickerNoTechs: 'No active employees',
+    techPickerAssign: 'Assign Tech',
+    techPickerChange: 'Change',
     employeeActivated: 'Employee activated',
     employeeDeactivated: 'Employee deactivated',
     employeeAdded: 'Employee added!',
@@ -6120,6 +6131,17 @@ const adminT = {
     emailTemplatesSaveError: 'No se pudieron guardar las plantillas de correo',
     unassigned: '\u2014 Sin asignar \u2014',
     unassignedLabel: 'Sin asignar',
+    techPickerTitle: 'Asignar Técnico',
+    techPickerRecommended: 'Mejor opción',
+    techPickerCertified: 'Certificado',
+    techPickerNotCertified: 'No certificado',
+    techPickerToday: 'hoy',
+    techPickerOff: 'Libre',
+    techPickerCurrent: 'Actual',
+    techPickerViewPlanner: 'Abrir Planificador',
+    techPickerNoTechs: 'Sin empleados activos',
+    techPickerAssign: 'Asignar Técnico',
+    techPickerChange: 'Cambiar',
     employeeActivated: 'Empleado activado',
     employeeDeactivated: 'Empleado desactivado',
     employeeAdded: '\u00A1Empleado agregado!',
@@ -9558,15 +9580,12 @@ function renderAppointments() {
       <td class="p-3">${servicesBadgesHtml(a)}</td>
       <td class="p-3"><div class="text-sm">${esc(a.email)}</div>${a.phone?`<div class="text-xs text-gray-500">${esc(fmtPhone(a.phone))}</div>`:''}</td>
       <td class="p-3 text-xs max-w-[180px]"><span class="task-summary-text cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 block truncate" onclick="editTaskSummary('${a.id}', this)" title="${esc(a.task_summary||'')}">${a.task_summary ? esc(a.task_summary) : '<span class=&quot;text-gray-400 italic&quot;>+ Add task</span>'}</span></td>
-      <td class="p-3 text-sm">${a.assigned_employee_id ? esc(employees.find(e=>e.id===a.assigned_employee_id)?.name||'Unknown') : '<span class="text-gray-400">' + adminT[currentLang].unassignedLabel + '</span>'}</td>
+      <td class="p-3 text-sm">${(function(){var emp=a.assigned_employee_id?employees.find(function(e){return e.id===a.assigned_employee_id;}):null;var nm=emp?esc(emp.name):adminT[currentLang].techPickerAssign;var ini=emp?(emp.name.trim().split(/\s+/).map(function(w){return w[0]}).join('').substring(0,2).toUpperCase()):'';var colors=['bg-blue-500','bg-emerald-500','bg-purple-500','bg-amber-500','bg-rose-500','bg-cyan-500'];var ci=emp?Math.abs(emp.name.split('').reduce(function(h,c){return((h<<5)-h)+c.charCodeAt(0)},0))%6:0;return '<button onclick="openTechPicker(event,\''+a.id+'\',\''+esc(a.service||'')+'\',\''+esc(a.preferred_date||'')+'\','+(a.assigned_employee_id||'null')+')" class="border rounded px-2 py-1 text-xs w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-1.5 '+(emp?'border-green-400 bg-green-50 dark:border-green-700 dark:bg-green-900/20':'border-orange-400 bg-orange-50 dark:border-orange-700 dark:bg-orange-900/20')+'">'+(emp?'<span class="w-5 h-5 rounded-full '+colors[ci]+' text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">'+ini+'</span>':'')+'<span class="truncate">'+nm+'</span><svg class="w-3 h-3 ml-auto flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>'})()}</td>
       <td class="p-3">${statusBadge(a.status)}${calSyncBadge(a)}</td>
       <td class="p-3"><div class="flex flex-col gap-1">
         <select onchange="updateApptStatus('${a.id}',this.value)" class="border rounded px-2 py-1 text-xs">
           <option value="new" ${a.status==='new'?'selected':''}>New</option><option value="confirmed" ${a.status==='confirmed'?'selected':''}>Confirmed</option>
           <option value="completed" ${a.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${a.status==='cancelled'?'selected':''}>Cancelled</option>
-        </select>
-        <select onchange="updateApptAssignment('${a.id}',this.value)" class="border rounded px-2 py-1 text-xs">
-          <option value="">${adminT[currentLang].unassignedLabel}</option>${employees.filter(e=>e.is_active).map(e=>`<option value="${e.id}" ${a.assigned_employee_id===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}
         </select>
         <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100">\uD83D\uDCDD Notes</button>
       </div></td>
@@ -12086,6 +12105,19 @@ async function updateApptStatus(id, status) {
       }
     }
   } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
+}
+
+function openTechPicker(event, apptId, service, date, currentEmpId) {
+  event.stopPropagation();
+  TechPicker.open({
+    anchor: event.currentTarget,
+    service: service || null,
+    date: date || null,
+    currentEmployeeId: currentEmpId,
+    onSelect: function(empId, empName) {
+      updateApptAssignment(apptId, empId);
+    }
+  });
 }
 
 async function updateApptAssignment(id, empId, forceAssign) {
@@ -14943,6 +14975,7 @@ loadMessages = async function() {
 <script src="/admin/js/service-reminders.js"></script>
 <script src="/admin/js/resource-planner.js"></script>
 <script src="/admin/js/labor-tracker.js"></script>
+<script src="/admin/js/tech-picker.js"></script>
 <script src="/admin/js/admin-help.js"></script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';

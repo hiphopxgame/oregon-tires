@@ -416,6 +416,62 @@ function renderRoDetailModal() {
     apptP.textContent = ro.appointment.reference_number + ' \u2022 ' + (ro.appointment.service || '').replace(/-/g, ' ') + ' \u2022 ' + ro.appointment.preferred_date;
     headerLeft.appendChild(apptP);
   }
+
+  // Assigned tech row
+  var techRow = document.createElement('div');
+  techRow.className = 'flex items-center gap-2 mt-1.5';
+
+  if (ro.assigned_employee_id) {
+    var assignedEmp = (typeof employees !== 'undefined' ? employees : []).find(function(e) { return e.id === ro.assigned_employee_id; });
+    var techName = assignedEmp ? assignedEmp.name : (ro.assigned_employee_name || 'Unknown');
+
+    var techBadge = document.createElement('span');
+    techBadge.className = 'inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-200 font-medium';
+    techBadge.textContent = '\uD83D\uDD27 ' + techName;
+    techRow.appendChild(techBadge);
+
+    var changeBtn = document.createElement('button');
+    changeBtn.className = 'text-[10px] px-1.5 py-0.5 rounded border border-white/30 text-white/70 hover:text-white hover:bg-white/10 transition';
+    changeBtn.textContent = t('techPickerChange', 'Change');
+    changeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (typeof TechPicker === 'undefined') return;
+      TechPicker.open({
+        anchor: changeBtn,
+        service: ro.appointment ? ro.appointment.service : null,
+        date: ro.appointment ? ro.appointment.preferred_date : null,
+        currentEmployeeId: ro.assigned_employee_id,
+        onSelect: function(empId) {
+          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, assigned_employee_id: empId } })
+            .then(function() { viewRoDetail(ro.id); })
+            .catch(function(err) { showToast(err.message, true); });
+        }
+      });
+    });
+    techRow.appendChild(changeBtn);
+  } else {
+    var assignBtn = document.createElement('button');
+    assignBtn.className = 'inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-200 hover:bg-amber-500/30 transition font-medium cursor-pointer';
+    assignBtn.textContent = '\uD83D\uDD27 ' + t('techPickerAssign', 'Assign Tech');
+    assignBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (typeof TechPicker === 'undefined') return;
+      TechPicker.open({
+        anchor: assignBtn,
+        service: ro.appointment ? ro.appointment.service : null,
+        date: ro.appointment ? ro.appointment.preferred_date : null,
+        currentEmployeeId: null,
+        onSelect: function(empId) {
+          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, assigned_employee_id: empId } })
+            .then(function() { viewRoDetail(ro.id); })
+            .catch(function(err) { showToast(err.message, true); });
+        }
+      });
+    });
+    techRow.appendChild(assignBtn);
+  }
+  headerLeft.appendChild(techRow);
+
   headerTop.appendChild(headerLeft);
 
   var headerBtns = document.createElement('div');
