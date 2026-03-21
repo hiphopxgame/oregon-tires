@@ -411,7 +411,7 @@
       });
       L.marker([45.46205, -122.57893], { icon: otIcon })
         .addTo(map)
-        .bindPopup('<strong>Oregon Tires Auto Care</strong><br>8536 SE 82nd Ave');
+        .bindPopup('<strong>Oregon Tires Auto Care</strong><br>\u2B50 4.8 (981)<br>8536 SE 82nd Ave, Portland<br>\uD83D\uDCDE (503) 367-9714');
 
       // Add shop markers
       addMarkers();
