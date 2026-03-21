@@ -579,13 +579,17 @@
     <div id="tab-overview" class="tab-content fade-in" role="tabpanel">
       <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-6" data-t="dashboardOverview">Dashboard Overview</h2>
       <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
-        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-red-500 dark:bg-gray-800 dark:border-l-red-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="actionRequired">Action Required</div><div class="text-3xl font-bold text-red-600 dark:text-red-400" id="stat-action">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-action-detail" data-t="awaitingConfirmation">Needs attention</p></div>
-        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-amber-500 dark:bg-gray-800 dark:border-l-amber-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="todaySchedule">Today</div><div class="text-3xl font-bold text-amber-600 dark:text-amber-400" id="stat-today">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-today-detail"></p></div>
-        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-500 dark:bg-gray-800 dark:border-l-blue-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="thisWeek">This Week</div><div class="text-3xl font-bold text-blue-600 dark:text-blue-400" id="stat-week">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-week-detail"></p></div>
-        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-green-500 dark:bg-gray-800 dark:border-l-green-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="upcoming">Upcoming</div><div class="text-3xl font-bold text-green-600 dark:text-green-400" id="stat-upcoming">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-upcoming-detail"></p></div>
-        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-gray-400 dark:bg-gray-800 dark:border-l-gray-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="completedLabel">Completed</div><div class="text-3xl font-bold text-gray-600 dark:text-gray-300" id="stat-completed">0</div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="allTime">All time</p></div>
-        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-purple-500 dark:bg-gray-800 dark:border-l-purple-500"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="rpTomorrow">Tomorrow</div><div class="text-3xl font-bold text-purple-600 dark:text-purple-400" id="stat-tomorrow">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-tomorrow-detail"></p></div>
+        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-red-500 dark:bg-gray-800 dark:border-l-red-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="actionRequired">Action Required</div><div class="text-3xl font-bold text-red-600 dark:text-red-400" id="stat-action">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-action-detail" data-t="awaitingConfirmation">Needs attention</p></div>
+        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-amber-500 dark:bg-gray-800 dark:border-l-amber-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="todaySchedule">Today</div><div class="text-3xl font-bold text-amber-600 dark:text-amber-400" id="stat-today">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-today-detail"></p></div>
+        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-500 dark:bg-gray-800 dark:border-l-blue-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="thisWeek">This Week</div><div class="text-3xl font-bold text-blue-600 dark:text-blue-400" id="stat-week">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-week-detail"></p></div>
+        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-green-500 dark:bg-gray-800 dark:border-l-green-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="upcoming">Upcoming</div><div class="text-3xl font-bold text-green-600 dark:text-green-400" id="stat-upcoming">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-upcoming-detail"></p></div>
+        <div onclick="switchTab('analytics')" class="bg-white rounded-xl shadow p-6 border-l-4 border-gray-400 dark:bg-gray-800 dark:border-l-gray-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="completedLabel">Completed</div><div class="text-3xl font-bold text-gray-600 dark:text-gray-300" id="stat-completed">0</div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="allTime">All time</p></div>
+        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-purple-500 dark:bg-gray-800 dark:border-l-purple-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="rpTomorrow">Tomorrow</div><div class="text-3xl font-bold text-purple-600 dark:text-purple-400" id="stat-tomorrow">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-tomorrow-detail"></p></div>
       </div>
+      <!-- Quick Actions -->
+      <div id="overview-quick-actions" class="mb-6"></div>
+      <!-- Live Status Row -->
+      <div id="overview-live-status" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
       <div id="overview-alerts" class="mb-8 space-y-3"></div>
       <!-- Shop Floor -->
       <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 mb-6">
@@ -4791,6 +4795,29 @@ const adminT = {
     analyticsConversionFunnel: 'Conversion Funnel (30d)',
     analyticsServiceDuration: 'Avg Service Duration (days)',
     analyticsCustomerRetention: 'Customer Retention',
+    analyticsNoShowRate: 'No-Show / Cancel Rate',
+    analyticsNoShowHint: 'Lower is better',
+    analyticsATV: 'Avg Ticket Value',
+    analyticsATVHint: 'Per approved estimate',
+    analyticsLaborHours: 'Total Labor Hours',
+    analyticsLaborHint: 'Tracked billable hours',
+    analyticsCustomerGrowth: 'Customer Growth (6mo)',
+    analyticsRevByService: 'Revenue by Service',
+    analyticsTopCustomers: 'Top Customers',
+    analyticsEstimates: 'estimates',
+    analyticsLaborByEmployee: 'Labor Hours by Technician',
+    // Quick Actions
+    qaNewAppointment: 'New Appointment',
+    qaWalkIn: 'Walk-In',
+    qaNewRo: 'New RO',
+    qaMessages: 'Messages',
+    qaUnassigned: 'Unassigned',
+    // Live Status
+    lsActiveROs: 'Active ROs',
+    lsInbox: 'Inbox',
+    lsConversations: 'Unread Threads',
+    lsEmployeesOn: 'Team On Duty',
+    clickToView: 'Click to view',
     // Shared Actions
     actionCancel: 'Cancel',
     actionSave: 'Save',
@@ -6200,7 +6227,30 @@ const adminT = {
     analyticsApprovedRevenue: 'Ingresos Aprobados (6mo)',
     analyticsConversionFunnel: 'Embudo de Conversión (30d)',
     analyticsServiceDuration: 'Duración Promedio del Servicio (días)',
-    analyticsCustomerRetention: 'Retención de Clientes',
+    analyticsCustomerRetention: 'Retenci\u00f3n de Clientes',
+    analyticsNoShowRate: 'Tasa de Ausencia / Cancelaci\u00f3n',
+    analyticsNoShowHint: 'Menor es mejor',
+    analyticsATV: 'Ticket Promedio',
+    analyticsATVHint: 'Por presupuesto aprobado',
+    analyticsLaborHours: 'Total Horas de Trabajo',
+    analyticsLaborHint: 'Horas facturables registradas',
+    analyticsCustomerGrowth: 'Crecimiento de Clientes (6 meses)',
+    analyticsRevByService: 'Ingresos por Servicio',
+    analyticsTopCustomers: 'Mejores Clientes',
+    analyticsEstimates: 'presupuestos',
+    analyticsLaborByEmployee: 'Horas por T\u00e9cnico',
+    // Quick Actions
+    qaNewAppointment: 'Nueva Cita',
+    qaWalkIn: 'Sin Cita',
+    qaNewRo: 'Nueva OT',
+    qaMessages: 'Mensajes',
+    qaUnassigned: 'Sin Asignar',
+    // Live Status
+    lsActiveROs: 'OTs Activas',
+    lsInbox: 'Bandeja',
+    lsConversations: 'Hilos Sin Leer',
+    lsEmployeesOn: 'Equipo en Turno',
+    clickToView: 'Clic para ver',
     // Shared Actions
     actionCancel: 'Cancelar',
     actionSave: 'Guardar',
@@ -7942,7 +7992,7 @@ function renderOverviewAlerts(stats) {
       items.push('<div class="text-sm text-red-800 dark:text-red-300 flex items-center gap-2"><span>' + esc(a.first_name) + ' ' + esc(a.last_name) + '</span><span class="text-red-500 text-xs">' + fmtDate(a.preferred_date) + ' — ' + esc(a.service) + '</span></div>');
     });
     var extra = stats.overdue.length > 5 ? '<p class="text-xs text-red-500 mt-1">+' + (stats.overdue.length - 5) + ' ' + (T.showMore || 'more') + '</p>' : '';
-    parts.push('<div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4"><div class="flex items-center gap-2 mb-2"><span class="text-red-600 dark:text-red-400 font-semibold">' + (T.overdueAppts || 'Overdue Appointments') + ' (' + stats.overdue.length + ')</span></div><div class="space-y-1">' + items.join('') + extra + '</div></div>');
+    parts.push('<div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 cursor-pointer hover:shadow-md transition" onclick="switchTab(\'appointments\')"><div class="flex items-center justify-between mb-2"><span class="text-red-600 dark:text-red-400 font-semibold">' + (T.overdueAppts || 'Overdue Appointments') + ' (' + stats.overdue.length + ')</span><span class="text-xs text-red-400 dark:text-red-500">' + (T.clickToView || 'Click to view') + ' →</span></div><div class="space-y-1">' + items.join('') + extra + '</div></div>');
   }
   if (stats.unassigned.length) {
     var uItems = [];
@@ -7950,7 +8000,7 @@ function renderOverviewAlerts(stats) {
       uItems.push('<div class="text-sm text-amber-800 dark:text-amber-300 flex items-center gap-2"><span>' + esc(a.first_name) + ' ' + esc(a.last_name) + '</span><span class="text-amber-500 text-xs">' + fmtDate(a.preferred_date) + ' ' + fmtTime(a.preferred_time) + ' — ' + esc(a.service) + '</span></div>');
     });
     var uExtra = stats.unassigned.length > 5 ? '<p class="text-xs text-amber-500 mt-1">+' + (stats.unassigned.length - 5) + ' ' + (T.showMore || 'more') + '</p>' : '';
-    parts.push('<div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4"><div class="flex items-center gap-2 mb-2"><span class="text-amber-600 dark:text-amber-400 font-semibold">' + (T.unassignedUpcoming || 'Unassigned Upcoming') + ' (' + stats.unassigned.length + ')</span></div><div class="space-y-1">' + uItems.join('') + uExtra + '</div></div>');
+    parts.push('<div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 cursor-pointer hover:shadow-md transition" onclick="switchTab(\'appointments\')"><div class="flex items-center justify-between mb-2"><span class="text-amber-600 dark:text-amber-400 font-semibold">' + (T.unassignedUpcoming || 'Unassigned Upcoming') + ' (' + stats.unassigned.length + ')</span><span class="text-xs text-amber-400 dark:text-amber-500">' + (T.clickToView || 'Click to view') + ' →</span></div><div class="space-y-1">' + uItems.join('') + uExtra + '</div></div>');
   }
   container.innerHTML = parts.join('');
 }
@@ -8151,12 +8201,88 @@ function renderOverview() {
 
   document.getElementById('stat-completed').textContent = stats.completed.length;
 
+  renderQuickActions(stats);
+  renderLiveStatus();
   renderOverviewAlerts(stats);
   if (typeof renderOverviewSkillGapAlerts === 'function') renderOverviewSkillGapAlerts();
   if (typeof renderTomorrowStat === 'function') renderTomorrowStat();
   renderUpcomingSchedule(stats);
   renderEmployeeSchedule(stats);
   renderOverviewCharts();
+}
+
+function renderQuickActions(stats) {
+  var T = adminT[currentLang];
+  var box = document.getElementById('overview-quick-actions');
+  if (!box) return;
+  box.textContent = '';
+  var wrap = document.createElement('div');
+  wrap.className = 'flex flex-wrap gap-2';
+
+  var actions = [
+    { label: T.qaNewAppointment || 'New Appointment', icon: '📅', color: 'bg-green-600 hover:bg-green-700', action: function() { switchTab('appointments'); setTimeout(function() { var btn = document.querySelector('[onclick*="openNewAppointment"]'); if (btn) btn.click(); }, 200); } },
+    { label: T.qaWalkIn || 'Walk-In', icon: '🚶', color: 'bg-blue-600 hover:bg-blue-700', action: function() { switchTab('walkinqueue'); setTimeout(function() { if (typeof openAddToQueue === 'function') openAddToQueue(); }, 200); } },
+    { label: T.qaNewRo || 'New RO', icon: '🔧', color: 'bg-purple-600 hover:bg-purple-700', action: function() { switchTab('repairorders'); } },
+    { label: T.qaMessages || 'Messages', icon: '💬', color: 'bg-amber-600 hover:bg-amber-700', action: function() { switchTab('messages'); } },
+  ];
+  if (stats.unassigned.length > 0) {
+    actions.unshift({ label: stats.unassigned.length + ' ' + (T.qaUnassigned || 'Unassigned'), icon: '⚠️', color: 'bg-red-600 hover:bg-red-700 animate-pulse', action: function() { switchTab('appointments'); } });
+  }
+  actions.forEach(function(a) {
+    var btn = document.createElement('button');
+    btn.className = a.color + ' text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition shadow-sm';
+    btn.textContent = a.icon + ' ' + a.label;
+    btn.addEventListener('click', a.action);
+    wrap.appendChild(btn);
+  });
+  box.appendChild(wrap);
+}
+
+function renderLiveStatus() {
+  var T = adminT[currentLang];
+  var box = document.getElementById('overview-live-status');
+  if (!box) return;
+  box.textContent = '';
+
+  // Count active ROs (non-completed, non-cancelled, non-invoiced)
+  var roTableBody = document.getElementById('ro-table-body');
+  var activeRoCount = 0;
+  if (roTableBody) {
+    activeRoCount = roTableBody.querySelectorAll('tr[data-ro-id]').length;
+  }
+
+  // Unread messages
+  var unreadBadge = document.getElementById('conv-unread-badge');
+  var unreadCount = unreadBadge && !unreadBadge.classList.contains('hidden') ? (parseInt(unreadBadge.textContent) || 0) : 0;
+  var contactNew = messages.filter(function(m) { return m.status === 'new' || m.status === 'priority'; }).length;
+
+  var items = [
+    { label: T.lsActiveROs || 'Active ROs', value: String(activeRoCount || '—'), icon: '🔧', color: 'text-purple-600 dark:text-purple-400', tab: 'repairorders' },
+    { label: T.lsInbox || 'Inbox', value: String(contactNew), icon: '📩', color: 'text-blue-600 dark:text-blue-400', tab: 'messages' },
+    { label: T.lsConversations || 'Unread Threads', value: String(unreadCount), icon: '💬', color: 'text-amber-600 dark:text-amber-400', tab: 'messages' },
+    { label: T.lsEmployeesOn || 'Team On Duty', value: String(employees.filter(function(e) { return e.is_active; }).length), icon: '👥', color: 'text-green-600 dark:text-green-400', tab: 'employees' }
+  ];
+
+  items.forEach(function(item) {
+    var card = document.createElement('div');
+    card.className = 'bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-3 flex items-center gap-3 cursor-pointer hover:shadow-md hover:border-green-300 dark:hover:border-green-600 transition-all';
+    card.addEventListener('click', function() { switchTab(item.tab); });
+    var iconSpan = document.createElement('span');
+    iconSpan.className = 'text-xl';
+    iconSpan.textContent = item.icon;
+    card.appendChild(iconSpan);
+    var info = document.createElement('div');
+    var val = document.createElement('div');
+    val.className = 'text-lg font-bold ' + item.color;
+    val.textContent = item.value;
+    info.appendChild(val);
+    var lbl = document.createElement('div');
+    lbl.className = 'text-xs text-gray-500 dark:text-gray-400';
+    lbl.textContent = item.label;
+    info.appendChild(lbl);
+    card.appendChild(info);
+    box.appendChild(card);
+  });
 }
 
 function renderOverviewCharts() {
@@ -10907,7 +11033,20 @@ async function loadAnalytics() {
 
   try {
     // Fetch server-side analytics + use local appointment/employee/message data
-    var serverData = await api('analytics.php').catch(function() { return { data: null }; });
+    // Build date range query params
+    var analyticsUrl = 'analytics.php';
+    var fromInput = document.getElementById('analytics-from');
+    var toInput = document.getElementById('analytics-to');
+    if (fromInput && fromInput.value && toInput && toInput.value) {
+      analyticsUrl += '?start_date=' + fromInput.value + '&end_date=' + toInput.value;
+    } else if (analyticsRangeDays > 0) {
+      var endDate = new Date();
+      var startDate = new Date();
+      startDate.setDate(startDate.getDate() - analyticsRangeDays);
+      analyticsUrl += '?start_date=' + startDate.toISOString().split('T')[0] + '&end_date=' + endDate.toISOString().split('T')[0];
+    }
+    // else: analyticsRangeDays === 0 means "All Time" — no date params, API defaults to all
+    var serverData = await api(analyticsUrl).catch(function() { return { data: null }; });
     var sData = serverData.data || serverData;
 
     // Local data computations
@@ -11250,8 +11389,89 @@ async function loadAnalytics() {
 
     frag.appendChild(fdRow);
 
-    // -- Customer Retention Row (full width) --
-    var retRow = el('div', 'grid grid-cols-1 gap-6 mb-6');
+    // -- KPI Cards Row (No-Show, ATV, Labor Hours) --
+    var kpiRow = el('div', 'grid grid-cols-1 md:grid-cols-3 gap-4 mb-6');
+    var noShowCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 text-center');
+    noShowCard.appendChild(el('div', 'text-sm text-gray-600 dark:text-gray-400 mb-1', T.analyticsNoShowRate || 'No-Show / Cancel Rate'));
+    var noShowVal = (sData && typeof sData.no_show_rate !== 'undefined') ? parseFloat(sData.no_show_rate).toFixed(1) + '%' : '—';
+    var noShowNum = el('div', 'text-3xl font-bold', noShowVal);
+    noShowNum.className += parseFloat(noShowVal) > 15 ? ' text-red-600 dark:text-red-400' : parseFloat(noShowVal) > 8 ? ' text-amber-600 dark:text-amber-400' : ' text-green-600 dark:text-green-400';
+    noShowCard.appendChild(noShowNum);
+    noShowCard.appendChild(el('p', 'text-xs text-gray-400 dark:text-gray-500 mt-1', T.analyticsNoShowHint || 'Lower is better'));
+    kpiRow.appendChild(noShowCard);
+
+    var atvCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 text-center');
+    atvCard.appendChild(el('div', 'text-sm text-gray-600 dark:text-gray-400 mb-1', T.analyticsATV || 'Avg Ticket Value'));
+    var atvVal = (sData && typeof sData.average_ticket_value !== 'undefined' && sData.average_ticket_value) ? '$' + parseFloat(sData.average_ticket_value).toFixed(0) : '—';
+    atvCard.appendChild(el('div', 'text-3xl font-bold text-brand dark:text-green-400', atvVal));
+    atvCard.appendChild(el('p', 'text-xs text-gray-400 dark:text-gray-500 mt-1', T.analyticsATVHint || 'Per approved estimate'));
+    kpiRow.appendChild(atvCard);
+
+    var laborCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 text-center');
+    laborCard.appendChild(el('div', 'text-sm text-gray-600 dark:text-gray-400 mb-1', T.analyticsLaborHours || 'Total Labor Hours'));
+    var laborVal = (sData && sData.labor_hours_total) ? parseFloat(sData.labor_hours_total).toFixed(1) + 'h' : '—';
+    laborCard.appendChild(el('div', 'text-3xl font-bold text-purple-600 dark:text-purple-400', laborVal));
+    laborCard.appendChild(el('p', 'text-xs text-gray-400 dark:text-gray-500 mt-1', T.analyticsLaborHint || 'Tracked billable hours'));
+    kpiRow.appendChild(laborCard);
+
+    frag.appendChild(kpiRow);
+
+    // -- Customer Acquisition + Revenue by Service Row --
+    var custRevRow = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-6 mb-6');
+
+    var acqCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
+    acqCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', T.analyticsCustomerGrowth || 'Customer Growth (6mo)'));
+    if (sData && sData.customer_acquisition && sData.customer_acquisition.length) {
+      OTCharts.barChart(acqCard, sData.customer_acquisition.map(function(d) {
+        var parts = d.month.split('-');
+        var monthLabel = new Date(parts[0], parseInt(parts[1]) - 1).toLocaleDateString(currentLang === 'es' ? 'es-MX' : 'en-US', { month: 'short' });
+        return { label: monthLabel, value: parseInt(d.new_customers) };
+      }), { height: 140, color: OTCharts.TOKENS.colors.brandMid });
+    } else {
+      acqCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    custRevRow.appendChild(acqCard);
+
+    var revSvcCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
+    revSvcCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', T.analyticsRevByService || 'Revenue by Service'));
+    if (sData && sData.revenue_by_service && sData.revenue_by_service.length) {
+      OTCharts.horizontalBars(revSvcCard, sData.revenue_by_service.map(function(r) {
+        return { label: r.service || '—', value: parseFloat(r.total_revenue) };
+      }), { color: OTCharts.TOKENS.colors.brandMid, valueFormatter: function(v) { return '$' + v.toLocaleString(); } });
+    } else {
+      revSvcCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    custRevRow.appendChild(revSvcCard);
+
+    frag.appendChild(custRevRow);
+
+    // -- Top Customers + Customer Retention Row --
+    var topCustRow = el('div', 'grid grid-cols-1 md:grid-cols-2 gap-6 mb-6');
+
+    var topCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
+    topCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', T.analyticsTopCustomers || 'Top Customers'));
+    if (sData && sData.top_customers && sData.top_customers.length) {
+      var tcList = el('div', 'space-y-2');
+      sData.top_customers.slice(0, 8).forEach(function(c, i) {
+        var row = el('div', 'flex items-center justify-between py-2 ' + (i < sData.top_customers.length - 1 ? 'border-b dark:border-gray-700' : ''));
+        var left = el('div', 'flex items-center gap-2 min-w-0');
+        var rank = el('span', 'w-6 h-6 rounded-full bg-brand/10 dark:bg-green-900/30 text-brand dark:text-green-400 text-xs font-bold flex items-center justify-center shrink-0', String(i + 1));
+        left.appendChild(rank);
+        var name = el('span', 'text-sm font-medium text-gray-800 dark:text-gray-200 truncate', (c.first_name || '') + ' ' + (c.last_name || ''));
+        left.appendChild(name);
+        row.appendChild(left);
+        var right = el('div', 'text-right shrink-0 ml-2');
+        right.appendChild(el('div', 'text-sm font-bold text-brand dark:text-green-400', '$' + parseFloat(c.total_spent || 0).toLocaleString()));
+        right.appendChild(el('div', 'text-xs text-gray-400', c.estimate_count + ' ' + (T.analyticsEstimates || 'estimates')));
+        row.appendChild(right);
+        tcList.appendChild(row);
+      });
+      topCard.appendChild(tcList);
+    } else {
+      topCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+    }
+    topCustRow.appendChild(topCard);
+
     var retCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
     retCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', T.analyticsCustomerRetention));
     if (sData && sData.customer_retention) {
@@ -11259,8 +11479,21 @@ async function loadAnalytics() {
     } else {
       retCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
     }
-    retRow.appendChild(retCard);
-    frag.appendChild(retRow);
+    topCustRow.appendChild(retCard);
+
+    frag.appendChild(topCustRow);
+
+    // -- Labor Hours per Employee (if data exists) --
+    if (sData && sData.labor_hours_per_employee && sData.labor_hours_per_employee.length) {
+      var labRow = el('div', 'grid grid-cols-1 gap-6 mb-6');
+      var labCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
+      labCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', T.analyticsLaborByEmployee || 'Labor Hours by Technician'));
+      OTCharts.horizontalBars(labCard, sData.labor_hours_per_employee.map(function(e) {
+        return { label: e.employee_name || 'Unknown', value: parseFloat(e.total_hours) };
+      }), { color: OTCharts.TOKENS.colors.amber, valueFormatter: function(v) { return v.toFixed(1) + 'h'; } });
+      labRow.appendChild(labCard);
+      frag.appendChild(labRow);
+    }
 
     container.textContent = '';
     container.appendChild(frag);
