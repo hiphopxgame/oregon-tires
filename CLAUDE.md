@@ -30,8 +30,10 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - Local: `public_html/` prefix
 - Server: flat at `---oregon.tires/` level (strip `public_html/` when SCPing)
 - CLI scripts: `cli/` (bootstrap path on server: `__DIR__ . '/../includes/bootstrap.php'`)
-- SQL migrations: `sql/` (outside public_html, 52 migration files)
+- SQL migrations: `sql/` (outside public_html, 62 migration files)
 - Uploads: `uploads/inspections/{ro_number}/` (inspection photos)
+- Market data: `_data/portland-auto-directory.json` (976 businesses, raw)
+- Market data (minified): `admin/js/market-intel-data.json` (served to admin)
 
 ## Authentication (member-kit)
 - **Roles**: admin > employee > member (stored in member-kit `members` table)
@@ -109,8 +111,20 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `oretir_conversations.source` — conversation source: web, email, contact_form
 - `oretir_conversations.email_thread_id` — original email Message-ID for thread root
 
+### Services (migration 057)
+- `oretir_services` — DB-driven service catalog (slug, bilingual names, icon, colors, price display, category, bookable flag, detail page flag, duration estimate)
+- `oretir_service_faqs` — per-service FAQ entries (bilingual Q&A, sort order)
+- `oretir_service_related` — related service cross-links
+
 ## RO Lifecycle
-`intake → diagnosis → estimate_pending → pending_approval → approved → in_progress → waiting_parts → ready → completed → invoiced` (also: `cancelled`)
+`intake → check_in → diagnosis → estimate_pending → pending_approval → approved → in_progress → on_hold → waiting_parts → ready → completed → invoiced` (also: `cancelled`)
+
+## Notes Lifecycle (Appointment → RO)
+1. Customer books → notes saved to `appointment.notes`
+2. Admin adds notes → saved to `appointment.admin_notes` (append-only with timestamps)
+3. RO created → `customer_concern` gets services + customer notes; `admin_notes` gets `[From Appointment]` prefix + appointment admin_notes
+4. During RO work → `technician_notes` and `admin_notes` append independently (timestamped, author-tagged)
+5. RO detail modal shows all: Customer Concern, Appointment Notes (origin), Tech Notes, Admin Notes
 
 ## Shop Management Features
 - **VIN decode**: NHTSA vPIC API with permanent DB cache (`includes/vin-decode.php`)
@@ -122,6 +136,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - **Reference numbers**: `RO-XXXXXXXX` (repair orders), `ES-XXXXXXXX` (estimates)
 - **Care plans**: Subscription-based service plans with PayPal billing
 - **Google Reviews**: Fetched via Places API, cached in DB (`includes/google-reviews.php`)
+- **DB-driven services**: `oretir_services` table replaces hardcoded service lists; admin-managed via Services tab; seeded with 10 core services (migration 057b)
 
 ## API Endpoints
 
@@ -145,6 +160,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `GET /api/testimonials.php` — customer testimonials
 - `GET /api/sitemap.php` — dynamic XML sitemap
 - `GET /api/calendar-event.php` — .ics calendar event download
+- `GET /api/services.php` — public services list (bookable flag, detail page, FAQs)
 - `GET /api/appointment-status.php?ref=` — appointment status check
 - `POST /api/appointment-cancel.php` — cancel via token
 - `POST /api/appointment-reschedule.php` — reschedule via token
@@ -244,6 +260,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `/api/admin/service-reminders.php` — service reminder management
 - `/api/admin/waitlist.php` — walk-in queue management
 - `/api/admin/tire-quotes.php` — tire quote request management
+- `/api/admin/services.php` — service catalog CRUD (DB-driven services with FAQs + related)
 - `/api/admin/visit-log.php` — visit tracking log
 - `/api/admin/google-business-sync.php` — Google Business Profile sync
 - `/api/admin/business-hours.php` — business hours configuration
@@ -329,6 +346,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `generate-vapid-keys.php` — one-time VAPID key pair generation for Web Push
 - `send-push-notifications.php` — push notification queue processor (cron, every 5 min)
 - `fetch-inbound-emails.php` — IMAP inbound email fetch into conversations (cron, every 2 min)
+- `collect-portland-auto-shops.php` — Google Places API collector for Market Intel (one-time, 976 businesses)
 
 ## Cron Jobs (on server)
 ```
@@ -342,32 +360,85 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 ```
 
 ## Admin Panel
-- **Tabs**: Dashboard, Appointments, Customers, Repair Orders, Messages, Employees, Blog, FAQ, Promotions, Testimonials, Subscribers, Feedback, Gallery, Settings, Resource Planner, Referrals
+- **SPA architecture**: Single-page app (`admin/index.html`) with hash-based routing (`#tab-name`)
+- **Browser history**: Each tab switch creates a history entry; back/forward buttons navigate between tabs
+- **Deep links**: `https://oregon.tires/admin/#analytics` opens directly to Analytics tab
+- **Page titles**: Update per tab for meaningful browser history entries
+- **Navigation**: 4 dropdown groups (Workflow, Shop, Team, Marketing) + Settings
 - **RO Tab**: Table view + kanban board (drag-and-drop), status timeline, create from appointment or walk-in
 - **Member Dashboard** (`/members`): 8 tabs — Appointments, Vehicles, Estimates, Messages, Care Plan, Invoices, Loyalty Points, Refer a Friend
 - **Employee Dashboard**: My Schedule, My Assigned Work, My Customers (via member portal)
 
+### Admin Tab Groups
+- **Workflow**: Appointments, Repair Orders, Invoices, Labor, Visits, Waitlist
+- **Shop**: Customers, Walk-In Queue, Tire Quotes, Services, Resource Planner
+- **Team**: Employees, Messages, My Schedule (employee-only), My Work (employee-only)
+- **Marketing**: Blog, Promotions, FAQ, Reviews, Gallery, Subscribers, Loyalty & Rewards, Referrals, Service Reminders, **Market Intel**
+- **Settings**: Analytics, Site Content, Docs
+
+### Overview Dashboard
+- 6 clickable stat cards (Action Required → overdue filter, Today, This Week, Upcoming, Completed, Tomorrow)
+- Quick Actions bar (New Appointment, Walk-In, New RO, Messages + pulsing Unassigned alert)
+- Live Status row (Active ROs via API, Inbox, Unread Threads, Team On Duty)
+- Actionable alerts: Overdue + Unassigned click through to filtered appointment views
+- Shop Floor widget (live bay status, 30s auto-refresh)
+- 5 charts: Weekly Bookings, Service Breakdown, Bay Utilization, 30-Day Trend, Service Staffing
+- Upcoming Schedule + Employee Schedule sidebars
+
+### Analytics (`#analytics`)
+- Date range filtering: 7d, 30d, 90d, 1yr, All Time, custom range (params passed to API)
+- Top stats: appointments, messages, customers, employees
+- Rate cards: new, confirmed, completion, cancellation rates
+- Charts: Popular Services, Status Breakdown, Peak Times, Bookings Trend
+- Employee Performance table + Employee Productivity chart (30d)
+- Revenue Trend (6mo), Conversion Funnel, Service Duration
+- KPIs: No-Show Rate (color-coded), Avg Ticket Value, Total Labor Hours
+- Customer Growth (6mo bar chart), Revenue by Service, Top Customers, Customer Retention
+- Labor Hours by Technician (conditional, if data exists)
+- All empty states show contextual hints explaining what action populates the data
+
+### Market Intel (`#marketintel`)
+- Interactive Leaflet.js map of 976 Portland metro auto businesses
+- Color-coded markers: blue (repair), amber (parts), purple (dealership), green (specialty)
+- Oregon Tires shown with special green home marker
+- Click marker → side panel with full details (rating, reviews, phone, website, hours, services)
+- Directory table view: sortable by rating, reviews, name, or distance from Oregon Tires
+- Filters: category, city, chain/independent, free-text search
+- Stats bar: total businesses, total reviews, average rating, category breakdowns
+- Data collected via Google Places API (`cli/collect-portland-auto-shops.php`)
+- Leaflet.js loaded lazily (only when Map view is opened)
+- CSP updated to allow unpkg.com (Leaflet) + tile.openstreetmap.org (map tiles)
+
 ### Admin JS
-- `admin/js/repair-orders.js` — RO tab, inspection, estimate management
+- `admin/js/repair-orders.js` — RO tab, inspection, estimate management, appointment notes display
 - `admin/js/kanban.js` — kanban board (drag-and-drop status changes, time-in-status)
 - `admin/js/blog.js` — blog post editor
 - `admin/js/faq.js` — FAQ management
 - `admin/js/promotions.js` — promotion management
 - `admin/js/testimonials.js` — testimonial management
 - `admin/js/subscribers.js` — subscriber management
-- `admin/js/ot-charts.js` — dashboard charts (includes stackedHorizontalBars)
+- `admin/js/services.js` — DB-driven service catalog management + per-service FAQs
+- `admin/js/ot-charts.js` — dashboard charts (bar, line, pie, horizontal bars with valueFormatter + labelWidth)
 - `admin/js/resource-planner.js` — resource planner tab (grid, heatmap, skills matrix, recommendations)
 - `admin/js/brand-toast.js` — branded toast notifications
 - `admin/js/admin-analytics.js` — enhanced analytics dashboard
 - `admin/js/labor-tracker.js` — labor hours tracking UI
-- `admin/js/visit-tracker.js` — visit tracking UI
+- `admin/js/visit-tracker.js` — visit tracking UI + Shop Floor widget
 - `admin/js/referrals.js` — referral management tab (list, filter, mark complete, award points)
+- `admin/js/invoices.js` — invoice management (dark mode, responsive tables)
+- `admin/js/waitlist.js` — ROs on hold / awaiting parts
+- `admin/js/walkin-queue.js` — walk-in customer queue with customer search autofill
+- `admin/js/tire-quotes.js` — tire quote request management
+- `admin/js/loyalty.js` — loyalty points ledger + rewards catalog CRUD
+- `admin/js/service-reminders.js` — automated service due date reminders
+- `admin/js/market-intel.js` — Market Intel tab (Leaflet map + directory view)
+- `admin/js/market-intel-data.json` — 976 Portland auto businesses (minified, 600KB)
 - `admin/js/feature-data.js` — feature configuration data
 
 ### Frontend JS
-- `assets/js/pwa-manager.js` — PWA install prompt (Android + iOS), push subscription, online/offline indicator
+- `assets/js/pwa-manager.js` — PWA install prompt (Android + iOS), push subscription, online/offline indicator; language fallback via localStorage
 - `assets/js/offline-booking.js` — IndexedDB queue for offline bookings + Background Sync fallback
-- `assets/js/exit-intent.js` — exit intent popup
+- `assets/js/exit-intent.js` — exit intent popup (role="dialog", aria-modal, auto-focus email, Escape key close)
 - `assets/js/scroll-reveal.js` — scroll animation
 - `assets/js/htmx.min.js` — HTMX for partial page updates
 
@@ -384,6 +455,21 @@ See `.env.example` for full template. Key additions beyond DB/SMTP:
 ## SEO
 - `includes/seo-config.php` — per-page title, description, canonical, OG tags
 - `includes/seo-head.php` — renders meta tags, JSON-LD Organization schema
-- `api/sitemap.php` — dynamic XML sitemap (services, blog, regions)
+- `api/sitemap.php` — dynamic XML sitemap (13 static pages, 10 service pages, 8 regional pages, blog posts, promotions)
+- `index.php` JSON-LD: AutomotiveBusiness with aggregateRating, openingHours, geo, sameAs
 - Regional pages target Portland-area neighborhoods for local SEO
 - IndexNow integration for fast Bing indexing of new content
+
+## Date/Time Handling
+- **Always use `localDateStr()`** for date comparisons in admin JS (helper at line ~7620)
+- **Never use `toISOString().split('T')[0]`** — returns UTC, causes wrong "today" after 5 PM PST
+- Calendar, stats, schedules, charts, booking form all use `localDateStr()` for local timezone
+- Calendar labels respect `currentLang` (es-MX vs en-US)
+
+## Content Security Policy (.htaccess)
+Allowed external sources:
+- `script-src`: googletagmanager, google-analytics, hiphop.world, **unpkg.com** (Leaflet.js)
+- `style-src`: **unpkg.com** (Leaflet CSS)
+- `img-src`: google-analytics, googletagmanager, google.com, **\*.tile.openstreetmap.org** (map tiles)
+- `connect-src`: google-analytics, googletagmanager, hiphop.world
+- `frame-src`: google.com
