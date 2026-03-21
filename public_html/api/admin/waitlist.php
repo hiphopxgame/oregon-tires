@@ -118,22 +118,55 @@ try {
             }
         }
 
-        // If "serving", auto-create a visit check-in
+        // If "serving", auto-create a visit check-in linked to waitlist
         $visitId = null;
         if ($newStatus === 'serving' && !empty($entry['customer_id'])) {
             try {
+                // Use checked_in_at as the real arrival time if available, otherwise NOW()
+                $checkInTime = $entry['checked_in_at'] ?? date('Y-m-d H:i:s');
                 $db->prepare(
-                    'INSERT INTO oretir_visit_log (customer_id, check_in_at, notes)
-                     VALUES (?, NOW(), ?)'
-                )->execute([(int) $entry['customer_id'], 'Auto check-in from waitlist #' . $id]);
+                    'INSERT INTO oretir_visit_log
+                       (customer_id, waitlist_id, check_in_at, service_start_at, service, notes)
+                     VALUES (?, ?, ?, NOW(), ?, ?)'
+                )->execute([
+                    (int) $entry['customer_id'],
+                    $id,
+                    $checkInTime,
+                    $entry['service'] ?: null,
+                    'Walk-in from waitlist #' . $id,
+                ]);
                 $visitId = (int) $db->lastInsertId();
+
+                // Calculate wait_minutes (time from check-in to service start)
+                $db->prepare(
+                    'UPDATE oretir_visit_log
+                     SET wait_minutes = TIMESTAMPDIFF(MINUTE, check_in_at, service_start_at)
+                     WHERE id = ?'
+                )->execute([$visitId]);
             } catch (\Throwable $e) {
                 error_log('waitlist: auto check-in error: ' . $e->getMessage());
             }
         }
 
-        // If completed or cancelled, try to advance the queue
-        if (in_array($newStatus, ['completed', 'cancelled'], true)) {
+        // If completed, finalize the linked visit
+        if ($newStatus === 'completed') {
+            try {
+                $db->prepare(
+                    'UPDATE oretir_visit_log
+                     SET service_end_at = COALESCE(service_end_at, NOW()),
+                         check_out_at   = COALESCE(check_out_at, NOW()),
+                         service_minutes = TIMESTAMPDIFF(MINUTE, service_start_at, COALESCE(service_end_at, NOW())),
+                         total_minutes   = TIMESTAMPDIFF(MINUTE, check_in_at, NOW())
+                     WHERE waitlist_id = ? AND check_out_at IS NULL'
+                )->execute([$id]);
+            } catch (\Throwable $e) {
+                error_log('waitlist: visit finalize error: ' . $e->getMessage());
+            }
+            advanceQueue($db);
+        }
+
+        // If cancelled, try to advance the queue
+        if ($newStatus === 'cancelled') {
             advanceQueue($db);
         }
 

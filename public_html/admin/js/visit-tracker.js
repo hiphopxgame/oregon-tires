@@ -15,13 +15,23 @@
   function hdrs(json) { var h = { 'X-CSRF-Token': getCsrf() }; if (json) h['Content-Type'] = 'application/json'; return h; }
   function toast(msg, err) { if (typeof showToast === 'function') showToast(msg, !!err); }
 
-  function formatDuration(startStr) {
+  function formatDuration(startStr, endStr) {
     if (!startStr) return '--';
     var start = new Date(startStr.replace(' ', 'T'));
-    var diff = Math.floor((Date.now() - start.getTime()) / 1000 / 60);
+    var end = endStr ? new Date(endStr.replace(' ', 'T')) : new Date();
+    var diff = Math.floor((end.getTime() - start.getTime()) / 1000 / 60);
     if (diff < 0) return '0m';
     if (diff < 60) return diff + 'm';
     return Math.floor(diff / 60) + 'h ' + (diff % 60) + 'm';
+  }
+
+  function fmtClock(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr.replace(' ', 'T'));
+    var h = d.getHours(); var m = d.getMinutes();
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
   }
 
   function el(tag, cls, text) {
@@ -93,7 +103,8 @@
       var row = el('div', 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg');
       var info = el('div');
       info.appendChild(el('p', 'font-medium text-sm text-gray-900 dark:text-white', name));
-      info.appendChild(el('p', 'text-xs text-gray-500 dark:text-gray-400', [v.ro_number ? 'RO: ' + v.ro_number : '', v.bay_number ? t('visitBayLabel', 'Bay') + ' ' + v.bay_number : ''].filter(Boolean).join(' \u2022 ')));
+      var detailParts = [v.ro_number ? 'RO: ' + v.ro_number : '', v.bay_number ? t('visitBayLabel', 'Bay') + ' ' + v.bay_number : '', v.service ? v.service.replace(/-/g, ' ') : '', v.employee_name ? '\u2192 ' + v.employee_name : ''].filter(Boolean);
+      info.appendChild(el('p', 'text-xs text-gray-500 dark:text-gray-400', detailParts.join(' \u2022 ')));
       info.appendChild(el('p', 'text-xs font-medium ' + statusCls, statusText));
       row.appendChild(info);
 
@@ -187,43 +198,85 @@
           : isInService ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
           : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
 
-        var card = el('div', 'bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-4 flex items-center justify-between hover:shadow-md transition');
-        var info = el('div', 'flex-1 min-w-0');
+        var card = el('div', 'bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-4 hover:shadow-md transition');
 
-        // Name + RO
-        var nameRow = el('div', 'flex items-center gap-2 flex-wrap');
-        nameRow.appendChild(el('span', 'font-semibold text-gray-800 dark:text-gray-200', name));
-        if (v.ro_number) nameRow.appendChild(el('span', 'text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded', 'RO: ' + v.ro_number));
-        nameRow.appendChild(el('span', 'text-xs px-2 py-0.5 rounded-full font-medium ' + statusCls, statusText));
-        info.appendChild(nameRow);
-
-        // Timing details
-        var timings = [];
-        if (v.bay_number) timings.push(t('visitBayLabel', 'Bay') + ' ' + v.bay_number);
-        timings.push(t('visitCheckedIn', 'Checked in') + ' ' + formatDuration(v.check_in_at) + ' ago');
-        if (v.service_start_at) timings.push(t('visitServiceLabel', 'Service') + ': ' + formatDuration(v.service_start_at));
-        info.appendChild(el('p', 'text-xs text-gray-500 dark:text-gray-400 mt-1', timings.join(' \u2022 ')));
-
-        if (v.phone) info.appendChild(el('p', 'text-xs text-gray-400 dark:text-gray-500 mt-0.5', v.phone));
-        card.appendChild(info);
+        // ── Top row: name, badges, actions ──
+        var topRow = el('div', 'flex items-center justify-between gap-2');
+        var nameWrap = el('div', 'flex items-center gap-2 flex-wrap min-w-0');
+        nameWrap.appendChild(el('span', 'font-semibold text-gray-800 dark:text-gray-200', name));
+        if (v.ro_number) nameWrap.appendChild(el('span', 'text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded', 'RO: ' + v.ro_number));
+        nameWrap.appendChild(el('span', 'text-xs px-2 py-0.5 rounded-full font-medium ' + statusCls, statusText));
+        topRow.appendChild(nameWrap);
 
         // Actions
-        var actions = el('div', 'flex gap-2 ml-3 shrink-0');
+        var actions = el('div', 'flex gap-2 shrink-0');
         if (!v.service_start_at) {
           var sb = el('button', 'px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition', t('visitStartService', 'Start Service'));
           sb.addEventListener('click', function() { updateVisit(v.id, { service_start_at: 'now' }); setTimeout(loadFullVisitTracker, 500); });
           actions.appendChild(sb);
         } else if (!v.service_end_at) {
-          var db = el('button', 'px-3 py-1.5 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 transition', t('visitFinishService', 'Finish'));
-          db.addEventListener('click', function() { updateVisit(v.id, { service_end_at: 'now' }); setTimeout(loadFullVisitTracker, 500); });
-          actions.appendChild(db);
+          var fb = el('button', 'px-3 py-1.5 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 transition', t('visitFinishService', 'Finish'));
+          fb.addEventListener('click', function() { updateVisit(v.id, { service_end_at: 'now' }); setTimeout(loadFullVisitTracker, 500); });
+          actions.appendChild(fb);
         }
         if (!v.check_out_at) {
           var ob = el('button', 'px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition', t('visitCheckOut', 'Check Out'));
           ob.addEventListener('click', function() { updateVisit(v.id, { check_out_at: 'now' }); setTimeout(loadFullVisitTracker, 500); });
           actions.appendChild(ob);
         }
-        card.appendChild(actions);
+        topRow.appendChild(actions);
+        card.appendChild(topRow);
+
+        // ── Detail row: service, employee, bay, phone ──
+        var details = [];
+        if (v.service || v.appt_service) details.push((v.service || v.appt_service).replace(/-/g, ' '));
+        if (v.employee_name) details.push('\u2192 ' + v.employee_name);
+        if (v.bay_number) details.push(t('visitBayLabel', 'Bay') + ' ' + v.bay_number);
+        if (v.phone) details.push(v.phone);
+        if (details.length) {
+          card.appendChild(el('p', 'text-xs text-gray-500 dark:text-gray-400 mt-2', details.join(' \u2022 ')));
+        }
+
+        // ── Timing row: visual timeline ──
+        var timeRow = el('div', 'mt-3 grid grid-cols-4 gap-2 text-center');
+
+        // Check-in time
+        var t1 = el('div', 'rounded-lg p-2 ' + (v.check_in_at ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'));
+        t1.appendChild(el('div', 'text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500 font-semibold', t('visitArrival', 'Arrival')));
+        t1.appendChild(el('div', 'text-sm font-bold ' + (v.check_in_at ? 'text-green-700 dark:text-green-400' : 'text-gray-300'), v.check_in_at ? fmtClock(v.check_in_at) : '--'));
+        timeRow.appendChild(t1);
+
+        // Service start
+        var t2 = el('div', 'rounded-lg p-2 ' + (v.service_start_at ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'));
+        t2.appendChild(el('div', 'text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500 font-semibold', t('visitServiceStart', 'Start')));
+        t2.appendChild(el('div', 'text-sm font-bold ' + (v.service_start_at ? 'text-blue-700 dark:text-blue-400' : 'text-gray-300'), v.service_start_at ? fmtClock(v.service_start_at) : '--'));
+        if (v.check_in_at && v.service_start_at) {
+          t2.appendChild(el('div', 'text-[10px] text-gray-400', t('visitWaitLabel', 'wait') + ' ' + formatDuration(v.check_in_at, v.service_start_at)));
+        }
+        timeRow.appendChild(t2);
+
+        // Service end
+        var t3 = el('div', 'rounded-lg p-2 ' + (v.service_end_at ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800' : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'));
+        t3.appendChild(el('div', 'text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500 font-semibold', t('visitServiceEnd', 'Done')));
+        t3.appendChild(el('div', 'text-sm font-bold ' + (v.service_end_at ? 'text-amber-700 dark:text-amber-400' : 'text-gray-300'), v.service_end_at ? fmtClock(v.service_end_at) : '--'));
+        if (v.service_start_at && v.service_end_at) {
+          t3.appendChild(el('div', 'text-[10px] text-gray-400', t('visitSvcTime', 'service') + ' ' + formatDuration(v.service_start_at, v.service_end_at)));
+        } else if (v.service_start_at && !v.service_end_at) {
+          t3.appendChild(el('div', 'text-[10px] text-blue-500 font-medium', formatDuration(v.service_start_at) + '...'));
+        }
+        timeRow.appendChild(t3);
+
+        // Check-out / total
+        var t4 = el('div', 'rounded-lg p-2 ' + (v.check_out_at ? 'bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600' : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'));
+        t4.appendChild(el('div', 'text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500 font-semibold', t('visitCheckOut', 'Check Out')));
+        t4.appendChild(el('div', 'text-sm font-bold ' + (v.check_out_at ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300'), v.check_out_at ? fmtClock(v.check_out_at) : '--'));
+        if (v.check_in_at) {
+          var totalTime = formatDuration(v.check_in_at, v.check_out_at || undefined);
+          t4.appendChild(el('div', 'text-[10px] font-semibold ' + (v.check_out_at ? 'text-gray-500' : 'text-green-500'), t('visitTotal', 'total') + ' ' + totalTime));
+        }
+        timeRow.appendChild(t4);
+
+        card.appendChild(timeRow);
         grid.appendChild(card);
       });
       container.appendChild(grid);

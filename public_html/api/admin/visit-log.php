@@ -21,10 +21,14 @@ try {
             // Currently checked-in (no check_out_at)
             $stmt = $db->prepare(
                 "SELECT v.*, c.first_name, c.last_name, c.phone,
-                        r.ro_number, r.status AS ro_status
+                        r.ro_number, r.status AS ro_status,
+                        e.name AS employee_name,
+                        a.preferred_time AS appt_time, a.service AS appt_service
                  FROM oretir_visit_log v
                  JOIN oretir_customers c ON c.id = v.customer_id
                  LEFT JOIN oretir_repair_orders r ON r.id = v.repair_order_id
+                 LEFT JOIN oretir_employees e ON e.id = v.assigned_employee_id
+                 LEFT JOIN oretir_appointments a ON a.id = v.appointment_id
                  WHERE v.check_in_at IS NOT NULL AND v.check_out_at IS NULL
                  ORDER BY v.check_in_at ASC"
             );
@@ -33,10 +37,14 @@ try {
             // By date
             $stmt = $db->prepare(
                 "SELECT v.*, c.first_name, c.last_name, c.phone,
-                        r.ro_number, r.status AS ro_status
+                        r.ro_number, r.status AS ro_status,
+                        e.name AS employee_name,
+                        a.preferred_time AS appt_time, a.service AS appt_service
                  FROM oretir_visit_log v
                  JOIN oretir_customers c ON c.id = v.customer_id
                  LEFT JOIN oretir_repair_orders r ON r.id = v.repair_order_id
+                 LEFT JOIN oretir_employees e ON e.id = v.assigned_employee_id
+                 LEFT JOIN oretir_appointments a ON a.id = v.appointment_id
                  WHERE DATE(v.check_in_at) = ?
                  ORDER BY v.check_in_at DESC"
             );
@@ -98,14 +106,34 @@ try {
         $bayNumber = !empty($data['bay_number']) ? max(1, min(20, (int) $data['bay_number'])) : null;
         $notes = sanitize((string) ($data['notes'] ?? ''), 1000);
 
+        // Pull service info from appointment if linked
+        $service = sanitize((string) ($data['service'] ?? ''), 100) ?: null;
+        $employeeId = !empty($data['assigned_employee_id']) ? (int) $data['assigned_employee_id'] : null;
+        if ($appointmentId && (!$service || !$employeeId)) {
+            $apptInfo = $db->prepare('SELECT service, assigned_employee_id FROM oretir_appointments WHERE id = ?');
+            $apptInfo->execute([$appointmentId]);
+            $apptRow = $apptInfo->fetch(PDO::FETCH_ASSOC);
+            if ($apptRow) {
+                $service = $service ?: ($apptRow['service'] ?? null);
+                $employeeId = $employeeId ?: ((int) ($apptRow['assigned_employee_id'] ?? 0) ?: null);
+            }
+        }
+
         $stmt = $db->prepare(
             'INSERT INTO oretir_visit_log
-                (customer_id, appointment_id, repair_order_id, check_in_at, bay_number, notes)
-             VALUES (?, ?, ?, NOW(), ?, ?)'
+                (customer_id, appointment_id, repair_order_id, check_in_at, bay_number, assigned_employee_id, service, notes)
+             VALUES (?, ?, ?, NOW(), ?, ?, ?, ?)'
         );
-        $stmt->execute([$customerId, $appointmentId, $repairOrderId, $bayNumber, $notes ?: null]);
+        $stmt->execute([$customerId, $appointmentId, $repairOrderId, $bayNumber, $employeeId, $service, $notes ?: null]);
 
         $visitId = (int) $db->lastInsertId();
+
+        // Sync check_in_at to linked appointment
+        if ($appointmentId) {
+            $db->prepare('UPDATE oretir_appointments SET check_in_at = NOW() WHERE id = ? AND check_in_at IS NULL')
+               ->execute([$appointmentId]);
+        }
+
         jsonSuccess(['id' => $visitId, 'checked_in' => true]);
     }
 
@@ -147,11 +175,50 @@ try {
             $params[] = sanitize((string) $data['notes'], 1000) ?: null;
         }
 
+        // assigned_employee_id
+        if (isset($data['assigned_employee_id'])) {
+            $fields[] = 'assigned_employee_id = ?';
+            $params[] = $data['assigned_employee_id'] ? (int) $data['assigned_employee_id'] : null;
+        }
+
+        // service
+        if (isset($data['service'])) {
+            $fields[] = 'service = ?';
+            $params[] = sanitize((string) $data['service'], 100) ?: null;
+        }
+
         if (empty($fields)) jsonError('No fields to update.', 400);
 
         $params[] = $id;
         $db->prepare('UPDATE oretir_visit_log SET ' . implode(', ', $fields) . ' WHERE id = ?')
            ->execute($params);
+
+        // ─── Compute duration columns ─────────────────────────────
+        $db->prepare(
+            'UPDATE oretir_visit_log SET
+               wait_minutes    = IF(service_start_at IS NOT NULL AND check_in_at IS NOT NULL, TIMESTAMPDIFF(MINUTE, check_in_at, service_start_at), NULL),
+               service_minutes = IF(service_end_at IS NOT NULL AND service_start_at IS NOT NULL, TIMESTAMPDIFF(MINUTE, service_start_at, service_end_at), NULL),
+               total_minutes   = IF(check_out_at IS NOT NULL AND check_in_at IS NOT NULL, TIMESTAMPDIFF(MINUTE, check_in_at, check_out_at), NULL)
+             WHERE id = ?'
+        )->execute([$id]);
+
+        // ─── Sync timestamps to linked appointment ─────────────────
+        $visitFull = $db->prepare('SELECT appointment_id, waitlist_id, service_start_at, service_end_at, check_out_at FROM oretir_visit_log WHERE id = ?');
+        $visitFull->execute([$id]);
+        $vRow = $visitFull->fetch(PDO::FETCH_ASSOC);
+
+        if (!empty($vRow['appointment_id'])) {
+            $apptUpdates = [];
+            $apptParams = [];
+            if (isset($data['service_start_at'])) { $apptUpdates[] = 'service_start_at = ?'; $apptParams[] = $vRow['service_start_at']; }
+            if (isset($data['service_end_at']))   { $apptUpdates[] = 'service_end_at = ?';   $apptParams[] = $vRow['service_end_at']; }
+            if (isset($data['check_out_at']))      { $apptUpdates[] = 'check_out_at = ?';     $apptParams[] = $vRow['check_out_at']; }
+            if ($apptUpdates) {
+                $apptParams[] = (int) $vRow['appointment_id'];
+                $db->prepare('UPDATE oretir_appointments SET ' . implode(', ', $apptUpdates) . ' WHERE id = ?')
+                   ->execute($apptParams);
+            }
+        }
 
         // ─── Auto-actions on check-out ──────────────────────────────
         $autoActions = [];
