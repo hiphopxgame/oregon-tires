@@ -688,7 +688,7 @@
           <div class="flex flex-wrap gap-3 mb-4">
             <input type="text" id="appt-search" data-t="searchPlaceholder" placeholder="Search by name, email, service..." onkeyup="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm flex-1 min-w-0" aria-label="Search">
             <select id="appt-filter" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
-              <option value="all" data-t="apptStatusAll">All Status</option><option value="new" data-t="apptStatusNew">New</option><option value="confirmed" data-t="apptStatusConfirmed">Confirmed</option><option value="completed" data-t="apptStatusCompleted">Completed</option><option value="cancelled" data-t="apptStatusCancelled">Cancelled</option>
+              <option value="all" data-t="apptStatusAll">All Status</option><option value="new" data-t="apptStatusNew">New</option><option value="confirmed" data-t="apptStatusConfirmed">Confirmed</option><option value="unassigned" data-t="apptStatusUnassigned">Unassigned</option><option value="completed" data-t="apptStatusCompleted">Completed</option><option value="cancelled" data-t="apptStatusCancelled">Cancelled</option>
             </select>
             <select id="appt-month" onchange="renderAppointments()" class="border rounded-lg px-3 py-2 text-sm">
               <option value="all" data-t="apptAllMonths">All Months</option>
@@ -8509,7 +8509,7 @@ function renderOverviewAlerts(stats) {
       uItems.push('<div class="text-sm text-amber-800 dark:text-amber-300 flex items-center gap-2"><span>' + esc(a.first_name) + ' ' + esc(a.last_name) + '</span><span class="text-amber-500 text-xs">' + fmtDate(a.preferred_date) + ' ' + fmtTime(a.preferred_time) + ' — ' + esc(a.service) + '</span></div>');
     });
     var uExtra = stats.unassigned.length > 5 ? '<p class="text-xs text-amber-500 mt-1">+' + (stats.unassigned.length - 5) + ' ' + (T.showMore || 'more') + '</p>' : '';
-    parts.push('<div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 cursor-pointer hover:shadow-md transition" onclick="switchTab(\'appointments\')"><div class="flex items-center justify-between mb-2"><span class="text-amber-600 dark:text-amber-400 font-semibold">' + (T.unassignedUpcoming || 'Unassigned Upcoming') + ' (' + stats.unassigned.length + ')</span><span class="text-xs text-amber-400 dark:text-amber-500">' + (T.clickToView || 'Click to view') + ' →</span></div><div class="space-y-1">' + uItems.join('') + uExtra + '</div></div>');
+    parts.push('<div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 cursor-pointer hover:shadow-md transition" onclick="showUnassignedAppointments()"><div class="flex items-center justify-between mb-2"><span class="text-amber-600 dark:text-amber-400 font-semibold">' + (T.unassignedUpcoming || 'Unassigned Upcoming') + ' (' + stats.unassigned.length + ')</span><span class="text-xs text-amber-400 dark:text-amber-500">' + (T.clickToView || 'Click to view') + ' →</span></div><div class="space-y-1">' + uItems.join('') + uExtra + '</div></div>');
   }
   container.innerHTML = parts.join('');
 }
@@ -8737,7 +8737,7 @@ function renderQuickActions(stats) {
     { label: T.qaMessages || 'Messages', icon: '💬', color: 'bg-amber-600 hover:bg-amber-700', action: function() { switchTab('messages'); } },
   ];
   if (stats.unassigned.length > 0) {
-    actions.unshift({ label: stats.unassigned.length + ' ' + (T.qaUnassigned || 'Unassigned'), icon: '⚠️', color: 'bg-red-600 hover:bg-red-700 animate-pulse', action: function() { switchTab('appointments'); } });
+    actions.unshift({ label: stats.unassigned.length + ' ' + (T.qaUnassigned || 'Unassigned'), icon: '⚠️', color: 'bg-red-600 hover:bg-red-700 animate-pulse', action: function() { showUnassignedAppointments(); } });
   }
   actions.forEach(function(a) {
     var btn = document.createElement('button');
@@ -9529,6 +9529,14 @@ function roStepBadgeHtml(roStatus) {
     '</div>';
 }
 
+function showUnassignedAppointments() {
+  switchTab('appointments');
+  setTimeout(function() {
+    var filterEl = document.getElementById('appt-filter');
+    if (filterEl) { filterEl.value = 'unassigned'; renderAppointments(); }
+  }, 100);
+}
+
 function renderAppointments() {
   const filter = document.getElementById('appt-filter').value;
   const search = document.getElementById('appt-search').value.toLowerCase();
@@ -9536,7 +9544,8 @@ function renderAppointments() {
   const perPage = document.getElementById('appt-per-page').value;
 
   let filtered = appointments.filter(a => {
-    if (filter !== 'all' && a.status !== filter) return false;
+    if (filter === 'unassigned') { if (a.assigned_employee_id || a.status === 'completed' || a.status === 'cancelled') return false; }
+    else if (filter !== 'all' && a.status !== filter) return false;
     if (month !== 'all') { const [y,m] = month.split('-'); const ad = new Date(a.preferred_date+'T00:00:00'); if(ad.getFullYear()!==parseInt(y)||ad.getMonth()+1!==parseInt(m)) return false; }
     if (search) { const s = `${a.first_name} ${a.last_name} ${a.email} ${a.phone||''} ${a.service} ${a.status}`.toLowerCase(); if(!s.includes(search)) return false; }
     return true;
