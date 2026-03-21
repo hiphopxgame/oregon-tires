@@ -52,7 +52,7 @@ assert_test(str_contains($roFile, 'return; // Already has a pending reminder'), 
 echo "\nTEST 4: Correct insert fields\n";
 
 assert_test(str_contains($roFile, 'customer_id, vehicle_id, service_type, last_service_date, next_due_date, due_mileage, mileage_at_service, status'), 'All required fields in INSERT');
-assert_test(str_contains($roFile, "status\n         VALUES"), 'Status included in insert');
+assert_test(str_contains($roFile, "'pending',"), 'Pending status value in insert');
 
 // ─── TEST 5: Function is called in invoiced transition ──────────────────────
 echo "\nTEST 5: Called during invoiced status transition\n";
