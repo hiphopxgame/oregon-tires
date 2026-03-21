@@ -418,6 +418,20 @@ function renderRoDetailModal() {
   }
   headerTop.appendChild(headerLeft);
 
+  var headerBtns = document.createElement('div');
+  headerBtns.className = 'flex items-center gap-2';
+
+  var printBtn = document.createElement('button');
+  printBtn.className = 'text-white/80 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition flex items-center gap-1.5';
+  printBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>';
+  var printLabel = document.createTextNode(t('roPrintWorkOrder', 'Print'));
+  printBtn.appendChild(printLabel);
+  printBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    window.open('/work-order?ro_id=' + ro.id, '_blank');
+  });
+  headerBtns.appendChild(printBtn);
+
   var closeBtn = document.createElement('button');
   closeBtn.className = 'text-white/80 hover:text-white text-2xl font-bold leading-none';
   closeBtn.textContent = '\u00D7';
@@ -427,7 +441,8 @@ function renderRoDetailModal() {
     modal.remove();
   }
   closeBtn.addEventListener('click', cleanupAndClose);
-  headerTop.appendChild(closeBtn);
+  headerBtns.appendChild(closeBtn);
+  headerTop.appendChild(headerBtns);
   header.appendChild(headerTop);
   card.appendChild(header);
 
@@ -862,7 +877,11 @@ function renderRoDetailModal() {
 
     ro.inspections.forEach(function(insp) {
       var iCard = document.createElement('div');
-      iCard.className = 'border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-2 flex justify-between items-center';
+      iCard.className = 'border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-2';
+
+      // Top row: status, date, condition, actions
+      var iTopRow = document.createElement('div');
+      iTopRow.className = 'flex justify-between items-center';
 
       var iLeft = document.createElement('div');
       iLeft.className = 'flex items-center gap-3';
@@ -885,7 +904,16 @@ function renderRoDetailModal() {
         condDot.className = 'w-3 h-3 rounded-full ' + (condColors[insp.overall_condition] || 'bg-gray-400');
         iLeft.appendChild(condDot);
       }
-      iCard.appendChild(iLeft);
+
+      // Photo count badge
+      if (insp.photo_count && insp.photo_count > 0) {
+        var photoBadge = document.createElement('span');
+        photoBadge.className = 'text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+        photoBadge.textContent = insp.photo_count + ' photo' + (insp.photo_count > 1 ? 's' : '');
+        iLeft.appendChild(photoBadge);
+      }
+
+      iTopRow.appendChild(iLeft);
 
       var iActions = document.createElement('div');
       iActions.className = 'flex gap-2';
@@ -940,7 +968,67 @@ function renderRoDetailModal() {
         iActions.appendChild(resendSentInspBtn);
       }
 
-      iCard.appendChild(iActions);
+      iTopRow.appendChild(iActions);
+      iCard.appendChild(iTopRow);
+
+      // Inspection photos — collect all photos from items with non-green ratings first, then all
+      var allPhotos = [];
+      if (insp.items && insp.items.length > 0) {
+        insp.items.forEach(function(item) {
+          if (item.photos && item.photos.length > 0) {
+            item.photos.forEach(function(photo) {
+              allPhotos.push({
+                url: photo.image_url,
+                caption: photo.caption || '',
+                itemLabel: item.label || '',
+                itemCategory: item.category || '',
+                itemRating: item.condition_rating || 'green'
+              });
+            });
+          }
+        });
+      }
+
+      if (allPhotos.length > 0) {
+        var photoGrid = document.createElement('div');
+        photoGrid.className = 'flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50';
+
+        allPhotos.forEach(function(photoData, idx) {
+          var thumbWrap = document.createElement('button');
+          thumbWrap.className = 'relative group rounded-lg overflow-hidden border-2 transition hover:border-green-500 focus:border-green-500 focus:outline-none';
+          // Rating-colored border
+          var ratingBorderCls = photoData.itemRating === 'red' ? 'border-red-400 dark:border-red-600' :
+            photoData.itemRating === 'yellow' ? 'border-yellow-400 dark:border-yellow-600' : 'border-gray-200 dark:border-gray-600';
+          thumbWrap.className += ' ' + ratingBorderCls;
+
+          var thumbImg = document.createElement('img');
+          thumbImg.src = photoData.url;
+          thumbImg.alt = photoData.itemLabel + (photoData.caption ? ' - ' + photoData.caption : '');
+          thumbImg.className = 'w-16 h-16 object-cover';
+          thumbImg.loading = 'lazy';
+          thumbWrap.appendChild(thumbImg);
+
+          // Hover overlay with item label
+          var overlay = document.createElement('div');
+          overlay.className = 'absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-end p-1';
+          var overlayText = document.createElement('span');
+          overlayText.className = 'text-[9px] text-white font-medium leading-tight truncate';
+          overlayText.textContent = photoData.itemLabel;
+          overlay.appendChild(overlayText);
+          thumbWrap.appendChild(overlay);
+
+          // Click to open lightbox
+          thumbWrap.addEventListener('click', function(e) {
+            e.stopPropagation();
+            _showInspectionPhotoLightbox(allPhotos, idx);
+          });
+
+          photoGrid.appendChild(thumbWrap);
+        });
+
+        iCard.appendChild(photoGrid);
+      }
+
       inspSection.appendChild(iCard);
     });
     // Highlight inspection section during check_in/diagnosis when it's the focus
@@ -1237,6 +1325,135 @@ function renderRoDetailModal() {
   card.appendChild(body);
   modal.appendChild(card);
   document.body.appendChild(modal);
+}
+
+// ─── Inspection Photo Lightbox ────────────────────────────────────────────────
+function _showInspectionPhotoLightbox(photos, startIdx) {
+  var currentIdx = startIdx;
+
+  // Backdrop
+  var backdrop = document.createElement('div');
+  backdrop.className = 'fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center';
+  backdrop.style.cssText = 'backdrop-filter:blur(4px);';
+
+  // Close on backdrop click
+  backdrop.addEventListener('click', function(e) {
+    if (e.target === backdrop) backdrop.remove();
+  });
+
+  // Container
+  var lbContainer = document.createElement('div');
+  lbContainer.className = 'relative max-w-4xl w-full mx-4';
+
+  // Close button
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'absolute -top-10 right-0 text-white/80 hover:text-white text-3xl font-bold leading-none z-10';
+  closeBtn.textContent = '\u00D7';
+  closeBtn.addEventListener('click', function() { backdrop.remove(); });
+  lbContainer.appendChild(closeBtn);
+
+  // Image wrapper
+  var imgWrap = document.createElement('div');
+  imgWrap.className = 'relative flex items-center justify-center';
+
+  var mainImg = document.createElement('img');
+  mainImg.className = 'max-h-[75vh] max-w-full object-contain rounded-xl shadow-2xl';
+  imgWrap.appendChild(mainImg);
+
+  lbContainer.appendChild(imgWrap);
+
+  // Caption area
+  var captionArea = document.createElement('div');
+  captionArea.className = 'text-center mt-3';
+  lbContainer.appendChild(captionArea);
+
+  // Navigation buttons
+  if (photos.length > 1) {
+    var prevBtn = document.createElement('button');
+    prevBtn.className = 'absolute left-0 top-1/2 -translate-y-1/2 -ml-2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center text-xl transition';
+    prevBtn.textContent = '\u2039';
+    prevBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      currentIdx = (currentIdx - 1 + photos.length) % photos.length;
+      updateLbImage();
+    });
+    imgWrap.appendChild(prevBtn);
+
+    var nextBtn = document.createElement('button');
+    nextBtn.className = 'absolute right-0 top-1/2 -translate-y-1/2 -mr-2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center text-xl transition';
+    nextBtn.textContent = '\u203A';
+    nextBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      currentIdx = (currentIdx + 1) % photos.length;
+      updateLbImage();
+    });
+    imgWrap.appendChild(nextBtn);
+  }
+
+  function updateLbImage() {
+    var photo = photos[currentIdx];
+    mainImg.src = photo.url;
+    mainImg.alt = photo.itemLabel + (photo.caption ? ' - ' + photo.caption : '');
+
+    // Rating dot color
+    var ratingColors = { red: '#ef4444', yellow: '#eab308', green: '#22c55e' };
+
+    captionArea.textContent = '';
+
+    var labelRow = document.createElement('div');
+    labelRow.className = 'flex items-center justify-center gap-2 mb-1';
+
+    var ratingDot = document.createElement('span');
+    ratingDot.className = 'w-3 h-3 rounded-full inline-block';
+    ratingDot.style.backgroundColor = ratingColors[photo.itemRating] || '#9ca3af';
+    labelRow.appendChild(ratingDot);
+
+    var labelText = document.createElement('span');
+    labelText.className = 'text-white font-medium text-sm';
+    labelText.textContent = photo.itemLabel;
+    if (photo.itemCategory) {
+      labelText.textContent += ' (' + photo.itemCategory + ')';
+    }
+    labelRow.appendChild(labelText);
+
+    captionArea.appendChild(labelRow);
+
+    if (photo.caption) {
+      var captionText = document.createElement('p');
+      captionText.className = 'text-white/70 text-xs';
+      captionText.textContent = photo.caption;
+      captionArea.appendChild(captionText);
+    }
+
+    if (photos.length > 1) {
+      var counter = document.createElement('p');
+      counter.className = 'text-white/50 text-xs mt-1';
+      counter.textContent = (currentIdx + 1) + ' / ' + photos.length;
+      captionArea.appendChild(counter);
+    }
+  }
+
+  // Keyboard navigation
+  function handleKey(e) {
+    if (e.key === 'Escape') { backdrop.remove(); document.removeEventListener('keydown', handleKey); }
+    else if (e.key === 'ArrowLeft' && photos.length > 1) { currentIdx = (currentIdx - 1 + photos.length) % photos.length; updateLbImage(); }
+    else if (e.key === 'ArrowRight' && photos.length > 1) { currentIdx = (currentIdx + 1) % photos.length; updateLbImage(); }
+  }
+  document.addEventListener('keydown', handleKey);
+
+  // Clean up key listener when backdrop is removed
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.removedNodes.forEach(function(n) {
+        if (n === backdrop) { document.removeEventListener('keydown', handleKey); observer.disconnect(); }
+      });
+    });
+  });
+  observer.observe(document.body, { childList: true });
+
+  updateLbImage();
+  backdrop.appendChild(lbContainer);
+  document.body.appendChild(backdrop);
 }
 
 // ─── Inline Estimate Item Editor ─────────────────────────────────────────────

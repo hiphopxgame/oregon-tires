@@ -43,10 +43,55 @@ try {
             $ro = $stmt->fetch(PDO::FETCH_ASSOC);
             if (!$ro) jsonError('Repair order not found.', 404);
 
-            // Inspections
+            // Inspections with photo counts and photos
             $iStmt = $db->prepare('SELECT * FROM oretir_inspections WHERE repair_order_id = ? ORDER BY created_at DESC');
             $iStmt->execute([$id]);
             $ro['inspections'] = $iStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Fetch inspection items and photos for each inspection
+            $inspIds = array_column($ro['inspections'], 'id');
+            if (!empty($inspIds)) {
+                $inspPlaceholders = implode(',', array_fill(0, count($inspIds), '?'));
+
+                // Get items
+                $itemStmt = $db->prepare(
+                    "SELECT * FROM oretir_inspection_items WHERE inspection_id IN ({$inspPlaceholders}) ORDER BY sort_order ASC, id ASC"
+                );
+                $itemStmt->execute($inspIds);
+                $allItems = $itemStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Get photos for all items
+                $itemIds = array_column($allItems, 'id');
+                $photosByItem = [];
+                if (!empty($itemIds)) {
+                    $photoPlaceholders = implode(',', array_fill(0, count($itemIds), '?'));
+                    $photoStmt = $db->prepare(
+                        "SELECT * FROM oretir_inspection_photos WHERE inspection_item_id IN ({$photoPlaceholders}) ORDER BY id ASC"
+                    );
+                    $photoStmt->execute($itemIds);
+                    foreach ($photoStmt->fetchAll(PDO::FETCH_ASSOC) as $photo) {
+                        $photosByItem[(int) $photo['inspection_item_id']][] = $photo;
+                    }
+                }
+
+                // Group items by inspection and attach photos
+                $itemsByInsp = [];
+                foreach ($allItems as $item) {
+                    $item['photos'] = $photosByItem[(int) $item['id']] ?? [];
+                    $itemsByInsp[(int) $item['inspection_id']][] = $item;
+                }
+
+                // Attach to each inspection + compute photo_count
+                foreach ($ro['inspections'] as &$insp) {
+                    $insp['items'] = $itemsByInsp[(int) $insp['id']] ?? [];
+                    $photoCount = 0;
+                    foreach ($insp['items'] as $item) {
+                        $photoCount += count($item['photos']);
+                    }
+                    $insp['photo_count'] = $photoCount;
+                }
+                unset($insp);
+            }
 
             // Estimates
             $eStmt = $db->prepare('SELECT * FROM oretir_estimates WHERE repair_order_id = ? ORDER BY version DESC');
@@ -806,4 +851,80 @@ function sendRoStatusSms(PDO $db, array $ro, string $trigger): void
     } catch (\Throwable $e) {
         error_log("repair-orders.php: sendRoStatusSms({$trigger}) failed for RO #{$ro['id']}: " . $e->getMessage());
     }
+}
+
+// ─── createServiceReminderFromRo — auto-create next-visit service reminder ──
+function createServiceReminderFromRo(PDO $db, array $ro): void
+{
+    if (empty($ro['customer_id'])) return;
+
+    // Determine service type from linked appointment
+    $serviceType = null;
+    if (!empty($ro['appointment_id'])) {
+        $aStmt = $db->prepare('SELECT service FROM oretir_appointments WHERE id = ?');
+        $aStmt->execute([$ro['appointment_id']]);
+        $serviceType = $aStmt->fetchColumn() ?: null;
+    }
+
+    // Normalize service type and determine interval
+    $serviceType = $serviceType ? strtolower(str_replace('-', '_', $serviceType)) : 'other';
+    $intervals = [
+        'oil_change'        => ['days' => 90,  'miles' => 5000],
+        'tire_rotation'     => ['days' => 180, 'miles' => 7500],
+        'brake_service'     => ['days' => 365, 'miles' => 30000],
+        'brake_inspection'  => ['days' => 365, 'miles' => 30000],
+    ];
+    $interval = $intervals[$serviceType] ?? ['days' => 365, 'miles' => null];
+
+    $today = date('Y-m-d');
+    $dueDate = date('Y-m-d', strtotime("+{$interval['days']} days"));
+    $dueMileage = null;
+    if ($interval['miles'] !== null) {
+        // Get current vehicle mileage
+        $currentMileage = null;
+        if (!empty($ro['vehicle_id'])) {
+            $mStmt = $db->prepare('SELECT mileage FROM oretir_vehicles WHERE id = ?');
+            $mStmt->execute([$ro['vehicle_id']]);
+            $currentMileage = $mStmt->fetchColumn() ?: null;
+        }
+        // Fall back to mileage_out on the RO
+        if (!$currentMileage && !empty($ro['mileage_out'])) {
+            $currentMileage = (int) $ro['mileage_out'];
+        }
+        if ($currentMileage) {
+            $dueMileage = (int) $currentMileage + $interval['miles'];
+        }
+    }
+
+    // Check for existing pending reminder for same customer+vehicle+service
+    $checkStmt = $db->prepare(
+        'SELECT id FROM oretir_service_reminders
+         WHERE customer_id = ? AND vehicle_id <=> ? AND service_type = ? AND status = ?
+         LIMIT 1'
+    );
+    $checkStmt->execute([$ro['customer_id'], $ro['vehicle_id'] ?: null, $serviceType, 'pending']);
+    if ($checkStmt->fetch()) {
+        return; // Already has a pending reminder
+    }
+
+    $insertStmt = $db->prepare(
+        'INSERT INTO oretir_service_reminders
+         (customer_id, vehicle_id, service_type, last_service_date, next_due_date, due_mileage, mileage_at_service, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    );
+    $mileageAtService = !empty($ro['mileage_out']) ? (int) $ro['mileage_out'] : null;
+    $insertStmt->execute([
+        $ro['customer_id'],
+        $ro['vehicle_id'] ?: null,
+        $serviceType,
+        $today,
+        $dueDate,
+        $dueMileage,
+        $mileageAtService,
+        'pending',
+    ]);
+
+    $result = ['service_reminder_created' => true, 'service_type' => $serviceType, 'due_date' => $dueDate];
+    if ($dueMileage) $result['due_mileage'] = $dueMileage;
+    error_log("repair-orders.php: Service reminder created for RO #{$ro['id']}: {$serviceType} due {$dueDate}");
 }

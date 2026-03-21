@@ -48,15 +48,17 @@ function createTrashIcon() {
 
 var LaborTracker = {
   roId: null,
+  assignedEmployeeId: null,
   entries: [],
   totalHours: 0,
   billableHours: 0,
   employees: [],
   _intervals: [],
 
-  init: function(roId) {
+  init: function(roId, assignedEmployeeId) {
     this.cleanup();
     this.roId = roId;
+    this.assignedEmployeeId = assignedEmployeeId || null;
     this.entries = [];
     this.totalHours = 0;
     this.billableHours = 0;
@@ -148,14 +150,27 @@ var LaborTracker = {
 
     headerRow.appendChild(headerLeft);
 
-    // Clock In button
+    // Active tech count badge
+    var activeEntries = this.entries.filter(function(e) { return !e.clock_out_at; });
+    if (activeEntries.length > 0) {
+      var activeBadge = document.createElement('span');
+      activeBadge.className = 'text-xs font-medium px-2 py-0.5 rounded-full bg-green-500/20 text-green-700 dark:text-green-400 flex items-center gap-1';
+      var activeDot = document.createElement('span');
+      activeDot.className = 'w-2 h-2 bg-green-500 rounded-full animate-pulse inline-block';
+      activeBadge.appendChild(activeDot);
+      var activeText = document.createTextNode(activeEntries.length + ' ' + t('laborTechsActive', 'tech(s) active'));
+      activeBadge.appendChild(activeText);
+      headerLeft.appendChild(activeBadge);
+    }
+
+    // Clock In button — changes label when techs are already active
     var clockInBtn = document.createElement('button');
     clockInBtn.className = 'px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition flex items-center gap-1.5';
     var clockIcon = document.createElement('span');
     clockIcon.textContent = '\u23F1';
     clockInBtn.appendChild(clockIcon);
     var clockText = document.createElement('span');
-    clockText.textContent = t('laborClockIn', 'Clock In');
+    clockText.textContent = activeEntries.length > 0 ? t('laborClockInAnother', 'Clock In Another Tech') : t('laborClockIn', 'Clock In');
     clockInBtn.appendChild(clockText);
     clockInBtn.addEventListener('click', function() {
       self._showClockInForm(container, containerId);
@@ -164,8 +179,7 @@ var LaborTracker = {
 
     section.appendChild(headerRow);
 
-    // Active entries (clocked in, not yet out) — highlight
-    var activeEntries = this.entries.filter(function(e) { return !e.clock_out_at; });
+    // Completed entries
     var completedEntries = this.entries.filter(function(e) { return e.clock_out_at; });
 
     if (activeEntries.length > 0) {
@@ -391,6 +405,11 @@ var LaborTracker = {
     var existing = document.getElementById('labor-clock-in-form');
     if (existing) { existing.remove(); return; }
 
+    // Find employees already clocked in on this RO
+    var clockedInEmpIds = this.entries
+      .filter(function(e) { return !e.clock_out_at; })
+      .map(function(e) { return parseInt(e.employee_id, 10); });
+
     var form = document.createElement('div');
     form.id = 'labor-clock-in-form';
     form.className = 'border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20 rounded-xl p-4 mb-4';
@@ -403,7 +422,7 @@ var LaborTracker = {
     var grid = document.createElement('div');
     grid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3';
 
-    // Employee dropdown
+    // Employee dropdown — shows ALL active employees, marks clocked-in ones
     var empGroup = document.createElement('div');
     var empLabel = document.createElement('label');
     empLabel.className = 'block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1';
@@ -418,10 +437,26 @@ var LaborTracker = {
     defaultOpt.textContent = t('laborSelectEmployee', 'Select employee...');
     empSelect.appendChild(defaultOpt);
 
+    var assignedId = self.assignedEmployeeId ? parseInt(self.assignedEmployeeId, 10) : null;
+
     this.employees.forEach(function(emp) {
+      var empId = parseInt(emp.id, 10);
+      var isClockedIn = clockedInEmpIds.indexOf(empId) !== -1;
       var opt = document.createElement('option');
       opt.value = emp.id;
-      opt.textContent = emp.name + (emp.role ? ' (' + emp.role + ')' : '');
+      var label = emp.name + (emp.role ? ' (' + emp.role + ')' : '');
+      if (isClockedIn) {
+        label += ' \u2014 ' + t('laborAlreadyClockedIn', 'already clocked in');
+        opt.disabled = true;
+      }
+      if (assignedId === empId) {
+        label += ' \u2605'; // star for assigned tech
+      }
+      opt.textContent = label;
+      // Pre-select assigned employee if not already clocked in
+      if (assignedId === empId && !isClockedIn) {
+        opt.selected = true;
+      }
       empSelect.appendChild(opt);
     });
     empGroup.appendChild(empSelect);
