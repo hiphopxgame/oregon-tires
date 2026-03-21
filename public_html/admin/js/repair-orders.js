@@ -1161,9 +1161,9 @@ function renderRoDetailModal() {
   }
   _sections.labor = laborSection;
 
-  // Initialize LaborTracker for this RO
+  // Initialize LaborTracker for this RO (pass assigned employee for pre-selection)
   if (typeof LaborTracker !== 'undefined') {
-    LaborTracker.init(ro.id);
+    LaborTracker.init(ro.id, ro.assigned_employee_id);
     LaborTracker.render('ro-labor-section');
   }
 
@@ -1362,9 +1362,9 @@ function renderEstimateItemEditor(est, container, roId) {
   });
   editor.appendChild(table);
 
-  // Add item button
+  // Add item button + Use Template dropdown
   var addRow = document.createElement('div');
-  addRow.className = 'flex gap-2 mb-3';
+  addRow.className = 'flex gap-2 mb-3 flex-wrap items-center';
   var addBtn = document.createElement('button');
   addBtn.type = 'button';
   addBtn.className = 'text-sm text-green-600 hover:text-green-800 font-medium flex items-center gap-1';
@@ -1375,6 +1375,49 @@ function renderEstimateItemEditor(est, container, roId) {
     updateEstimateTotal(editor);
   });
   addRow.appendChild(addBtn);
+
+  // "Use Template" dropdown
+  var tplSelect = document.createElement('select');
+  tplSelect.className = 'border rounded px-2 py-1.5 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+  var defaultOpt = document.createElement('option');
+  defaultOpt.value = '';
+  defaultOpt.textContent = t('roUseTemplate', 'Use Template...');
+  tplSelect.appendChild(defaultOpt);
+
+  // Load templates asynchronously
+  (function loadTemplates() {
+    api('estimate-templates.php').then(function(json) {
+      var templates = json.data || [];
+      templates.forEach(function(tpl) {
+        var opt = document.createElement('option');
+        opt.value = JSON.stringify(tpl.items);
+        opt.textContent = tpl.name_en;
+        tplSelect.appendChild(opt);
+      });
+    }).catch(function() { /* templates table may not exist yet — silently ignore */ });
+  })();
+
+  tplSelect.addEventListener('change', function() {
+    if (!tplSelect.value) return;
+    try {
+      var tplItems = JSON.parse(tplSelect.value);
+      tplItems.forEach(function(ti) {
+        var newItem = {
+          id: 'new_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          item_type: ti.type || 'labor',
+          description: ti.description_en || '',
+          quantity: ti.quantity || 1,
+          unit_price: ti.unit_price || 0
+        };
+        table.appendChild(buildItemRow(newItem, table.children.length));
+      });
+      updateEstimateTotal(editor);
+      showToast(t('roTemplateApplied', 'Template items added'));
+    } catch(e) { /* ignore parse errors */ }
+    tplSelect.selectedIndex = 0;
+  });
+  addRow.appendChild(tplSelect);
+
   editor.appendChild(addRow);
 
   // Tax rate + totals

@@ -44,6 +44,9 @@ function memberT(string $key, string $lang = ''): string
         'service'           => ['en' => 'Service', 'es' => 'Servicio'],
         'date_time'         => ['en' => 'Date & Time', 'es' => 'Fecha y Hora'],
 
+        // RO Status
+        'ro_status_label'   => ['en' => 'Repair Status', 'es' => 'Estado de Reparación'],
+
         // Vehicles
         'my_vehicles'       => ['en' => 'My Vehicles', 'es' => 'Mis Vehículos'],
         'vehicles_subtitle' => ['en' => 'Vehicles associated with your account', 'es' => 'Vehículos asociados a su cuenta'],

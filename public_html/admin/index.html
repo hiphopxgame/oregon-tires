@@ -363,6 +363,8 @@
   <script src="/admin/js/admin-analytics.js"></script>
   <!-- Chart utilities (token-based, from Agentic UI Studio) -->
   <script src="/admin/js/ot-charts.js"></script>
+  <!-- Shop Performance Analytics -->
+  <script src="/admin/js/shop-performance.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen dark:bg-gray-900 dark:text-gray-100">
 
@@ -1535,6 +1537,7 @@
         </div>
       </div>
       <div id="analytics-content"></div>
+      <div id="shop-performance-container" class="mt-8"></div>
     </div>
 
     <!-- DOCUMENTATION TAB -->
@@ -5089,6 +5092,27 @@ const adminT = {
     analyticsTopCustomers: 'Top Customers',
     analyticsEstimates: 'estimates',
     analyticsLaborByEmployee: 'Labor Hours by Technician',
+    // Shop Performance
+    spTitle: 'Shop Performance',
+    spAvgTimeInShop: 'Avg Time in Shop',
+    spAvgWaitTime: 'Avg Wait Time',
+    spAvgServiceTime: 'Avg Service Time',
+    spCompleted30d: 'Completed (30d)',
+    spServiceDuration: 'Service Duration (30d)',
+    spService: 'Service',
+    spAvgDuration: 'Avg Duration',
+    spJobCount: 'Job Count',
+    spTechProductivity: 'Technician Productivity (30d)',
+    spEmployee: 'Employee',
+    spTotalHours: 'Total Hours',
+    spBillable: 'Billable',
+    spEfficiency: 'Efficiency %',
+    spJobs: 'Jobs',
+    spRoStatus: 'RO Status Distribution',
+    spMinutes: 'min',
+    spHours: 'h',
+    spNoData: 'No data available yet',
+    spVehicles: 'vehicles',
     // Quick Actions
     qaNewAppointment: 'New Appointment',
     qaWalkIn: 'Walk-In',
@@ -6634,6 +6658,27 @@ const adminT = {
     analyticsTopCustomers: 'Mejores Clientes',
     analyticsEstimates: 'presupuestos',
     analyticsLaborByEmployee: 'Horas por T\u00e9cnico',
+    // Shop Performance
+    spTitle: 'Rendimiento del Taller',
+    spAvgTimeInShop: 'Tiempo Prom. en Taller',
+    spAvgWaitTime: 'Tiempo Prom. de Espera',
+    spAvgServiceTime: 'Tiempo Prom. de Servicio',
+    spCompleted30d: 'Completados (30d)',
+    spServiceDuration: 'Duraci\u00f3n del Servicio (30d)',
+    spService: 'Servicio',
+    spAvgDuration: 'Duraci\u00f3n Prom.',
+    spJobCount: 'Trabajos',
+    spTechProductivity: 'Productividad de T\u00e9cnicos (30d)',
+    spEmployee: 'Empleado',
+    spTotalHours: 'Horas Totales',
+    spBillable: 'Facturables',
+    spEfficiency: 'Eficiencia %',
+    spJobs: 'Trabajos',
+    spRoStatus: 'Distribuci\u00f3n de Estado de OT',
+    spMinutes: 'min',
+    spHours: 'h',
+    spNoData: 'A\u00fan no hay datos disponibles',
+    spVehicles: 'veh\u00edculos',
     // Quick Actions
     qaNewAppointment: 'Nueva Cita',
     qaWalkIn: 'Sin Cita',
@@ -12667,7 +12712,7 @@ function switchTab(tab) {
     if (pg) pg.classList.add('group-active');
   }
   // Existing tab loaders
-  if(tab==='analytics') loadAnalytics();
+  if(tab==='analytics') { loadAnalytics(); if (typeof loadShopPerformance === 'function') loadShopPerformance(); }
   if(tab==='appointments') renderCalendar();
   if(tab==='customers') loadCustomers();
   if(tab==='sitecontent') { loadSiteSettings(); loadEmailTemplates(); }

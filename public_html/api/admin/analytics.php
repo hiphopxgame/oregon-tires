@@ -28,6 +28,90 @@ try {
     requireMethod('GET');
     $db = getDB();
 
+    // ─── Shop Performance sub-endpoint ──────────────────────────────────
+    $type = $_GET['type'] ?? '';
+    if ($type === 'shop_performance') {
+        $spData = [];
+
+        // (a) Average service duration by service type (last 30 days)
+        try {
+            $stmt = $db->query(
+                "SELECT a.service,
+                        ROUND(AVG(TIMESTAMPDIFF(MINUTE, r.service_started_at, r.service_ended_at)), 0) AS avg_minutes,
+                        COUNT(*) AS job_count
+                 FROM oretir_repair_orders r
+                 JOIN oretir_appointments a ON a.id = r.appointment_id
+                 WHERE r.service_started_at IS NOT NULL AND r.service_ended_at IS NOT NULL
+                   AND r.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                 GROUP BY a.service ORDER BY job_count DESC"
+            );
+            $spData['service_duration'] = $stmt->fetchAll();
+        } catch (\Throwable $e) {
+            error_log('shop_performance service_duration: ' . $e->getMessage());
+            $spData['service_duration'] = [];
+        }
+
+        // (b) Technician productivity (last 30 days)
+        try {
+            $stmt = $db->query(
+                "SELECT e.name, e.id,
+                        ROUND(SUM(l.duration_minutes) / 60, 1) AS total_hours,
+                        ROUND(SUM(CASE WHEN l.is_billable = 1 THEN l.duration_minutes ELSE 0 END) / 60, 1) AS billable_hours,
+                        COUNT(DISTINCT l.repair_order_id) AS jobs_completed
+                 FROM oretir_labor_entries l
+                 JOIN oretir_employees e ON e.id = l.employee_id
+                 WHERE l.clock_out_at IS NOT NULL AND l.clock_in_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                 GROUP BY e.id, e.name ORDER BY total_hours DESC"
+            );
+            $spData['tech_productivity'] = $stmt->fetchAll();
+        } catch (\Throwable $e) {
+            error_log('shop_performance tech_productivity: ' . $e->getMessage());
+            $spData['tech_productivity'] = [];
+        }
+
+        // (c) Average vehicle time in shop (last 30 days)
+        try {
+            $stmt = $db->query(
+                "SELECT
+                    ROUND(AVG(TIMESTAMPDIFF(MINUTE, checked_in_at, checked_out_at)), 0) AS avg_total_minutes,
+                    ROUND(AVG(TIMESTAMPDIFF(MINUTE, checked_in_at, service_started_at)), 0) AS avg_wait_minutes,
+                    ROUND(AVG(TIMESTAMPDIFF(MINUTE, service_started_at, service_ended_at)), 0) AS avg_service_minutes,
+                    COUNT(*) AS completed_count
+                 FROM oretir_repair_orders
+                 WHERE checked_in_at IS NOT NULL AND checked_out_at IS NOT NULL
+                   AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)"
+            );
+            $row = $stmt->fetch();
+            $spData['vehicle_time'] = $row ?: [
+                'avg_total_minutes' => null,
+                'avg_wait_minutes' => null,
+                'avg_service_minutes' => null,
+                'completed_count' => 0,
+            ];
+        } catch (\Throwable $e) {
+            error_log('shop_performance vehicle_time: ' . $e->getMessage());
+            $spData['vehicle_time'] = [
+                'avg_total_minutes' => null,
+                'avg_wait_minutes' => null,
+                'avg_service_minutes' => null,
+                'completed_count' => 0,
+            ];
+        }
+
+        // (d) RO status distribution (current)
+        try {
+            $stmt = $db->query(
+                "SELECT status, COUNT(*) AS count FROM oretir_repair_orders GROUP BY status"
+            );
+            $spData['ro_status_distribution'] = $stmt->fetchAll();
+        } catch (\Throwable $e) {
+            error_log('shop_performance ro_status_distribution: ' . $e->getMessage());
+            $spData['ro_status_distribution'] = [];
+        }
+
+        jsonSuccess($spData);
+    }
+
     // ─── Date range parsing ─────────────────────────────────────────────
     $endDate = $_GET['end_date'] ?? date('Y-m-d');
     $startDate = $_GET['start_date'] ?? date('Y-m-d', strtotime('-30 days'));

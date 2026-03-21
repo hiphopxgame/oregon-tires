@@ -15,19 +15,20 @@ try {
     $memberId = (int) $_SESSION['member_id'];
     $status = sanitize((string) ($_GET['status'] ?? ''), 20);
 
-    $sql = 'SELECT id, reference_number, service, preferred_date, preferred_time,
-                   vehicle_year, vehicle_make, vehicle_model, status, language,
-                   created_at
-            FROM oretir_appointments
-            WHERE member_id = ?';
+    $sql = 'SELECT a.id, a.reference_number, a.service, a.preferred_date, a.preferred_time,
+                   a.vehicle_year, a.vehicle_make, a.vehicle_model, a.status, a.language,
+                   a.created_at, ro.status as ro_status, ro.ro_number
+            FROM oretir_appointments a
+            LEFT JOIN oretir_repair_orders ro ON ro.appointment_id = a.id
+            WHERE a.member_id = ?';
     $params = [$memberId];
 
     if ($status && in_array($status, ['new', 'confirmed', 'completed', 'cancelled'], true)) {
-        $sql .= ' AND status = ?';
+        $sql .= ' AND a.status = ?';
         $params[] = $status;
     }
 
-    $sql .= ' ORDER BY preferred_date DESC, preferred_time DESC';
+    $sql .= ' ORDER BY a.preferred_date DESC, a.preferred_time DESC';
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);

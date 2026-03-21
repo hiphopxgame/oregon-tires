@@ -48,11 +48,52 @@ try {
         }
     }
 
+    // RO status step map (10 steps)
+    $roStepMap = [
+        'intake'           => 1,
+        'check_in'         => 2,
+        'diagnosis'        => 3,
+        'estimate_pending' => 4,
+        'pending_approval' => 5,
+        'approved'         => 6,
+        'in_progress'      => 7,
+        'ready'            => 8,
+        'completed'        => 9,
+        'invoiced'         => 10,
+    ];
+    $roStepLabels = [
+        'en' => [
+            'intake'           => 'Intake',
+            'check_in'         => 'Checked in',
+            'diagnosis'        => 'Diagnosis',
+            'estimate_pending' => 'Estimate ready',
+            'pending_approval' => 'Awaiting approval',
+            'approved'         => 'Approved',
+            'in_progress'      => 'Work in progress',
+            'ready'            => 'Ready for pickup',
+            'completed'        => 'Completed',
+            'invoiced'         => 'Invoiced',
+        ],
+        'es' => [
+            'intake'           => 'Recepción',
+            'check_in'         => 'Registrado',
+            'diagnosis'        => 'Diagnóstico',
+            'estimate_pending' => 'Estimado listo',
+            'pending_approval' => 'Esperando aprobación',
+            'approved'         => 'Aprobado',
+            'in_progress'      => 'En progreso',
+            'ready'            => 'Listo para recoger',
+            'completed'        => 'Completado',
+            'invoiced'         => 'Facturado',
+        ],
+    ];
+
     // Enhanced query: match by member_id OR by email on orphaned appointments
     $sql = 'SELECT DISTINCT a.id, a.reference_number, a.service, a.preferred_date, a.preferred_time,
                    a.vehicle_year, a.vehicle_make, a.vehicle_model, a.status, a.language,
                    a.created_at, e.name as employee_name,
                    insp.customer_view_token,
+                   ro.status as ro_status, ro.ro_number,
                    (SELECT COUNT(*) FROM oretir_inspection_photos ip
                     JOIN oretir_inspection_items ii ON ip.inspection_item_id = ii.id
                     WHERE ii.inspection_id = insp.id) as photo_count
@@ -169,6 +210,47 @@ try {
                                         <?php endif; ?>
                                     </a>
                                 </p>
+                                <?php endif; ?>
+                                <?php
+                                // ── RO Status Progress Bar ──
+                                if (!empty($booking['ro_status']) && isset($roStepMap[$booking['ro_status']])):
+                                    $roStatus = $booking['ro_status'];
+                                    $currentStep = $roStepMap[$roStatus];
+                                    $totalSteps = 10;
+                                    $stepLabel = $roStepLabels[$lang][$roStatus] ?? $roStepLabels['en'][$roStatus] ?? $roStatus;
+                                    $stepText = ($lang === 'es')
+                                        ? "Paso {$currentStep}/{$totalSteps} — {$stepLabel}"
+                                        : "Step {$currentStep}/{$totalSteps} — {$stepLabel}";
+                                    $pct = round(($currentStep / $totalSteps) * 100);
+                                    // Color: green for completed/invoiced, blue for in-progress, amber for pending
+                                    if ($currentStep >= 9) {
+                                        $barColor = '#22c55e'; $barBg = '#dcfce7'; $textColor = '#166534';
+                                    } elseif ($currentStep >= 6) {
+                                        $barColor = '#3b82f6'; $barBg = '#dbeafe'; $textColor = '#1e40af';
+                                    } else {
+                                        $barColor = '#f59e0b'; $barBg = '#fef3c7'; $textColor = '#92400e';
+                                    }
+                                ?>
+                                <div style="margin-top: 0.75rem; padding: 0.625rem 0.75rem; background: <?= $barBg ?>; border-radius: 0.5rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.375rem;">
+                                        <span style="font-size: 0.75rem; font-weight: 600; color: <?= $textColor ?>;">
+                                            <?= htmlspecialchars($stepText) ?>
+                                        </span>
+                                        <?php if (!empty($booking['ro_number'])): ?>
+                                        <span style="font-size: 0.7rem; color: <?= $textColor ?>; opacity: 0.7;">
+                                            <?= htmlspecialchars($booking['ro_number']) ?>
+                                        </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div style="background: rgba(0,0,0,0.1); border-radius: 0.25rem; height: 6px; overflow: hidden;">
+                                        <div style="background: <?= $barColor ?>; height: 100%; width: <?= $pct ?>%; border-radius: 0.25rem; transition: width 0.3s ease;"></div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-top: 0.25rem;">
+                                        <?php for ($s = 1; $s <= $totalSteps; $s++): ?>
+                                        <div style="width: 6px; height: 6px; border-radius: 50%; background: <?= $s <= $currentStep ? $barColor : 'rgba(0,0,0,0.15)' ?>;"></div>
+                                        <?php endfor; ?>
+                                    </div>
+                                </div>
                                 <?php endif; ?>
                             </div>
                         </div>
