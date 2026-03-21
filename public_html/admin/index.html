@@ -5205,6 +5205,8 @@ const adminT = {
     lsInbox: 'Inbox',
     lsConversations: 'Unread Threads',
     lsEmployeesOn: 'Team On Duty',
+    lsNeedsDvi: 'Needs Inspection',
+    dviNeedsInspection: 'Needs Inspection',
     clickToView: 'Click to view',
     statConfirmed: 'confirmed',
     statNew: 'new',
@@ -6839,6 +6841,8 @@ const adminT = {
     lsInbox: 'Bandeja',
     lsConversations: 'Hilos Sin Leer',
     lsEmployeesOn: 'Equipo en Turno',
+    lsNeedsDvi: 'Necesita Inspección',
+    dviNeedsInspection: 'Necesita Inspección',
     clickToView: 'Clic para ver',
     statConfirmed: 'confirmadas',
     statNew: 'nuevas',
@@ -8865,6 +8869,7 @@ function renderLiveStatus() {
 
   var items = [
     { id: 'ls-active-ros', label: T.lsActiveROs || 'Active ROs', value: '...', icon: '🔧', color: 'text-purple-600 dark:text-purple-400', tab: 'repairorders' },
+    { id: 'ls-needs-dvi', label: T.lsNeedsDvi || 'Needs Inspection', value: '...', icon: '🔍', color: 'text-gray-400 dark:text-gray-500', tab: 'repairorders' },
     { label: T.lsInbox || 'Inbox', value: String(contactNew), icon: '📩', color: contactNew > 0 ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400', tab: 'messages' },
     { label: T.lsConversations || 'Unread Threads', value: String(unreadCount), icon: '💬', color: unreadCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400', tab: 'messages' },
     { label: T.lsEmployeesOn || 'Team On Duty', value: String(employees.filter(function(e) { return e.is_active; }).length), icon: '👥', color: 'text-green-600 dark:text-green-400', tab: 'employees' }
@@ -8892,23 +8897,64 @@ function renderLiveStatus() {
     box.appendChild(card);
   });
 
-  // Async: fetch all ROs (limit=1 for count) then subtract terminal statuses
+  // Async: fetch all ROs for counts + DVI queue
   fetch('/api/admin/repair-orders.php?limit=500', { credentials: 'include' })
     .then(function(r) { return r.json(); })
     .then(function(json) {
-      var el = document.getElementById('ls-active-ros');
-      if (!el) return;
       var data = json.data || [];
       var activeCount = data.filter(function(ro) {
         return ro.status !== 'completed' && ro.status !== 'cancelled' && ro.status !== 'invoiced';
       }).length;
-      el.textContent = String(activeCount);
-      el.className = 'text-lg font-bold ' + (activeCount > 0 ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500');
+
+      var el = document.getElementById('ls-active-ros');
+      if (el) {
+        el.textContent = String(activeCount);
+        el.className = 'text-lg font-bold ' + (activeCount > 0 ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500');
+      }
+
+      // DVI: ROs in check_in or diagnosis without completed inspections
+      var dviNeeded = data.filter(function(ro) {
+        return ro.status === 'check_in' || ro.status === 'diagnosis';
+      });
+      var dviEl = document.getElementById('ls-needs-dvi');
+      if (dviEl) {
+        dviEl.textContent = String(dviNeeded.length);
+        dviEl.className = 'text-lg font-bold ' + (dviNeeded.length > 0 ? 'text-purple-600 dark:text-purple-400 animate-pulse' : 'text-gray-400 dark:text-gray-500');
+      }
+
+      // DVI alert card
+      renderDviAlert(dviNeeded);
     })
     .catch(function() {
       var el = document.getElementById('ls-active-ros');
-      if (el) { el.textContent = '—'; el.className = 'text-lg font-bold text-gray-400 dark:text-gray-500'; }
+      if (el) { el.textContent = '\u2014'; el.className = 'text-lg font-bold text-gray-400 dark:text-gray-500'; }
     });
+}
+
+function renderDviAlert(dviRos) {
+  var T = adminT[currentLang];
+  var container = document.getElementById('overview-alerts');
+  if (!container || !dviRos.length) return;
+  // Append DVI alert after existing alerts
+  var items = [];
+  dviRos.slice(0, 5).forEach(function(ro) {
+    var cust = ((ro.first_name || '') + ' ' + (ro.last_name || '')).trim() || 'Unknown';
+    var veh = [ro.vehicle_year, ro.vehicle_make, ro.vehicle_model].filter(Boolean).join(' ') || '';
+    var statusLabel = ro.status === 'check_in' ? (T.roStatusCheckIn || 'Checked In') : (T.roStatusDiagnosis || 'Diagnosis');
+    items.push('<div class="text-sm text-purple-800 dark:text-purple-300 flex items-center gap-2 cursor-pointer hover:underline" onclick="viewRoDetail(' + ro.id + ')">'
+      + '<span class="w-2 h-2 rounded-full ' + (ro.status === 'check_in' ? 'bg-cyan-500' : 'bg-purple-500') + ' shrink-0"></span>'
+      + '<span>' + esc(ro.ro_number) + '</span>'
+      + '<span class="text-purple-500 dark:text-purple-400 text-xs">' + esc(cust) + (veh ? ' \u2022 ' + esc(veh) : '') + '</span>'
+      + '<span class="ml-auto text-xs px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">' + esc(statusLabel) + '</span>'
+      + '</div>');
+  });
+  var extra = dviRos.length > 5 ? '<p class="text-xs text-purple-500 mt-1">+' + (dviRos.length - 5) + ' ' + (T.showMore || 'more') + '</p>' : '';
+  var alertHtml = '<div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 cursor-pointer hover:shadow-md transition">'
+    + '<div class="flex items-center justify-between mb-2">'
+    + '<span class="text-purple-600 dark:text-purple-400 font-semibold">\uD83D\uDD0D ' + (T.dviNeedsInspection || 'Needs Inspection') + ' (' + dviRos.length + ')</span>'
+    + '<span class="text-xs text-purple-400 dark:text-purple-500">' + (T.clickToView || 'Click to view') + ' \u2192</span>'
+    + '</div><div class="space-y-1.5">' + items.join('') + extra + '</div></div>';
+  container.innerHTML += alertHtml;
 }
 
 function renderOverviewCharts() {
