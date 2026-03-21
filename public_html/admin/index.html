@@ -14824,9 +14824,13 @@ function closeNotifPanel() {
 function clearNotifications() {
   notifItems = [];
   renderNotifications();
-  // Mark all conversations read in DB and refresh the Messages tab badge
+  // Mark all conversations read in DB and refresh all badges
   api('conversations.php', { method: 'POST', body: { action: 'mark_read_all' } })
-    .then(function() { refreshConvUnreadBadge(); })
+    .then(function() {
+      refreshConvUnreadBadge();
+      renderLiveStatus();
+      if (typeof loadMessages === 'function') loadMessages();
+    })
     .catch(function(e) { console.error('mark_read_all failed:', e); });
 }
 
