@@ -9413,58 +9413,52 @@ function renderCalDayWithSchedule(dateStr, sched) {
       var rightDiv = document.createElement('div');
       rightDiv.className = 'flex flex-col gap-2 min-w-[180px]';
 
-      // Employee select
+      // Employee — TechPicker trigger button
       var empWrap = document.createElement('div');
       var empLbl = document.createElement('label');
       empLbl.className = 'text-xs font-medium text-gray-500 dark:text-gray-400';
       empLbl.textContent = 'Employee';
       empWrap.appendChild(empLbl);
-      var empSel = document.createElement('select');
-      empSel.className = 'w-full border rounded px-2 py-1.5 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ' +
-        (!a.assigned_employee_id ? 'border-orange-400 bg-orange-50 dark:border-orange-700 dark:bg-orange-900/20' : 'border-green-400 bg-green-50 dark:border-green-700 dark:bg-green-900/20');
-      empSel.onchange = (function(apptId) { return function() { updateApptAssignment(apptId, this.value); }; })(a.id);
-      var defaultOpt = document.createElement('option');
-      defaultOpt.value = '';
-      defaultOpt.textContent = T.schedUnassigned || 'Unassigned';
-      empSel.appendChild(defaultOpt);
 
-      // Filter employees to those working this slot (if schedule data available)
-      var workingEmpIds = null;
-      if (sched && sched.employees) {
-        workingEmpIds = [];
-        sched.employees.forEach(function(emp) {
-          var isOff = emp.ov_is_closed == 1 || (!emp.is_available && !emp.override_id);
-          if (!isOff) {
-            var empStart = parseInt((emp.ov_start_time || emp.start_time || '08:00').substring(0,2));
-            var empEnd = parseInt((emp.ov_end_time || emp.end_time || '17:00').substring(0,2));
-            if (parseInt(slotKey.substring(0,2)) >= empStart && parseInt(slotKey.substring(0,2)) < empEnd) {
-              workingEmpIds.push(parseInt(emp.employee_id));
-            }
-          }
-        });
+      var empBtn = document.createElement('button');
+      var assignedEmp = a.assigned_employee_id ? employees.find(function(e) { return e.id === a.assigned_employee_id; }) : null;
+      empBtn.className = 'w-full border rounded px-2 py-1.5 text-sm text-left flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-gray-600 ' +
+        (assignedEmp ? 'border-green-400 bg-green-50 dark:border-green-700 dark:bg-green-900/20 dark:text-gray-200' : 'border-orange-400 bg-orange-50 dark:border-orange-700 dark:bg-orange-900/20 dark:text-gray-200');
+
+      if (assignedEmp) {
+        var colors = ['bg-blue-500','bg-emerald-500','bg-purple-500','bg-amber-500','bg-rose-500','bg-cyan-500'];
+        var ci = Math.abs(assignedEmp.name.split('').reduce(function(h,c){return((h<<5)-h)+c.charCodeAt(0);},0)) % 6;
+        var ini = assignedEmp.name.trim().split(/\s+/).map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+        var avatar = document.createElement('span');
+        avatar.className = 'w-5 h-5 rounded-full ' + colors[ci] + ' text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0';
+        avatar.textContent = ini;
+        empBtn.appendChild(avatar);
       }
 
-      activeEmps.forEach(function(e) {
-        var hasSkills = e.skills && e.skills.length > 0;
-        var isCertified = !hasSkills || e.skills.indexOf(a.service) !== -1;
-        var isWorking = workingEmpIds === null || workingEmpIds.indexOf(parseInt(e.id)) !== -1;
-        // Hide uncertified employees unless currently assigned
-        if (!isCertified && a.assigned_employee_id !== e.id) return;
-        var opt = document.createElement('option');
-        opt.value = e.id;
-        if (a.assigned_employee_id === e.id) opt.selected = true;
-        if (!isCertified) {
-          opt.textContent = e.name + ' (' + (T.notCertified || 'not certified') + ')';
-          opt.className = 'text-red-400';
-        } else if (!isWorking) {
-          opt.textContent = e.name + ' (' + (T.empOff || 'off') + ')';
-          opt.className = 'text-gray-400';
-        } else {
-          opt.textContent = e.name;
-        }
-        empSel.appendChild(opt);
-      });
-      empWrap.appendChild(empSel);
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'truncate';
+      nameSpan.textContent = assignedEmp ? assignedEmp.name : (T.techPickerAssign || adminT[currentLang].techPickerAssign || 'Assign Tech');
+      empBtn.appendChild(nameSpan);
+
+      var chevron = document.createElement('span');
+      chevron.className = 'ml-auto flex-shrink-0 text-gray-400';
+      chevron.innerHTML = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>';
+      empBtn.appendChild(chevron);
+
+      empBtn.addEventListener('click', (function(apptId, service, date, currentEmpId) {
+        return function(e) {
+          e.stopPropagation();
+          TechPicker.open({
+            anchor: e.currentTarget,
+            service: service || null,
+            date: date || null,
+            currentEmployeeId: currentEmpId,
+            onSelect: function(empId) { updateApptAssignment(apptId, empId); }
+          });
+        };
+      })(a.id, a.service, a.preferred_date, a.assigned_employee_id));
+
+      empWrap.appendChild(empBtn);
       rightDiv.appendChild(empWrap);
 
       // Status select
