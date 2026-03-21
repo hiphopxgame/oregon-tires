@@ -197,8 +197,8 @@ try {
                     $linkedRo = $roCheck->fetch(PDO::FETCH_ASSOC);
                     if ($linkedRo && $linkedRo['status'] === 'intake') {
                         $db->prepare('UPDATE oretir_repair_orders SET status = ?, assigned_employee_id = ?, updated_at = NOW() WHERE id = ?')
-                           ->execute(['diagnosis', $empId, $linkedRo['id']]);
-                        syncAppointmentRoStatus('ro', (int) $linkedRo['id'], 'diagnosis', $db);
+                           ->execute(['check_in', $empId, $linkedRo['id']]);
+                        syncAppointmentRoStatus('ro', (int) $linkedRo['id'], 'check_in', $db);
                     } elseif ($linkedRo) {
                         // RO exists but not in intake — still sync employee assignment
                         $db->prepare('UPDATE oretir_repair_orders SET assigned_employee_id = ?, updated_at = NOW() WHERE id = ?')

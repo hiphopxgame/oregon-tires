@@ -11,6 +11,7 @@
 // ─── Column definitions ─────────────────────────────────────────────────────
 var COLUMNS = [
   { key: 'intake',           label: 'Intake',      color: '#3b82f6' },
+  { key: 'check_in',         label: 'Check In',    color: '#06b6d4' },
   { key: 'diagnosis',        label: 'Diagnosis',   color: '#8b5cf6' },
   { key: 'estimate_pending', label: 'Estimate',    color: '#f59e0b' },
   { key: 'pending_approval', label: 'Approval',    color: '#f59e0b' },
@@ -70,13 +71,13 @@ function getNextAction(ro) {
   var hasInspection = (ro.inspection_count || 0) > 0;
   var hasEstimate = (ro.estimate_count || 0) > 0;
 
-  if (s === 'intake' && !hasInspection) return { label: 'Needs DVI', bg: '#fef3c7', color: '#92400e' };
-  if (s === 'intake' && hasInspection) return { label: 'Start Diag', bg: '#ede9fe', color: '#6d28d9' };
+  if (s === 'intake') return { label: 'Check In', bg: '#cffafe', color: '#0e7490' };
+  if (s === 'check_in') return { label: 'Start Diag', bg: '#ede9fe', color: '#6d28d9' };
   if (s === 'diagnosis' && !hasEstimate) return { label: 'Needs Est.', bg: '#fef3c7', color: '#92400e' };
   if (s === 'estimate_pending') return { label: 'Send Est.', bg: '#dbeafe', color: '#1d4ed8' };
   if (s === 'pending_approval') return { label: 'Awaiting', bg: '#ffedd5', color: '#c2410c' };
   if (s === 'approved') return { label: 'Start Work', bg: '#dcfce7', color: '#166534' };
-  if (s === 'ready') return { label: 'Notify', bg: '#d1fae5', color: '#065f46' };
+  if (s === 'ready') return { label: 'Complete', bg: '#d1fae5', color: '#065f46' };
   if (s === 'completed') return { label: 'Invoice', bg: '#ccfbf1', color: '#0f766e' };
   return null;
 }
@@ -241,6 +242,7 @@ function createColumn(colDef, cards) {
     'letter-spacing:0.5px;';
   var labelKeys = {
     intake: 'roStatusIntake',
+    check_in: 'roStatusCheckIn',
     diagnosis: 'roStatusDiagnosis',
     estimate_pending: 'roTimelineEst',
     pending_approval: 'roTimelineApproval',

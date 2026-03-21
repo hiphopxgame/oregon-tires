@@ -58,6 +58,18 @@ try {
             $invStmt->execute([$id]);
             $ro['invoices'] = $invStmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Active labor entries with employee names
+            $laborStmt = $db->prepare(
+                'SELECT l.id, l.employee_id, l.clock_in_at, l.task_description, l.is_billable,
+                        e.name AS employee_name
+                 FROM oretir_labor_entries l
+                 JOIN oretir_employees e ON e.id = l.employee_id
+                 WHERE l.repair_order_id = ? AND l.clock_out_at IS NULL
+                 ORDER BY l.clock_in_at ASC'
+            );
+            $laborStmt->execute([$id]);
+            $ro['active_labor'] = $laborStmt->fetchAll(PDO::FETCH_ASSOC);
+
             // Linked appointment
             if ($ro['appointment_id']) {
                 $aStmt = $db->prepare('SELECT id, reference_number, service, preferred_date, preferred_time, status FROM oretir_appointments WHERE id = ?');
@@ -84,7 +96,7 @@ try {
         $sortColumn = $sortMapping[$sortBy] ?? 'r.created_at';
         if (!in_array($sortOrder, ['ASC', 'DESC'], true)) $sortOrder = 'DESC';
 
-        $allowedStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
+        $allowedStatuses = ['intake','check_in','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
 
         $where = 'WHERE 1=1';
         $params = [];
@@ -190,17 +202,21 @@ try {
 
             $roNumber = generateRoNumber($db);
 
+            // Auto-assign employee from appointment if present
+            $assignedEmpFromAppt = !empty($appt['assigned_employee_id']) ? (int) $appt['assigned_employee_id'] : null;
+
             $stmt = $db->prepare(
                 'INSERT INTO oretir_repair_orders
-                    (ro_number, customer_id, vehicle_id, appointment_id, status,
+                    (ro_number, customer_id, vehicle_id, appointment_id, assigned_employee_id, status,
                      customer_concern, mileage_in, promised_date, promised_time, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
             );
             $stmt->execute([
                 $roNumber,
                 $customerId,
                 $vehicleId,
                 $appointmentId,
+                $assignedEmpFromAppt,
                 'intake',
                 $appt['notes'] ?? null,
                 !empty($data['mileage_in']) ? (int) $data['mileage_in'] : null,
@@ -285,7 +301,7 @@ try {
         // Status transition
         if (isset($data['status'])) {
             $newStatus = sanitize((string) $data['status'], 30);
-            $allowedStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
+            $allowedStatuses = ['intake','check_in','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
             if (!in_array($newStatus, $allowedStatuses, true)) {
                 jsonError('Invalid status value.');
             }
@@ -351,41 +367,219 @@ try {
 
         $db->prepare('UPDATE oretir_repair_orders SET ' . implode(', ', $fields) . ' WHERE id = ?')->execute($params);
 
-        // ─── Sync status to linked appointment ────────────────────────────
+        // ─── Handle status transition side effects ────────────────────────
+        $transitionResult = [];
         if (isset($data['status'])) {
-            try {
-                syncAppointmentRoStatus('ro', $id, $data['status'], $db);
-            } catch (\Throwable $syncErr) {
-                error_log("repair-orders.php: appointment sync failed for RO #{$id}: " . $syncErr->getMessage());
-            }
+            $transitionResult = handleStatusTransition($db, $id, $ro, $data['status'], $staff, $data);
         }
 
-        // ─── Auto-clock-out open labor entries on terminal statuses ─────────
-        $autoClockOutCount = 0;
-        if (isset($data['status']) && in_array($data['status'], ['completed', 'invoiced', 'cancelled', 'on_hold'], true)) {
+        $resp = ['message' => 'Repair order updated.'];
+        if (!empty($transitionResult['auto_clock_out'])) {
+            $resp['auto_clock_out'] = $transitionResult['auto_clock_out'];
+        }
+        if (!empty($transitionResult['invoice_created'])) {
+            $resp['invoice_created'] = true;
+        }
+        jsonSuccess($resp);
+    }
+
+} catch (\Throwable $e) {
+    error_log("Oregon Tires api/admin/repair-orders.php error: " . $e->getMessage());
+    jsonError('Server error', 500);
+}
+
+// ─── handleStatusTransition — centralized side effects for every status change ──
+function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus, array $staff, array $body): array
+{
+    $result = ['auto_clock_out' => 0];
+    $oldStatus = $ro['status'];
+
+    // ── Sync status to linked appointment ──
+    try {
+        syncAppointmentRoStatus('ro', $roId, $newStatus, $db);
+    } catch (\Throwable $e) {
+        error_log("repair-orders.php: appointment sync failed for RO #{$roId}: " . $e->getMessage());
+    }
+
+    // ── Transition-specific side effects ──
+    switch ($newStatus) {
+
+        case 'check_in':
+            // Create/update visit_log, set RO checked_in_at, sync appointment check_in_at
+            try {
+                $bayNumber = !empty($body['bay_number']) ? (int) $body['bay_number'] : null;
+
+                // Create visit_log entry if table exists
+                try {
+                    $vlStmt = $db->prepare(
+                        'INSERT INTO oretir_visit_log (repair_order_id, appointment_id, customer_id, check_in_at, bay_number, created_at)
+                         VALUES (?, ?, ?, NOW(), ?, NOW())'
+                    );
+                    $vlStmt->execute([$roId, $ro['appointment_id'] ?: null, $ro['customer_id'], $bayNumber]);
+                    $visitLogId = (int) $db->lastInsertId();
+                    $db->prepare('UPDATE oretir_repair_orders SET checked_in_at = NOW(), visit_log_id = ? WHERE id = ?')
+                       ->execute([$visitLogId, $roId]);
+                } catch (\Throwable $vlErr) {
+                    // visit_log table may not exist yet — just set the RO timestamp
+                    $db->prepare('UPDATE oretir_repair_orders SET checked_in_at = NOW() WHERE id = ?')
+                       ->execute([$roId]);
+                }
+
+                // Sync check_in_at to appointment
+                if ($ro['appointment_id']) {
+                    $db->prepare('UPDATE oretir_appointments SET check_in_at = NOW() WHERE id = ?')
+                       ->execute([$ro['appointment_id']]);
+                }
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: check_in side effects failed for RO #{$roId}: " . $e->getMessage());
+            }
+            break;
+
+        case 'diagnosis':
+            // Auto clock-in assigned employee (starts REPAIR timer)
+            try {
+                $db->prepare('UPDATE oretir_repair_orders SET service_started_at = COALESCE(service_started_at, NOW()) WHERE id = ?')
+                   ->execute([$roId]);
+
+                // Update visit_log service_start_at
+                if ($ro['appointment_id']) {
+                    $db->prepare('UPDATE oretir_appointments SET service_start_at = COALESCE(service_start_at, NOW()) WHERE id = ?')
+                       ->execute([$ro['appointment_id']]);
+                }
+
+                // Auto clock-in assigned employee if no active labor
+                $empId = $ro['assigned_employee_id'] ?? null;
+                if ($empId) {
+                    $openCheck = $db->prepare('SELECT id FROM oretir_labor_entries WHERE repair_order_id = ? AND clock_out_at IS NULL LIMIT 1');
+                    $openCheck->execute([$roId]);
+                    if (!$openCheck->fetch()) {
+                        $empCheck = $db->prepare('SELECT id FROM oretir_employees WHERE id = ? AND is_active = 1');
+                        $empCheck->execute([$empId]);
+                        if ($empCheck->fetch()) {
+                            $db->prepare(
+                                'INSERT INTO oretir_labor_entries (repair_order_id, employee_id, clock_in_at, is_billable, task_description, created_at, updated_at)
+                                 VALUES (?, ?, NOW(), 1, ?, NOW(), NOW())'
+                            )->execute([$roId, $empId, 'Diagnosis']);
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: diagnosis side effects failed for RO #{$roId}: " . $e->getMessage());
+            }
+            break;
+
+        case 'in_progress':
+            // Auto clock-in assigned employee if no active timer (coming from approved, waiting_parts, or on_hold)
+            try {
+                $empId = $ro['assigned_employee_id'] ?? null;
+                if ($empId) {
+                    $openCheck = $db->prepare('SELECT id FROM oretir_labor_entries WHERE repair_order_id = ? AND clock_out_at IS NULL LIMIT 1');
+                    $openCheck->execute([$roId]);
+                    if (!$openCheck->fetch()) {
+                        $empCheck = $db->prepare('SELECT id FROM oretir_employees WHERE id = ? AND is_active = 1');
+                        $empCheck->execute([$empId]);
+                        if ($empCheck->fetch()) {
+                            $task = in_array($oldStatus, ['waiting_parts', 'on_hold'], true) ? 'Resumed' : 'Repairs';
+                            $db->prepare(
+                                'INSERT INTO oretir_labor_entries (repair_order_id, employee_id, clock_in_at, is_billable, task_description, created_at, updated_at)
+                                 VALUES (?, ?, NOW(), 1, ?, NOW(), NOW())'
+                            )->execute([$roId, $empId, $task]);
+                        }
+                    }
+                }
+
+                // Set service_started_at if not set (first time hitting in_progress)
+                $db->prepare('UPDATE oretir_repair_orders SET service_started_at = COALESCE(service_started_at, NOW()) WHERE id = ?')
+                   ->execute([$roId]);
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: in_progress side effects failed for RO #{$roId}: " . $e->getMessage());
+            }
+            break;
+
+        case 'waiting_parts':
+        case 'on_hold':
+            // Auto clock-out ALL active labor entries
             try {
                 $clockOutStmt = $db->prepare('UPDATE oretir_labor_entries SET clock_out_at = NOW() WHERE repair_order_id = ? AND clock_out_at IS NULL');
-                $clockOutStmt->execute([$id]);
-                $autoClockOutCount = $clockOutStmt->rowCount();
+                $clockOutStmt->execute([$roId]);
+                $result['auto_clock_out'] = $clockOutStmt->rowCount();
             } catch (\Throwable $e) {
-                error_log("repair-orders.php: auto-clock-out failed for RO #{$id}: " . $e->getMessage());
+                error_log("repair-orders.php: auto-clock-out failed for RO #{$roId}: " . $e->getMessage());
             }
-        }
+            break;
 
-        // ─── Auto-create invoice when RO status changes to 'completed' or 'invoiced' ────
-        if (isset($data['status']) && in_array($data['status'], ['completed', 'invoiced'], true)) {
+        case 'ready':
+            // Auto clock-out all labor, set service_ended_at, send "job finished" notification
             try {
+                $clockOutStmt = $db->prepare('UPDATE oretir_labor_entries SET clock_out_at = NOW() WHERE repair_order_id = ? AND clock_out_at IS NULL');
+                $clockOutStmt->execute([$roId]);
+                $result['auto_clock_out'] = $clockOutStmt->rowCount();
+
+                $db->prepare('UPDATE oretir_repair_orders SET service_ended_at = NOW() WHERE id = ?')->execute([$roId]);
+
+                // Update visit_log + appointment
+                if ($ro['appointment_id']) {
+                    $db->prepare('UPDATE oretir_appointments SET service_end_at = NOW() WHERE id = ?')
+                       ->execute([$ro['appointment_id']]);
+                }
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: ready clock-out failed for RO #{$roId}: " . $e->getMessage());
+            }
+
+            // Send "job finished" email + SMS
+            try {
+                require_once __DIR__ . '/../../includes/mail.php';
+                require_once __DIR__ . '/../../includes/sms.php';
+
+                $notifResult = sendJobFinishedEmail($ro, $db);
+                if (!$notifResult['success']) {
+                    error_log("repair-orders.php: Job finished email failed for RO #{$roId}: " . ($notifResult['error'] ?? 'unknown'));
+                }
+
+                if (!empty($ro['customer_id'])) {
+                    $custStmt = $db->prepare('SELECT first_name, last_name, phone, language FROM oretir_customers WHERE id = ?');
+                    $custStmt->execute([$ro['customer_id']]);
+                    $cust = $custStmt->fetch(PDO::FETCH_ASSOC);
+                    if ($cust && !empty($cust['phone'])) {
+                        $custName = trim($cust['first_name'] . ' ' . $cust['last_name']);
+                        sendJobFinishedSms($cust['phone'], $custName, $ro['ro_number'], $cust['language'] ?? 'english');
+                    }
+                }
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: Job finished notification error for RO #{$roId}: " . $e->getMessage());
+            }
+            break;
+
+        case 'completed':
+            // Manager gate — NO auto-invoice. Just clock out any remaining labor.
+            try {
+                $clockOutStmt = $db->prepare('UPDATE oretir_labor_entries SET clock_out_at = NOW() WHERE repair_order_id = ? AND clock_out_at IS NULL');
+                $clockOutStmt->execute([$roId]);
+                $result['auto_clock_out'] = $clockOutStmt->rowCount();
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: completed clock-out failed for RO #{$roId}: " . $e->getMessage());
+            }
+            break;
+
+        case 'invoiced':
+            // Auto-create invoice, send invoice email, set checked_out_at, end visit
+            try {
+                $clockOutStmt = $db->prepare('UPDATE oretir_labor_entries SET clock_out_at = NOW() WHERE repair_order_id = ? AND clock_out_at IS NULL');
+                $clockOutStmt->execute([$roId]);
+                $result['auto_clock_out'] = $clockOutStmt->rowCount();
+
+                $db->prepare('UPDATE oretir_repair_orders SET checked_out_at = NOW(), service_ended_at = COALESCE(service_ended_at, NOW()) WHERE id = ?')
+                   ->execute([$roId]);
+
                 require_once __DIR__ . '/../../includes/invoices.php';
                 require_once __DIR__ . '/../../includes/mail.php';
-                $invoiceResult = createInvoiceFromEstimate($db, $id);
-
-                // Fallback: if no approved estimate, create invoice from any estimate (even draft)
+                $invoiceResult = createInvoiceFromEstimate($db, $roId);
                 if (!$invoiceResult) {
-                    $invoiceResult = createInvoiceFromAnyEstimate($db, $id);
+                    $invoiceResult = createInvoiceFromAnyEstimate($db, $roId);
                 }
 
                 if ($invoiceResult) {
-                    // Send invoice email
+                    $result['invoice_created'] = true;
                     $custStmt2 = $db->prepare('SELECT first_name, last_name, email, language FROM oretir_customers WHERE id = ?');
                     $custStmt2->execute([$ro['customer_id']]);
                     $cust2 = $custStmt2->fetch(PDO::FETCH_ASSOC);
@@ -400,60 +594,39 @@ try {
                         $inv2 = getInvoiceWithItems($db, $invoiceResult['invoice_id']);
                         $viewUrl2 = $baseUrl2 . '/invoice/' . $inv2['customer_view_token'];
                         sendInvoiceEmail($cust2['email'], $custName2, $ro['ro_number'], $vehicle2, '$' . number_format((float)$inv2['total'], 2), $invoiceResult['invoice_number'], $viewUrl2, $lang2);
-                        // Update invoice status to 'sent'
                         $db->prepare('UPDATE oretir_invoices SET status = ? WHERE id = ?')->execute(['sent', $invoiceResult['invoice_id']]);
                     }
-
-                    // Auto-advance RO to 'invoiced' if it was set to 'completed'
-                    if ($data['status'] === 'completed') {
-                        $db->prepare("UPDATE oretir_repair_orders SET status = 'invoiced', updated_at = NOW() WHERE id = ?")->execute([$id]);
-                        try {
-                            syncAppointmentRoStatus('ro', $id, 'invoiced', $db);
-                        } catch (\Throwable $syncErr2) {
-                            error_log("repair-orders.php: sync after auto-invoice failed for RO #{$id}: " . $syncErr2->getMessage());
-                        }
-                    }
                 }
-            } catch (\Throwable $e) {
-                error_log("repair-orders.php: Auto-invoice creation failed for RO #{$id}: " . $e->getMessage());
-            }
-        }
 
-        // ─── Send "Job Finished" notification when status changes to 'ready' ────
-        if (isset($data['status']) && $data['status'] === 'ready') {
+                // End visit log
+                try {
+                    $db->prepare('UPDATE oretir_visit_log SET check_out_at = NOW() WHERE repair_order_id = ? AND check_out_at IS NULL')
+                       ->execute([$roId]);
+                } catch (\Throwable $vlErr) { /* visit_log may not exist */ }
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: invoiced side effects failed for RO #{$roId}: " . $e->getMessage());
+            }
+            break;
+
+        case 'cancelled':
+            // Clock out all labor, end visit timer
             try {
-                require_once __DIR__ . '/../../includes/mail.php';
-                require_once __DIR__ . '/../../includes/sms.php';
+                $clockOutStmt = $db->prepare('UPDATE oretir_labor_entries SET clock_out_at = NOW() WHERE repair_order_id = ? AND clock_out_at IS NULL');
+                $clockOutStmt->execute([$roId]);
+                $result['auto_clock_out'] = $clockOutStmt->rowCount();
 
-                $notifResult = sendJobFinishedEmail($ro, $db);
-                if (!$notifResult['success']) {
-                    error_log("repair-orders.php: Job finished email failed for RO #{$id}: " . ($notifResult['error'] ?? 'unknown'));
-                }
+                $db->prepare('UPDATE oretir_repair_orders SET checked_out_at = COALESCE(checked_out_at, NOW()), service_ended_at = COALESCE(service_ended_at, NOW()) WHERE id = ?')
+                   ->execute([$roId]);
 
-                // SMS if customer has opted in
-                if (!empty($ro['customer_id'])) {
-                    $custStmt = $db->prepare('SELECT first_name, last_name, phone, language FROM oretir_customers WHERE id = ?');
-                    $custStmt->execute([$ro['customer_id']]);
-                    $cust = $custStmt->fetch(PDO::FETCH_ASSOC);
-                    if ($cust && !empty($cust['phone'])) {
-                        $custName = trim($cust['first_name'] . ' ' . $cust['last_name']);
-                        $lang = ($cust['language'] ?? 'english');
-                        sendJobFinishedSms($cust['phone'], $custName, $ro['ro_number'], $lang);
-                    }
-                }
+                try {
+                    $db->prepare('UPDATE oretir_visit_log SET check_out_at = NOW() WHERE repair_order_id = ? AND check_out_at IS NULL')
+                       ->execute([$roId]);
+                } catch (\Throwable $vlErr) { /* visit_log may not exist */ }
             } catch (\Throwable $e) {
-                error_log("repair-orders.php: Job finished notification error for RO #{$id}: " . $e->getMessage());
+                error_log("repair-orders.php: cancelled side effects failed for RO #{$roId}: " . $e->getMessage());
             }
-        }
-
-        $resp = ['message' => 'Repair order updated.'];
-        if ($autoClockOutCount > 0) {
-            $resp['auto_clock_out'] = $autoClockOutCount;
-        }
-        jsonSuccess($resp);
+            break;
     }
 
-} catch (\Throwable $e) {
-    error_log("Oregon Tires api/admin/repair-orders.php error: " . $e->getMessage());
-    jsonError('Server error', 500);
+    return $result;
 }

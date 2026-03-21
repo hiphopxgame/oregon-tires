@@ -8901,8 +8901,11 @@ function renderCalendarGrid(y, m, closures) {
   for (var d = 1; d <= daysInMonth; d++) {
     var dateStr = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
     var count = appointments.filter(function(a) { return a.preferred_date === dateStr; }).length;
-    var isSelected = calSelectedDate.toISOString().split('T')[0] === dateStr;
-    var isToday = new Date().toISOString().split('T')[0] === dateStr;
+    var now = new Date();
+    var todayLocal = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+    var selLocal = calSelectedDate.getFullYear() + '-' + String(calSelectedDate.getMonth()+1).padStart(2,'0') + '-' + String(calSelectedDate.getDate()).padStart(2,'0');
+    var isSelected = selLocal === dateStr;
+    var isToday = todayLocal === dateStr;
     var hasAppts = count > 0;
     var isClosed = !!closures[dateStr];
     var isSunday = new Date(y, m, d).getDay() === 0;
