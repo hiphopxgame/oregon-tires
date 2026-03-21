@@ -5103,6 +5103,36 @@ const adminT = {
     refCompleteOk: 'Referral marked complete.',
     refAwardOk: 'Points awarded successfully.',
     refFail: 'Action failed. Please try again.',
+    // Walk-In Queue
+    wqTotalInQueue: 'In Queue',
+    wqWaiting: 'Waiting',
+    wqBeingServed: 'Being Served',
+    wqEstWait: 'Est. Wait',
+    wqEmpty: 'No customers in queue',
+    wqAddFirst: 'Add a walk-in customer to get started',
+    wqNotify: 'Notify',
+    wqServe: 'Serve',
+    wqCheckIn: 'Check In',
+    wqComplete: 'Complete',
+    wqCancel: 'Cancel',
+    wqStatusUpdated: 'Queue updated',
+    wqAutoCheckedIn: 'Auto-checked in to Visit Tracker',
+    wqNetworkError: 'Network error',
+    wqRemoved: 'Removed from queue',
+    wqLoadFail: 'Failed to load queue',
+    wqAddTitle: 'Add to Queue',
+    wqFirstName: 'First Name',
+    wqLastName: 'Last Name',
+    wqSearchOrType: 'Search or type...',
+    wqPhone: 'Phone',
+    wqService: 'Service',
+    wqSelectService: 'Select a service...',
+    wqNotes: 'Notes',
+    wqNotesPlaceholder: 'Optional notes',
+    wqAddToQueue: 'Add to Queue',
+    wqNameRequired: 'Name is required',
+    wqAdding: 'Adding...',
+    wqAdded: 'Added to queue',
     // Calendar Retry
     calSyncRetried: 'Calendar sync retried successfully',
     calRetryFailed: 'Retry failed',
@@ -9532,7 +9562,7 @@ function renderEmployeeCard(emp, inactive) {
       + esc(lbl) + '</label>';
   }).join('');
 
-  return '<div class="border rounded-lg p-4 ' + (inactive ? 'bg-gray-50 dark:bg-gray-900' : isEmpAdmin ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : 'bg-white dark:bg-gray-800 dark:border-gray-600') + '" id="emp-card-' + emp.id + '">'
+  return '<div class="border rounded-lg p-4 ' + (inactive ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-800 dark:border-gray-600') + '" id="emp-card-' + emp.id + '">'
     + '<div id="emp-view-' + emp.id + '">'
     + '<div class="flex items-start gap-3">'
     // Avatar
@@ -9542,7 +9572,7 @@ function renderEmployeeCard(emp, inactive) {
     + '<div class="flex items-center gap-2 flex-wrap">'
     + '<span class="font-semibold text-base dark:text-gray-200">' + esc(emp.name) + '</span>'
     + '<span class="text-xs px-2 py-0.5 rounded-full ' + (emp.group_name === 'Manager' || emp.role === 'Manager' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300') + '">' + esc(empGroupName) + '</span>'
-    + (isEmpSuperAdmin ? '<span class="text-xs px-2 py-0.5 rounded-full bg-purple-600 text-white">Super Admin</span>' : isEmpAdmin ? '<span class="text-xs px-2 py-0.5 rounded-full bg-green-600 text-white">Admin Access</span>' : '<span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300">Staff Only</span>')
+    + (isEmpSuperAdmin ? '<span class="text-xs px-2 py-0.5 rounded-full bg-purple-600 text-white">Super Admin</span>' : '')
     + (currentUser && currentUser.email && emp.email && currentUser.email.toLowerCase() === emp.email.toLowerCase() ? '<span class="text-xs px-2 py-0.5 rounded-full bg-amber-500 text-white font-bold">' + (T.youBadge || 'YOU') + '</span>' : '')
     + (inactive ? '<span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400">Inactive</span>' : '')
     + '</div>'
