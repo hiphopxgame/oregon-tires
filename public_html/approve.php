@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Approve Estimate - Oregon Tires Auto Care</title>
     <meta name="robots" content="noindex, nofollow">
-    <link rel="icon" href="assets/favicon.ico" sizes="any">
-    <link rel="icon" href="assets/favicon.png" type="image/png" sizes="32x32">
-    <link rel="stylesheet" href="assets/styles.css">
+    <link rel="icon" href="/assets/favicon.ico" sizes="any">
+    <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
+    <link rel="stylesheet" href="/assets/styles.css">
     <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
     <style>
     @media print {
