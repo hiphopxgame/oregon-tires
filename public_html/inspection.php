@@ -266,9 +266,9 @@
 
 <!-- Photo Overlay -->
 <div id="photo-overlay" class="fixed inset-0 z-50 bg-black/80 hidden items-center justify-center p-4" onclick="closePhoto()">
-    <button onclick="closePhoto()" class="fixed top-4 right-4 z-50 text-white text-4xl leading-none font-light w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition focus:outline-none focus:ring-2 focus:ring-white" aria-label="Close photo overlay">&times;</button>
-    <button id="photo-prev" onclick="event.stopPropagation(); navigatePhoto(-1)" class="fixed left-3 top-1/2 -translate-y-1/2 z-50 text-white text-3xl w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition focus:outline-none focus:ring-2 focus:ring-white" aria-label="Previous photo">&#8249;</button>
-    <button id="photo-next" onclick="event.stopPropagation(); navigatePhoto(1)" class="fixed right-3 top-1/2 -translate-y-1/2 z-50 text-white text-3xl w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition focus:outline-none focus:ring-2 focus:ring-white" aria-label="Next photo">&#8250;</button>
+    <button onclick="closePhoto()" class="fixed top-4 right-4 z-50 text-white text-4xl leading-none font-light w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition focus:outline-none focus:ring-2 focus:ring-white" data-t-aria="closePhotoOverlay" aria-label="Close photo overlay">&times;</button>
+    <button id="photo-prev" onclick="event.stopPropagation(); navigatePhoto(-1)" class="fixed left-3 top-1/2 -translate-y-1/2 z-50 text-white text-3xl w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition focus:outline-none focus:ring-2 focus:ring-white" data-t-aria="previousPhoto" aria-label="Previous photo">&#8249;</button>
+    <button id="photo-next" onclick="event.stopPropagation(); navigatePhoto(1)" class="fixed right-3 top-1/2 -translate-y-1/2 z-50 text-white text-3xl w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 transition focus:outline-none focus:ring-2 focus:ring-white" data-t-aria="nextPhoto" aria-label="Next photo">&#8250;</button>
     <div class="max-w-3xl w-full" onclick="event.stopPropagation()">
         <img id="photo-overlay-img" src="" class="w-full rounded-xl" alt="Inspection photo" role="img">
         <p id="photo-overlay-caption" class="text-white text-center mt-3 text-sm"></p>
@@ -330,6 +330,9 @@ const t = {
         safetyItemsWarning: ' safety item(s) need attention',
         scheduleRepair: 'Schedule a Repair',
         photoOf: 'of',
+        closePhotoOverlay: 'Close photo overlay',
+        previousPhoto: 'Previous photo',
+        nextPhoto: 'Next photo',
     },
     es: {
         backToHome: 'Volver al Inicio',
@@ -358,6 +361,9 @@ const t = {
         safetyItemsWarning: ' elemento(s) de seguridad necesitan atención',
         scheduleRepair: 'Agendar una Reparación',
         photoOf: 'de',
+        closePhotoOverlay: 'Cerrar visor de fotos',
+        previousPhoto: 'Foto anterior',
+        nextPhoto: 'Siguiente foto',
     }
 };
 
@@ -550,6 +556,12 @@ function applyTranslations() {
         var key = el.getAttribute('data-t');
         if (t[currentLang] && t[currentLang][key]) {
             el.textContent = t[currentLang][key];
+        }
+    });
+    document.querySelectorAll('[data-t-aria]').forEach(function(el) {
+        var key = el.getAttribute('data-t-aria');
+        if (t[currentLang] && t[currentLang][key]) {
+            el.setAttribute('aria-label', t[currentLang][key]);
         }
     });
 }

@@ -143,21 +143,27 @@ self.addEventListener('push', (event) => {
     actions: [],
   };
 
-  // Add contextual actions based on notification type
+  // Add contextual actions based on notification type (bilingual)
   const type = payload.data?.type || '';
+  const lang = payload.data?.lang || (self.navigator?.language?.startsWith('es') ? 'es' : 'en');
+  const NT = {
+    en: { viewBooking: 'View Booking', viewEstimate: 'View Estimate', viewDetails: 'View Details', dismiss: 'Dismiss' },
+    es: { viewBooking: 'Ver Reserva', viewEstimate: 'Ver Presupuesto', viewDetails: 'Ver Detalles', dismiss: 'Descartar' }
+  }[lang] || { viewBooking: 'View Booking', viewEstimate: 'View Estimate', viewDetails: 'View Details', dismiss: 'Dismiss' };
+
   if (type === 'booking_confirmed' || type === 'appointment_reminder') {
     options.actions = [
-      { action: 'view', title: 'View Booking' },
-      { action: 'dismiss', title: 'Dismiss' },
+      { action: 'view', title: NT.viewBooking },
+      { action: 'dismiss', title: NT.dismiss },
     ];
   } else if (type === 'estimate_ready') {
     options.actions = [
-      { action: 'view', title: 'View Estimate' },
-      { action: 'dismiss', title: 'Dismiss' },
+      { action: 'view', title: NT.viewEstimate },
+      { action: 'dismiss', title: NT.dismiss },
     ];
   } else if (type === 'vehicle_ready') {
     options.actions = [
-      { action: 'view', title: 'View Details' },
+      { action: 'view', title: NT.viewDetails },
     ];
   }
 
@@ -252,8 +258,11 @@ async function replayOfflineBookings() {
 
           // Show confirmation notification
           const ref = json.data?.result?.reference_number || '';
-          await self.registration.showNotification('Booking Submitted!', {
-            body: ref ? 'Your offline booking is confirmed. Ref: ' + ref : 'Your offline booking has been submitted.',
+          const isEs = (self.navigator?.language || '').startsWith('es');
+          await self.registration.showNotification(isEs ? '¡Reserva Enviada!' : 'Booking Submitted!', {
+            body: ref
+              ? (isEs ? 'Tu reserva offline está confirmada. Ref: ' + ref : 'Your offline booking is confirmed. Ref: ' + ref)
+              : (isEs ? 'Tu reserva offline ha sido enviada.' : 'Your offline booking has been submitted.'),
             icon: '/assets/icon-192.png',
             badge: '/assets/favicon.png',
             tag: 'offline-sync-' + entry.sync_id,

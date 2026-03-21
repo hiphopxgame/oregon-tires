@@ -147,7 +147,7 @@
             </div>
 
             <!-- Priority Cost Summary -->
-            <div id="priority-summary" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6" role="region" aria-label="Cost breakdown by priority"></div>
+            <div id="priority-summary" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6" role="region" data-t-aria="costBreakdown" aria-label="Cost breakdown by priority"></div>
 
             <!-- Line Items -->
             <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden mb-6 shadow-sm">
@@ -297,6 +297,7 @@ var t = {
         declined: 'Declined',
         submitting: 'Submitting...',
         printEstimate: 'Print Estimate',
+        costBreakdown: 'Cost breakdown by priority',
         safetyCritical: 'Safety-Critical',
         recommended: 'Recommended',
         preventive: 'Preventive',
@@ -349,6 +350,7 @@ var t = {
         declined: 'Rechazado',
         submitting: 'Enviando...',
         printEstimate: 'Imprimir Presupuesto',
+        costBreakdown: 'Desglose de costos por prioridad',
         safetyCritical: 'Seguridad Critica',
         recommended: 'Recomendado',
         preventive: 'Preventivo',
@@ -442,6 +444,12 @@ function applyTranslations() {
         var key = el.getAttribute('data-t');
         if (t[currentLang] && t[currentLang][key]) {
             el.textContent = t[currentLang][key];
+        }
+    });
+    document.querySelectorAll('[data-t-aria]').forEach(function(el) {
+        var key = el.getAttribute('data-t-aria');
+        if (t[currentLang] && t[currentLang][key]) {
+            el.setAttribute('aria-label', t[currentLang][key]);
         }
     });
 }

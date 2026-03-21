@@ -152,7 +152,7 @@ $canonicalUrl = 'https://oregon.tires/reviews';
                 <div class="flex items-center gap-2 text-sm" data-star="5">
                   <span class="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">5</span>
                   <span class="text-yellow-400">&#9733;</span>
-                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 5 star reviews">
+                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 5 star reviews" data-t-aria="filterStarReviews5">
                     <div class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width:0%"></div>
                   </div>
                   <span class="w-8 text-right text-xs text-gray-500 dark:text-gray-400">0</span>
@@ -160,7 +160,7 @@ $canonicalUrl = 'https://oregon.tires/reviews';
                 <div class="flex items-center gap-2 text-sm" data-star="4">
                   <span class="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">4</span>
                   <span class="text-yellow-400">&#9733;</span>
-                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 4 star reviews">
+                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 4 star reviews" data-t-aria="filterStarReviews4">
                     <div class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width:0%"></div>
                   </div>
                   <span class="w-8 text-right text-xs text-gray-500 dark:text-gray-400">0</span>
@@ -168,7 +168,7 @@ $canonicalUrl = 'https://oregon.tires/reviews';
                 <div class="flex items-center gap-2 text-sm" data-star="3">
                   <span class="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">3</span>
                   <span class="text-yellow-400">&#9733;</span>
-                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 3 star reviews">
+                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 3 star reviews" data-t-aria="filterStarReviews3">
                     <div class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width:0%"></div>
                   </div>
                   <span class="w-8 text-right text-xs text-gray-500 dark:text-gray-400">0</span>
@@ -176,7 +176,7 @@ $canonicalUrl = 'https://oregon.tires/reviews';
                 <div class="flex items-center gap-2 text-sm" data-star="2">
                   <span class="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">2</span>
                   <span class="text-yellow-400">&#9733;</span>
-                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 2 star reviews">
+                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 2 star reviews" data-t-aria="filterStarReviews2">
                     <div class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width:0%"></div>
                   </div>
                   <span class="w-8 text-right text-xs text-gray-500 dark:text-gray-400">0</span>
@@ -184,7 +184,7 @@ $canonicalUrl = 'https://oregon.tires/reviews';
                 <div class="flex items-center gap-2 text-sm" data-star="1">
                   <span class="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">1</span>
                   <span class="text-yellow-400">&#9733;</span>
-                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 1 star reviews">
+                  <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden cursor-pointer hover:opacity-80 transition" role="button" tabindex="0" aria-label="Filter 1 star reviews" data-t-aria="filterStarReviews1">
                     <div class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width:0%"></div>
                   </div>
                   <span class="w-8 text-right text-xs text-gray-500 dark:text-gray-400">0</span>
@@ -333,7 +333,12 @@ $canonicalUrl = 'https://oregon.tires/reviews';
       googleBadge:        { en: 'Google', es: 'Google' },
       daysAgo:            { en: 'days ago', es: 'd\u00edas' },
       weeksAgo:           { en: 'weeks ago', es: 'semanas' },
-      monthsAgo:          { en: 'months ago', es: 'meses' }
+      monthsAgo:          { en: 'months ago', es: 'meses' },
+      filterStarReviews5: { en: 'Filter 5 star reviews', es: 'Filtrar rese\u00f1as de 5 estrellas' },
+      filterStarReviews4: { en: 'Filter 4 star reviews', es: 'Filtrar rese\u00f1as de 4 estrellas' },
+      filterStarReviews3: { en: 'Filter 3 star reviews', es: 'Filtrar rese\u00f1as de 3 estrellas' },
+      filterStarReviews2: { en: 'Filter 2 star reviews', es: 'Filtrar rese\u00f1as de 2 estrellas' },
+      filterStarReviews1: { en: 'Filter 1 star reviews', es: 'Filtrar rese\u00f1as de 1 estrella' }
     };
     var params = new URLSearchParams(window.location.search);
     var lang = params.get('lang');
@@ -348,6 +353,10 @@ $canonicalUrl = 'https://oregon.tires/reviews';
     document.querySelectorAll('[data-t]').forEach(function(el){
       var key = el.getAttribute('data-t');
       if (t[key] && t[key][lang]) el.textContent = t[key][lang];
+    });
+    document.querySelectorAll('[data-t-aria]').forEach(function(el){
+      var key = el.getAttribute('data-t-aria');
+      if (t[key] && t[key][lang]) el.setAttribute('aria-label', t[key][lang]);
     });
 
     // ─── Dynamic Reviews ──────────────────────────────────────

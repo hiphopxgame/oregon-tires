@@ -7491,6 +7491,7 @@ document.getElementById('forgot-form').addEventListener('submit', async function
 });
 
 async function signOut() {
+  if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; }
   try { await api('logout.php', { method: 'POST' }); } catch(e) {}
   window.location.href = '/members';
 }
@@ -9219,27 +9220,28 @@ function renderMessages() {
 // ===== EMAIL LOGS =====
 // Email log type → display label + color
 var LOG_TYPE_CONFIG = {
-  booking:                     { label: 'Booking Notify',      icon: '📅', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' },
-  booking_confirmation:        { label: 'Booking Confirm',     icon: '✅', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' },
-  appointment_confirmed:       { label: 'Appt Confirmed',      icon: '📋', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
-  appointment_assigned:        { label: 'Assigned (Customer)', icon: '👤', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300' },
-  appointment_assigned_employee:{ label: 'Assigned (Tech)',    icon: '🔧', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' },
-  contact_notification:        { label: 'Contact Form',        icon: '💬', color: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300' },
-  password_reset:              { label: 'Password Reset',      icon: '🔑', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' },
-  password_setup:              { label: 'Password Setup',      icon: '🔐', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' },
-  admin_setup:                 { label: 'Admin Setup',         icon: '🛡', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300' },
-  admin_setup_failed:          { label: 'Setup Failed',        icon: '⚠️', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' },
-  admin_invite:                { label: 'Admin Invite',        icon: '✉️', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300' },
-  welcome_credentials:         { label: 'Welcome Email',       icon: '👋', color: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300' },
-  subscriber_welcome:          { label: 'Subscriber Welcome',  icon: '📰', color: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300' },
-  platform_overview:           { label: 'Platform Overview',   icon: '📊', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' },
-  tire_quote_notify:           { label: 'Tire Quote Notify',   icon: '🛞', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
-  tire_quote_confirm:          { label: 'Tire Quote Confirm',  icon: '🛞', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
+  booking:                     { en: 'Booking Notify',      es: 'Notif. Reserva',       icon: '📅', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' },
+  booking_confirmation:        { en: 'Booking Confirm',     es: 'Confirm. Reserva',      icon: '✅', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' },
+  appointment_confirmed:       { en: 'Appt Confirmed',      es: 'Cita Confirmada',       icon: '📋', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
+  appointment_assigned:        { en: 'Assigned (Customer)', es: 'Asignado (Cliente)',     icon: '👤', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300' },
+  appointment_assigned_employee:{ en: 'Assigned (Tech)',    es: 'Asignado (T\u00E9cnico)',icon: '🔧', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' },
+  contact_notification:        { en: 'Contact Form',        es: 'Form. Contacto',        icon: '💬', color: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300' },
+  password_reset:              { en: 'Password Reset',      es: 'Restablecer Clave',     icon: '🔑', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' },
+  password_setup:              { en: 'Password Setup',      es: 'Config. Clave',         icon: '🔐', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' },
+  admin_setup:                 { en: 'Admin Setup',         es: 'Config. Admin',         icon: '🛡', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300' },
+  admin_setup_failed:          { en: 'Setup Failed',        es: 'Config. Fallida',       icon: '⚠️', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' },
+  admin_invite:                { en: 'Admin Invite',        es: 'Invitaci\u00F3n Admin', icon: '✉️', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300' },
+  welcome_credentials:         { en: 'Welcome Email',       es: 'Correo Bienvenida',     icon: '👋', color: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300' },
+  subscriber_welcome:          { en: 'Subscriber Welcome',  es: 'Bienvenida Suscriptor', icon: '📰', color: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300' },
+  platform_overview:           { en: 'Platform Overview',   es: 'Resumen Plataforma',    icon: '📊', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' },
+  tire_quote_notify:           { en: 'Tire Quote Notify',   es: 'Notif. Cotizaci\u00F3n',icon: '🛞', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
+  tire_quote_confirm:          { en: 'Tire Quote Confirm',  es: 'Confirm. Cotizaci\u00F3n',icon: '🛞', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
 };
 
 function formatLogType(type) {
   var cfg = LOG_TYPE_CONFIG[type];
-  return cfg ? cfg.label : type.replace(/_/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+  if (cfg) return cfg[currentLang] || cfg.en;
+  return type.replace(/_/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
 }
 
 function renderEmailLogs() {
@@ -9264,7 +9266,8 @@ function renderEmailLogs() {
   }
 
   emailLogs.forEach(function(log) {
-    var cfg = LOG_TYPE_CONFIG[log.log_type] || { label: log.log_type, icon: '📧', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' };
+    var cfgRaw = LOG_TYPE_CONFIG[log.log_type] || { en: log.log_type, es: log.log_type, icon: '📧', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' };
+    var cfg = { label: cfgRaw[currentLang] || cfgRaw.en, icon: cfgRaw.icon, color: cfgRaw.color };
 
     var tr = document.createElement('tr');
     tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
@@ -10869,7 +10872,8 @@ async function uploadGalleryImages() {
   const titleEs = document.getElementById('gallery-title-es').value;
   if (!files.length) { showToast(adminT[currentLang].selectAtLeastOneFile, true); return; }
   const btn = document.getElementById('gallery-upload-btn');
-  btn.textContent = 'Uploading...'; btn.disabled = true;
+  var GT = adminT[currentLang] || {};
+  btn.textContent = GT.uploading || 'Uploading...'; btn.disabled = true;
   const progressContainer = document.getElementById('gallery-upload-progress');
   progressContainer.classList.remove('hidden');
   progressContainer.innerHTML = '';
@@ -10882,16 +10886,16 @@ async function uploadGalleryImages() {
     const progEl = document.createElement('div');
     progEl.id = 'upload-progress-' + i;
     progEl.className = 'flex items-center gap-2 text-sm';
-    progEl.innerHTML = '<span class="flex-1 truncate">' + file.name + '</span><span class="file-progress text-gray-500">Compressing...</span>';
+    progEl.innerHTML = '<span class="flex-1 truncate">' + file.name + '</span><span class="file-progress text-gray-500">' + (GT.compressed || 'Compressing') + '...</span>';
     progressContainer.appendChild(progEl);
     try {
       // Compress image
       const compressed = await compressImage(file, 1920, 0.85);
       const statusEl = progEl.querySelector('.file-progress');
       if (compressed !== file) {
-        statusEl.textContent = 'Compressed: ' + formatFileSize(file.size) + ' → ' + formatFileSize(compressed.size);
+        statusEl.textContent = (GT.compressed || 'Compressed') + ': ' + formatFileSize(file.size) + ' \u2192 ' + formatFileSize(compressed.size);
       }
-      statusEl.textContent = 'Uploading...';
+      statusEl.textContent = GT.uploading || 'Uploading...';
       const fd = new FormData();
       fd.append('image', compressed);
       fd.append('title_en', fileTitleEn);
@@ -10899,12 +10903,12 @@ async function uploadGalleryImages() {
       fd.append('description_en', document.getElementById('gallery-desc-en').value);
       fd.append('description_es', document.getElementById('gallery-desc-es').value);
       const json = await api('gallery.php', { method: 'POST', body: fd, headers: { 'X-CSRF-Token': csrfToken } });
-      statusEl.textContent = 'Done';
+      statusEl.textContent = GT.uploadDone || 'Done';
       statusEl.className = 'file-progress text-green-600 font-medium';
       successCount++;
     } catch (e) {
       const statusEl = progEl.querySelector('.file-progress');
-      statusEl.textContent = 'Failed: ' + e.message;
+      statusEl.textContent = (GT.uploadFailedPrefix || 'Failed') + ': ' + e.message;
       statusEl.className = 'file-progress text-red-600';
     }
   }
