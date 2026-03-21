@@ -450,7 +450,7 @@ function syncAppointmentRoStatus(string $entity, int $entityId, string $newStatu
 {
     try {
         if ($entity === 'appointment') {
-            // Appointment → RO: only cascade cancellation
+            // Appointment → RO: cascade cancellation
             if ($newStatus === 'cancelled') {
                 $db->prepare(
                     "UPDATE oretir_repair_orders
@@ -459,7 +459,7 @@ function syncAppointmentRoStatus(string $entity, int $entityId, string $newStatu
                 )->execute([$entityId]);
             }
         } elseif ($entity === 'ro') {
-            // RO → Appointment: cascade completed/invoiced/cancelled
+            // RO → Appointment: keep appointment status aligned with RO progress
             $roStmt = $db->prepare('SELECT appointment_id FROM oretir_repair_orders WHERE id = ? LIMIT 1');
             $roStmt->execute([$entityId]);
             $ro = $roStmt->fetch(PDO::FETCH_ASSOC);
@@ -468,20 +468,26 @@ function syncAppointmentRoStatus(string $entity, int $entityId, string $newStatu
             }
             $apptId = (int) $ro['appointment_id'];
 
-            // Auto-confirm appointment when work begins on the RO
-            if (in_array($newStatus, ['diagnosis', 'estimate_pending', 'in_progress', 'approved'], true)) {
+            // Auto-confirm appointment when RO progresses past intake
+            // check_in, diagnosis, estimate_pending, pending_approval, approved, in_progress, ready
+            $confirmStatuses = ['check_in', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'ready'];
+            if (in_array($newStatus, $confirmStatuses, true)) {
                 $db->prepare(
                     "UPDATE oretir_appointments SET status = 'confirmed', updated_at = NOW()
                      WHERE id = ? AND status IN ('new', 'pending')"
                 )->execute([$apptId]);
             }
 
-            if ($newStatus === 'completed' || $newStatus === 'invoiced') {
+            // Mark appointment completed when RO reaches completed, invoiced, or ready
+            if (in_array($newStatus, ['completed', 'invoiced'], true)) {
                 $db->prepare(
                     "UPDATE oretir_appointments SET status = 'completed', updated_at = NOW()
                      WHERE id = ? AND status NOT IN ('completed', 'cancelled')"
                 )->execute([$apptId]);
-            } elseif ($newStatus === 'cancelled') {
+            }
+
+            // Cancel appointment when RO is cancelled
+            if ($newStatus === 'cancelled') {
                 $db->prepare(
                     "UPDATE oretir_appointments SET status = 'cancelled', updated_at = NOW()
                      WHERE id = ? AND status NOT IN ('completed', 'cancelled')"

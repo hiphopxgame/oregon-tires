@@ -1062,17 +1062,18 @@ document.body.addEventListener('htmx:configRequest', function(e) {
 
   // Multi-service: collect checked services into clean array + set service for compat
   var checkedServices = Array.from(form.querySelectorAll('input[name="services[]"]:checked')).map(function(cb) { return cb.value; });
-  if (e.detail.parameters && typeof e.detail.parameters === 'object' && !(e.detail.parameters instanceof FormData)) {
+  if (e.detail.parameters instanceof FormData) {
+    // FormData mode: remove all services[] entries, re-add as JSON array
+    e.detail.parameters.delete('services[]');
+    e.detail.parameters.set('services', JSON.stringify(checkedServices));
+    e.detail.parameters.set('service', checkedServices[0] || '');
+    var smsVal = e.detail.parameters.get('sms_opt_in');
+    e.detail.parameters.set('sms_opt_in', smsVal === 'on' ? '1' : '0');
+  } else if (e.detail.parameters && typeof e.detail.parameters === 'object') {
     // json-enc mode: set services array and service string
     delete e.detail.parameters['services[]'];
     e.detail.parameters.services = checkedServices;
     e.detail.parameters.service = checkedServices[0] || '';
-  }
-
-  // Convert sms_opt_in from checkbox 'on' to API-compatible 1/0
-  if (e.detail.parameters instanceof FormData) {
-    var smsVal = e.detail.parameters.get('sms_opt_in');
-    e.detail.parameters.set('sms_opt_in', smsVal === 'on' ? '1' : '0');
   }
 });
 

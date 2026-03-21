@@ -216,6 +216,10 @@ function parseServices(array $data): array
 
     if (!empty($data['services']) && is_array($data['services'])) {
         $raw = $data['services'];
+    } elseif (!empty($data['services']) && is_string($data['services'])) {
+        // Handle JSON-encoded array string (from FormData submissions)
+        $decoded = json_decode($data['services'], true);
+        $raw = is_array($decoded) ? $decoded : [$data['services']];
     } elseif (!empty($data['service']) && is_string($data['service'])) {
         $raw = [$data['service']];
     }
