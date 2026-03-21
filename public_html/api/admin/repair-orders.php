@@ -502,11 +502,21 @@ try {
         }
 
         // ─── Update bay assignment on visit_log if provided ──────────────
-        if (!empty($data['bay_number']) && !empty($ro['visit_log_id'])) {
+        if (!empty($data['bay_number'])) {
             try {
                 $bayNum = max(1, min(20, (int) $data['bay_number']));
-                $db->prepare('UPDATE oretir_visit_log SET bay_number = ?, updated_at = NOW() WHERE id = ?')
-                   ->execute([$bayNum, $ro['visit_log_id']]);
+                if (!empty($ro['visit_log_id'])) {
+                    $db->prepare('UPDATE oretir_visit_log SET bay_number = ?, updated_at = NOW() WHERE id = ?')
+                       ->execute([$bayNum, $ro['visit_log_id']]);
+                } else {
+                    // No visit_log yet — create one (RO may have skipped check_in)
+                    $db->prepare(
+                        'INSERT INTO oretir_visit_log (repair_order_id, appointment_id, customer_id, check_in_at, bay_number, assigned_employee_id, created_at, updated_at)
+                         VALUES (?, ?, ?, NOW(), ?, ?, NOW(), NOW())'
+                    )->execute([$id, $ro['appointment_id'] ?: null, $ro['customer_id'], $bayNum, $ro['assigned_employee_id'] ?? null]);
+                    $vlId = (int) $db->lastInsertId();
+                    $db->prepare('UPDATE oretir_repair_orders SET visit_log_id = ? WHERE id = ?')->execute([$vlId, $id]);
+                }
             } catch (\Throwable $e) {
                 error_log("repair-orders.php: bay update failed for RO #{$id}: " . $e->getMessage());
             }
