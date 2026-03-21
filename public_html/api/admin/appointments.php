@@ -524,7 +524,7 @@ try {
             $vehicleYear ?: null, $vehicleMake ?: null, $vehicleModel ?: null,
             $firstName, $lastName, $phone, $email, $notes ?: null,
             $tirePreference ?: null, $tireCount,
-            'confirmed', $language, $employeeId, $adminNotes, $taskSummary
+            $employeeId ? 'confirmed' : 'new', $language, $employeeId, $adminNotes, $taskSummary
         ]);
         $appointmentId = (int) $db->lastInsertId();
 
