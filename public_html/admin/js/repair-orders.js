@@ -725,16 +725,27 @@ function renderRoDetailModal() {
     body.appendChild(doneBar);
   }
 
-  // ── Customer concern (prominent, right after guided bar) ──
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CONTEXT-AWARE SECTIONS — ordered by relevance to the current step
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Pre-build all sections into named containers so we can order them by status
+  var _sections = {};
+
+  // ── Customer concern ──
   if (ro.customer_concern) {
     var concernDiv = document.createElement('div');
-    concernDiv.className = 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3 flex items-start gap-2';
-    concernDiv.appendChild(function() { var i = document.createElement('span'); i.className = 'text-lg shrink-0'; i.textContent = '\u26A0\uFE0F'; return i; }());
+    // Highlight concern prominently during intake/check_in when it's the primary info
+    var isEarlyStage = ['intake', 'check_in', 'diagnosis'].indexOf(status) !== -1;
+    concernDiv.className = isEarlyStage
+      ? 'bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-300 dark:border-amber-700 rounded-xl p-4 flex items-start gap-3'
+      : 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3 flex items-start gap-2';
+    concernDiv.appendChild(function() { var i = document.createElement('span'); i.className = isEarlyStage ? 'text-2xl shrink-0' : 'text-lg shrink-0'; i.textContent = '\u26A0\uFE0F'; return i; }());
     var concernContent = document.createElement('div');
     concernContent.appendChild(function() { var h = document.createElement('h4'); h.className = 'text-xs font-bold text-amber-800 dark:text-amber-300 uppercase'; h.textContent = t('roCustomerConcern', 'Customer Concern'); return h; }());
-    concernContent.appendChild(function() { var p = document.createElement('p'); p.className = 'text-sm text-gray-700 dark:text-gray-300 mt-0.5'; p.textContent = ro.customer_concern; return p; }());
+    concernContent.appendChild(function() { var p = document.createElement('p'); p.className = (isEarlyStage ? 'text-base' : 'text-sm') + ' text-gray-700 dark:text-gray-300 mt-0.5'; p.textContent = ro.customer_concern; return p; }());
     concernDiv.appendChild(concernContent);
-    body.appendChild(concernDiv);
+    _sections.concern = concernDiv;
   }
 
   // ── Collapsible Details (vehicle specs, dates, VIN — not the primary focus) ──
@@ -792,7 +803,9 @@ function renderRoDetailModal() {
   detailsGrid.appendChild(advRow);
 
   detailsToggle.appendChild(detailsGrid);
-  body.appendChild(detailsToggle);
+  // Auto-open details during intake (user needs to verify vehicle info)
+  if (status === 'intake') detailsToggle.open = true;
+  _sections.details = detailsToggle;
 
   // ── Notes (collapsible) ──
   var hasNotes = (ro.technician_notes && ro.technician_notes.trim()) || (ro.admin_notes && ro.admin_notes.trim());
@@ -837,7 +850,7 @@ function renderRoDetailModal() {
   noteForm.appendChild(noteActions);
   notesBody.appendChild(noteForm);
   notesDetails.appendChild(notesBody);
-  body.appendChild(notesDetails);
+  _sections.notes = notesDetails;
 
   // Inspections
   if (ro.inspections && ro.inspections.length > 0) {
@@ -930,7 +943,19 @@ function renderRoDetailModal() {
       iCard.appendChild(iActions);
       inspSection.appendChild(iCard);
     });
-    body.appendChild(inspSection);
+    // Highlight inspection section during check_in/diagnosis when it's the focus
+    if (status === 'check_in' || status === 'diagnosis') {
+      inspSection.className = 'ring-2 ring-purple-300 dark:ring-purple-700 rounded-xl p-1';
+    }
+    _sections.inspections = inspSection;
+  } else {
+    // No inspections — show prompt during check_in
+    if (status === 'check_in') {
+      var noInspDiv = document.createElement('div');
+      noInspDiv.className = 'border-2 border-dashed border-purple-300 dark:border-purple-700 rounded-xl p-4 text-center';
+      noInspDiv.appendChild(function() { var p = document.createElement('p'); p.className = 'text-sm text-purple-600 dark:text-purple-400 font-medium'; p.textContent = t('roNoInspYet', 'No inspection yet \u2014 the "Start Diagnosis" button above will create one and begin the inspection process.'); return p; }());
+      _sections.inspections = noInspDiv;
+    }
   }
 
   // Estimates
@@ -1029,7 +1054,11 @@ function renderRoDetailModal() {
     noEst.textContent = t('roNoEstimates', 'No estimates yet. Click "New Estimate" above to create one.');
     estSection.appendChild(noEst);
   }
-  body.appendChild(estSection);
+  // Highlight estimate section when it's the focus
+  if (['diagnosis', 'estimate_pending', 'pending_approval'].indexOf(status) !== -1) {
+    estSection.className = 'ring-2 ring-blue-300 dark:ring-blue-700 rounded-xl p-1';
+  }
+  _sections.estimates = estSection;
 
   // Invoices
   if (ro.invoices && ro.invoices.length > 0) {
@@ -1100,7 +1129,11 @@ function renderRoDetailModal() {
       iCard.appendChild(iActions);
       invSection.appendChild(iCard);
     });
-    body.appendChild(invSection);
+    // Highlight invoices during completed/invoiced
+    if (status === 'completed' || status === 'invoiced') {
+      invSection.className = 'ring-2 ring-teal-300 dark:ring-teal-700 rounded-xl p-1';
+    }
+    _sections.invoices = invSection;
   }
 
   // ─── Labor Tracking Section ─────────────────────────────────────────────────
@@ -1122,7 +1155,11 @@ function renderRoDetailModal() {
   var laborContainer = document.createElement('div');
   laborContainer.id = 'ro-labor-section';
   laborSection.appendChild(laborContainer);
-  body.appendChild(laborSection);
+  // Highlight labor during active work phases
+  if (['in_progress', 'on_hold', 'waiting_parts'].indexOf(status) !== -1) {
+    laborSection.className = 'bg-green-50 dark:bg-green-900/20 rounded-xl p-4 ring-2 ring-green-300 dark:ring-green-700';
+  }
+  _sections.labor = laborSection;
 
   // Initialize LaborTracker for this RO
   if (typeof LaborTracker !== 'undefined') {
@@ -1142,8 +1179,60 @@ function renderRoDetailModal() {
     apptInfo.className = 'text-sm text-gray-600 dark:text-gray-300';
     apptInfo.textContent = ro.appointment.reference_number + ' — ' + ro.appointment.service + ' — ' + ro.appointment.preferred_date;
     apptDiv.appendChild(apptInfo);
-    body.appendChild(apptDiv);
+    _sections.appointment = apptDiv;
   }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PRIORITY-BASED SECTION ORDERING — show what matters NOW at the top
+  // ═══════════════════════════════════════════════════════════════════════════
+  var sectionOrder;
+  switch (status) {
+    case 'intake':
+      // Verify vehicle info, see concern, check appointment
+      sectionOrder = ['concern', 'details', 'appointment', 'notes', 'inspections', 'estimates', 'labor', 'invoices'];
+      break;
+    case 'check_in':
+      // Concern is key context, inspections are the next action
+      sectionOrder = ['concern', 'inspections', 'details', 'notes', 'labor', 'estimates', 'appointment', 'invoices'];
+      break;
+    case 'diagnosis':
+      // Inspections to review, then build estimate
+      sectionOrder = ['concern', 'inspections', 'estimates', 'notes', 'labor', 'details', 'appointment', 'invoices'];
+      break;
+    case 'estimate_pending':
+    case 'pending_approval':
+      // Estimate is the focus — review and send/await
+      sectionOrder = ['estimates', 'concern', 'inspections', 'notes', 'labor', 'details', 'appointment', 'invoices'];
+      break;
+    case 'approved':
+      // About to start work — labor section is next, show estimate for reference
+      sectionOrder = ['estimates', 'labor', 'concern', 'notes', 'inspections', 'details', 'appointment', 'invoices'];
+      break;
+    case 'in_progress':
+    case 'on_hold':
+    case 'waiting_parts':
+      // Active work — labor is primary, notes for tech communication
+      sectionOrder = ['labor', 'notes', 'concern', 'estimates', 'inspections', 'details', 'appointment', 'invoices'];
+      break;
+    case 'ready':
+      // Waiting for pickup — show labor summary, estimate for final review
+      sectionOrder = ['labor', 'estimates', 'notes', 'concern', 'inspections', 'invoices', 'details', 'appointment'];
+      break;
+    case 'completed':
+      // Manager review — invoices will be created, show estimates + labor for verification
+      sectionOrder = ['estimates', 'labor', 'invoices', 'notes', 'concern', 'inspections', 'details', 'appointment'];
+      break;
+    case 'invoiced':
+      // Done — invoices are primary, everything else is reference
+      sectionOrder = ['invoices', 'labor', 'estimates', 'notes', 'inspections', 'concern', 'details', 'appointment'];
+      break;
+    default:
+      sectionOrder = ['concern', 'details', 'inspections', 'estimates', 'notes', 'labor', 'invoices', 'appointment'];
+  }
+
+  sectionOrder.forEach(function(key) {
+    if (_sections[key]) body.appendChild(_sections[key]);
+  });
 
   card.appendChild(body);
   modal.appendChild(card);
