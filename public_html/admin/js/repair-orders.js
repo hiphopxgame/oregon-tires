@@ -500,6 +500,50 @@ function renderRoDetailModal() {
   }
   headerLeft.appendChild(techRow);
 
+  // Bay assignment row — show for active ROs (not completed/invoiced/cancelled)
+  var activeStatuses = ['intake','check_in','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready'];
+  if (activeStatuses.indexOf(ro.status) !== -1) {
+    var bayRow = document.createElement('div');
+    bayRow.className = 'flex items-center gap-2 mt-1';
+    var currentBay = ro.visit && ro.visit.bay_number ? ro.visit.bay_number : null;
+
+    if (currentBay) {
+      var bayBadge = document.createElement('span');
+      bayBadge.className = 'inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-200 font-medium';
+      bayBadge.textContent = '\uD83C\uDFE0 ' + t('visitBayLabel', 'Bay') + ' ' + currentBay;
+      bayRow.appendChild(bayBadge);
+
+      var bayChangeBtn = document.createElement('button');
+      bayChangeBtn.className = 'text-[10px] px-1.5 py-0.5 rounded border border-white/30 text-white/70 hover:text-white hover:bg-white/10 transition';
+      bayChangeBtn.textContent = t('techPickerChange', 'Change');
+      bayChangeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        showBayPickerDialog(ro, function(bayNum) {
+          if (bayNum === null) return;
+          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: ro.status, bay_number: bayNum } })
+            .then(function() { showToast(t('visitBayLabel', 'Bay') + ' ' + bayNum + ' ' + t('roStatusUpdatedTo', 'assigned')); viewRoDetail(ro.id); })
+            .catch(function(err) { showToast(err.message, true); });
+        });
+      });
+      bayRow.appendChild(bayChangeBtn);
+    } else {
+      var bayAssignBtn = document.createElement('button');
+      bayAssignBtn.className = 'inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-200 hover:bg-blue-500/30 transition font-medium cursor-pointer';
+      bayAssignBtn.textContent = '\uD83C\uDFE0 ' + t('bayPickerTitle', 'Assign Bay');
+      bayAssignBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        showBayPickerDialog(ro, function(bayNum) {
+          if (bayNum === null) return;
+          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: ro.status, bay_number: bayNum } })
+            .then(function() { showToast(t('visitBayLabel', 'Bay') + ' ' + bayNum + ' ' + t('roStatusUpdatedTo', 'assigned')); viewRoDetail(ro.id); })
+            .catch(function(err) { showToast(err.message, true); });
+        });
+      });
+      bayRow.appendChild(bayAssignBtn);
+    }
+    headerLeft.appendChild(bayRow);
+  }
+
   headerTop.appendChild(headerLeft);
 
   var headerBtns = document.createElement('div');

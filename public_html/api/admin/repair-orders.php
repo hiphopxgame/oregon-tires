@@ -501,6 +501,17 @@ try {
             }
         }
 
+        // ─── Update bay assignment on visit_log if provided ──────────────
+        if (!empty($data['bay_number']) && !empty($ro['visit_log_id'])) {
+            try {
+                $bayNum = max(1, min(20, (int) $data['bay_number']));
+                $db->prepare('UPDATE oretir_visit_log SET bay_number = ?, updated_at = NOW() WHERE id = ?')
+                   ->execute([$bayNum, $ro['visit_log_id']]);
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: bay update failed for RO #{$id}: " . $e->getMessage());
+            }
+        }
+
         // ─── Handle status transition side effects ────────────────────────
         $transitionResult = [];
         if (isset($data['status'])) {
