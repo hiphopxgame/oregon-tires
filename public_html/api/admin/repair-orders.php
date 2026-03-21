@@ -505,6 +505,8 @@ try {
 // ─── handleStatusTransition — centralized side effects for every status change ──
 function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus, array $staff, array $body): array
 {
+    require_once __DIR__ . '/../../includes/sms.php';
+
     $result = ['auto_clock_out' => 0];
     $oldStatus = $ro['status'];
 
