@@ -59,8 +59,8 @@ try {
                 $serviceId,
                 sanitize($questionEn, 500),
                 sanitize(trim((string) ($body['question_es'] ?? '')), 500),
-                $body['answer_en'] ?? '',
-                $body['answer_es'] ?? '',
+                sanitize(trim((string) ($body['answer_en'] ?? '')), 2000),
+                sanitize(trim((string) ($body['answer_es'] ?? '')), 2000),
                 (int) ($body['sort_order'] ?? 0),
             ]);
             jsonSuccess(['id' => (int) $db->lastInsertId()]);
@@ -78,8 +78,8 @@ try {
             $stmt->execute([
                 sanitize(trim((string) ($body['question_en'] ?? '')), 500),
                 sanitize(trim((string) ($body['question_es'] ?? '')), 500),
-                $body['answer_en'] ?? '',
-                $body['answer_es'] ?? '',
+                sanitize(trim((string) ($body['answer_en'] ?? '')), 2000),
+                sanitize(trim((string) ($body['answer_es'] ?? '')), 2000),
                 (int) ($body['sort_order'] ?? 0),
                 $id,
             ]);

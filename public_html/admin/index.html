@@ -819,7 +819,7 @@
                 <th class="p-3 w-16"></th>
               </tr></thead>
               <tbody id="emaillog-table-body">
-                <tr><td colspan="5" class="text-center py-8 text-gray-400">Loading...</td></tr>
+                <tr><td colspan="5" class="text-center py-8 text-gray-400" data-t="loading">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -876,6 +876,7 @@
           <select id="ro-status-filter" onchange="loadRepairOrders()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
             <option value="" data-t="roStatusAll">All Statuses</option>
             <option value="intake" data-t="roStatusIntake">Intake</option>
+            <option value="check_in" data-t="roStatusCheckIn">Check In</option>
             <option value="diagnosis" data-t="roStatusDiagnosis">Diagnosis</option>
             <option value="estimate_pending" data-t="roStatusEstimatePending">Estimate Pending</option>
             <option value="pending_approval" data-t="roStatusPendingApproval">Pending Approval</option>
@@ -1334,7 +1335,7 @@
               </tr>
             </thead>
             <tbody id="promotions-table-body">
-              <tr><td colspan="8" class="text-center py-8 text-gray-400">Loading...</td></tr>
+              <tr><td colspan="8" class="text-center py-8 text-gray-400" data-t="loading">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -3537,7 +3538,7 @@
         <button onclick="loadMySchedule()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800" id="myschedule-content">
-        <p class="text-gray-400">Loading...</p>
+        <p class="text-gray-400 dark:text-gray-500" data-t="loading">Loading...</p>
       </div>
     </div>
 
@@ -3548,7 +3549,7 @@
         <p class="text-green-100" data-t="myWorkSubtitle">Repair orders and appointments assigned to you</p>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800" id="mywork-content">
-        <p class="text-gray-400">Loading...</p>
+        <p class="text-gray-400 dark:text-gray-500" data-t="loading">Loading...</p>
       </div>
     </div>
 
@@ -4709,6 +4710,7 @@ const adminT = {
     // RO Status labels
     roStatusAll: 'All Statuses',
     roStatusIntake: 'Intake',
+    roStatusCheckIn: 'Check In',
     roStatusDiagnosis: 'Diagnosis',
     roStatusEstimatePending: 'Estimate Pending',
     roStatusPendingApproval: 'Pending Approval',
@@ -4958,6 +4960,7 @@ const adminT = {
     kanbanLoading: 'Loading kanban board...',
     kanbanFailedLoad: 'Failed to load kanban',
     // RO timeline labels
+    roTimelineCheckIn: 'Check In',
     roTimelineDiag: 'Diag',
     roTimelineEst: 'Est.',
     roTimelineApproval: 'Approval',
@@ -4965,6 +4968,20 @@ const adminT = {
     roTimelineOnHold: 'On Hold',
     roTimelineParts: 'Parts',
     roTimelineDone: 'Done',
+    // RO timer labels
+    roTimerVisit: 'VISIT',
+    roTimerRepair: 'REPAIR',
+    // Job board labels
+    laborJobBoard: 'Job Board',
+    laborReports: 'Reports',
+    laborJbActiveRos: 'Active ROs',
+    laborJbTechsWorking: 'Techs Working',
+    laborJbHoursToday: 'Hours Today',
+    laborJbAllActive: 'All Active',
+    laborJbWaiting: 'Waiting',
+    laborJbNoRos: 'No active repair orders',
+    laborJbCompletedToday: 'Completed Today',
+    laborAssigned: 'Assigned',
     // Schedules
     schedWorkSchedules: 'Work Schedules',
     schedWeekly: 'Weekly',
@@ -5434,6 +5451,8 @@ const adminT = {
     msgReopen: 'Reopen',
     msgRefresh: '\u21BB Refresh',
     msgSend: 'Send',
+    msgReplySent: 'Reply sent',
+    msgReplyFailed: 'Failed to send reply',
     // Customers
     custVehicle: 'Vehicle',
     custVehicles: 'Vehicles',
@@ -6202,6 +6221,7 @@ const adminT = {
     // RO Status labels
     roStatusAll: 'Todos los Estados',
     roStatusIntake: 'Recepci\u00F3n',
+    roStatusCheckIn: 'Registro',
     roStatusDiagnosis: 'Diagn\u00F3stico',
     roStatusEstimatePending: 'Presupuesto Pendiente',
     roStatusPendingApproval: 'Pendiente de Aprobaci\u00F3n',
@@ -6451,6 +6471,7 @@ const adminT = {
     kanbanLoading: 'Cargando tablero kanban...',
     kanbanFailedLoad: 'Error al cargar kanban',
     // RO timeline labels
+    roTimelineCheckIn: 'Registro',
     roTimelineDiag: 'Diag',
     roTimelineEst: 'Est.',
     roTimelineApproval: 'Aprob.',
@@ -6458,6 +6479,20 @@ const adminT = {
     roTimelineOnHold: 'En Espera',
     roTimelineParts: 'Partes',
     roTimelineDone: 'Hecho',
+    // RO timer labels
+    roTimerVisit: 'VISITA',
+    roTimerRepair: 'REPARACI\u00D3N',
+    // Job board labels
+    laborJobBoard: 'Tablero de Trabajo',
+    laborReports: 'Reportes',
+    laborJbActiveRos: 'OTs Activas',
+    laborJbTechsWorking: 'T\u00E9cnicos Trabajando',
+    laborJbHoursToday: 'Horas Hoy',
+    laborJbAllActive: 'Todas Activas',
+    laborJbWaiting: 'En Espera',
+    laborJbNoRos: 'Sin \u00F3rdenes de trabajo activas',
+    laborJbCompletedToday: 'Completadas Hoy',
+    laborAssigned: 'Asignado',
     // Schedules
     schedWorkSchedules: 'Horarios de Trabajo',
     schedWeekly: 'Semanal',
@@ -6927,6 +6962,8 @@ const adminT = {
     msgReopen: 'Reabrir',
     msgRefresh: '\u21BB Actualizar',
     msgSend: 'Enviar',
+    msgReplySent: 'Respuesta enviada',
+    msgReplyFailed: 'Error al enviar respuesta',
     // Customers
     custVehicle: 'Veh\u00EDculo',
     custVehicles: 'Veh\u00EDculos',
@@ -9856,7 +9893,7 @@ async function openConversation(id) {
     });
 
     // Mark as read and refresh badge immediately
-    api('conversations.php?id=' + id, { method: 'POST', body: JSON.stringify({ action: 'mark_read' }) })
+    api('conversations.php?id=' + id, { method: 'POST', body: { action: 'mark_read' } })
       .then(function() { refreshConvUnreadBadge(); })
       .catch(function() {});
   } catch(e) { console.error('openConversation failed:', e); }
@@ -9875,11 +9912,11 @@ async function sendAdminReply() {
   var body = input.value.trim();
   if (!body) return;
   try {
-    await api('conversations.php?id=' + currentConvId, { method: 'POST', body: JSON.stringify({ body: body }) });
+    await api('conversations.php?id=' + currentConvId, { method: 'POST', body: { body: body } });
     input.value = '';
-    showToast('Reply sent');
+    showToast(adminT[currentLang].msgReplySent || 'Reply sent');
     openConversation(currentConvId);
-  } catch(e) { showToast('Failed to send reply', true); }
+  } catch(e) { showToast(adminT[currentLang].msgReplyFailed || 'Failed to send reply', true); }
 }
 
 async function updateConvStatus() {
@@ -9888,11 +9925,11 @@ async function updateConvStatus() {
   var status = select.value;
   if (!status) return;
   try {
-    await api('conversations.php?id=' + currentConvId, { method: 'PUT', body: JSON.stringify({ status: status }) });
-    showToast('Status updated');
+    await api('conversations.php?id=' + currentConvId, { method: 'PUT', body: { status: status } });
+    showToast(adminT[currentLang].statusUpdated || 'Status updated');
     select.value = '';
     openConversation(currentConvId);
-  } catch(e) { showToast('Failed to update status', true); }
+  } catch(e) { showToast(adminT[currentLang].error || 'Failed to update status', true); }
 }
 
 async function checkEmail() {
@@ -14050,7 +14087,7 @@ function fillCustomerData(c) {
   if (!form) return;
   var set = function(name, val) {
     var el = form.querySelector('[name="' + name + '"]');
-    if (el && val) el.value = val;
+    if (el) el.value = val || '';
   };
   set('appt-first-name', c.first_name);
   set('appt-last-name', c.last_name);
@@ -14416,7 +14453,7 @@ function clearNotifications() {
   notifItems = [];
   renderNotifications();
   // Mark all conversations read in DB and refresh the Messages tab badge
-  api('conversations.php', { method: 'POST', body: JSON.stringify({ action: 'mark_read_all' }) })
+  api('conversations.php', { method: 'POST', body: { action: 'mark_read_all' } })
     .then(function() { refreshConvUnreadBadge(); })
     .catch(function(e) { console.error('mark_read_all failed:', e); });
 }

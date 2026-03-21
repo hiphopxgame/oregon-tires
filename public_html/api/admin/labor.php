@@ -24,10 +24,112 @@ try {
     $method = $_SERVER['REQUEST_METHOD'];
 
     // Active RO statuses (not completed/cancelled/invoiced)
-    $activeStatuses = ['intake', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'on_hold', 'waiting_parts', 'ready'];
+    $activeStatuses = ['intake', 'check_in', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'on_hold', 'waiting_parts', 'ready'];
 
     // ─── GET: List labor entries ────────────────────────────────────────────
     if ($method === 'GET') {
+
+        // Job board: all active ROs with timer data + labor entries
+        if (!empty($_GET['job_board'])) {
+            $jobStatuses = ['check_in', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'on_hold', 'waiting_parts', 'ready'];
+            $placeholders = implode(',', array_fill(0, count($jobStatuses), '?'));
+
+            $roStmt = $db->prepare(
+                "SELECT r.id, r.ro_number, r.status, r.customer_id, r.vehicle_id,
+                        r.assigned_employee_id, r.checked_in_at, r.service_started_at,
+                        r.service_ended_at, r.checked_out_at, r.appointment_id,
+                        r.customer_concern, r.created_at, r.updated_at,
+                        c.first_name, c.last_name, c.email AS customer_email, c.phone AS customer_phone,
+                        v.year AS vehicle_year, v.make AS vehicle_make, v.model AS vehicle_model,
+                        v.license_plate, v.vin,
+                        e.name AS assigned_employee_name,
+                        (SELECT COUNT(*) FROM oretir_inspections WHERE repair_order_id = r.id) AS inspection_count,
+                        (SELECT COUNT(*) FROM oretir_estimates WHERE repair_order_id = r.id) AS estimate_count
+                 FROM oretir_repair_orders r
+                 JOIN oretir_customers c ON c.id = r.customer_id
+                 LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
+                 LEFT JOIN oretir_employees e ON e.id = r.assigned_employee_id
+                 WHERE r.status IN ($placeholders)
+                 ORDER BY r.updated_at DESC"
+            );
+            $roStmt->execute($jobStatuses);
+            $ros = $roStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Fetch all active labor entries for these ROs
+            $roIds = array_column($ros, 'id');
+            $laborByRo = [];
+            if (!empty($roIds)) {
+                $lPlaceholders = implode(',', array_fill(0, count($roIds), '?'));
+                $laborStmt = $db->prepare(
+                    "SELECT l.id, l.repair_order_id, l.employee_id, l.clock_in_at,
+                            l.task_description, l.is_billable,
+                            e.name AS employee_name
+                     FROM oretir_labor_entries l
+                     JOIN oretir_employees e ON e.id = l.employee_id
+                     WHERE l.repair_order_id IN ($lPlaceholders) AND l.clock_out_at IS NULL
+                     ORDER BY l.clock_in_at ASC"
+                );
+                $laborStmt->execute($roIds);
+                foreach ($laborStmt->fetchAll(PDO::FETCH_ASSOC) as $entry) {
+                    $laborByRo[(int)$entry['repair_order_id']][] = $entry;
+                }
+            }
+
+            // Attach labor and next-action to each RO
+            $nextActions = [
+                'check_in' => 'Start Diagnosis', 'diagnosis' => 'Create Estimate',
+                'estimate_pending' => 'Send Estimate', 'pending_approval' => 'Awaiting Approval',
+                'approved' => 'Start Repairs', 'in_progress' => 'Mark Ready',
+                'on_hold' => 'Resume', 'waiting_parts' => 'Parts Arrived',
+                'ready' => 'Complete',
+            ];
+
+            foreach ($ros as &$r) {
+                $r['active_labor'] = $laborByRo[(int)$r['id']] ?? [];
+                $r['next_action'] = $nextActions[$r['status']] ?? null;
+            }
+            unset($r);
+
+            // Summary stats
+            $laborArrays = array_map(function($r) {
+                return array_column($r['active_labor'], 'employee_id');
+            }, $ros);
+            $techsWorking = count(array_unique($laborArrays ? array_merge(...$laborArrays) : []));
+
+            $todayHoursStmt = $db->prepare(
+                "SELECT ROUND(COALESCE(SUM(duration_minutes), 0) / 60, 1)
+                 FROM oretir_labor_entries
+                 WHERE DATE(clock_in_at) = CURDATE() AND clock_out_at IS NOT NULL"
+            );
+            $todayHoursStmt->execute();
+            $todayHours = (float) $todayHoursStmt->fetchColumn();
+
+            // Completed today
+            $completedStmt = $db->prepare(
+                "SELECT r.id, r.ro_number, r.status, r.checked_out_at,
+                        c.first_name, c.last_name,
+                        v.year AS vehicle_year, v.make AS vehicle_make, v.model AS vehicle_model
+                 FROM oretir_repair_orders r
+                 JOIN oretir_customers c ON c.id = r.customer_id
+                 LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
+                 WHERE r.status IN ('completed','invoiced')
+                   AND DATE(r.updated_at) = CURDATE()
+                 ORDER BY r.updated_at DESC
+                 LIMIT 20"
+            );
+            $completedStmt->execute();
+            $completedToday = $completedStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            jsonSuccess([
+                'ros' => $ros,
+                'summary' => [
+                    'active_ros' => count($ros),
+                    'techs_working' => $techsWorking,
+                    'hours_today' => $todayHours,
+                ],
+                'completed_today' => $completedToday,
+            ]);
+        }
 
         // Cross-RO labor dashboard (for the dedicated Labor tab)
         if (!empty($_GET['summary'])) {
