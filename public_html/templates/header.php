@@ -53,13 +53,24 @@
     <a href="/">
       <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="/assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" width="781" height="275" loading="eager"></picture>
     </a>
-    <nav class="hidden md:flex items-center gap-6">
+    <nav class="hidden md:flex items-center gap-5">
       <a href="/" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="navHome">Home</a>
       <a href="/#services" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="navServices">Services</a>
-      <a href="/#about" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="navAbout">About</a>
+      <a href="/financing" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="navFinancing">Financing</a>
       <a href="/#reviews" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="navReviews">Reviews</a>
-      <a href="/#contact" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="navContact">Contact</a>
-      <a href="/blog" class="text-brand dark:text-green-400 font-medium hover:opacity-70" data-t="navBlog">Blog</a>
+      <div class="relative group">
+        <button class="text-brand dark:text-green-400 font-medium hover:opacity-70 flex items-center gap-1" data-t="navMore">More <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-xl py-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+          <a href="/why-us" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="navWhyUs">Why Choose Us</a>
+          <a href="/guarantee" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="navGuarantee">Our Guarantee</a>
+          <a href="/care-plan" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="navCarePlan">Care Plan</a>
+          <a href="/service-areas" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="navServiceAreas">Service Areas</a>
+          <a href="/blog" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="navBlog">Blog</a>
+          <a href="/promotions" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="navPromotions">Promotions</a>
+          <a href="/faq" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="navFaq">FAQ</a>
+          <a href="/#contact" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-t="navContact">Contact</a>
+        </div>
+      </div>
       <?php if (!empty($_SESSION['member_id'])): ?>
       <a href="/dashboard" class="text-brand dark:text-green-400 font-medium hover:opacity-70"><?= ($_SESSION['dashboard_role'] ?? 'member') !== 'member' ? 'Dashboard' : 'My Account' ?></a>
       <?php endif; ?>
@@ -76,10 +87,16 @@
   <div id="mobile-menu" class="hidden md:hidden bg-white border-t px-4 pb-4 dark:bg-gray-800 dark:border-gray-700">
     <a href="/" class="block py-2 text-brand dark:text-green-400" data-t="navHome">Home</a>
     <a href="/#services" class="block py-2 text-brand dark:text-green-400" data-t="navServices">Services</a>
-    <a href="/#about" class="block py-2 text-brand dark:text-green-400" data-t="navAbout">About</a>
+    <a href="/financing" class="block py-2 text-brand dark:text-green-400" data-t="navFinancing">Financing</a>
     <a href="/#reviews" class="block py-2 text-brand dark:text-green-400" data-t="navReviews">Reviews</a>
-    <a href="/#contact" class="block py-2 text-brand dark:text-green-400" data-t="navContact">Contact</a>
+    <a href="/why-us" class="block py-2 text-brand dark:text-green-400" data-t="navWhyUs">Why Choose Us</a>
+    <a href="/guarantee" class="block py-2 text-brand dark:text-green-400" data-t="navGuarantee">Our Guarantee</a>
+    <a href="/care-plan" class="block py-2 text-brand dark:text-green-400" data-t="navCarePlan">Care Plan</a>
+    <a href="/service-areas" class="block py-2 text-brand dark:text-green-400" data-t="navServiceAreas">Service Areas</a>
     <a href="/blog" class="block py-2 text-brand dark:text-green-400" data-t="navBlog">Blog</a>
+    <a href="/promotions" class="block py-2 text-brand dark:text-green-400" data-t="navPromotions">Promotions</a>
+    <a href="/faq" class="block py-2 text-brand dark:text-green-400" data-t="navFaq">FAQ</a>
+    <a href="/#contact" class="block py-2 text-brand dark:text-green-400" data-t="navContact">Contact</a>
     <?php if (!empty($_SESSION['member_id'])): ?>
     <a href="/dashboard" class="block py-2 text-brand dark:text-green-400 font-medium"><?= ($_SESSION['dashboard_role'] ?? 'member') !== 'member' ? 'Dashboard' : 'My Account' ?></a>
     <?php endif; ?>

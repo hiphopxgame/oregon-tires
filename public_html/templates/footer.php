@@ -6,7 +6,7 @@
 ?>
 <footer class="bg-brand text-white py-12 pb-24 md:pb-12">
   <div class="container mx-auto px-4">
-    <div class="grid md:grid-cols-3 gap-8">
+    <div class="grid md:grid-cols-4 gap-8">
       <div>
         <h3 class="text-xl font-bold mb-4" data-t="footContact">Contact Information</h3>
         <div class="space-y-2 text-gray-200">
@@ -14,6 +14,10 @@
           <p>&#9993;&#65039; <a href="mailto:oregontirespdx@gmail.com">oregontirespdx@gmail.com</a></p>
           <p>&#128205; 8536 SE 82nd Ave, Portland, OR 97266</p>
           <p>&#128336; <span data-t="footHours">Mon-Sat 7AM-7PM</span></p>
+        </div>
+        <div class="mt-4 space-y-2">
+          <a href="https://www.facebook.com/61571913202998/" target="_blank" class="inline-block text-gray-200 hover:text-amber-300 mr-3">Facebook</a>
+          <a href="https://www.instagram.com/oregontires" target="_blank" class="inline-block text-gray-200 hover:text-amber-300">Instagram</a>
         </div>
       </div>
       <div>
@@ -30,11 +34,31 @@
         </ul>
       </div>
       <div>
-        <h3 class="text-xl font-bold mb-4" data-t="footFollow">Follow Us</h3>
-        <div class="space-y-2">
-          <a href="https://www.facebook.com/61571913202998/" target="_blank" class="block text-gray-200 hover:text-amber-300">Facebook</a>
-          <a href="https://www.instagram.com/oregontires" target="_blank" class="block text-gray-200 hover:text-amber-300">Instagram</a>
-        </div>
+        <h3 class="text-xl font-bold mb-4" data-t="footQuickLinks">Quick Links</h3>
+        <ul class="space-y-1 text-gray-200">
+          <li><a href="/financing" class="hover:text-amber-300 transition" data-t="footFinancing">Financing</a></li>
+          <li><a href="/guarantee" class="hover:text-amber-300 transition" data-t="footGuarantee">Our Guarantee</a></li>
+          <li><a href="/why-us" class="hover:text-amber-300 transition" data-t="footWhyUs">Why Choose Us</a></li>
+          <li><a href="/care-plan" class="hover:text-amber-300 transition" data-t="footCarePlan">Care Plan</a></li>
+          <li><a href="/promotions" class="hover:text-amber-300 transition" data-t="footPromotions">Promotions</a></li>
+          <li><a href="/blog" class="hover:text-amber-300 transition" data-t="footBlog">Blog</a></li>
+          <li><a href="/faq" class="hover:text-amber-300 transition" data-t="footFaq">FAQ</a></li>
+          <li><a href="/reviews" class="hover:text-amber-300 transition" data-t="footReviews">Reviews</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-xl font-bold mb-4" data-t="footServiceAreas">Service Areas</h3>
+        <ul class="space-y-1 text-gray-200">
+          <li><a href="/service-areas" class="hover:text-amber-300 transition" data-t="footAllAreas">All Service Areas</a></li>
+          <li><a href="/tires-se-portland" class="hover:text-amber-300 transition">SE Portland</a></li>
+          <li><a href="/tires-foster-powell" class="hover:text-amber-300 transition">Foster-Powell</a></li>
+          <li><a href="/tires-woodstock" class="hover:text-amber-300 transition">Woodstock</a></li>
+          <li><a href="/tires-lents" class="hover:text-amber-300 transition">Lents</a></li>
+          <li><a href="/tires-mt-scott" class="hover:text-amber-300 transition">Mt. Scott</a></li>
+          <li><a href="/tires-happy-valley" class="hover:text-amber-300 transition">Happy Valley</a></li>
+          <li><a href="/tires-clackamas" class="hover:text-amber-300 transition">Clackamas</a></li>
+          <li><a href="/tires-milwaukie" class="hover:text-amber-300 transition">Milwaukie</a></li>
+        </ul>
       </div>
     </div>
     <div class="border-t border-green-600 mt-8 pt-8 text-center text-gray-300">
@@ -53,6 +77,14 @@
     navReviews:{ en:'Reviews', es:'Rese\u00f1as' },
     navContact:{ en:'Contact', es:'Contacto' },
     navBlog:{ en:'Blog', es:'Blog' },
+    navFinancing:{ en:'Financing', es:'Financiamiento' },
+    navMore:{ en:'More', es:'M\u00e1s' },
+    navWhyUs:{ en:'Why Choose Us', es:'Por Qu\u00e9 Elegirnos' },
+    navGuarantee:{ en:'Our Guarantee', es:'Nuestra Garant\u00eda' },
+    navCarePlan:{ en:'Care Plan', es:'Plan de Cuidado' },
+    navServiceAreas:{ en:'Service Areas', es:'\u00c1reas de Servicio' },
+    navPromotions:{ en:'Promotions', es:'Promociones' },
+    navFaq:{ en:'FAQ', es:'Preguntas Frecuentes' },
     navSchedule:{ en:'Schedule Service', es:'Agendar Servicio' },
     topHours:{ en:'\uD83D\uDD50 Mon-Sat 7AM-7PM', es:'\uD83D\uDD50 Lun-S\u00e1b 7AM-7PM' },
     footContact:{ en:'Contact Information', es:'Informaci\u00f3n de Contacto' },
@@ -66,6 +98,17 @@
     footDiagnostics:{ en:'Engine Diagnostics', es:'Diagn\u00f3stico de Motor' },
     footSuspension:{ en:'Suspension Repair', es:'Reparaci\u00f3n de Suspensi\u00f3n' },
     footFleet:{ en:'Fleet Services', es:'Servicios de Flotilla' },
+    footQuickLinks:{ en:'Quick Links', es:'Enlaces R\u00e1pidos' },
+    footFinancing:{ en:'Financing', es:'Financiamiento' },
+    footGuarantee:{ en:'Our Guarantee', es:'Nuestra Garant\u00eda' },
+    footWhyUs:{ en:'Why Choose Us', es:'Por Qu\u00e9 Elegirnos' },
+    footCarePlan:{ en:'Care Plan', es:'Plan de Cuidado' },
+    footPromotions:{ en:'Promotions', es:'Promociones' },
+    footBlog:{ en:'Blog', es:'Blog' },
+    footFaq:{ en:'FAQ', es:'Preguntas Frecuentes' },
+    footReviews:{ en:'Reviews', es:'Rese\u00f1as' },
+    footServiceAreas:{ en:'Service Areas', es:'\u00c1reas de Servicio' },
+    footAllAreas:{ en:'All Service Areas', es:'Todas las \u00c1reas' },
     footFollow:{ en:'Follow Us', es:'S\u00edguenos' },
     footCopyright:{ en:'\u00a9 2026 Oregon Tires Auto Care. All rights reserved.', es:'\u00a9 2026 Oregon Tires Auto Care. Todos los derechos reservados.' }
   };
