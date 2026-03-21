@@ -191,7 +191,7 @@
             <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 text-center" data-t="maxServices">Select up to 5 services per appointment</p>
             <div id="services-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <!-- Services loaded dynamically from API -->
-              <div class="col-span-full text-center py-4 text-gray-400 dark:text-gray-500 text-sm">Loading services...</div>
+              <div class="col-span-full text-center py-4 text-gray-400 dark:text-gray-500 text-sm" data-t="loadingServices">Loading services...</div>
             </div>
             <!-- Selected services summary chips -->
             <div id="selected-services-summary" class="hidden mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
@@ -558,6 +558,7 @@ const t = {
     selectService: 'Select a Service',
     selectServices: 'Select Services',
     maxServices: 'Select up to 5 services per appointment',
+    loadingServices: 'Loading services...',
     selectedServices: 'Selected:',
     tireInstallation: 'Tire Installation',
     tireRepair: 'Tire Repair',
@@ -660,6 +661,7 @@ const t = {
     selectService: 'Seleccione un Servicio',
     selectServices: 'Seleccionar Servicios',
     maxServices: 'Seleccione hasta 5 servicios por cita',
+    loadingServices: 'Cargando servicios...',
     selectedServices: 'Seleccionados:',
     tireInstallation: 'Instalación de Llantas',
     tireRepair: 'Reparación de Llantas',
@@ -1105,10 +1107,15 @@ document.body.addEventListener('htmx:beforeRequest', function(e) {
 
   var hasErrors = false;
 
-  // Service(s) — at least one must be checked
+  // Service(s) — at least one, max 5
   var checkedBoxes = form.querySelectorAll('input[name="services[]"]:checked');
   if (checkedBoxes.length < 1) {
     showStatus(t[currentLang].pleaseSelectService, 'orange');
+    e.preventDefault();
+    return;
+  }
+  if (checkedBoxes.length > 5) {
+    showStatus(currentLang === 'es' ? 'Máximo 5 servicios por cita.' : 'Maximum 5 services per appointment.', 'orange');
     e.preventDefault();
     return;
   }
@@ -1989,7 +1996,7 @@ function autoSelectServiceFromUrl() {
   if (typeof gtag === 'function') gtag('event', 'booking_deeplink', {
     event_category: 'booking_funnel', service: serviceSlug
   });
-})();
+}
 
 // ===== ABANDONED BOOKING RECOVERY =====
 (function() {

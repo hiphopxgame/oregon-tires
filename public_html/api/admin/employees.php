@@ -85,10 +85,15 @@ try {
             error_log("employees.php: auto-seed schedule failed for employee #{$newEmpId}: " . $schedErr->getMessage());
         }
 
-        // Auto-seed all service skills for new employee
+        // Auto-seed all service skills for new employee (from DB, not hardcoded)
         try {
-            $allServices = ['tire-installation','tire-repair','wheel-alignment','oil-change',
-                            'brake-service','tuneup','mechanical-inspection','mobile-service','roadside-assistance','other'];
+            $svcStmt = $db->query('SELECT slug FROM oretir_services WHERE is_active = 1 ORDER BY sort_order ASC');
+            $allServices = $svcStmt->fetchAll(\PDO::FETCH_COLUMN);
+            if (empty($allServices)) {
+                // Fallback if services table is empty
+                $allServices = ['tire-installation','tire-repair','wheel-alignment','oil-change',
+                                'brake-service','engine-diagnostics','suspension-repair','mobile-service','roadside-assistance','other'];
+            }
             $skillStmt = $db->prepare(
                 'INSERT INTO oretir_employee_skills (employee_id, service_type) VALUES (?, ?)
                  ON DUPLICATE KEY UPDATE certified_at = certified_at'
