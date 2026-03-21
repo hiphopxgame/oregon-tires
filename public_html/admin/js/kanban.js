@@ -163,6 +163,21 @@ function createCard(ro) {
   vehEl.textContent = vehicle;
   card.appendChild(vehEl);
 
+  // Active labor indicator
+  if (ro.active_labor_count > 0) {
+    var laborInd = document.createElement('div');
+    laborInd.style.cssText = 'display:flex;align-items:center;gap:4px;margin-bottom:3px;';
+    var pulseDot = document.createElement('span');
+    pulseDot.style.cssText = 'width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;';
+    pulseDot.className = 'animate-pulse';
+    laborInd.appendChild(pulseDot);
+    var laborText = document.createElement('span');
+    laborText.style.cssText = 'font-size:10px;font-weight:600;color:' + (dark ? '#4ade80' : '#16a34a') + ';';
+    laborText.textContent = ro.active_labor_count + ' ' + (ro.active_labor_count === 1 ? 'tech working' : 'techs working');
+    laborInd.appendChild(laborText);
+    card.appendChild(laborInd);
+  }
+
   // Bottom row: time + next-action badge
   var bottomRow = document.createElement('div');
   bottomRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:2px;';

@@ -117,7 +117,8 @@ try {
                     v.year as vehicle_year, v.make as vehicle_make, v.model as vehicle_model, v.vin,
                     v.trim_level, v.engine, v.transmission, v.drive_type, v.fuel_type, v.license_plate,
                     (SELECT COUNT(*) FROM oretir_inspections WHERE repair_order_id = r.id) as inspection_count,
-                    (SELECT COUNT(*) FROM oretir_estimates WHERE repair_order_id = r.id) as estimate_count
+                    (SELECT COUNT(*) FROM oretir_estimates WHERE repair_order_id = r.id) as estimate_count,
+                    (SELECT COUNT(*) FROM oretir_labor_entries WHERE repair_order_id = r.id AND clock_out_at IS NULL) as active_labor_count
                 FROM oretir_repair_orders r
                 JOIN oretir_customers c ON c.id = r.customer_id
                 LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
@@ -359,6 +360,18 @@ try {
             }
         }
 
+        // ─── Auto-clock-out open labor entries on terminal statuses ─────────
+        $autoClockOutCount = 0;
+        if (isset($data['status']) && in_array($data['status'], ['completed', 'invoiced', 'cancelled', 'on_hold'], true)) {
+            try {
+                $clockOutStmt = $db->prepare('UPDATE oretir_labor_entries SET clock_out_at = NOW() WHERE repair_order_id = ? AND clock_out_at IS NULL');
+                $clockOutStmt->execute([$id]);
+                $autoClockOutCount = $clockOutStmt->rowCount();
+            } catch (\Throwable $e) {
+                error_log("repair-orders.php: auto-clock-out failed for RO #{$id}: " . $e->getMessage());
+            }
+        }
+
         // ─── Auto-create invoice when RO status changes to 'completed' or 'invoiced' ────
         if (isset($data['status']) && in_array($data['status'], ['completed', 'invoiced'], true)) {
             try {
@@ -433,7 +446,11 @@ try {
             }
         }
 
-        jsonSuccess(['message' => 'Repair order updated.']);
+        $resp = ['message' => 'Repair order updated.'];
+        if ($autoClockOutCount > 0) {
+            $resp['auto_clock_out'] = $autoClockOutCount;
+        }
+        jsonSuccess($resp);
     }
 
 } catch (\Throwable $e) {

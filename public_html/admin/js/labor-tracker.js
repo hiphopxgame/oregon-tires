@@ -653,14 +653,35 @@ window.loadLaborSummary = async function() {
       active.forEach(function(entry) {
         var card = _el('div', 'border-2 border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-900/20 rounded-xl p-4');
 
-        // Top row: name + RO
+        // Top row: name + role + RO badge
         var top = _el('div', 'flex items-center justify-between mb-2');
         var nameWrap = _el('div', 'flex items-center gap-2');
         nameWrap.appendChild(_el('span', 'w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse'));
         nameWrap.appendChild(_el('span', 'font-bold text-gray-900 dark:text-white text-sm', entry.employee_name));
+        if (entry.employee_role) nameWrap.appendChild(_el('span', 'text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400', entry.employee_role));
         top.appendChild(nameWrap);
-        top.appendChild(_el('span', 'text-xs font-mono bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded', entry.ro_number));
+
+        var roBadge = _el('div', 'flex items-center gap-1.5');
+        roBadge.appendChild(_el('span', 'text-xs font-mono bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600', entry.ro_number));
+        if (entry.ro_status) {
+          var statusColors = { intake: 'bg-gray-100 text-gray-600', diagnosis: 'bg-purple-100 text-purple-700', estimate_pending: 'bg-blue-100 text-blue-700', pending_approval: 'bg-amber-100 text-amber-700', approved: 'bg-green-100 text-green-700', in_progress: 'bg-blue-100 text-blue-700', on_hold: 'bg-red-100 text-red-700', waiting_parts: 'bg-orange-100 text-orange-700', ready: 'bg-teal-100 text-teal-700' };
+          var sCls = statusColors[entry.ro_status] || 'bg-gray-100 text-gray-600';
+          roBadge.appendChild(_el('span', 'text-[10px] px-1.5 py-0.5 rounded font-medium ' + sCls, entry.ro_status.replace(/_/g, ' ')));
+        }
+        top.appendChild(roBadge);
         card.appendChild(top);
+
+        // Vehicle + Customer row
+        var vehicle = [entry.vehicle_year, entry.vehicle_make, entry.vehicle_model].filter(Boolean).join(' ');
+        var customer = [entry.customer_first, entry.customer_last].filter(Boolean).join(' ');
+        var contextParts = [];
+        if (vehicle) contextParts.push(vehicle);
+        if (customer) contextParts.push(customer);
+        if (entry.customer_phone) contextParts.push(entry.customer_phone);
+        if (entry.license_plate) contextParts.push(entry.license_plate);
+        if (contextParts.length) {
+          card.appendChild(_el('p', 'text-xs text-gray-500 dark:text-gray-400 mb-1', contextParts.join(' \u2022 ')));
+        }
 
         // Task
         if (entry.task_description) {
@@ -713,18 +734,23 @@ window.loadLaborSummary = async function() {
 
       var table = _el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700');
 
-      var thead = _el('div', 'grid grid-cols-5 gap-2 bg-gray-50 dark:bg-gray-900/50 px-5 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider');
-      [t('laborSummaryEmployee', 'Employee'), t('laborSummaryTotalHrs', 'Total Hours'), t('laborSummaryBillableHrs', 'Billable'), t('laborSummaryActiveClocks', 'Active'), t('laborSummaryRoCount', 'ROs')].forEach(function(text) {
+      var thead = _el('div', 'grid grid-cols-6 gap-2 bg-gray-50 dark:bg-gray-900/50 px-5 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider');
+      [t('laborSummaryEmployee', 'Employee'), t('laborSummaryTotalHrs', 'Total Hours'), t('laborSummaryBillableHrs', 'Billable'), t('laborEfficiency', 'Efficiency'), t('laborSummaryActiveClocks', 'Active'), t('laborSummaryRoCount', 'ROs')].forEach(function(text) {
         thead.appendChild(_el('div', '', text));
       });
       table.appendChild(thead);
 
       employees.forEach(function(row) {
-        var tr = _el('div', 'grid grid-cols-5 gap-2 px-5 py-3 border-t border-gray-100 dark:border-gray-700/50 text-sm items-center hover:bg-gray-50 dark:hover:bg-gray-800/50 transition');
+        var tr = _el('div', 'grid grid-cols-6 gap-2 px-5 py-3 border-t border-gray-100 dark:border-gray-700/50 text-sm items-center hover:bg-gray-50 dark:hover:bg-gray-800/50 transition');
 
         tr.appendChild(_el('div', 'font-medium text-gray-900 dark:text-white', row.employee_name || 'Unknown'));
         tr.appendChild(_el('div', 'text-gray-700 dark:text-gray-300', (row.total_hours || 0).toFixed(1) + 'h'));
         tr.appendChild(_el('div', 'text-green-600 dark:text-green-400 font-medium', (row.billable_hours || 0).toFixed(1) + 'h'));
+
+        // Efficiency %
+        var eff = row.total_hours > 0 ? Math.round((row.billable_hours / row.total_hours) * 100) : 0;
+        var effCls = eff >= 80 ? 'text-green-600 dark:text-green-400' : eff >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400';
+        tr.appendChild(_el('div', 'font-bold ' + effCls, eff + '%'));
 
         var activeCell = _el('div', '');
         if (row.active_count > 0) {
@@ -757,8 +783,9 @@ window.loadLaborSummary = async function() {
       var rHead = _el('div', 'grid grid-cols-12 gap-1 bg-gray-50 dark:bg-gray-900/50 px-5 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider');
       var rCols = [
         { text: t('laborEmployee', 'Employee'), span: 2 },
-        { text: t('laborRo', 'RO'), span: 2 },
-        { text: t('laborTask', 'Task'), span: 3 },
+        { text: t('laborRo', 'RO'), span: 1 },
+        { text: t('laborVehicle', 'Vehicle'), span: 2 },
+        { text: t('laborTask', 'Task'), span: 2 },
         { text: t('laborClockInTime', 'In'), span: 2 },
         { text: t('laborClockOutTime', 'Out'), span: 2 },
         { text: t('laborDuration', 'Dur.'), span: 1 }
@@ -775,9 +802,17 @@ window.loadLaborSummary = async function() {
         empCell.title = entry.employee_name;
         row.appendChild(empCell);
 
-        row.appendChild(_el('div', 'col-span-2 text-xs font-mono text-gray-500 dark:text-gray-400', entry.ro_number));
+        row.appendChild(_el('div', 'col-span-1 text-xs font-mono text-gray-500 dark:text-gray-400', entry.ro_number));
 
-        var taskCell = _el('div', 'col-span-3 text-gray-600 dark:text-gray-400 truncate', entry.task_description || '-');
+        var vehicle = [entry.vehicle_year, entry.vehicle_make, entry.vehicle_model].filter(Boolean).join(' ');
+        var customer = [entry.customer_first, entry.customer_last].filter(Boolean).join(' ');
+        var vehCell = _el('div', 'col-span-2 truncate');
+        if (vehicle) { vehCell.appendChild(_el('div', 'text-xs text-gray-700 dark:text-gray-300 truncate', vehicle)); }
+        if (customer) { vehCell.appendChild(_el('div', 'text-[10px] text-gray-400 truncate', customer)); }
+        if (!vehicle && !customer) { vehCell.textContent = '-'; vehCell.className += ' text-gray-400'; }
+        row.appendChild(vehCell);
+
+        var taskCell = _el('div', 'col-span-2 text-gray-600 dark:text-gray-400 truncate', entry.task_description || '-');
         taskCell.title = entry.task_description || '';
         row.appendChild(taskCell);
 

@@ -609,30 +609,142 @@ function renderRoDetailModal() {
   var hasInvoices = ro.invoices && ro.invoices.length > 0;
   var status = ro.status || 'intake';
 
-  // Suggested next step banner
-  var suggestion = null;
-  if (status === 'intake' && !hasInspections) suggestion = { text: t('roSuggestInspect', 'Start by creating an inspection for this vehicle'), icon: '\uD83D\uDD0D' };
-  else if (status === 'intake' && hasInspections) suggestion = { text: t('roSuggestDiag', 'Inspection exists \u2014 move to Diagnosis when ready'), icon: '\u2699\uFE0F' };
-  else if (status === 'diagnosis' && !hasEstimates) suggestion = { text: t('roSuggestEstimate', 'Create an estimate to send to the customer'), icon: '\uD83D\uDCCB' };
-  else if (status === 'estimate_pending' && latestEstimate && latestEstimate.status === 'draft') suggestion = { text: t('roSuggestSendEst', 'Estimate is ready \u2014 send it to the customer for approval'), icon: '\uD83D\uDCE7' };
-  else if (status === 'pending_approval') suggestion = { text: t('roSuggestWait', 'Waiting for customer approval. Follow up if needed.'), icon: '\u23F3' };
-  else if (status === 'approved') suggestion = { text: t('roSuggestStart', 'Customer approved \u2014 start the work!'), icon: '\uD83D\uDE80' };
-  else if (status === 'in_progress' || status === 'waiting_parts') suggestion = { text: t('roSuggestReady', 'Mark as Ready when the job is done'), icon: '\uD83D\uDD27' };
-  else if (status === 'ready') suggestion = { text: t('roSuggestComplete', 'Customer notified. Mark Completed when picked up.'), icon: '\u2705' };
-  else if (status === 'completed' && !hasInvoices) suggestion = { text: t('roSuggestInvoice', 'Invoice will be auto-generated. If not, check the estimate.'), icon: '\uD83D\uDCB0' };
+  // ─── Guided Workflow Action Bar ─────────────────────────────────────────────
+  var WORKFLOW_STEPS = [
+    { status: 'intake',            step: 1, total: 8 },
+    { status: 'diagnosis',         step: 2, total: 8 },
+    { status: 'estimate_pending',  step: 3, total: 8 },
+    { status: 'pending_approval',  step: 4, total: 8 },
+    { status: 'approved',          step: 5, total: 8 },
+    { status: 'in_progress',       step: 6, total: 8 },
+    { status: 'ready',             step: 7, total: 8 },
+    { status: 'completed',         step: 8, total: 8 },
+  ];
+  var currentStep = WORKFLOW_STEPS.find(function(s) { return s.status === status; });
 
-  if (suggestion) {
-    var suggestDiv = document.createElement('div');
-    suggestDiv.className = 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center gap-3';
-    var suggestIcon = document.createElement('span');
-    suggestIcon.className = 'text-xl shrink-0';
-    suggestIcon.textContent = suggestion.icon;
-    var suggestText = document.createElement('p');
-    suggestText.className = 'text-sm text-blue-800 dark:text-blue-300 font-medium';
-    suggestText.textContent = suggestion.text;
-    suggestDiv.appendChild(suggestIcon);
-    suggestDiv.appendChild(suggestText);
-    body.appendChild(suggestDiv);
+  var guide = null;
+  if (status === 'intake' && !hasInspections) guide = { text: t('roSuggestInspect', 'Create an inspection for this vehicle'), btn: t('roStartInspection', 'Start Inspection'), color: 'purple', icon: '\uD83D\uDD0D', action: 'inspect' };
+  else if (status === 'intake') guide = { text: t('roSuggestDiag', 'Inspection done \u2014 advance to diagnosis'), btn: t('roBeginDiagnosis', 'Begin Diagnosis'), color: 'purple', icon: '\u2699\uFE0F', action: 'diagnosis' };
+  else if (status === 'diagnosis' && !hasEstimates) guide = { text: t('roSuggestEstimate', 'Create an estimate for the customer'), btn: t('roCreateEstimate', 'Create Estimate'), color: 'blue', icon: '\uD83D\uDCCB', action: 'estimate' };
+  else if (status === 'diagnosis') guide = { text: t('roSuggestSendEst', 'Estimate ready \u2014 send to customer'), btn: t('roSendEstimate', 'Send Estimate'), color: 'blue', icon: '\uD83D\uDCE7', action: 'send_estimate' };
+  else if (status === 'estimate_pending') guide = { text: t('roSuggestSendEst', 'Send the estimate to the customer'), btn: t('roSendToCustomer', 'Send to Customer'), color: 'amber', icon: '\uD83D\uDCE7', action: 'send_estimate' };
+  else if (status === 'pending_approval') guide = { text: t('roSuggestWait', 'Waiting for customer approval'), btn: t('roMarkApproved', 'Mark Approved'), color: 'green', icon: '\u23F3', action: 'approve' };
+  else if (status === 'approved') guide = { text: t('roSuggestStart', 'Customer approved \u2014 begin work'), btn: t('roStartWorkClockIn', 'Start Work & Clock In'), color: 'green', icon: '\uD83D\uDE80', action: 'start_work' };
+  else if (status === 'in_progress') guide = { text: t('roSuggestReady', 'Mark ready when the job is done'), btn: t('roMarkReady', 'Mark Ready'), color: 'teal', icon: '\uD83D\uDD27', action: 'ready' };
+  else if (status === 'waiting_parts') guide = { text: t('roPartsArrivedHint', 'Parts arrived? Resume work.'), btn: t('roPartsArrived', 'Parts Arrived \u2014 Resume'), color: 'orange', icon: '\uD83D\uDCE6', action: 'resume' };
+  else if (status === 'ready') guide = { text: t('roSuggestComplete', 'Customer notified. Complete when picked up.'), btn: t('roCompleteInvoice', 'Complete & Invoice'), color: 'green', icon: '\u2705', action: 'complete' };
+  else if (status === 'completed' && !hasInvoices) guide = { text: t('roSuggestInvoice', 'Generate invoice from estimate'), btn: t('roGenerateInvoice', 'Generate Invoice'), color: 'teal', icon: '\uD83D\uDCB0', action: 'invoice' };
+
+  if (guide && currentStep) {
+    var colorMap = { purple: 'from-purple-600 to-purple-700', blue: 'from-blue-600 to-blue-700', amber: 'from-amber-500 to-amber-600', green: 'from-green-600 to-green-700', teal: 'from-teal-600 to-teal-700', orange: 'from-orange-500 to-orange-600' };
+    var gradCls = colorMap[guide.color] || colorMap.blue;
+
+    var guideBar = document.createElement('div');
+    guideBar.className = 'bg-gradient-to-r ' + gradCls + ' rounded-xl p-4 text-white';
+
+    // Step indicator + progress dots
+    var stepRow = document.createElement('div');
+    stepRow.className = 'flex items-center justify-between mb-2';
+    var stepLabel = document.createElement('span');
+    stepLabel.className = 'text-xs font-bold uppercase tracking-wider opacity-80';
+    stepLabel.textContent = t('roStep', 'Step') + ' ' + currentStep.step + ' ' + t('roStepOf', 'of') + ' ' + currentStep.total;
+    stepRow.appendChild(stepLabel);
+
+    var dots = document.createElement('div');
+    dots.className = 'flex gap-1';
+    for (var di = 1; di <= currentStep.total; di++) {
+      var dot = document.createElement('div');
+      dot.className = 'w-2 h-2 rounded-full ' + (di < currentStep.step ? 'bg-white' : di === currentStep.step ? 'bg-white ring-2 ring-white/50 scale-125' : 'bg-white/30');
+      dots.appendChild(dot);
+    }
+    stepRow.appendChild(dots);
+    guideBar.appendChild(stepRow);
+
+    // Main row: icon + text + button
+    var mainRow = document.createElement('div');
+    mainRow.className = 'flex items-center gap-3';
+    var gIcon = document.createElement('span');
+    gIcon.className = 'text-2xl shrink-0';
+    gIcon.textContent = guide.icon;
+    mainRow.appendChild(gIcon);
+    var gText = document.createElement('p');
+    gText.className = 'flex-1 text-sm font-medium opacity-90';
+    gText.textContent = guide.text;
+    mainRow.appendChild(gText);
+
+    var gBtn = document.createElement('button');
+    gBtn.className = 'shrink-0 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-bold transition backdrop-blur-sm border border-white/20';
+    gBtn.textContent = guide.btn;
+    gBtn.addEventListener('click', function() {
+      var a = guide.action;
+      if (a === 'inspect') {
+        api('inspections.php', { method: 'POST', body: { repair_order_id: ro.id } }).then(function() {
+          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'diagnosis' } }).then(function() {
+            showToast(t('roInspectionCreated', 'Inspection created \u2014 moved to Diagnosis'));
+            viewRoDetail(ro.id);
+          });
+        }).catch(function(err) { showToast(err.message, true); });
+      } else if (a === 'diagnosis') {
+        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'diagnosis' } }).then(function() {
+          showToast(t('roStatusAdvanced', 'Advanced to Diagnosis')); viewRoDetail(ro.id);
+        }).catch(function(err) { showToast(err.message, true); });
+      } else if (a === 'estimate') {
+        var inspId = hasInspections ? ro.inspections[0].id : null;
+        var payload = { repair_order_id: ro.id, tax_rate: 0.0 };
+        if (inspId) payload.from_inspection_id = inspId;
+        api('estimates.php', { method: 'POST', body: payload }).then(function() {
+          showToast(t('roEstimateCreated', 'Estimate created')); viewRoDetail(ro.id);
+        }).catch(function(err) { showToast(err.message, true); });
+      } else if (a === 'send_estimate') {
+        if (latestEstimate) {
+          api('estimates.php', { method: 'PUT', body: { id: latestEstimate.id, action: 'send' } }).then(function() {
+            api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'pending_approval' } }).then(function() {
+              showToast(t('roEstimateSent', 'Estimate sent \u2014 awaiting approval')); viewRoDetail(ro.id);
+            });
+          }).catch(function(err) { showToast(err.message, true); });
+        }
+      } else if (a === 'approve') {
+        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'approved' } }).then(function() {
+          showToast(t('roStatusAdvanced', 'Approved!')); viewRoDetail(ro.id);
+        }).catch(function(err) { showToast(err.message, true); });
+      } else if (a === 'start_work') {
+        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'in_progress' } }).then(function() {
+          showToast(t('roStatusAdvanced', 'Work started!'));
+          viewRoDetail(ro.id);
+          // After modal reloads, the labor section will be visible for clock-in
+        }).catch(function(err) { showToast(err.message, true); });
+      } else if (a === 'ready') {
+        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'ready' } }).then(function() {
+          showToast(t('roMarkedReady', 'Marked Ready \u2014 customer notified')); viewRoDetail(ro.id);
+        }).catch(function(err) { showToast(err.message, true); });
+      } else if (a === 'resume') {
+        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'in_progress' } }).then(function() {
+          showToast(t('roStatusAdvanced', 'Resumed \u2014 back in progress')); viewRoDetail(ro.id);
+        }).catch(function(err) { showToast(err.message, true); });
+      } else if (a === 'complete') {
+        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } }).then(function() {
+          showToast(t('roCompletedInvoiced', 'Completed \u2014 invoice generated'));
+          modal.remove(); loadRepairOrders(); if (typeof loadKanban === 'function') loadKanban();
+        }).catch(function(err) { showToast(err.message, true); });
+      } else if (a === 'invoice') {
+        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } }).then(function() {
+          showToast(t('roCompletedInvoiced', 'Invoice generated')); viewRoDetail(ro.id);
+        }).catch(function(err) { showToast(err.message, true); });
+      }
+    });
+    mainRow.appendChild(gBtn);
+    guideBar.appendChild(mainRow);
+    body.appendChild(guideBar);
+  } else if (status === 'invoiced' || status === 'completed') {
+    // Completed state - no action needed
+    var doneBar = document.createElement('div');
+    doneBar.className = 'bg-gray-100 dark:bg-gray-700 rounded-xl p-3 flex items-center gap-3';
+    doneBar.appendChild(document.createTextNode('\u2705 '));
+    var doneText = document.createElement('span');
+    doneText.className = 'text-sm text-gray-600 dark:text-gray-300 font-medium';
+    doneText.textContent = status === 'invoiced' ? t('roInvoicedDone', 'This repair order is complete and invoiced.') : t('roCompletedDone', 'This repair order is complete.');
+    doneBar.appendChild(doneText);
+    body.appendChild(doneBar);
   }
 
   var actions = document.createElement('div');
@@ -963,6 +1075,33 @@ function renderRoDetailModal() {
       invSection.appendChild(iCard);
     });
     body.appendChild(invSection);
+  }
+
+  // ─── Labor Tracking Section ─────────────────────────────────────────────────
+  var laborSection = document.createElement('div');
+  laborSection.className = 'bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4';
+  var laborH = document.createElement('h3');
+  laborH.className = 'font-bold text-gray-900 dark:text-white text-sm mb-3 flex items-center gap-2';
+  laborH.textContent = '\u23F1\uFE0F ' + t('laborTime', 'Labor Tracking');
+  if (ro.active_labor_count > 0) {
+    var laborBadge = document.createElement('span');
+    laborBadge.className = 'inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 font-medium';
+    var pulseDot = document.createElement('span');
+    pulseDot.className = 'w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block';
+    laborBadge.appendChild(pulseDot);
+    laborBadge.appendChild(document.createTextNode(' ' + ro.active_labor_count + ' ' + t('laborActiveNow', 'active')));
+    laborH.appendChild(laborBadge);
+  }
+  laborSection.appendChild(laborH);
+  var laborContainer = document.createElement('div');
+  laborContainer.id = 'ro-labor-section';
+  laborSection.appendChild(laborContainer);
+  body.appendChild(laborSection);
+
+  // Initialize LaborTracker for this RO
+  if (typeof LaborTracker !== 'undefined') {
+    LaborTracker.init(ro.id);
+    LaborTracker.render('ro-labor-section');
   }
 
   // Linked appointment

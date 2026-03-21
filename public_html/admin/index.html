@@ -4457,6 +4457,35 @@ const adminT = {
     passwordsNoMatch: 'Passwords do not match',
     nameIsRequired: 'Name is required',
     emailIsRequired: 'Email is required',
+    phoneRequired: 'Phone is required',
+    phone10Digits: 'Phone must be 10 digits',
+    serviceRequired: 'Service is required',
+    dateRequired: 'Date is required',
+    timeRequired: 'Time is required',
+    // Misc UI
+    showPassword: 'Show',
+    hidePassword: 'Hide',
+    loadingText: 'Loading...',
+    trendUp: 'vs prior period',
+    trendDown: 'vs prior period',
+    trendNoChange: 'No change',
+    noEmailLogs: 'No email logs found.',
+    noApptsCal: 'No appointments',
+    dayOpenBookings: 'This day is open for bookings',
+    employeesAvailable: 'employees available',
+    employeeAvailable: 'employee available',
+    unassignedApptCount: 'unassigned appointment',
+    unassignedApptsCount: 'unassigned appointments',
+    quickAssignAll: 'Quick Assign All',
+    notCertified: 'not certified',
+    empOff: 'off',
+    noApptsAssigned: 'No appointments assigned',
+    compressed: 'Compressed',
+    uploading: 'Uploading...',
+    uploadDone: 'Done',
+    uploadFailedPrefix: 'Failed',
+    errorCreatingAppt: 'Error creating appointment',
+    selectDate: 'Select a date',
     displayNameRequired: 'Display name is required',
     noActiveEmployees: 'No active employees to assign',
     noAppointmentsExport: 'No appointments to export',
@@ -4531,6 +4560,25 @@ const adminT = {
     roNoteEmpty: 'Please enter a note.',
     roNewInspection: 'New Inspection',
     roNewEstimate: 'New Estimate',
+    roStep: 'Step',
+    roStepOf: 'of',
+    roStartInspection: 'Start Inspection',
+    roBeginDiagnosis: 'Begin Diagnosis',
+    roCreateEstimate: 'Create Estimate',
+    roSendEstimate: 'Send Estimate',
+    roMarkApproved: 'Mark Approved',
+    roStartWorkClockIn: 'Start Work & Clock In',
+    roPartsArrived: 'Parts Arrived \u2014 Resume',
+    roMarkReady: 'Mark Ready',
+    roCompleteInvoice: 'Complete & Invoice',
+    roGenerateInvoice: 'Generate Invoice',
+    roStatusAdvanced: 'Status advanced',
+    roMarkedReady: 'Marked Ready \u2014 customer notified',
+    roInvoicedDone: 'This repair order is complete and invoiced.',
+    roCompletedDone: 'This repair order is complete.',
+    laborActiveNow: 'active',
+    laborVehicle: 'Vehicle',
+    laborEfficiency: 'Efficiency',
     roInspections: 'Inspections',
     roEstimates: 'Estimates',
     roLinkedAppointment: 'Linked Appointment',
@@ -5895,6 +5943,34 @@ const adminT = {
     passwordsNoMatch: 'Las contrase\u00F1as no coinciden',
     nameIsRequired: 'El nombre es obligatorio',
     emailIsRequired: 'El correo es obligatorio',
+    phoneRequired: 'Tel\u00E9fono es obligatorio',
+    phone10Digits: 'El tel\u00E9fono debe tener 10 d\u00EDgitos',
+    serviceRequired: 'El servicio es obligatorio',
+    dateRequired: 'La fecha es obligatoria',
+    timeRequired: 'La hora es obligatoria',
+    showPassword: 'Mostrar',
+    hidePassword: 'Ocultar',
+    loadingText: 'Cargando...',
+    trendUp: 'vs periodo anterior',
+    trendDown: 'vs periodo anterior',
+    trendNoChange: 'Sin cambios',
+    noEmailLogs: 'No se encontraron registros de correo.',
+    noApptsCal: 'Sin citas',
+    dayOpenBookings: 'Este d\u00EDa est\u00E1 disponible para reservas',
+    employeesAvailable: 'empleados disponibles',
+    employeeAvailable: 'empleado disponible',
+    unassignedApptCount: 'cita sin asignar',
+    unassignedApptsCount: 'citas sin asignar',
+    quickAssignAll: 'Asignar Todo',
+    notCertified: 'no certificado',
+    empOff: 'libre',
+    noApptsAssigned: 'No hay citas asignadas',
+    compressed: 'Comprimido',
+    uploading: 'Subiendo...',
+    uploadDone: 'Listo',
+    uploadFailedPrefix: 'Error',
+    errorCreatingAppt: 'Error al crear cita',
+    selectDate: 'Selecciona una fecha',
     displayNameRequired: 'El nombre para mostrar es obligatorio',
     noActiveEmployees: 'No hay empleados activos para asignar',
     noAppointmentsExport: 'No hay citas para exportar',
@@ -5969,6 +6045,25 @@ const adminT = {
     roNoteEmpty: 'Por favor ingrese una nota.',
     roNewInspection: 'Nueva Inspecci\u00F3n',
     roNewEstimate: 'Nuevo Presupuesto',
+    roStep: 'Paso',
+    roStepOf: 'de',
+    roStartInspection: 'Iniciar Inspecci\u00F3n',
+    roBeginDiagnosis: 'Iniciar Diagn\u00F3stico',
+    roCreateEstimate: 'Crear Presupuesto',
+    roSendEstimate: 'Enviar Presupuesto',
+    roMarkApproved: 'Marcar Aprobado',
+    roStartWorkClockIn: 'Iniciar Trabajo',
+    roPartsArrived: 'Partes Llegaron \u2014 Reanudar',
+    roMarkReady: 'Marcar Listo',
+    roCompleteInvoice: 'Completar y Facturar',
+    roGenerateInvoice: 'Generar Factura',
+    roStatusAdvanced: 'Estado avanzado',
+    roMarkedReady: 'Marcado Listo \u2014 cliente notificado',
+    roInvoicedDone: 'Esta orden est\u00E1 completa y facturada.',
+    roCompletedDone: 'Esta orden est\u00E1 completa.',
+    laborActiveNow: 'activo',
+    laborVehicle: 'Veh\u00EDculo',
+    laborEfficiency: 'Eficiencia',
     roInspections: 'Inspecciones',
     roEstimates: 'Presupuestos',
     roLinkedAppointment: 'Cita Vinculada',
@@ -7202,8 +7297,9 @@ function showToastNew(message, type) {
 // ===== PASSWORD VISIBILITY TOGGLE =====
 function togglePasswordVisibility(inputId, btn) {
   var input = document.getElementById(inputId);
-  if (input.type === 'password') { input.type = 'text'; btn.textContent = 'Hide'; }
-  else { input.type = 'password'; btn.textContent = 'Show'; }
+  var T = adminT[currentLang] || adminT.en;
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = T.hidePassword || 'Hide'; }
+  else { input.type = 'password'; btn.textContent = T.showPassword || 'Show'; }
 }
 
 // ===== LOADING STATE UTILITY =====
@@ -7216,7 +7312,7 @@ function setButtonLoading(btn, isLoading) {
     spinner.className = 'inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin';
     btn.appendChild(spinner);
     var loadText = document.createElement('span');
-    loadText.textContent = ' Loading...';
+    loadText.textContent = ' ' + ((adminT[currentLang] || {}).loadingText || 'Loading...');
     btn.appendChild(loadText);
   } else {
     btn.disabled = false;
@@ -7235,13 +7331,13 @@ function updateStatTrends(current, previous) {
     if (prev === 0) { el.textContent = ''; return; }
     var pct = Math.round(((curr - prev) / prev) * 100);
     if (pct > 0) {
-      el.textContent = '\u2191 ' + pct + '% vs prior period';
+      el.textContent = '\u2191 ' + pct + '% ' + ((adminT[currentLang]||{}).trendUp || 'vs prior period');
       el.className = 'text-xs mt-1 text-green-600';
     } else if (pct < 0) {
-      el.textContent = '\u2193 ' + Math.abs(pct) + '% vs prior period';
+      el.textContent = '\u2193 ' + Math.abs(pct) + '% ' + ((adminT[currentLang]||{}).trendDown || 'vs prior period');
       el.className = 'text-xs mt-1 text-red-500';
     } else {
-      el.textContent = '\u2192 No change';
+      el.textContent = '\u2192 ' + ((adminT[currentLang]||{}).trendNoChange || 'No change');
       el.className = 'text-xs mt-1 text-gray-400';
     }
   });
@@ -7285,10 +7381,15 @@ function showToast(msg, isError) {
   t.className = `fixed bottom-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${isError ? 'bg-red-600' : 'bg-brand'}`;
   setTimeout(() => t.classList.add('hidden'), 3000);
 }
-function statusBadge(s) { return `<span class="px-2 py-1 rounded-full text-xs font-medium status-${s||'new'}">${(s||'new').charAt(0).toUpperCase()+(s||'new').slice(1)}</span>`; }
+function statusBadge(s) {
+  var key = 'status' + (s||'new').charAt(0).toUpperCase() + (s||'new').slice(1).replace(/_([a-z])/g, function(m,c){return c.toUpperCase();});
+  var T = adminT[currentLang] || {};
+  var label = T[key] || (s||'new').replace(/_/g, ' ').replace(/\b\w/g, function(c){return c.toUpperCase();});
+  return '<span class="px-2 py-1 rounded-full text-xs font-medium status-' + (s||'new') + '">' + label + '</span>';
+}
 function calSyncBadge() { return ''; }
-function fmtDate(d) { if(!d) return '—'; return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
-function fmtTime(t) { if(!t) return '—'; const [h,m]=t.split(':'); const hr=parseInt(h); return `${hr%12||12}:${m} ${hr>=12?'PM':'AM'}`; }
+function fmtDate(d) { if(!d) return '\u2014'; var loc = currentLang === 'es' ? 'es-MX' : 'en-US'; return new Date(d+'T00:00:00').toLocaleDateString(loc,{month:'short',day:'numeric',year:'numeric'}); }
+function fmtTime(t) { if(!t) return '\u2014'; const [h,m]=t.split(':'); const hr=parseInt(h); return `${hr%12||12}:${m} ${hr>=12?'PM':'AM'}`; }
 function fmtDateTime(d) { return new Date(d).toLocaleString(); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 function esc(s) { if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
@@ -7496,8 +7597,13 @@ function showDashboard(user) {
 
   // Re-trigger hash-based deep link now that session is loaded
   var hashTab = location.hash.replace('#', '');
-  if (hashTab && document.getElementById('tab-' + hashTab)) {
-    switchTab(hashTab);
+  if (hashTab) {
+    var hashTarget = document.getElementById('tab-' + hashTab);
+    var hashBtn = document.querySelector('.tab-btn[data-tab="' + hashTab + '"]');
+    // Only switch if tab exists AND is visible (not hidden by permissions)
+    if (hashTarget && (!hashBtn || hashBtn.style.display !== 'none')) {
+      switchTab(hashTab);
+    }
   }
 }
 
@@ -8795,13 +8901,13 @@ function renderCalDayWithSchedule(dateStr, sched) {
     emptyDiv.appendChild(emptyIcon);
     var emptyTitle = document.createElement('p');
     emptyTitle.className = 'text-lg font-medium';
-    emptyTitle.textContent = 'No appointments';
+    emptyTitle.textContent = T.noApptsCal || 'No appointments';
     emptyDiv.appendChild(emptyTitle);
     var emptySub = document.createElement('p');
     emptySub.className = 'text-sm';
     emptySub.textContent = sched && sched.working_count > 0
-      ? sched.working_count + ' employee' + (sched.working_count > 1 ? 's' : '') + ' available'
-      : 'This day is open for bookings';
+      ? sched.working_count + ' ' + (sched.working_count > 1 ? (T.employeesAvailable || 'employees available') : (T.employeeAvailable || 'employee available'))
+      : (T.dayOpenBookings || 'This day is open for bookings');
     emptyDiv.appendChild(emptySub);
     container.appendChild(emptyDiv);
     return;
@@ -8814,11 +8920,11 @@ function renderCalDayWithSchedule(dateStr, sched) {
     warnDiv.className = 'bg-orange-50 border border-orange-300 rounded-lg p-3 mb-4 flex justify-between items-center dark:bg-orange-900/20 dark:border-orange-800';
     var warnText = document.createElement('span');
     warnText.className = 'text-orange-800 font-medium dark:text-orange-300';
-    warnText.textContent = '\u26A0\uFE0F ' + unassigned + ' unassigned appointment' + (unassigned > 1 ? 's' : '');
+    warnText.textContent = '\u26A0\uFE0F ' + unassigned + ' ' + (unassigned > 1 ? (T.unassignedApptsCount || 'unassigned appointments') : (T.unassignedApptCount || 'unassigned appointment'));
     warnDiv.appendChild(warnText);
     var qAssignBtn = document.createElement('button');
     qAssignBtn.className = 'bg-orange-600 text-white px-3 py-1 rounded text-sm hover:bg-orange-700';
-    qAssignBtn.textContent = '\u26A1 Quick Assign All';
+    qAssignBtn.textContent = '\u26A1 ' + (T.quickAssignAll || 'Quick Assign All');
     qAssignBtn.onclick = function() { quickAssignDay(dateStr); };
     warnDiv.appendChild(qAssignBtn);
     container.appendChild(warnDiv);
@@ -8959,10 +9065,10 @@ function renderCalDayWithSchedule(dateStr, sched) {
         opt.value = e.id;
         if (a.assigned_employee_id === e.id) opt.selected = true;
         if (!isCertified) {
-          opt.textContent = e.name + ' (not certified)';
+          opt.textContent = e.name + ' (' + (T.notCertified || 'not certified') + ')';
           opt.className = 'text-red-400';
         } else if (!isWorking) {
-          opt.textContent = e.name + ' (off)';
+          opt.textContent = e.name + ' (' + (T.empOff || 'off') + ')';
           opt.className = 'text-gray-400';
         } else {
           opt.textContent = e.name;
@@ -9140,7 +9246,7 @@ function renderEmailLogs() {
     var td = document.createElement('td');
     td.colSpan = 5;
     td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
-    td.textContent = 'No email logs found.';
+    td.textContent = (adminT[currentLang] || {}).noEmailLogs || 'No email logs found.';
     tr.appendChild(td);
     tbody.appendChild(tr);
     renderEmailLogPagination();
@@ -9650,7 +9756,7 @@ async function saveMessageEdits(id, btn) {
     message: document.getElementById('msg-edit-body').value.trim(),
     status: document.getElementById('msg-edit-status').value
   };
-  if (!data.email) { showToast('Email is required', true); return; }
+  if (!data.email) { showToast(adminT[currentLang].emailIsRequired || 'Email is required', true); return; }
   btn.disabled = true;
   btn.textContent = adminT[currentLang].saving || 'Saving...';
   try {
@@ -10230,7 +10336,7 @@ function buildDailyScheduleDOM() {
   if (!data) {
     var placeholder = document.createElement('p');
     placeholder.className = 'text-gray-500 dark:text-gray-400 text-center py-4';
-    placeholder.textContent = 'Select a date';
+    placeholder.textContent = (adminT[currentLang] || {}).selectDate || 'Select a date';
     container.appendChild(placeholder);
     return;
   }
@@ -10288,7 +10394,7 @@ function buildDailyScheduleDOM() {
       } else if (!isOff) {
         var noAppt = document.createElement('p');
         noAppt.className = 'text-xs text-gray-400 dark:text-gray-500 mt-2';
-        noAppt.textContent = 'No appointments assigned';
+        noAppt.textContent = T.noApptsAssigned || 'No appointments assigned';
         card.appendChild(noAppt);
       }
 
@@ -12160,6 +12266,7 @@ function switchTab(tab) {
   });
   document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('tab-active'); el.classList.add('text-white','hover:bg-green-600'); el.setAttribute('aria-selected', 'false'); });
   var target = document.getElementById('tab-' + tab);
+  if (!target) return; // guard against invalid/permission-hidden tabs
   target.classList.add('tab-entering');
   target.classList.remove('hidden');
   requestAnimationFrame(function() {
@@ -12186,8 +12293,8 @@ function switchTab(tab) {
   if(tab==='promotions' && typeof loadPromotions === 'function') loadPromotions();
   if(tab==='faq' && typeof loadFaqs === 'function') loadFaqs();
   if(tab==='reviews' && typeof loadTestimonials === 'function') loadTestimonials();
-  if(tab==='myschedule') loadMySchedule();
-  if(tab==='mywork') loadMyWork();
+  if(tab==='myschedule' && typeof loadMySchedule === 'function') loadMySchedule();
+  if(tab==='mywork' && typeof loadMyWork === 'function') loadMyWork();
   // New tab loaders
   if(tab==='invoices' && typeof loadInvoices === 'function') loadInvoices();
   if(tab==='waitlist' && typeof loadWaitlist === 'function') loadWaitlist();
@@ -13782,15 +13889,16 @@ async function createAppointment(e) {
     notes: form.querySelector('[name="appt-notes"]').value.trim() || '',
     language: (form.querySelector('input[name="appt-language"]:checked') || {}).value || 'english'
   };
-  if (!data.first_name || !data.last_name) { errorEl.textContent = 'Name is required'; errorEl.classList.remove('hidden'); return; }
-  if (!data.email) { errorEl.textContent = 'Email is required'; errorEl.classList.remove('hidden'); return; }
-  if (!data.phone) { errorEl.textContent = 'Phone is required'; errorEl.classList.remove('hidden'); return; }
+  var VT = adminT[currentLang] || {};
+  if (!data.first_name || !data.last_name) { errorEl.textContent = VT.nameIsRequired || 'Name is required'; errorEl.classList.remove('hidden'); return; }
+  if (!data.email) { errorEl.textContent = VT.emailIsRequired || 'Email is required'; errorEl.classList.remove('hidden'); return; }
+  if (!data.phone) { errorEl.textContent = VT.phoneRequired || 'Phone is required'; errorEl.classList.remove('hidden'); return; }
   var pDigits = data.phone.replace(/\D/g, '');
   if (pDigits.length === 11 && pDigits[0] === '1') pDigits = pDigits.substring(1);
-  if (pDigits.length !== 10) { errorEl.textContent = 'Phone must be 10 digits'; errorEl.classList.remove('hidden'); return; }
-  if (!data.service) { errorEl.textContent = 'Service is required'; errorEl.classList.remove('hidden'); return; }
-  if (!data.preferred_date) { errorEl.textContent = 'Date is required'; errorEl.classList.remove('hidden'); return; }
-  if (!data.preferred_time) { errorEl.textContent = 'Time is required'; errorEl.classList.remove('hidden'); return; }
+  if (pDigits.length !== 10) { errorEl.textContent = VT.phone10Digits || 'Phone must be 10 digits'; errorEl.classList.remove('hidden'); return; }
+  if (!data.service) { errorEl.textContent = VT.serviceRequired || 'Service is required'; errorEl.classList.remove('hidden'); return; }
+  if (!data.preferred_date) { errorEl.textContent = VT.dateRequired || 'Date is required'; errorEl.classList.remove('hidden'); return; }
+  if (!data.preferred_time) { errorEl.textContent = VT.timeRequired || 'Time is required'; errorEl.classList.remove('hidden'); return; }
   btn.disabled = true;
   btn.textContent = adminT[currentLang].creating || 'Creating...';
   try {
