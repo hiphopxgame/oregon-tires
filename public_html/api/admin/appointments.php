@@ -89,10 +89,12 @@ try {
                     v.transmission AS v_transmission, v.drive_type AS v_drive_type,
                     v.fuel_type AS v_fuel_type, v.body_class AS v_body_class,
                     v.license_plate AS v_license_plate, v.tire_size_front AS v_tire_size_front,
-                    v.tire_size_rear AS v_tire_size_rear, v.color AS v_color
+                    v.tire_size_rear AS v_tire_size_rear, v.color AS v_color,
+                    ro.id AS ro_id, ro.ro_number, ro.status AS ro_status
                     FROM oretir_appointments a
                     LEFT JOIN oretir_employees e ON a.assigned_employee_id = e.id
                     LEFT JOIN oretir_vehicles v ON a.vehicle_id = v.id
+                    LEFT JOIN oretir_repair_orders ro ON ro.appointment_id = a.id
                     {$whereSQL}
                     ORDER BY {$sortPrefix}{$sortBy} {$sortOrder}
                     LIMIT ? OFFSET ?";

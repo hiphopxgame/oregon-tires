@@ -9177,7 +9177,7 @@ function renderAppointments() {
           <option value="">${adminT[currentLang].unassignedLabel}</option>${employees.filter(e=>e.is_active).map(e=>`<option value="${e.id}" ${a.assigned_employee_id===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}
         </select>
         <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100">📝 Notes</button>
-        ${a.status!=='cancelled'?`<button onclick="roShowCreateModal('${a.id}')" class="border border-green-500 text-green-700 rounded px-2 py-1 text-xs hover:bg-green-50 font-medium">🔧 Create RO</button>`:''}
+        ${a.ro_id ? `<button onclick="viewRoDetail(${a.ro_id})" class="border border-green-600 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded px-2 py-1 text-xs hover:bg-green-100 dark:hover:bg-green-900/40 font-bold transition">\uD83D\uDD27 ${esc(a.ro_number||'')} \u2022 ${esc((a.ro_status||'').replace(/_/g,' '))}</button>` : (a.status!=='cancelled'?`<button onclick="roShowCreateModal('${a.id}')" class="border border-green-500 text-green-700 rounded px-2 py-1 text-xs hover:bg-green-50 font-medium">\uD83D\uDD27 Create RO</button>`:'')}
       </div></td>
     </tr>
   `).join('') : '<tr><td colspan="9" class="p-6 text-center text-gray-500">No appointments found</td></tr>';
