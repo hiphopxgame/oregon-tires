@@ -6,7 +6,12 @@
   'use strict';
 
   var refreshInterval = null;
-  var BAY_COUNT = 4; // configurable bay count
+  var BAY_COUNT = parseInt(localStorage.getItem('shop_bay_count'), 10) || 4;
+
+  function setBayCount(n) {
+    BAY_COUNT = Math.max(1, Math.min(12, n));
+    localStorage.setItem('shop_bay_count', BAY_COUNT);
+  }
 
   function t(key, fb) {
     return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fb;
@@ -160,16 +165,34 @@
       });
       container.appendChild(stats);
 
-      // Bay status bar
-      var bayRow = el('div', 'flex gap-3 mb-6');
+      // Bay status bar with +/- config
+      var bayWrap = el('div', 'mb-6');
+      var bayRow = el('div', 'flex gap-3');
       for (var i = 1; i <= BAY_COUNT; i++) {
         var inUse = baysInUse.indexOf(i) !== -1;
         bayRow.appendChild(el('div', 'flex-1 text-center py-3 rounded-xl border-2 text-sm font-semibold ' +
           (inUse ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700'
                  : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700'),
-          t('visitBayLabel', 'Bay') + ' ' + i + ' — ' + (inUse ? t('visitOccupied', 'Occupied') : t('visitAvailable', 'Available'))));
+          t('visitBayLabel', 'Bay') + ' ' + i + ' \u2014 ' + (inUse ? t('visitOccupied', 'Occupied') : t('visitAvailable', 'Available'))));
       }
-      container.appendChild(bayRow);
+      bayWrap.appendChild(bayRow);
+
+      var bayConfig = el('div', 'flex items-center justify-end gap-2 mt-2');
+      var removeBtn = document.createElement('button');
+      removeBtn.className = 'w-7 h-7 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-bold transition flex items-center justify-center';
+      removeBtn.textContent = '\u2212';
+      removeBtn.disabled = BAY_COUNT <= 1;
+      removeBtn.addEventListener('click', function() { setBayCount(BAY_COUNT - 1); loadVisitTracker(); });
+      bayConfig.appendChild(removeBtn);
+      bayConfig.appendChild(el('span', 'text-xs text-gray-500 dark:text-gray-400', BAY_COUNT + ' ' + t('visitBaysLabel', 'bays')));
+      var addBtn = document.createElement('button');
+      addBtn.className = 'w-7 h-7 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-bold transition flex items-center justify-center';
+      addBtn.textContent = '+';
+      addBtn.disabled = BAY_COUNT >= 12;
+      addBtn.addEventListener('click', function() { setBayCount(BAY_COUNT + 1); loadVisitTracker(); });
+      bayConfig.appendChild(addBtn);
+      bayWrap.appendChild(bayConfig);
+      container.appendChild(bayWrap);
 
       // Check In button
       var btnRow = el('div', 'flex justify-end mb-4');

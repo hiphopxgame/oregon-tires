@@ -842,17 +842,9 @@ function renderRoDetailModal() {
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'start_diagnosis') {
       showBayPickerDialog(ro, function(bayNumber) {
-        var body = { id: ro.id, status: 'diagnosis' };
-        if (bayNumber) body.bay_number = bayNumber;
-        api('repair-orders.php', { method: 'PUT', body: body }).then(function() {
-          // Update visit_log bay if assigned
-          if (bayNumber && ro.visit_log_id) {
-            fetch('/api/admin/visit-log.php', {
-              method: 'PUT', credentials: 'include',
-              headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '') },
-              body: JSON.stringify({ id: ro.visit_log_id, bay_number: bayNumber })
-            }).catch(function() {});
-          }
+        var reqBody = { id: ro.id, status: 'diagnosis' };
+        if (bayNumber) reqBody.bay_number = bayNumber;
+        api('repair-orders.php', { method: 'PUT', body: reqBody }).then(function() {
           showToast(t('roDiagnosisStarted', 'Diagnosis started \u2014 tech clocked in')); refreshAfterStatus(); viewRoDetail(ro.id);
         }).catch(function(err) { showToast(err.message, true); });
       });

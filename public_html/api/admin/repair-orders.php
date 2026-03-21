@@ -596,6 +596,15 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
 
                 // Auto clock-in assigned employee if no active labor
                 autoClockInEmployee($db, $roId, $ro['assigned_employee_id'] ?? null, 'Diagnosis');
+
+                // Update bay assignment on visit_log if provided
+                if (!empty($body['bay_number'])) {
+                    $bayNum = max(1, min(20, (int) $body['bay_number']));
+                    if (!empty($ro['visit_log_id'])) {
+                        $db->prepare('UPDATE oretir_visit_log SET bay_number = ?, updated_at = NOW() WHERE id = ?')
+                           ->execute([$bayNum, $ro['visit_log_id']]);
+                    }
+                }
             } catch (\Throwable $e) {
                 error_log("repair-orders.php: diagnosis side effects failed for RO #{$roId}: " . $e->getMessage());
             }
