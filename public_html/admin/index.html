@@ -9344,17 +9344,18 @@ function renderCalDayWithSchedule(dateStr, sched) {
 function sortAppts(col) { if(apptSortBy===col) apptSortOrder=apptSortOrder==='asc'?'desc':'asc'; else { apptSortBy=col; apptSortOrder='desc'; } renderAppointments(); }
 
 var RO_STEP_MAP = {
-  intake:           { step: 1, total: 10, label: 'Intake',     icon: '\uD83D\uDCCB', color: 'gray',   action: 'Inspect vehicle' },
-  diagnosis:        { step: 2, total: 10, label: 'Diagnosis',  icon: '\uD83D\uDD0D', color: 'purple', action: 'Create estimate' },
-  estimate_pending: { step: 3, total: 10, label: 'Estimate',   icon: '\uD83D\uDCCB', color: 'blue',   action: 'Send to customer' },
-  pending_approval: { step: 4, total: 10, label: 'Approval',   icon: '\u23F3',       color: 'amber',  action: 'Awaiting approval' },
-  approved:         { step: 5, total: 10, label: 'Approved',   icon: '\u2705',       color: 'green',  action: 'Clock in & start' },
-  in_progress:      { step: 6, total: 10, label: 'Working',    icon: '\uD83D\uDD27', color: 'blue',   action: 'Tech clocked in' },
-  on_hold:          { step: 6, total: 10, label: 'On Hold',    icon: '\u23F8',       color: 'deepred', action: 'Paused' },
-  waiting_parts:    { step: 6, total: 10, label: 'Parts',      icon: '\uD83D\uDCE6', color: 'orange', action: 'Waiting for parts' },
-  ready:            { step: 7, total: 10, label: 'Ready',      icon: '\uD83D\uDE97', color: 'teal',   action: 'Ready for pickup' },
-  completed:        { step: 8, total: 10, label: 'Complete',   icon: '\uD83C\uDFC1', color: 'gray',   action: 'Checked out' },
-  invoiced:         { step: 9, total: 10, label: 'Invoiced',   icon: '\uD83D\uDCB0', color: 'green',  action: 'Invoiced' },
+  intake:           { step: 1, total: 10, label: 'Intake',     icon: '\uD83D\uDE97', color: 'gray',   action: 'Vehicle arrived' },
+  check_in:         { step: 2, total: 10, label: 'Checked In', icon: '\uD83D\uDCCB', color: 'blue',   action: 'Inspect vehicle' },
+  diagnosis:        { step: 3, total: 10, label: 'Diagnosis',  icon: '\uD83D\uDD0D', color: 'purple', action: 'Create estimate' },
+  estimate_pending: { step: 4, total: 10, label: 'Estimate',   icon: '\uD83D\uDCCB', color: 'blue',   action: 'Send to customer' },
+  pending_approval: { step: 5, total: 10, label: 'Approval',   icon: '\u23F3',       color: 'amber',  action: 'Awaiting approval' },
+  approved:         { step: 6, total: 10, label: 'Approved',   icon: '\u2705',       color: 'green',  action: 'Start repairs' },
+  in_progress:      { step: 7, total: 10, label: 'Working',    icon: '\uD83D\uDD27', color: 'blue',   action: 'Tech working' },
+  on_hold:          { step: 7, total: 10, label: 'On Hold',    icon: '\u23F8',       color: 'deepred', action: 'Paused' },
+  waiting_parts:    { step: 7, total: 10, label: 'Parts',      icon: '\uD83D\uDCE6', color: 'orange', action: 'Waiting for parts' },
+  ready:            { step: 8, total: 10, label: 'Ready',      icon: '\u2705',       color: 'teal',   action: 'Vehicle ready' },
+  completed:        { step: 9, total: 10, label: 'Complete',   icon: '\uD83C\uDFC1', color: 'gray',   action: 'Manager approved' },
+  invoiced:         { step: 10, total: 10, label: 'Invoiced',  icon: '\uD83D\uDCB0', color: 'green',  action: 'Vehicle released' },
   cancelled:        { step: 0, total: 10, label: 'Cancelled',  icon: '\u274C',       color: 'red',    action: 'Cancelled' },
 };
 
