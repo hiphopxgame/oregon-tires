@@ -703,56 +703,61 @@ function renderRoDetailModal() {
 
   // Guided action handler (shared by bar button)
   function executeGuideAction(a) {
+    function refreshAfterStatus() {
+      if (typeof loadRepairOrders === 'function') loadRepairOrders();
+      if (typeof loadKanban === 'function') loadKanban();
+      if (typeof loadLaborSummary === 'function') loadLaborSummary();
+    }
     if (a === 'check_in') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'check_in' } }).then(function() {
-        showToast(t('roCheckedIn', 'Vehicle checked in')); viewRoDetail(ro.id);
+        showToast(t('roCheckedIn', 'Vehicle checked in')); refreshAfterStatus(); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'start_diagnosis') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'diagnosis' } }).then(function() {
-        showToast(t('roDiagnosisStarted', 'Diagnosis started \u2014 tech clocked in')); viewRoDetail(ro.id);
+        showToast(t('roDiagnosisStarted', 'Diagnosis started \u2014 tech clocked in')); refreshAfterStatus(); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'estimate') {
       var inspId = hasInspections ? ro.inspections[0].id : null;
       var payload = { repair_order_id: ro.id, tax_rate: 0.0 };
       if (inspId) payload.from_inspection_id = inspId;
       api('estimates.php', { method: 'POST', body: payload }).then(function() {
-        showToast(t('roEstimateCreated', 'Estimate created')); viewRoDetail(ro.id);
+        showToast(t('roEstimateCreated', 'Estimate created')); refreshAfterStatus(); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'send_estimate') {
       if (latestEstimate) {
         api('estimates.php', { method: 'PUT', body: { id: latestEstimate.id, action: 'send' } }).then(function() {
           return api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'pending_approval' } });
         }).then(function() {
-          showToast(t('roEstimateSent', 'Estimate sent \u2014 awaiting approval')); viewRoDetail(ro.id);
+          showToast(t('roEstimateSent', 'Estimate sent \u2014 awaiting approval')); refreshAfterStatus(); viewRoDetail(ro.id);
         }).catch(function(err) { showToast(err.message, true); });
       } else {
         showToast(t('roNoEstimate', 'No estimate to send \u2014 create one first'), true);
       }
     } else if (a === 'approve') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'approved' } }).then(function() {
-        showToast(t('roStatusAdvanced', 'Approved!')); viewRoDetail(ro.id);
+        showToast(t('roStatusAdvanced', 'Approved!')); refreshAfterStatus(); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'start_work') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'in_progress' } }).then(function() {
-        showToast(t('roStatusAdvanced', 'Work started!')); viewRoDetail(ro.id);
+        showToast(t('roStatusAdvanced', 'Work started!')); refreshAfterStatus(); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'ready') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'ready' } }).then(function() {
-        showToast(t('roMarkedReady', 'Marked Ready \u2014 customer notified')); viewRoDetail(ro.id);
+        showToast(t('roMarkedReady', 'Marked Ready \u2014 customer notified')); refreshAfterStatus(); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'resume') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'in_progress' } }).then(function() {
-        showToast(t('roStatusAdvanced', 'Resumed \u2014 back in progress')); viewRoDetail(ro.id);
+        showToast(t('roStatusAdvanced', 'Resumed \u2014 back in progress')); refreshAfterStatus(); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'complete') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } }).then(function() {
         showToast(t('roMarkedComplete', 'Marked complete \u2014 ready for invoicing'));
-        viewRoDetail(ro.id);
+        refreshAfterStatus(); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'invoice') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'invoiced' } }).then(function() {
         showToast(t('roInvoicedCheckOut', 'Invoice generated \u2014 vehicle released'));
-        cleanupAndClose(); loadRepairOrders(); if (typeof loadKanban === 'function') loadKanban();
+        cleanupAndClose(); refreshAfterStatus();
       }).catch(function(err) { showToast(err.message, true); });
     }
   }
@@ -877,6 +882,9 @@ function renderRoDetailModal() {
     try {
       await api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: statusSelect.value } });
       showToast(t('roStatusUpdatedTo', 'Status updated to') + ' ' + statusSelect.value.replace(/_/g, ' '));
+      if (typeof loadRepairOrders === 'function') loadRepairOrders();
+      if (typeof loadKanban === 'function') loadKanban();
+      if (typeof loadLaborSummary === 'function') loadLaborSummary();
       viewRoDetail(ro.id);
     } catch (err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
   });
