@@ -261,6 +261,19 @@
               </select>
             </div>
           </div>
+
+          <!-- Service Location (shown for roadside/mobile services) -->
+          <div id="service-location-section" class="hidden mt-6 border-2 border-blue-200 dark:border-blue-800 rounded-lg p-5 bg-blue-50/50 dark:bg-blue-900/20 transition-all duration-300">
+            <h3 class="text-lg font-bold text-blue-700 dark:text-blue-400 mb-1 flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span data-t="serviceLocationTitle">Service Location</span>
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3" data-t="serviceLocationSubtitle">Where should we come to you?</p>
+            <input type="text" name="service_location" id="service-location-input"
+              class="w-full border-2 border-blue-300 dark:border-blue-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-gray-100"
+              data-t-placeholder="serviceLocationPlaceholder" placeholder="Full address (street, city, state, zip)">
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2" data-t="serviceLocationNote">We serve the greater Portland metro area. Distance fees may apply.</p>
+          </div>
         </div>
 
         <!-- Step 2: Date & Time -->
@@ -632,6 +645,10 @@ const t = {
     smsOptIn: 'Text me updates about my service (appointment reminders, vehicle ready notifications)',
     privacyConsent: 'I agree to the collection and use of my personal information to process this appointment request.',
     pricingDisclaimer: 'Service times are estimates and may vary.',
+    serviceLocationTitle: 'Service Location',
+    serviceLocationSubtitle: 'Where should we come to you?',
+    serviceLocationPlaceholder: 'Full address (street, city, state, zip)',
+    serviceLocationNote: 'We serve the greater Portland metro area. Distance fees may apply.',
     findTireSize: 'Find My Tire Size',
     tireSize: 'Tire Size',
     tireSizeHelp: 'Check your tire sidewall for a code like 225/65R17',
@@ -736,6 +753,10 @@ const t = {
     smsOptIn: 'Enviarme actualizaciones por mensaje de texto (recordatorios de cita, notificaciones de vehiculo listo)',
     privacyConsent: 'Acepto la recopilacion y el uso de mi informacion personal para procesar esta solicitud de cita.',
     pricingDisclaimer: 'Los tiempos de servicio son estimados y pueden variar.',
+    serviceLocationTitle: 'Ubicación del Servicio',
+    serviceLocationSubtitle: '¿A dónde debemos ir?',
+    serviceLocationPlaceholder: 'Dirección completa (calle, ciudad, estado, código postal)',
+    serviceLocationNote: 'Servimos el área metropolitana de Portland. Pueden aplicar cargos por distancia.',
     findTireSize: 'Encontrar Tamaño de Llanta',
     tireSize: 'Tamaño de Llanta',
     tireSizeHelp: 'Revise el costado de su llanta para un código como 225/65R17',
@@ -1522,6 +1543,21 @@ function updateServiceSummary() {
   if (tireOpts) {
     if (hasTireOption) tireOpts.classList.remove('hidden');
     else tireOpts.classList.add('hidden');
+  }
+
+  // Show/hide service location for roadside/mobile services
+  var LOCATION_SERVICES = ['roadside-assistance', 'mobile-service'];
+  var locationSection = document.getElementById('service-location-section');
+  var locationInput = document.getElementById('service-location-input');
+  if (locationSection) {
+    var needsLocation = values.some(function(v) { return LOCATION_SERVICES.indexOf(v) !== -1; });
+    if (needsLocation) {
+      locationSection.classList.remove('hidden');
+      if (locationInput) locationInput.required = true;
+    } else {
+      locationSection.classList.add('hidden');
+      if (locationInput) { locationInput.required = false; locationInput.value = ''; }
+    }
   }
 }
 

@@ -59,6 +59,39 @@ try {
     $language     = sanitize((string) ($data['language'] ?? 'english'), 20);
     $smsOptIn     = !empty($data['sms_opt_in']) ? 1 : 0;
 
+    // Service location (roadside/mobile services)
+    $serviceLocation = sanitize((string) ($data['service_location'] ?? ''), 500) ?: null;
+    $serviceDistanceMiles = null;
+    if ($serviceLocation) {
+        // Calculate distance from shop (8536 SE 82nd Ave: 45.46205, -122.57893)
+        try {
+            $geoUrl = 'https://nominatim.openstreetmap.org/search?' . http_build_query([
+                'q' => $serviceLocation, 'format' => 'json', 'limit' => 1,
+                'countrycodes' => 'us', 'viewbox' => '-123.2,-122.2,45.2,45.8',
+            ]);
+            $ctx = stream_context_create(['http' => [
+                'header' => "User-Agent: OregonTiresBooking/1.0\r\n", 'timeout' => 5,
+            ]]);
+            $geoResult = @file_get_contents($geoUrl, false, $ctx);
+            if ($geoResult) {
+                $geoData = json_decode($geoResult, true);
+                if (!empty($geoData[0]['lat']) && !empty($geoData[0]['lon'])) {
+                    $lat = (float) $geoData[0]['lat'];
+                    $lon = (float) $geoData[0]['lon'];
+                    // Haversine distance from shop
+                    $shopLat = 45.46205; $shopLon = -122.57893;
+                    $dLat = deg2rad($lat - $shopLat);
+                    $dLon = deg2rad($lon - $shopLon);
+                    $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($shopLat)) * cos(deg2rad($lat)) * sin($dLon/2) * sin($dLon/2);
+                    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                    $serviceDistanceMiles = round(3959 * $c, 1); // Earth radius in miles
+                }
+            }
+        } catch (\Throwable $geoErr) {
+            error_log("book.php: geocoding failed for '{$serviceLocation}': " . $geoErr->getMessage());
+        }
+    }
+
     // UTM tracking fields
     $utmSource   = sanitize((string) ($data['utm_source'] ?? ''), 100);
     $utmMedium   = sanitize((string) ($data['utm_medium'] ?? ''), 100);
@@ -244,37 +277,41 @@ try {
     $stmt = $db->prepare(
         'INSERT INTO oretir_appointments
             (reference_number, service, services, preferred_date, preferred_time, vehicle_year, vehicle_make, vehicle_model, vehicle_vin, tire_size, tire_preference, tire_count,
-             first_name, last_name, phone, email, notes, sms_opt_in, utm_source, utm_medium, utm_campaign, utm_content, preferred_employee_id, status, language, created_at, updated_at)
+             first_name, last_name, phone, email, notes, service_location, service_distance_miles,
+             sms_opt_in, utm_source, utm_medium, utm_campaign, utm_content, preferred_employee_id, status, language, created_at, updated_at)
          VALUES
             (:reference_number, :service, :services, :preferred_date, :preferred_time, :vehicle_year, :vehicle_make, :vehicle_model, :vehicle_vin, :tire_size, :tire_preference, :tire_count,
-             :first_name, :last_name, :phone, :email, :notes, :sms_opt_in, :utm_source, :utm_medium, :utm_campaign, :utm_content, :preferred_employee_id, :status, :language, NOW(), NOW())'
+             :first_name, :last_name, :phone, :email, :notes, :service_location, :service_distance_miles,
+             :sms_opt_in, :utm_source, :utm_medium, :utm_campaign, :utm_content, :preferred_employee_id, :status, :language, NOW(), NOW())'
     );
     $stmt->execute([
-        ':reference_number'     => $referenceNumber,
-        ':service'              => $service,
-        ':services'             => $servicesJson,
-        ':preferred_date'       => $preferredDate,
-        ':preferred_time'       => $preferredTime,
-        ':vehicle_year'         => $vehicleYear ?: null,
-        ':vehicle_make'         => $vehicleMake ?: null,
-        ':vehicle_model'        => $vehicleModel ?: null,
-        ':vehicle_vin'          => $vehicleVin ?: null,
-        ':tire_size'            => $tireSize ?: null,
-        ':tire_preference'      => $tirePreference ?: null,
-        ':tire_count'           => $tireCount,
-        ':first_name'           => $firstName,
-        ':last_name'            => $lastName,
-        ':phone'                => $phone,
-        ':email'                => $email,
-        ':notes'                => $notes ?: null,
-        ':sms_opt_in'           => $smsOptIn,
-        ':utm_source'           => $utmSource ?: null,
-        ':utm_medium'           => $utmMedium ?: null,
-        ':utm_campaign'         => $utmCampaign ?: null,
-        ':utm_content'          => $utmContent ?: null,
-        ':preferred_employee_id'=> $preferredEmployeeId,
-        ':status'               => 'new',
-        ':language'             => $language,
+        ':reference_number'       => $referenceNumber,
+        ':service'                => $service,
+        ':services'               => $servicesJson,
+        ':preferred_date'         => $preferredDate,
+        ':preferred_time'         => $preferredTime,
+        ':vehicle_year'           => $vehicleYear ?: null,
+        ':vehicle_make'           => $vehicleMake ?: null,
+        ':vehicle_model'          => $vehicleModel ?: null,
+        ':vehicle_vin'            => $vehicleVin ?: null,
+        ':tire_size'              => $tireSize ?: null,
+        ':tire_preference'        => $tirePreference ?: null,
+        ':tire_count'             => $tireCount,
+        ':first_name'             => $firstName,
+        ':last_name'              => $lastName,
+        ':phone'                  => $phone,
+        ':email'                  => $email,
+        ':notes'                  => $notes ?: null,
+        ':service_location'       => $serviceLocation,
+        ':service_distance_miles' => $serviceDistanceMiles,
+        ':sms_opt_in'             => $smsOptIn,
+        ':utm_source'             => $utmSource ?: null,
+        ':utm_medium'             => $utmMedium ?: null,
+        ':utm_campaign'           => $utmCampaign ?: null,
+        ':utm_content'            => $utmContent ?: null,
+        ':preferred_employee_id'  => $preferredEmployeeId,
+        ':status'                 => 'new',
+        ':language'               => $language,
     ]);
 
     $appointmentId = (int) $db->lastInsertId();

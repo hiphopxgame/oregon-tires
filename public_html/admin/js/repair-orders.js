@@ -1055,6 +1055,27 @@ function renderRoDetailModal() {
     _sections.concern = concernDiv;
   }
 
+  // ── Service Location (roadside/mobile) ──
+  if (ro.service_location) {
+    var locDiv = document.createElement('div');
+    locDiv.className = 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-xl p-4 flex items-start gap-3';
+    locDiv.appendChild(function() { var i = document.createElement('span'); i.className = 'text-2xl shrink-0'; i.textContent = '\uD83D\uDCCD'; return i; }());
+    var locContent = document.createElement('div');
+    locContent.className = 'flex-1';
+    locContent.appendChild(function() { var h = document.createElement('h4'); h.className = 'text-xs font-bold text-blue-800 dark:text-blue-300 uppercase'; h.textContent = t('roServiceLocation', 'Service Location'); return h; }());
+    locContent.appendChild(function() { var p = document.createElement('p'); p.className = 'text-sm text-gray-700 dark:text-gray-300 mt-0.5 font-medium'; p.textContent = ro.service_location; return p; }());
+    if (ro.service_distance_miles !== null && ro.service_distance_miles !== undefined) {
+      locContent.appendChild(function() {
+        var d = document.createElement('p');
+        d.className = 'text-xs text-blue-600 dark:text-blue-400 mt-1 font-semibold';
+        d.textContent = '\uD83D\uDCCF ' + ro.service_distance_miles + ' ' + t('roMilesFromShop', 'miles from shop');
+        return d;
+      }());
+    }
+    locDiv.appendChild(locContent);
+    _sections.location = locDiv;
+  }
+
   // ── Collapsible Details (vehicle specs, dates, VIN — not the primary focus) ──
   var detailsToggle = document.createElement('details');
   detailsToggle.className = 'border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden';
@@ -1646,9 +1667,14 @@ function renderRoDetailModal() {
       sectionOrder = ['concern', 'details', 'inspections', 'estimates', 'notes', 'labor', 'invoices', 'appointment'];
   }
 
-  // Insert apptOrigin after concern in the display order (if it exists)
+  // Insert location + apptOrigin after concern in the display order
+  if (_sections.location) {
+    var locIdx = sectionOrder.indexOf('concern');
+    if (locIdx !== -1) sectionOrder.splice(locIdx + 1, 0, 'location');
+    else sectionOrder.unshift('location');
+  }
   if (_sections.apptOrigin) {
-    var concernIdx = sectionOrder.indexOf('concern');
+    var concernIdx = sectionOrder.indexOf('location') !== -1 ? sectionOrder.indexOf('location') : sectionOrder.indexOf('concern');
     if (concernIdx !== -1) sectionOrder.splice(concernIdx + 1, 0, 'apptOrigin');
     else sectionOrder.unshift('apptOrigin');
   }

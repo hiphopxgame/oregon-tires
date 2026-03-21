@@ -427,8 +427,9 @@ function createRoForAppointment(int $appointmentId, PDO $db): ?array
     $stmt = $db->prepare(
         'INSERT INTO oretir_repair_orders
             (ro_number, customer_id, vehicle_id, appointment_id, status,
-             customer_concern, admin_notes, promised_date, promised_time, assigned_employee_id, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+             customer_concern, service_location, service_distance_miles,
+             admin_notes, promised_date, promised_time, assigned_employee_id, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
     );
     $stmt->execute([
         $roNumber,
@@ -437,6 +438,8 @@ function createRoForAppointment(int $appointmentId, PDO $db): ?array
         $appointmentId,
         'intake',
         $concern ?: null,
+        $appt['service_location'] ?? null,
+        $appt['service_distance_miles'] ?? null,
         $roAdminNotes,
         $appt['preferred_date'] ?? null,
         $appt['preferred_time'] ?? null,
