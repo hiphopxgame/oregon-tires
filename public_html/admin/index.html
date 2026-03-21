@@ -529,6 +529,7 @@
             <button onclick="switchTab('loyalty')" data-tab="loyalty" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🎁 <span data-t="tabLoyalty">Loyalty &amp; Rewards</span></button>
             <button onclick="switchTab('referrals')" data-tab="referrals" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🤝 <span data-t="tabReferrals">Referrals</span></button>
             <button onclick="switchTab('reminders')" data-tab="reminders" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔔 <span data-t="tabReminders">Service Reminders</span></button>
+            <button onclick="switchTab('marketintel')" data-tab="marketintel" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🗺️ <span data-t="tabMarketIntel">Market Intel</span></button>
           </div>
         </div>
 
@@ -572,6 +573,7 @@
           <option value="loyalty" data-t="tabLoyalty">Loyalty &amp; Rewards</option>
           <option value="referrals" data-t="tabReferrals">Referrals</option>
           <option value="reminders" data-t="tabReminders">Service Reminders</option>
+          <option value="marketintel" data-t="tabMarketIntel">Market Intel</option>
         </optgroup>
         <optgroup label="⚙️ Settings" data-t-label="navSettings">
           <option value="analytics" data-t="tabAnalytics">Analytics</option>
@@ -3886,6 +3888,18 @@
       </div>
     </div>
 
+    <!-- MARKET INTEL TAB -->
+    <div id="tab-marketintel" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🗺️ <span data-t="tabMarketIntel">Market Intel</span></h2>
+          <p class="text-green-100" data-t="marketIntelSubtitle">Portland auto industry directory — competitors, partners, and market landscape</p>
+        </div>
+        <button onclick="loadMarketIntel()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="market-intel-container"></div>
+    </div>
+
   </div>
 
 <!-- APPOINTMENT DETAILS + NOTES MODAL -->
@@ -5123,6 +5137,42 @@ const adminT = {
     hintNewCustomers: 'New customers appear as bookings come in',
     hintBookAppointments: 'Book appointments to see this data',
     hintBookWithTimes: 'Book appointments with preferred times to see peak hours',
+    // Market Intel
+    tabMarketIntel: 'Market Intel',
+    marketIntelSubtitle: 'Portland auto industry directory — competitors, partners, and market landscape',
+    miLoading: 'Loading market data...',
+    miTotalShops: 'Total Businesses',
+    miTotalReviews: 'Total Reviews',
+    miAvgRating: 'Avg Rating',
+    miRepairShops: 'Repair Shops',
+    miDealerships: 'Dealerships',
+    miSpecialty: 'Specialty',
+    miParts: 'Parts',
+    miMap: 'Map',
+    miDirectory: 'Directory',
+    miSearch: 'Search businesses...',
+    miAllCategories: 'All Categories',
+    miAllCities: 'All Cities',
+    miAllTypes: 'All Types',
+    miIndependent: 'Independent',
+    miChains: 'Chains',
+    miSortRating: 'Rating',
+    miSortReviews: 'Reviews',
+    miSortDistance: 'Distance',
+    miResults: 'results',
+    miLegend: 'Legend',
+    miReviews: 'reviews',
+    miServices: 'Services',
+    miViewOnGoogle: 'View on Google Maps',
+    miClickMarker: 'Click a marker to see details',
+    miBusiness: 'Business',
+    miCategory: 'Category',
+    miLocation: 'Location',
+    miRating: 'Rating',
+    miPhone: 'Phone',
+    miType: 'Type',
+    miNoResults: 'No businesses match your filters.',
+    miPage: 'Page',
     // Shop Performance
     spTitle: 'Shop Performance',
     spAvgTimeInShop: 'Avg Time in Shop',
@@ -6721,6 +6771,42 @@ const adminT = {
     hintNewCustomers: 'Los nuevos clientes aparecen cuando llegan las reservas',
     hintBookAppointments: 'Reserve citas para ver estos datos',
     hintBookWithTimes: 'Reserve citas con horarios preferidos para ver horas pico',
+    // Market Intel
+    tabMarketIntel: 'Inteligencia de Mercado',
+    marketIntelSubtitle: 'Directorio automotriz de Portland \u2014 competidores, socios y panorama del mercado',
+    miLoading: 'Cargando datos del mercado...',
+    miTotalShops: 'Total de Negocios',
+    miTotalReviews: 'Total de Rese\u00f1as',
+    miAvgRating: 'Calificaci\u00f3n Prom.',
+    miRepairShops: 'Talleres',
+    miDealerships: 'Agencias',
+    miSpecialty: 'Especialidad',
+    miParts: 'Refacciones',
+    miMap: 'Mapa',
+    miDirectory: 'Directorio',
+    miSearch: 'Buscar negocios...',
+    miAllCategories: 'Todas las Categor\u00edas',
+    miAllCities: 'Todas las Ciudades',
+    miAllTypes: 'Todos los Tipos',
+    miIndependent: 'Independiente',
+    miChains: 'Cadenas',
+    miSortRating: 'Calificaci\u00f3n',
+    miSortReviews: 'Rese\u00f1as',
+    miSortDistance: 'Distancia',
+    miResults: 'resultados',
+    miLegend: 'Leyenda',
+    miReviews: 'rese\u00f1as',
+    miServices: 'Servicios',
+    miViewOnGoogle: 'Ver en Google Maps',
+    miClickMarker: 'Haga clic en un marcador para ver detalles',
+    miBusiness: 'Negocio',
+    miCategory: 'Categor\u00eda',
+    miLocation: 'Ubicaci\u00f3n',
+    miRating: 'Calificaci\u00f3n',
+    miPhone: 'Tel\u00e9fono',
+    miType: 'Tipo',
+    miNoResults: 'Ning\u00fan negocio coincide con sus filtros.',
+    miPage: 'P\u00e1gina',
     // Shop Performance
     spTitle: 'Rendimiento del Taller',
     spAvgTimeInShop: 'Tiempo Prom. en Taller',
@@ -12933,6 +13019,7 @@ function switchTab(tab) {
   if(tab==='referrals' && typeof loadReferrals === 'function') loadReferrals();
   if(tab==='reminders' && typeof loadServiceReminders === 'function') loadServiceReminders();
   if(tab==='resourceplanner' && typeof loadResourcePlanner === 'function') loadResourcePlanner();
+  if(tab==='marketintel' && typeof loadMarketIntel === 'function') loadMarketIntel();
   if(tab==='blog' && typeof loadBlogPosts === 'function') loadBlogPosts();
   if(tab==='gallery' && typeof renderGallery === 'function') renderGallery();
   if(tab==='messages') { if(typeof loadMessages === 'function') loadMessages(); if(typeof loadConversations === 'function') loadConversations(); }
@@ -15172,6 +15259,7 @@ loadMessages = async function() {
 <script src="/admin/js/labor-tracker.js"></script>
 <script src="/admin/js/tech-picker.js"></script>
 <script src="/admin/js/admin-help.js"></script>
+<script src="/admin/js/market-intel.js" defer></script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';
   // Override global showToast — handles legacy (msg, isError: bool) and new (msg, type: string)
