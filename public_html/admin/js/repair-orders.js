@@ -445,105 +445,6 @@ function renderRoDetailModal() {
     headerLeft.appendChild(apptP);
   }
 
-  // Assigned tech row
-  var techRow = document.createElement('div');
-  techRow.className = 'flex items-center gap-2 mt-1.5';
-
-  if (ro.assigned_employee_id) {
-    var assignedEmp = (typeof employees !== 'undefined' ? employees : []).find(function(e) { return e.id === ro.assigned_employee_id; });
-    var techName = assignedEmp ? assignedEmp.name : (ro.assigned_employee_name || 'Unknown');
-
-    var techBadge = document.createElement('span');
-    techBadge.className = 'inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-200 font-medium';
-    techBadge.textContent = '\uD83D\uDD27 ' + techName;
-    techRow.appendChild(techBadge);
-
-    var changeBtn = document.createElement('button');
-    changeBtn.className = 'text-[10px] px-1.5 py-0.5 rounded border border-white/30 text-white/70 hover:text-white hover:bg-white/10 transition';
-    changeBtn.textContent = t('techPickerChange', 'Change');
-    changeBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (typeof TechPicker === 'undefined') return;
-      TechPicker.open({
-        anchor: changeBtn,
-        service: ro.appointment ? ro.appointment.service : null,
-        date: ro.appointment ? ro.appointment.preferred_date : null,
-        currentEmployeeId: ro.assigned_employee_id,
-        onSelect: function(empId) {
-          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, assigned_employee_id: empId } })
-            .then(function() { viewRoDetail(ro.id); })
-            .catch(function(err) { showToast(err.message, true); });
-        }
-      });
-    });
-    techRow.appendChild(changeBtn);
-  } else {
-    var assignBtn = document.createElement('button');
-    assignBtn.className = 'inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-200 hover:bg-amber-500/30 transition font-medium cursor-pointer';
-    assignBtn.textContent = '\uD83D\uDD27 ' + t('techPickerAssign', 'Assign Tech');
-    assignBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (typeof TechPicker === 'undefined') return;
-      TechPicker.open({
-        anchor: assignBtn,
-        service: ro.appointment ? ro.appointment.service : null,
-        date: ro.appointment ? ro.appointment.preferred_date : null,
-        currentEmployeeId: null,
-        onSelect: function(empId) {
-          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, assigned_employee_id: empId } })
-            .then(function() { viewRoDetail(ro.id); })
-            .catch(function(err) { showToast(err.message, true); });
-        }
-      });
-    });
-    techRow.appendChild(assignBtn);
-  }
-  headerLeft.appendChild(techRow);
-
-  // Bay assignment row — show for active ROs (not completed/invoiced/cancelled)
-  var activeStatuses = ['intake','check_in','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready'];
-  if (activeStatuses.indexOf(ro.status) !== -1) {
-    var bayRow = document.createElement('div');
-    bayRow.className = 'flex items-center gap-2 mt-1';
-    var currentBay = ro.visit && ro.visit.bay_number ? ro.visit.bay_number : null;
-
-    if (currentBay) {
-      var bayBadge = document.createElement('span');
-      bayBadge.className = 'inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-200 font-medium';
-      bayBadge.textContent = '\uD83C\uDFE0 ' + t('visitBayLabel', 'Bay') + ' ' + currentBay;
-      bayRow.appendChild(bayBadge);
-
-      var bayChangeBtn = document.createElement('button');
-      bayChangeBtn.className = 'text-[10px] px-1.5 py-0.5 rounded border border-white/30 text-white/70 hover:text-white hover:bg-white/10 transition';
-      bayChangeBtn.textContent = t('techPickerChange', 'Change');
-      bayChangeBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        showBayPickerDialog(ro, function(bayNum) {
-          if (bayNum === null) return;
-          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: ro.status, bay_number: bayNum } })
-            .then(function() { showToast(t('visitBayLabel', 'Bay') + ' ' + bayNum + ' ' + t('roStatusUpdatedTo', 'assigned')); viewRoDetail(ro.id); })
-            .catch(function(err) { showToast(err.message, true); });
-        });
-      });
-      bayRow.appendChild(bayChangeBtn);
-    } else {
-      var bayAssignBtn = document.createElement('button');
-      bayAssignBtn.className = 'inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-200 hover:bg-blue-500/30 transition font-medium cursor-pointer';
-      bayAssignBtn.textContent = '\uD83C\uDFE0 ' + t('bayPickerTitle', 'Assign Bay');
-      bayAssignBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        showBayPickerDialog(ro, function(bayNum) {
-          if (bayNum === null) return;
-          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: ro.status, bay_number: bayNum } })
-            .then(function() { showToast(t('visitBayLabel', 'Bay') + ' ' + bayNum + ' ' + t('roStatusUpdatedTo', 'assigned')); viewRoDetail(ro.id); })
-            .catch(function(err) { showToast(err.message, true); });
-        });
-      });
-      bayRow.appendChild(bayAssignBtn);
-    }
-    headerLeft.appendChild(bayRow);
-  }
-
   headerTop.appendChild(headerLeft);
 
   var headerBtns = document.createElement('div');
@@ -1014,6 +915,121 @@ function renderRoDetailModal() {
     cancelBar.appendChild(function() { var i = document.createElement('span'); i.className = 'text-3xl'; i.textContent = '\u274C'; return i; }());
     cancelBar.appendChild(function() { var p = document.createElement('p'); p.className = 'font-semibold text-red-800 dark:text-red-300'; p.textContent = t('roCancelledDone', 'This repair order has been cancelled.'); return p; }());
     body.appendChild(cancelBar);
+  }
+
+  // ── Technician & Bay assignment card (body, not header) ──
+  var _activeStatuses = ['intake','check_in','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready'];
+  if (_activeStatuses.indexOf(ro.status) !== -1) {
+    var assignCard = document.createElement('div');
+    assignCard.className = 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-wrap gap-4';
+
+    // ── Technician column ──
+    var techCol = document.createElement('div');
+    techCol.className = 'flex-1 min-w-[140px]';
+    techCol.appendChild(function() { var l = document.createElement('div'); l.className = 'text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 mb-1.5'; l.textContent = t('techPickerTitle', 'Assign Technician'); return l; }());
+
+    if (ro.assigned_employee_id) {
+      var _assignedEmp = (typeof employees !== 'undefined' ? employees : []).find(function(e) { return e.id === ro.assigned_employee_id; });
+      var _techName = _assignedEmp ? _assignedEmp.name : (ro.assigned_employee_name || 'Unknown');
+      var techInfo = document.createElement('div');
+      techInfo.className = 'flex items-center gap-2';
+
+      var _colors = ['bg-blue-500','bg-emerald-500','bg-purple-500','bg-amber-500','bg-rose-500','bg-cyan-500'];
+      var _ci = Math.abs(_techName.split('').reduce(function(h,c){return((h<<5)-h)+c.charCodeAt(0);},0)) % 6;
+      var _ini = _techName.trim().split(/\s+/).map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+      var _avatar = document.createElement('div');
+      _avatar.className = 'w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ' + _colors[_ci];
+      _avatar.textContent = _ini;
+      techInfo.appendChild(_avatar);
+
+      var _nameWrap = document.createElement('div');
+      _nameWrap.appendChild(function() { var n = document.createElement('div'); n.className = 'text-sm font-semibold text-gray-900 dark:text-gray-100'; n.textContent = _techName; return n; }());
+      techInfo.appendChild(_nameWrap);
+      techCol.appendChild(techInfo);
+
+      var techChangeBtn = document.createElement('button');
+      techChangeBtn.className = 'mt-2 text-xs text-green-600 dark:text-green-400 hover:underline font-medium';
+      techChangeBtn.textContent = t('techPickerChange', 'Change');
+      techChangeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (typeof TechPicker === 'undefined') return;
+        TechPicker.open({
+          anchor: techChangeBtn,
+          service: ro.appointment ? ro.appointment.service : null,
+          date: ro.appointment ? ro.appointment.preferred_date : null,
+          currentEmployeeId: ro.assigned_employee_id,
+          onSelect: function(empId) {
+            api('repair-orders.php', { method: 'PUT', body: { id: ro.id, assigned_employee_id: empId } })
+              .then(function() { viewRoDetail(ro.id); })
+              .catch(function(err) { showToast(err.message, true); });
+          }
+        });
+      });
+      techCol.appendChild(techChangeBtn);
+    } else {
+      var techAssignBtn = document.createElement('button');
+      techAssignBtn.className = 'w-full py-2.5 rounded-lg border-2 border-dashed border-amber-400 dark:border-amber-600 text-amber-600 dark:text-amber-400 text-sm font-semibold hover:bg-amber-50 dark:hover:bg-amber-900/20 transition';
+      techAssignBtn.textContent = '\uD83D\uDD27 ' + t('techPickerAssign', 'Assign Tech');
+      techAssignBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (typeof TechPicker === 'undefined') return;
+        TechPicker.open({
+          anchor: techAssignBtn,
+          service: ro.appointment ? ro.appointment.service : null,
+          date: ro.appointment ? ro.appointment.preferred_date : null,
+          currentEmployeeId: null,
+          onSelect: function(empId) {
+            api('repair-orders.php', { method: 'PUT', body: { id: ro.id, assigned_employee_id: empId } })
+              .then(function() { viewRoDetail(ro.id); })
+              .catch(function(err) { showToast(err.message, true); });
+          }
+        });
+      });
+      techCol.appendChild(techAssignBtn);
+    }
+    assignCard.appendChild(techCol);
+
+    // ── Bay column ──
+    var bayCol = document.createElement('div');
+    bayCol.className = 'flex-1 min-w-[140px]';
+    bayCol.appendChild(function() { var l = document.createElement('div'); l.className = 'text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 mb-1.5'; l.textContent = t('bayPickerTitle', 'Assign Bay'); return l; }());
+    var _currentBay = ro.visit && ro.visit.bay_number ? ro.visit.bay_number : null;
+
+    function _bayAction(e) {
+      e.stopPropagation();
+      showBayPickerDialog(ro, function(bayNum) {
+        if (bayNum === null) return;
+        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: ro.status, bay_number: bayNum } })
+          .then(function() { showToast(t('visitBayLabel', 'Bay') + ' ' + bayNum + ' ' + t('roStatusUpdatedTo', 'assigned')); viewRoDetail(ro.id); })
+          .catch(function(err) { showToast(err.message, true); });
+      });
+    }
+
+    if (_currentBay) {
+      var bayDisplay = document.createElement('div');
+      bayDisplay.className = 'flex items-center gap-2';
+      var bayIcon = document.createElement('div');
+      bayIcon.className = 'w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 text-sm font-bold';
+      bayIcon.textContent = _currentBay;
+      bayDisplay.appendChild(bayIcon);
+      bayDisplay.appendChild(function() { var n = document.createElement('div'); n.className = 'text-sm font-semibold text-gray-900 dark:text-gray-100'; n.textContent = t('visitBayLabel', 'Bay') + ' ' + _currentBay; return n; }());
+      bayCol.appendChild(bayDisplay);
+
+      var bayChgBtn = document.createElement('button');
+      bayChgBtn.className = 'mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium';
+      bayChgBtn.textContent = t('techPickerChange', 'Change');
+      bayChgBtn.addEventListener('click', _bayAction);
+      bayCol.appendChild(bayChgBtn);
+    } else {
+      var bayAssignBtn = document.createElement('button');
+      bayAssignBtn.className = 'w-full py-2.5 rounded-lg border-2 border-dashed border-blue-400 dark:border-blue-600 text-blue-600 dark:text-blue-400 text-sm font-semibold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition';
+      bayAssignBtn.textContent = '\uD83C\uDFE0 ' + t('bayPickerTitle', 'Assign Bay');
+      bayAssignBtn.addEventListener('click', _bayAction);
+      bayCol.appendChild(bayAssignBtn);
+    }
+    assignCard.appendChild(bayCol);
+
+    body.appendChild(assignCard);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
