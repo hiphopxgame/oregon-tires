@@ -123,7 +123,7 @@
 
     // Sort
     if (sortBy === 'rating') {
-      filteredShops.sort(function(a, b) { return (b.google_rating || 0) - (a.google_rating || 0); });
+      filteredShops.sort(function(a, b) { var d = (b.google_rating || 0) - (a.google_rating || 0); return d !== 0 ? d : (b.google_review_count || 0) - (a.google_review_count || 0); });
     } else if (sortBy === 'reviews') {
       filteredShops.sort(function(a, b) { return (b.google_review_count || 0) - (a.google_review_count || 0); });
     } else if (sortBy === 'name') {
