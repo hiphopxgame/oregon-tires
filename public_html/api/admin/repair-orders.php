@@ -35,7 +35,7 @@ try {
                     v.tire_size_front, v.tire_size_rear, v.color as vehicle_color,
                     v.license_plate
                  FROM oretir_repair_orders r
-                 JOIN oretir_customers c ON c.id = r.customer_id
+                 LEFT JOIN oretir_customers c ON c.id = r.customer_id
                  LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
                  WHERE r.id = ?'
             );
@@ -200,7 +200,7 @@ try {
         }
 
         $countSql = "SELECT COUNT(*) FROM oretir_repair_orders r
-                     JOIN oretir_customers c ON c.id = r.customer_id
+                     LEFT JOIN oretir_customers c ON c.id = r.customer_id
                      LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
                      {$where}";
         $countStmt = $db->prepare($countSql);
@@ -214,7 +214,7 @@ try {
                     (SELECT COUNT(*) FROM oretir_estimates WHERE repair_order_id = r.id) as estimate_count,
                     (SELECT COUNT(*) FROM oretir_labor_entries WHERE repair_order_id = r.id AND clock_out_at IS NULL) as active_labor_count
                 FROM oretir_repair_orders r
-                JOIN oretir_customers c ON c.id = r.customer_id
+                LEFT JOIN oretir_customers c ON c.id = r.customer_id
                 LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
                 {$where}
                 ORDER BY {$sortColumn} {$sortOrder}

@@ -488,7 +488,7 @@
           <button class="nav-group-btn" data-t="navWorkflow">📋 Workflow ▾</button>
           <div class="nav-dropdown">
             <button onclick="switchTab('appointments')" data-tab="appointments" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📅 <span data-t="tabAppointments">Appointments</span></button>
-            <button onclick="switchTab('repairorders')" data-tab="repairorders" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔧 <span data-t="tabRepairOrders">Repair Orders</span></button>
+            <button onclick="switchTab('repairorders')" data-tab="repairorders" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📊 <span data-t="tabRepairOrders">Shop Board</span></button>
             <button onclick="switchTab('invoices')" data-tab="invoices" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🧾 <span data-t="tabInvoices">Invoices</span></button>
             <button onclick="switchTab('labor')" data-tab="labor" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">⏱ <span data-t="tabLabor">Labor Tracking</span></button>
             <button onclick="switchTab('visits')" data-tab="visits" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">👣 <span data-t="tabVisits">Visit Tracking</span></button>
@@ -864,11 +864,10 @@
     <!-- REPAIR ORDERS TAB -->
     <div id="tab-repairorders" class="tab-content hidden fade-in" role="tabpanel">
       <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
-        <div><h2 class="text-2xl font-bold">🔧 <span data-t="repairOrders">Repair Orders</span></h2><p class="text-green-100" data-t="roSubtitle">Manage repair orders, inspections, and estimates</p></div>
+        <div><h2 class="text-2xl font-bold">📊 <span data-t="repairOrders">Shop Board</span></h2><p class="text-green-100" data-t="roSubtitle">Drag-and-drop kanban board for all active repair orders</p></div>
         <div class="flex items-center gap-3">
-          <button onclick="roShowCreateModal()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30" data-t="roNewRo">+ New RO</button>
           <button onclick="exportRepairOrdersCsv()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30" data-t="exportCsv">Export CSV</button>
-          <button onclick="loadRepairOrders()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30" data-t="roRefresh">↻ Refresh</button>
+          <button onclick="if(typeof loadKanban==='function')loadKanban();loadRepairOrders();" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30" data-t="roRefresh">↻ Refresh</button>
         </div>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
@@ -12894,7 +12893,7 @@ function switchTab(tab) {
   if(tab==='customers') loadCustomers();
   if(tab==='sitecontent') { loadSiteSettings(); loadEmailTemplates(); }
   if(tab==='subscribers' && typeof loadSubscribers === 'function') loadSubscribers();
-  if(tab==='repairorders' && typeof loadRepairOrders === 'function') loadRepairOrders();
+  if(tab==='repairorders') { if(typeof loadKanban === 'function') loadKanban(); if(typeof loadRepairOrders === 'function') loadRepairOrders(); }
   if(tab==='promotions' && typeof loadPromotions === 'function') loadPromotions();
   if(tab==='faq' && typeof loadFaqs === 'function') loadFaqs();
   if(tab==='reviews' && typeof loadTestimonials === 'function') loadTestimonials();
