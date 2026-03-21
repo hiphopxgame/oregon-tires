@@ -437,56 +437,149 @@ function renderRoDetailModal() {
   // Status timeline stepper (compact)
   body.appendChild(renderStatusTimeline(ro.status));
 
-  // ── Live Timer Displays ──
-  if (ro.checked_in_at || ro.service_started_at) {
-    var timerBar = document.createElement('div');
-    timerBar.className = 'flex items-center gap-6 px-4 py-2 bg-gray-50 dark:bg-gray-900/30 rounded-lg mb-2';
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TIME TRACKING — Visit + Labor unified view
+  // ═══════════════════════════════════════════════════════════════════════════
+  var hasTimeData = ro.checked_in_at || ro.service_started_at || (ro.active_labor && ro.active_labor.length > 0) || (ro.labor_entries && ro.labor_entries.length > 0);
 
-    function makeTimer(label, startTime, colorCls, dotColor) {
+  if (hasTimeData) {
+    var timeCard = document.createElement('div');
+    timeCard.className = 'bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden';
+
+    // Header with live timers
+    var timeHeader = document.createElement('div');
+    timeHeader.className = 'px-4 py-3 bg-gray-100 dark:bg-gray-800 flex items-center justify-between flex-wrap gap-2';
+    var timeTitle = document.createElement('span');
+    timeTitle.className = 'text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400';
+    timeTitle.textContent = t('roTimeTracking', 'Time Tracking');
+    timeHeader.appendChild(timeTitle);
+
+    // Live timer badges (visit + repair)
+    var timerWrap = document.createElement('div');
+    timerWrap.className = 'flex items-center gap-3';
+
+    function makeLiveBadge(label, startTime, endTime, colorCls, dotColor) {
       if (!startTime) return null;
-      var wrap = document.createElement('div');
-      wrap.className = 'flex items-center gap-2';
-      var dot = document.createElement('span');
-      dot.className = 'w-2.5 h-2.5 rounded-full animate-pulse ' + dotColor;
-      wrap.appendChild(dot);
-      var lbl = document.createElement('span');
-      lbl.className = 'text-xs font-bold uppercase tracking-wider ' + colorCls;
-      lbl.textContent = label + ': ';
-      wrap.appendChild(lbl);
-      var val = document.createElement('span');
-      val.className = 'text-sm font-bold ' + colorCls + ' ro-live-timer';
-      val.setAttribute('data-start', startTime);
-      wrap.appendChild(val);
-      return wrap;
-    }
-
-    var visitTimer = makeTimer(t('roTimerVisit', 'VISIT'), ro.checked_in_at, 'text-green-700 dark:text-green-400', 'bg-green-500');
-    if (visitTimer && !ro.checked_out_at) timerBar.appendChild(visitTimer);
-
-    // Repair timer: use latest active labor clock_in, or service_started_at
-    var repairStart = ro.service_started_at;
-    if (ro.active_labor && ro.active_labor.length > 0) {
-      repairStart = ro.active_labor[0].clock_in_at;
-    }
-    var repairTimer = makeTimer(t('roTimerRepair', 'REPAIR'), repairStart, 'text-orange-600 dark:text-orange-400', 'bg-orange-500');
-    if (repairTimer && !ro.service_ended_at) timerBar.appendChild(repairTimer);
-
-    if (timerBar.childNodes.length > 0) {
-      body.appendChild(timerBar);
-      // Update all timers every 30s
-      function updateRoTimers() {
-        var timers = timerBar.querySelectorAll('.ro-live-timer');
-        timers.forEach(function(el) {
-          var start = new Date(el.getAttribute('data-start'));
-          var diff = Math.floor((Date.now() - start.getTime()) / 60000);
-          var h = Math.floor(diff / 60); var m = diff % 60;
-          el.textContent = (h > 0 ? h + 'h ' : '') + m + 'm';
-        });
+      var isLive = !endTime;
+      var badge = document.createElement('span');
+      badge.className = 'inline-flex items-center gap-1.5 text-xs font-bold px-2 py-1 rounded-full ' + colorCls;
+      if (isLive) {
+        var dot = document.createElement('span');
+        dot.className = 'w-2 h-2 rounded-full animate-pulse ' + dotColor;
+        badge.appendChild(dot);
       }
-      updateRoTimers();
-      modal._roTimerInterval = setInterval(updateRoTimers, 30000);
-      modal.addEventListener('click', function(e) { if (e.target === modal) cleanupAndClose(); });
+      var txt = document.createElement('span');
+      txt.className = 'ro-live-timer';
+      txt.setAttribute('data-start', startTime);
+      if (endTime) txt.setAttribute('data-end', endTime);
+      badge.appendChild(document.createTextNode(label + ' '));
+      badge.appendChild(txt);
+      return badge;
     }
+
+    var vBadge = makeLiveBadge(t('roTimerVisit', 'Visit'), ro.checked_in_at, ro.checked_out_at, 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300', 'bg-green-500');
+    if (vBadge) timerWrap.appendChild(vBadge);
+
+    var repairStart = ro.service_started_at;
+    if (ro.active_labor && ro.active_labor.length > 0) repairStart = ro.active_labor[0].clock_in_at;
+    var rBadge = makeLiveBadge(t('roTimerRepair', 'Repair'), repairStart, ro.service_ended_at, 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300', 'bg-orange-500');
+    if (rBadge) timerWrap.appendChild(rBadge);
+
+    timeHeader.appendChild(timerWrap);
+    timeCard.appendChild(timeHeader);
+
+    // ── 4-column timeline: Arrival → Service Start → Service End → Check Out ──
+    var tlRow = document.createElement('div');
+    tlRow.className = 'grid grid-cols-4 gap-2 p-4 text-center';
+
+    function fmtClock(ts) {
+      if (!ts) return '--';
+      var d = new Date(ts.replace(' ', 'T'));
+      var h = d.getHours(); var m = d.getMinutes();
+      var ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+    }
+    function minutesBetween(a, b) {
+      if (!a || !b) return null;
+      return Math.floor((new Date(b.replace(' ', 'T')).getTime() - new Date(a.replace(' ', 'T')).getTime()) / 60000);
+    }
+    function fmtMin(m) {
+      if (m === null || m === undefined) return '';
+      if (m < 60) return m + 'm';
+      return Math.floor(m / 60) + 'h ' + (m % 60) + 'm';
+    }
+
+    var steps = [
+      { label: t('roTimeArrival', 'Arrival'), ts: ro.checked_in_at, color: 'green', active: !!ro.checked_in_at },
+      { label: t('roTimeServiceStart', 'Service Start'), ts: ro.service_started_at, color: 'blue', active: !!ro.service_started_at, dur: minutesBetween(ro.checked_in_at, ro.service_started_at), durLabel: t('roTimeWait', 'wait') },
+      { label: t('roTimeServiceEnd', 'Service Done'), ts: ro.service_ended_at, color: 'amber', active: !!ro.service_ended_at, dur: minutesBetween(ro.service_started_at, ro.service_ended_at), durLabel: t('roTimeService', 'service') },
+      { label: t('roTimeCheckOut', 'Check Out'), ts: ro.checked_out_at, color: 'gray', active: !!ro.checked_out_at, dur: minutesBetween(ro.checked_in_at, ro.checked_out_at), durLabel: t('roTimeTotal', 'total') },
+    ];
+
+    steps.forEach(function(s) {
+      var colorMap = { green: 'border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20', blue: 'border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20', amber: 'border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20', gray: 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800' };
+      var textMap = { green: 'text-green-700 dark:text-green-400', blue: 'text-blue-700 dark:text-blue-400', amber: 'text-amber-700 dark:text-amber-400', gray: 'text-gray-600 dark:text-gray-400' };
+      var cls = s.active ? (colorMap[s.color] || colorMap.gray) : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800';
+      var cell = document.createElement('div');
+      cell.className = 'rounded-lg p-2 border ' + cls;
+      cell.appendChild(function() { var l = document.createElement('div'); l.className = 'text-[10px] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500'; l.textContent = s.label; return l; }());
+      cell.appendChild(function() { var v = document.createElement('div'); v.className = 'text-sm font-bold ' + (s.active ? (textMap[s.color] || '') : 'text-gray-300 dark:text-gray-600'); v.textContent = fmtClock(s.ts); return v; }());
+      if (s.dur !== null && s.dur !== undefined) {
+        cell.appendChild(function() { var d = document.createElement('div'); d.className = 'text-[10px] text-gray-400 mt-0.5'; d.textContent = s.durLabel + ' ' + fmtMin(s.dur); return d; }());
+      }
+      tlRow.appendChild(cell);
+    });
+    timeCard.appendChild(tlRow);
+
+    // ── Active labor entries (currently clocked in) ──
+    if (ro.active_labor && ro.active_labor.length > 0) {
+      var activeDiv = document.createElement('div');
+      activeDiv.className = 'px-4 pb-3';
+      ro.active_labor.forEach(function(le) {
+        var row = document.createElement('div');
+        row.className = 'flex items-center gap-2 py-1.5 border-t border-gray-200/50 dark:border-gray-700/50';
+        row.appendChild(function() { var d = document.createElement('span'); d.className = 'w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0'; return d; }());
+        row.appendChild(function() { var n = document.createElement('span'); n.className = 'text-xs font-bold text-gray-800 dark:text-gray-200'; n.textContent = le.employee_name; return n; }());
+        if (le.task_description) {
+          row.appendChild(function() { var t = document.createElement('span'); t.className = 'text-xs text-gray-400 truncate'; t.textContent = le.task_description; return t; }());
+        }
+        row.appendChild(function() { var e = document.createElement('span'); e.className = 'text-xs font-medium text-green-600 dark:text-green-400 ml-auto ro-live-timer'; e.setAttribute('data-start', le.clock_in_at); return e; }());
+        activeDiv.appendChild(row);
+      });
+      timeCard.appendChild(activeDiv);
+    }
+
+    // ── Completed labor summary (if entries exist) ──
+    var completedLabor = (ro.labor_entries || []).filter(function(le) { return le.clock_out_at; });
+    if (completedLabor.length > 0 || ro.labor_total_hours > 0) {
+      var laborSummary = document.createElement('div');
+      laborSummary.className = 'px-4 pb-3 flex items-center gap-3 text-xs';
+      laborSummary.appendChild(function() { var s = document.createElement('span'); s.className = 'font-bold text-gray-500 dark:text-gray-400'; s.textContent = completedLabor.length + ' ' + t('roLaborEntries', 'labor entries'); return s; }());
+      laborSummary.appendChild(function() { var s = document.createElement('span'); s.className = 'text-gray-400'; s.textContent = '\u2022'; return s; }());
+      laborSummary.appendChild(function() { var s = document.createElement('span'); s.className = 'font-bold text-gray-700 dark:text-gray-300'; s.textContent = (ro.labor_total_hours || 0).toFixed(1) + 'h ' + t('roLaborTotal', 'total'); return s; }());
+      laborSummary.appendChild(function() { var s = document.createElement('span'); s.className = 'text-gray-400'; s.textContent = '\u2022'; return s; }());
+      laborSummary.appendChild(function() { var s = document.createElement('span'); s.className = 'font-bold text-green-600 dark:text-green-400'; s.textContent = (ro.labor_billable_hours || 0).toFixed(1) + 'h ' + t('roLaborBillable', 'billable'); return s; }());
+      timeCard.appendChild(laborSummary);
+    }
+
+    body.appendChild(timeCard);
+
+    // Live timer updater
+    function updateRoTimers() {
+      var timers = timeCard.querySelectorAll('.ro-live-timer');
+      timers.forEach(function(el) {
+        var start = new Date(el.getAttribute('data-start'));
+        var endAttr = el.getAttribute('data-end');
+        var end = endAttr ? new Date(endAttr) : new Date();
+        var diff = Math.floor((end.getTime() - start.getTime()) / 60000);
+        if (diff < 0) diff = 0;
+        var h = Math.floor(diff / 60); var m = diff % 60;
+        el.textContent = (h > 0 ? h + 'h ' : '') + m + 'm';
+      });
+    }
+    updateRoTimers();
+    modal._roTimerInterval = setInterval(updateRoTimers, 30000);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

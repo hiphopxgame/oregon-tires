@@ -70,6 +70,43 @@ try {
             $laborStmt->execute([$id]);
             $ro['active_labor'] = $laborStmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // All labor entries (for history display)
+            $allLaborStmt = $db->prepare(
+                'SELECT l.id, l.employee_id, l.clock_in_at, l.clock_out_at, l.duration_minutes,
+                        l.task_description, l.is_billable, e.name AS employee_name
+                 FROM oretir_labor_entries l
+                 JOIN oretir_employees e ON e.id = l.employee_id
+                 WHERE l.repair_order_id = ?
+                 ORDER BY l.clock_in_at ASC'
+            );
+            $allLaborStmt->execute([$id]);
+            $ro['labor_entries'] = $allLaborStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Labor totals
+            $totalMins = 0; $billableMins = 0;
+            foreach ($ro['labor_entries'] as $le) {
+                $m = $le['duration_minutes'] !== null ? (int) $le['duration_minutes'] : 0;
+                $totalMins += $m;
+                if ($le['is_billable']) $billableMins += $m;
+            }
+            $ro['labor_total_hours'] = round($totalMins / 60, 2);
+            $ro['labor_billable_hours'] = round($billableMins / 60, 2);
+
+            // Visit log (if linked)
+            try {
+                $visitStmt = $db->prepare(
+                    'SELECT v.*, e.name AS employee_name
+                     FROM oretir_visit_log v
+                     LEFT JOIN oretir_employees e ON e.id = v.assigned_employee_id
+                     WHERE v.repair_order_id = ?
+                     ORDER BY v.check_in_at DESC LIMIT 1'
+                );
+                $visitStmt->execute([$id]);
+                $ro['visit'] = $visitStmt->fetch(PDO::FETCH_ASSOC) ?: null;
+            } catch (\Throwable $e) {
+                $ro['visit'] = null;
+            }
+
             // Linked appointment
             if ($ro['appointment_id']) {
                 $aStmt = $db->prepare('SELECT id, reference_number, service, preferred_date, preferred_time, status FROM oretir_appointments WHERE id = ?');
