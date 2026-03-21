@@ -695,7 +695,15 @@ function renderRoDetailModal() {
   else if (status === 'estimate_pending') guide = { text: t('roGuideSendPending', 'Send the estimate to the customer for review'), btn: t('roSendToCustomer', 'Send to Customer'), color: 'amber', icon: '\uD83D\uDCE7', action: 'send_estimate' };
   else if (status === 'pending_approval') guide = { text: t('roGuideApproval', 'Customer is reviewing the estimate. Approve when confirmed.'), btn: t('roMarkApproved', 'Mark Approved'), color: 'amber', icon: '\u23F3', action: 'approve' };
   else if (status === 'approved') guide = { text: t('roGuideStart', 'Customer approved! Start the repairs.'), btn: t('roStartRepairs', 'Start Repairs'), color: 'green', icon: '\uD83D\uDE80', action: 'start_work', sub: t('roGuideStartSub', 'This will clock in the tech and start the repair timer') };
-  else if (status === 'in_progress') guide = { text: t('roGuideReady', 'Work in progress. Mark ready when the job is done.'), btn: t('roMarkReady', 'Mark Ready'), color: 'teal', icon: '\uD83D\uDD27', action: 'ready', sub: t('roGuideReadySub', 'This will clock out the tech and notify the customer') };
+  else if (status === 'in_progress') guide = {
+    text: t('roGuideInProgress', 'Work in progress. Update the status as the job evolves.'),
+    color: 'indigo', icon: '\uD83D\uDD27',
+    multiAction: [
+      { btn: t('roWaitingParts', 'Waiting on Parts'), action: 'waiting_parts', color: 'orange', icon: '\uD83D\uDCE6' },
+      { btn: t('roPutOnHold', 'On Hold'), action: 'on_hold', color: 'red', icon: '\u23F8' },
+      { btn: t('roMarkReady', 'Mark Ready'), action: 'ready', color: 'teal', icon: '\u2705' }
+    ]
+  };
   else if (status === 'on_hold') guide = { text: t('roGuideOnHold', 'Job is on hold. Resume when ready to continue.'), btn: t('roResumeWork', 'Resume Work'), color: 'red', icon: '\u23F8', action: 'resume' };
   else if (status === 'waiting_parts') guide = { text: t('roGuideWaitParts', 'Waiting for parts. Resume when parts arrive.'), btn: t('roPartsArrived', 'Parts Arrived \u2014 Resume'), color: 'orange', icon: '\uD83D\uDCE6', action: 'resume' };
   else if (status === 'ready') guide = { text: t('roGuidePickup', 'Vehicle is ready. Mark complete when approved by manager.'), btn: t('roMarkComplete', 'Mark Complete'), color: 'green', icon: '\u2705', action: 'complete', sub: t('roGuideCompleteSub', 'Manager gate \u2014 no invoice generated yet') };
@@ -745,6 +753,14 @@ function renderRoDetailModal() {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'ready' } }).then(function() {
         showToast(t('roMarkedReady', 'Marked Ready \u2014 customer notified')); refreshAfterStatus(); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
+    } else if (a === 'waiting_parts') {
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'waiting_parts' } }).then(function() {
+        showToast(t('roWaitingPartsSet', 'Status set to Waiting on Parts')); refreshAfterStatus(); viewRoDetail(ro.id);
+      }).catch(function(err) { showToast(err.message, true); });
+    } else if (a === 'on_hold') {
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'on_hold' } }).then(function() {
+        showToast(t('roOnHoldSet', 'Job put on hold')); refreshAfterStatus(); viewRoDetail(ro.id);
+      }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'resume') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'in_progress' } }).then(function() {
         showToast(t('roStatusAdvanced', 'Resumed \u2014 back in progress')); refreshAfterStatus(); viewRoDetail(ro.id);
@@ -764,7 +780,7 @@ function renderRoDetailModal() {
 
   // ── Render the guided action bar ──
   if (guide && currentStep) {
-    var colorMap = { purple: 'from-purple-600 to-purple-700', blue: 'from-blue-600 to-blue-700', amber: 'from-amber-500 to-amber-600', green: 'from-green-600 to-green-700', teal: 'from-teal-600 to-teal-700', orange: 'from-orange-500 to-orange-600', red: 'from-red-800 to-red-900' };
+    var colorMap = { purple: 'from-purple-600 to-purple-700', blue: 'from-blue-600 to-blue-700', amber: 'from-amber-500 to-amber-600', green: 'from-green-600 to-green-700', teal: 'from-teal-600 to-teal-700', orange: 'from-orange-500 to-orange-600', red: 'from-red-800 to-red-900', indigo: 'from-indigo-600 to-indigo-700' };
     var guideBar = document.createElement('div');
     guideBar.className = 'bg-gradient-to-r ' + (colorMap[guide.color] || colorMap.blue) + ' rounded-xl p-4 text-white';
 
@@ -790,11 +806,32 @@ function renderRoDetailModal() {
       textCol.appendChild(function() { var s = document.createElement('p'); s.className = 'text-xs opacity-70 mt-0.5'; s.textContent = guide.sub; return s; }());
     }
     mainRow.appendChild(textCol);
-    var gBtn = document.createElement('button');
-    gBtn.className = 'shrink-0 px-5 py-2.5 bg-white text-gray-900 rounded-lg font-bold text-sm hover:bg-gray-100 transition shadow-lg';
-    gBtn.textContent = guide.btn;
-    gBtn.addEventListener('click', function() { executeGuideAction(guide.action); });
-    mainRow.appendChild(gBtn);
+
+    if (guide.multiAction) {
+      // Multiple action buttons (e.g. in_progress → waiting_parts / on_hold / ready)
+      var btnGroup = document.createElement('div');
+      btnGroup.className = 'flex flex-wrap gap-2 shrink-0';
+      guide.multiAction.forEach(function(ma) {
+        var btnColorMap = { teal: 'bg-white text-gray-900 hover:bg-gray-100', orange: 'bg-orange-400/30 text-white hover:bg-orange-400/50 border border-orange-300/40', red: 'bg-red-400/30 text-white hover:bg-red-400/50 border border-red-300/40' };
+        var maBtn = document.createElement('button');
+        maBtn.className = 'px-4 py-2 rounded-lg font-bold text-sm transition shadow-sm flex items-center gap-1.5 ' + (btnColorMap[ma.color] || 'bg-white/20 text-white hover:bg-white/30');
+        var maIcon = document.createElement('span');
+        maIcon.textContent = ma.icon;
+        maBtn.appendChild(maIcon);
+        var maTxt = document.createElement('span');
+        maTxt.textContent = ma.btn;
+        maBtn.appendChild(maTxt);
+        maBtn.addEventListener('click', function() { executeGuideAction(ma.action); });
+        btnGroup.appendChild(maBtn);
+      });
+      mainRow.appendChild(btnGroup);
+    } else {
+      var gBtn = document.createElement('button');
+      gBtn.className = 'shrink-0 px-5 py-2.5 bg-white text-gray-900 rounded-lg font-bold text-sm hover:bg-gray-100 transition shadow-lg';
+      gBtn.textContent = guide.btn;
+      gBtn.addEventListener('click', function() { executeGuideAction(guide.action); });
+      mainRow.appendChild(gBtn);
+    }
     guideBar.appendChild(mainRow);
     body.appendChild(guideBar);
   } else if (status === 'invoiced') {
