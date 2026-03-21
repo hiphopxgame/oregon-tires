@@ -12278,13 +12278,6 @@ async function updateApptAssignment(id, empId, forceAssign) {
     // Refresh RO list + kanban so new intake ROs appear immediately
     if (typeof loadRepairOrders === 'function') loadRepairOrders();
     if (typeof loadKanban === 'function') loadKanban();
-    // Auto-open RO after assignment (which also confirms)
-    if (empId) {
-      var updated = appointments.find(function(x) { return String(x.id) === String(id); });
-      if (updated && updated.ro_id) {
-        viewRoDetail(updated.ro_id);
-      }
-    }
   } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
 }
 
