@@ -74,6 +74,8 @@ $services = [
     'oil-change',
     'engine-diagnostics',
     'suspension-repair',
+    'mobile-service',
+    'roadside-assistance',
 ];
 
 // ---------------------------------------------------------------------------

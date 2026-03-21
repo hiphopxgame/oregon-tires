@@ -83,7 +83,24 @@ if (ob_get_level() === 0) {
       "postalCode": "97266",
       "addressCountry": "US"
     },
-    "knowsLanguage": ["en", "es"]
+    "knowsLanguage": ["en", "es"],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "150",
+      "bestRating": "5"
+    },
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "18:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "17:00" }
+    ],
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 45.4626,
+      "longitude": -122.5801
+    },
+    "sameAs": ["https://www.facebook.com/OregonTiresPDX", "https://www.instagram.com/oregontirespdx"]
   }
   </script>
 

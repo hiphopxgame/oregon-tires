@@ -8,7 +8,7 @@
   'use strict';
 
   // ─── Translation strings ──────────────────────────────────────────────────
-  var lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
+  var lang = (typeof currentLang !== 'undefined') ? currentLang : (localStorage.getItem('oregontires_lang') || 'en');
   var strings = {
     en: {
       installTitle: 'Install Oregon Tires App',

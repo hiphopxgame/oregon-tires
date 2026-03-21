@@ -50,6 +50,9 @@
     overlay.style.cssText = 'position:fixed;inset:0;background:var(--color-overlay, rgba(0,0,0,0.6));z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;';
 
     var popup = document.createElement('div');
+    popup.setAttribute('role', 'dialog');
+    popup.setAttribute('aria-modal', 'true');
+    popup.setAttribute('aria-label', title || 'Special Offer');
     var animateSlide = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     popup.style.cssText = 'background:var(--ot-card-bg);border-radius:1rem;max-width:28rem;width:100%;padding:2rem;position:relative;box-shadow:0 25px 50px rgba(0,0,0,0.25);' + (animateSlide ? 'animation:otSlideUp 0.3s ease;' : '');
 
@@ -141,6 +144,9 @@
       style.textContent = '@keyframes otSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}';
       document.head.appendChild(style);
     }
+
+    // Focus email input for keyboard users
+    setTimeout(function() { emailInput.focus(); }, 100);
 
     // Close handlers
     closeBtn.addEventListener('click', function() {
