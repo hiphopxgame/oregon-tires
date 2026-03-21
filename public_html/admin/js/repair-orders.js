@@ -283,10 +283,36 @@ function renderRoTable() {
     }
     tr.appendChild(td3);
 
-    // Column 4: Status badge + step + time in status
+    // Column 4: Status dropdown (any direction) + time in status
     var td4 = document.createElement('td');
     td4.className = 'p-3 text-sm';
-    td4.appendChild(createStatusBadge(ro.status));
+    var statusSelect = document.createElement('select');
+    statusSelect.className = 'text-xs border rounded-lg px-2 py-1.5 font-bold cursor-pointer dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+    var allStatuses = ['intake','check_in','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
+    var statusColorMap = { intake:'#dbeafe', check_in:'#cffafe', diagnosis:'#ede9fe', estimate_pending:'#fef3c7', pending_approval:'#ffedd5', approved:'#dcfce7', in_progress:'#e0e7ff', on_hold:'#991b1b', waiting_parts:'#fef3c7', ready:'#d1fae5', completed:'#f3f4f6', invoiced:'#ccfbf1', cancelled:'#fee2e2' };
+    allStatuses.forEach(function(s) {
+      var opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s.replace(/_/g, ' ');
+      if (s === ro.status) opt.selected = true;
+      statusSelect.appendChild(opt);
+    });
+    statusSelect.style.backgroundColor = statusColorMap[ro.status] || '';
+    if (ro.status === 'on_hold') statusSelect.style.color = '#fff';
+    statusSelect.addEventListener('click', function(e) { e.stopPropagation(); });
+    statusSelect.addEventListener('change', (function(roId, sel) { return async function(e) {
+      e.stopPropagation();
+      try {
+        await api('repair-orders.php', { method: 'PUT', body: { id: roId, status: sel.value } });
+        showToast(t('roStatusUpdatedTo', 'Status updated to') + ' ' + sel.value.replace(/_/g, ' '));
+        loadRepairOrders();
+        if (typeof loadKanban === 'function') loadKanban();
+      } catch(err) {
+        showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true);
+        loadRepairOrders();
+      }
+    }; })(ro.id, statusSelect));
+    td4.appendChild(statusSelect);
     var updatedAge = timeAgo(ro.updated_at);
     if (updatedAge) {
       var timeLabel = document.createElement('div');
@@ -709,6 +735,100 @@ function renderRoDetailModal() {
   else if (status === 'ready') guide = { text: t('roGuidePickup', 'Vehicle is ready. Mark complete when approved by manager.'), btn: t('roMarkComplete', 'Mark Complete'), color: 'green', icon: '\u2705', action: 'complete', sub: t('roGuideCompleteSub', 'Manager gate \u2014 no invoice generated yet') };
   else if (status === 'completed') guide = { text: t('roGuideInvoice', 'Approved by manager \u2014 generate invoice and release vehicle'), btn: t('roInvoiceRelease', 'Invoice & Release Vehicle'), color: 'teal', icon: '\uD83D\uDCB0', action: 'invoice', sub: t('roGuideInvoiceSub', 'This will generate the invoice, email it, and mark the vehicle as out') };
 
+  // Bay picker dialog for diagnosis step
+  function showBayPickerDialog(ro, onConfirm) {
+    var bayCount = parseInt(localStorage.getItem('shop_bay_count'), 10) || 4;
+    var existing = document.getElementById('bay-picker-overlay');
+    if (existing) existing.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'bay-picker-overlay';
+    overlay.className = 'fixed inset-0 z-[200] flex items-center justify-center p-4';
+
+    var backdrop = document.createElement('div');
+    backdrop.className = 'absolute inset-0 bg-black/40';
+    overlay.appendChild(backdrop);
+
+    var card = document.createElement('div');
+    card.className = 'relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden';
+    card.style.animation = 'fadeInScale 0.2s ease-out';
+
+    // Header
+    var header = document.createElement('div');
+    header.className = 'bg-purple-50 dark:bg-purple-900/20 px-5 py-4 border-b border-purple-200 dark:border-purple-800';
+    var titleRow = document.createElement('div');
+    titleRow.className = 'flex items-center gap-2.5';
+    var icon = document.createElement('div');
+    icon.className = 'w-9 h-9 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center flex-shrink-0 text-lg';
+    icon.textContent = '\uD83D\uDD27';
+    titleRow.appendChild(icon);
+    var titleText = document.createElement('div');
+    var h3 = document.createElement('h3');
+    h3.className = 'font-semibold text-gray-900 dark:text-gray-100 text-sm';
+    h3.textContent = t('bayPickerTitle', 'Assign Bay');
+    titleText.appendChild(h3);
+    var sub = document.createElement('p');
+    sub.className = 'text-xs text-gray-500 dark:text-gray-400';
+    sub.textContent = t('bayPickerSub', 'Select a bay for this vehicle');
+    titleText.appendChild(sub);
+    titleRow.appendChild(titleText);
+    header.appendChild(titleRow);
+    card.appendChild(header);
+
+    // Bay grid
+    var body = document.createElement('div');
+    body.className = 'px-5 py-4';
+    var grid = document.createElement('div');
+    grid.className = 'grid grid-cols-' + Math.min(bayCount, 4) + ' gap-2';
+    var selectedBay = null;
+
+    for (var i = 1; i <= bayCount; i++) {
+      (function(bayNum) {
+        var btn = document.createElement('button');
+        btn.className = 'py-3 rounded-xl border-2 text-sm font-semibold transition bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-100 dark:hover:bg-green-900/40';
+        btn.textContent = t('visitBayLabel', 'Bay') + ' ' + bayNum;
+        btn.addEventListener('click', function() {
+          // Deselect previous
+          var allBtns = grid.querySelectorAll('button');
+          for (var j = 0; j < allBtns.length; j++) {
+            allBtns[j].className = 'py-3 rounded-xl border-2 text-sm font-semibold transition bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-100 dark:hover:bg-green-900/40';
+          }
+          // Select this one
+          btn.className = 'py-3 rounded-xl border-2 text-sm font-semibold transition bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-500 dark:border-purple-500 ring-2 ring-purple-500/30';
+          selectedBay = bayNum;
+        });
+        grid.appendChild(btn);
+      })(i);
+    }
+    body.appendChild(grid);
+    card.appendChild(body);
+
+    // Footer
+    var footer = document.createElement('div');
+    footer.className = 'px-5 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700 flex gap-3 justify-between';
+
+    var skipBtn = document.createElement('button');
+    skipBtn.className = 'px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition';
+    skipBtn.textContent = t('bayPickerSkip', 'Skip');
+    skipBtn.addEventListener('click', function() { overlay.remove(); onConfirm(null); });
+    footer.appendChild(skipBtn);
+
+    var confirmBtn = document.createElement('button');
+    confirmBtn.className = 'px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition shadow-sm';
+    confirmBtn.textContent = t('bayPickerConfirm', 'Assign & Start');
+    confirmBtn.addEventListener('click', function() { overlay.remove(); onConfirm(selectedBay); });
+    footer.appendChild(confirmBtn);
+
+    card.appendChild(footer);
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    // Escape to skip
+    function onKey(e) { if (e.key === 'Escape') { document.removeEventListener('keydown', onKey); overlay.remove(); onConfirm(null); } }
+    document.addEventListener('keydown', onKey);
+    backdrop.addEventListener('click', function() { document.removeEventListener('keydown', onKey); overlay.remove(); onConfirm(null); });
+  }
+
   // Guided action handler (shared by bar button)
   function executeGuideAction(a) {
     function refreshAfterStatus() {
@@ -721,9 +841,21 @@ function renderRoDetailModal() {
         showToast(t('roCheckedIn', 'Vehicle checked in')); refreshAfterStatus(); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'start_diagnosis') {
-      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'diagnosis' } }).then(function() {
-        showToast(t('roDiagnosisStarted', 'Diagnosis started \u2014 tech clocked in')); refreshAfterStatus(); viewRoDetail(ro.id);
-      }).catch(function(err) { showToast(err.message, true); });
+      showBayPickerDialog(ro, function(bayNumber) {
+        var body = { id: ro.id, status: 'diagnosis' };
+        if (bayNumber) body.bay_number = bayNumber;
+        api('repair-orders.php', { method: 'PUT', body: body }).then(function() {
+          // Update visit_log bay if assigned
+          if (bayNumber && ro.visit_log_id) {
+            fetch('/api/admin/visit-log.php', {
+              method: 'PUT', credentials: 'include',
+              headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '') },
+              body: JSON.stringify({ id: ro.visit_log_id, bay_number: bayNumber })
+            }).catch(function() {});
+          }
+          showToast(t('roDiagnosisStarted', 'Diagnosis started \u2014 tech clocked in')); refreshAfterStatus(); viewRoDetail(ro.id);
+        }).catch(function(err) { showToast(err.message, true); });
+      });
     } else if (a === 'estimate') {
       var inspId = hasInspections ? ro.inspections[0].id : null;
       var payload = { repair_order_id: ro.id, tax_rate: 0.0 };
