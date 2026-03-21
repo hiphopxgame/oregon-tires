@@ -5109,6 +5109,8 @@ const adminT = {
     hintBookingsToROs: 'Book appointments and create repair orders',
     hintCompleteROs: 'Complete or invoice repair orders to see service times',
     hintNewCustomers: 'New customers appear as bookings come in',
+    hintBookAppointments: 'Book appointments to see this data',
+    hintBookWithTimes: 'Book appointments with preferred times to see peak hours',
     // Shop Performance
     spTitle: 'Shop Performance',
     spAvgTimeInShop: 'Avg Time in Shop',
@@ -6691,6 +6693,8 @@ const adminT = {
     hintBookingsToROs: 'Reserve citas y cree \u00f3rdenes de reparaci\u00f3n',
     hintCompleteROs: 'Complete o facture \u00f3rdenes de reparaci\u00f3n para ver tiempos de servicio',
     hintNewCustomers: 'Los nuevos clientes aparecen cuando llegan las reservas',
+    hintBookAppointments: 'Reserve citas para ver estos datos',
+    hintBookWithTimes: 'Reserve citas con horarios preferidos para ver horas pico',
     // Shop Performance
     spTitle: 'Rendimiento del Taller',
     spAvgTimeInShop: 'Tiempo Prom. en Taller',
@@ -11802,7 +11806,7 @@ async function loadAnalytics() {
     if (serviceData.length) {
       OTCharts.serviceBars(svcCard, serviceData, T.analyticsAppointments);
     } else {
-      svcCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      svcCard.appendChild(emptyHint(T.analyticsNoData, T.hintBookAppointments || 'Book appointments to see service popularity'));
     }
     midRow.appendChild(svcCard);
 
@@ -11818,7 +11822,7 @@ async function loadAnalytics() {
         { label: T.analyticsCancelled, value: cancelled, color: OTCharts.TOKENS.colors.statusCancelled, textColor: OTCharts.TOKENS.colors.statusCancelled }
       ], totalFromStatus);
     } else {
-      statusCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      statusCard.appendChild(emptyHint(T.analyticsNoData, T.hintBookAppointments || 'Book appointments to see status breakdown'));
     }
     midRow.appendChild(statusCard);
 
@@ -11835,7 +11839,7 @@ async function loadAnalytics() {
         return { label: fmtHour(p.hour_slot), value: parseInt(p.count) };
       }), { color: OTCharts.TOKENS.colors.amber, maxValue: maxPeak });
     } else {
-      peakCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      peakCard.appendChild(emptyHint(T.analyticsNoData, T.hintBookWithTimes || 'Book appointments with preferred times to see peak hours'));
     }
     timeRow.appendChild(peakCard);
 
@@ -11851,7 +11855,7 @@ async function loadAnalytics() {
         labelFormatter: function(d) { return d.date || d.label; },
       });
     } else {
-      trendCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      trendCard.appendChild(emptyHint(T.analyticsNoData, T.hintBookAppointments || 'Book appointments to see booking trends'));
     }
     timeRow.appendChild(trendCard);
 
@@ -11886,7 +11890,13 @@ async function loadAnalytics() {
     // Employee Performance
     var empCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow p-6');
     empCard.appendChild(el('h3', 'text-lg font-bold text-gray-800 dark:text-gray-200 mb-4', T.analyticsEmployeePerf));
-    if (empStats.length) {
+    if (empStats.length || (sData && sData.employee_productivity && sData.employee_productivity.length)) {
+      // Prefer server-side data if local empStats is empty
+      if (!empStats.length && sData && sData.employee_productivity) {
+        empStats = sData.employee_productivity.map(function(ep) {
+          return { name: ep.employee_name, total: ep.completed_count || 0, completed: ep.completed_count || 0, totalTime: 0, avgTime: 0 };
+        });
+      }
       var tableWrap = el('div', 'overflow-x-auto');
       var table = el('table', 'w-full text-sm');
       var thead = document.createElement('thead');
@@ -11916,7 +11926,7 @@ async function loadAnalytics() {
       tableWrap.appendChild(table);
       empCard.appendChild(tableWrap);
     } else {
-      empCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      empCard.appendChild(emptyHint(T.analyticsNoData, T.hintAssignEmployees || 'Assign employees to appointments and mark as completed'));
     }
     btmRow.appendChild(empCard);
 
@@ -12063,10 +12073,10 @@ async function loadAnalytics() {
 
     var retCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
     retCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', T.analyticsCustomerRetention));
-    if (sData && sData.customer_retention) {
+    if (sData && sData.customer_retention && sData.customer_retention.total > 0) {
       OTCharts.retentionDisplay(retCard, sData.customer_retention);
     } else {
-      retCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      retCard.appendChild(emptyHint(T.analyticsNoData, T.hintNewCustomers || 'New customers appear as bookings come in'));
     }
     topCustRow.appendChild(retCard);
 
@@ -12164,6 +12174,9 @@ async function updateApptAssignment(id, empId, forceAssign) {
     if (!res.ok || !json.success) throw new Error(json.error || 'Request failed');
     showToast(empId ? adminT[currentLang].employeeAssigned : adminT[currentLang].assignmentRemoved);
     await loadAppointments();
+    // Refresh RO list + kanban so new intake ROs appear immediately
+    if (typeof loadRepairOrders === 'function') loadRepairOrders();
+    if (typeof loadKanban === 'function') loadKanban();
     // Auto-open RO after assignment (which also confirms)
     if (empId) {
       var updated = appointments.find(function(x) { return String(x.id) === String(id); });
