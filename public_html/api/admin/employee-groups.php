@@ -40,15 +40,21 @@ try {
         if (!$group) jsonError('Group not found.', 404);
         if ($group['is_system']) jsonError('Cannot delete system groups.', 400);
 
-        // Reassign employees to default group
-        $defStmt = $db->query('SELECT id FROM oretir_employee_groups WHERE is_default = 1 LIMIT 1');
-        $defaultId = $defStmt->fetchColumn();
-        if ($defaultId) {
-            $db->prepare('UPDATE oretir_employees SET group_id = ? WHERE group_id = ?')
-               ->execute([$defaultId, $id]);
+        // Reassign employees to default group, then delete (transactional)
+        $db->beginTransaction();
+        try {
+            $defStmt = $db->query('SELECT id FROM oretir_employee_groups WHERE is_default = 1 LIMIT 1');
+            $defaultId = $defStmt->fetchColumn();
+            if ($defaultId) {
+                $db->prepare('UPDATE oretir_employees SET group_id = ? WHERE group_id = ?')
+                   ->execute([$defaultId, $id]);
+            }
+            $db->prepare('DELETE FROM oretir_employee_groups WHERE id = ?')->execute([$id]);
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            throw $e;
         }
-
-        $db->prepare('DELETE FROM oretir_employee_groups WHERE id = ?')->execute([$id]);
         jsonSuccess(['deleted' => $id]);
     }
 
