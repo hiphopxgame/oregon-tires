@@ -7616,6 +7616,7 @@ function statusBadge(s) {
   return '<span class="px-2 py-1 rounded-full text-xs font-medium status-' + (s||'new') + '">' + label + '</span>';
 }
 function calSyncBadge() { return ''; }
+function localDateStr(d) { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
 function fmtDate(d) { if(!d) return '\u2014'; var loc = currentLang === 'es' ? 'es-MX' : 'en-US'; return new Date(d+'T00:00:00').toLocaleDateString(loc,{month:'short',day:'numeric',year:'numeric'}); }
 function fmtTime(t) { if(!t) return '\u2014'; const [h,m]=t.split(':'); const hr=parseInt(h); return `${hr%12||12}:${m} ${hr>=12?'PM':'AM'}`; }
 function fmtDateTime(d) { return new Date(d).toLocaleString(); }
@@ -8301,7 +8302,7 @@ function populateMonthFilter() {
     const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     const opt = document.createElement('option');
     opt.value = val;
-    opt.textContent = d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+    opt.textContent = d.toLocaleDateString(currentLang==='es'?'es-MX':'en-US',{month:'long',year:'numeric'});
     sel.appendChild(opt);
   }
 }
@@ -8309,7 +8310,7 @@ function populateMonthFilter() {
 // ===== OVERVIEW =====
 function getOverviewStats() {
   var T = adminT[currentLang];
-  var todayStr = new Date().toISOString().split('T')[0];
+  var todayStr = localDateStr();
   var today = new Date(todayStr + 'T00:00:00');
   var weekEnd = new Date(today); weekEnd.setDate(weekEnd.getDate() + (7 - weekEnd.getDay()));
 
@@ -8369,7 +8370,7 @@ function renderUpcomingSchedule(stats) {
   dates.forEach(function(date, idx) {
     var apts = byDate[date];
     var d = new Date(date + 'T00:00:00');
-    var dayLabel = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    var dayLabel = d.toLocaleDateString(currentLang==='es'?'es-MX':'en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     var isToday = date === stats.todayStr;
     if (idx === 14) pieces.push('<div id="overview-more-days" class="hidden">');
     var chunk = '<div class="border-l-4 ' + (apts.length ? 'border-green-600 bg-green-50 dark:bg-green-900/20' : 'border-gray-300') + ' pl-4 py-2 rounded-r-lg ' + (isToday ? 'ring-2 ring-amber-500 bg-amber-50 dark:bg-amber-900/20' : '') + '">';
@@ -8674,7 +8675,7 @@ function renderOverviewCharts() {
   var weekData = [];
   for (var d = 0; d < 6; d++) {
     var dt = new Date(monday); dt.setDate(monday.getDate() + d);
-    var dateStr = dt.toISOString().split('T')[0];
+    var dateStr = localDateStr(dt);
     var count = appointments.filter(function(a) { return a.preferred_date === dateStr; }).length;
     weekData.push({ label: dayNames[d], value: count });
   }
@@ -8706,7 +8707,7 @@ function renderOverviewCharts() {
     renderEnhancedBayUtilization();
   } else {
     var bayEl = clearEl('chart-bay-utilization');
-    var todayStr = new Date().toISOString().split('T')[0];
+    var todayStr = localDateStr();
     var todayApts = appointments.filter(function(a) { return a.preferred_date === todayStr && a.status !== 'cancelled'; });
     var hourMap = {};
     todayApts.forEach(function(a) {
@@ -8733,7 +8734,7 @@ function renderOverviewCharts() {
   var now = new Date(); now.setHours(0,0,0,0);
   for (var i = 29; i >= 0; i--) {
     var dd = new Date(now); dd.setDate(now.getDate() - i);
-    var ds = dd.toISOString().split('T')[0];
+    var ds = localDateStr(dd);
     var cnt = appointments.filter(function(a) { return (a.created_at || '').substring(0, 10) === ds; }).length;
     trendData.push({ label: dd.toLocaleDateString(currentLang === 'es' ? 'es' : 'en', { month: 'short', day: 'numeric' }), value: cnt });
   }
@@ -8870,7 +8871,7 @@ async function fetchCalMonthOverrides(y, m) {
 function renderCalendar() {
   var grid = document.getElementById('cal-grid');
   var y = calDate.getFullYear(), m = calDate.getMonth();
-  document.getElementById('cal-month-label').textContent = calDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  document.getElementById('cal-month-label').textContent = calDate.toLocaleDateString(currentLang==='es'?'es-MX':'en-US',{month:'long',year:'numeric'});
 
   // Fetch month overrides then render
   fetchCalMonthOverrides(y, m).then(function(closures) {
@@ -8898,12 +8899,11 @@ function renderCalendarGrid(y, m, closures) {
     grid.appendChild(document.createElement('div'));
   }
 
+  var todayLocal = localDateStr();
+  var selLocal = localDateStr(calSelectedDate);
   for (var d = 1; d <= daysInMonth; d++) {
     var dateStr = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
     var count = appointments.filter(function(a) { return a.preferred_date === dateStr; }).length;
-    var now = new Date();
-    var todayLocal = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
-    var selLocal = calSelectedDate.getFullYear() + '-' + String(calSelectedDate.getMonth()+1).padStart(2,'0') + '-' + String(calSelectedDate.getDate()).padStart(2,'0');
     var isSelected = selLocal === dateStr;
     var isToday = todayLocal === dateStr;
     var hasAppts = count > 0;
@@ -8960,8 +8960,9 @@ async function fetchCalDaySchedule(dateStr) {
 }
 
 function renderCalDay() {
-  var dateStr = calSelectedDate.toISOString().split('T')[0];
-  document.getElementById('cal-day-label').textContent = calSelectedDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  var dateStr = localDateStr(calSelectedDate);
+  var dayLoc = currentLang === 'es' ? 'es-MX' : 'en-US';
+  document.getElementById('cal-day-label').textContent = calSelectedDate.toLocaleDateString(dayLoc,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 
   // Fetch schedule data then render the full view
   fetchCalDaySchedule(dateStr).then(function(sched) {
@@ -10087,7 +10088,7 @@ function renderEmployees() {
 
 function renderEmployeeCard(emp, inactive) {
   var T = adminT[currentLang];
-  var todayStr = new Date().toISOString().split('T')[0];
+  var todayStr = localDateStr();
   var todayDate = new Date(todayStr + 'T00:00:00');
   var empUpcoming = appointments.filter(function(a) { return a.assigned_employee_id===emp.id && new Date(a.preferred_date+'T00:00:00') >= todayDate && a.status !== 'completed' && a.status !== 'cancelled'; });
   var empToday = empUpcoming.filter(function(a) { return a.preferred_date === todayStr; });
@@ -10279,7 +10280,7 @@ async function loadSchedules(type) {
       if (json.success) { scheduleData.weekly = json.data; showWeeklySchedules(); }
     } else if (type === 'daily') {
       var dateEl = document.getElementById('sched-daily-date');
-      var date = dateEl ? dateEl.value : new Date().toISOString().split('T')[0];
+      var date = dateEl ? dateEl.value : localDateStr();
       var res = await fetch('/api/admin/schedules.php?type=daily&date=' + date, { credentials: 'include' });
       var json = await res.json();
       if (json.success) { scheduleData.daily = json.data; showDailySchedule(); }
@@ -10558,7 +10559,7 @@ function buildDailyScheduleDOM() {
   var T = adminT[currentLang];
   var container = document.getElementById('schedule-daily-view');
   var data = scheduleData.daily;
-  var today = new Date().toISOString().split('T')[0];
+  var today = localDateStr();
   var dateVal = data ? data.date : today;
 
   // Clear and rebuild with DOM methods
@@ -11442,7 +11443,7 @@ async function loadAnalytics() {
       var endDate = new Date();
       var startDate = new Date();
       startDate.setDate(startDate.getDate() - analyticsRangeDays);
-      analyticsUrl += '?start_date=' + startDate.toISOString().split('T')[0] + '&end_date=' + endDate.toISOString().split('T')[0];
+      analyticsUrl += '?start_date=' + localDateStr(startDate) + '&end_date=' + localDateStr(endDate);
     }
     // else: analyticsRangeDays === 0 means "All Time" — no date params, API defaults to all
     var serverData = await api(analyticsUrl).catch(function() { return { data: null }; });
@@ -13412,7 +13413,7 @@ async function loadMySchedule() {
     container.textContent = '';
     var dayLabels = [T.schedSun||'Sun', T.schedMon||'Mon', T.schedTue||'Tue', T.schedWed||'Wed', T.schedThu||'Thu', T.schedFri||'Fri', T.schedSat||'Sat'];
     var dayLabelsFull = [T.schedSunFull||'Sunday', T.schedMonFull||'Monday', T.schedTueFull||'Tuesday', T.schedWedFull||'Wednesday', T.schedThuFull||'Thursday', T.schedFriFull||'Friday', T.schedSatFull||'Saturday'];
-    var todayStr = new Date().toISOString().split('T')[0];
+    var todayStr = localDateStr();
     var todayDow = new Date().getDay();
 
     // Find my schedule data
@@ -13461,7 +13462,7 @@ async function loadMySchedule() {
         // Get today's appointments for this day
         var dayDate = new Date();
         dayDate.setDate(dayDate.getDate() + (dow - todayDow));
-        var dayDateStr = dayDate.toISOString().split('T')[0];
+        var dayDateStr = localDateStr(dayDate);
         var dayAppts = appointments.filter(function(a) { return parseInt(a.assigned_employee_id) === empId && a.preferred_date === dayDateStr && a.status !== 'cancelled'; });
 
         var card = document.createElement('div');
@@ -13641,7 +13642,7 @@ async function loadMySchedule() {
           // Count appointments for this employee on this day
           var dayDate = new Date();
           dayDate.setDate(dayDate.getDate() + (dayIdx - todayDow));
-          var dayDateStr = dayDate.toISOString().split('T')[0];
+          var dayDateStr = localDateStr(dayDate);
           var dayApptCount = appointments.filter(function(a) { return parseInt(a.assigned_employee_id) === emp.employee_id && a.preferred_date === dayDateStr && a.status !== 'cancelled'; }).length;
 
           var td = document.createElement('td');
@@ -13777,7 +13778,7 @@ async function loadMyWork() {
     }
 
     // ── Stats summary ──
-    var todayStr = new Date().toISOString().split('T')[0];
+    var todayStr = localDateStr();
     var todayAppts = allAppts.filter(function(a) { return a.preferred_date === todayStr; });
     var upcomingAppts = allAppts.filter(function(a) { return a.preferred_date > todayStr; });
     var overdueAppts = allAppts.filter(function(a) { return a.preferred_date < todayStr; });
@@ -14116,7 +14117,7 @@ function showNewApptModal() {
     empSelect.appendChild(opt);
   });
   document.getElementById('new-appt-form').reset();
-  var today = new Date().toISOString().split('T')[0];
+  var today = localDateStr();
   var dateInput = document.querySelector('#new-appt-form [name="appt-date"]');
   dateInput.setAttribute('min', today);
   dateInput.value = today;
