@@ -8166,7 +8166,9 @@ function renderUpcomingSchedule(stats) {
     chunk += '</div>';
     if (apts.length) {
       apts.slice(0, 3).forEach(function(a) {
-        chunk += '<div class="text-sm flex justify-between items-center bg-white dark:bg-gray-700 p-2 rounded mb-1 border dark:border-gray-600"><span><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(servicesLabel(a)) + ')</span></span>' + statusBadge(a.status) + (typeof calSyncBadge === 'function' ? calSyncBadge(a) : '') + '</div>';
+        var roStep = a.ro_id && a.ro_status ? roStepBadgeHtml(a.ro_status) : '';
+        var roClick = a.ro_id ? ' cursor-pointer" onclick="viewRoDetail(' + a.ro_id + ')' : '';
+        chunk += '<div class="text-sm flex justify-between items-center bg-white dark:bg-gray-700 p-2 rounded mb-1 border dark:border-gray-600' + roClick + '"><div><strong>' + fmtTime(a.preferred_time) + '</strong> — ' + esc(a.first_name) + ' ' + esc(a.last_name) + ' <span class="text-gray-500 dark:text-gray-400 text-xs">(' + esc(servicesLabel(a)) + ')</span></div><div class="flex items-center gap-2">' + roStep + statusBadge(a.status) + (typeof calSyncBadge === 'function' ? calSyncBadge(a) : '') + '</div></div>';
       });
       if (apts.length > 3) chunk += '<p class="text-xs text-gray-400">+' + (apts.length - 3) + ' ' + (T.showMore || 'more') + '</p>';
     }
@@ -9125,6 +9127,36 @@ function renderCalDayWithSchedule(dateStr, sched) {
 // ===== APPOINTMENTS =====
 function sortAppts(col) { if(apptSortBy===col) apptSortOrder=apptSortOrder==='asc'?'desc':'asc'; else { apptSortBy=col; apptSortOrder='desc'; } renderAppointments(); }
 
+var RO_STEP_MAP = {
+  intake:           { step: 1, label: 'Intake',   icon: '\uD83D\uDCCB', color: 'gray',   action: 'Inspect vehicle' },
+  diagnosis:        { step: 2, label: 'Diagnosis', icon: '\uD83D\uDD0D', color: 'purple', action: 'Create estimate' },
+  estimate_pending: { step: 3, label: 'Estimate',  icon: '\uD83D\uDCE7', color: 'blue',   action: 'Send to customer' },
+  pending_approval: { step: 4, label: 'Approval',  icon: '\u23F3',       color: 'amber',  action: 'Awaiting approval' },
+  approved:         { step: 5, label: 'Approved',  icon: '\uD83D\uDE80', color: 'green',  action: 'Start work' },
+  in_progress:      { step: 6, label: 'Working',   icon: '\uD83D\uDD27', color: 'blue',   action: 'In progress' },
+  on_hold:          { step: 6, label: 'On Hold',   icon: '\u23F8',       color: 'red',    action: 'On hold' },
+  waiting_parts:    { step: 6, label: 'Parts',     icon: '\uD83D\uDCE6', color: 'orange', action: 'Waiting for parts' },
+  ready:            { step: 7, label: 'Ready',     icon: '\u2705',       color: 'teal',   action: 'Ready for pickup' },
+  completed:        { step: 8, label: 'Done',      icon: '\uD83C\uDFC1', color: 'gray',   action: 'Completed' },
+  invoiced:         { step: 8, label: 'Invoiced',  icon: '\uD83D\uDCB0', color: 'green',  action: 'Invoiced' },
+};
+
+function roStepBadgeHtml(roStatus) {
+  var info = RO_STEP_MAP[roStatus];
+  if (!info) return '';
+  var colors = { gray: 'bg-gray-100 text-gray-600', purple: 'bg-purple-100 text-purple-700', blue: 'bg-blue-100 text-blue-700', amber: 'bg-amber-100 text-amber-700', green: 'bg-green-100 text-green-700', teal: 'bg-teal-100 text-teal-700', red: 'bg-red-100 text-red-700', orange: 'bg-orange-100 text-orange-700' };
+  var cls = colors[info.color] || colors.gray;
+  // Progress dots
+  var dots = '';
+  for (var i = 1; i <= 8; i++) {
+    dots += '<span class="inline-block w-1.5 h-1.5 rounded-full ' + (i < info.step ? 'bg-current opacity-60' : i === info.step ? 'bg-current' : 'bg-current opacity-20') + '"></span>';
+  }
+  return '<div class="flex flex-col gap-1">' +
+    '<span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold ' + cls + '">' + info.icon + ' Step ' + info.step + '/8 \u2022 ' + info.action + '</span>' +
+    '<span class="flex gap-0.5 px-1">' + dots + '</span>' +
+    '</div>';
+}
+
 function renderAppointments() {
   const filter = document.getElementById('appt-filter').value;
   const search = document.getElementById('appt-search').value.toLowerCase();
@@ -9177,7 +9209,7 @@ function renderAppointments() {
           <option value="">${adminT[currentLang].unassignedLabel}</option>${employees.filter(e=>e.is_active).map(e=>`<option value="${e.id}" ${a.assigned_employee_id===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}
         </select>
         <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100">📝 Notes</button>
-        ${a.ro_id ? `<button onclick="viewRoDetail(${a.ro_id})" class="border border-green-600 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded px-2 py-1 text-xs hover:bg-green-100 dark:hover:bg-green-900/40 font-bold transition">\uD83D\uDD27 ${esc(a.ro_number||'')} \u2022 ${esc((a.ro_status||'').replace(/_/g,' '))}</button>` : (a.status!=='cancelled'?`<button onclick="roShowCreateModal('${a.id}')" class="border border-green-500 text-green-700 rounded px-2 py-1 text-xs hover:bg-green-50 font-medium">\uD83D\uDD27 Create RO</button>`:'')}
+        ${a.ro_id ? `<div class="cursor-pointer" onclick="viewRoDetail(${a.ro_id})">${roStepBadgeHtml(a.ro_status)}</div>` : (a.status!=='cancelled'?`<button onclick="roShowCreateModal('${a.id}')" class="border border-green-500 text-green-700 rounded px-2 py-1 text-xs hover:bg-green-50 font-medium">\uD83D\uDD27 Create RO</button>`:'')}
       </div></td>
     </tr>
   `).join('') : '<tr><td colspan="9" class="p-6 text-center text-gray-500">No appointments found</td></tr>';
