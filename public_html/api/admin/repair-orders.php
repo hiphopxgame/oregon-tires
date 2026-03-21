@@ -618,7 +618,18 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
 
                 $db->prepare('UPDATE oretir_repair_orders SET service_ended_at = NOW() WHERE id = ?')->execute([$roId]);
 
-                // Update visit_log + appointment
+                // Update visit_log service_end_at + compute durations
+                try {
+                    $db->prepare(
+                        'UPDATE oretir_visit_log SET
+                           service_end_at = COALESCE(service_end_at, NOW()),
+                           service_minutes = TIMESTAMPDIFF(MINUTE, service_start_at, COALESCE(service_end_at, NOW())),
+                           wait_minutes = TIMESTAMPDIFF(MINUTE, check_in_at, service_start_at)
+                         WHERE repair_order_id = ? AND check_out_at IS NULL'
+                    )->execute([$roId]);
+                } catch (\Throwable $vlErr) { /* visit_log may not exist */ }
+
+                // Update appointment
                 if ($ro['appointment_id']) {
                     $db->prepare('UPDATE oretir_appointments SET service_end_at = NOW() WHERE id = ?')
                        ->execute([$ro['appointment_id']]);
@@ -705,10 +716,17 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
                     }
                 }
 
-                // End visit log
+                // End visit log with computed durations
                 try {
-                    $db->prepare('UPDATE oretir_visit_log SET check_out_at = NOW() WHERE repair_order_id = ? AND check_out_at IS NULL')
-                       ->execute([$roId]);
+                    $db->prepare(
+                        'UPDATE oretir_visit_log SET
+                           check_out_at = NOW(),
+                           service_end_at = COALESCE(service_end_at, NOW()),
+                           service_minutes = TIMESTAMPDIFF(MINUTE, service_start_at, COALESCE(service_end_at, NOW())),
+                           total_minutes = TIMESTAMPDIFF(MINUTE, check_in_at, NOW()),
+                           wait_minutes = TIMESTAMPDIFF(MINUTE, check_in_at, service_start_at)
+                         WHERE repair_order_id = ? AND check_out_at IS NULL'
+                    )->execute([$roId]);
                 } catch (\Throwable $vlErr) { /* visit_log may not exist */ }
 
                 // Auto-create service reminder for the next visit
@@ -739,8 +757,12 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
                 }
 
                 try {
-                    $db->prepare('UPDATE oretir_visit_log SET check_out_at = NOW() WHERE repair_order_id = ? AND check_out_at IS NULL')
-                       ->execute([$roId]);
+                    $db->prepare(
+                        'UPDATE oretir_visit_log SET
+                           check_out_at = NOW(),
+                           total_minutes = TIMESTAMPDIFF(MINUTE, check_in_at, NOW())
+                         WHERE repair_order_id = ? AND check_out_at IS NULL'
+                    )->execute([$roId]);
                 } catch (\Throwable $vlErr) { /* visit_log may not exist */ }
             } catch (\Throwable $e) {
                 error_log("repair-orders.php: cancelled side effects failed for RO #{$roId}: " . $e->getMessage());
