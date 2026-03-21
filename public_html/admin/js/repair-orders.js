@@ -382,245 +382,75 @@ function renderRoDetailModal() {
   var card = document.createElement('div');
   card.className = 'bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto';
 
-  // Header
+  // ═══════════════════════════════════════════════════════════════════════════
+  // HEADER — Clean: RO#, customer, vehicle, status badge, close
+  // ═══════════════════════════════════════════════════════════════════════════
   var header = document.createElement('div');
-  header.className = 'bg-gradient-to-r from-green-700 to-green-900 text-white p-6 rounded-t-2xl';
+  header.className = 'bg-gradient-to-r from-green-700 to-green-900 text-white p-5 rounded-t-2xl';
 
   var headerTop = document.createElement('div');
   headerTop.className = 'flex justify-between items-start';
 
   var headerLeft = document.createElement('div');
   var h2 = document.createElement('h2');
-  h2.className = 'text-2xl font-bold';
+  h2.className = 'text-xl font-bold flex items-center gap-3';
   h2.textContent = ro.ro_number;
+  h2.appendChild(createStatusBadge(ro.status));
   headerLeft.appendChild(h2);
 
   var custP = document.createElement('p');
-  custP.className = 'text-green-200 mt-1';
-  custP.textContent = customer + ' — ' + vehicle;
+  custP.className = 'text-green-200 mt-1 text-sm';
+  custP.textContent = customer + ' \u2022 ' + vehicle;
+  if (ro.customer_phone) { custP.textContent += ' \u2022 ' + ro.customer_phone; }
   headerLeft.appendChild(custP);
+
+  // Appointment info in header
+  if (ro.appointment) {
+    var apptP = document.createElement('p');
+    apptP.className = 'text-green-300/70 text-xs mt-0.5';
+    apptP.textContent = ro.appointment.reference_number + ' \u2022 ' + (ro.appointment.service || '').replace(/-/g, ' ') + ' \u2022 ' + ro.appointment.preferred_date;
+    headerLeft.appendChild(apptP);
+  }
   headerTop.appendChild(headerLeft);
 
   var closeBtn = document.createElement('button');
-  closeBtn.className = 'text-white/80 hover:text-white text-2xl font-bold';
+  closeBtn.className = 'text-white/80 hover:text-white text-2xl font-bold leading-none';
   closeBtn.textContent = '\u00D7';
   closeBtn.addEventListener('click', function() { modal.remove(); });
   headerTop.appendChild(closeBtn);
   header.appendChild(headerTop);
-
-  // Status + actions
-  var statusRow = document.createElement('div');
-  statusRow.className = 'flex items-center gap-3 mt-4 flex-wrap';
-  statusRow.appendChild(createStatusBadge(ro.status));
-
-  var statusSelect = document.createElement('select');
-  statusSelect.className = 'bg-white/20 text-white border border-white/30 rounded-lg px-3 py-1.5 text-sm';
-  ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'].forEach(function(s) {
-    var opt = document.createElement('option');
-    opt.value = s;
-    var sKey = 'roStatus' + s.replace(/_([a-z])/g, function(m,c){ return c.toUpperCase(); }).replace(/^[a-z]/, function(c){ return c.toUpperCase(); });
-    opt.textContent = t(sKey, s.replace(/_/g, ' '));
-    opt.className = 'text-gray-900';
-    if (s === ro.status) opt.selected = true;
-    statusSelect.appendChild(opt);
-  });
-
-  var updateBtn = document.createElement('button');
-  updateBtn.className = 'bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-white/30 font-medium';
-  updateBtn.textContent = t('roUpdateStatus', 'Update Status');
-  updateBtn.addEventListener('click', async function() {
-    var newStatus = statusSelect.value;
-    if (newStatus === ro.status) return;
-    try {
-      await api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: newStatus } });
-      showToast(t('roStatusUpdatedTo', 'Status updated to') + ' ' + newStatus.replace(/_/g, ' '));
-      modal.remove();
-      loadRepairOrders();
-    } catch (err) {
-      showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true);
-    }
-  });
-
-  statusRow.appendChild(statusSelect);
-  statusRow.appendChild(updateBtn);
-  header.appendChild(statusRow);
   card.appendChild(header);
 
-  // Body
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BODY
+  // ═══════════════════════════════════════════════════════════════════════════
   var body = document.createElement('div');
-  body.className = 'p-6 space-y-6';
+  body.className = 'p-5 space-y-4';
 
-  // Status timeline stepper
+  // Status timeline stepper (compact)
   body.appendChild(renderStatusTimeline(ro.status));
 
-  // Info grid
-  var grid = document.createElement('div');
-  grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-4';
-
-  var vehicleSpecs = [ro.engine, ro.transmission, ro.drive_type].filter(Boolean).join(' | ');
-  var infoItems = [
-    [t('roThCustomer', 'Customer'), customer],
-    [t('emailLabel2', 'Email'), ro.customer_email || '-'],
-    [t('phone', 'Phone'), ro.customer_phone || '-'],
-    [t('roThVehicle', 'Vehicle'), vehicle + (ro.trim_level ? ' ' + ro.trim_level : '')],
-    ['VIN', ro.vin || '-'],
-    ['Plate', ro.license_plate || '-'],
-    [t('roMileageIn', 'Mileage In'), ro.mileage_in ? Number(ro.mileage_in).toLocaleString() : '-'],
-  ];
-  if (vehicleSpecs) infoItems.push(['Specs', vehicleSpecs]);
-  if (ro.fuel_type) infoItems.push(['Fuel', ro.fuel_type]);
-  infoItems.push(
-    [t('roPromisedDate', 'Promised Date'), ro.promised_date || '-'],
-    [t('roThCreated', 'Created'), formatDate(ro.created_at)],
-    [t('roUpdated', 'Updated'), formatDate(ro.updated_at)]
-  );
-  infoItems.forEach(function(pair) {
-    var div = document.createElement('div');
-    var lbl = document.createElement('p');
-    lbl.className = 'text-xs text-gray-400 uppercase font-medium';
-    lbl.textContent = pair[0];
-    var val = document.createElement('p');
-    val.className = 'font-semibold text-gray-900 dark:text-white text-sm';
-    val.textContent = pair[1];
-    div.appendChild(lbl);
-    div.appendChild(val);
-    grid.appendChild(div);
-  });
-  body.appendChild(grid);
-
-  // Customer concern
-  if (ro.customer_concern) {
-    var concernDiv = document.createElement('div');
-    concernDiv.className = 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4';
-    var concernLbl = document.createElement('h3');
-    concernLbl.className = 'font-bold text-amber-800 dark:text-amber-300 text-sm mb-1';
-    concernLbl.textContent = t('roCustomerConcern', 'Customer Concern');
-    var concernTxt = document.createElement('p');
-    concernTxt.className = 'text-sm text-gray-700 dark:text-gray-300';
-    concernTxt.textContent = ro.customer_concern;
-    concernDiv.appendChild(concernLbl);
-    concernDiv.appendChild(concernTxt);
-    body.appendChild(concernDiv);
-  }
-
-  // ─── Notes section ───────────────────────────────────────────────────────
-  var notesSection = document.createElement('div');
-  notesSection.className = 'border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden';
-
-  var notesHeader = document.createElement('div');
-  notesHeader.className = 'bg-gray-50 dark:bg-gray-900/50 px-4 py-3 flex justify-between items-center';
-  var notesH = document.createElement('h3');
-  notesH.className = 'font-bold text-gray-900 dark:text-white text-sm';
-  notesH.textContent = t('roNotes', 'Notes');
-  notesHeader.appendChild(notesH);
-  notesSection.appendChild(notesHeader);
-
-  var notesBody = document.createElement('div');
-  notesBody.className = 'p-4 space-y-3';
-
-  // Existing technician notes log (read-only)
-  if (ro.technician_notes && ro.technician_notes.trim()) {
-    var techLog = document.createElement('div');
-    techLog.className = 'p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700';
-    var techLbl = document.createElement('div');
-    techLbl.className = 'text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider mb-1';
-    techLbl.textContent = t('roTechNotes', 'Technician Notes');
-    techLog.appendChild(techLbl);
-    var techTxt = document.createElement('div');
-    techTxt.className = 'text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap';
-    techTxt.textContent = ro.technician_notes;
-    techLog.appendChild(techTxt);
-    notesBody.appendChild(techLog);
-  }
-
-  // Existing admin notes log (read-only)
-  if (ro.admin_notes && ro.admin_notes.trim()) {
-    var adminLog = document.createElement('div');
-    adminLog.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600';
-    var adminLbl = document.createElement('div');
-    adminLbl.className = 'text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1';
-    adminLbl.textContent = t('roAdminNotes', 'Admin Notes');
-    adminLog.appendChild(adminLbl);
-    var adminTxt = document.createElement('div');
-    adminTxt.className = 'text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap';
-    adminTxt.textContent = ro.admin_notes;
-    adminLog.appendChild(adminTxt);
-    notesBody.appendChild(adminLog);
-  }
-
-  // Add new note form
-  var noteForm = document.createElement('div');
-  noteForm.className = 'border-t border-gray-200 dark:border-gray-700 pt-3';
-
-  var noteLabel = document.createElement('label');
-  noteLabel.className = 'block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1';
-  noteLabel.textContent = t('roAddNote', 'Add Note');
-  noteForm.appendChild(noteLabel);
-
-  var noteTextarea = document.createElement('textarea');
-  noteTextarea.className = 'w-full p-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 resize-none';
-  noteTextarea.rows = 3;
-  noteTextarea.maxLength = 2000;
-  noteTextarea.placeholder = t('roNotePlaceholder', 'Type a note...');
-  noteForm.appendChild(noteTextarea);
-
-  var noteActions = document.createElement('div');
-  noteActions.className = 'flex gap-2 mt-2';
-
-  var saveTechBtn = document.createElement('button');
-  saveTechBtn.className = 'px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition';
-  saveTechBtn.textContent = t('roSaveTechNote', 'Save as Tech Note');
-  saveTechBtn.addEventListener('click', async function() {
-    var txt = noteTextarea.value.trim();
-    if (!txt) { showToast(t('roNoteEmpty', 'Please enter a note.'), true); return; }
-    try {
-      await api('repair-orders.php', { method: 'PUT', body: { id: ro.id, technician_notes: txt, note_append: true } });
-      showToast(t('roNoteSaved', 'Note saved'));
-      modal.remove();
-      viewRoDetail(ro.id);
-    } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
-  });
-  noteActions.appendChild(saveTechBtn);
-
-  var saveAdminBtn = document.createElement('button');
-  saveAdminBtn.className = 'px-3 py-1.5 bg-gray-600 text-white rounded-lg text-xs font-medium hover:bg-gray-700 transition';
-  saveAdminBtn.textContent = t('roSaveAdminNote', 'Save as Admin Note');
-  saveAdminBtn.addEventListener('click', async function() {
-    var txt = noteTextarea.value.trim();
-    if (!txt) { showToast(t('roNoteEmpty', 'Please enter a note.'), true); return; }
-    try {
-      await api('repair-orders.php', { method: 'PUT', body: { id: ro.id, admin_notes: txt, note_append: true } });
-      showToast(t('roNoteSaved', 'Note saved'));
-      modal.remove();
-      viewRoDetail(ro.id);
-    } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
-  });
-  noteActions.appendChild(saveAdminBtn);
-
-  noteForm.appendChild(noteActions);
-  notesBody.appendChild(noteForm);
-  notesSection.appendChild(notesBody);
-  body.appendChild(notesSection);
-
-  // ─── Smart Action Bar (context-aware) ──────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GUIDED WORKFLOW — THE primary interface. One system, one flow.
+  // ═══════════════════════════════════════════════════════════════════════════
   var hasInspections = ro.inspections && ro.inspections.length > 0;
   var hasEstimates = ro.estimates && ro.estimates.length > 0;
   var latestEstimate = hasEstimates ? ro.estimates[0] : null;
   var hasInvoices = ro.invoices && ro.invoices.length > 0;
   var status = ro.status || 'intake';
 
-  // ─── Guided Workflow Action Bar ─────────────────────────────────────────────
   var WORKFLOW_STEPS = [
-    { status: 'intake',            step: 1, total: 8 },
-    { status: 'diagnosis',         step: 2, total: 8 },
-    { status: 'estimate_pending',  step: 3, total: 8 },
-    { status: 'pending_approval',  step: 4, total: 8 },
-    { status: 'approved',          step: 5, total: 8 },
-    { status: 'in_progress',       step: 6, total: 8 },
-    { status: 'ready',             step: 7, total: 8 },
-    { status: 'completed',         step: 8, total: 8 },
+    { status: 'intake',           step: 1, label: t('roStepIntake', 'Intake') },
+    { status: 'diagnosis',        step: 2, label: t('roStepDiagnosis', 'Diagnosis') },
+    { status: 'estimate_pending', step: 3, label: t('roStepEstimate', 'Estimate') },
+    { status: 'pending_approval', step: 4, label: t('roStepApproval', 'Approval') },
+    { status: 'approved',         step: 5, label: t('roStepApproved', 'Approved') },
+    { status: 'in_progress',      step: 6, label: t('roStepWork', 'Work') },
+    { status: 'ready',            step: 7, label: t('roStepReady', 'Ready') },
+    { status: 'completed',        step: 8, label: t('roStepDone', 'Done') },
   ];
   var currentStep = WORKFLOW_STEPS.find(function(s) { return s.status === status; });
+  var stepNum = currentStep ? currentStep.step : 0;
 
   var guide = null;
   if (status === 'intake' && !hasInspections) guide = { text: t('roSuggestInspect', 'Create an inspection for this vehicle'), btn: t('roStartInspection', 'Start Inspection'), color: 'purple', icon: '\uD83D\uDD0D', action: 'inspect' };
@@ -635,183 +465,211 @@ function renderRoDetailModal() {
   else if (status === 'ready') guide = { text: t('roSuggestComplete', 'Customer notified. Complete when picked up.'), btn: t('roCompleteInvoice', 'Complete & Invoice'), color: 'green', icon: '\u2705', action: 'complete' };
   else if (status === 'completed' && !hasInvoices) guide = { text: t('roSuggestInvoice', 'Generate invoice from estimate'), btn: t('roGenerateInvoice', 'Generate Invoice'), color: 'teal', icon: '\uD83D\uDCB0', action: 'invoice' };
 
+  // Guided action handler (shared by bar button)
+  function executeGuideAction(a) {
+    if (a === 'inspect') {
+      api('inspections.php', { method: 'POST', body: { repair_order_id: ro.id } }).then(function() {
+        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'diagnosis' } }).then(function() {
+          showToast(t('roInspectionCreated', 'Inspection created \u2014 moved to Diagnosis')); viewRoDetail(ro.id);
+        });
+      }).catch(function(err) { showToast(err.message, true); });
+    } else if (a === 'diagnosis') {
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'diagnosis' } }).then(function() {
+        showToast(t('roStatusAdvanced', 'Advanced to Diagnosis')); viewRoDetail(ro.id);
+      }).catch(function(err) { showToast(err.message, true); });
+    } else if (a === 'estimate') {
+      var inspId = hasInspections ? ro.inspections[0].id : null;
+      var payload = { repair_order_id: ro.id, tax_rate: 0.0 };
+      if (inspId) payload.from_inspection_id = inspId;
+      api('estimates.php', { method: 'POST', body: payload }).then(function() {
+        showToast(t('roEstimateCreated', 'Estimate created')); viewRoDetail(ro.id);
+      }).catch(function(err) { showToast(err.message, true); });
+    } else if (a === 'send_estimate') {
+      if (latestEstimate) {
+        api('estimates.php', { method: 'PUT', body: { id: latestEstimate.id, action: 'send' } }).then(function() {
+          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'pending_approval' } }).then(function() {
+            showToast(t('roEstimateSent', 'Estimate sent \u2014 awaiting approval')); viewRoDetail(ro.id);
+          });
+        }).catch(function(err) { showToast(err.message, true); });
+      }
+    } else if (a === 'approve') {
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'approved' } }).then(function() {
+        showToast(t('roStatusAdvanced', 'Approved!')); viewRoDetail(ro.id);
+      }).catch(function(err) { showToast(err.message, true); });
+    } else if (a === 'start_work') {
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'in_progress' } }).then(function() {
+        showToast(t('roStatusAdvanced', 'Work started!')); viewRoDetail(ro.id);
+      }).catch(function(err) { showToast(err.message, true); });
+    } else if (a === 'ready') {
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'ready' } }).then(function() {
+        showToast(t('roMarkedReady', 'Marked Ready \u2014 customer notified')); viewRoDetail(ro.id);
+      }).catch(function(err) { showToast(err.message, true); });
+    } else if (a === 'resume') {
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'in_progress' } }).then(function() {
+        showToast(t('roStatusAdvanced', 'Resumed \u2014 back in progress')); viewRoDetail(ro.id);
+      }).catch(function(err) { showToast(err.message, true); });
+    } else if (a === 'complete') {
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } }).then(function() {
+        showToast(t('roCompletedInvoiced', 'Completed \u2014 invoice generated'));
+        modal.remove(); loadRepairOrders(); if (typeof loadKanban === 'function') loadKanban();
+      }).catch(function(err) { showToast(err.message, true); });
+    } else if (a === 'invoice') {
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } }).then(function() {
+        showToast(t('roCompletedInvoiced', 'Invoice generated')); viewRoDetail(ro.id);
+      }).catch(function(err) { showToast(err.message, true); });
+    }
+  }
+
+  // ── Render the guided action bar ──
   if (guide && currentStep) {
     var colorMap = { purple: 'from-purple-600 to-purple-700', blue: 'from-blue-600 to-blue-700', amber: 'from-amber-500 to-amber-600', green: 'from-green-600 to-green-700', teal: 'from-teal-600 to-teal-700', orange: 'from-orange-500 to-orange-600' };
-    var gradCls = colorMap[guide.color] || colorMap.blue;
-
     var guideBar = document.createElement('div');
-    guideBar.className = 'bg-gradient-to-r ' + gradCls + ' rounded-xl p-4 text-white';
+    guideBar.className = 'bg-gradient-to-r ' + (colorMap[guide.color] || colorMap.blue) + ' rounded-xl p-4 text-white';
 
-    // Step indicator + progress dots
     var stepRow = document.createElement('div');
-    stepRow.className = 'flex items-center justify-between mb-2';
-    var stepLabel = document.createElement('span');
-    stepLabel.className = 'text-xs font-bold uppercase tracking-wider opacity-80';
-    stepLabel.textContent = t('roStep', 'Step') + ' ' + currentStep.step + ' ' + t('roStepOf', 'of') + ' ' + currentStep.total;
-    stepRow.appendChild(stepLabel);
-
-    var dots = document.createElement('div');
-    dots.className = 'flex gap-1';
-    for (var di = 1; di <= currentStep.total; di++) {
+    stepRow.className = 'flex items-center justify-between mb-3';
+    stepRow.appendChild(function() { var s = document.createElement('span'); s.className = 'text-xs font-bold uppercase tracking-wider opacity-80'; s.textContent = t('roStep', 'Step') + ' ' + stepNum + ' ' + t('roStepOf', 'of') + ' 8'; return s; }());
+    var dots = document.createElement('div'); dots.className = 'flex gap-1.5';
+    for (var di = 1; di <= 8; di++) {
       var dot = document.createElement('div');
-      dot.className = 'w-2 h-2 rounded-full ' + (di < currentStep.step ? 'bg-white' : di === currentStep.step ? 'bg-white ring-2 ring-white/50 scale-125' : 'bg-white/30');
+      dot.className = 'w-2.5 h-2.5 rounded-full transition ' + (di < stepNum ? 'bg-white' : di === stepNum ? 'bg-white ring-2 ring-white/40 scale-110' : 'bg-white/25');
       dots.appendChild(dot);
     }
     stepRow.appendChild(dots);
     guideBar.appendChild(stepRow);
 
-    // Main row: icon + text + button
     var mainRow = document.createElement('div');
     mainRow.className = 'flex items-center gap-3';
-    var gIcon = document.createElement('span');
-    gIcon.className = 'text-2xl shrink-0';
-    gIcon.textContent = guide.icon;
-    mainRow.appendChild(gIcon);
-    var gText = document.createElement('p');
-    gText.className = 'flex-1 text-sm font-medium opacity-90';
-    gText.textContent = guide.text;
-    mainRow.appendChild(gText);
-
+    mainRow.appendChild(function() { var i = document.createElement('span'); i.className = 'text-3xl shrink-0'; i.textContent = guide.icon; return i; }());
+    mainRow.appendChild(function() { var p = document.createElement('p'); p.className = 'flex-1 font-medium'; p.textContent = guide.text; return p; }());
     var gBtn = document.createElement('button');
-    gBtn.className = 'shrink-0 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-bold transition backdrop-blur-sm border border-white/20';
+    gBtn.className = 'shrink-0 px-5 py-2.5 bg-white text-gray-900 rounded-lg font-bold text-sm hover:bg-gray-100 transition shadow-lg';
     gBtn.textContent = guide.btn;
-    gBtn.addEventListener('click', function() {
-      var a = guide.action;
-      if (a === 'inspect') {
-        api('inspections.php', { method: 'POST', body: { repair_order_id: ro.id } }).then(function() {
-          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'diagnosis' } }).then(function() {
-            showToast(t('roInspectionCreated', 'Inspection created \u2014 moved to Diagnosis'));
-            viewRoDetail(ro.id);
-          });
-        }).catch(function(err) { showToast(err.message, true); });
-      } else if (a === 'diagnosis') {
-        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'diagnosis' } }).then(function() {
-          showToast(t('roStatusAdvanced', 'Advanced to Diagnosis')); viewRoDetail(ro.id);
-        }).catch(function(err) { showToast(err.message, true); });
-      } else if (a === 'estimate') {
-        var inspId = hasInspections ? ro.inspections[0].id : null;
-        var payload = { repair_order_id: ro.id, tax_rate: 0.0 };
-        if (inspId) payload.from_inspection_id = inspId;
-        api('estimates.php', { method: 'POST', body: payload }).then(function() {
-          showToast(t('roEstimateCreated', 'Estimate created')); viewRoDetail(ro.id);
-        }).catch(function(err) { showToast(err.message, true); });
-      } else if (a === 'send_estimate') {
-        if (latestEstimate) {
-          api('estimates.php', { method: 'PUT', body: { id: latestEstimate.id, action: 'send' } }).then(function() {
-            api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'pending_approval' } }).then(function() {
-              showToast(t('roEstimateSent', 'Estimate sent \u2014 awaiting approval')); viewRoDetail(ro.id);
-            });
-          }).catch(function(err) { showToast(err.message, true); });
-        }
-      } else if (a === 'approve') {
-        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'approved' } }).then(function() {
-          showToast(t('roStatusAdvanced', 'Approved!')); viewRoDetail(ro.id);
-        }).catch(function(err) { showToast(err.message, true); });
-      } else if (a === 'start_work') {
-        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'in_progress' } }).then(function() {
-          showToast(t('roStatusAdvanced', 'Work started!'));
-          viewRoDetail(ro.id);
-          // After modal reloads, the labor section will be visible for clock-in
-        }).catch(function(err) { showToast(err.message, true); });
-      } else if (a === 'ready') {
-        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'ready' } }).then(function() {
-          showToast(t('roMarkedReady', 'Marked Ready \u2014 customer notified')); viewRoDetail(ro.id);
-        }).catch(function(err) { showToast(err.message, true); });
-      } else if (a === 'resume') {
-        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'in_progress' } }).then(function() {
-          showToast(t('roStatusAdvanced', 'Resumed \u2014 back in progress')); viewRoDetail(ro.id);
-        }).catch(function(err) { showToast(err.message, true); });
-      } else if (a === 'complete') {
-        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } }).then(function() {
-          showToast(t('roCompletedInvoiced', 'Completed \u2014 invoice generated'));
-          modal.remove(); loadRepairOrders(); if (typeof loadKanban === 'function') loadKanban();
-        }).catch(function(err) { showToast(err.message, true); });
-      } else if (a === 'invoice') {
-        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } }).then(function() {
-          showToast(t('roCompletedInvoiced', 'Invoice generated')); viewRoDetail(ro.id);
-        }).catch(function(err) { showToast(err.message, true); });
-      }
-    });
+    gBtn.addEventListener('click', function() { executeGuideAction(guide.action); });
     mainRow.appendChild(gBtn);
     guideBar.appendChild(mainRow);
     body.appendChild(guideBar);
-  } else if (status === 'invoiced' || status === 'completed') {
-    // Completed state - no action needed
+  } else if (status === 'invoiced' || (status === 'completed' && hasInvoices)) {
     var doneBar = document.createElement('div');
-    doneBar.className = 'bg-gray-100 dark:bg-gray-700 rounded-xl p-3 flex items-center gap-3';
-    doneBar.appendChild(document.createTextNode('\u2705 '));
-    var doneText = document.createElement('span');
-    doneText.className = 'text-sm text-gray-600 dark:text-gray-300 font-medium';
-    doneText.textContent = status === 'invoiced' ? t('roInvoicedDone', 'This repair order is complete and invoiced.') : t('roCompletedDone', 'This repair order is complete.');
-    doneBar.appendChild(doneText);
+    doneBar.className = 'bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 rounded-xl p-4 flex items-center gap-3';
+    doneBar.appendChild(function() { var i = document.createElement('span'); i.className = 'text-3xl'; i.textContent = '\u2705'; return i; }());
+    doneBar.appendChild(function() { var p = document.createElement('p'); p.className = 'font-semibold text-green-800 dark:text-green-300'; p.textContent = status === 'invoiced' ? t('roInvoicedDone', 'This repair order is complete and invoiced.') : t('roCompletedDone', 'This repair order is complete.'); return p; }());
     body.appendChild(doneBar);
   }
 
-  var actions = document.createElement('div');
-  actions.className = 'flex flex-wrap gap-3';
-
-  // Always show core action buttons
-  var inspBtn = document.createElement('button');
-  inspBtn.className = 'px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition';
-  inspBtn.textContent = t('roNewInspection', 'New Inspection');
-  inspBtn.addEventListener('click', async function() {
-    try {
-      await api('inspections.php', { method: 'POST', body: { repair_order_id: ro.id } });
-      showToast(t('roInspectionCreated', 'Inspection created with template items'));
-      viewRoDetail(ro.id);
-    } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
-  });
-  actions.appendChild(inspBtn);
-
-  var estBtn = document.createElement('button');
-  estBtn.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition';
-  estBtn.textContent = t('roNewEstimate', 'New Estimate');
-  estBtn.addEventListener('click', async function() {
-    var inspId = null;
-    if (ro.inspections && ro.inspections.length > 0) inspId = ro.inspections[0].id;
-    try {
-      var payload = { repair_order_id: ro.id, tax_rate: 0.0 };
-      if (inspId) payload.from_inspection_id = inspId;
-      await api('estimates.php', { method: 'POST', body: payload });
-      showToast(t('roEstimateCreated', 'Estimate created'));
-      viewRoDetail(ro.id);
-    } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
-  });
-  actions.appendChild(estBtn);
-
-  // Quick-send button if draft estimate exists
-  if (latestEstimate && latestEstimate.status === 'draft' && parseFloat(latestEstimate.total || 0) > 0) {
-    var quickSendBtn = document.createElement('button');
-    quickSendBtn.className = 'px-4 py-2 bg-amber-500 text-black rounded-lg text-sm font-bold hover:bg-amber-600 transition';
-    quickSendBtn.textContent = '\uD83D\uDCE7 ' + t('roQuickSendEstimate', 'Send Estimate ($' + parseFloat(latestEstimate.total).toFixed(2) + ')');
-    quickSendBtn.addEventListener('click', async function() {
-      try {
-        await api('estimates.php', { method: 'PUT', body: { id: latestEstimate.id, action: 'send' } });
-        showToast(t('roEstimateSent', 'Estimate sent to customer'));
-        viewRoDetail(ro.id);
-      } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
-    });
-    actions.appendChild(quickSendBtn);
+  // ── Customer concern (prominent, right after guided bar) ──
+  if (ro.customer_concern) {
+    var concernDiv = document.createElement('div');
+    concernDiv.className = 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3 flex items-start gap-2';
+    concernDiv.appendChild(function() { var i = document.createElement('span'); i.className = 'text-lg shrink-0'; i.textContent = '\u26A0\uFE0F'; return i; }());
+    var concernContent = document.createElement('div');
+    concernContent.appendChild(function() { var h = document.createElement('h4'); h.className = 'text-xs font-bold text-amber-800 dark:text-amber-300 uppercase'; h.textContent = t('roCustomerConcern', 'Customer Concern'); return h; }());
+    concernContent.appendChild(function() { var p = document.createElement('p'); p.className = 'text-sm text-gray-700 dark:text-gray-300 mt-0.5'; p.textContent = ro.customer_concern; return p; }());
+    concernDiv.appendChild(concernContent);
+    body.appendChild(concernDiv);
   }
 
-  // Quick complete button if status is ready
-  if (status === 'ready') {
-    var completeBtn = document.createElement('button');
-    completeBtn.className = 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 transition';
-    completeBtn.textContent = '\u2705 ' + t('roMarkCompleted', 'Mark Completed & Invoice');
-    completeBtn.addEventListener('click', async function() {
-      try {
-        await api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } });
-        showToast(t('roCompletedInvoiced', 'Completed \u2014 invoice generated & sent'));
-        modal.remove();
-        loadRepairOrders();
-        if (typeof loadKanban === 'function') loadKanban();
-      } catch(err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
-    });
-    actions.appendChild(completeBtn);
-  }
+  // ── Collapsible Details (vehicle specs, dates, VIN — not the primary focus) ──
+  var detailsToggle = document.createElement('details');
+  detailsToggle.className = 'border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden';
+  var detailsSummary = document.createElement('summary');
+  detailsSummary.className = 'px-4 py-2.5 bg-gray-50 dark:bg-gray-900/50 cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 select-none hover:bg-gray-100 dark:hover:bg-gray-800 transition';
+  detailsSummary.textContent = t('roShowDetails', 'Vehicle & Order Details');
+  detailsToggle.appendChild(detailsSummary);
+  var detailsGrid = document.createElement('div');
+  detailsGrid.className = 'grid grid-cols-2 md:grid-cols-3 gap-3 p-4';
+  var vehicleSpecs = [ro.engine, ro.transmission, ro.drive_type].filter(Boolean).join(' | ');
+  var detailItems = [
+    [t('roThVehicle', 'Vehicle'), vehicle + (ro.trim_level ? ' ' + ro.trim_level : '')],
+    ['VIN', ro.vin || '-'],
+    [t('roPlate', 'Plate'), ro.license_plate || '-'],
+    [t('roMileageIn', 'Mileage In'), ro.mileage_in ? Number(ro.mileage_in).toLocaleString() : '-'],
+  ];
+  if (vehicleSpecs) detailItems.push([t('roSpecs', 'Specs'), vehicleSpecs]);
+  if (ro.fuel_type) detailItems.push([t('roFuel', 'Fuel'), ro.fuel_type]);
+  detailItems.push(
+    [t('roPromisedDate', 'Promised'), ro.promised_date || '-'],
+    [t('roThCreated', 'Created'), formatDate(ro.created_at)],
+    [t('roUpdated', 'Updated'), formatDate(ro.updated_at)]
+  );
+  detailItems.forEach(function(pair) {
+    var div = document.createElement('div');
+    div.appendChild(function() { var l = document.createElement('p'); l.className = 'text-[10px] text-gray-400 uppercase font-bold'; l.textContent = pair[0]; return l; }());
+    div.appendChild(function() { var v = document.createElement('p'); v.className = 'text-sm font-medium text-gray-800 dark:text-gray-200'; v.textContent = pair[1]; return v; }());
+    detailsGrid.appendChild(div);
+  });
 
-  body.appendChild(actions);
+  // Advanced status override (inside details)
+  var advRow = document.createElement('div');
+  advRow.className = 'col-span-full border-t border-gray-200 dark:border-gray-700 pt-3 mt-2 flex items-center gap-2';
+  advRow.appendChild(function() { var l = document.createElement('span'); l.className = 'text-[10px] text-gray-400 uppercase font-bold'; l.textContent = t('roManualStatus', 'Manual Override'); return l; }());
+  var statusSelect = document.createElement('select');
+  statusSelect.className = 'border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-2 py-1 text-xs';
+  ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'].forEach(function(s) {
+    var opt = document.createElement('option'); opt.value = s; opt.textContent = s.replace(/_/g, ' '); opt.className = 'text-gray-900'; if (s === ro.status) opt.selected = true; statusSelect.appendChild(opt);
+  });
+  advRow.appendChild(statusSelect);
+  var advBtn = document.createElement('button');
+  advBtn.className = 'px-2 py-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg text-xs hover:bg-gray-300 dark:hover:bg-gray-500 transition';
+  advBtn.textContent = t('roUpdateStatus', 'Update');
+  advBtn.addEventListener('click', async function() {
+    if (statusSelect.value === ro.status) return;
+    try {
+      await api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: statusSelect.value } });
+      showToast(t('roStatusUpdatedTo', 'Status updated to') + ' ' + statusSelect.value.replace(/_/g, ' '));
+      viewRoDetail(ro.id);
+    } catch (err) { showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true); }
+  });
+  advRow.appendChild(advBtn);
+  detailsGrid.appendChild(advRow);
+
+  detailsToggle.appendChild(detailsGrid);
+  body.appendChild(detailsToggle);
+
+  // ── Notes (collapsible) ──
+  var hasNotes = (ro.technician_notes && ro.technician_notes.trim()) || (ro.admin_notes && ro.admin_notes.trim());
+  var notesDetails = document.createElement('details');
+  notesDetails.className = 'border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden';
+  if (hasNotes) notesDetails.open = true;
+  var notesSummary = document.createElement('summary');
+  notesSummary.className = 'px-4 py-2.5 bg-gray-50 dark:bg-gray-900/50 cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 select-none hover:bg-gray-100 dark:hover:bg-gray-800 transition';
+  notesSummary.textContent = t('roNotes', 'Notes') + (hasNotes ? '' : ' (' + t('roNoNotes', 'none') + ')');
+  notesDetails.appendChild(notesSummary);
+  var notesBody = document.createElement('div');
+  notesBody.className = 'p-4 space-y-3';
+  if (ro.technician_notes && ro.technician_notes.trim()) {
+    var techLog = document.createElement('div'); techLog.className = 'p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700';
+    techLog.appendChild(function() { var l = document.createElement('div'); l.className = 'text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider mb-1'; l.textContent = t('roTechNotes', 'Tech Notes'); return l; }());
+    techLog.appendChild(function() { var d = document.createElement('div'); d.className = 'text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap'; d.textContent = ro.technician_notes; return d; }());
+    notesBody.appendChild(techLog);
+  }
+  if (ro.admin_notes && ro.admin_notes.trim()) {
+    var adminLog = document.createElement('div'); adminLog.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600';
+    adminLog.appendChild(function() { var l = document.createElement('div'); l.className = 'text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1'; l.textContent = t('roAdminNotes', 'Admin Notes'); return l; }());
+    adminLog.appendChild(function() { var d = document.createElement('div'); d.className = 'text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap'; d.textContent = ro.admin_notes; return d; }());
+    notesBody.appendChild(adminLog);
+  }
+  // Add note form
+  var noteForm = document.createElement('div'); noteForm.className = 'border-t border-gray-200 dark:border-gray-700 pt-3';
+  var noteTextarea = document.createElement('textarea');
+  noteTextarea.className = 'w-full p-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 resize-none';
+  noteTextarea.rows = 2; noteTextarea.maxLength = 2000; noteTextarea.placeholder = t('roNotePlaceholder', 'Add a note...');
+  noteForm.appendChild(noteTextarea);
+  var noteActions = document.createElement('div'); noteActions.className = 'flex gap-2 mt-2';
+  ['technician_notes', 'admin_notes'].forEach(function(field) {
+    var btn = document.createElement('button');
+    btn.className = 'px-3 py-1 ' + (field === 'technician_notes' ? 'bg-blue-600' : 'bg-gray-600') + ' text-white rounded-lg text-xs font-medium hover:opacity-90 transition';
+    btn.textContent = field === 'technician_notes' ? t('roSaveTechNote', 'Tech Note') : t('roSaveAdminNote', 'Admin Note');
+    btn.addEventListener('click', async function() {
+      var txt = noteTextarea.value.trim(); if (!txt) return;
+      try { var b = { id: ro.id, note_append: true }; b[field] = txt; await api('repair-orders.php', { method: 'PUT', body: b }); showToast(t('roNoteSaved', 'Saved')); viewRoDetail(ro.id); } catch(e) { showToast(e.message, true); }
+    });
+    noteActions.appendChild(btn);
+  });
+  noteForm.appendChild(noteActions);
+  notesBody.appendChild(noteForm);
+  notesDetails.appendChild(notesBody);
+  body.appendChild(notesDetails);
 
   // Inspections
   if (ro.inspections && ro.inspections.length > 0) {
