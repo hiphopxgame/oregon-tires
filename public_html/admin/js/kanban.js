@@ -70,16 +70,40 @@ function getNextAction(ro) {
   var s = ro.status || 'intake';
   var hasInspection = (ro.inspection_count || 0) > 0;
   var hasEstimate = (ro.estimate_count || 0) > 0;
+  var dark = isDark();
 
-  if (s === 'intake') return { label: 'Check In', bg: '#cffafe', color: '#0e7490' };
-  if (s === 'check_in') return { label: 'Start Diag', bg: '#ede9fe', color: '#6d28d9' };
-  if (s === 'diagnosis' && !hasEstimate) return { label: 'Needs Est.', bg: '#fef3c7', color: '#92400e' };
-  if (s === 'estimate_pending') return { label: 'Send Est.', bg: '#dbeafe', color: '#1d4ed8' };
-  if (s === 'pending_approval') return { label: 'Awaiting', bg: '#ffedd5', color: '#c2410c' };
-  if (s === 'approved') return { label: 'Start Work', bg: '#dcfce7', color: '#166534' };
-  if (s === 'ready') return { label: 'Complete', bg: '#d1fae5', color: '#065f46' };
-  if (s === 'completed') return { label: 'Invoice', bg: '#ccfbf1', color: '#0f766e' };
+  if (s === 'intake') return { label: 'Check In', bg: dark ? '#164e63' : '#cffafe', color: dark ? '#67e8f9' : '#0e7490' };
+  if (s === 'check_in') return { label: 'Start Diag', bg: dark ? '#3b0764' : '#ede9fe', color: dark ? '#c4b5fd' : '#6d28d9' };
+  if (s === 'diagnosis' && !hasEstimate) return { label: 'Needs Est.', bg: dark ? '#451a03' : '#fef3c7', color: dark ? '#fcd34d' : '#92400e' };
+  if (s === 'estimate_pending') return { label: 'Send Est.', bg: dark ? '#1e3a5f' : '#dbeafe', color: dark ? '#93c5fd' : '#1d4ed8' };
+  if (s === 'pending_approval') return { label: 'Awaiting', bg: dark ? '#431407' : '#ffedd5', color: dark ? '#fdba74' : '#c2410c' };
+  if (s === 'approved') return { label: 'Start Work', bg: dark ? '#052e16' : '#dcfce7', color: dark ? '#86efac' : '#166534' };
+  if (s === 'ready') return { label: 'Complete', bg: dark ? '#022c22' : '#d1fae5', color: dark ? '#6ee7b7' : '#065f46' };
+  if (s === 'completed') return { label: 'Invoice', bg: dark ? '#042f2e' : '#ccfbf1', color: dark ? '#5eead4' : '#0f766e' };
   return null;
+}
+
+// ─── Next-status mapping for quick advance ──────────────────────────────────
+function getNextStatus(ro) {
+  var s = ro.status || 'intake';
+  var hasEstimate = (ro.estimate_count || 0) > 0;
+
+  var map = {
+    'intake': 'check_in',
+    'check_in': 'diagnosis',
+    'estimate_pending': 'pending_approval',
+    'pending_approval': 'approved',
+    'approved': 'in_progress',
+    'in_progress': 'ready',
+    'ready': 'completed',
+    'completed': 'invoiced'
+  };
+
+  // diagnosis only advances if it has an estimate
+  if (s === 'diagnosis' && hasEstimate) return 'estimate_pending';
+  if (s === 'diagnosis') return null; // can't advance without estimate
+
+  return map[s] || null;
 }
 
 // ─── Build a kanban card ─────────────────────────────────────────────────────
@@ -101,17 +125,7 @@ function createCard(ro) {
     'transition:box-shadow 0.15s, transform 0.15s;' +
     'border:1px solid ' + (dark ? '#4b5563' : '#e5e7eb') + ';';
 
-  // Hover effect
-  card.addEventListener('mouseenter', function() {
-    card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-    card.style.transform = 'translateY(-1px)';
-  });
-  card.addEventListener('mouseleave', function() {
-    card.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-    card.style.transform = 'translateY(0)';
-  });
-
-  // Click → detail
+  // Click → detail (also handled by overlay "Open" button)
   card.addEventListener('click', function() {
     if (typeof viewRoDetail === 'function') {
       viewRoDetail(ro.id);
@@ -201,6 +215,85 @@ function createCard(ro) {
     bottomRow.appendChild(actionBadge);
   }
   card.appendChild(bottomRow);
+
+  // ─── Hover quick-action overlay ───────────────────────────────────────────
+  var overlay = document.createElement('div');
+  overlay.style.cssText =
+    'position:absolute;bottom:0;left:0;right:0;' +
+    'display:none;' +
+    'justify-content:center;' +
+    'align-items:center;' +
+    'gap:6px;' +
+    'padding:6px;' +
+    'background:' + (dark ? 'rgba(17,24,39,0.88)' : 'rgba(255,255,255,0.88)') + ';' +
+    'backdrop-filter:blur(2px);' +
+    'border-radius:0 0 6px 6px;' +
+    'border-top:1px solid ' + (dark ? '#374151' : '#e5e7eb') + ';';
+
+  // "Open" button
+  var openBtn = document.createElement('button');
+  openBtn.style.cssText =
+    'font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;border:none;cursor:pointer;' +
+    'background:' + (dark ? '#374151' : '#e5e7eb') + ';' +
+    'color:' + (dark ? '#d1d5db' : '#374151') + ';' +
+    'transition:background 0.15s;';
+  openBtn.textContent = t('kanbanOpen', 'Open');
+  openBtn.addEventListener('mouseenter', function() {
+    openBtn.style.background = dark ? '#4b5563' : '#d1d5db';
+  });
+  openBtn.addEventListener('mouseleave', function() {
+    openBtn.style.background = dark ? '#374151' : '#e5e7eb';
+  });
+  openBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (typeof viewRoDetail === 'function') {
+      viewRoDetail(ro.id);
+    }
+  });
+  overlay.appendChild(openBtn);
+
+  // "Next" button (only if there's a valid next status)
+  var nextStatus = getNextStatus(ro);
+  if (nextStatus && nextAction) {
+    var nextBtn = document.createElement('button');
+    nextBtn.style.cssText =
+      'font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;border:none;cursor:pointer;' +
+      'background:' + nextAction.color + ';' +
+      'color:#ffffff;' +
+      'transition:opacity 0.15s;';
+    var friendlyNext = nextStatus.replace(/_/g, ' ');
+    friendlyNext = friendlyNext.charAt(0).toUpperCase() + friendlyNext.slice(1);
+    nextBtn.textContent = t('kanbanNext', 'Next') + ' \u2192';
+    nextBtn.title = friendlyNext;
+    nextBtn.addEventListener('mouseenter', function() {
+      nextBtn.style.opacity = '0.85';
+    });
+    nextBtn.addEventListener('mouseleave', function() {
+      nextBtn.style.opacity = '1';
+    });
+    nextBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      handleStatusDrop(ro.id, nextStatus);
+    });
+    overlay.appendChild(nextBtn);
+  }
+
+  // Card needs position:relative for the overlay
+  card.style.position = 'relative';
+  card.style.overflow = 'hidden';
+  card.appendChild(overlay);
+
+  // Show/hide overlay on hover
+  card.addEventListener('mouseenter', function() {
+    overlay.style.display = 'flex';
+    card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    card.style.transform = 'translateY(-1px)';
+  });
+  card.addEventListener('mouseleave', function() {
+    overlay.style.display = 'none';
+    card.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    card.style.transform = 'translateY(0)';
+  });
 
   return card;
 }
