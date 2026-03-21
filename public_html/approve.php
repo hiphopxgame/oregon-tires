@@ -681,8 +681,14 @@ function updateButtonLabel() {
 }
 
 async function loadEstimate() {
+    // Token can come from URL path (/approve/TOKEN) or query string (?token=TOKEN)
     var params = new URLSearchParams(window.location.search);
     estimateToken = params.get('token');
+    if (!estimateToken) {
+        // Extract from path: /approve/abc123...
+        var pathMatch = window.location.pathname.match(/\/approve\/([a-f0-9]+)/i);
+        if (pathMatch) estimateToken = pathMatch[1];
+    }
     if (!estimateToken) return showError('No estimate token provided.');
 
     try {
