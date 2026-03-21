@@ -888,6 +888,39 @@ function renderRoDetailModal() {
   if (status === 'intake') detailsToggle.open = true;
   _sections.details = detailsToggle;
 
+  // ── Appointment Origin (if linked) ──
+  if (ro.appointment && (ro.appointment.notes || ro.appointment.admin_notes)) {
+    var apptOrigin = document.createElement('details');
+    apptOrigin.className = 'border border-green-200 dark:border-green-800 rounded-xl overflow-hidden';
+    apptOrigin.open = true;
+    var apptSummary = document.createElement('summary');
+    apptSummary.className = 'px-4 py-2.5 bg-green-50 dark:bg-green-900/20 cursor-pointer text-sm font-medium text-green-800 dark:text-green-300 select-none hover:bg-green-100 dark:hover:bg-green-900/30 transition';
+    apptSummary.textContent = t('roApptOrigin', 'Appointment Notes') + (ro.appointment.reference_number ? ' (' + ro.appointment.reference_number + ')' : '');
+    apptOrigin.appendChild(apptSummary);
+    var apptBody = document.createElement('div');
+    apptBody.className = 'p-4 space-y-2';
+    if (ro.appointment.notes) {
+      var custNoteDiv = document.createElement('div');
+      custNoteDiv.className = 'p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700';
+      var custLabel = document.createElement('div'); custLabel.className = 'text-xs font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wider mb-1'; custLabel.textContent = t('roBookingNotes', 'Customer Booking Notes');
+      custNoteDiv.appendChild(custLabel);
+      var custText = document.createElement('p'); custText.className = 'text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap'; custText.textContent = ro.appointment.notes;
+      custNoteDiv.appendChild(custText);
+      apptBody.appendChild(custNoteDiv);
+    }
+    if (ro.appointment.admin_notes) {
+      var admNoteDiv = document.createElement('div');
+      admNoteDiv.className = 'p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600';
+      var admLabel = document.createElement('div'); admLabel.className = 'text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1'; admLabel.textContent = t('roApptAdminNotes', 'Admin Notes (from Appointment)');
+      admNoteDiv.appendChild(admLabel);
+      var admText = document.createElement('div'); admText.className = 'text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap'; admText.textContent = ro.appointment.admin_notes;
+      admNoteDiv.appendChild(admText);
+      apptBody.appendChild(admNoteDiv);
+    }
+    apptOrigin.appendChild(apptBody);
+    _sections.apptOrigin = apptOrigin;
+  }
+
   // ── Notes (collapsible) ──
   var hasNotes = (ro.technician_notes && ro.technician_notes.trim()) || (ro.admin_notes && ro.admin_notes.trim());
   var notesDetails = document.createElement('details');
@@ -1384,6 +1417,12 @@ function renderRoDetailModal() {
       sectionOrder = ['concern', 'details', 'inspections', 'estimates', 'notes', 'labor', 'invoices', 'appointment'];
   }
 
+  // Insert apptOrigin after concern in the display order (if it exists)
+  if (_sections.apptOrigin) {
+    var concernIdx = sectionOrder.indexOf('concern');
+    if (concernIdx !== -1) sectionOrder.splice(concernIdx + 1, 0, 'apptOrigin');
+    else sectionOrder.unshift('apptOrigin');
+  }
   sectionOrder.forEach(function(key) {
     if (_sections[key]) body.appendChild(_sections[key]);
   });

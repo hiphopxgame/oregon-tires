@@ -418,11 +418,17 @@ function createRoForAppointment(int $appointmentId, PDO $db): ?array
         $concern = ucwords(str_replace('-', ' ', $appt['service'])) . ($concern ? "\n" . $concern : '');
     }
 
+    // Transfer appointment admin_notes to RO admin_notes
+    $roAdminNotes = null;
+    if (!empty($appt['admin_notes'])) {
+        $roAdminNotes = "[From Appointment]\n" . $appt['admin_notes'];
+    }
+
     $stmt = $db->prepare(
         'INSERT INTO oretir_repair_orders
             (ro_number, customer_id, vehicle_id, appointment_id, status,
-             customer_concern, promised_date, promised_time, assigned_employee_id, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+             customer_concern, admin_notes, promised_date, promised_time, assigned_employee_id, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
     );
     $stmt->execute([
         $roNumber,
@@ -431,6 +437,7 @@ function createRoForAppointment(int $appointmentId, PDO $db): ?array
         $appointmentId,
         'intake',
         $concern ?: null,
+        $roAdminNotes,
         $appt['preferred_date'] ?? null,
         $appt['preferred_time'] ?? null,
         $appt['assigned_employee_id'] ?? null,

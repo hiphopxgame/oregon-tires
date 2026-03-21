@@ -152,9 +152,9 @@ try {
                 $ro['visit'] = null;
             }
 
-            // Linked appointment
+            // Linked appointment (include notes for full traceability)
             if ($ro['appointment_id']) {
-                $aStmt = $db->prepare('SELECT id, reference_number, service, preferred_date, preferred_time, status FROM oretir_appointments WHERE id = ?');
+                $aStmt = $db->prepare('SELECT id, reference_number, service, services, preferred_date, preferred_time, status, notes, admin_notes, sms_opt_in, created_at FROM oretir_appointments WHERE id = ?');
                 $aStmt->execute([$ro['appointment_id']]);
                 $ro['appointment'] = $aStmt->fetch(PDO::FETCH_ASSOC) ?: null;
             }
@@ -292,11 +292,30 @@ try {
             // Auto-assign employee from appointment if present
             $assignedEmpFromAppt = !empty($appt['assigned_employee_id']) ? (int) $appt['assigned_employee_id'] : null;
 
+            // Build customer concern from services + notes
+            $concern = $appt['notes'] ?? '';
+            $servicesJson = $appt['services'] ?? null;
+            if ($servicesJson) {
+                $servicesList = json_decode($servicesJson, true);
+                if (is_array($servicesList) && count($servicesList) > 0) {
+                    $serviceLabels = implode(' + ', array_map(fn(string $s) => ucwords(str_replace('-', ' ', $s)), $servicesList));
+                    $concern = $serviceLabels . ($concern ? "\n" . $concern : '');
+                }
+            } elseif (!empty($appt['service'])) {
+                $concern = ucwords(str_replace('-', ' ', $appt['service'])) . ($concern ? "\n" . $concern : '');
+            }
+
+            // Transfer appointment admin_notes to RO admin_notes
+            $roAdminNotes = null;
+            if (!empty($appt['admin_notes'])) {
+                $roAdminNotes = "[From Appointment]\n" . $appt['admin_notes'];
+            }
+
             $stmt = $db->prepare(
                 'INSERT INTO oretir_repair_orders
                     (ro_number, customer_id, vehicle_id, appointment_id, assigned_employee_id, status,
-                     customer_concern, mileage_in, promised_date, promised_time, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+                     customer_concern, admin_notes, mileage_in, promised_date, promised_time, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
             );
             $stmt->execute([
                 $roNumber,
@@ -305,7 +324,8 @@ try {
                 $appointmentId,
                 $assignedEmpFromAppt,
                 'intake',
-                $appt['notes'] ?? null,
+                $concern ?: null,
+                $roAdminNotes,
                 !empty($data['mileage_in']) ? (int) $data['mileage_in'] : null,
                 $appt['preferred_date'] ?? null,
                 $appt['preferred_time'] ?? null,
