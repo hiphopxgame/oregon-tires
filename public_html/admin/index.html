@@ -451,6 +451,7 @@
           </div>
           <button id="admin-dark-toggle" onclick="toggleAdminDarkMode()" aria-label="Toggle dark mode" class="text-sm text-white hover:text-green-200 transition-colors w-9 h-9 inline-flex items-center justify-center">🌙</button>
           <button id="admin-lang-toggle" onclick="toggleAdminLanguage()" aria-label="Toggle language" class="text-sm text-white hover:text-green-200 transition-colors w-9 h-9 inline-flex items-center justify-center">EN</button>
+          <button id="admin-help-toggle" onclick="toggleAdminHelp()" aria-label="Toggle help guide" aria-pressed="false" class="text-sm text-white hover:text-green-200 transition-colors w-9 h-9 inline-flex items-center justify-center" title="Turn on guide">?</button>
           <div class="relative" id="notif-bell-wrap">
             <button onclick="toggleNotifPanel()" aria-label="Notifications" class="relative text-white hover:text-green-200 transition-colors text-lg w-9 h-9 inline-flex items-center justify-center" id="notif-bell-btn">🔔<span id="notif-badge" class="notif-badge hidden">0</span></button>
             <div id="notif-dropdown" class="notif-dropdown hidden">
@@ -6508,8 +6509,38 @@ const adminT = {
     refCompleteOk: 'Referencia marcada como completa.',
     refAwardOk: 'Puntos otorgados exitosamente.',
     refFail: 'Acción fallida. Intente de nuevo.',
+    // Walk-In Queue
+    wqTotalInQueue: 'En Cola',
+    wqWaiting: 'Esperando',
+    wqBeingServed: 'Siendo Atendido',
+    wqEstWait: 'Espera Est.',
+    wqEmpty: 'No hay clientes en cola',
+    wqAddFirst: 'Agregue un cliente sin cita para comenzar',
+    wqNotify: 'Notificar',
+    wqServe: 'Atender',
+    wqCheckIn: 'Registrar',
+    wqComplete: 'Completar',
+    wqCancel: 'Cancelar',
+    wqStatusUpdated: 'Cola actualizada',
+    wqAutoCheckedIn: 'Registrado autom\u00e1ticamente en Seguimiento de Visitas',
+    wqNetworkError: 'Error de red',
+    wqRemoved: 'Removido de la cola',
+    wqLoadFail: 'Error al cargar la cola',
+    wqAddTitle: 'Agregar a la Cola',
+    wqFirstName: 'Nombre',
+    wqLastName: 'Apellido',
+    wqSearchOrType: 'Buscar o escribir...',
+    wqPhone: 'Tel\u00e9fono',
+    wqService: 'Servicio',
+    wqSelectService: 'Seleccionar servicio...',
+    wqNotes: 'Notas',
+    wqNotesPlaceholder: 'Notas opcionales',
+    wqAddToQueue: 'Agregar a la Cola',
+    wqNameRequired: 'El nombre es requerido',
+    wqAdding: 'Agregando...',
+    wqAdded: 'Agregado a la cola',
     // Calendar Retry
-    calSyncRetried: 'Sincronización de calendario reintentada exitosamente',
+    calSyncRetried: 'Sincronizaci\u00f3n de calendario reintentada exitosamente',
     calRetryFailed: 'Error al reintentar',
     calNetworkError: 'Error de red',
     // HTML Translation Gap Fixes
@@ -14083,6 +14114,7 @@ loadMessages = async function() {
 <script src="/admin/js/service-reminders.js"></script>
 <script src="/admin/js/resource-planner.js"></script>
 <script src="/admin/js/labor-tracker.js"></script>
+<script src="/admin/js/admin-help.js"></script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';
   // Override global showToast — handles legacy (msg, isError: bool) and new (msg, type: string)

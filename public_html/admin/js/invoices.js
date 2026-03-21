@@ -23,12 +23,12 @@
 
   function statusClass(s) {
     var map = {
-      draft: 'bg-gray-100 text-gray-700',
-      sent: 'bg-blue-100 text-blue-700',
-      paid: 'bg-green-100 text-green-700',
-      void: 'bg-red-100 text-red-700',
+      draft: 'bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-200',
+      sent: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+      paid: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+      void: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
     };
-    return map[s] || 'bg-gray-100 text-gray-700';
+    return map[s] || 'bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-200';
   }
 
   function formatCurrency(n) {
@@ -58,7 +58,7 @@
     bar.className = 'flex flex-wrap items-center gap-3 mb-4';
 
     var select = document.createElement('select');
-    select.className = 'border rounded px-3 py-2 text-sm';
+    select.className = 'border rounded px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
     var statuses = ['', 'draft', 'sent', 'paid', 'void'];
     var labels = [t('invAllStatuses', 'All Statuses'), t('invDraft', 'Draft'), t('invSent', 'Sent'), t('invPaid', 'Paid'), t('invVoid', 'Void')];
     statuses.forEach(function(val, i) {
@@ -77,7 +77,7 @@
     var input = document.createElement('input');
     input.type = 'text';
     input.placeholder = t('invSearchPlaceholder', 'Search invoices…');
-    input.className = 'border rounded px-3 py-2 text-sm flex-1 min-w-[180px]';
+    input.className = 'border rounded px-3 py-2 text-sm flex-1 min-w-[180px] dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400';
     input.value = searchQuery;
     var debounce = null;
     input.addEventListener('input', function() {
@@ -107,18 +107,18 @@
   // ─── Table Render ──────────────────────────────────────────────────────────
   function renderTable(container, invoices) {
     var table = document.createElement('table');
-    table.className = 'w-full text-sm border-collapse';
+    table.className = 'w-full text-sm border-collapse responsive-table';
 
     var thead = document.createElement('thead');
     var headRow = document.createElement('tr');
-    headRow.className = 'border-b bg-gray-50 text-left';
+    headRow.className = 'border-b bg-gray-50 dark:bg-gray-700 text-left';
     var colKeys = [
       ['invInvoiceNum', 'Invoice #'], ['invCustomer', 'Customer'], ['invRoNum', 'RO #'],
       ['invTotal', 'Total'], ['invStatus', 'Status'], ['invDate', 'Date'], ['invActions', 'Actions']
     ];
     colKeys.forEach(function(pair) {
       var th = document.createElement('th');
-      th.className = 'px-3 py-2 font-medium';
+      th.className = 'px-3 py-2 font-medium text-gray-600 dark:text-gray-300';
       th.textContent = t(pair[0], pair[1]);
       headRow.appendChild(th);
     });
@@ -130,37 +130,42 @@
       var emptyRow = document.createElement('tr');
       var emptyTd = document.createElement('td');
       emptyTd.colSpan = 7;
-      emptyTd.className = 'px-3 py-8 text-center text-gray-400';
+      emptyTd.className = 'px-3 py-8 text-center text-gray-400 dark:text-gray-500';
       emptyTd.textContent = t('invNoInvoices', 'No invoices found.');
       emptyRow.appendChild(emptyTd);
       tbody.appendChild(emptyRow);
     } else {
       invoices.forEach(function(inv) {
         var tr = document.createElement('tr');
-        tr.className = 'border-b hover:bg-gray-50';
+        tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
 
         var tdNum = document.createElement('td');
-        tdNum.className = 'px-3 py-2 font-mono';
+        tdNum.className = 'px-3 py-2 font-mono dark:text-gray-200';
+        tdNum.setAttribute('data-label', t('invInvoiceNum', 'Invoice #'));
         tdNum.textContent = inv.invoice_number || '-';
         tr.appendChild(tdNum);
 
         var tdCust = document.createElement('td');
-        tdCust.className = 'px-3 py-2';
+        tdCust.className = 'px-3 py-2 dark:text-gray-200';
+        tdCust.setAttribute('data-label', t('invCustomer', 'Customer'));
         tdCust.textContent = inv.customer_name || '-';
         tr.appendChild(tdCust);
 
         var tdRo = document.createElement('td');
-        tdRo.className = 'px-3 py-2 font-mono';
+        tdRo.className = 'px-3 py-2 font-mono dark:text-gray-200';
+        tdRo.setAttribute('data-label', t('invRoNum', 'RO #'));
         tdRo.textContent = inv.ro_number || '-';
         tr.appendChild(tdRo);
 
         var tdTotal = document.createElement('td');
-        tdTotal.className = 'px-3 py-2';
+        tdTotal.className = 'px-3 py-2 font-semibold dark:text-gray-100';
+        tdTotal.setAttribute('data-label', t('invTotal', 'Total'));
         tdTotal.textContent = formatCurrency(inv.total);
         tr.appendChild(tdTotal);
 
         var tdStatus = document.createElement('td');
         tdStatus.className = 'px-3 py-2';
+        tdStatus.setAttribute('data-label', t('invStatus', 'Status'));
         var badge = document.createElement('span');
         badge.className = 'px-2 py-0.5 rounded-full text-xs font-medium ' + statusClass(inv.status);
         badge.textContent = statusLabel(inv.status);
@@ -168,12 +173,14 @@
         tr.appendChild(tdStatus);
 
         var tdDate = document.createElement('td');
-        tdDate.className = 'px-3 py-2';
+        tdDate.className = 'px-3 py-2 dark:text-gray-300';
+        tdDate.setAttribute('data-label', t('invDate', 'Date'));
         tdDate.textContent = formatDate(inv.created_at);
         tr.appendChild(tdDate);
 
         var tdActions = document.createElement('td');
         tdActions.className = 'px-3 py-2 flex gap-1 flex-wrap';
+        tdActions.setAttribute('data-label', t('invActions', 'Actions'));
         appendActionButtons(tdActions, inv);
         tr.appendChild(tdActions);
 
@@ -185,7 +192,7 @@
   }
 
   function appendActionButtons(td, inv) {
-    var viewBtn = makeBtn(t('invView', 'View'), 'bg-gray-200 hover:bg-gray-300 text-gray-800', function() {
+    var viewBtn = makeBtn(t('invView', 'View'), 'bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-100', function() {
       window.open('/api/admin/invoices.php?id=' + inv.id + '&format=html', '_blank');
     });
     td.appendChild(viewBtn);
@@ -222,17 +229,17 @@
     nav.className = 'flex items-center justify-between mt-4 text-sm';
 
     var prevBtn = document.createElement('button');
-    prevBtn.className = 'px-3 py-1 border rounded disabled:opacity-40';
+    prevBtn.className = 'px-3 py-1 border rounded disabled:opacity-40 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
     prevBtn.textContent = t('invPrev', '← Prev');
     prevBtn.disabled = (page <= 1);
     prevBtn.addEventListener('click', function() { page--; loadInvoices(); });
 
     var info = document.createElement('span');
-    info.className = 'text-gray-500';
+    info.className = 'text-gray-500 dark:text-gray-400';
     info.textContent = t('invPageOf', 'Page {page} of {total}').replace('{page}', page).replace('{total}', totalPages);
 
     var nextBtn = document.createElement('button');
-    nextBtn.className = 'px-3 py-1 border rounded disabled:opacity-40';
+    nextBtn.className = 'px-3 py-1 border rounded disabled:opacity-40 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
     nextBtn.textContent = t('invNext', 'Next →');
     nextBtn.disabled = (page >= totalPages);
     nextBtn.addEventListener('click', function() { page++; loadInvoices(); });
