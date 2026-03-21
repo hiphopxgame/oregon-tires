@@ -88,12 +88,18 @@ try {
         ],
     ];
 
-    // Enhanced query: match by member_id OR by email on orphaned appointments
+    // Enhanced query: full RO journey data
     $sql = 'SELECT DISTINCT a.id, a.reference_number, a.service, a.preferred_date, a.preferred_time,
                    a.vehicle_year, a.vehicle_make, a.vehicle_model, a.status, a.language,
                    a.created_at, e.name as employee_name,
                    insp.customer_view_token,
-                   ro.status as ro_status, ro.ro_number,
+                   ro.id as ro_id, ro.status as ro_status, ro.ro_number,
+                   ro.customer_concern, ro.promised_date, ro.checked_in_at, ro.service_started_at,
+                   ro.service_ended_at, ro.checked_out_at,
+                   est.id as estimate_id, est.estimate_number, est.status as estimate_status,
+                   est.total as estimate_total, est.approval_token,
+                   inv.invoice_number, inv.status as invoice_status, inv.total as invoice_total,
+                   inv.customer_view_token as invoice_token,
                    (SELECT COUNT(*) FROM oretir_inspection_photos ip
                     JOIN oretir_inspection_items ii ON ip.inspection_item_id = ii.id
                     WHERE ii.inspection_id = insp.id) as photo_count
@@ -102,6 +108,8 @@ try {
             LEFT JOIN oretir_employees e ON a.assigned_employee_id = e.id
             LEFT JOIN oretir_repair_orders ro ON ro.appointment_id = a.id
             LEFT JOIN oretir_inspections insp ON insp.repair_order_id = ro.id
+            LEFT JOIN oretir_estimates est ON est.repair_order_id = ro.id
+            LEFT JOIN oretir_invoices inv ON inv.repair_order_id = ro.id
             WHERE (a.member_id = :mid';
 
     $params = [':mid' => $memberId];
@@ -172,87 +180,110 @@ try {
                 </p>
             <?php else: ?>
                 <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <?php foreach ($bookings as $booking): ?>
-                        <div style="padding: 1rem; background: var(--member-surface-hover); border-radius: var(--member-radius); border-left: 3px solid var(--member-accent);">
+                    <?php foreach ($bookings as $b):
+                        $vehicle = trim(($b['vehicle_year'] ?? '') . ' ' . ($b['vehicle_make'] ?? '') . ' ' . ($b['vehicle_model'] ?? ''));
+                        $hasRo = !empty($b['ro_status']);
+                        $roStatus = $b['ro_status'] ?? '';
+                        $currentStep = $roStepMap[$roStatus] ?? 0;
+                        $totalSteps = 10;
+                        $stepLabel = $roStepLabels[$lang][$roStatus] ?? $roStepLabels['en'][$roStatus] ?? $roStatus;
+                        $isActive = $hasRo && !in_array($roStatus, ['completed', 'invoiced', 'cancelled'], true);
+                        $isDone = in_array($roStatus, ['completed', 'invoiced'], true);
+                        $isCancelled = $b['status'] === 'cancelled' || $roStatus === 'cancelled';
+
+                        // Colors
+                        if ($isDone) { $borderColor = '#22c55e'; $barColor = '#22c55e'; $barBg = '#dcfce7'; $textColor = '#166534'; }
+                        elseif ($isCancelled) { $borderColor = '#ef4444'; $barColor = '#ef4444'; $barBg = '#fef2f2'; $textColor = '#991b1b'; }
+                        elseif ($isActive) { $borderColor = '#3b82f6'; $barColor = '#3b82f6'; $barBg = '#dbeafe'; $textColor = '#1e40af'; }
+                        else { $borderColor = '#f59e0b'; $barColor = '#f59e0b'; $barBg = '#fef3c7'; $textColor = '#92400e'; }
+
+                        $canApprove = in_array($b['estimate_status'] ?? '', ['sent', 'viewed'], true) && !empty($b['approval_token']);
+                    ?>
+                        <div style="padding: 1rem; background: var(--member-surface-hover); border-radius: var(--member-radius); border-left: 4px solid <?= $borderColor ?>;">
+                            <!-- Header: Vehicle + Status -->
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
                                 <div>
-                                    <h3 style="margin: 0 0 0.25rem; font-size: 0.95rem;">
-                                        <?= htmlspecialchars($booking['vehicle_year'] . ' ' . $booking['vehicle_make'] . ' ' . $booking['vehicle_model']) ?>
+                                    <h3 style="margin: 0 0 0.25rem; font-size: 1rem; font-weight: 700;">
+                                        <?= htmlspecialchars($vehicle ?: memberT('no_vehicle', $lang)) ?>
                                     </h3>
-                                    <?php if (!empty($booking['employee_name'])): ?>
-                                    <p style="margin: 0 0 0.25rem; color: var(--member-text-muted); font-size: 0.875rem;">
-                                        <?= htmlspecialchars(memberT('your_technician', $lang)) ?>: <?= htmlspecialchars($booking['employee_name']) ?>
+                                    <p style="margin: 0; color: var(--member-text-muted); font-size: 0.8rem;">
+                                        <?= htmlspecialchars(ucwords(str_replace('-', ' ', $b['service'] ?? ''))) ?>
+                                        · <?= htmlspecialchars(date('M d, Y', strtotime($b['preferred_date']))) ?>
+                                        · <?= htmlspecialchars(date('g:i A', strtotime($b['preferred_time']))) ?>
+                                    </p>
+                                    <?php if (!empty($b['employee_name'])): ?>
+                                    <p style="margin: 0.125rem 0 0; color: var(--member-text-muted); font-size: 0.8rem;">
+                                        🔧 <?= htmlspecialchars($b['employee_name']) ?>
                                     </p>
                                     <?php endif; ?>
-                                    <p style="margin: 0; color: var(--member-text-muted); font-size: 0.875rem;">
-                                        <?= htmlspecialchars(memberT('ref', $lang)) ?>: <?= htmlspecialchars($booking['reference_number']) ?>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span style="display: inline-block; padding: 0.2rem 0.6rem; background: <?= $borderColor ?>; color: white; border-radius: 0.25rem; font-size: 0.7rem; font-weight: 700;">
+                                        <?= htmlspecialchars($hasRo ? $stepLabel : ucfirst($b['status'])) ?>
+                                    </span>
+                                    <p style="margin: 0.25rem 0 0; font-size: 0.65rem; color: var(--member-text-muted);">
+                                        <?= htmlspecialchars($b['reference_number']) ?>
+                                        <?= !empty($b['ro_number']) ? ' · ' . htmlspecialchars($b['ro_number']) : '' ?>
                                     </p>
                                 </div>
-                                <span style="padding: 0.25rem 0.75rem; background: var(--member-accent); color: var(--member-accent-text); border-radius: 0.25rem; font-size: 0.75rem;">
-                                    <?= htmlspecialchars(ucfirst($booking['status'])) ?>
-                                </span>
                             </div>
-                            <div style="margin-top: 0.5rem; font-size: 0.875rem;">
-                                <p style="margin: 0;">
-                                    <?= htmlspecialchars(memberT('service', $lang)) ?>: <strong><?= htmlspecialchars($booking['service']) ?></strong>
-                                </p>
-                                <p style="margin: 0.25rem 0 0;">
-                                    <?= htmlspecialchars(memberT('date_time', $lang)) ?>: <?= htmlspecialchars(date('M d, Y g:i A', strtotime($booking['preferred_date'] . ' ' . $booking['preferred_time']))) ?>
-                                </p>
-                                <?php if (!empty($booking['customer_view_token'])): ?>
-                                <p style="margin: 0.5rem 0 0;">
-                                    <a href="/inspection/<?= htmlspecialchars($booking['customer_view_token']) ?>" style="color: var(--member-accent); text-decoration: none; font-size: 0.875rem; font-weight: 600;">
-                                        <?= htmlspecialchars(memberT('view_inspection', $lang)) ?>
-                                        <?php if (!empty($booking['photo_count'])): ?>
-                                        <span style="background: var(--member-accent); color: var(--member-accent-text); padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.7rem; margin-left: 0.25rem;">
-                                            <?= (int) $booking['photo_count'] ?> <?= htmlspecialchars(memberT('photos', $lang)) ?>
-                                        </span>
-                                        <?php endif; ?>
-                                    </a>
-                                </p>
-                                <?php endif; ?>
-                                <?php
-                                // ── RO Status Progress Bar ──
-                                if (!empty($booking['ro_status']) && isset($roStepMap[$booking['ro_status']])):
-                                    $roStatus = $booking['ro_status'];
-                                    $currentStep = $roStepMap[$roStatus];
-                                    $totalSteps = 10;
-                                    $stepLabel = $roStepLabels[$lang][$roStatus] ?? $roStepLabels['en'][$roStatus] ?? $roStatus;
-                                    $stepText = ($lang === 'es')
-                                        ? "Paso {$currentStep}/{$totalSteps} — {$stepLabel}"
-                                        : "Step {$currentStep}/{$totalSteps} — {$stepLabel}";
-                                    $pct = round(($currentStep / $totalSteps) * 100);
-                                    // Color: green for completed/invoiced, blue for in-progress, amber for pending
-                                    if ($currentStep >= 9) {
-                                        $barColor = '#22c55e'; $barBg = '#dcfce7'; $textColor = '#166534';
-                                    } elseif ($currentStep >= 6) {
-                                        $barColor = '#3b82f6'; $barBg = '#dbeafe'; $textColor = '#1e40af';
-                                    } else {
-                                        $barColor = '#f59e0b'; $barBg = '#fef3c7'; $textColor = '#92400e';
-                                    }
-                                ?>
-                                <div style="margin-top: 0.75rem; padding: 0.625rem 0.75rem; background: <?= $barBg ?>; border-radius: 0.5rem;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.375rem;">
-                                        <span style="font-size: 0.75rem; font-weight: 600; color: <?= $textColor ?>;">
-                                            <?= htmlspecialchars($stepText) ?>
-                                        </span>
-                                        <?php if (!empty($booking['ro_number'])): ?>
-                                        <span style="font-size: 0.7rem; color: <?= $textColor ?>; opacity: 0.7;">
-                                            <?= htmlspecialchars($booking['ro_number']) ?>
-                                        </span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div style="background: rgba(0,0,0,0.1); border-radius: 0.25rem; height: 6px; overflow: hidden;">
-                                        <div style="background: <?= $barColor ?>; height: 100%; width: <?= $pct ?>%; border-radius: 0.25rem; transition: width 0.3s ease;"></div>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; margin-top: 0.25rem;">
-                                        <?php for ($s = 1; $s <= $totalSteps; $s++): ?>
-                                        <div style="width: 6px; height: 6px; border-radius: 50%; background: <?= $s <= $currentStep ? $barColor : 'rgba(0,0,0,0.15)' ?>;"></div>
-                                        <?php endfor; ?>
-                                    </div>
+
+                            <?php if ($hasRo && !$isCancelled): ?>
+                            <!-- RO Progress Bar -->
+                            <div style="margin: 0.5rem 0; padding: 0.5rem 0.75rem; background: <?= $barBg ?>; border-radius: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                                    <span style="font-size: 0.7rem; font-weight: 700; color: <?= $textColor ?>;">
+                                        <?= $lang === 'es' ? 'Paso' : 'Step' ?> <?= $currentStep ?>/<?= $totalSteps ?> — <?= htmlspecialchars($stepLabel) ?>
+                                    </span>
                                 </div>
+                                <div style="background: rgba(0,0,0,0.08); border-radius: 0.25rem; height: 6px; overflow: hidden;">
+                                    <div style="background: <?= $barColor ?>; height: 100%; width: <?= round(($currentStep / $totalSteps) * 100) ?>%; border-radius: 0.25rem;"></div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 0.25rem;">
+                                    <?php for ($s = 1; $s <= $totalSteps; $s++): ?>
+                                    <div style="width: 5px; height: 5px; border-radius: 50%; background: <?= $s <= $currentStep ? $barColor : 'rgba(0,0,0,0.12)' ?>;"></div>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+
+                            <!-- Action Buttons -->
+                            <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                <?php if ($canApprove): ?>
+                                <a href="/approve/<?= htmlspecialchars($b['approval_token']) ?>" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.4rem 0.75rem; background: #f59e0b; color: #000; text-decoration: none; font-size: 0.8rem; font-weight: 700; border-radius: 0.375rem;">
+                                    ✅ <?= $lang === 'es' ? 'Revisar Presupuesto' : 'Review Estimate' ?>
+                                    ($<?= number_format((float) ($b['estimate_total'] ?? 0), 2) ?>)
+                                </a>
+                                <?php endif; ?>
+
+                                <?php if (!empty($b['customer_view_token'])): ?>
+                                <a href="/inspection/<?= htmlspecialchars($b['customer_view_token']) ?>" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.4rem 0.75rem; background: var(--member-accent); color: var(--member-accent-text); text-decoration: none; font-size: 0.8rem; font-weight: 600; border-radius: 0.375rem;">
+                                    🔍 <?= htmlspecialchars(memberT('view_inspection', $lang)) ?>
+                                    <?php if (!empty($b['photo_count'])): ?>
+                                    (<?= (int) $b['photo_count'] ?> <?= htmlspecialchars(memberT('photos', $lang)) ?>)
+                                    <?php endif; ?>
+                                </a>
+                                <?php endif; ?>
+
+                                <?php if (!empty($b['invoice_token'])): ?>
+                                <a href="/invoice/<?= htmlspecialchars($b['invoice_token']) ?>" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.4rem 0.75rem; background: #16a34a; color: white; text-decoration: none; font-size: 0.8rem; font-weight: 600; border-radius: 0.375rem;">
+                                    🧾 <?= $lang === 'es' ? 'Ver Factura' : 'View Invoice' ?>
+                                    ($<?= number_format((float) ($b['invoice_total'] ?? 0), 2) ?>)
+                                </a>
+                                <?php endif; ?>
+
+                                <?php if ($b['status'] !== 'cancelled' && !$isDone): ?>
+                                <a href="/book-appointment/" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.4rem 0.75rem; color: var(--member-text-muted); text-decoration: none; font-size: 0.75rem; border: 1px solid var(--member-border); border-radius: 0.375rem;">
+                                    <?= $lang === 'es' ? 'Reagendar' : 'Reschedule' ?>
+                                </a>
                                 <?php endif; ?>
                             </div>
+
+                            <?php if (!empty($b['customer_concern'])): ?>
+                            <p style="margin: 0.5rem 0 0; font-size: 0.75rem; color: var(--member-text-muted); font-style: italic;">
+                                <?= htmlspecialchars($b['customer_concern']) ?>
+                            </p>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
