@@ -721,10 +721,12 @@ function renderRoDetailModal() {
     } else if (a === 'send_estimate') {
       if (latestEstimate) {
         api('estimates.php', { method: 'PUT', body: { id: latestEstimate.id, action: 'send' } }).then(function() {
-          api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'pending_approval' } }).then(function() {
-            showToast(t('roEstimateSent', 'Estimate sent \u2014 awaiting approval')); viewRoDetail(ro.id);
-          });
+          return api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'pending_approval' } });
+        }).then(function() {
+          showToast(t('roEstimateSent', 'Estimate sent \u2014 awaiting approval')); viewRoDetail(ro.id);
         }).catch(function(err) { showToast(err.message, true); });
+      } else {
+        showToast(t('roNoEstimate', 'No estimate to send \u2014 create one first'), true);
       }
     } else if (a === 'approve') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'approved' } }).then(function() {
@@ -794,8 +796,14 @@ function renderRoDetailModal() {
     var doneBar = document.createElement('div');
     doneBar.className = 'bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 rounded-xl p-4 flex items-center gap-3';
     doneBar.appendChild(function() { var i = document.createElement('span'); i.className = 'text-3xl'; i.textContent = '\u2705'; return i; }());
-    doneBar.appendChild(function() { var p = document.createElement('p'); p.className = 'font-semibold text-green-800 dark:text-green-300'; p.textContent = status === 'invoiced' ? t('roInvoicedDone', 'This repair order is complete and invoiced.') : t('roCompletedDone', 'This repair order is complete.'); return p; }());
+    doneBar.appendChild(function() { var p = document.createElement('p'); p.className = 'font-semibold text-green-800 dark:text-green-300'; p.textContent = t('roInvoicedDone', 'This repair order is complete and invoiced.'); return p; }());
     body.appendChild(doneBar);
+  } else if (status === 'cancelled') {
+    var cancelBar = document.createElement('div');
+    cancelBar.className = 'bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-700 rounded-xl p-4 flex items-center gap-3';
+    cancelBar.appendChild(function() { var i = document.createElement('span'); i.className = 'text-3xl'; i.textContent = '\u274C'; return i; }());
+    cancelBar.appendChild(function() { var p = document.createElement('p'); p.className = 'font-semibold text-red-800 dark:text-red-300'; p.textContent = t('roCancelledDone', 'This repair order has been cancelled.'); return p; }());
+    body.appendChild(cancelBar);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
