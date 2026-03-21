@@ -1616,6 +1616,7 @@
   <li>Sincronizaci&oacute;n Google Business Profile</li>
   <li>Notificaciones Push (PWA)</li>
   <li>Integraci&oacute;n de Email Entrante</li>
+  <li>Grupos de Usuario y Permisos</li>
 </ol>
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
@@ -1677,7 +1678,7 @@
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">4. Gesti&oacute;n de Empleados</h2>
-<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">En la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Empleados</strong>, puede agregar, editar y eliminar empleados. Cada empleado tiene nombre, correo, tel&eacute;fono y rol (Empleado o Gerente). Tambi&eacute;n puede crear cuentas de administrador para otros usuarios.</p>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">En la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Empleados</strong>, puede agregar, editar y desactivar empleados. Cada empleado tiene nombre, correo, tel&eacute;fono y se asigna a un <strong class="font-semibold text-gray-800 dark:text-gray-200">Grupo de Usuario</strong> que controla lo que puede ver y hacer en el panel de administraci&oacute;n. Tambi&eacute;n puede crear cuentas de administrador para usuarios que necesiten acceso completo.</p>
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
@@ -1985,6 +1986,60 @@
   <li>Un trabajo cron se ejecuta cada 2 minutos para obtener nuevos emails v&iacute;a IMAP.</li>
 </ol>
 
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
+<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">36. Grupos de Usuario y Permisos</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Los Grupos de Usuario le permiten controlar a qu&eacute; &aacute;reas del panel de administraci&oacute;n puede acceder cada empleado. En lugar de dar acceso completo a todos, asigne a cada empleado un grupo con permisos espec&iacute;ficos.</p>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">C&oacute;mo Funciona</h3>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Administradores</strong> siempre tienen acceso completo a todo &mdash; los grupos no restringen a los administradores.</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Empleados</strong> solo ven las pesta&ntilde;as y funciones permitidas por su grupo.</li>
+  <li>Todos los empleados siempre tienen acceso a <strong class="font-semibold text-gray-800 dark:text-gray-200">Mi Horario</strong> y <strong class="font-semibold text-gray-800 dark:text-gray-200">Mi Trabajo</strong> sin importar su grupo.</li>
+</ul>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Paquetes de Permisos</h3>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Cada grupo tiene uno o m&aacute;s <strong class="font-semibold text-gray-800 dark:text-gray-200">paquetes de permisos</strong>. Cada paquete otorga acceso a un conjunto de pesta&ntilde;as:</p>
+<table class="w-full border-collapse mb-6">
+  <thead><tr><th class="bg-gray-50 dark:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-left">Paquete</th><th class="bg-gray-50 dark:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-left">Pesta&ntilde;as Otorgadas</th></tr></thead>
+  <tbody>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Operaciones del Taller</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Citas, &Oacute;rdenes de Reparaci&oacute;n, Facturas, Cola de Espera, En Espera, Cotizaciones, Servicios, Seguimiento de Visitas</td></tr>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Gesti&oacute;n de Clientes</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Clientes, Planificador de Recursos</td></tr>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Mensajer&iacute;a</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Mensajes</td></tr>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Gesti&oacute;n de Equipo</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Empleados, Seguimiento de Horas</td></tr>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Marketing y Contenido</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Blog, Promociones, Preguntas Frecuentes, Rese&ntilde;as, Galer&iacute;a, Suscriptores, Lealtad y Recompensas, Referidos, Recordatorios de Servicio</td></tr>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Configuraci&oacute;n y An&aacute;lisis</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Anal&iacute;ticas, Contenido del Sitio, Documentaci&oacute;n</td></tr>
+  </tbody>
+</table>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Grupos Predeterminados</h3>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">El sistema incluye 4 grupos integrados que no se pueden eliminar:</p>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Mec&aacute;nico</strong> (predeterminado) &mdash; Solo Operaciones del Taller. Ideal para t&eacute;cnicos.</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Recepci&oacute;n</strong> &mdash; Operaciones del Taller + Gesti&oacute;n de Clientes + Mensajer&iacute;a. Para personal de atenci&oacute;n al cliente.</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Gerente</strong> &mdash; Todo excepto Configuraci&oacute;n y An&aacute;lisis. Para l&iacute;deres de turno y gerentes.</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Marketing</strong> &mdash; Solo Marketing y Contenido. Para personal de marketing.</li>
+</ul>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Crear un Grupo Personalizado</h3>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Vaya a la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Empleados</strong> y despl&aacute;cese hasta <strong class="font-semibold text-gray-800 dark:text-gray-200">Grupos de Usuario y Permisos</strong>.</li>
+  <li>Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;+ Agregar Grupo&rdquo;</strong>.</li>
+  <li>Ingrese el nombre del grupo en ingl&eacute;s y espa&ntilde;ol.</li>
+  <li>Marque los paquetes de permisos deseados. Cada casilla muestra exactamente qu&eacute; pesta&ntilde;as se desbloquear&aacute;n.</li>
+  <li>Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Guardar</strong>.</li>
+</ol>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Asignar un Empleado a un Grupo</h3>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>En la pesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Empleados</strong>, haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Editar</strong> en la tarjeta del empleado.</li>
+  <li>Use el men&uacute; desplegable <strong class="font-semibold text-gray-800 dark:text-gray-200">Grupo</strong> para seleccionar su grupo.</li>
+  <li>Haga clic en <strong class="font-semibold text-gray-800 dark:text-gray-200">Guardar</strong>. El empleado ver&aacute; solo las pesta&ntilde;as permitidas por su nuevo grupo en su pr&oacute;ximo inicio de sesi&oacute;n.</li>
+</ol>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Referencia de Permisos</h3>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Haga clic en la subpesta&ntilde;a <strong class="font-semibold text-gray-800 dark:text-gray-200">Referencia de Permisos</strong> en Grupos de Usuario para ver una matriz visual que muestra exactamente qu&eacute; permisos tiene cada grupo. Esto facilita la comparaci&oacute;n r&aacute;pida entre grupos.</p>
+
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed italic">Este manual fue escrito para el equipo de administraci&oacute;n de Oregon Tires Auto Care. Para soporte t&eacute;cnico, contacte a Tyrone Norris en <a class="text-green-600 hover:text-green-800 underline" href="mailto:tyronenorris@gmail.com">tyronenorris@gmail.com</a> o (774) 277-9202. Para soporte en espa&ntilde;ol, contacte a Margarita Escalante en <a class="text-green-600 hover:text-green-800 underline" href="mailto:growwithmagi@gmail.com">growwithmagi@gmail.com</a> o (541) 936-1884.</p>
 </div>
 <div class="doc-lang-en">
@@ -2051,6 +2106,7 @@
   <li>Google Business Profile Sync</li>
   <li>Push Notifications (PWA)</li>
   <li>Inbound Email Integration</li>
+  <li><a class="text-green-600 hover:text-green-800 underline" href="#user-groups">User Groups &amp; Permissions</a></li>
 </ol>
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
@@ -2233,6 +2289,8 @@
 
 <!-- Section 4 -->
 <h2 id="managing-employees" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">4. Managing Employees</h2>
+
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">In the <strong class="font-semibold text-gray-800 dark:text-gray-200">Employees</strong> tab, you can add, edit, and deactivate employees. Each employee has a name, email, phone, and is assigned to a <strong class="font-semibold text-gray-800 dark:text-gray-200">User Group</strong> that controls what they can see and do in the admin panel. You can also create admin accounts for users who need full access.</p>
 
 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Adding a New Employee</h3>
 
@@ -2947,6 +3005,65 @@
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
+<h2 id="user-groups" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">36. User Groups &amp; Permissions</h2>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">User Groups let you control which areas of the admin panel each employee can access. Instead of giving every employee full admin access, you assign them to a group with specific permissions.</p>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">How It Works</h3>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Admins</strong> always have full access to everything &mdash; groups don&rsquo;t restrict admins.</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Employees</strong> see only the tabs and features allowed by their group.</li>
+  <li>Every employee always has access to <strong class="font-semibold text-gray-800 dark:text-gray-200">My Schedule</strong> and <strong class="font-semibold text-gray-800 dark:text-gray-200">My Work</strong> regardless of their group.</li>
+</ul>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Permission Bundles</h3>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Each group is assigned one or more <strong class="font-semibold text-gray-800 dark:text-gray-200">permission bundles</strong>. Each bundle grants access to a set of tabs:</p>
+<table class="w-full border-collapse mb-6">
+  <thead>
+    <tr>
+      <th class="bg-gray-50 dark:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-left">Bundle</th>
+      <th class="bg-gray-50 dark:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-left">Tabs Granted</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Shop Operations</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Appointments, Repair Orders, Invoices, Walk-In Queue, On Hold, Tire Quotes, Services, Visit Tracking</td></tr>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Customer Management</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Customers, Resource Planner</td></tr>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Messaging</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Messages</td></tr>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Team Management</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Employees, Labor Tracking</td></tr>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Marketing &amp; Content</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Blog, Promotions, FAQ, Reviews, Gallery, Subscribers, Loyalty &amp; Rewards, Referrals, Service Reminders</td></tr>
+    <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Settings &amp; Analytics</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Analytics, Site Content, Docs</td></tr>
+  </tbody>
+</table>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Built-In Groups</h3>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">The system comes with 4 built-in groups that cannot be deleted:</p>
+<ul class="list-disc pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Mechanic</strong> (default) &mdash; Shop Operations only. Ideal for technicians.</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Front Desk</strong> &mdash; Shop Operations + Customer Management + Messaging. For customer-facing staff.</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Manager</strong> &mdash; Everything except Settings &amp; Analytics. For shift leads and shop managers.</li>
+  <li><strong class="font-semibold text-gray-800 dark:text-gray-200">Marketer</strong> &mdash; Marketing &amp; Content only. For marketing staff.</li>
+</ul>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Creating a Custom Group</h3>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>Go to the <strong class="font-semibold text-gray-800 dark:text-gray-200">Employees</strong> tab and scroll down to <strong class="font-semibold text-gray-800 dark:text-gray-200">User Groups &amp; Permissions</strong>.</li>
+  <li>Click <strong class="font-semibold text-gray-800 dark:text-gray-200">&ldquo;+ Add Group&rdquo;</strong>.</li>
+  <li>Enter the group name in English and Spanish.</li>
+  <li>Check the permission bundles you want this group to have. Each checkbox shows exactly which tabs will be unlocked.</li>
+  <li>Click <strong class="font-semibold text-gray-800 dark:text-gray-200">Save</strong>.</li>
+</ol>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Assigning an Employee to a Group</h3>
+<ol class="list-decimal pl-6 mb-4 space-y-2 text-gray-600 dark:text-gray-400">
+  <li>In the <strong class="font-semibold text-gray-800 dark:text-gray-200">Employees</strong> tab, click <strong class="font-semibold text-gray-800 dark:text-gray-200">Edit</strong> on the employee card.</li>
+  <li>Use the <strong class="font-semibold text-gray-800 dark:text-gray-200">Group</strong> dropdown to select their group.</li>
+  <li>Click <strong class="font-semibold text-gray-800 dark:text-gray-200">Save</strong>. The employee will see only the tabs allowed by their new group on their next login.</li>
+</ol>
+
+<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Permission Reference</h3>
+<p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Click the <strong class="font-semibold text-gray-800 dark:text-gray-200">Permission Reference</strong> sub-tab in User Groups to see a visual matrix showing exactly which permissions each group has. This makes it easy to compare groups at a glance.</p>
+
+<hr class="border-t border-gray-200 dark:border-gray-600 my-8">
+
 <!-- Quick Reference: Admin Dashboard Tabs -->
 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">Quick Reference: Admin Dashboard Tabs</h2>
 
@@ -2993,6 +3110,58 @@
     <tr>
       <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Repair Orders</strong></td>
       <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Create and manage repair orders, inspections, estimates, and customer approvals</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Walk-In Queue</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Manage walk-in customers with a live queue system</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Invoices</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Generate and send digital invoices from completed repair orders</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Tire Quotes</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">View and respond to customer tire quote requests</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Services</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Configure service catalog, pricing, and availability</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Labor Tracking</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Track technician hours, billable time, and labor per repair order</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Loyalty &amp; Rewards</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Manage customer loyalty points and redeemable rewards</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Referrals</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Track customer referrals, codes, and bonus point awards</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Resource Planner</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Multi-day view of employee availability, skills matrix, and scheduling gaps</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Blog</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Create and publish bilingual blog posts for SEO and customer education</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Promotions</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Create promotional offers with images and targeting</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Subscribers</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Manage email newsletter subscriber list</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Site Content</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Edit business hours, rating, review count, Google Analytics, and email templates</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Docs</strong></td>
+      <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">View this instruction manual and platform value overview</td>
     </tr>
   </tbody>
 </table>
