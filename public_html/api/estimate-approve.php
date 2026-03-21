@@ -176,9 +176,15 @@ try {
             "UPDATE oretir_estimates SET status = ?, customer_responded_at = NOW(), subtotal = ?, tax_amount = ?, total = ?, decline_reason = ?, updated_at = NOW() WHERE id = ?"
         )->execute([$newStatus, $approvedSubtotal, $taxAmount, $total, $declineReason, $est['id']]);
 
-        // Update RO status
+        // Update RO status and sync to appointment
         if ($newStatus === 'approved' || $newStatus === 'partial') {
-            $db->prepare("UPDATE oretir_repair_orders SET status = 'approved', updated_at = NOW() WHERE id = ? AND status = 'pending_approval'")->execute([$est['ro_id']]);
+            $updated = $db->prepare("UPDATE oretir_repair_orders SET status = 'approved', updated_at = NOW() WHERE id = ? AND status = 'pending_approval'");
+            $updated->execute([$est['ro_id']]);
+
+            if ($updated->rowCount() > 0) {
+                require_once __DIR__ . '/../includes/vin-decode.php';
+                syncAppointmentRoStatus('ro', (int) $est['ro_id'], 'approved', $db);
+            }
         }
 
         // Send confirmation email + SMS

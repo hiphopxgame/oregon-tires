@@ -505,6 +505,9 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
             } catch (\Throwable $e) {
                 error_log("repair-orders.php: check_in side effects failed for RO #{$roId}: " . $e->getMessage());
             }
+
+            // SMS: notify customer vehicle received
+            sendRoStatusSms($db, $ro, 'check_in');
             break;
 
         case 'diagnosis':
@@ -526,6 +529,12 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
             }
             break;
 
+        case 'estimate_pending':
+        case 'pending_approval':
+            // SMS: notify customer estimate is ready
+            sendRoStatusSms($db, $ro, 'estimate_sent');
+            break;
+
         case 'in_progress':
             // Auto clock-in assigned employee if no active timer (coming from approved, waiting_parts, or on_hold)
             try {
@@ -538,6 +547,9 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
             } catch (\Throwable $e) {
                 error_log("repair-orders.php: in_progress side effects failed for RO #{$roId}: " . $e->getMessage());
             }
+
+            // SMS: notify customer work has begun
+            sendRoStatusSms($db, $ro, 'in_progress');
             break;
 
         case 'waiting_parts':
@@ -653,6 +665,13 @@ function handleStatusTransition(PDO $db, int $roId, array $ro, string $newStatus
                     $db->prepare('UPDATE oretir_visit_log SET check_out_at = NOW() WHERE repair_order_id = ? AND check_out_at IS NULL')
                        ->execute([$roId]);
                 } catch (\Throwable $vlErr) { /* visit_log may not exist */ }
+
+                // Auto-create service reminder for the next visit
+                try {
+                    createServiceReminderFromRo($db, $ro);
+                } catch (\Throwable $srErr) {
+                    error_log("repair-orders.php: service reminder creation failed for RO #{$roId}: " . $srErr->getMessage());
+                }
             } catch (\Throwable $e) {
                 error_log("repair-orders.php: invoiced side effects failed for RO #{$roId}: " . $e->getMessage());
             }
@@ -711,5 +730,80 @@ function autoClockInEmployee(PDO $db, int $roId, ?int $empId, string $task = 'Wo
     } catch (\Throwable $e) {
         // Duplicate or concurrent insert — safe to ignore
         error_log("autoClockInEmployee: insert failed for RO #{$roId} emp #{$empId}: " . $e->getMessage());
+    }
+}
+
+// ─── sendRoStatusSms — bilingual SMS at key RO status transitions ──
+/**
+ * Send SMS notification at key RO status transitions.
+ * Only sends if customer has phone AND appointment has sms_opt_in = 1.
+ *
+ * @param string $trigger One of: 'check_in', 'estimate_sent', 'in_progress'
+ */
+function sendRoStatusSms(PDO $db, array $ro, string $trigger): void
+{
+    try {
+        if (empty($ro['customer_id'])) return;
+
+        // Check sms_opt_in from linked appointment
+        $smsOptIn = false;
+        if (!empty($ro['appointment_id'])) {
+            $optStmt = $db->prepare('SELECT sms_opt_in FROM oretir_appointments WHERE id = ? LIMIT 1');
+            $optStmt->execute([$ro['appointment_id']]);
+            $smsOptIn = (bool) (int) ($optStmt->fetchColumn() ?: 0);
+        }
+        if (!$smsOptIn) return;
+
+        // Get customer info
+        $custStmt = $db->prepare('SELECT first_name, last_name, phone, language FROM oretir_customers WHERE id = ?');
+        $custStmt->execute([$ro['customer_id']]);
+        $cust = $custStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$cust || empty($cust['phone'])) return;
+
+        // Get vehicle info
+        $vehicleStr = '';
+        if (!empty($ro['vehicle_id'])) {
+            $vStmt = $db->prepare('SELECT year, make, model FROM oretir_vehicles WHERE id = ?');
+            $vStmt->execute([$ro['vehicle_id']]);
+            $v = $vStmt->fetch(PDO::FETCH_ASSOC);
+            if ($v) {
+                $vehicleStr = trim(implode(' ', array_filter([$v['year'], $v['make'], $v['model']])));
+            }
+        }
+        $vehicleLabel = $vehicleStr ?: 'vehicle';
+        $vehicleLabelEs = $vehicleStr ?: 'vehículo';
+        $isSpanish = ($cust['language'] ?? 'english') === 'spanish';
+
+        require_once __DIR__ . '/../../includes/sms.php';
+
+        $body = '';
+        switch ($trigger) {
+            case 'check_in':
+                $body = $isSpanish
+                    ? "Oregon Tires: Hemos recibido su {$vehicleLabelEs}. Le mantendremos informado."
+                    : "Oregon Tires: We've received your {$vehicleLabel}. We'll keep you updated.";
+                break;
+
+            case 'estimate_sent':
+                $body = $isSpanish
+                    ? "Oregon Tires: Su presupuesto está listo para revisión. Revise su correo."
+                    : "Oregon Tires: Your estimate is ready for review. Check your email.";
+                break;
+
+            case 'in_progress':
+                $body = $isSpanish
+                    ? "Oregon Tires: El trabajo ha comenzado en su {$vehicleLabelEs}."
+                    : "Oregon Tires: Work has begun on your {$vehicleLabel}.";
+                break;
+        }
+
+        if (empty($body)) return;
+
+        $smsResult = sendSms($cust['phone'], $body);
+        if (!$smsResult['success']) {
+            error_log("repair-orders.php: RO #{$ro['id']} {$trigger} SMS failed: " . ($smsResult['error'] ?? 'unknown'));
+        }
+    } catch (\Throwable $e) {
+        error_log("repair-orders.php: sendRoStatusSms({$trigger}) failed for RO #{$ro['id']}: " . $e->getMessage());
     }
 }
