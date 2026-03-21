@@ -559,13 +559,18 @@ function sendBookingConfirmationEmail(
     string $rawDate = '',
     string $rawTime = '',
     string $cancelToken = '',
-    int $visitCount = 0
+    int $visitCount = 0,
+    string $technicianName = ''
 ): array {
     $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
 
     // Build vehicle line (only if vehicle info provided)
     $vehicleLine = $vehicleInfo ? "<br><strong>Vehicle:</strong> {$vehicleInfo}" : '';
     $vehicleLineEs = $vehicleInfo ? "<br><strong>Vehículo:</strong> {$vehicleInfo}" : '';
+
+    // Build technician line (only if assigned)
+    $techLine = $technicianName ? "<br><strong>Your Technician:</strong> {$technicianName}" : '';
+    $techLineEs = $technicianName ? "<br><strong>Su Técnico:</strong> {$technicianName}" : '';
 
     // Build reference line (only if reference number provided)
     $refLine = $referenceNumber ? "<br><strong>Reference:</strong> {$referenceNumber}" : '';
@@ -687,6 +692,7 @@ HTML;
         'date'             => $date,
         'time'             => $time,
         'vehicle_line'     => $vehicleLine,
+        'technician_line'  => $techLine,
         'reference_line'   => $refLine,
         'reference_number' => $referenceNumber,
         'email'            => $email,
@@ -713,6 +719,7 @@ HTML;
     // For customer emails, replace vehicle_line and reference_line with localized versions in ES fields
     $varsEs = $vars;
     $varsEs['vehicle_line'] = $vehicleLineEs;
+    $varsEs['technician_line'] = $techLineEs;
     $varsEs['reference_line'] = $refLineEs;
 
     // Build language sections manually for the vehicle line localization

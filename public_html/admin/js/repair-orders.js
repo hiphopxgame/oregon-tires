@@ -212,125 +212,127 @@ function renderRoTable() {
     tr.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-700/30 cursor-pointer transition';
     tr.addEventListener('click', function() { viewRoDetail(ro.id); });
 
-    // RO Number + age
-    var tdNum = document.createElement('td');
-    tdNum.className = 'p-3 text-sm';
-    var roLink = document.createElement('span');
+    // Column 1: RO# + Customer + Phone
+    var td1 = document.createElement('td');
+    td1.className = 'p-3 text-sm';
+    var roLink = document.createElement('div');
     roLink.className = 'font-bold text-green-700 dark:text-green-400';
     roLink.textContent = ro.ro_number;
-    tdNum.appendChild(roLink);
-    var age = timeAgo(ro.created_at);
-    if (age) {
-      var ageBadge = document.createElement('span');
-      ageBadge.className = 'ml-1.5 text-xs text-gray-400';
-      ageBadge.textContent = age;
-      tdNum.appendChild(ageBadge);
+    td1.appendChild(roLink);
+    var custName = ((ro.first_name || '') + ' ' + (ro.last_name || '')).trim();
+    if (custName) {
+      var nameEl = document.createElement('div');
+      nameEl.className = 'font-medium text-gray-800 dark:text-gray-200';
+      nameEl.textContent = custName;
+      td1.appendChild(nameEl);
     }
-    tr.appendChild(tdNum);
-
-    // Customer + contact
-    var tdCust = document.createElement('td');
-    tdCust.className = 'p-3 text-sm';
-    var custName = ((ro.first_name || '') + ' ' + (ro.last_name || '')).trim() || '-';
-    var nameEl = document.createElement('div');
-    nameEl.className = 'font-medium';
-    nameEl.textContent = custName;
-    tdCust.appendChild(nameEl);
     if (ro.customer_phone) {
       var phoneEl = document.createElement('div');
       phoneEl.className = 'text-xs text-gray-400';
       phoneEl.textContent = ro.customer_phone;
-      tdCust.appendChild(phoneEl);
+      td1.appendChild(phoneEl);
     }
-    tr.appendChild(tdCust);
+    tr.appendChild(td1);
 
-    // Vehicle + VIN
-    var tdVeh = document.createElement('td');
-    tdVeh.className = 'p-3 text-sm';
+    // Column 2: Vehicle + Service
+    var td2 = document.createElement('td');
+    td2.className = 'p-3 text-sm';
     var vehStr = [ro.vehicle_year, ro.vehicle_make, ro.vehicle_model].filter(Boolean).join(' ');
-    var vehEl = document.createElement('div');
-    vehEl.className = 'font-medium';
-    vehEl.textContent = vehStr || '-';
-    tdVeh.appendChild(vehEl);
-    if (ro.vin) {
-      var vinEl = document.createElement('div');
-      vinEl.className = 'text-xs text-gray-400 font-mono';
-      vinEl.textContent = ro.vin;
-      tdVeh.appendChild(vinEl);
+    if (vehStr) {
+      var vehEl = document.createElement('div');
+      vehEl.className = 'font-medium text-gray-800 dark:text-gray-200';
+      vehEl.textContent = vehStr;
+      td2.appendChild(vehEl);
+    }
+    if (ro.appt_service) {
+      var svcEl = document.createElement('div');
+      svcEl.className = 'text-xs text-green-600 dark:text-green-400';
+      svcEl.textContent = ro.appt_service.replace(/-/g, ' ');
+      td2.appendChild(svcEl);
     }
     if (ro.license_plate) {
       var plateEl = document.createElement('div');
       plateEl.className = 'text-xs text-gray-400';
-      plateEl.textContent = 'Plate: ' + ro.license_plate;
-      tdVeh.appendChild(plateEl);
+      plateEl.textContent = ro.license_plate;
+      td2.appendChild(plateEl);
     }
-    tr.appendChild(tdVeh);
+    tr.appendChild(td2);
 
-    // Status — inline dropdown
-    var tdStatus = document.createElement('td');
-    tdStatus.className = 'p-3 text-sm';
-    var statusSelect = document.createElement('select');
-    statusSelect.className = 'text-xs border rounded-lg px-2 py-1.5 font-medium dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 cursor-pointer';
-    var allStatuses = ['intake','check_in','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
-    allStatuses.forEach(function(s) {
-      var opt = document.createElement('option');
-      opt.value = s;
-      var sKey = 'roStatus' + s.replace(/_([a-z])/g, function(m,c){ return c.toUpperCase(); }).replace(/^[a-z]/, function(c){ return c.toUpperCase(); });
-      opt.textContent = t(sKey, s.replace(/_/g, ' '));
-      if (s === ro.status) opt.selected = true;
-      statusSelect.appendChild(opt);
-    });
-    // Color the select based on current status
-    var colorMap = { intake:'#dbeafe', check_in:'#cffafe', diagnosis:'#ede9fe', estimate_pending:'#fef3c7', pending_approval:'#ffedd5', approved:'#dcfce7', in_progress:'#e0e7ff', on_hold:'#991b1b', waiting_parts:'#fef3c7', ready:'#d1fae5', completed:'#f3f4f6', invoiced:'#ccfbf1', cancelled:'#fee2e2' };
-    statusSelect.style.backgroundColor = colorMap[ro.status] || '';
-    statusSelect.addEventListener('click', function(e) { e.stopPropagation(); });
-    statusSelect.addEventListener('change', (function(roId, sel) { return async function(e) {
-      e.stopPropagation();
-      var newStatus = sel.value;
-      try {
-        await api('repair-orders.php', { method: 'PUT', body: { id: roId, status: newStatus } });
-        showToast(t('roStatusUpdatedTo', 'Status updated to') + ' ' + newStatus.replace(/_/g, ' '));
-        loadRepairOrders();
-      } catch(err) {
-        showToast(t('roFailedMsg', 'Failed') + ': ' + err.message, true);
-        loadRepairOrders();
+    // Column 3: Appointment Date + Tech
+    var td3 = document.createElement('td');
+    td3.className = 'p-3 text-sm';
+    if (ro.appt_date) {
+      var dateEl = document.createElement('div');
+      dateEl.className = 'font-medium text-gray-800 dark:text-gray-200';
+      dateEl.textContent = fmtDate(ro.appt_date);
+      td3.appendChild(dateEl);
+      if (ro.appt_time) {
+        var timeEl = document.createElement('div');
+        timeEl.className = 'text-xs text-gray-500';
+        timeEl.textContent = fmtTime(ro.appt_time);
+        td3.appendChild(timeEl);
       }
-    }; })(ro.id, statusSelect));
-    tdStatus.appendChild(statusSelect);
-    // Time in current status
+    } else {
+      td3.appendChild(document.createTextNode(formatDate(ro.created_at)));
+    }
+    if (ro.assigned_employee_name) {
+      var techEl = document.createElement('div');
+      techEl.className = 'text-xs text-blue-600 dark:text-blue-400 mt-0.5';
+      techEl.textContent = '\u2192 ' + ro.assigned_employee_name;
+      td3.appendChild(techEl);
+    }
+    tr.appendChild(td3);
+
+    // Column 4: Status badge + step + time in status
+    var td4 = document.createElement('td');
+    td4.className = 'p-3 text-sm';
+    td4.appendChild(createStatusBadge(ro.status));
     var updatedAge = timeAgo(ro.updated_at);
     if (updatedAge) {
       var timeLabel = document.createElement('div');
-      timeLabel.className = 'text-xs text-gray-400 mt-0.5';
-      timeLabel.textContent = updatedAge + ' in status';
-      tdStatus.appendChild(timeLabel);
+      timeLabel.className = 'text-xs text-gray-400 mt-1';
+      timeLabel.textContent = updatedAge + ' ' + t('roInStatus', 'in status');
+      td4.appendChild(timeLabel);
     }
-    tr.appendChild(tdStatus);
+    // Active labor indicator
+    if (ro.active_labor_count > 0) {
+      var laborInd = document.createElement('div');
+      laborInd.className = 'flex items-center gap-1 mt-1';
+      var pDot = document.createElement('span');
+      pDot.className = 'w-2 h-2 rounded-full bg-green-500 animate-pulse';
+      laborInd.appendChild(pDot);
+      var labText = document.createElement('span');
+      labText.className = 'text-xs text-green-600 dark:text-green-400 font-medium';
+      labText.textContent = ro.active_labor_count + ' ' + t('roTechWorking', 'working');
+      laborInd.appendChild(labText);
+      td4.appendChild(laborInd);
+    }
+    tr.appendChild(td4);
 
-    // Created
-    var tdDate = document.createElement('td');
-    tdDate.className = 'p-3 text-sm text-gray-500';
-    tdDate.textContent = formatDate(ro.created_at);
-    tr.appendChild(tdDate);
-
-    // Inspections + Estimates counts
-    var tdCounts = document.createElement('td');
-    tdCounts.className = 'p-3 text-sm';
-    var counts = [];
-    if (ro.inspection_count > 0) counts.push(ro.inspection_count + ' DVI');
-    if (ro.estimate_count > 0) counts.push(ro.estimate_count + ' Est');
-    tdCounts.textContent = counts.join(', ') || '-';
-    tr.appendChild(tdCounts);
-
-    // Actions
-    var tdAct = document.createElement('td');
-    tdAct.className = 'p-3 text-sm';
+    // Column 5: DVI/Est counts + action
+    var td5 = document.createElement('td');
+    td5.className = 'p-3 text-sm';
+    var badges = document.createElement('div');
+    badges.className = 'flex flex-wrap gap-1';
+    if (ro.inspection_count > 0) {
+      var dviBadge = document.createElement('span');
+      dviBadge.className = 'text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 font-medium';
+      dviBadge.textContent = ro.inspection_count + ' DVI';
+      badges.appendChild(dviBadge);
+    }
+    if (ro.estimate_count > 0) {
+      var estBadge = document.createElement('span');
+      estBadge.className = 'text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-medium';
+      estBadge.textContent = ro.estimate_count + ' Est';
+      badges.appendChild(estBadge);
+    }
+    td5.appendChild(badges);
     var viewBtn = document.createElement('button');
-    viewBtn.className = 'text-green-600 hover:text-green-800 text-sm font-medium';
-    viewBtn.textContent = t('actionView', 'View');
+    viewBtn.className = 'text-green-600 hover:text-green-800 dark:text-green-400 text-xs font-bold mt-1 block';
+    viewBtn.textContent = t('actionView', 'Open') + ' \u2192';
     viewBtn.addEventListener('click', function(e) { e.stopPropagation(); viewRoDetail(ro.id); });
-    tdAct.appendChild(viewBtn);
-    tr.appendChild(tdAct);
+    td5.appendChild(viewBtn);
+    tr.appendChild(td5);
 
     tbody.appendChild(tr);
   });

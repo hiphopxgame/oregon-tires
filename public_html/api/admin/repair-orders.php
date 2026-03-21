@@ -210,12 +210,17 @@ try {
         $sql = "SELECT r.*, c.first_name, c.last_name, c.email as customer_email, c.phone as customer_phone,
                     v.year as vehicle_year, v.make as vehicle_make, v.model as vehicle_model, v.vin,
                     v.trim_level, v.engine, v.transmission, v.drive_type, v.fuel_type, v.license_plate,
+                    e.name as assigned_employee_name,
+                    a.preferred_date as appt_date, a.preferred_time as appt_time,
+                    a.service as appt_service, a.reference_number as appt_ref,
                     (SELECT COUNT(*) FROM oretir_inspections WHERE repair_order_id = r.id) as inspection_count,
                     (SELECT COUNT(*) FROM oretir_estimates WHERE repair_order_id = r.id) as estimate_count,
                     (SELECT COUNT(*) FROM oretir_labor_entries WHERE repair_order_id = r.id AND clock_out_at IS NULL) as active_labor_count
                 FROM oretir_repair_orders r
                 LEFT JOIN oretir_customers c ON c.id = r.customer_id
                 LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
+                LEFT JOIN oretir_employees e ON e.id = r.assigned_employee_id
+                LEFT JOIN oretir_appointments a ON a.id = r.appointment_id
                 {$where}
                 ORDER BY {$sortColumn} {$sortOrder}
                 LIMIT {$limit} OFFSET {$offset}";

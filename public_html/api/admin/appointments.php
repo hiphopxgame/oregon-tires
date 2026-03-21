@@ -333,11 +333,14 @@ try {
         if (isset($body['status']) && $body['status'] === 'confirmed') {
             try {
                 $confirmStmt = $db->prepare(
-                    'SELECT id, reference_number, service, services, preferred_date, preferred_time,
-                            first_name, last_name, email, language,
-                            vehicle_year, vehicle_make, vehicle_model,
-                            cancel_token, cancel_token_expires
-                     FROM oretir_appointments WHERE id = ?'
+                    'SELECT a.id, a.reference_number, a.service, a.services, a.preferred_date, a.preferred_time,
+                            a.first_name, a.last_name, a.email, a.language,
+                            a.vehicle_year, a.vehicle_make, a.vehicle_model,
+                            a.cancel_token, a.cancel_token_expires, a.assigned_employee_id,
+                            e.name AS technician_name
+                     FROM oretir_appointments a
+                     LEFT JOIN oretir_employees e ON e.id = a.assigned_employee_id
+                     WHERE a.id = ?'
                 );
                 $confirmStmt->execute([$id]);
                 $row = $confirmStmt->fetch();
@@ -369,11 +372,13 @@ try {
                            ->execute([$cancelToken, $cancelExpires, $id]);
                     }
 
+                    $techName = $row['technician_name'] ?? '';
+
                     sendBookingConfirmationEmail(
                         $row['email'], $custName, $svcDisplay, $displayDate, $displayTime,
                         $vehicleInfo, $custLang, $row['reference_number'],
                         $row['service'], $row['preferred_date'], $row['preferred_time'],
-                        $cancelToken
+                        $cancelToken, 0, $techName
                     );
 
                     logEmail('appointment_confirmed', "Confirmation email sent to {$row['email']} for {$row['reference_number']}");
@@ -443,6 +448,34 @@ try {
                 }
             } catch (\Throwable $e) {
                 error_log("appointments.php: Assignment email error for #{$id}: " . $e->getMessage());
+            }
+        }
+
+        // ─── Sync notes to linked RO ──────────────────────────────────
+        if (isset($body['admin_notes']) || isset($body['task_summary'])) {
+            try {
+                $roLookup = $db->prepare('SELECT id FROM oretir_repair_orders WHERE appointment_id = ? LIMIT 1');
+                $roLookup->execute([$id]);
+                $linkedRoId = $roLookup->fetchColumn();
+                if ($linkedRoId) {
+                    // Sync admin_notes → RO admin_notes
+                    if (isset($body['admin_notes'])) {
+                        $apptNotesStmt = $db->prepare('SELECT admin_notes FROM oretir_appointments WHERE id = ?');
+                        $apptNotesStmt->execute([$id]);
+                        $latestNotes = (string) ($apptNotesStmt->fetchColumn() ?: '');
+                        if ($latestNotes) {
+                            $db->prepare('UPDATE oretir_repair_orders SET admin_notes = ?, updated_at = NOW() WHERE id = ?')
+                               ->execute([$latestNotes, $linkedRoId]);
+                        }
+                    }
+                    // Sync task_summary → RO customer_concern (if concern is empty)
+                    if (isset($body['task_summary'])) {
+                        $db->prepare('UPDATE oretir_repair_orders SET customer_concern = COALESCE(NULLIF(customer_concern, \'\'), ?), updated_at = NOW() WHERE id = ?')
+                           ->execute([sanitize($body['task_summary'], 500), $linkedRoId]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                error_log("appointments.php: note sync to RO failed for #{$id}: " . $e->getMessage());
             }
         }
 
