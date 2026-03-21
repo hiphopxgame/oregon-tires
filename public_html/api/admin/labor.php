@@ -1,7 +1,8 @@
 <?php
 /**
  * Oregon Tires — Admin Labor Time Tracking
- * GET    /api/admin/labor.php?summary=1                        — cross-RO employee labor summary
+ * GET    /api/admin/labor.php?summary=1[&start_date=&end_date=] — cross-RO labor dashboard (with optional date filter)
+ * GET    /api/admin/labor.php?report=1[&employee_id=N]&start_date=&end_date= — employee hours report grouped by day
  * GET    /api/admin/labor.php?ro_id=N                         — entries for a repair order
  * GET    /api/admin/labor.php?employee_id=N&start_date=&end_date= — entries for an employee in date range
  * POST   /api/admin/labor.php                                 — clock in
@@ -31,8 +32,18 @@ try {
         // Cross-RO labor dashboard (for the dedicated Labor tab)
         if (!empty($_GET['summary'])) {
 
+            // Optional date range filter for employee summary + totals
+            $dateFilter = '';
+            $dateParams = [];
+            $summaryStart = sanitize((string) ($_GET['start_date'] ?? ''), 10);
+            $summaryEnd   = sanitize((string) ($_GET['end_date'] ?? ''), 10);
+            if ($summaryStart && $summaryEnd) {
+                $dateFilter = ' AND DATE(l.clock_in_at) >= ? AND DATE(l.clock_in_at) <= ?';
+                $dateParams = [$summaryStart, $summaryEnd];
+            }
+
             // 1. Per-employee summary
-            $stmt = $db->query(
+            $stmt = $db->prepare(
                 'SELECT
                     e.id   AS employee_id,
                     e.name AS employee_name,
@@ -42,9 +53,11 @@ try {
                     COUNT(DISTINCT l.repair_order_id) AS ro_count
                  FROM oretir_labor_entries l
                  JOIN oretir_employees e ON e.id = l.employee_id
+                 WHERE 1=1' . $dateFilter . '
                  GROUP BY e.id, e.name
                  ORDER BY e.name'
             );
+            $stmt->execute($dateParams);
             $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
             foreach ($employees as &$r) {
                 $r['total_hours']    = (float) $r['total_hours'];
@@ -59,14 +72,19 @@ try {
                 'SELECT l.id, l.repair_order_id, l.employee_id, l.clock_in_at,
                         l.task_description, l.is_billable,
                         e.name AS employee_name, e.role AS employee_role,
-                        r.ro_number, r.status AS ro_status,
+                        r.ro_number, r.status AS ro_status, r.customer_concern,
                         c.first_name AS customer_first, c.last_name AS customer_last, c.phone AS customer_phone,
-                        v.year AS vehicle_year, v.make AS vehicle_make, v.model AS vehicle_model, v.license_plate
+                        v.year AS vehicle_year, v.make AS vehicle_make, v.model AS vehicle_model, v.license_plate,
+                        a.id AS appointment_id, a.reference_number AS appt_ref, a.service AS appt_service,
+                        a.preferred_date AS appt_date, a.preferred_time AS appt_time,
+                        a.check_in_at AS appt_check_in, a.service_start_at AS appt_service_start,
+                        a.service_end_at AS appt_service_end
                  FROM oretir_labor_entries l
                  JOIN oretir_employees e ON e.id = l.employee_id
                  JOIN oretir_repair_orders r ON r.id = l.repair_order_id
                  LEFT JOIN oretir_customers c ON c.id = r.customer_id
                  LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
+                 LEFT JOIN oretir_appointments a ON a.id = r.appointment_id
                  WHERE l.clock_out_at IS NULL
                  ORDER BY l.clock_in_at ASC'
             )->fetchAll(PDO::FETCH_ASSOC);
@@ -77,12 +95,15 @@ try {
                         l.duration_minutes, l.task_description, l.is_billable,
                         e.name AS employee_name, r.ro_number, r.status AS ro_status,
                         c.first_name AS customer_first, c.last_name AS customer_last,
-                        v.year AS vehicle_year, v.make AS vehicle_make, v.model AS vehicle_model
+                        v.year AS vehicle_year, v.make AS vehicle_make, v.model AS vehicle_model,
+                        a.reference_number AS appt_ref, a.service AS appt_service,
+                        a.preferred_date AS appt_date, a.preferred_time AS appt_time
                  FROM oretir_labor_entries l
                  JOIN oretir_employees e ON e.id = l.employee_id
                  JOIN oretir_repair_orders r ON r.id = l.repair_order_id
                  LEFT JOIN oretir_customers c ON c.id = r.customer_id
                  LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
+                 LEFT JOIN oretir_appointments a ON a.id = r.appointment_id
                  WHERE l.clock_out_at IS NOT NULL
                  ORDER BY l.clock_out_at DESC
                  LIMIT 20'
@@ -101,27 +122,99 @@ try {
             $roStmt->execute($activeStatuses);
             $availableROs = $roStmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // 5. Totals
-            $totals = $db->query(
+            // 5. Totals (with optional date filter)
+            $totalsStmt = $db->prepare(
                 'SELECT
                     COUNT(*) AS total_entries,
                     ROUND(COALESCE(SUM(duration_minutes), 0) / 60, 2) AS total_hours,
                     ROUND(COALESCE(SUM(CASE WHEN is_billable = 1 THEN duration_minutes ELSE 0 END), 0) / 60, 2) AS billable_hours,
                     SUM(CASE WHEN clock_out_at IS NULL THEN 1 ELSE 0 END) AS active_clocks
-                 FROM oretir_labor_entries'
-            )->fetch(PDO::FETCH_ASSOC);
+                 FROM oretir_labor_entries l
+                 WHERE 1=1' . $dateFilter
+            );
+            $totalsStmt->execute($dateParams);
+            $totals = $totalsStmt->fetch(PDO::FETCH_ASSOC);
             $totals['total_hours']    = (float) $totals['total_hours'];
             $totals['billable_hours'] = (float) $totals['billable_hours'];
             $totals['active_clocks']  = (int) $totals['active_clocks'];
             $totals['total_entries']  = (int) $totals['total_entries'];
 
-            jsonSuccess([
+            $result = [
                 'employees'  => $employees,
                 'active'     => $active,
                 'recent'     => $recent,
                 'available_employees' => $availableEmployees,
                 'available_ros'       => $availableROs,
                 'totals'     => $totals,
+            ];
+            if ($summaryStart && $summaryEnd) {
+                $result['start_date'] = $summaryStart;
+                $result['end_date']   = $summaryEnd;
+            }
+            jsonSuccess($result);
+        }
+
+        // Employee hours report grouped by day
+        if (!empty($_GET['report'])) {
+            $empId     = (int) ($_GET['employee_id'] ?? 0);
+            $rptStart  = sanitize((string) ($_GET['start_date'] ?? ''), 10);
+            $rptEnd    = sanitize((string) ($_GET['end_date'] ?? ''), 10);
+
+            if (!$rptStart || !$rptEnd) {
+                $rptStart = date('Y-m-d', strtotime('monday this week'));
+                $rptEnd   = date('Y-m-d', strtotime('sunday this week'));
+            }
+
+            $where = 'DATE(l.clock_in_at) >= ? AND DATE(l.clock_in_at) <= ?';
+            $params = [$rptStart, $rptEnd];
+            if ($empId > 0) {
+                $where .= ' AND l.employee_id = ?';
+                $params[] = $empId;
+            }
+
+            $stmt = $db->prepare(
+                "SELECT l.id, l.repair_order_id, l.employee_id, l.clock_in_at, l.clock_out_at,
+                        l.duration_minutes, l.task_description, l.is_billable,
+                        e.name AS employee_name, r.ro_number,
+                        c.first_name AS customer_first, c.last_name AS customer_last,
+                        v.year AS vehicle_year, v.make AS vehicle_make, v.model AS vehicle_model,
+                        DATE(l.clock_in_at) AS work_date
+                 FROM oretir_labor_entries l
+                 JOIN oretir_employees e ON e.id = l.employee_id
+                 JOIN oretir_repair_orders r ON r.id = l.repair_order_id
+                 LEFT JOIN oretir_customers c ON c.id = r.customer_id
+                 LEFT JOIN oretir_vehicles v ON v.id = r.vehicle_id
+                 WHERE $where
+                 ORDER BY l.clock_in_at ASC"
+            );
+            $stmt->execute($params);
+            $entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Group by day
+            $days = [];
+            $grandTotal = 0;
+            $grandBillable = 0;
+            foreach ($entries as $entry) {
+                $date = $entry['work_date'];
+                if (!isset($days[$date])) {
+                    $days[$date] = ['date' => $date, 'entries' => [], 'total_minutes' => 0, 'billable_minutes' => 0];
+                }
+                $mins = $entry['duration_minutes'] !== null ? (int) $entry['duration_minutes'] : 0;
+                $days[$date]['entries'][] = $entry;
+                $days[$date]['total_minutes'] += $mins;
+                if ($entry['is_billable']) $days[$date]['billable_minutes'] += $mins;
+                $grandTotal += $mins;
+                if ($entry['is_billable']) $grandBillable += $mins;
+            }
+
+            jsonSuccess([
+                'days'             => array_values($days),
+                'total_entries'    => count($entries),
+                'total_hours'      => round($grandTotal / 60, 2),
+                'billable_hours'   => round($grandBillable / 60, 2),
+                'start_date'       => $rptStart,
+                'end_date'         => $rptEnd,
+                'employee_id'      => $empId > 0 ? $empId : null,
             ]);
         }
 
@@ -301,9 +394,9 @@ try {
                 $fields[] = 'clock_out_at = ?';
                 $params[] = $clockOut;
             } else {
-                // Set to NOW()
+                // Set to NOW() — allow same-second clock-out (< not <=)
                 $now = date('Y-m-d H:i:s');
-                if (strtotime($now) <= strtotime($entry['clock_in_at'])) {
+                if (strtotime($now) < strtotime($entry['clock_in_at'])) {
                     jsonError('Clock out time must be after clock in time.', 400);
                 }
                 $fields[] = 'clock_out_at = NOW()';

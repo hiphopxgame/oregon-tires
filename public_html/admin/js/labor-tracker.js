@@ -509,7 +509,10 @@ function _el(tag, cls, text) {
   return e;
 }
 
-window.loadLaborSummary = async function() {
+var _laborDateRange = null; // null = all time
+
+window.loadLaborSummary = async function(dateRange) {
+  if (typeof dateRange !== 'undefined') _laborDateRange = dateRange;
   var container = document.getElementById('labor-container');
   if (!container) return;
   _clearLaborTimers();
@@ -519,7 +522,9 @@ window.loadLaborSummary = async function() {
   container.appendChild(loading);
 
   try {
-    var res = await fetch('/api/admin/labor.php?summary=1', { credentials: 'include' });
+    var url = '/api/admin/labor.php?summary=1';
+    if (_laborDateRange) url += '&start_date=' + _laborDateRange.start + '&end_date=' + _laborDateRange.end;
+    var res = await fetch(url, { credentials: 'include' });
     var json = await res.json();
     container.textContent = '';
 
@@ -560,6 +565,37 @@ window.loadLaborSummary = async function() {
       stats.appendChild(card);
     });
     container.appendChild(stats);
+
+    // ── Date Range Filter ───────────────────────────────────────────────
+    var filterBar = _el('div', 'flex flex-wrap items-center gap-2 mb-6');
+
+    function makePreset(label, range) {
+      var isActive = (!range && !_laborDateRange) || (range && _laborDateRange && _laborDateRange.start === range.start && _laborDateRange.end === range.end);
+      var btn = _el('button', 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' + (isActive
+        ? 'bg-green-600 text-white'
+        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'), label);
+      btn.addEventListener('click', function() { loadLaborSummary(range); });
+      return btn;
+    }
+
+    var today = new Date().toISOString().slice(0, 10);
+    var dow = new Date().getDay();
+    var mondayOffset = dow === 0 ? -6 : 1 - dow;
+    var monday = new Date(); monday.setDate(monday.getDate() + mondayOffset);
+    var sunday = new Date(monday); sunday.setDate(sunday.getDate() + 6);
+    var monthStart = today.slice(0, 8) + '01';
+
+    filterBar.appendChild(makePreset(t('laborToday', 'Today'), { start: today, end: today }));
+    filterBar.appendChild(makePreset(t('laborThisWeek', 'This Week'), { start: monday.toISOString().slice(0, 10), end: sunday.toISOString().slice(0, 10) }));
+    filterBar.appendChild(makePreset(t('laborThisMonth', 'This Month'), { start: monthStart, end: today }));
+    filterBar.appendChild(makePreset(t('laborAllTime', 'All Time'), null));
+
+    if (_laborDateRange) {
+      var rangeLabel = _el('span', 'text-xs text-gray-500 dark:text-gray-400 ml-2', _laborDateRange.start + ' \u2192 ' + _laborDateRange.end);
+      filterBar.appendChild(rangeLabel);
+    }
+
+    container.appendChild(filterBar);
 
     // ── Quick Clock-In ──────────────────────────────────────────────────
     if (availEmps.length > 0 && availROs.length > 0) {
@@ -662,7 +698,12 @@ window.loadLaborSummary = async function() {
         top.appendChild(nameWrap);
 
         var roBadge = _el('div', 'flex items-center gap-1.5');
-        roBadge.appendChild(_el('span', 'text-xs font-mono bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600', entry.ro_number));
+        var roLink = _el('span', 'text-xs font-mono bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 transition', entry.ro_number);
+        roLink.title = t('laborViewRo', 'View repair order');
+        roLink.addEventListener('click', function() {
+          if (typeof viewRoDetail === 'function') viewRoDetail(entry.repair_order_id);
+        });
+        roBadge.appendChild(roLink);
         if (entry.ro_status) {
           var statusColors = { intake: 'bg-gray-100 text-gray-600', diagnosis: 'bg-purple-100 text-purple-700', estimate_pending: 'bg-blue-100 text-blue-700', pending_approval: 'bg-amber-100 text-amber-700', approved: 'bg-green-100 text-green-700', in_progress: 'bg-blue-100 text-blue-700', on_hold: 'bg-red-100 text-red-700', waiting_parts: 'bg-orange-100 text-orange-700', ready: 'bg-teal-100 text-teal-700' };
           var sCls = statusColors[entry.ro_status] || 'bg-gray-100 text-gray-600';
@@ -671,33 +712,71 @@ window.loadLaborSummary = async function() {
         top.appendChild(roBadge);
         card.appendChild(top);
 
-        // Vehicle + Customer row
+        // ── Customer + Vehicle info ──
         var vehicle = [entry.vehicle_year, entry.vehicle_make, entry.vehicle_model].filter(Boolean).join(' ');
         var customer = [entry.customer_first, entry.customer_last].filter(Boolean).join(' ');
-        var contextParts = [];
-        if (vehicle) contextParts.push(vehicle);
-        if (customer) contextParts.push(customer);
-        if (entry.customer_phone) contextParts.push(entry.customer_phone);
-        if (entry.license_plate) contextParts.push(entry.license_plate);
-        if (contextParts.length) {
-          card.appendChild(_el('p', 'text-xs text-gray-500 dark:text-gray-400 mb-1', contextParts.join(' \u2022 ')));
+        if (customer || vehicle) {
+          var infoRow = _el('div', 'flex items-center gap-2 mb-1 flex-wrap');
+          if (customer) {
+            infoRow.appendChild(_el('span', 'text-xs font-medium text-gray-700 dark:text-gray-200', customer));
+          }
+          if (vehicle) {
+            infoRow.appendChild(_el('span', 'text-xs text-gray-500 dark:text-gray-400', vehicle));
+          }
+          if (entry.license_plate) {
+            infoRow.appendChild(_el('span', 'text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-mono', entry.license_plate));
+          }
+          if (entry.customer_phone) {
+            infoRow.appendChild(_el('span', 'text-xs text-gray-400', entry.customer_phone));
+          }
+          card.appendChild(infoRow);
         }
 
-        // Task
-        if (entry.task_description) {
-          card.appendChild(_el('p', 'text-sm text-gray-600 dark:text-gray-400 mb-2', entry.task_description));
+        // ── Appointment + Service info ──
+        var service = entry.appt_service || entry.task_description || entry.customer_concern || '';
+        if (service) {
+          var svcEl = _el('div', 'flex items-center gap-2 mb-1');
+          svcEl.appendChild(_el('span', 'text-xs font-semibold text-green-700 dark:text-green-400', service.replace(/-/g, ' ')));
+          if (entry.appt_ref) {
+            svcEl.appendChild(_el('span', 'text-[10px] text-gray-400', entry.appt_ref));
+          }
+          card.appendChild(svcEl);
         }
 
-        // Elapsed time + clock out
+        // ── Task description (if different from service) ──
+        if (entry.task_description && entry.task_description !== service) {
+          card.appendChild(_el('p', 'text-xs text-gray-500 dark:text-gray-400 mb-1 italic', entry.task_description));
+        }
+
+        // ── Engagement Timeline (appointment → clock in → now) ──
+        var timelineRow = _el('div', 'flex items-center gap-1 mb-2 flex-wrap');
+
+        if (entry.appt_date) {
+          var apptTime = entry.appt_time ? formatDateTime(entry.appt_date + ' ' + entry.appt_time) : entry.appt_date;
+          var apptTag = _el('span', 'text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium', t('laborScheduled', 'Scheduled') + ': ' + apptTime);
+          timelineRow.appendChild(apptTag);
+          timelineRow.appendChild(_el('span', 'text-gray-300 dark:text-gray-600', '\u2192'));
+        }
+        if (entry.appt_check_in) {
+          var arrTag = _el('span', 'text-[10px] px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-medium', t('laborArrived', 'Arrived') + ': ' + formatDateTime(entry.appt_check_in));
+          timelineRow.appendChild(arrTag);
+          timelineRow.appendChild(_el('span', 'text-gray-300 dark:text-gray-600', '\u2192'));
+        }
+        var clockTag = _el('span', 'text-[10px] px-1.5 py-0.5 rounded bg-green-200 dark:bg-green-800/40 text-green-800 dark:text-green-200 font-bold', t('laborClockIn', 'Clock In') + ': ' + formatDateTime(entry.clock_in_at));
+        timelineRow.appendChild(clockTag);
+
+        card.appendChild(timelineRow);
+
+        // ── Live elapsed timer + clock out ──
         var bottom = _el('div', 'flex items-center justify-between');
-        var elapsed = _el('span', 'text-sm font-medium text-green-700 dark:text-green-400');
+        var elapsed = _el('span', 'text-sm font-bold text-green-700 dark:text-green-400');
         var updateElapsed = function() {
           var now = new Date();
           var start = new Date(entry.clock_in_at);
           var diffMin = Math.floor((now - start) / 60000);
           var h = Math.floor(diffMin / 60);
           var m = diffMin % 60;
-          elapsed.textContent = (h > 0 ? h + 'h ' : '') + m + 'm' + ' \u2014 ' + t('laborStarted', 'Started') + ' ' + formatDateTime(entry.clock_in_at);
+          elapsed.textContent = '\u23F1 ' + (h > 0 ? h + 'h ' : '') + m + 'm ' + t('laborElapsed', 'elapsed');
         };
         updateElapsed();
         _laborTimers.push(setInterval(updateElapsed, 30000));
@@ -780,45 +859,55 @@ window.loadLaborSummary = async function() {
 
       var rTable = _el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700');
 
-      var rHead = _el('div', 'grid grid-cols-12 gap-1 bg-gray-50 dark:bg-gray-900/50 px-5 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider');
-      var rCols = [
-        { text: t('laborEmployee', 'Employee'), span: 2 },
-        { text: t('laborRo', 'RO'), span: 1 },
-        { text: t('laborVehicle', 'Vehicle'), span: 2 },
-        { text: t('laborTask', 'Task'), span: 2 },
-        { text: t('laborClockInTime', 'In'), span: 2 },
-        { text: t('laborClockOutTime', 'Out'), span: 2 },
-        { text: t('laborDuration', 'Dur.'), span: 1 }
-      ];
-      rCols.forEach(function(col) {
-        rHead.appendChild(_el('div', 'col-span-' + col.span, col.text));
-      });
-      rTable.appendChild(rHead);
-
+      // Responsive card layout instead of grid table for richer info
       recent.forEach(function(entry) {
-        var row = _el('div', 'grid grid-cols-12 gap-1 px-5 py-2.5 border-t border-gray-100 dark:border-gray-700/50 text-sm items-center hover:bg-gray-50 dark:hover:bg-gray-800/50 transition');
-
-        var empCell = _el('div', 'col-span-2 font-medium text-gray-900 dark:text-white truncate', entry.employee_name);
-        empCell.title = entry.employee_name;
-        row.appendChild(empCell);
-
-        row.appendChild(_el('div', 'col-span-1 text-xs font-mono text-gray-500 dark:text-gray-400', entry.ro_number));
-
         var vehicle = [entry.vehicle_year, entry.vehicle_make, entry.vehicle_model].filter(Boolean).join(' ');
         var customer = [entry.customer_first, entry.customer_last].filter(Boolean).join(' ');
-        var vehCell = _el('div', 'col-span-2 truncate');
-        if (vehicle) { vehCell.appendChild(_el('div', 'text-xs text-gray-700 dark:text-gray-300 truncate', vehicle)); }
-        if (customer) { vehCell.appendChild(_el('div', 'text-[10px] text-gray-400 truncate', customer)); }
-        if (!vehicle && !customer) { vehCell.textContent = '-'; vehCell.className += ' text-gray-400'; }
-        row.appendChild(vehCell);
+        var service = entry.appt_service || entry.task_description || '';
 
-        var taskCell = _el('div', 'col-span-2 text-gray-600 dark:text-gray-400 truncate', entry.task_description || '-');
-        taskCell.title = entry.task_description || '';
-        row.appendChild(taskCell);
+        var row = _el('div', 'border-b border-gray-100 dark:border-gray-700/50 p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition');
 
-        row.appendChild(_el('div', 'col-span-2 text-gray-500 dark:text-gray-400 text-xs', formatDateTime(entry.clock_in_at)));
-        row.appendChild(_el('div', 'col-span-2 text-gray-500 dark:text-gray-400 text-xs', formatDateTime(entry.clock_out_at)));
-        row.appendChild(_el('div', 'col-span-1 font-medium text-gray-700 dark:text-gray-300', formatDuration(entry.duration_minutes)));
+        // Top: employee + RO + duration
+        var topRow = _el('div', 'flex items-center justify-between mb-1');
+        var leftTop = _el('div', 'flex items-center gap-2 flex-wrap');
+        leftTop.appendChild(_el('span', 'font-semibold text-gray-900 dark:text-white text-sm', entry.employee_name));
+        leftTop.appendChild(_el('span', 'text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded', entry.ro_number));
+        if (entry.ro_status) {
+          var statusColors = { intake: 'bg-gray-100 text-gray-600', diagnosis: 'bg-purple-100 text-purple-700', estimate_pending: 'bg-blue-100 text-blue-700', pending_approval: 'bg-amber-100 text-amber-700', approved: 'bg-green-100 text-green-700', in_progress: 'bg-blue-100 text-blue-700', completed: 'bg-gray-100 text-gray-600', invoiced: 'bg-teal-100 text-teal-700' };
+          var sCls = statusColors[entry.ro_status] || 'bg-gray-100 text-gray-600';
+          leftTop.appendChild(_el('span', 'text-[10px] px-1.5 py-0.5 rounded font-medium ' + sCls, entry.ro_status.replace(/_/g, ' ')));
+        }
+        topRow.appendChild(leftTop);
+        topRow.appendChild(_el('span', 'font-bold text-gray-800 dark:text-gray-200 text-sm', formatDuration(entry.duration_minutes)));
+        row.appendChild(topRow);
+
+        // Middle: customer + vehicle + service
+        var details = [];
+        if (customer) details.push(customer);
+        if (vehicle) details.push(vehicle);
+        if (service) details.push(service.replace(/-/g, ' '));
+        if (details.length) {
+          row.appendChild(_el('div', 'text-xs text-gray-500 dark:text-gray-400 mb-1', details.join(' \u2022 ')));
+        }
+
+        // Task (if different from service)
+        if (entry.task_description && entry.task_description !== service) {
+          row.appendChild(_el('div', 'text-xs text-gray-400 italic mb-1', entry.task_description));
+        }
+
+        // Bottom: clock in → clock out + appointment time
+        var timeRow = _el('div', 'flex items-center gap-2 flex-wrap text-[10px] text-gray-400');
+        if (entry.appt_date && entry.appt_time) {
+          timeRow.appendChild(_el('span', 'px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400', t('laborScheduled', 'Scheduled') + ' ' + entry.appt_date + ' ' + entry.appt_time));
+          timeRow.appendChild(_el('span', '', '\u2192'));
+        }
+        timeRow.appendChild(_el('span', '', t('laborClockInTime', 'In') + ': ' + formatDateTime(entry.clock_in_at)));
+        timeRow.appendChild(_el('span', '', '\u2192'));
+        timeRow.appendChild(_el('span', '', t('laborClockOutTime', 'Out') + ': ' + formatDateTime(entry.clock_out_at)));
+        if (entry.is_billable) {
+          timeRow.appendChild(_el('span', 'px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 font-medium', t('laborBillableTag', 'Billable')));
+        }
+        row.appendChild(timeRow);
 
         rTable.appendChild(row);
       });
