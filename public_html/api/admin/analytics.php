@@ -217,7 +217,7 @@ try {
                 SUM(e.total) AS revenue,
                 COUNT(e.id) AS estimate_count
          FROM oretir_estimates e
-         WHERE e.status = 'approved'
+         WHERE e.status IN ('approved', 'sent', 'viewed')
            AND e.updated_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
          GROUP BY month
          ORDER BY month ASC"
@@ -238,7 +238,7 @@ try {
     $totalROs = (int) $stmt->fetchColumn();
 
     $stmt = $db->prepare(
-        "SELECT COUNT(*) FROM oretir_repair_orders WHERE status = 'completed' AND updated_at >= ? AND updated_at <= ?"
+        "SELECT COUNT(*) FROM oretir_repair_orders WHERE status IN ('completed', 'invoiced') AND updated_at >= ? AND updated_at <= ?"
     );
     $stmt->execute([$startDate, $endDateEnd]);
     $completedROs = (int) $stmt->fetchColumn();
@@ -256,7 +256,7 @@ try {
                 COUNT(r.id) AS sample_size
          FROM oretir_repair_orders r
          JOIN oretir_appointments a ON a.id = r.appointment_id
-         WHERE r.status = 'completed'
+         WHERE r.status IN ('completed', 'invoiced')
          GROUP BY a.service
          HAVING sample_size >= 1
          ORDER BY avg_days ASC"
@@ -278,7 +278,7 @@ try {
          FROM oretir_estimates e
          JOIN oretir_repair_orders r ON r.id = e.repair_order_id
          JOIN oretir_appointments a ON a.id = r.appointment_id
-         WHERE e.status = 'approved'
+         WHERE e.status IN ('approved', 'sent', 'viewed')
            AND e.updated_at >= ? AND e.updated_at <= ?
          GROUP BY a.service
          ORDER BY total_revenue DESC"
@@ -303,7 +303,7 @@ try {
          FROM oretir_customers c
          JOIN oretir_repair_orders r ON r.customer_id = c.id
          JOIN oretir_estimates e ON e.repair_order_id = r.id
-         WHERE e.status = 'approved'
+         WHERE e.status IN ('approved', 'sent', 'viewed')
            AND e.updated_at >= ? AND e.updated_at <= ?
          GROUP BY c.id, c.first_name, c.last_name, c.email
          ORDER BY total_spent DESC
@@ -333,7 +333,7 @@ try {
     // ─── Average ticket value (within date range) ───────────────────────
     $stmt = $db->prepare(
         "SELECT AVG(total) FROM oretir_estimates
-         WHERE status = 'approved'
+         WHERE status IN ('approved', 'sent', 'viewed')
            AND updated_at >= ? AND updated_at <= ?"
     );
     $stmt->execute([$startDate, $endDateEnd]);

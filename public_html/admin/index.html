@@ -5103,6 +5103,12 @@ const adminT = {
     analyticsTopCustomers: 'Top Customers',
     analyticsEstimates: 'estimates',
     analyticsLaborByEmployee: 'Labor Hours by Technician',
+    // Analytics empty state hints
+    hintAssignEmployees: 'Assign employees to appointments and mark as completed',
+    hintCreateEstimates: 'Create estimates on repair orders to track revenue',
+    hintBookingsToROs: 'Book appointments and create repair orders',
+    hintCompleteROs: 'Complete or invoice repair orders to see service times',
+    hintNewCustomers: 'New customers appear as bookings come in',
     // Shop Performance
     spTitle: 'Shop Performance',
     spAvgTimeInShop: 'Avg Time in Shop',
@@ -6680,6 +6686,11 @@ const adminT = {
     analyticsTopCustomers: 'Mejores Clientes',
     analyticsEstimates: 'presupuestos',
     analyticsLaborByEmployee: 'Horas por T\u00e9cnico',
+    hintAssignEmployees: 'Asigne empleados a las citas y m\u00e1rquelas como completadas',
+    hintCreateEstimates: 'Cree presupuestos en \u00f3rdenes de reparaci\u00f3n para rastrear ingresos',
+    hintBookingsToROs: 'Reserve citas y cree \u00f3rdenes de reparaci\u00f3n',
+    hintCompleteROs: 'Complete o facture \u00f3rdenes de reparaci\u00f3n para ver tiempos de servicio',
+    hintNewCustomers: 'Los nuevos clientes aparecen cuando llegan las reservas',
     // Shop Performance
     spTitle: 'Rendimiento del Taller',
     spAvgTimeInShop: 'Tiempo Prom. en Taller',
@@ -11720,6 +11731,12 @@ async function loadAnalytics() {
       if (text !== undefined) e.textContent = text;
       return e;
     }
+    function emptyHint(msg, hint) {
+      var wrap = el('div', 'text-center py-6');
+      wrap.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-sm', msg));
+      if (hint) wrap.appendChild(el('p', 'text-gray-300 dark:text-gray-600 text-xs mt-1', hint));
+      return wrap;
+    }
 
     // -- Top Stats Row (4 cards) --
     var topRow = el('div', 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6');
@@ -11911,10 +11928,10 @@ async function loadAnalytics() {
     // Employee Productivity (30d)
     var epCard = el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6');
     epCard.appendChild(el('h3', 'text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4', T.analyticsEmployeeProductivity));
-    if (sData && sData.employee_productivity) {
+    if (sData && sData.employee_productivity && sData.employee_productivity.some(function(e) { return e.completed_count > 0; })) {
       OTCharts.employeeProductivityChart(epCard, sData.employee_productivity);
     } else {
-      epCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      epCard.appendChild(emptyHint(T.analyticsNoData, T.hintAssignEmployees || 'Assign employees to appointments and mark as completed'));
     }
     enhRow.appendChild(epCard);
 
@@ -11924,7 +11941,7 @@ async function loadAnalytics() {
     if (sData && sData.revenue_by_month && sData.revenue_by_month.length) {
       OTCharts.revenueChart(revCard, sData.revenue_by_month);
     } else {
-      revCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      revCard.appendChild(emptyHint(T.analyticsNoData, T.hintCreateEstimates || 'Create estimates on repair orders to track revenue'));
     }
     enhRow.appendChild(revCard);
 
@@ -11939,7 +11956,7 @@ async function loadAnalytics() {
     if (sData && sData.conversion_funnel) {
       OTCharts.funnelChart(funCard, sData.conversion_funnel);
     } else {
-      funCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      funCard.appendChild(emptyHint(T.analyticsNoData, T.hintBookingsToROs || 'Book appointments and create repair orders'));
     }
     fdRow.appendChild(funCard);
 
@@ -11949,7 +11966,7 @@ async function loadAnalytics() {
     if (sData && sData.service_duration && sData.service_duration.length) {
       OTCharts.durationChart(durCard, sData.service_duration);
     } else {
-      durCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      durCard.appendChild(emptyHint(T.analyticsNoData, T.hintCompleteROs || 'Complete repair orders to see average service times'));
     }
     fdRow.appendChild(durCard);
 
@@ -12000,7 +12017,7 @@ async function loadAnalytics() {
         return { label: monthLabel, value: parseInt(d.new_customers) || 0 };
       }), { height: 140, color: OTCharts.TOKENS.colors.brandMid });
     } else {
-      acqCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      acqCard.appendChild(emptyHint(T.analyticsNoData, T.hintNewCustomers || 'New customers appear as bookings come in'));
     }
     custRevRow.appendChild(acqCard);
 
@@ -12011,7 +12028,7 @@ async function loadAnalytics() {
         return { label: r.service || '—', value: parseFloat(r.total_revenue) };
       }), { color: OTCharts.TOKENS.colors.brandMid, labelWidth: 'w-28', valueFormatter: function(v) { return '$' + Math.round(v).toLocaleString(); } });
     } else {
-      revSvcCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      revSvcCard.appendChild(emptyHint(T.analyticsNoData, T.hintCreateEstimates || 'Create estimates on repair orders to track revenue'));
     }
     custRevRow.appendChild(revSvcCard);
 
@@ -12040,7 +12057,7 @@ async function loadAnalytics() {
       });
       topCard.appendChild(tcList);
     } else {
-      topCard.appendChild(el('p', 'text-gray-400 dark:text-gray-500 text-center py-8', T.analyticsNoData));
+      topCard.appendChild(emptyHint(T.analyticsNoData, T.hintCreateEstimates || 'Create estimates on repair orders to track revenue'));
     }
     topCustRow.appendChild(topCard);
 
