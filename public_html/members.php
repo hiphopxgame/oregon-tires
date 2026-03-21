@@ -127,6 +127,7 @@ $memberDashboardConfig = [
     'name'           => 'Oregon Tires Auto Care',
     'logo'           => '/assets/logo.png',
     'favicon'        => '/assets/favicon.ico',
+    'default_avatar' => '/assets/logo.png',
     'stylesheets'    => ['/assets/styles.css'],
     'scripts'        => [],
     'nav_include'    => __DIR__ . '/templates/header.php',
