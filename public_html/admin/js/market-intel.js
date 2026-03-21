@@ -7,6 +7,7 @@
   'use strict';
 
   var DATA_URL = '/admin/js/market-intel-data.json';
+  var OT_PLACE_ID = 'ChIJLSxZDQyflVQRWXEi9LpJGxs'; // Oregon Tires Auto Care
   var allShops = [];
   var filteredShops = [];
   var map = null;
@@ -22,6 +23,19 @@
   var directoryPage = 1;
   var perPage = 25;
   var leafletLoaded = false;
+
+  function getOtRank(list) {
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].google_place_id === OT_PLACE_ID) return i + 1;
+    }
+    return null;
+  }
+  function getOtShop(list) {
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].google_place_id === OT_PLACE_ID) return list[i];
+    }
+    return null;
+  }
 
   function t(key, fb) {
     return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fb;
@@ -154,8 +168,57 @@
 
   // ─── Stats Bar ────────────────────────────────────────────────────────────
   function renderStats() {
+    var wrap = document.createElement('div');
+
+    // Oregon Tires rank card (prominent)
+    var otShop = getOtShop(allShops);
+    var otRankAll = getOtRank(filteredShops);
+    if (otShop) {
+      var rankCard = document.createElement('div');
+      rankCard.className = 'bg-gradient-to-r from-green-600 to-green-800 text-white rounded-xl p-4 mb-4 flex items-center justify-between flex-wrap gap-3';
+
+      var rankLeft = document.createElement('div');
+      rankLeft.className = 'flex items-center gap-3';
+      var rankIcon = document.createElement('span');
+      rankIcon.className = 'text-3xl';
+      rankIcon.textContent = '\uD83C\uDFC6';
+      rankLeft.appendChild(rankIcon);
+      var rankInfo = document.createElement('div');
+      var rankTitle = document.createElement('div');
+      rankTitle.className = 'font-bold text-lg';
+      rankTitle.textContent = 'Oregon Tires Auto Care';
+      rankInfo.appendChild(rankTitle);
+      var rankSub = document.createElement('div');
+      rankSub.className = 'text-green-200 text-sm';
+      rankSub.textContent = otShop.google_rating + '\u2B50 \u2022 ' + (otShop.google_review_count || 0).toLocaleString() + ' ' + t('miReviews', 'reviews');
+      rankInfo.appendChild(rankSub);
+      rankLeft.appendChild(rankInfo);
+      rankCard.appendChild(rankLeft);
+
+      var rankRight = document.createElement('div');
+      rankRight.className = 'text-right';
+      if (otRankAll !== null) {
+        var rankNum = document.createElement('div');
+        rankNum.className = 'text-3xl font-black';
+        rankNum.textContent = '#' + otRankAll;
+        rankRight.appendChild(rankNum);
+        var rankOf = document.createElement('div');
+        rankOf.className = 'text-green-200 text-xs';
+        rankOf.textContent = t('miOutOf', 'out of') + ' ' + filteredShops.length + ' ' + (filterCategory !== 'all' ? (CAT_CONFIG[filterCategory] || {}).label || filterCategory : t('miBusinesses', 'businesses'));
+        rankRight.appendChild(rankOf);
+      } else {
+        var notInView = document.createElement('div');
+        notInView.className = 'text-green-200 text-sm italic';
+        notInView.textContent = t('miNotInView', 'Not in current filter');
+        rankRight.appendChild(notInView);
+      }
+      rankCard.appendChild(rankRight);
+      wrap.appendChild(rankCard);
+    }
+
+    // Stats grid
     var stats = document.createElement('div');
-    stats.className = 'grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4';
+    stats.className = 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-4';
 
     var cats = {};
     var totalReviews = 0;
@@ -166,14 +229,12 @@
       totalReviews += (s.google_review_count || 0);
       if (s.google_rating) { ratingSum += s.google_rating; ratedCount++; }
     });
-    var avgRating = ratedCount ? (ratingSum / ratedCount).toFixed(1) : '—';
-
-    stats.className = 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-4';
+    var avgRating = ratedCount ? (ratingSum / ratedCount).toFixed(1) : '\u2014';
 
     [
-      [String(allShops.length), t('miTotalShops', 'Total Businesses'), 'text-brand dark:text-green-400'],
+      [String(filteredShops.length) + '/' + allShops.length, t('miShowing', 'Showing'), 'text-brand dark:text-green-400'],
       [totalReviews.toLocaleString(), t('miTotalReviews', 'Total Reviews'), 'text-amber-600 dark:text-amber-400'],
-      [avgRating + '⭐', t('miAvgRating', 'Avg Rating'), 'text-amber-600 dark:text-amber-400'],
+      [avgRating + '\u2B50', t('miAvgRating', 'Avg Rating'), 'text-amber-600 dark:text-amber-400'],
       [String(cats.auto_repair || 0), t('miRepairShops', 'Repair Shops'), 'text-blue-600 dark:text-blue-400'],
       [String(cats.dealership || 0), t('miDealerships', 'Dealerships'), 'text-purple-600 dark:text-purple-400'],
       [String(cats.specialty || 0), t('miSpecialty', 'Specialty'), 'text-emerald-600 dark:text-emerald-400'],
@@ -191,7 +252,8 @@
       stats.appendChild(card);
     });
 
-    return stats;
+    wrap.appendChild(stats);
+    return wrap;
   }
 
   // ─── Filter Bar ───────────────────────────────────────────────────────────
@@ -609,8 +671,9 @@
     }
 
     pageShops.forEach(function(shop, idx) {
+      var isOt = shop.google_place_id === OT_PLACE_ID;
       var tr = document.createElement('tr');
-      tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition';
+      tr.className = (isOt ? 'bg-green-50 dark:bg-green-900/20 ring-2 ring-green-500 ' : '') + 'hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition';
       tr.addEventListener('click', function() {
         currentView = 'map';
         selectedShop = shop;
@@ -622,8 +685,8 @@
 
       // Rank
       var tdRank = document.createElement('td');
-      tdRank.className = 'px-3 py-2 text-gray-400 text-xs';
-      tdRank.textContent = String(start + idx + 1);
+      tdRank.className = 'px-3 py-2 text-xs ' + (isOt ? 'font-black text-green-700 dark:text-green-400 text-sm' : 'text-gray-400');
+      tdRank.textContent = isOt ? '#' + (start + idx + 1) : String(start + idx + 1);
       tr.appendChild(tdRank);
 
       // Name + website
@@ -688,27 +751,61 @@
     wrap.appendChild(tableWrap);
 
     // Pagination
+    var pag = document.createElement('div');
+    pag.className = 'flex items-center justify-between mt-3 text-sm flex-wrap gap-2';
+
+    // Left: per-page selector + count
+    var pagLeft = document.createElement('div');
+    pagLeft.className = 'flex items-center gap-2';
+    var ppSelect = document.createElement('select');
+    ppSelect.className = 'border rounded px-2 py-1 text-xs dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+    [10, 25, 50, 100].forEach(function(n) {
+      var opt = document.createElement('option');
+      opt.value = n; opt.textContent = n + ' / page';
+      if (n === perPage) opt.selected = true;
+      ppSelect.appendChild(opt);
+    });
+    ppSelect.addEventListener('change', function() { perPage = parseInt(ppSelect.value); directoryPage = 1; render(); });
+    pagLeft.appendChild(ppSelect);
+    var countLabel = document.createElement('span');
+    countLabel.className = 'text-gray-400 dark:text-gray-500 text-xs';
+    countLabel.textContent = (start + 1) + '-' + Math.min(start + perPage, filteredShops.length) + ' ' + t('miOf', 'of') + ' ' + filteredShops.length;
+    pagLeft.appendChild(countLabel);
+    pag.appendChild(pagLeft);
+
+    // Center: page numbers
     if (totalPages > 1) {
-      var pag = document.createElement('div');
-      pag.className = 'flex items-center justify-between mt-3 text-sm';
+      var pagCenter = document.createElement('div');
+      pagCenter.className = 'flex items-center gap-1';
       var prevBtn = document.createElement('button');
-      prevBtn.className = 'px-3 py-1 border rounded dark:border-gray-600 dark:text-gray-300 disabled:opacity-40';
-      prevBtn.textContent = '← Prev';
+      prevBtn.className = 'px-2 py-1 border rounded dark:border-gray-600 dark:text-gray-300 disabled:opacity-30 text-xs';
+      prevBtn.textContent = '\u2190';
       prevBtn.disabled = directoryPage <= 1;
       prevBtn.addEventListener('click', function() { directoryPage--; render(); });
-      var info = document.createElement('span');
-      info.className = 'text-gray-500 dark:text-gray-400';
-      info.textContent = t('miPage', 'Page') + ' ' + directoryPage + ' / ' + totalPages;
+      pagCenter.appendChild(prevBtn);
+
+      // Show up to 7 page buttons
+      var startPage = Math.max(1, directoryPage - 3);
+      var endPage = Math.min(totalPages, startPage + 6);
+      if (endPage - startPage < 6) startPage = Math.max(1, endPage - 6);
+      for (var p = startPage; p <= endPage; p++) {
+        var pgBtn = document.createElement('button');
+        pgBtn.className = 'px-2 py-1 rounded text-xs font-medium ' + (p === directoryPage ? 'bg-green-600 text-white' : 'border dark:border-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700');
+        pgBtn.textContent = String(p);
+        pgBtn.addEventListener('click', (function(pg) { return function() { directoryPage = pg; render(); }; })(p));
+        pagCenter.appendChild(pgBtn);
+      }
+
       var nextBtn = document.createElement('button');
-      nextBtn.className = 'px-3 py-1 border rounded dark:border-gray-600 dark:text-gray-300 disabled:opacity-40';
-      nextBtn.textContent = 'Next →';
+      nextBtn.className = 'px-2 py-1 border rounded dark:border-gray-600 dark:text-gray-300 disabled:opacity-30 text-xs';
+      nextBtn.textContent = '\u2192';
       nextBtn.disabled = directoryPage >= totalPages;
       nextBtn.addEventListener('click', function() { directoryPage++; render(); });
-      pag.appendChild(prevBtn);
-      pag.appendChild(info);
-      pag.appendChild(nextBtn);
-      wrap.appendChild(pag);
+      pagCenter.appendChild(nextBtn);
+      pag.appendChild(pagCenter);
     }
+
+    wrap.appendChild(pag);
 
     return wrap;
   }
