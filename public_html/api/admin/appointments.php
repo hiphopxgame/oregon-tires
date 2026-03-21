@@ -207,7 +207,7 @@ try {
                 $fields[] = 'assigned_employee_id = ?';
                 $params[] = $empId;
 
-                // Sync employee assignment to linked RO (keep RO at current status)
+                // Sync employee to linked RO, or auto-create RO at intake if none exists
                 try {
                     $roCheck = $db->prepare('SELECT id, status FROM oretir_repair_orders WHERE appointment_id = ? LIMIT 1');
                     $roCheck->execute([$id]);
@@ -215,9 +215,41 @@ try {
                     if ($linkedRo) {
                         $db->prepare('UPDATE oretir_repair_orders SET assigned_employee_id = ?, updated_at = NOW() WHERE id = ?')
                            ->execute([$empId, $linkedRo['id']]);
+                    } else {
+                        // Auto-create RO at intake
+                        $apptRow = $db->prepare('SELECT * FROM oretir_appointments WHERE id = ?');
+                        $apptRow->execute([$id]);
+                        $appt = $apptRow->fetch(PDO::FETCH_ASSOC);
+                        if ($appt) {
+                            $custId = !empty($appt['customer_id']) ? (int) $appt['customer_id'] : null;
+                            if (!$custId) {
+                                $custId = findOrCreateCustomer(
+                                    $appt['email'], $appt['first_name'], $appt['last_name'],
+                                    $appt['phone'] ?? '', $appt['language'] ?? 'english', $db
+                                );
+                            }
+                            if ($custId) {
+                                $vehId = !empty($appt['vehicle_id']) ? (int) $appt['vehicle_id'] : findOrCreateVehicle(
+                                    $custId, $appt['vehicle_year'] ?? null, $appt['vehicle_make'] ?? null,
+                                    $appt['vehicle_model'] ?? null, null, $db
+                                );
+                                $db->prepare('UPDATE oretir_appointments SET customer_id = COALESCE(customer_id, ?), vehicle_id = COALESCE(vehicle_id, ?) WHERE id = ?')
+                                   ->execute([$custId, $vehId, $id]);
+                                $roNumber = generateRoNumber($db);
+                                $db->prepare(
+                                    'INSERT INTO oretir_repair_orders
+                                        (ro_number, customer_id, vehicle_id, appointment_id, assigned_employee_id, status,
+                                         customer_concern, promised_date, promised_time, created_at, updated_at)
+                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+                                )->execute([
+                                    $roNumber, $custId, $vehId, $id, $empId, 'intake',
+                                    $appt['notes'] ?? null, $appt['preferred_date'] ?? null, $appt['preferred_time'] ?? null,
+                                ]);
+                            }
+                        }
                     }
                 } catch (\Throwable $roErr) {
-                    error_log("appointments.php: RO employee sync failed: " . $roErr->getMessage());
+                    error_log("appointments.php: RO employee sync/create failed: " . $roErr->getMessage());
                 }
             } else {
                 // Employee unassigned → set status to 'new' (unless explicitly set otherwise)
