@@ -52,12 +52,19 @@ var LaborTracker = {
   totalHours: 0,
   billableHours: 0,
   employees: [],
+  _intervals: [],
 
   init: function(roId) {
+    this.cleanup();
     this.roId = roId;
     this.entries = [];
     this.totalHours = 0;
     this.billableHours = 0;
+  },
+
+  cleanup: function() {
+    this._intervals.forEach(function(id) { clearInterval(id); });
+    this._intervals = [];
   },
 
   loadEmployees: async function() {
@@ -260,6 +267,7 @@ var LaborTracker = {
     };
     updateElapsed();
     var elapsedInterval = setInterval(updateElapsed, 30000);
+    self._intervals.push(elapsedInterval);
     card._elapsedInterval = elapsedInterval;
     timeInfo.appendChild(elapsed);
 
@@ -495,7 +503,6 @@ window.LaborTracker = LaborTracker;
 
 // ─── Cross-RO Labor Dashboard (for dedicated Labor tab) ─────────────────────
 
-// Intervals for live elapsed timers
 var _laborTimers = [];
 function _clearLaborTimers() {
   _laborTimers.forEach(function(id) { clearInterval(id); });
@@ -509,426 +516,395 @@ function _el(tag, cls, text) {
   return e;
 }
 
-var _laborDateRange = null; // null = all time
+var _laborDateRange = null;
+var _laborView = 'job_board'; // 'job_board' or 'reports'
+var _jobBoardFilter = '';
 
-window.loadLaborSummary = async function(dateRange) {
-  if (typeof dateRange !== 'undefined') _laborDateRange = dateRange;
+// ─── Mini status stepper for job board cards ──────────────────────────────────
+var JB_STATUSES = ['intake','check_in','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced'];
+var JB_COLORS = { intake:'#3b82f6', check_in:'#06b6d4', diagnosis:'#8b5cf6', estimate_pending:'#f59e0b', pending_approval:'#f59e0b', approved:'#22c55e', in_progress:'#16a34a', on_hold:'#991b1b', waiting_parts:'#f97316', ready:'#14b8a6', completed:'#6b7280', invoiced:'#0d9488' };
+
+function renderMiniStepper(currentStatus) {
+  var wrap = _el('div', 'flex items-center gap-0.5 mb-2');
+  var idx = JB_STATUSES.indexOf(currentStatus);
+  JB_STATUSES.forEach(function(s, i) {
+    if (i > 0) {
+      var line = _el('div', '');
+      line.style.cssText = 'width:8px;height:2px;background:' + (i <= idx ? JB_COLORS[currentStatus] || '#16a34a' : '#d1d5db') + ';';
+      wrap.appendChild(line);
+    }
+    var dot = _el('div', '');
+    var isCurrent = i === idx;
+    var isPast = i < idx;
+    if (isCurrent) {
+      dot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:' + (JB_COLORS[s] || '#16a34a') + ';box-shadow:0 0 0 2px rgba(22,163,106,0.3);flex-shrink:0;';
+    } else if (isPast) {
+      dot.style.cssText = 'width:6px;height:6px;border-radius:50%;background:' + (JB_COLORS[currentStatus] || '#16a34a') + ';flex-shrink:0;';
+    } else {
+      dot.style.cssText = 'width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0;';
+    }
+    wrap.appendChild(dot);
+  });
+  return wrap;
+}
+
+function formatElapsed(startStr) {
+  if (!startStr) return '-';
+  var diff = Math.floor((Date.now() - new Date(startStr).getTime()) / 60000);
+  if (diff < 0) diff = 0;
+  var h = Math.floor(diff / 60); var m = diff % 60;
+  return (h > 0 ? h + 'h ' : '') + m + 'm';
+}
+
+// ─── JOB BOARD VIEW ─────────────────────────────────────────────────────────
+
+async function loadJobBoard() {
+  var container = document.getElementById('labor-container');
+  if (!container) return;
+  _clearLaborTimers();
+  container.textContent = '';
+  container.appendChild(_el('div', 'text-gray-400 text-center py-12', t('laborSummaryLoading', 'Loading job board...')));
+
+  try {
+    var res = await fetch('/api/admin/labor.php?job_board=1', { credentials: 'include' });
+    var json = await res.json();
+    container.textContent = '';
+    if (!json.success) { container.appendChild(_el('p', 'text-red-500 text-center py-8', json.error || 'Error')); return; }
+
+    var data = json.data;
+    var ros = data.ros || [];
+    var summary = data.summary || {};
+    var completedToday = data.completed_today || [];
+
+    // ── View Toggle ──
+    var viewToggle = _el('div', 'flex items-center gap-2 mb-4');
+    ['job_board', 'reports'].forEach(function(v) {
+      var btn = _el('button', 'px-4 py-2 rounded-lg text-sm font-medium transition ' +
+        (v === _laborView ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'),
+        v === 'job_board' ? t('laborJobBoard', 'Job Board') : t('laborReports', 'Reports'));
+      btn.addEventListener('click', function() {
+        _laborView = v;
+        if (v === 'job_board') loadJobBoard();
+        else loadLaborReports();
+      });
+      viewToggle.appendChild(btn);
+    });
+    container.appendChild(viewToggle);
+
+    // ── Summary Stats ──
+    var stats = _el('div', 'grid grid-cols-3 gap-4 mb-4');
+    [
+      { label: t('laborJbActiveRos', 'Active ROs'), value: summary.active_ros || 0, pulse: (summary.active_ros || 0) > 0 },
+      { label: t('laborJbTechsWorking', 'Techs Working'), value: summary.techs_working || 0 },
+      { label: t('laborJbHoursToday', 'Hours Today'), value: (summary.hours_today || 0) + 'h' }
+    ].forEach(function(c) {
+      var card = _el('div', 'bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700');
+      var row = _el('div', 'flex items-center gap-2 mb-1');
+      if (c.pulse) row.appendChild(_el('span', 'w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse'));
+      row.appendChild(_el('span', 'text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider', c.label));
+      card.appendChild(row);
+      card.appendChild(_el('div', 'text-2xl font-bold text-gray-900 dark:text-white', String(c.value)));
+      stats.appendChild(card);
+    });
+    container.appendChild(stats);
+
+    // ── Filters ──
+    var filterBar = _el('div', 'flex flex-wrap items-center gap-2 mb-4');
+    var filterStatuses = [
+      { key: '', label: t('laborJbAllActive', 'All Active') },
+      { key: 'check_in', label: t('roStatusCheckIn', 'Checked In') },
+      { key: 'in_progress', label: t('roStatusInProgress', 'In Progress') },
+      { key: 'waiting', label: t('laborJbWaiting', 'Waiting') },
+      { key: 'ready', label: t('roStatusReady', 'Ready') },
+    ];
+    filterStatuses.forEach(function(f) {
+      var active = _jobBoardFilter === f.key;
+      var btn = _el('button', 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' +
+        (active ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'), f.label);
+      btn.addEventListener('click', function() { _jobBoardFilter = f.key; loadJobBoard(); });
+      filterBar.appendChild(btn);
+    });
+    container.appendChild(filterBar);
+
+    // ── Filter ROs ──
+    var filteredRos = ros;
+    if (_jobBoardFilter === 'waiting') {
+      filteredRos = ros.filter(function(r) { return r.status === 'waiting_parts' || r.status === 'on_hold'; });
+    } else if (_jobBoardFilter) {
+      filteredRos = ros.filter(function(r) { return r.status === _jobBoardFilter; });
+    }
+
+    // ── Job Cards ──
+    if (filteredRos.length > 0) {
+      var cardGrid = _el('div', 'grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6');
+
+      filteredRos.forEach(function(ro) {
+        var card = _el('div', 'bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md transition');
+        card.addEventListener('click', function() { if (typeof viewRoDetail === 'function') viewRoDetail(ro.id); });
+
+        // Mini stepper
+        card.appendChild(renderMiniStepper(ro.status));
+
+        // RO# + Customer
+        var topRow = _el('div', 'flex items-center justify-between mb-1');
+        topRow.appendChild(_el('span', 'font-bold text-green-700 dark:text-green-400 text-sm', ro.ro_number));
+        var custName = ((ro.first_name || '') + ' ' + (ro.last_name || '')).trim();
+        topRow.appendChild(_el('span', 'text-sm font-medium text-gray-700 dark:text-gray-300', custName));
+        card.appendChild(topRow);
+
+        // Vehicle + Plate
+        var vehRow = _el('div', 'flex items-center justify-between mb-2');
+        var vehicle = [ro.vehicle_year, ro.vehicle_make, ro.vehicle_model].filter(Boolean).join(' ');
+        vehRow.appendChild(_el('span', 'text-xs text-gray-500 dark:text-gray-400', vehicle || '-'));
+        if (ro.license_plate) {
+          vehRow.appendChild(_el('span', 'text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400', 'Plate: ' + ro.license_plate));
+        }
+        card.appendChild(vehRow);
+
+        // Timers row
+        var timerRow = _el('div', 'flex items-center gap-4 mb-2');
+        if (ro.checked_in_at) {
+          var visitWrap = _el('div', 'flex items-center gap-1');
+          visitWrap.appendChild(_el('span', 'w-2 h-2 rounded-full bg-green-500 animate-pulse'));
+          visitWrap.appendChild(_el('span', 'text-xs font-bold text-green-700 dark:text-green-400', t('roTimerVisit', 'VISIT') + ':'));
+          var visitVal = _el('span', 'text-xs font-bold text-green-700 dark:text-green-400 jb-timer');
+          visitVal.setAttribute('data-start', ro.checked_in_at);
+          visitVal.textContent = formatElapsed(ro.checked_in_at);
+          visitWrap.appendChild(visitVal);
+          timerRow.appendChild(visitWrap);
+        }
+        var repairStart = null;
+        if (ro.active_labor && ro.active_labor.length > 0) {
+          repairStart = ro.active_labor[0].clock_in_at;
+        } else if (ro.service_started_at && !ro.service_ended_at) {
+          repairStart = ro.service_started_at;
+        }
+        if (repairStart) {
+          var repairWrap = _el('div', 'flex items-center gap-1');
+          repairWrap.appendChild(_el('span', 'w-2 h-2 rounded-full bg-orange-500 animate-pulse'));
+          repairWrap.appendChild(_el('span', 'text-xs font-bold text-orange-600 dark:text-orange-400', t('roTimerRepair', 'REPAIR') + ':'));
+          var repairVal = _el('span', 'text-xs font-bold text-orange-600 dark:text-orange-400 jb-timer');
+          repairVal.setAttribute('data-start', repairStart);
+          repairVal.textContent = formatElapsed(repairStart);
+          repairWrap.appendChild(repairVal);
+          timerRow.appendChild(repairWrap);
+        }
+        card.appendChild(timerRow);
+
+        // Tech + Next action row
+        var bottomRow = _el('div', 'flex items-center justify-between');
+        var techInfo = _el('div', 'flex items-center gap-2');
+        if (ro.active_labor && ro.active_labor.length > 0) {
+          ro.active_labor.forEach(function(l) {
+            var techBadge = _el('span', 'text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium', l.employee_name);
+            techInfo.appendChild(techBadge);
+          });
+        } else if (ro.assigned_employee_name) {
+          techInfo.appendChild(_el('span', 'text-xs text-gray-500', t('laborAssigned', 'Assigned') + ': ' + ro.assigned_employee_name));
+        }
+        bottomRow.appendChild(techInfo);
+
+        if (ro.next_action) {
+          var nextBtn = _el('span', 'text-[10px] font-bold px-2 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', '\u2192 ' + ro.next_action);
+          bottomRow.appendChild(nextBtn);
+        }
+        card.appendChild(bottomRow);
+
+        cardGrid.appendChild(card);
+      });
+      container.appendChild(cardGrid);
+    } else {
+      container.appendChild(_el('div', 'text-center py-8 text-gray-400', t('laborJbNoRos', 'No active repair orders')));
+    }
+
+    // ── Completed Today (collapsed) ──
+    if (completedToday.length > 0) {
+      var details = document.createElement('details');
+      details.className = 'border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden';
+      var summary2 = document.createElement('summary');
+      summary2.className = 'px-4 py-3 bg-gray-50 dark:bg-gray-900/50 cursor-pointer text-sm font-medium text-gray-600 dark:text-gray-400';
+      summary2.textContent = t('laborJbCompletedToday', 'Completed Today') + ' (' + completedToday.length + ')';
+      details.appendChild(summary2);
+      var cList = _el('div', 'p-3 space-y-2');
+      completedToday.forEach(function(r) {
+        var row = _el('div', 'flex items-center justify-between text-sm px-2 py-1');
+        row.appendChild(_el('span', 'font-medium text-green-700 dark:text-green-400', r.ro_number));
+        var cust = ((r.first_name || '') + ' ' + (r.last_name || '')).trim();
+        row.appendChild(_el('span', 'text-gray-600 dark:text-gray-400', cust));
+        var veh = [r.vehicle_year, r.vehicle_make, r.vehicle_model].filter(Boolean).join(' ');
+        row.appendChild(_el('span', 'text-xs text-gray-400', veh));
+        row.appendChild(_el('span', 'text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500', r.status));
+        cList.appendChild(row);
+      });
+      details.appendChild(cList);
+      container.appendChild(details);
+    }
+
+    // Single timer update interval for all job board timers
+    function updateAllJbTimers() {
+      var timers = document.querySelectorAll('.jb-timer');
+      timers.forEach(function(el) {
+        var start = el.getAttribute('data-start');
+        if (start) el.textContent = formatElapsed(start);
+      });
+    }
+    _laborTimers.push(setInterval(updateAllJbTimers, 30000));
+
+  } catch (err) {
+    container.textContent = '';
+    container.appendChild(_el('p', 'text-red-500 text-center py-8', t('laborSummaryError', 'Error loading job board')));
+    console.error('Job board error:', err);
+  }
+}
+
+// ─── REPORTS VIEW (existing summary/report UI) ──────────────────────────────
+
+async function loadLaborReports() {
   var container = document.getElementById('labor-container');
   if (!container) return;
   _clearLaborTimers();
   container.textContent = '';
 
-  var loading = _el('div', 'text-gray-400 dark:text-gray-500 text-center py-12', t('laborSummaryLoading', 'Loading labor data...'));
-  container.appendChild(loading);
+  // View Toggle
+  var viewToggle = _el('div', 'flex items-center gap-2 mb-4');
+  ['job_board', 'reports'].forEach(function(v) {
+    var btn = _el('button', 'px-4 py-2 rounded-lg text-sm font-medium transition ' +
+      (v === _laborView ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'),
+      v === 'job_board' ? t('laborJobBoard', 'Job Board') : t('laborReports', 'Reports'));
+    btn.addEventListener('click', function() {
+      _laborView = v;
+      if (v === 'job_board') loadJobBoard();
+      else loadLaborReports();
+    });
+    viewToggle.appendChild(btn);
+  });
+  container.appendChild(viewToggle);
+
+  container.appendChild(_el('div', 'text-gray-400 text-center py-12', t('laborSummaryLoading', 'Loading reports...')));
 
   try {
     var url = '/api/admin/labor.php?summary=1';
     if (_laborDateRange) url += '&start_date=' + _laborDateRange.start + '&end_date=' + _laborDateRange.end;
     var res = await fetch(url, { credentials: 'include' });
     var json = await res.json();
-    container.textContent = '';
 
-    if (!json.success) {
-      container.appendChild(_el('p', 'text-red-500 text-center py-8', json.error || 'Error'));
-      return;
-    }
+    // Remove loading
+    var loadingEl = container.querySelector('.text-gray-400');
+    if (loadingEl) loadingEl.remove();
+
+    if (!json.success) { container.appendChild(_el('p', 'text-red-500 text-center py-8', json.error || 'Error')); return; }
 
     var d = json.data;
     var totals = d.totals || {};
-    var active = d.active || [];
-    var recent = d.recent || [];
     var employees = d.employees || [];
-    var availEmps = d.available_employees || [];
-    var availROs = d.available_ros || [];
+    var recent = d.recent || [];
 
-    // ── Stat Cards ──────────────────────────────────────────────────────
+    // Stats
     var stats = _el('div', 'grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6');
-
-    var cards = [
-      { label: t('laborStatActive', 'Active Clocks'), value: active.length, color: 'green', pulse: active.length > 0 },
-      { label: t('laborStatTotalHrs', 'Total Hours'), value: totals.total_hours ? totals.total_hours.toFixed(1) + 'h' : '0h', color: 'sky' },
-      { label: t('laborStatBillable', 'Billable Hours'), value: totals.billable_hours ? totals.billable_hours.toFixed(1) + 'h' : '0h', color: 'emerald' },
-      { label: t('laborStatEntries', 'Total Entries'), value: totals.total_entries || 0, color: 'gray' }
-    ];
-
-    cards.forEach(function(c) {
+    [
+      { label: t('laborStatActive', 'Active Clocks'), value: totals.active_clocks || 0 },
+      { label: t('laborStatTotalHrs', 'Total Hours'), value: totals.total_hours ? totals.total_hours.toFixed(1) + 'h' : '0h' },
+      { label: t('laborStatBillable', 'Billable Hours'), value: totals.billable_hours ? totals.billable_hours.toFixed(1) + 'h' : '0h' },
+      { label: t('laborStatEntries', 'Total Entries'), value: totals.total_entries || 0 }
+    ].forEach(function(c) {
       var card = _el('div', 'bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700');
-
-      var labelRow = _el('div', 'flex items-center gap-2 mb-1');
-      if (c.pulse) {
-        labelRow.appendChild(_el('span', 'w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse'));
-      }
-      labelRow.appendChild(_el('span', 'text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider', c.label));
-      card.appendChild(labelRow);
-
+      card.appendChild(_el('div', 'text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1', c.label));
       card.appendChild(_el('div', 'text-2xl font-bold text-gray-900 dark:text-white', String(c.value)));
       stats.appendChild(card);
     });
     container.appendChild(stats);
 
-    // ── Date Range Filter ───────────────────────────────────────────────
+    // Date range filter
     var filterBar = _el('div', 'flex flex-wrap items-center gap-2 mb-6');
-
     function makePreset(label, range) {
       var isActive = (!range && !_laborDateRange) || (range && _laborDateRange && _laborDateRange.start === range.start && _laborDateRange.end === range.end);
-      var btn = _el('button', 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' + (isActive
-        ? 'bg-green-600 text-white'
-        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'), label);
-      btn.addEventListener('click', function() { loadLaborSummary(range); });
+      var btn = _el('button', 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' + (isActive ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'), label);
+      btn.addEventListener('click', function() { _laborDateRange = range; loadLaborReports(); });
       return btn;
     }
-
     var today = new Date().toISOString().slice(0, 10);
     var dow = new Date().getDay();
-    var mondayOffset = dow === 0 ? -6 : 1 - dow;
-    var monday = new Date(); monday.setDate(monday.getDate() + mondayOffset);
-    var sunday = new Date(monday); sunday.setDate(sunday.getDate() + 6);
-    var monthStart = today.slice(0, 8) + '01';
-
+    var mondayOff = dow === 0 ? -6 : 1 - dow;
+    var mon = new Date(); mon.setDate(mon.getDate() + mondayOff);
+    var sun = new Date(mon); sun.setDate(sun.getDate() + 6);
     filterBar.appendChild(makePreset(t('laborToday', 'Today'), { start: today, end: today }));
-    filterBar.appendChild(makePreset(t('laborThisWeek', 'This Week'), { start: monday.toISOString().slice(0, 10), end: sunday.toISOString().slice(0, 10) }));
-    filterBar.appendChild(makePreset(t('laborThisMonth', 'This Month'), { start: monthStart, end: today }));
+    filterBar.appendChild(makePreset(t('laborThisWeek', 'This Week'), { start: mon.toISOString().slice(0, 10), end: sun.toISOString().slice(0, 10) }));
+    filterBar.appendChild(makePreset(t('laborThisMonth', 'This Month'), { start: today.slice(0, 8) + '01', end: today }));
     filterBar.appendChild(makePreset(t('laborAllTime', 'All Time'), null));
-
-    if (_laborDateRange) {
-      var rangeLabel = _el('span', 'text-xs text-gray-500 dark:text-gray-400 ml-2', _laborDateRange.start + ' \u2192 ' + _laborDateRange.end);
-      filterBar.appendChild(rangeLabel);
-    }
-
     container.appendChild(filterBar);
 
-    // ── Quick Clock-In ──────────────────────────────────────────────────
-    if (availEmps.length > 0 && availROs.length > 0) {
-      var clockSection = _el('div', 'bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 mb-6');
-
-      var clockHeader = _el('div', 'flex items-center justify-between mb-4');
-      clockHeader.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm', '\u23F1 ' + t('laborQuickClockIn', 'Quick Clock In')));
-      clockSection.appendChild(clockHeader);
-
-      var form = _el('div', 'grid grid-cols-1 sm:grid-cols-4 gap-3 items-end');
-
-      // Employee select
-      var empGroup = _el('div', '');
-      empGroup.appendChild(_el('label', 'block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1', t('laborEmployee', 'Employee')));
-      var empSel = _el('select', 'w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-3 py-2.5 text-sm');
-      var defOpt = _el('option', '', t('laborSelectEmployee', 'Select employee...'));
-      defOpt.value = '';
-      empSel.appendChild(defOpt);
-      availEmps.forEach(function(emp) {
-        var opt = _el('option', '', emp.name);
-        opt.value = emp.id;
-        empSel.appendChild(opt);
-      });
-      empGroup.appendChild(empSel);
-      form.appendChild(empGroup);
-
-      // RO select
-      var roGroup = _el('div', '');
-      roGroup.appendChild(_el('label', 'block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1', t('laborRo', 'Repair Order')));
-      var roSel = _el('select', 'w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-3 py-2.5 text-sm');
-      var roDefOpt = _el('option', '', t('laborSelectRo', 'Select RO...'));
-      roDefOpt.value = '';
-      roSel.appendChild(roDefOpt);
-      availROs.forEach(function(ro) {
-        var opt = _el('option', '', ro.ro_number + ' (' + ro.status + ')');
-        opt.value = ro.id;
-        roSel.appendChild(opt);
-      });
-      roGroup.appendChild(roSel);
-      form.appendChild(roGroup);
-
-      // Task input
-      var taskGroup = _el('div', '');
-      taskGroup.appendChild(_el('label', 'block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1', t('laborTask', 'Task') + ' (' + t('laborOptional', 'optional') + ')'));
-      var taskInput = _el('input', 'w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-3 py-2.5 text-sm');
-      taskInput.type = 'text';
-      taskInput.placeholder = t('laborTaskPlaceholder', 'e.g. Brake pad replacement');
-      taskInput.maxLength = 500;
-      taskGroup.appendChild(taskInput);
-      form.appendChild(taskGroup);
-
-      // Submit button
-      var btnGroup = _el('div', '');
-      var clockBtn = _el('button', 'w-full px-4 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition flex items-center justify-center gap-2');
-      clockBtn.appendChild(_el('span', '', '\u25B6'));
-      clockBtn.appendChild(_el('span', '', t('laborClockIn', 'Clock In')));
-      clockBtn.addEventListener('click', async function() {
-        var eId = parseInt(empSel.value, 10);
-        var rId = parseInt(roSel.value, 10);
-        if (!eId) { showToast(t('laborSelectEmployeeFirst', 'Select an employee'), true); return; }
-        if (!rId) { showToast(t('laborSelectRoFirst', 'Select a repair order'), true); return; }
-        clockBtn.disabled = true;
-        clockBtn.style.opacity = '0.5';
-        try {
-          await api('labor.php', { method: 'POST', body: {
-            repair_order_id: rId, employee_id: eId,
-            task_description: taskInput.value.trim(), is_billable: 1
-          }});
-          showToast(t('laborClockedIn', 'Clocked in successfully'));
-          loadLaborSummary();
-        } catch (err) {
-          showToast(t('laborClockInFail', 'Failed to clock in') + ': ' + (err.message || ''), true);
-          clockBtn.disabled = false;
-          clockBtn.style.opacity = '1';
-        }
-      });
-      btnGroup.appendChild(clockBtn);
-      form.appendChild(btnGroup);
-
-      clockSection.appendChild(form);
-      container.appendChild(clockSection);
-    }
-
-    // ── Active Clocks ───────────────────────────────────────────────────
-    if (active.length > 0) {
-      var activeSection = _el('div', 'mb-6');
-      activeSection.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm mb-3', '\uD83D\uDFE2 ' + t('laborActiveClocks', 'Active Clocks') + ' (' + active.length + ')'));
-
-      var activeGrid = _el('div', 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3');
-
-      active.forEach(function(entry) {
-        var card = _el('div', 'border-2 border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-900/20 rounded-xl p-4');
-
-        // Top row: name + role + RO badge
-        var top = _el('div', 'flex items-center justify-between mb-2');
-        var nameWrap = _el('div', 'flex items-center gap-2');
-        nameWrap.appendChild(_el('span', 'w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse'));
-        nameWrap.appendChild(_el('span', 'font-bold text-gray-900 dark:text-white text-sm', entry.employee_name));
-        if (entry.employee_role) nameWrap.appendChild(_el('span', 'text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400', entry.employee_role));
-        top.appendChild(nameWrap);
-
-        var roBadge = _el('div', 'flex items-center gap-1.5');
-        var roLink = _el('span', 'text-xs font-mono bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 transition', entry.ro_number);
-        roLink.title = t('laborViewRo', 'View repair order');
-        roLink.addEventListener('click', function() {
-          if (typeof viewRoDetail === 'function') viewRoDetail(entry.repair_order_id);
-        });
-        roBadge.appendChild(roLink);
-        if (entry.ro_status) {
-          var statusColors = { intake: 'bg-gray-100 text-gray-600', diagnosis: 'bg-purple-100 text-purple-700', estimate_pending: 'bg-blue-100 text-blue-700', pending_approval: 'bg-amber-100 text-amber-700', approved: 'bg-green-100 text-green-700', in_progress: 'bg-blue-100 text-blue-700', on_hold: 'bg-red-100 text-red-700', waiting_parts: 'bg-orange-100 text-orange-700', ready: 'bg-teal-100 text-teal-700' };
-          var sCls = statusColors[entry.ro_status] || 'bg-gray-100 text-gray-600';
-          roBadge.appendChild(_el('span', 'text-[10px] px-1.5 py-0.5 rounded font-medium ' + sCls, entry.ro_status.replace(/_/g, ' ')));
-        }
-        top.appendChild(roBadge);
-        card.appendChild(top);
-
-        // ── Customer + Vehicle info ──
-        var vehicle = [entry.vehicle_year, entry.vehicle_make, entry.vehicle_model].filter(Boolean).join(' ');
-        var customer = [entry.customer_first, entry.customer_last].filter(Boolean).join(' ');
-        if (customer || vehicle) {
-          var infoRow = _el('div', 'flex items-center gap-2 mb-1 flex-wrap');
-          if (customer) {
-            infoRow.appendChild(_el('span', 'text-xs font-medium text-gray-700 dark:text-gray-200', customer));
-          }
-          if (vehicle) {
-            infoRow.appendChild(_el('span', 'text-xs text-gray-500 dark:text-gray-400', vehicle));
-          }
-          if (entry.license_plate) {
-            infoRow.appendChild(_el('span', 'text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-mono', entry.license_plate));
-          }
-          if (entry.customer_phone) {
-            infoRow.appendChild(_el('span', 'text-xs text-gray-400', entry.customer_phone));
-          }
-          card.appendChild(infoRow);
-        }
-
-        // ── Appointment + Service info ──
-        var service = entry.appt_service || entry.task_description || entry.customer_concern || '';
-        if (service) {
-          var svcEl = _el('div', 'flex items-center gap-2 mb-1');
-          svcEl.appendChild(_el('span', 'text-xs font-semibold text-green-700 dark:text-green-400', service.replace(/-/g, ' ')));
-          if (entry.appt_ref) {
-            svcEl.appendChild(_el('span', 'text-[10px] text-gray-400', entry.appt_ref));
-          }
-          card.appendChild(svcEl);
-        }
-
-        // ── Task description (if different from service) ──
-        if (entry.task_description && entry.task_description !== service) {
-          card.appendChild(_el('p', 'text-xs text-gray-500 dark:text-gray-400 mb-1 italic', entry.task_description));
-        }
-
-        // ── Engagement Timeline (appointment → clock in → now) ──
-        var timelineRow = _el('div', 'flex items-center gap-1 mb-2 flex-wrap');
-
-        if (entry.appt_date) {
-          var apptTime = entry.appt_time ? formatDateTime(entry.appt_date + ' ' + entry.appt_time) : entry.appt_date;
-          var apptTag = _el('span', 'text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium', t('laborScheduled', 'Scheduled') + ': ' + apptTime);
-          timelineRow.appendChild(apptTag);
-          timelineRow.appendChild(_el('span', 'text-gray-300 dark:text-gray-600', '\u2192'));
-        }
-        if (entry.appt_check_in) {
-          var arrTag = _el('span', 'text-[10px] px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-medium', t('laborArrived', 'Arrived') + ': ' + formatDateTime(entry.appt_check_in));
-          timelineRow.appendChild(arrTag);
-          timelineRow.appendChild(_el('span', 'text-gray-300 dark:text-gray-600', '\u2192'));
-        }
-        var clockTag = _el('span', 'text-[10px] px-1.5 py-0.5 rounded bg-green-200 dark:bg-green-800/40 text-green-800 dark:text-green-200 font-bold', t('laborClockIn', 'Clock In') + ': ' + formatDateTime(entry.clock_in_at));
-        timelineRow.appendChild(clockTag);
-
-        card.appendChild(timelineRow);
-
-        // ── Live elapsed timer + clock out ──
-        var bottom = _el('div', 'flex items-center justify-between');
-        var elapsed = _el('span', 'text-sm font-bold text-green-700 dark:text-green-400');
-        var updateElapsed = function() {
-          var now = new Date();
-          var start = new Date(entry.clock_in_at);
-          var diffMin = Math.floor((now - start) / 60000);
-          var h = Math.floor(diffMin / 60);
-          var m = diffMin % 60;
-          elapsed.textContent = '\u23F1 ' + (h > 0 ? h + 'h ' : '') + m + 'm ' + t('laborElapsed', 'elapsed');
-        };
-        updateElapsed();
-        _laborTimers.push(setInterval(updateElapsed, 30000));
-        bottom.appendChild(elapsed);
-
-        var outBtn = _el('button', 'px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-700 transition', t('laborClockOut', 'Clock Out'));
-        outBtn.addEventListener('click', async function() {
-          outBtn.disabled = true;
-          outBtn.textContent = '...';
-          try {
-            await api('labor.php', { method: 'PUT', body: { id: entry.id, clock_out: true } });
-            showToast(t('laborClockedOut', 'Clocked out successfully'));
-            loadLaborSummary();
-          } catch (err) {
-            showToast(t('laborClockOutFail', 'Failed to clock out') + ': ' + (err.message || ''), true);
-            outBtn.disabled = false;
-            outBtn.textContent = t('laborClockOut', 'Clock Out');
-          }
-        });
-        bottom.appendChild(outBtn);
-        card.appendChild(bottom);
-
-        activeGrid.appendChild(card);
-      });
-
-      activeSection.appendChild(activeGrid);
-      container.appendChild(activeSection);
-    }
-
-    // ── Employee Summary Table ──────────────────────────────────────────
+    // Employee summary table
     if (employees.length > 0) {
       var summarySection = _el('div', 'mb-6');
-      summarySection.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm mb-3', '\uD83D\uDCCA ' + t('laborEmployeeSummary', 'Employee Summary')));
-
+      summarySection.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm mb-3', t('laborEmployeeSummary', 'Employee Summary')));
       var table = _el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700');
-
       var thead = _el('div', 'grid grid-cols-6 gap-2 bg-gray-50 dark:bg-gray-900/50 px-5 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider');
-      [t('laborSummaryEmployee', 'Employee'), t('laborSummaryTotalHrs', 'Total Hours'), t('laborSummaryBillableHrs', 'Billable'), t('laborEfficiency', 'Efficiency'), t('laborSummaryActiveClocks', 'Active'), t('laborSummaryRoCount', 'ROs')].forEach(function(text) {
-        thead.appendChild(_el('div', '', text));
-      });
+      [t('laborSummaryEmployee', 'Employee'), t('laborSummaryTotalHrs', 'Total Hours'), t('laborSummaryBillableHrs', 'Billable'), t('laborEfficiency', 'Efficiency'), t('laborSummaryActiveClocks', 'Active'), t('laborSummaryRoCount', 'ROs')].forEach(function(txt) { thead.appendChild(_el('div', '', txt)); });
       table.appendChild(thead);
-
       employees.forEach(function(row) {
         var tr = _el('div', 'grid grid-cols-6 gap-2 px-5 py-3 border-t border-gray-100 dark:border-gray-700/50 text-sm items-center hover:bg-gray-50 dark:hover:bg-gray-800/50 transition');
-
         tr.appendChild(_el('div', 'font-medium text-gray-900 dark:text-white', row.employee_name || 'Unknown'));
         tr.appendChild(_el('div', 'text-gray-700 dark:text-gray-300', (row.total_hours || 0).toFixed(1) + 'h'));
         tr.appendChild(_el('div', 'text-green-600 dark:text-green-400 font-medium', (row.billable_hours || 0).toFixed(1) + 'h'));
-
-        // Efficiency %
         var eff = row.total_hours > 0 ? Math.round((row.billable_hours / row.total_hours) * 100) : 0;
-        var effCls = eff >= 80 ? 'text-green-600 dark:text-green-400' : eff >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400';
+        var effCls = eff >= 80 ? 'text-green-600' : eff >= 50 ? 'text-amber-600' : 'text-red-600';
         tr.appendChild(_el('div', 'font-bold ' + effCls, eff + '%'));
-
-        var activeCell = _el('div', '');
-        if (row.active_count > 0) {
-          activeCell.appendChild(_el('span', 'inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1'));
-          var actText = _el('span', 'text-green-700 dark:text-green-400 font-medium');
-          actText.textContent = row.active_count;
-          activeCell.appendChild(actText);
-        } else {
-          activeCell.className = 'text-gray-400';
-          activeCell.textContent = '-';
-        }
-        tr.appendChild(activeCell);
-
+        tr.appendChild(_el('div', row.active_count > 0 ? 'text-green-700 font-medium' : 'text-gray-400', row.active_count > 0 ? String(row.active_count) : '-'));
         tr.appendChild(_el('div', 'text-gray-600 dark:text-gray-400', String(row.ro_count || 0)));
-
         table.appendChild(tr);
       });
-
       summarySection.appendChild(table);
       container.appendChild(summarySection);
     }
 
-    // ── Recent Entries ──────────────────────────────────────────────────
+    // Recent entries
     if (recent.length > 0) {
       var recentSection = _el('div', 'mb-6');
-      recentSection.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm mb-3', '\uD83D\uDD52 ' + t('laborRecentEntries', 'Recent Entries')));
-
+      recentSection.appendChild(_el('h3', 'font-semibold text-gray-900 dark:text-white text-sm mb-3', t('laborRecentEntries', 'Recent Entries')));
       var rTable = _el('div', 'bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700');
-
-      // Responsive card layout instead of grid table for richer info
       recent.forEach(function(entry) {
-        var vehicle = [entry.vehicle_year, entry.vehicle_make, entry.vehicle_model].filter(Boolean).join(' ');
-        var customer = [entry.customer_first, entry.customer_last].filter(Boolean).join(' ');
-        var service = entry.appt_service || entry.task_description || '';
-
         var row = _el('div', 'border-b border-gray-100 dark:border-gray-700/50 p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition');
-
-        // Top: employee + RO + duration
         var topRow = _el('div', 'flex items-center justify-between mb-1');
         var leftTop = _el('div', 'flex items-center gap-2 flex-wrap');
         leftTop.appendChild(_el('span', 'font-semibold text-gray-900 dark:text-white text-sm', entry.employee_name));
-        leftTop.appendChild(_el('span', 'text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded', entry.ro_number));
-        if (entry.ro_status) {
-          var statusColors = { intake: 'bg-gray-100 text-gray-600', diagnosis: 'bg-purple-100 text-purple-700', estimate_pending: 'bg-blue-100 text-blue-700', pending_approval: 'bg-amber-100 text-amber-700', approved: 'bg-green-100 text-green-700', in_progress: 'bg-blue-100 text-blue-700', completed: 'bg-gray-100 text-gray-600', invoiced: 'bg-teal-100 text-teal-700' };
-          var sCls = statusColors[entry.ro_status] || 'bg-gray-100 text-gray-600';
-          leftTop.appendChild(_el('span', 'text-[10px] px-1.5 py-0.5 rounded font-medium ' + sCls, entry.ro_status.replace(/_/g, ' ')));
-        }
+        leftTop.appendChild(_el('span', 'text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-500 px-1.5 py-0.5 rounded', entry.ro_number));
         topRow.appendChild(leftTop);
         topRow.appendChild(_el('span', 'font-bold text-gray-800 dark:text-gray-200 text-sm', formatDuration(entry.duration_minutes)));
         row.appendChild(topRow);
-
-        // Middle: customer + vehicle + service
         var details = [];
-        if (customer) details.push(customer);
-        if (vehicle) details.push(vehicle);
-        if (service) details.push(service.replace(/-/g, ' '));
-        if (details.length) {
-          row.appendChild(_el('div', 'text-xs text-gray-500 dark:text-gray-400 mb-1', details.join(' \u2022 ')));
-        }
-
-        // Task (if different from service)
-        if (entry.task_description && entry.task_description !== service) {
-          row.appendChild(_el('div', 'text-xs text-gray-400 italic mb-1', entry.task_description));
-        }
-
-        // Bottom: clock in → clock out + appointment time
-        var timeRow = _el('div', 'flex items-center gap-2 flex-wrap text-[10px] text-gray-400');
-        if (entry.appt_date && entry.appt_time) {
-          timeRow.appendChild(_el('span', 'px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400', t('laborScheduled', 'Scheduled') + ' ' + entry.appt_date + ' ' + entry.appt_time));
-          timeRow.appendChild(_el('span', '', '\u2192'));
-        }
-        timeRow.appendChild(_el('span', '', t('laborClockInTime', 'In') + ': ' + formatDateTime(entry.clock_in_at)));
+        var cust = [entry.customer_first, entry.customer_last].filter(Boolean).join(' ');
+        var veh = [entry.vehicle_year, entry.vehicle_make, entry.vehicle_model].filter(Boolean).join(' ');
+        if (cust) details.push(cust);
+        if (veh) details.push(veh);
+        if (details.length) row.appendChild(_el('div', 'text-xs text-gray-500 mb-1', details.join(' \u2022 ')));
+        var timeRow = _el('div', 'flex items-center gap-2 text-[10px] text-gray-400');
+        timeRow.appendChild(_el('span', '', 'In: ' + formatDateTime(entry.clock_in_at)));
         timeRow.appendChild(_el('span', '', '\u2192'));
-        timeRow.appendChild(_el('span', '', t('laborClockOutTime', 'Out') + ': ' + formatDateTime(entry.clock_out_at)));
-        if (entry.is_billable) {
-          timeRow.appendChild(_el('span', 'px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 font-medium', t('laborBillableTag', 'Billable')));
-        }
+        timeRow.appendChild(_el('span', '', 'Out: ' + formatDateTime(entry.clock_out_at)));
+        if (entry.is_billable) timeRow.appendChild(_el('span', 'px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium', t('laborBillableTag', 'Billable')));
         row.appendChild(timeRow);
-
         rTable.appendChild(row);
       });
-
       recentSection.appendChild(rTable);
       container.appendChild(recentSection);
     }
 
-    // ── Empty State (no entries AND no active clocks) ───────────────────
-    if (employees.length === 0 && active.length === 0 && recent.length === 0) {
-      var emptyWrap = _el('div', 'text-center py-12');
-      emptyWrap.appendChild(_el('div', 'text-4xl mb-3', '\u23F1'));
-      emptyWrap.appendChild(_el('h3', 'text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2', t('laborEmptyTitle', 'No labor entries yet')));
-      emptyWrap.appendChild(_el('p', 'text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto', t('laborEmptyDesc', 'Use the clock-in form above to start tracking technician time on repair orders. You can also clock in from inside any Repair Order.')));
-      container.appendChild(emptyWrap);
+    if (employees.length === 0 && recent.length === 0) {
+      container.appendChild(_el('div', 'text-center py-12 text-gray-400', t('laborEmptyTitle', 'No labor entries yet')));
     }
 
   } catch (err) {
-    container.textContent = '';
-    container.appendChild(_el('p', 'text-red-500 text-center py-8', t('laborSummaryError', 'Error loading labor data')));
-    console.error('Labor summary error:', err);
+    container.appendChild(_el('p', 'text-red-500 text-center py-8', t('laborSummaryError', 'Error loading reports')));
+  }
+}
+
+// ─── Entry point (called by tab switch + refresh button) ────────────────────
+window.loadLaborSummary = function(dateRange) {
+  if (typeof dateRange !== 'undefined') _laborDateRange = dateRange;
+  if (_laborView === 'job_board') {
+    loadJobBoard();
+  } else {
+    loadLaborReports();
   }
 };
 

@@ -23,6 +23,7 @@ var currentRo = null;
 // ─── Status badge colors ─────────────────────────────────────────────────────
 var statusColors = {
   intake:           'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+  check_in:         'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300',
   diagnosis:        'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
   estimate_pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
   pending_approval: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
@@ -53,10 +54,11 @@ function formatDate(dateStr) {
 }
 
 // ─── Status Timeline / Stepper ──────────────────────────────────────────────
-var timelineStatuses = ['intake', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'on_hold', 'waiting_parts', 'ready', 'completed', 'invoiced'];
+var timelineStatuses = ['intake', 'check_in', 'diagnosis', 'estimate_pending', 'pending_approval', 'approved', 'in_progress', 'on_hold', 'waiting_parts', 'ready', 'completed', 'invoiced'];
 function getTimelineLabels() {
   return {
     intake: t('roStatusIntake', 'Intake'),
+    check_in: t('roStatusCheckIn', 'Check In'),
     diagnosis: t('roTimelineDiag', 'Diag'),
     estimate_pending: t('roTimelineEst', 'Est.'),
     pending_approval: t('roTimelineApproval', 'Approval'),
@@ -269,7 +271,7 @@ function renderRoTable() {
     tdStatus.className = 'p-3 text-sm';
     var statusSelect = document.createElement('select');
     statusSelect.className = 'text-xs border rounded-lg px-2 py-1.5 font-medium dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 cursor-pointer';
-    var allStatuses = ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
+    var allStatuses = ['intake','check_in','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'];
     allStatuses.forEach(function(s) {
       var opt = document.createElement('option');
       opt.value = s;
@@ -279,7 +281,7 @@ function renderRoTable() {
       statusSelect.appendChild(opt);
     });
     // Color the select based on current status
-    var colorMap = { intake:'#dbeafe', diagnosis:'#ede9fe', estimate_pending:'#fef3c7', pending_approval:'#ffedd5', approved:'#dcfce7', in_progress:'#e0e7ff', on_hold:'#991b1b', waiting_parts:'#fef3c7', ready:'#d1fae5', completed:'#f3f4f6', invoiced:'#ccfbf1', cancelled:'#fee2e2' };
+    var colorMap = { intake:'#dbeafe', check_in:'#cffafe', diagnosis:'#ede9fe', estimate_pending:'#fef3c7', pending_approval:'#ffedd5', approved:'#dcfce7', in_progress:'#e0e7ff', on_hold:'#991b1b', waiting_parts:'#fef3c7', ready:'#d1fae5', completed:'#f3f4f6', invoiced:'#ccfbf1', cancelled:'#fee2e2' };
     statusSelect.style.backgroundColor = colorMap[ro.status] || '';
     statusSelect.addEventListener('click', function(e) { e.stopPropagation(); });
     statusSelect.addEventListener('change', (function(roId, sel) { return async function(e) {
@@ -416,7 +418,12 @@ function renderRoDetailModal() {
   var closeBtn = document.createElement('button');
   closeBtn.className = 'text-white/80 hover:text-white text-2xl font-bold leading-none';
   closeBtn.textContent = '\u00D7';
-  closeBtn.addEventListener('click', function() { modal.remove(); });
+  function cleanupAndClose() {
+    if (modal._roTimerInterval) clearInterval(modal._roTimerInterval);
+    if (typeof LaborTracker !== 'undefined' && LaborTracker.cleanup) LaborTracker.cleanup();
+    modal.remove();
+  }
+  closeBtn.addEventListener('click', cleanupAndClose);
   headerTop.appendChild(closeBtn);
   header.appendChild(headerTop);
   card.appendChild(header);
@@ -430,6 +437,58 @@ function renderRoDetailModal() {
   // Status timeline stepper (compact)
   body.appendChild(renderStatusTimeline(ro.status));
 
+  // ── Live Timer Displays ──
+  if (ro.checked_in_at || ro.service_started_at) {
+    var timerBar = document.createElement('div');
+    timerBar.className = 'flex items-center gap-6 px-4 py-2 bg-gray-50 dark:bg-gray-900/30 rounded-lg mb-2';
+
+    function makeTimer(label, startTime, colorCls, dotColor) {
+      if (!startTime) return null;
+      var wrap = document.createElement('div');
+      wrap.className = 'flex items-center gap-2';
+      var dot = document.createElement('span');
+      dot.className = 'w-2.5 h-2.5 rounded-full animate-pulse ' + dotColor;
+      wrap.appendChild(dot);
+      var lbl = document.createElement('span');
+      lbl.className = 'text-xs font-bold uppercase tracking-wider ' + colorCls;
+      lbl.textContent = label + ': ';
+      wrap.appendChild(lbl);
+      var val = document.createElement('span');
+      val.className = 'text-sm font-bold ' + colorCls + ' ro-live-timer';
+      val.setAttribute('data-start', startTime);
+      wrap.appendChild(val);
+      return wrap;
+    }
+
+    var visitTimer = makeTimer(t('roTimerVisit', 'VISIT'), ro.checked_in_at, 'text-green-700 dark:text-green-400', 'bg-green-500');
+    if (visitTimer && !ro.checked_out_at) timerBar.appendChild(visitTimer);
+
+    // Repair timer: use latest active labor clock_in, or service_started_at
+    var repairStart = ro.service_started_at;
+    if (ro.active_labor && ro.active_labor.length > 0) {
+      repairStart = ro.active_labor[0].clock_in_at;
+    }
+    var repairTimer = makeTimer(t('roTimerRepair', 'REPAIR'), repairStart, 'text-orange-600 dark:text-orange-400', 'bg-orange-500');
+    if (repairTimer && !ro.service_ended_at) timerBar.appendChild(repairTimer);
+
+    if (timerBar.childNodes.length > 0) {
+      body.appendChild(timerBar);
+      // Update all timers every 30s
+      function updateRoTimers() {
+        var timers = timerBar.querySelectorAll('.ro-live-timer');
+        timers.forEach(function(el) {
+          var start = new Date(el.getAttribute('data-start'));
+          var diff = Math.floor((Date.now() - start.getTime()) / 60000);
+          var h = Math.floor(diff / 60); var m = diff % 60;
+          el.textContent = (h > 0 ? h + 'h ' : '') + m + 'm';
+        });
+      }
+      updateRoTimers();
+      modal._roTimerInterval = setInterval(updateRoTimers, 30000);
+      modal.addEventListener('click', function(e) { if (e.target === modal) cleanupAndClose(); });
+    }
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   // GUIDED WORKFLOW — THE primary interface. One system, one flow.
   // ═══════════════════════════════════════════════════════════════════════════
@@ -439,49 +498,49 @@ function renderRoDetailModal() {
   var hasInvoices = ro.invoices && ro.invoices.length > 0;
   var status = ro.status || 'intake';
 
-  // 10-step workflow: intake → diagnosis → estimate → approval → approved → work → ready → complete → invoiced → done
-  var TOTAL_STEPS = 10;
+  // 11-step workflow: intake → check_in → diagnosis → estimate → approval → approved → work → ready → complete → invoiced → done
+  var TOTAL_STEPS = 11;
   var WORKFLOW_STEPS = [
     { status: 'intake',           step: 1 },
-    { status: 'diagnosis',        step: 2 },
-    { status: 'estimate_pending', step: 3 },
-    { status: 'pending_approval', step: 4 },
-    { status: 'approved',         step: 5 },
-    { status: 'in_progress',      step: 6 },
-    { status: 'on_hold',          step: 6 },
-    { status: 'waiting_parts',    step: 6 },
-    { status: 'ready',            step: 7 },
-    { status: 'completed',        step: 8 },
-    { status: 'invoiced',         step: 9 },
+    { status: 'check_in',        step: 2 },
+    { status: 'diagnosis',        step: 3 },
+    { status: 'estimate_pending', step: 4 },
+    { status: 'pending_approval', step: 5 },
+    { status: 'approved',         step: 6 },
+    { status: 'in_progress',      step: 7 },
+    { status: 'on_hold',          step: 7 },
+    { status: 'waiting_parts',    step: 7 },
+    { status: 'ready',            step: 8 },
+    { status: 'completed',        step: 9 },
+    { status: 'invoiced',         step: 10 },
   ];
   var currentStep = WORKFLOW_STEPS.find(function(s) { return s.status === status; });
   var stepNum = currentStep ? currentStep.step : 0;
 
   var guide = null;
-  if (status === 'intake' && !hasInspections) guide = { text: t('roGuideInspect', 'Inspect the vehicle \u2014 document condition, take photos'), btn: t('roStartInspection', 'Start Inspection'), color: 'purple', icon: '\uD83D\uDD0D', action: 'inspect' };
-  else if (status === 'intake') guide = { text: t('roGuideDiag', 'Inspection complete \u2014 review findings and diagnose'), btn: t('roBeginDiagnosis', 'Begin Diagnosis'), color: 'purple', icon: '\u2699\uFE0F', action: 'diagnosis' };
+  if (status === 'intake') guide = { text: t('roGuideCheckIn', 'Customer has arrived \u2014 check them in to start the process'), btn: t('roCheckInCustomer', 'Check In Customer'), color: 'blue', icon: '\uD83D\uDCCB', action: 'check_in' };
+  else if (status === 'check_in' && !hasInspections) guide = { text: t('roGuideInspect', 'Customer checked in \u2014 inspect the vehicle and start diagnosis'), btn: t('roStartDiagnosis', 'Start Diagnosis'), color: 'purple', icon: '\uD83D\uDD0D', action: 'start_diagnosis', sub: t('roGuideStartDiagSub', 'This will clock in the assigned technician and start the repair timer') };
+  else if (status === 'check_in') guide = { text: t('roGuideDiag', 'Inspection complete \u2014 review findings and diagnose'), btn: t('roStartDiagnosis', 'Start Diagnosis'), color: 'purple', icon: '\u2699\uFE0F', action: 'start_diagnosis', sub: t('roGuideStartDiagSub', 'This will clock in the assigned technician and start the repair timer') };
   else if (status === 'diagnosis' && !hasEstimates) guide = { text: t('roGuideEstimate', 'Build an estimate from inspection findings'), btn: t('roCreateEstimate', 'Create Estimate'), color: 'blue', icon: '\uD83D\uDCCB', action: 'estimate' };
   else if (status === 'diagnosis') guide = { text: t('roGuideSendEst', 'Estimate ready \u2014 email it to the customer'), btn: t('roSendEstimate', 'Send Estimate'), color: 'blue', icon: '\uD83D\uDCE7', action: 'send_estimate' };
   else if (status === 'estimate_pending') guide = { text: t('roGuideSendPending', 'Send the estimate to the customer for review'), btn: t('roSendToCustomer', 'Send to Customer'), color: 'amber', icon: '\uD83D\uDCE7', action: 'send_estimate' };
   else if (status === 'pending_approval') guide = { text: t('roGuideApproval', 'Customer is reviewing the estimate. Approve when confirmed.'), btn: t('roMarkApproved', 'Mark Approved'), color: 'amber', icon: '\u23F3', action: 'approve' };
-  else if (status === 'approved') guide = { text: t('roGuideStart', 'Customer approved! Clock in the technician and start work.'), btn: t('roStartWorkClockIn', 'Start Work & Clock In'), color: 'green', icon: '\uD83D\uDE80', action: 'start_work', sub: t('roGuideStartSub', 'This will check in the customer, clock in the tech, and start the timer') };
+  else if (status === 'approved') guide = { text: t('roGuideStart', 'Customer approved! Start the repairs.'), btn: t('roStartRepairs', 'Start Repairs'), color: 'green', icon: '\uD83D\uDE80', action: 'start_work', sub: t('roGuideStartSub', 'This will clock in the tech and start the repair timer') };
   else if (status === 'in_progress') guide = { text: t('roGuideReady', 'Work in progress. Mark ready when the job is done.'), btn: t('roMarkReady', 'Mark Ready'), color: 'teal', icon: '\uD83D\uDD27', action: 'ready', sub: t('roGuideReadySub', 'This will clock out the tech and notify the customer') };
   else if (status === 'on_hold') guide = { text: t('roGuideOnHold', 'Job is on hold. Resume when ready to continue.'), btn: t('roResumeWork', 'Resume Work'), color: 'red', icon: '\u23F8', action: 'resume' };
   else if (status === 'waiting_parts') guide = { text: t('roGuideWaitParts', 'Waiting for parts. Resume when parts arrive.'), btn: t('roPartsArrived', 'Parts Arrived \u2014 Resume'), color: 'orange', icon: '\uD83D\uDCE6', action: 'resume' };
-  else if (status === 'ready') guide = { text: t('roGuidePickup', 'Customer notified. Complete when vehicle is picked up.'), btn: t('roCompleteInvoice', 'Complete & Check Out'), color: 'green', icon: '\uD83D\uDE97', action: 'complete', sub: t('roGuidePickupSub', 'This will check out the customer, generate invoice, and close the order') };
-  else if (status === 'completed' && !hasInvoices) guide = { text: t('roGuideInvoice', 'Order complete \u2014 generate the invoice'), btn: t('roGenerateInvoice', 'Generate Invoice'), color: 'teal', icon: '\uD83D\uDCB0', action: 'invoice' };
+  else if (status === 'ready') guide = { text: t('roGuidePickup', 'Customer notified. Mark complete when vehicle is picked up.'), btn: t('roMarkComplete', 'Mark Complete'), color: 'green', icon: '\u2705', action: 'complete', sub: t('roGuideCompleteSub', 'Manager gate \u2014 no invoice generated yet') };
+  else if (status === 'completed') guide = { text: t('roGuideInvoice', 'Approved by manager \u2014 invoice the customer and check out'), btn: t('roInvoiceCheckOut', 'Invoice & Check Out'), color: 'teal', icon: '\uD83D\uDCB0', action: 'invoice', sub: t('roGuideInvoiceSub', 'This will generate the invoice, email it, and end the visit') };
 
   // Guided action handler (shared by bar button)
   function executeGuideAction(a) {
-    if (a === 'inspect') {
-      api('inspections.php', { method: 'POST', body: { repair_order_id: ro.id } }).then(function() {
-        api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'diagnosis' } }).then(function() {
-          showToast(t('roInspectionCreated', 'Inspection created \u2014 moved to Diagnosis')); viewRoDetail(ro.id);
-        });
+    if (a === 'check_in') {
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'check_in' } }).then(function() {
+        showToast(t('roCheckedIn', 'Customer checked in')); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
-    } else if (a === 'diagnosis') {
+    } else if (a === 'start_diagnosis') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'diagnosis' } }).then(function() {
-        showToast(t('roStatusAdvanced', 'Advanced to Diagnosis')); viewRoDetail(ro.id);
+        showToast(t('roDiagnosisStarted', 'Diagnosis started \u2014 tech clocked in')); viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'estimate') {
       var inspId = hasInspections ? ro.inspections[0].id : null;
@@ -516,12 +575,13 @@ function renderRoDetailModal() {
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'complete') {
       api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } }).then(function() {
-        showToast(t('roCompletedInvoiced', 'Completed \u2014 invoice generated'));
-        modal.remove(); loadRepairOrders(); if (typeof loadKanban === 'function') loadKanban();
+        showToast(t('roMarkedComplete', 'Marked complete \u2014 ready for invoicing'));
+        viewRoDetail(ro.id);
       }).catch(function(err) { showToast(err.message, true); });
     } else if (a === 'invoice') {
-      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'completed' } }).then(function() {
-        showToast(t('roCompletedInvoiced', 'Invoice generated')); viewRoDetail(ro.id);
+      api('repair-orders.php', { method: 'PUT', body: { id: ro.id, status: 'invoiced' } }).then(function() {
+        showToast(t('roInvoicedCheckOut', 'Invoice generated \u2014 customer checked out'));
+        cleanupAndClose(); loadRepairOrders(); if (typeof loadKanban === 'function') loadKanban();
       }).catch(function(err) { showToast(err.message, true); });
     }
   }
@@ -561,7 +621,7 @@ function renderRoDetailModal() {
     mainRow.appendChild(gBtn);
     guideBar.appendChild(mainRow);
     body.appendChild(guideBar);
-  } else if (status === 'invoiced' || (status === 'completed' && hasInvoices)) {
+  } else if (status === 'invoiced') {
     var doneBar = document.createElement('div');
     doneBar.className = 'bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 rounded-xl p-4 flex items-center gap-3';
     doneBar.appendChild(function() { var i = document.createElement('span'); i.className = 'text-3xl'; i.textContent = '\u2705'; return i; }());
@@ -617,7 +677,7 @@ function renderRoDetailModal() {
   advRow.appendChild(function() { var l = document.createElement('span'); l.className = 'text-[10px] text-gray-400 uppercase font-bold'; l.textContent = t('roManualStatus', 'Manual Override'); return l; }());
   var statusSelect = document.createElement('select');
   statusSelect.className = 'border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-2 py-1 text-xs';
-  ['intake','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'].forEach(function(s) {
+  ['intake','check_in','diagnosis','estimate_pending','pending_approval','approved','in_progress','on_hold','waiting_parts','ready','completed','invoiced','cancelled'].forEach(function(s) {
     var opt = document.createElement('option'); opt.value = s; opt.textContent = s.replace(/_/g, ' '); opt.className = 'text-gray-900'; if (s === ro.status) opt.selected = true; statusSelect.appendChild(opt);
   });
   advRow.appendChild(statusSelect);
@@ -991,8 +1051,6 @@ function renderRoDetailModal() {
 
   card.appendChild(body);
   modal.appendChild(card);
-
-  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
   document.body.appendChild(modal);
 }
 

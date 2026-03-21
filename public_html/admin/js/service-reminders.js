@@ -363,7 +363,7 @@
       });
       var json = await res.json();
       if (!json.success) return;
-      var customers = json.data.customers || json.data || [];
+      var customers = (json.data && json.data.customers) || json.data || [];
       if (customers.length && customers[0]) {
         selectedCustomerId = customers[0].id;
         var input = document.getElementById('reminder-customer-search');
@@ -386,7 +386,7 @@
         credentials: 'include', headers: { 'X-CSRF-Token': getCsrf() }
       });
       var json = await res.json();
-      var vehicles = json.data || [];
+      var vehicles = (json.success && json.data) ? json.data : [];
       vehicles.forEach(function(v) {
         var opt = document.createElement('option');
         opt.value = v.id;
