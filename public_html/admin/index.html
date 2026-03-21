@@ -14843,29 +14843,39 @@ document.addEventListener('click', function(e) {
 });
 
 // ===== ENHANCEMENT 1: DEEP LINKS — Hash-Based Tab Navigation =====
+var _navigatingFromPopstate = false;
 (function() {
   var hashTab = location.hash.replace('#', '');
   if (hashTab && document.getElementById('tab-' + hashTab)) {
     setTimeout(function() { switchTab(hashTab); }, 100);
   }
   window.addEventListener('popstate', function() {
-    var tab = location.hash.replace('#', '');
-    if (tab && document.getElementById('tab-' + tab)) {
-      switchTab(tab);
+    var tab = location.hash.replace('#', '') || 'overview';
+    if (document.getElementById('tab-' + tab)) {
+      _navigatingFromPopstate = true;
+      _origSwitchTab(tab);
+      // Sync mobile dropdown
+      var mobileSelect = document.getElementById('mobile-tab-select');
+      if (mobileSelect) mobileSelect.value = tab;
+      _navigatingFromPopstate = false;
     }
   });
 })();
 
-// Patch switchTab to update hash + mobile dropdown
+// Patch switchTab to update hash + mobile dropdown + browser history
 var _origSwitchTab = switchTab;
 switchTab = function(tab) {
   _origSwitchTab(tab);
-  if (location.hash !== '#' + tab) {
-    history.replaceState(null, '', '#' + tab);
+  // Only push to history when user clicks a tab (not when navigating via back/forward)
+  if (!_navigatingFromPopstate && location.hash !== '#' + tab) {
+    history.pushState({ tab: tab }, '', '#' + tab);
   }
   // Sync mobile dropdown
   var mobileSelect = document.getElementById('mobile-tab-select');
   if (mobileSelect) mobileSelect.value = tab;
+  // Update page title for clarity in browser history
+  var tabLabels = { overview: 'Dashboard', appointments: 'Appointments', customers: 'Customers', repairorders: 'Repair Orders', invoices: 'Invoices', employees: 'Employees', messages: 'Messages', blog: 'Blog', analytics: 'Analytics', sitecontent: 'Settings' };
+  document.title = (tabLabels[tab] || tab.charAt(0).toUpperCase() + tab.slice(1)) + ' — Oregon Tires Admin';
 };
 
 // ===== ENHANCEMENT 2: CSV EXPORTS =====
