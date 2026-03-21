@@ -207,22 +207,17 @@ try {
                 $fields[] = 'assigned_employee_id = ?';
                 $params[] = $empId;
 
-                // Auto-advance linked RO from intake → diagnosis
+                // Sync employee assignment to linked RO (keep RO at current status)
                 try {
                     $roCheck = $db->prepare('SELECT id, status FROM oretir_repair_orders WHERE appointment_id = ? LIMIT 1');
                     $roCheck->execute([$id]);
                     $linkedRo = $roCheck->fetch(PDO::FETCH_ASSOC);
-                    if ($linkedRo && $linkedRo['status'] === 'intake') {
-                        $db->prepare('UPDATE oretir_repair_orders SET status = ?, assigned_employee_id = ?, updated_at = NOW() WHERE id = ?')
-                           ->execute(['check_in', $empId, $linkedRo['id']]);
-                        syncAppointmentRoStatus('ro', (int) $linkedRo['id'], 'check_in', $db);
-                    } elseif ($linkedRo) {
-                        // RO exists but not in intake — still sync employee assignment
+                    if ($linkedRo) {
                         $db->prepare('UPDATE oretir_repair_orders SET assigned_employee_id = ?, updated_at = NOW() WHERE id = ?')
                            ->execute([$empId, $linkedRo['id']]);
                     }
                 } catch (\Throwable $roErr) {
-                    error_log("appointments.php: RO auto-advance failed: " . $roErr->getMessage());
+                    error_log("appointments.php: RO employee sync failed: " . $roErr->getMessage());
                 }
             } else {
                 // Employee unassigned → set status to 'new' (unless explicitly set otherwise)
