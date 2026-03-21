@@ -141,9 +141,11 @@ var OTCharts = (function() {
       var row = el('div', 'flex items-center gap-3');
       row.setAttribute('role', 'listitem');
 
-      var label = el('span', 'w-20 text-sm font-medium');
+      var labelWidth = opts.labelWidth || 'w-20';
+      var label = el('span', labelWidth + ' text-sm font-medium truncate shrink-0');
       label.style.color = t.textPrimary;
       label.textContent = d.label;
+      label.title = d.label;
       row.appendChild(label);
 
       var barBg = el('div', 'flex-1 rounded-full h-4');
@@ -154,9 +156,10 @@ var OTCharts = (function() {
       barBg.appendChild(barFill);
       row.appendChild(barBg);
 
-      var val = el('span', 'text-sm w-8 text-right');
+      var val = el('span', 'text-sm text-right');
       val.style.color = t.textSecondary;
-      val.textContent = String(d.value);
+      val.style.minWidth = '2rem';
+      val.textContent = opts.valueFormatter ? opts.valueFormatter(d.value) : String(d.value);
       row.appendChild(val);
 
       list.appendChild(row);
