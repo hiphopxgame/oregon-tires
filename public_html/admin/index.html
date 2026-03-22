@@ -4165,7 +4165,7 @@
 
 <script>
 // ===== TRANSLATION SYSTEM =====
-let currentLang = 'es'; // Admin defaults to Spanish
+let currentLang = 'en'; // Default to English; overridden by user preference on login
 
 const adminT = {
   en: {
@@ -8002,12 +8002,10 @@ function showDashboard(user) {
   // Apply user's language preference to the admin panel UI
   var langEl = document.getElementById('settings-language');
   if(user.language && langEl) langEl.value = user.language;
-  if (user.language === 'en') {
-    currentLang = 'en';
-  } else if (user.language === 'es') {
+  if (user.language === 'es') {
     currentLang = 'es';
   } else {
-    currentLang = 'es';
+    currentLang = 'en';
   }
   document.documentElement.lang = currentLang;
   document.getElementById('admin-lang-toggle').textContent = currentLang === 'en' ? 'ES' : 'EN';
