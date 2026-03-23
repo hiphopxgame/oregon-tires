@@ -601,6 +601,8 @@
       <div id="overview-quick-actions" class="mb-6"></div>
       <!-- Live Status Row -->
       <div id="overview-live-status" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
+      <!-- Recent Reviews Widget -->
+      <div id="overview-reviews-widget" class="mb-6"></div>
       <div id="overview-alerts" class="mb-8 space-y-3"></div>
       <!-- Shop Floor -->
       <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 mb-6">
@@ -1523,6 +1525,22 @@
       <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
         <div><h2 class="text-2xl font-bold" data-t="analyticsDashboard">Analytics Dashboard</h2><p class="text-green-100" data-t="analyticsSubtitle">Overview of your business metrics</p></div>
         <button onclick="loadAnalytics()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="analyticsRefresh">Refresh</button>
+      </div>
+      <!-- Website Traffic (Google Analytics) -->
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-5 mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">📊</span>
+            <div>
+              <h3 class="font-bold text-gray-900 dark:text-white" data-t="gaTrafficTitle">Website Traffic (Google Analytics)</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400" data-t="gaTrafficDesc">Real-time visitor data, page views, traffic sources, and conversion tracking across all pages</p>
+            </div>
+          </div>
+          <a href="https://analytics.google.com" target="_blank" rel="noopener" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 shrink-0">
+            <span data-t="gaOpenDashboard">Open Google Analytics</span> <span>↗</span>
+          </a>
+        </div>
+        <p class="text-xs text-blue-600 dark:text-blue-400 mt-2" data-t="gaTrackingNote">Google Analytics is tracking all pages of your website including booking form, service pages, and blog.</p>
       </div>
       <div class="flex flex-wrap gap-2 mb-6 items-center">
         <button onclick="setAnalyticsRange(7)" class="analytics-range-btn px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition" data-days="7" data-t="analyticsLast7">Last 7 Days</button>
@@ -5215,6 +5233,14 @@ const adminT = {
     lsNeedsDvi: 'Needs Inspection',
     dviNeedsInspection: 'Needs Inspection',
     clickToView: 'Click to view',
+    gaTrafficTitle: 'Website Traffic (Google Analytics)',
+    gaTrafficDesc: 'Real-time visitor data, page views, traffic sources, and conversion tracking across all pages',
+    gaOpenDashboard: 'Open Google Analytics',
+    gaTrackingNote: 'Google Analytics is tracking all pages of your website including booking form, service pages, and blog.',
+    recentReviews: 'Recent Google Reviews',
+    respondOnGoogle: 'Respond on Google',
+    respond: 'Respond',
+    viewAll: 'View All',
     statConfirmed: 'confirmed',
     statNew: 'new',
     statAssigned: 'assigned',
@@ -6852,6 +6878,14 @@ const adminT = {
     lsNeedsDvi: 'Necesita Inspección',
     dviNeedsInspection: 'Necesita Inspección',
     clickToView: 'Clic para ver',
+    gaTrafficTitle: 'Tr\u00e1fico del Sitio Web (Google Analytics)',
+    gaTrafficDesc: 'Datos de visitantes en tiempo real, vistas de p\u00e1ginas, fuentes de tr\u00e1fico y seguimiento de conversiones en todas las p\u00e1ginas',
+    gaOpenDashboard: 'Abrir Google Analytics',
+    gaTrackingNote: 'Google Analytics est\u00e1 rastreando todas las p\u00e1ginas de su sitio web incluyendo el formulario de reservas, p\u00e1ginas de servicios y blog.',
+    recentReviews: 'Rese\u00f1as Recientes de Google',
+    respondOnGoogle: 'Responder en Google',
+    respond: 'Responder',
+    viewAll: 'Ver Todas',
     statConfirmed: 'confirmadas',
     statNew: 'nuevas',
     statAssigned: 'asignadas',
@@ -8829,6 +8863,7 @@ function renderOverview() {
 
   renderQuickActions(stats);
   renderLiveStatus();
+  renderRecentReviews();
   renderOverviewAlerts(stats);
   if (typeof renderOverviewSkillGapAlerts === 'function') renderOverviewSkillGapAlerts();
   if (typeof renderTomorrowStat === 'function') renderTomorrowStat();
@@ -8961,6 +8996,86 @@ function renderDviAlert(dviRos) {
     + '<span class="text-xs text-purple-400 dark:text-purple-500">' + (T.clickToView || 'Click to view') + ' \u2192</span>'
     + '</div><div class="space-y-1.5">' + items.join('') + extra + '</div></div>';
   container.innerHTML += alertHtml;
+}
+
+function renderRecentReviews() {
+  var widget = document.getElementById('overview-reviews-widget');
+  if (!widget) return;
+  var T = adminT[currentLang];
+  var RESPOND_URL = 'https://www.google.com/maps/place/?q=place_id:ChIJLSxZDQyflVQRWXEi9LpJGxs';
+
+  fetch('/api/testimonials.php?limit=5&source=google', { credentials: 'include' })
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      var reviews = (json.data || []).slice(0, 5);
+      if (!reviews.length) { widget.textContent = ''; return; }
+
+      widget.textContent = '';
+      var card = document.createElement('div');
+      card.className = 'bg-white dark:bg-gray-800 rounded-xl shadow p-5';
+
+      var hdr = document.createElement('div');
+      hdr.className = 'flex items-center justify-between mb-3';
+      var hdrLeft = document.createElement('h3');
+      hdrLeft.className = 'text-lg font-bold text-brand dark:text-green-400 flex items-center gap-2';
+      hdrLeft.textContent = '⭐ ' + (T.recentReviews || 'Recent Google Reviews');
+      hdr.appendChild(hdrLeft);
+      var hdrRight = document.createElement('div');
+      hdrRight.className = 'flex gap-2';
+      var viewAllBtn = document.createElement('button');
+      viewAllBtn.className = 'text-xs text-blue-600 dark:text-blue-400 hover:underline';
+      viewAllBtn.textContent = T.viewAll || 'View All';
+      viewAllBtn.addEventListener('click', function() { switchTab('reviews'); });
+      hdrRight.appendChild(viewAllBtn);
+      var respondAllBtn = document.createElement('a');
+      respondAllBtn.href = RESPOND_URL;
+      respondAllBtn.target = '_blank';
+      respondAllBtn.rel = 'noopener';
+      respondAllBtn.className = 'text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded font-medium hover:bg-amber-200 dark:hover:bg-amber-900/50 transition';
+      respondAllBtn.textContent = '📍 ' + (T.respondOnGoogle || 'Respond on Google');
+      hdrRight.appendChild(respondAllBtn);
+      hdr.appendChild(hdrRight);
+      card.appendChild(hdr);
+
+      var list = document.createElement('div');
+      list.className = 'space-y-2';
+      reviews.forEach(function(r) {
+        var row = document.createElement('div');
+        row.className = 'flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border dark:border-gray-700';
+
+        var stars = document.createElement('div');
+        stars.className = 'text-amber-500 text-sm shrink-0';
+        stars.textContent = '⭐'.repeat(Math.min(r.rating || 0, 5));
+        row.appendChild(stars);
+
+        var body = document.createElement('div');
+        body.className = 'flex-1 min-w-0';
+        var author = document.createElement('div');
+        author.className = 'text-sm font-medium text-gray-900 dark:text-white';
+        author.textContent = r.customer_name || r.author_name || (T.anonymous || 'Anonymous');
+        body.appendChild(author);
+        if (r.review_text_en || r.review_text_es) {
+          var text = document.createElement('p');
+          text.className = 'text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2';
+          text.textContent = (currentLang === 'es' && r.review_text_es) ? r.review_text_es : (r.review_text_en || r.review_text_es || '');
+          body.appendChild(text);
+        }
+        row.appendChild(body);
+
+        var respondBtn = document.createElement('a');
+        respondBtn.href = RESPOND_URL;
+        respondBtn.target = '_blank';
+        respondBtn.rel = 'noopener';
+        respondBtn.className = 'shrink-0 text-xs text-blue-600 dark:text-blue-400 hover:underline';
+        respondBtn.textContent = T.respond || 'Respond';
+        row.appendChild(respondBtn);
+
+        list.appendChild(row);
+      });
+      card.appendChild(list);
+      widget.appendChild(card);
+    })
+    .catch(function() { widget.textContent = ''; });
 }
 
 function renderOverviewCharts() {
