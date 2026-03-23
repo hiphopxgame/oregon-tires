@@ -68,7 +68,6 @@
         { id: 'feat-whatsapp', text: 'WhatsApp messaging (ready to activate)', detail: 'The code is already built into your website. Once you create your WhatsApp Business account (see above), your developer just enters the credentials and it\'s live. Customers get automated messages for appointment reminders, estimates, and vehicle pickups — all FREE.', category: 'Ready' },
         { id: 'feat-google-business', text: 'Google Business Profile management', detail: 'Post shop updates, respond to reviews, and update your hours directly from your admin dashboard instead of going to Google separately.' },
         { id: 'feat-quickbooks', text: 'Accounting software sync', detail: 'Automatically send invoices and payment data to QuickBooks ($30/mo) or Wave (FREE). Saves hours of manual bookkeeping.' },
-        { id: 'feat-stripe-terminal', text: 'Card reader at the counter', detail: 'Accept credit card payments at the shop counter using a Stripe card reader. Reader costs $59 one-time. Transactions sync with your online records automatically.' },
         { id: 'feat-google-calendar', text: 'Google Calendar sync', detail: 'Appointments automatically appear on your Google Calendar. Technicians can see their schedules on their phones without logging into the admin panel.' },
         { id: 'feat-parts', text: 'Parts ordering from admin', detail: 'Look up and order parts directly from the repair order screen. No switching between websites.' },
         { id: 'feat-fleet', text: 'Fleet management portal', detail: 'A dedicated portal for commercial fleet customers (delivery companies, taxis, etc.). Volume pricing, priority scheduling, and fleet-wide reports.' },
@@ -120,11 +119,13 @@
     var progFill = document.createElement('div');
     progFill.className = 'h-full rounded-full transition-all ' + (pct === 100 ? 'bg-green-500' : 'bg-brand');
     progFill.style.width = pct + '%';
+    progFill.setAttribute('data-progress-fill', '');
     progBar.appendChild(progFill);
     progWrap.appendChild(progBar);
     var progLabel = document.createElement('span');
     progLabel.className = 'text-sm font-bold ' + (pct === 100 ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-300');
     progLabel.textContent = checkedItems + '/' + totalItems + ' (' + pct + '%)';
+    progLabel.setAttribute('data-progress-label', '');
     progWrap.appendChild(progLabel);
     header.appendChild(progWrap);
     container.appendChild(header);
@@ -178,7 +179,24 @@
         cb.className = 'mt-1 w-5 h-5 rounded text-green-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700 shrink-0 cursor-pointer';
         cb.addEventListener('change', function() {
           setChecked(item.id, cb.checked);
-          renderHandoff(container);
+          // Update row styling in place (no re-render)
+          row.className = 'flex items-start gap-3 p-3 rounded-lg ' + (cb.checked ? 'bg-green-50 dark:bg-green-900/10' : 'bg-white dark:bg-gray-800') + ' border dark:border-gray-700';
+          label.className = 'text-sm font-medium ' + (cb.checked ? 'text-green-700 dark:text-green-400 line-through' : 'text-gray-900 dark:text-white');
+          // Update section badge
+          var newChecked = getChecked();
+          var sc = section.items.filter(function(i) { return newChecked[i.id]; }).length;
+          badge.textContent = sc + '/' + sectionTotal;
+          var ad = sc === sectionTotal;
+          badge.className = 'text-xs font-medium px-2 py-1 rounded-full ' + (ad ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300');
+          icon.textContent = ad ? '\u2705' : section.icon;
+          // Update global progress bar
+          var tc = 0, cc = 0;
+          sections.forEach(function(s) { s.items.forEach(function(it) { tc++; if (newChecked[it.id]) cc++; }); });
+          var p = tc ? Math.round((cc / tc) * 100) : 0;
+          var pf = container.querySelector('[data-progress-fill]');
+          var pl = container.querySelector('[data-progress-label]');
+          if (pf) pf.style.width = p + '%';
+          if (pl) pl.textContent = cc + '/' + tc + ' (' + p + '%)';
         });
         row.appendChild(cb);
 
@@ -193,7 +211,7 @@
         labelRow.appendChild(label);
         if (item.category) {
           var catBadge = document.createElement('span');
-          var catColors = { Required: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', Recommended: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', Optional: 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' };
+          var catColors = { Required: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', Recommended: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', Ready: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', Optional: 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' };
           catBadge.className = 'text-[10px] px-1.5 py-0.5 rounded font-medium ' + (catColors[item.category] || catColors.Optional);
           catBadge.textContent = item.category;
           labelRow.appendChild(catBadge);
