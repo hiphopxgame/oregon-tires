@@ -26,99 +26,67 @@
     {
       id: 'hosting',
       icon: '🖥️',
-      title: 'Web Hosting Setup',
-      description: 'Choose and configure a standalone web host for Oregon Tires.',
+      title: 'Web Hosting',
+      description: 'Get your own hosting account. All recommended hosts include free SSL, email, backups, and one-click setup.',
       items: [
-        { id: 'host-choose', text: 'Choose a web host with SSH + cPanel support', detail: 'Recommended: A2 Hosting ($5/mo, SSH + cPanel), SiteGround ($15/mo, excellent support), or Hostinger ($3/mo, budget option). Requirements: PHP 8.1+, MySQL 8.0+, SSH access, Composer, free SSL.' },
-        { id: 'host-account', text: 'Create hosting account and cPanel login', detail: 'Sign up, verify email, access cPanel dashboard. Note the server IP address for DNS.' },
-        { id: 'host-database', text: 'Create MySQL database + user', detail: 'In cPanel → MySQL Databases: create database (e.g., oregontires_db), create user, grant all privileges. Save credentials for .env file.' },
-        { id: 'host-ssh', text: 'Enable SSH access and test connection', detail: 'In cPanel → SSH Access: generate key pair or enable password auth. Test: ssh username@server-ip' },
-        { id: 'host-php', text: 'Verify PHP 8.1+ and required extensions', detail: 'In cPanel → PHP Selector: set to PHP 8.1 or 8.2. Required extensions: pdo_mysql, mbstring, openssl, curl, json, fileinfo.' },
-        { id: 'host-upload', text: 'Upload Oregon Tires files to server', detail: 'Use SCP or cPanel File Manager. Upload public_html contents to web root. Upload .env file ABOVE web root for security.' },
-        { id: 'host-composer', text: 'Run composer install on server', detail: 'SSH into server: cd /path/to/site && composer install --no-dev' },
-        { id: 'host-migrations', text: 'Run all SQL migrations', detail: 'Import all files from sql/ directory in order. Or use: cat sql/migrate-*.sql | mysql -u user -p database' },
-        { id: 'host-ssl', text: 'Enable SSL certificate (HTTPS)', detail: 'In cPanel → SSL/TLS or Let\'s Encrypt: install free SSL for oregon.tires. Verify https:// works.' },
-        { id: 'host-cron', text: 'Configure cron jobs (7 jobs)', detail: '0 18 * * * php cli/send-reminders.php\n0 10 * * * php cli/send-review-requests.php\n0 6 * * * php cli/fetch-google-reviews.php\n*/5 * * * * php cli/send-push-notifications.php\n0 9 * * 1 php cli/send-service-reminders.php\n0 7 * * 1 php cli/sync-google-business.php\n*/2 * * * * php cli/fetch-inbound-emails.php' },
+        { id: 'host-choose', text: 'Sign up for a web host', detail: 'Pick one of these (all include SSL, email, backups, cPanel):\n\n• SiteGround ($15/mo) — Best support, fastest, auto-updates. Recommended.\n• A2 Hosting ($5/mo) — Great value, reliable, developer-friendly.\n• Hostinger ($3/mo) — Budget option, works well for small business.\n\nAll three include everything you need — no extra purchases required.' },
+        { id: 'host-share', text: 'Share your hosting login with your developer', detail: 'After signing up, share your cPanel login URL, username, and password with your developer so they can set up the site. They will handle the database, file upload, and configuration.' },
+        { id: 'host-email', text: 'Set up your business email', detail: 'In your hosting cPanel, create email accounts like contact@oregon.tires and info@oregon.tires. Your hosting includes free email. Share the email credentials with your developer.' },
       ]
     },
     {
       id: 'domain',
       icon: '🌐',
-      title: 'Domain Transfer',
-      description: 'Transfer oregon.tires domain to client ownership.',
+      title: 'Domain Ownership',
+      description: 'Transfer the oregon.tires domain into your name.',
       items: [
-        { id: 'dom-unlock', text: 'Unlock domain at current registrar', detail: 'Current registrar: check Domain_Registry_2026.xlsx. Remove transfer lock, obtain EPP/auth code.' },
-        { id: 'dom-transfer', text: 'Initiate transfer to client\'s registrar', detail: 'Client creates account at Namecheap, GoDaddy, or Cloudflare Registrar. Start transfer with EPP code. Approve transfer emails.' },
-        { id: 'dom-dns', text: 'Update DNS to point to new server', detail: 'A record → new server IP. If using Cloudflare: add site, update nameservers at registrar. Wait for propagation (up to 48 hours).' },
-        { id: 'dom-verify', text: 'Verify site loads on new server', detail: 'Test https://oregon.tires in browser. Check SSL, all pages, API endpoints.' },
+        { id: 'dom-registrar', text: 'Create a domain registrar account', detail: 'Sign up at Namecheap.com or Cloudflare.com (both are reputable and affordable). This is where your domain will live.' },
+        { id: 'dom-transfer', text: 'Receive domain transfer from developer', detail: 'Your developer will unlock the domain and send you a transfer code. Enter it in your registrar to complete the transfer. You\'ll get a confirmation email — click to approve.' },
+        { id: 'dom-verify', text: 'Verify the website loads', detail: 'After transfer completes (can take up to 48 hours), visit https://oregon.tires to confirm everything works. Check that the lock icon shows in the browser (SSL).' },
       ]
     },
     {
-      id: 'credentials',
+      id: 'accounts',
       icon: '🔑',
-      title: 'API Credentials (Client-Owned)',
-      description: 'Replace all developer credentials with client\'s own accounts.',
+      title: 'Business Accounts to Create',
+      description: 'Set up your own accounts for the services your website uses. Share credentials with your developer to connect them.',
       items: [
-        { id: 'cred-smtp', text: 'SMTP Email (sending)', detail: 'Get from hosting provider or set up Google Workspace ($6/mo). Env vars: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM, SMTP_FROM_NAME, CONTACT_EMAIL. Test: php cli/test-smtp-debug.php', category: 'Required' },
-        { id: 'cred-imap', text: 'IMAP Email (receiving)', detail: 'Same host as SMTP usually. Env vars: IMAP_HOST, IMAP_PORT, IMAP_USER, IMAP_PASSWORD, IMAP_ENCRYPTION. Enables customer email threading in conversations.', category: 'Required' },
-        { id: 'cred-google-oauth', text: 'Google OAuth (Login with Google)', detail: 'Go to console.cloud.google.com → Create project → APIs & Services → Credentials → Create OAuth 2.0 Client ID (Web application). Add redirect URI: https://oregon.tires/api/auth/google-callback.php. Env vars: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI', category: 'Required' },
-        { id: 'cred-google-places', text: 'Google Places API (reviews + map)', detail: 'Same Google Cloud project → Enable "Places API" and "Places API (New)". Create API key, restrict to oregon.tires domain. Env var: GOOGLE_PLACES_API_KEY. Cost: free tier covers normal usage.', category: 'Required' },
-        { id: 'cred-whatsapp', text: 'WhatsApp Business API (FREE messaging)', detail: 'Go to business.facebook.com → create Meta Business account. Go to developers.facebook.com → create app → add WhatsApp product. Register business phone number. Get WHATSAPP_PHONE_ID and WHATSAPP_ACCESS_TOKEN. Submit message templates for approval. FREE: 1,000 service conversations/month.', category: 'Recommended' },
-        { id: 'cred-twilio', text: 'Twilio SMS (optional fallback)', detail: 'Go to twilio.com → sign up → get Account SID, Auth Token, buy phone number (~$1/mo + $0.01/SMS). Env vars: TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM. Optional: WhatsApp is the free primary channel.', category: 'Optional' },
-        { id: 'cred-paypal', text: 'PayPal Business (payments)', detail: 'Go to developer.paypal.com → My Apps & Credentials → Create App. Get Client ID and Secret. Env vars: PAYPAL_CLIENT_ID, PAYPAL_SECRET, PAYPAL_MODE=live', category: 'Required' },
-        { id: 'cred-stripe', text: 'Stripe (alternative payments)', detail: 'Go to dashboard.stripe.com → Developers → API keys. Get Secret key. Set up webhook endpoint: https://oregon.tires/api/commerce/webhook.php. Env vars: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET', category: 'Optional' },
-        { id: 'cred-sentry', text: 'Sentry (error tracking)', detail: 'Go to sentry.io → create project (PHP + JavaScript). Get DSN for each. Env vars: SENTRY_DSN, SENTRY_DSN_JS. FREE tier: 5,000 errors/month.', category: 'Optional' },
-        { id: 'cred-gsc', text: 'Google Search Console', detail: 'Go to search.google.com/search-console → Add property → Verify with HTML meta tag. Copy verification code to GOOGLE_SITE_VERIFICATION env var.', category: 'Recommended' },
-        { id: 'cred-bing', text: 'Bing Webmaster Tools', detail: 'Go to bing.com/webmasters → Add site → Verify. Copy code to BING_SITE_VERIFICATION env var.', category: 'Recommended' },
-        { id: 'cred-indexnow', text: 'IndexNow Key', detail: 'Generate: php -r "echo bin2hex(random_bytes(16));" — save as INDEXNOW_KEY and create file at /public_html/{key}.txt containing the key.', category: 'Optional' },
-        { id: 'cred-vapid', text: 'VAPID Keys (push notifications)', detail: 'Run on server: php cli/generate-vapid-keys.php. Keys auto-saved to database. Set VAPID_SUBJECT=mailto:contact@oregon.tires in .env.', category: 'Recommended' },
-      ]
-    },
-    {
-      id: 'independence',
-      icon: '🔗',
-      title: 'Network Independence',
-      description: 'Decouple from the 1vsM developer network (shared kits).',
-      items: [
-        { id: 'ind-member-kit', text: 'Replace member-kit with standalone auth', detail: 'Build local members table + auth class. Member-kit handles login/register/OAuth/password-reset. Estimated effort: 2-3 days. Currently 24 API endpoints wrap member-kit.' },
-        { id: 'ind-form-kit', text: 'Replace form-kit with local contact handler', detail: 'Oregon Tires already has oretir_contact_messages table. Replace 4 API wrappers in api/form/ with direct DB queries. Estimated effort: 4 hours.' },
-        { id: 'ind-commerce-kit', text: 'Replace commerce-kit with direct PayPal/Stripe', detail: 'Replace 6 API wrappers in api/commerce/ with direct PayPal REST API calls. Estimated effort: 1-2 days.' },
-        { id: 'ind-engine-kit', text: 'Remove engine-kit (optional error tracking)', detail: 'Delete engine-kit references in bootstrap.php. Errors fall back to error_log automatically. Estimated effort: 30 minutes.' },
-        { id: 'ind-cors', text: 'Remove HipHop.World CORS and cross-DB references', detail: 'Remove CORS headers for hiphop.world in bootstrap.php. Remove HW_DB_NAME cross-database queries in member-kit-init.php. Remove SYNC_API_KEY.' },
-        { id: 'ind-deploy', text: 'Update deploy.sh for new server', detail: 'Change SSH_HOST and REMOTE_ROOT in deploy.sh to point to client\'s server. Or configure via DEPLOY_SSH_HOST and DEPLOY_REMOTE_PATH env vars.' },
+        { id: 'acct-google', text: 'Google Cloud account (reviews + customer login)', detail: 'Go to console.cloud.google.com and sign in with your business Gmail. This one account powers two features:\n\n1. "Login with Google" for your customers\n2. Google Reviews displayed on your website\n\nYour developer will set up the project — just create the account and share access.', category: 'Required' },
+        { id: 'acct-whatsapp', text: 'WhatsApp Business (FREE customer messaging)', detail: 'Go to business.facebook.com and create a Meta Business account using your Facebook. Then go to developers.facebook.com and add the WhatsApp product.\n\nThis gives you FREE automated messages to customers — appointment reminders, estimate approvals, vehicle ready notifications.\n\nFREE: 1,000 messages/month (more than enough for most shops).', category: 'Required' },
+        { id: 'acct-paypal', text: 'PayPal Business (accept payments)', detail: 'Go to paypal.com/business and create a PayPal Business account using your business email. This lets customers pay for care plans and services online.\n\nYour developer will connect it to the website.', category: 'Required' },
+        { id: 'acct-gsc', text: 'Google Search Console (SEO monitoring)', detail: 'Go to search.google.com/search-console and sign in with your business Gmail. Click "Add property" and add oregon.tires. This lets you see how your website appears in Google search results.\n\nFREE — highly recommended for any business website.', category: 'Recommended' },
+        { id: 'acct-stripe', text: 'Stripe (in-person + online payments)', detail: 'Go to stripe.com and create an account. Stripe lets you accept credit cards online and in-person at the shop counter with a card reader ($59 one-time).\n\nProcessing: 2.7% + 5¢ per in-person swipe, 2.9% + 30¢ online.', category: 'Optional' },
+        { id: 'acct-sentry', text: 'Sentry (error monitoring)', detail: 'Go to sentry.io and create a free account. This monitors your website for errors and alerts you when something breaks.\n\nFREE: 5,000 error reports/month (more than enough).', category: 'Optional' },
       ]
     },
     {
       id: 'features',
       icon: '🚀',
-      title: 'New Features to Integrate',
-      description: 'Recommended additions to enhance the platform.',
+      title: 'Features to Add',
+      description: 'Recommended upgrades to grow your business. Discuss with your developer which to prioritize.',
       items: [
-        { id: 'feat-whatsapp', text: 'WhatsApp Business API (FREE messaging)', detail: 'Already integrated in code. Just add credentials. Replaces paid Twilio SMS. Fallback chain: WhatsApp → SMS → Email.' },
-        { id: 'feat-google-business', text: 'Google Business Profile API', detail: 'Auto-post updates, respond to reviews from admin panel. Requires Google Business Profile API access.' },
-        { id: 'feat-quickbooks', text: 'QuickBooks / Wave (accounting sync)', detail: 'Sync invoices and payments to accounting software. Wave is FREE. QuickBooks $30/mo.' },
-        { id: 'feat-stripe-terminal', text: 'Stripe Terminal (in-person payments)', detail: 'Accept card payments at the counter. Reader: $59 one-time. Processing: 2.7% + 5¢.' },
-        { id: 'feat-google-calendar', text: 'Google Calendar API (appointment sync)', detail: 'Two-way sync appointments with Google Calendar. Techs see schedule on their phones.' },
-        { id: 'feat-parts', text: 'Parts Ordering API (Nexpart / WHI)', detail: 'Look up and order parts directly from the RO detail screen. Nexpart or WHI Solutions integration.' },
-        { id: 'feat-fleet', text: 'Fleet Management Portal', detail: 'Dedicated portal for commercial fleet clients. Volume pricing, priority scheduling, fleet-wide reports.' },
-        { id: 'feat-nps', text: 'Customer Satisfaction Surveys (NPS)', detail: 'Auto-send post-service survey. Track Net Promoter Score over time. Identify at-risk customers.' },
-        { id: 'feat-ai-chat', text: 'AI Chat Assistant (customer-facing)', detail: 'Bilingual chatbot on website for appointment booking, FAQs, and service info. Use Claude API or GPT.' },
+        { id: 'feat-whatsapp', text: 'WhatsApp messaging (ready to activate)', detail: 'The code is already built into your website. Once you create your WhatsApp Business account (see above), your developer just enters the credentials and it\'s live. Customers get automated messages for appointment reminders, estimates, and vehicle pickups — all FREE.', category: 'Ready' },
+        { id: 'feat-google-business', text: 'Google Business Profile management', detail: 'Post shop updates, respond to reviews, and update your hours directly from your admin dashboard instead of going to Google separately.' },
+        { id: 'feat-quickbooks', text: 'Accounting software sync', detail: 'Automatically send invoices and payment data to QuickBooks ($30/mo) or Wave (FREE). Saves hours of manual bookkeeping.' },
+        { id: 'feat-stripe-terminal', text: 'Card reader at the counter', detail: 'Accept credit card payments at the shop counter using a Stripe card reader. Reader costs $59 one-time. Transactions sync with your online records automatically.' },
+        { id: 'feat-google-calendar', text: 'Google Calendar sync', detail: 'Appointments automatically appear on your Google Calendar. Technicians can see their schedules on their phones without logging into the admin panel.' },
+        { id: 'feat-parts', text: 'Parts ordering from admin', detail: 'Look up and order parts directly from the repair order screen. No switching between websites.' },
+        { id: 'feat-fleet', text: 'Fleet management portal', detail: 'A dedicated portal for commercial fleet customers (delivery companies, taxis, etc.). Volume pricing, priority scheduling, and fleet-wide reports.' },
+        { id: 'feat-nps', text: 'Customer satisfaction surveys', detail: 'Automatically send a short survey after each service. Track your customer satisfaction score over time and catch unhappy customers before they leave a bad review.' },
+        { id: 'feat-ai-chat', text: 'AI chat assistant on website', detail: 'A bilingual chatbot that helps customers book appointments, answers common questions, and provides service info — 24/7, even when the shop is closed.' },
       ]
     },
     {
       id: 'maintenance',
       icon: '🛠️',
-      title: 'Monthly Maintenance',
-      description: 'Ongoing tasks to keep the platform healthy.',
+      title: 'Ongoing Business Tasks',
+      description: 'Keep your website and online presence healthy with these regular tasks.',
       items: [
-        { id: 'maint-ssl', text: 'SSL certificate auto-renewal', detail: 'If using Let\'s Encrypt, renewals are automatic. Verify monthly that https:// works.' },
-        { id: 'maint-backup', text: 'Database backups (daily)', detail: 'Set up automated daily MySQL backups via cPanel → Backup Wizard. Keep 30 days of backups.' },
-        { id: 'maint-errors', text: 'Review error logs weekly', detail: 'Check cPanel → Error Log or Sentry dashboard. Fix recurring errors promptly.' },
-        { id: 'maint-composer', text: 'Update PHP dependencies monthly', detail: 'SSH in, run: composer update --no-dev. Test site after updates.' },
-        { id: 'maint-analytics', text: 'Review Google Analytics monthly', detail: 'Check traffic, top pages, conversion rates. Adjust marketing accordingly.' },
-        { id: 'maint-reviews', text: 'Respond to Google Reviews', detail: 'Check reviews weekly. Respond professionally to all reviews (positive and negative).' },
-        { id: 'maint-content', text: 'Update blog and promotions', detail: 'Post 2-4 blog articles per month. Update seasonal promotions. Keep FAQ current.' },
-        { id: 'maint-sw', text: 'Bump service worker cache version', detail: 'After any file changes deployed, increment CACHE_VERSION in sw.js to invalidate old caches.' },
+        { id: 'maint-reviews', text: 'Respond to Google Reviews weekly', detail: 'Check your Google Business reviews every week. Respond to ALL reviews — thank positive reviewers and professionally address any complaints. This directly impacts whether new customers choose you.' },
+        { id: 'maint-content', text: 'Update blog and promotions monthly', detail: 'Post 2-4 blog articles per month about tire care, seasonal tips, or shop news. Update promotions for seasonal specials. Fresh content helps your Google ranking.' },
+        { id: 'maint-analytics', text: 'Review your website traffic monthly', detail: 'Check your admin Analytics tab to see how many visitors you\'re getting, which services are most popular, and where customers come from. Use this to focus your marketing.' },
+        { id: 'maint-backup', text: 'Verify backups are running', detail: 'Your hosting provider handles daily backups automatically. Once a month, log into cPanel and confirm backups are working. This protects your customer data.' },
+        { id: 'maint-ssl', text: 'Verify SSL certificate is active', detail: 'Visit your website and check that the lock icon appears in the browser address bar. SSL is auto-renewed by your host, but verify monthly.' },
       ]
     },
   ];
@@ -137,11 +105,11 @@
     header.className = 'mb-6';
     var h2 = document.createElement('h2');
     h2.className = 'text-2xl font-bold text-gray-900 dark:text-white mb-2';
-    h2.textContent = 'Oregon Tires — Independence & Handoff Guide';
+    h2.textContent = 'Oregon Tires — Setup & Ownership Guide';
     header.appendChild(h2);
     var desc = document.createElement('p');
     desc.className = 'text-sm text-gray-500 dark:text-gray-400 mb-4';
-    desc.textContent = 'Complete checklist for transferring the platform to client-owned infrastructure. Progress is saved locally in your browser.';
+    desc.textContent = 'Everything you need to fully own and operate your Oregon Tires website. Check off each item as you complete it — your progress is saved automatically.';
     header.appendChild(desc);
 
     // Progress bar
