@@ -1550,11 +1550,17 @@
         <div class="flex flex-wrap gap-2 p-4 border-b dark:border-gray-700">
           <button onclick="switchDocsView('platform')" id="docs-view-platform" class="px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">🏠 <span data-t="docsYourPlatform">Your Platform</span></button>
           <button onclick="switchDocsView('manual')" id="docs-view-manual" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">📋 <span data-t="docsManual">Manual</span></button>
+          <button onclick="switchDocsView('handoff')" id="docs-view-handoff" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">🚀 <span data-t="docsHandoff">Independence Guide</span></button>
         </div>
 
         <!-- Platform Sub-Tab -->
         <div id="docs-subtab-platform" class="p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
           <div id="platform-content"></div>
+        </div>
+
+        <!-- Handoff Sub-Tab -->
+        <div id="docs-subtab-handoff" class="hidden p-6 max-h-[75vh] overflow-y-auto scrollbar-thin">
+          <div id="handoff-content"></div>
         </div>
 
         <!-- Manual Sub-Tab -->
@@ -4416,6 +4422,7 @@ const adminT = {
     docsYourPlatform: 'Your Platform',
     docsComingSoon: 'Coming Soon',
     docsManual: 'Manual',
+    docsHandoff: 'Independence Guide',
     platformAlaCarteTitle: 'Available Upgrades',
     platformAlaCarteDesc: 'Additional features ready to be built for your platform.',
     comingSoonTitle: "What's Next for Oregon Tires",
@@ -6054,6 +6061,7 @@ const adminT = {
     docsYourPlatform: 'Su Plataforma',
     docsComingSoon: 'Pr\u00F3ximamente',
     docsManual: 'Manual',
+    docsHandoff: 'Gu\u00eda de Independencia',
     platformAlaCarteTitle: 'Mejoras Disponibles',
     platformAlaCarteDesc: 'Funciones adicionales listas para construir en su plataforma.',
     comingSoonTitle: 'Lo Que Viene para Oregon Tires',
@@ -13102,15 +13110,17 @@ function switchApptView(view) {
 
 // Sub-tab switching for Documentation
 function switchDocsView(view) {
-  var tabs = ['platform','manual'];
+  var tabs = ['platform','manual','handoff'];
   var active = 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white';
   var inactive = 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
   tabs.forEach(function(t) {
-    document.getElementById('docs-subtab-'+t).classList.toggle('hidden', view !== t);
+    var sub = document.getElementById('docs-subtab-'+t);
+    if (sub) sub.classList.toggle('hidden', view !== t);
     var btn = document.getElementById('docs-view-'+t);
-    btn.className = view === t ? active : inactive;
+    if (btn) btn.className = view === t ? active : inactive;
   });
   if (view === 'platform' && typeof renderPlatformTab === 'function') renderPlatformTab();
+  if (view === 'handoff' && typeof renderClientHandoff === 'function') renderClientHandoff(document.getElementById('handoff-content'));
 }
 
 
@@ -15303,6 +15313,7 @@ loadMessages = async function() {
 <script src="/admin/js/tech-picker.js"></script>
 <script src="/admin/js/admin-help.js"></script>
 <script src="/admin/js/market-intel.js" defer></script>
+<script src="/admin/js/client-handoff.js" defer></script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';
   // Override global showToast — handles legacy (msg, isError: bool) and new (msg, type: string)

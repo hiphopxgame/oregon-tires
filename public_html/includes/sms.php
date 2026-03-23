@@ -1,12 +1,194 @@
 <?php
 /**
- * Oregon Tires — SMS / WhatsApp Service (Twilio)
+ * Oregon Tires — Messaging Service (WhatsApp + SMS)
  *
- * Graceful fallback: SMS failure never blocks email or workflow.
- * Requires env vars: TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM
+ * Fallback chain: WhatsApp Cloud API → Twilio SMS → silent skip
+ * WhatsApp env vars: WHATSAPP_PHONE_ID, WHATSAPP_ACCESS_TOKEN
+ * Twilio env vars:   TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM
+ *
+ * Graceful fallback: messaging failure never blocks email or workflow.
  */
 
 declare(strict_types=1);
+
+// ─── WhatsApp Cloud API ──────────────────────────────────────────────────────
+
+/**
+ * Check if WhatsApp Business API is configured.
+ */
+function isWhatsAppConfigured(): bool
+{
+    return !empty($_ENV['WHATSAPP_PHONE_ID'])
+        && !empty($_ENV['WHATSAPP_ACCESS_TOKEN']);
+}
+
+/**
+ * Send a WhatsApp template message via Meta Cloud API.
+ * Templates must be pre-approved in Meta Business dashboard.
+ *
+ * @param string $to             Phone (E.164 format)
+ * @param string $templateName   Approved template name (e.g. 'vehicle_ready')
+ * @param array  $params         Body parameters in order [{type:'text',text:'value'}, ...]
+ * @param string $language       Template language code ('en_US' or 'es_MX')
+ * @return array{success: bool, message_id?: string, error?: string}
+ */
+function sendWhatsAppTemplate(string $to, string $templateName, array $params = [], string $language = 'en_US'): array
+{
+    if (!isWhatsAppConfigured()) {
+        return ['success' => false, 'error' => 'WhatsApp not configured'];
+    }
+
+    $to = normalizePhoneForSms($to);
+    if (empty($to)) {
+        return ['success' => false, 'error' => 'Invalid phone number'];
+    }
+
+    $phoneId = $_ENV['WHATSAPP_PHONE_ID'];
+    $token   = $_ENV['WHATSAPP_ACCESS_TOKEN'];
+
+    $payload = [
+        'messaging_product' => 'whatsapp',
+        'to'                => $to,
+        'type'              => 'template',
+        'template'          => [
+            'name'     => $templateName,
+            'language' => ['code' => $language],
+        ],
+    ];
+
+    if (!empty($params)) {
+        $payload['template']['components'] = [
+            [
+                'type'       => 'body',
+                'parameters' => $params,
+            ],
+        ];
+    }
+
+    return _whatsappApiCall($phoneId, $token, $payload);
+}
+
+/**
+ * Send a free-form WhatsApp text message.
+ * Only works within 24-hour customer service window (after customer messages first).
+ *
+ * @param string $to   Phone (E.164 format)
+ * @param string $body Message text
+ * @return array{success: bool, message_id?: string, error?: string}
+ */
+function sendWhatsAppText(string $to, string $body): array
+{
+    if (!isWhatsAppConfigured()) {
+        return ['success' => false, 'error' => 'WhatsApp not configured'];
+    }
+
+    $to = normalizePhoneForSms($to);
+    if (empty($to)) {
+        return ['success' => false, 'error' => 'Invalid phone number'];
+    }
+
+    $phoneId = $_ENV['WHATSAPP_PHONE_ID'];
+    $token   = $_ENV['WHATSAPP_ACCESS_TOKEN'];
+
+    $payload = [
+        'messaging_product' => 'whatsapp',
+        'to'                => $to,
+        'type'              => 'text',
+        'text'              => ['body' => mb_substr($body, 0, 4096, 'UTF-8')],
+    ];
+
+    return _whatsappApiCall($phoneId, $token, $payload);
+}
+
+/**
+ * Internal: Call WhatsApp Cloud API.
+ */
+function _whatsappApiCall(string $phoneId, string $token, array $payload): array
+{
+    try {
+        $url = "https://graph.facebook.com/v21.0/{$phoneId}/messages";
+
+        $ctx = stream_context_create([
+            'http' => [
+                'method'  => 'POST',
+                'header'  => [
+                    'Content-Type: application/json',
+                    'Authorization: Bearer ' . $token,
+                ],
+                'content' => json_encode($payload),
+                'timeout' => 15,
+            ],
+        ]);
+
+        $response = @file_get_contents($url, false, $ctx);
+
+        if ($response === false) {
+            error_log('Oregon Tires WhatsApp: Failed to reach Meta API');
+            return ['success' => false, 'error' => 'Failed to reach WhatsApp API'];
+        }
+
+        $json = json_decode($response, true);
+
+        if (!empty($json['messages'][0]['id'])) {
+            $msgId = $json['messages'][0]['id'];
+            error_log("Oregon Tires WhatsApp: Sent to {$payload['to']} (ID: {$msgId})");
+            return ['success' => true, 'message_id' => $msgId];
+        }
+
+        $errorMsg = $json['error']['message'] ?? 'Unknown WhatsApp error';
+        error_log("Oregon Tires WhatsApp error: {$errorMsg}");
+        return ['success' => false, 'error' => $errorMsg];
+
+    } catch (\Throwable $e) {
+        error_log('Oregon Tires WhatsApp exception: ' . $e->getMessage());
+        return ['success' => false, 'error' => 'WhatsApp service error'];
+    }
+}
+
+/**
+ * Send a message via the best available channel.
+ * Fallback chain: WhatsApp → SMS (Twilio) → skip
+ *
+ * @param string $to       Phone number
+ * @param string $body     Message body (for SMS and WhatsApp text)
+ * @param string $template WhatsApp template name (optional; if set, tries template first)
+ * @param array  $tplParams Template parameters
+ * @param string $language 'english' or 'spanish'
+ * @return array{success: bool, channel?: string, error?: string}
+ */
+function sendMessage(string $to, string $body, string $template = '', array $tplParams = [], string $language = 'english'): array
+{
+    $waLang = ($language === 'spanish') ? 'es_MX' : 'en_US';
+
+    // Try WhatsApp template first
+    if ($template && isWhatsAppConfigured()) {
+        $result = sendWhatsAppTemplate($to, $template, $tplParams, $waLang);
+        if ($result['success']) {
+            return ['success' => true, 'channel' => 'whatsapp', 'message_id' => $result['message_id'] ?? ''];
+        }
+        error_log("Oregon Tires: WhatsApp template '{$template}' failed, falling back to SMS");
+    }
+
+    // Try WhatsApp free-form text (within 24hr window)
+    if (isWhatsAppConfigured()) {
+        $result = sendWhatsAppText($to, $body);
+        if ($result['success']) {
+            return ['success' => true, 'channel' => 'whatsapp', 'message_id' => $result['message_id'] ?? ''];
+        }
+    }
+
+    // Fall back to SMS
+    if (isSmsConfigured()) {
+        $result = sendSms($to, $body);
+        if ($result['success']) {
+            return ['success' => true, 'channel' => 'sms', 'sid' => $result['sid'] ?? ''];
+        }
+    }
+
+    return ['success' => false, 'error' => 'No messaging channel available'];
+}
+
+// ─── Twilio SMS ──────────────────────────────────────────────────────────────
 
 /**
  * Check if SMS is configured (Twilio env vars present).
@@ -123,7 +305,10 @@ function sendInspectionSms(string $phone, string $name, string $viewUrl, string 
         $body = "Hi {$name}, your vehicle inspection report is ready. View results here: {$viewUrl} — Oregon Tires Auto Care";
     }
 
-    return sendSms($phone, $body);
+    return sendMessage($phone, $body, 'inspection_ready', [
+        ['type' => 'text', 'text' => $name],
+        ['type' => 'text', 'text' => $viewUrl],
+    ], $language);
 }
 
 /**
@@ -137,7 +322,11 @@ function sendEstimateSms(string $phone, string $name, string $total, string $app
         $body = "Hi {$name}, your estimate of {$total} is ready for review. Approve here: {$approveUrl} — Oregon Tires";
     }
 
-    return sendSms($phone, $body);
+    return sendMessage($phone, $body, 'estimate_ready', [
+        ['type' => 'text', 'text' => $name],
+        ['type' => 'text', 'text' => $total],
+        ['type' => 'text', 'text' => $approveUrl],
+    ], $language);
 }
 
 /**
@@ -153,7 +342,10 @@ function sendReadySms(string $phone, string $name, string $language = 'english')
         $body = "Hi {$name}! Your vehicle is ready for pickup at Oregon Tires Auto Care. Directions: {$mapsUrl}";
     }
 
-    return sendSms($phone, $body);
+    return sendMessage($phone, $body, 'vehicle_ready', [
+        ['type' => 'text', 'text' => $name],
+        ['type' => 'text', 'text' => $mapsUrl],
+    ], $language);
 }
 
 /**
@@ -169,7 +361,10 @@ function sendJobFinishedSms(string $phone, string $customerName, string $roNumbe
         $body = "Hi {$customerName}! Your vehicle (RO: {$roNumber}) is ready for pickup at Oregon Tires Auto Care. Directions: {$mapsUrl}";
     }
 
-    return sendSms($phone, $body);
+    return sendMessage($phone, $body, 'vehicle_ready', [
+        ['type' => 'text', 'text' => $customerName],
+        ['type' => 'text', 'text' => $mapsUrl],
+    ], $language);
 }
 
 /**
@@ -236,7 +431,10 @@ function sendRoStatusSms(PDO $db, array $ro, string $event): void
         if (!isset($messages[$event])) return;
         $body = $isEs ? $messages[$event]['es'] : $messages[$event]['en'];
 
-        sendSms($cust['phone'], $body);
+        sendMessage($cust['phone'], $body, 'ro_status_update', [
+            ['type' => 'text', 'text' => $name],
+            ['type' => 'text', 'text' => $vehicleLabel],
+        ], $lang);
     } catch (\Throwable $e) {
         error_log("sendRoStatusSms error (RO #{$ro['id']}, event={$event}): " . $e->getMessage());
     }
@@ -253,5 +451,20 @@ function sendApprovalConfirmationSms(string $phone, string $name, string $langua
         $body = "Thank you {$name}, your estimate has been approved. Our team will begin work shortly. — Oregon Tires Auto Care";
     }
 
-    return sendSms($phone, $body);
+    return sendMessage($phone, $body, '', [], $language);
+}
+
+/**
+ * Check messaging status: which channels are configured.
+ */
+function getMessagingStatus(): array
+{
+    return [
+        'whatsapp' => isWhatsAppConfigured(),
+        'sms'      => isSmsConfigured(),
+        'channels' => array_filter([
+            isWhatsAppConfigured() ? 'WhatsApp' : null,
+            isSmsConfigured() ? 'SMS (Twilio)' : null,
+        ]),
+    ];
 }
