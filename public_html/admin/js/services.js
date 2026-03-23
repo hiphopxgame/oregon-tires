@@ -69,7 +69,7 @@
       // Icon cell
       var tdIcon = document.createElement('td');
       tdIcon.className = 'px-3 py-3 text-center text-xl';
-      tdIcon.innerHTML = svc.icon || '';
+      tdIcon.textContent = svc.icon || '';
       tr.appendChild(tdIcon);
 
       // Name cell

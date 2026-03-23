@@ -452,9 +452,19 @@ function renderRoDetailModal() {
 
   var printBtn = document.createElement('button');
   printBtn.className = 'text-white/80 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition flex items-center gap-1.5';
-  printBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>';
-  var printLabel = document.createTextNode(t('roPrintWorkOrder', 'Print'));
-  printBtn.appendChild(printLabel);
+  var printSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  printSvg.setAttribute('class', 'w-4 h-4');
+  printSvg.setAttribute('fill', 'none');
+  printSvg.setAttribute('stroke', 'currentColor');
+  printSvg.setAttribute('viewBox', '0 0 24 24');
+  var printPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  printPath.setAttribute('stroke-linecap', 'round');
+  printPath.setAttribute('stroke-linejoin', 'round');
+  printPath.setAttribute('stroke-width', '2');
+  printPath.setAttribute('d', 'M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z');
+  printSvg.appendChild(printPath);
+  printBtn.appendChild(printSvg);
+  printBtn.appendChild(document.createTextNode(t('roPrintWorkOrder', 'Print')));
   printBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     window.open('/work-order?ro_id=' + ro.id, '_blank');
