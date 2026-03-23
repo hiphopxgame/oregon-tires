@@ -133,6 +133,7 @@ $memberDashboardConfig = [
     'nav_include'    => __DIR__ . '/templates/header.php',
     'footer_include' => __DIR__ . '/templates/footer.php',
     'universal_tab_labels' => [
+        'account'  => $lang === 'es' ? 'Mi Cuenta' : 'Account Settings',
         'profile'  => memberT('profile', $lang),
         'settings' => memberT('settings', $lang),
         'activity' => memberT('activity', $lang),
