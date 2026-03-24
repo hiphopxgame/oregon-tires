@@ -639,6 +639,33 @@ var HELP = {
         'Esta sección es de referencia — documenta cómo se construyó la plataforma y cómo funcionan las funciones'
       ]
     }
+  },
+
+  health: {
+    en: {
+      title: 'System Health',
+      desc: 'Monitor uptime, SSL certificates, backups, and automated feature tests.',
+      tips: [
+        'Uptime is checked every 5 minutes — the chart shows daily availability percentage',
+        'SSL certificate expiry is checked daily — you\'ll see warnings when it\'s close to expiring',
+        'Database backups run automatically at 6 AM daily and are retained for 30 days',
+        'Feature tests verify that key API endpoints (booking, services, FAQ, blog) are responding',
+        'A daily health report email is sent to the admin contact address every morning',
+        'Cron job status shows whether scheduled tasks (reminders, reviews, push) are running on time'
+      ]
+    },
+    es: {
+      title: 'Estado del Sistema',
+      desc: 'Monitoree disponibilidad, certificados SSL, respaldos y pruebas automatizadas.',
+      tips: [
+        'La disponibilidad se verifica cada 5 minutos — el gráfico muestra el porcentaje diario',
+        'La expiración del certificado SSL se verifica diariamente — verá alertas cuando esté cerca de expirar',
+        'Los respaldos de base de datos se ejecutan automáticamente a las 6 AM y se retienen por 30 días',
+        'Las pruebas de funciones verifican que los endpoints clave (reservas, servicios, FAQ, blog) respondan',
+        'Un reporte diario de salud se envía por correo al administrador cada mañana',
+        'El estado de tareas programadas muestra si los trabajos (recordatorios, reseñas, push) están funcionando'
+      ]
+    }
   }
 };
 

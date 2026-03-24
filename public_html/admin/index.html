@@ -503,6 +503,7 @@
             <button onclick="switchTab('walkinqueue')" data-tab="walkinqueue" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🚶 <span data-t="tabWalkInQueue">Walk-In Queue</span></button>
             <button onclick="switchTab('tirequotes')" data-tab="tirequotes" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🛞 <span data-t="tabTireQuotes">Tire Quotes</span></button>
             <button onclick="switchTab('services')" data-tab="services" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔧 <span data-t="tabServices">Services</span></button>
+            <button onclick="switchTab('parts')" data-tab="parts" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔩 <span data-t="tabParts">Parts &amp; Orders</span></button>
             <button onclick="switchTab('resourceplanner')" data-tab="resourceplanner" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📋 <span data-t="tabResourcePlanner">Resource Planner</span></button>
           </div>
         </div>
@@ -530,6 +531,8 @@
             <button onclick="switchTab('referrals')" data-tab="referrals" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🤝 <span data-t="tabReferrals">Referrals</span></button>
             <button onclick="switchTab('reminders')" data-tab="reminders" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🔔 <span data-t="tabReminders">Service Reminders</span></button>
             <button onclick="switchTab('marketintel')" data-tab="marketintel" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🗺️ <span data-t="tabMarketIntel">Market Intel</span></button>
+            <button onclick="switchTab('surveys')" data-tab="surveys" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📊 <span data-t="tabSurveys">Surveys</span></button>
+            <button onclick="switchTab('gbp')" data-tab="gbp" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📍 <span data-t="tabGBP">Google Business</span></button>
           </div>
         </div>
 
@@ -539,6 +542,7 @@
             <button onclick="switchTab('analytics')" data-tab="analytics" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📈 <span data-t="tabAnalytics">Analytics</span></button>
             <button onclick="switchTab('sitecontent')" data-tab="sitecontent" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📝 <span data-t="tabSiteContent">Site Content</span></button>
             <button onclick="switchTab('docs')" data-tab="docs" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">📖 <span data-t="tabDocs">Docs</span></button>
+            <button onclick="switchTab('health')" data-tab="health" role="tab" aria-selected="false" class="tab-btn nav-dropdown-item">🩺 <span data-t="tabHealth">System Health</span></button>
           </div>
         </div>
       </nav>
@@ -553,6 +557,7 @@
           <option value="waitlist" data-t="tabWaitlist">On Hold</option>
           <option value="tirequotes" data-t="tabTireQuotes">Tire Quotes</option>
           <option value="services" data-t="tabServices">Services</option>
+          <option value="parts" data-t="tabParts">Parts &amp; Orders</option>
           <option value="visits" data-t="tabVisits">Visit Tracking</option>
           <option value="resourceplanner" data-t="tabResourcePlanner">Resource Planner</option>
         </optgroup>
@@ -574,11 +579,14 @@
           <option value="referrals" data-t="tabReferrals">Referrals</option>
           <option value="reminders" data-t="tabReminders">Service Reminders</option>
           <option value="marketintel" data-t="tabMarketIntel">Market Intel</option>
+          <option value="surveys" data-t="tabSurveys">Surveys</option>
+          <option value="gbp" data-t="tabGBP">Google Business</option>
         </optgroup>
         <optgroup label="⚙️ Settings" data-t-label="navSettings">
           <option value="analytics" data-t="tabAnalytics">Analytics</option>
           <option value="sitecontent" data-t="tabSiteContent">Site Content</option>
           <option value="docs" data-t="tabDocs">Docs</option>
+          <option value="health" data-t="tabHealth">System Health</option>
         </optgroup>
       </select>
     </div>
@@ -3924,6 +3932,42 @@
       <div id="market-intel-container"></div>
     </div>
 
+    <!-- PARTS & ORDERS TAB -->
+    <div id="tab-parts" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🔩 <span data-t="tabParts">Parts &amp; Orders</span></h2>
+          <p class="text-green-100">Parts catalog, vendor management, and purchase orders</p>
+        </div>
+        <button onclick="loadParts()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition">Refresh</button>
+      </div>
+      <div id="parts-container"></div>
+    </div>
+
+    <!-- SURVEYS TAB -->
+    <div id="tab-surveys" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">📊 <span data-t="tabSurveys">Customer Surveys</span></h2>
+          <p class="text-green-100">Customer satisfaction surveys, NPS tracking, and feedback analytics</p>
+        </div>
+        <button onclick="loadSurveys()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition">Refresh</button>
+      </div>
+      <div id="surveys-container"></div>
+    </div>
+
+    <!-- GOOGLE BUSINESS PROFILE TAB -->
+    <div id="tab-gbp" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">📍 <span data-t="tabGBP">Google Business Profile</span></h2>
+          <p class="text-green-100">Posts, hours sync, insights, and Q&amp;A management</p>
+        </div>
+        <button onclick="loadGBP()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition">Refresh</button>
+      </div>
+      <div id="gbp-container"></div>
+    </div>
+
   </div>
 
 <!-- APPOINTMENT DETAILS + NOTES MODAL -->
@@ -3962,6 +4006,18 @@
     <div id="customer-history-table" class="overflow-x-auto"></div>
   </div>
 </div>
+
+    <!-- SYSTEM HEALTH TAB -->
+    <div id="tab-health" class="tab-content hidden fade-in" role="tabpanel">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">🩺 <span data-t="tabHealth">System Health</span></h2>
+          <p class="text-green-100" data-t="healthSubtitle">Uptime, SSL, backups, and feature monitoring</p>
+        </div>
+        <button onclick="loadHealthDashboard()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="refresh">Refresh</button>
+      </div>
+      <div id="health-dashboard-content"></div>
+    </div>
 
 <!-- ACCOUNT SETTINGS MODAL -->
 <div id="account-modal" role="dialog" aria-modal="true" aria-labelledby="account-modal-title" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
@@ -4225,6 +4281,37 @@ const adminT = {
     tabPromotions: 'Promotions',
     tabAnalytics: 'Analytics',
     tabDocs: 'Docs',
+    tabHealth: 'System Health',
+    healthSubtitle: 'Uptime, SSL, backups, and feature monitoring',
+    healthLoading: 'Loading health data...',
+    healthAllOperational: 'All Systems Operational',
+    healthDegraded: 'Performance Degraded',
+    healthIssues: 'Issues Detected',
+    healthLastCheck: 'Last check',
+    healthUptime24h: '24h Uptime',
+    healthUptime7d: '7-Day',
+    healthUptime30d: '30-Day',
+    healthSslCert: 'SSL Certificate',
+    healthDays: 'days',
+    healthExpires: 'Expires',
+    healthLastBackup: 'Last Backup',
+    healthNoBackup: 'No backup yet',
+    healthDiskUsage: 'Disk Usage',
+    healthNoData: 'No data yet',
+    healthUptimeChart: 'Uptime History',
+    healthResponseTimes: 'Response Times (24h avg)',
+    healthFeatureTests: 'Feature Tests',
+    healthPassed: 'passed',
+    healthCronStatus: 'Cron Jobs',
+    healthIncidents: 'Recent Incidents',
+    healthNoIncidents: 'No incidents in the last 7 days',
+    healthBackupLog: 'Backup History',
+    healthNoTests: 'No test results yet. Run the full health check first.',
+    healthNoCrons: 'No cron data yet',
+    healthJustNow: 'just now',
+    healthAgo: 'ago',
+    healthNever: 'never',
+    healthError: 'Error loading health data',
     tabSiteContent: 'Site Content',
     tabInvoices: 'Invoices',
     tabWaitlist: 'Waitlist',
@@ -5872,6 +5959,37 @@ const adminT = {
     tabPromotions: 'Promociones',
     tabAnalytics: 'Anal\u00EDticas',
     tabDocs: 'Documentos',
+    tabHealth: 'Estado del Sistema',
+    healthSubtitle: 'Disponibilidad, SSL, respaldos y monitoreo',
+    healthLoading: 'Cargando datos de salud...',
+    healthAllOperational: 'Todos los Sistemas Operativos',
+    healthDegraded: 'Rendimiento Degradado',
+    healthIssues: 'Problemas Detectados',
+    healthLastCheck: '\u00DAltima verificaci\u00F3n',
+    healthUptime24h: 'Disponibilidad 24h',
+    healthUptime7d: '7 D\u00EDas',
+    healthUptime30d: '30 D\u00EDas',
+    healthSslCert: 'Certificado SSL',
+    healthDays: 'd\u00EDas',
+    healthExpires: 'Expira',
+    healthLastBackup: '\u00DAltimo Respaldo',
+    healthNoBackup: 'Sin respaldo a\u00FAn',
+    healthDiskUsage: 'Uso de Disco',
+    healthNoData: 'Sin datos a\u00FAn',
+    healthUptimeChart: 'Historial de Disponibilidad',
+    healthResponseTimes: 'Tiempos de Respuesta (prom. 24h)',
+    healthFeatureTests: 'Pruebas de Funciones',
+    healthPassed: 'aprobadas',
+    healthCronStatus: 'Tareas Programadas',
+    healthIncidents: 'Incidentes Recientes',
+    healthNoIncidents: 'Sin incidentes en los \u00FAltimos 7 d\u00EDas',
+    healthBackupLog: 'Historial de Respaldos',
+    healthNoTests: 'Sin resultados de pruebas a\u00FAn. Ejecute la verificaci\u00F3n completa primero.',
+    healthNoCrons: 'Sin datos de tareas a\u00FAn',
+    healthJustNow: 'ahora mismo',
+    healthAgo: 'atr\u00E1s',
+    healthNever: 'nunca',
+    healthError: 'Error al cargar datos de salud',
     tabSiteContent: 'Contenido del Sitio',
     tabInvoices: 'Facturas',
     tabWaitlist: 'Lista de Espera',
@@ -13186,6 +13304,10 @@ function switchTab(tab) {
   if(tab==='reminders' && typeof loadServiceReminders === 'function') loadServiceReminders();
   if(tab==='resourceplanner' && typeof loadResourcePlanner === 'function') loadResourcePlanner();
   if(tab==='marketintel' && typeof loadMarketIntel === 'function') loadMarketIntel();
+  if(tab==='health' && typeof loadHealthDashboard === 'function') loadHealthDashboard();
+  if(tab==='parts' && typeof loadParts === 'function') loadParts();
+  if(tab==='surveys' && typeof loadSurveys === 'function') loadSurveys();
+  if(tab==='gbp' && typeof loadGBP === 'function') loadGBP();
   if(tab==='blog' && typeof loadBlogPosts === 'function') loadBlogPosts();
   if(tab==='gallery' && typeof renderGallery === 'function') renderGallery();
   if(tab==='messages') { if(typeof loadMessages === 'function') loadMessages(); if(typeof loadConversations === 'function') loadConversations(); }
@@ -15143,7 +15265,7 @@ switchTab = function(tab) {
   var mobileSelect = document.getElementById('mobile-tab-select');
   if (mobileSelect) mobileSelect.value = tab;
   // Update page title for clarity in browser history
-  var tabLabels = { overview: 'Dashboard', appointments: 'Appointments', customers: 'Customers', repairorders: 'Repair Orders', invoices: 'Invoices', employees: 'Employees', messages: 'Messages', blog: 'Blog', analytics: 'Analytics', sitecontent: 'Settings' };
+  var tabLabels = { overview: 'Dashboard', appointments: 'Appointments', customers: 'Customers', repairorders: 'Repair Orders', invoices: 'Invoices', employees: 'Employees', messages: 'Messages', blog: 'Blog', analytics: 'Analytics', sitecontent: 'Settings', parts: 'Parts & Orders', surveys: 'Surveys', gbp: 'Google Business' };
   document.title = (tabLabels[tab] || tab.charAt(0).toUpperCase() + tab.slice(1)) + ' — Oregon Tires Admin';
 };
 
@@ -15426,8 +15548,12 @@ loadMessages = async function() {
 <script src="/admin/js/resource-planner.js"></script>
 <script src="/admin/js/labor-tracker.js"></script>
 <script src="/admin/js/tech-picker.js"></script>
+<script src="/admin/js/health-dashboard.js"></script>
 <script src="/admin/js/admin-help.js"></script>
 <script src="/admin/js/market-intel.js" defer></script>
+<script src="/admin/js/parts.js" defer></script>
+<script src="/admin/js/surveys.js" defer></script>
+<script src="/admin/js/gbp.js" defer></script>
 <script src="/admin/js/client-handoff.js" defer></script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';
