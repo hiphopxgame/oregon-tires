@@ -8253,14 +8253,13 @@ function showDashboard(user) {
   setupPolling();
   populateMonthFilter();
 
-  // Re-trigger hash-based deep link now that session is loaded
-  var hashTab = location.hash.replace('#', '');
-  if (hashTab) {
-    var hashTarget = document.getElementById('tab-' + hashTab);
-    var hashBtn = document.querySelector('.tab-btn[data-tab="' + hashTab + '"]');
-    // Only switch if tab exists AND is visible (not hidden by permissions)
+  // Re-trigger deep link now that session is loaded (path-based or hash fallback)
+  var _pathTab = (location.pathname.match(/^\/admin\/([a-z][a-z0-9]*)/) || [])[1] || location.hash.replace('#', '');
+  if (_pathTab) {
+    var hashTarget = document.getElementById('tab-' + _pathTab);
+    var hashBtn = document.querySelector('.tab-btn[data-tab="' + _pathTab + '"]');
     if (hashTarget && (!hashBtn || hashBtn.style.display !== 'none')) {
-      switchTab(hashTab);
+      switchTab(_pathTab);
     }
   }
 }
@@ -15233,19 +15232,33 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ===== ENHANCEMENT 1: DEEP LINKS — Hash-Based Tab Navigation =====
+// ===== ENHANCEMENT 1: DEEP LINKS — Path-Based Tab Navigation =====
+// URLs: /admin/docs, /admin/analytics, /admin/appointments, etc.
 var _navigatingFromPopstate = false;
+
+function _getTabFromUrl() {
+  // Path-based: /admin/docs → 'docs'
+  var match = location.pathname.match(/^\/admin\/([a-z][a-z0-9]*)/);
+  if (match && match[1]) return match[1];
+  // Hash fallback for old bookmarks: /admin/#docs → redirect to /admin/docs
+  var hash = location.hash.replace('#', '');
+  if (hash) {
+    history.replaceState(null, '', '/admin/' + hash);
+    return hash;
+  }
+  return '';
+}
+
 (function() {
-  var hashTab = location.hash.replace('#', '');
-  if (hashTab && document.getElementById('tab-' + hashTab)) {
-    setTimeout(function() { switchTab(hashTab); }, 100);
+  var initTab = _getTabFromUrl();
+  if (initTab && document.getElementById('tab-' + initTab)) {
+    setTimeout(function() { switchTab(initTab); }, 100);
   }
   window.addEventListener('popstate', function() {
-    var tab = location.hash.replace('#', '') || 'overview';
+    var tab = _getTabFromUrl() || 'overview';
     if (document.getElementById('tab-' + tab)) {
       _navigatingFromPopstate = true;
       _origSwitchTab(tab);
-      // Sync mobile dropdown
       var mobileSelect = document.getElementById('mobile-tab-select');
       if (mobileSelect) mobileSelect.value = tab;
       _navigatingFromPopstate = false;
@@ -15253,20 +15266,20 @@ var _navigatingFromPopstate = false;
   });
 })();
 
-// Patch switchTab to update hash + mobile dropdown + browser history
+// Patch switchTab to update URL + mobile dropdown + browser history
 var _origSwitchTab = switchTab;
 switchTab = function(tab) {
   _origSwitchTab(tab);
-  // Only push to history when user clicks a tab (not when navigating via back/forward)
-  if (!_navigatingFromPopstate && location.hash !== '#' + tab) {
-    history.pushState({ tab: tab }, '', '#' + tab);
+  var targetPath = '/admin/' + tab;
+  if (!_navigatingFromPopstate && location.pathname !== targetPath) {
+    history.pushState({ tab: tab }, '', targetPath);
   }
   // Sync mobile dropdown
   var mobileSelect = document.getElementById('mobile-tab-select');
   if (mobileSelect) mobileSelect.value = tab;
-  // Update page title for clarity in browser history
-  var tabLabels = { overview: 'Dashboard', appointments: 'Appointments', customers: 'Customers', repairorders: 'Repair Orders', invoices: 'Invoices', employees: 'Employees', messages: 'Messages', blog: 'Blog', analytics: 'Analytics', sitecontent: 'Settings', parts: 'Parts & Orders', surveys: 'Surveys', gbp: 'Google Business' };
-  document.title = (tabLabels[tab] || tab.charAt(0).toUpperCase() + tab.slice(1)) + ' — Oregon Tires Admin';
+  // Update page title for browser history
+  var tabLabels = { overview: 'Dashboard', appointments: 'Appointments', customers: 'Customers', repairorders: 'Repair Orders', invoices: 'Invoices', employees: 'Employees', messages: 'Messages', blog: 'Blog', analytics: 'Analytics', sitecontent: 'Settings', parts: 'Parts & Orders', surveys: 'Surveys', gbp: 'Google Business', docs: 'Documentation', marketintel: 'Market Intel', gallery: 'Gallery', faq: 'FAQ', promotions: 'Promotions', reviews: 'Reviews', subscribers: 'Subscribers', loyalty: 'Loyalty', referrals: 'Referrals', reminders: 'Reminders', labor: 'Labor', visits: 'Visits', services: 'Services', walkinqueue: 'Walk-In Queue', waitlist: 'On Hold', tirequotes: 'Tire Quotes', resourceplanner: 'Resource Planner', health: 'System Health' };
+  document.title = (tabLabels[tab] || tab.charAt(0).toUpperCase() + tab.slice(1)) + ' \u2014 Oregon Tires Admin';
 };
 
 // ===== ENHANCEMENT 2: CSV EXPORTS =====

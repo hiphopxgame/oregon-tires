@@ -82,14 +82,20 @@
     # Tire quote page
     RewriteRule ^tire-quote/?$ tire-quote.php [L,QSA]
 
+    # Work order (staff view): /work-order/123 → work-order.php?ro_id=123
+    RewriteRule ^work-order/([0-9]+)/?$ work-order.php?ro_id=$1 [L,QSA]
+
     # Dynamic sitemap: /sitemap.xml → api/sitemap.php
     RewriteRule ^sitemap\.xml$ api/sitemap.php [L]
 
     # 301 redirect old root js/ → admin/js/ (ot-charts.js moved)
     RewriteRule ^js/(.+)$ /admin/js/$1 [R=301,L]
 
-    # Admin dashboard
+    # Admin dashboard — SPA with path-based routing
     RewriteRule ^admin/?$ admin/index.html [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^admin/([a-z][a-z0-9]*)/?$ admin/index.html [L]
 
     # API Versioning: /api/v1/* → /api/* alias
     RewriteRule ^api/v1/(.+)$ /api/$1 [L,QSA]
