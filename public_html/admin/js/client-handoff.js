@@ -33,9 +33,14 @@
           id: 'host-choose',
           text: { en: 'Sign up for a web host', es: 'Regístrese en un servicio de hospedaje' },
           detail: {
-            en: 'Pick one of these — all include SSL, email, daily backups, and plenty of storage:\n\n• SiteGround ($15/mo, 20GB storage) — Best support, fastest speed, automatic backups. Recommended for peace of mind.\n\n• A2 Hosting ($5/mo, 100GB storage) — Best value. Plenty of space for your website, database, photos, and years of backup history.\n\n• Hostinger ($3/mo, 100GB storage) — Budget-friendly, includes everything needed.\n\nAll three include: free SSL certificate, free email hosting, daily automatic backups, and one-click WordPress tools. No extra purchases needed.',
-            es: 'Elija uno — todos incluyen SSL, correo, respaldos diarios y amplio almacenamiento:\n\n• SiteGround ($15/mes, 20GB) — Mejor soporte, más rápido, respaldos automáticos. Recomendado.\n\n• A2 Hosting ($5/mes, 100GB) — Mejor valor. Espacio de sobra para su sitio, base de datos, fotos y años de respaldos.\n\n• Hostinger ($3/mes, 100GB) — Económico, incluye todo lo necesario.\n\nTodos incluyen: certificado SSL gratuito, correo electrónico, respaldos diarios automáticos. Sin compras adicionales.'
-          }
+            en: 'Pick one — all include free SSL, email, daily backups, and plenty of storage for your website, photos, customer data, and years of backup history. Click a link below to sign up:\n\n• SiteGround ($15/mo, 20GB) — Best support, fastest. Recommended.\n• A2 Hosting ($5/mo, 100GB) — Best value for growing businesses.\n• Hostinger ($3/mo, 100GB) — Budget-friendly, includes everything.',
+            es: 'Elija uno — todos incluyen SSL gratis, correo, respaldos diarios y amplio almacenamiento. Haga clic en un enlace para registrarse:\n\n• SiteGround ($15/mes, 20GB) — Mejor soporte, más rápido. Recomendado.\n• A2 Hosting ($5/mes, 100GB) — Mejor valor para negocios en crecimiento.\n• Hostinger ($3/mes, 100GB) — Económico, incluye todo.'
+          },
+          links: [
+            { label: { en: 'SiteGround (Recommended)', es: 'SiteGround (Recomendado)' }, url: 'https://www.siteground.com/web-hosting.htm' },
+            { label: { en: 'A2 Hosting (Best Value)', es: 'A2 Hosting (Mejor Valor)' }, url: 'https://www.a2hosting.com/web-hosting/' },
+            { label: { en: 'Hostinger (Budget)', es: 'Hostinger (Económico)' }, url: 'https://www.hostinger.com/web-hosting' }
+          ]
         },
         {
           id: 'host-share',
@@ -68,9 +73,13 @@
           id: 'dom-registrar',
           text: { en: 'Create a domain registrar account', es: 'Cree una cuenta de registrador de dominios' },
           detail: {
-            en: 'Sign up at Namecheap.com or Cloudflare.com (both are reputable and affordable). This is where your domain will live — like a title deed for your web address.',
-            es: 'Regístrese en Namecheap.com o Cloudflare.com (ambos son confiables y económicos). Aquí es donde vivirá su dominio — como la escritura de su dirección web.'
-          }
+            en: 'Sign up at one of these registrars (both are reputable and affordable). This is where your domain will live — like a title deed for your web address.',
+            es: 'Regístrese en uno de estos registradores (ambos son confiables y económicos). Aquí es donde vivirá su dominio — como la escritura de su dirección web.'
+          },
+          links: [
+            { label: { en: 'Namecheap', es: 'Namecheap' }, url: 'https://www.namecheap.com/' },
+            { label: { en: 'Cloudflare Registrar', es: 'Cloudflare Registrar' }, url: 'https://www.cloudflare.com/products/registrar/' }
+          ]
         },
         {
           id: 'dom-transfer',
@@ -103,36 +112,64 @@
           id: 'acct-google',
           text: { en: 'Google account (Reviews + Analytics + Login)', es: 'Cuenta de Google (Reseñas + Analíticas + Login)' },
           detail: {
-            en: 'Go to console.cloud.google.com and sign in with your business Gmail. This one account powers three features:\n\n1. Google Reviews — displayed on your website and admin dashboard\n2. Google Analytics — tracks how many people visit your site, which pages they view, and where they come from\n3. "Login with Google" — lets your customers sign in easily\n\nYour developer needs you to share your Google account access so they can set up the Reviews display, Analytics tracking (on every page), and customer login.',
-            es: 'Vaya a console.cloud.google.com e inicie sesión con su Gmail del negocio. Esta cuenta activa tres funciones:\n\n1. Reseñas de Google — mostradas en su sitio web y panel de administración\n2. Google Analytics — rastrea cuántas personas visitan su sitio, qué páginas ven y de dónde vienen\n3. "Iniciar sesión con Google" — permite a sus clientes iniciar sesión fácilmente\n\nSu desarrollador necesita que comparta su acceso de Google para configurar las reseñas, el seguimiento de analíticas (en cada página) y el inicio de sesión de clientes.'
+            en: 'Sign in with your business Gmail at the link below. This one account powers three features on your website:\n\n1. Google Reviews — your reviews displayed on your website and admin dashboard\n2. Google Analytics — tracks visitors, page views, and where customers come from\n3. "Login with Google" — lets customers sign in easily\n\nAfter creating the project, share your Google account login with your developer so they can connect Reviews, Analytics, and customer login.',
+            es: 'Inicie sesión con su Gmail del negocio en el enlace de abajo. Esta cuenta activa tres funciones en su sitio web:\n\n1. Reseñas de Google — sus reseñas mostradas en su sitio y panel de administración\n2. Google Analytics — rastrea visitantes, vistas de páginas y de dónde vienen los clientes\n3. "Iniciar sesión con Google" — permite a los clientes iniciar sesión fácilmente\n\nDespués de crear el proyecto, comparta su acceso de Google con su desarrollador para conectar Reseñas, Analíticas e inicio de sesión.'
           },
+          links: [
+            { label: { en: 'Open Google Cloud Console', es: 'Abrir Google Cloud Console' }, url: 'https://console.cloud.google.com/' },
+            { label: { en: 'Google Analytics Dashboard', es: 'Panel de Google Analytics' }, url: 'https://analytics.google.com/' }
+          ],
           category: { en: 'Required', es: 'Requerido' }
         },
         {
           id: 'acct-whatsapp',
           text: { en: 'WhatsApp Business (FREE customer messaging)', es: 'WhatsApp Business (mensajes a clientes GRATIS)' },
           detail: {
-            en: 'Your website already has WhatsApp messaging built in — you just need to create the account to activate it.\n\nStep 1: Go to business.facebook.com → create a Meta Business account (use your business Facebook page)\n\nStep 2: Go to developers.facebook.com → click "My Apps" → "Create App" → choose "Business" → add the "WhatsApp" product\n\nStep 3: In the WhatsApp section, register your shop\'s phone number\n\nStep 4: Share these with your developer:\n• WhatsApp Phone Number ID\n• Access Token\n\nOnce connected, customers automatically receive WhatsApp messages for:\n✓ Appointment reminders\n✓ Estimate approvals\n✓ Vehicle ready for pickup\n✓ Repair status updates\n\nFREE: 1,000 messages/month (plenty for most shops).',
-            es: 'Su sitio web ya tiene WhatsApp integrado — solo necesita crear la cuenta para activarlo.\n\nPaso 1: Vaya a business.facebook.com → cree una cuenta Meta Business (use su página de Facebook del negocio)\n\nPaso 2: Vaya a developers.facebook.com → "Mis Apps" → "Crear App" → tipo "Business" → agregar el producto "WhatsApp"\n\nPaso 3: En la sección de WhatsApp, registre el número de teléfono del taller\n\nPaso 4: Comparta estos datos con su desarrollador:\n• WhatsApp Phone Number ID\n• Access Token\n\nUna vez conectado, los clientes recibirán automáticamente mensajes de WhatsApp para:\n✓ Recordatorios de citas\n✓ Aprobación de presupuestos\n✓ Vehículo listo para recoger\n✓ Actualizaciones de estado de reparación\n\nGRATIS: 1,000 mensajes/mes (suficiente para la mayoría de talleres).'
+            en: 'Your website already has WhatsApp messaging built in — you just need to create the account to activate it.\n\nStep 1: Create a Meta Business account at the first link below\n\nStep 2: Create an app at the second link → click "My Apps" → "Create App" → choose "Business" → add the "WhatsApp" product\n\nStep 3: In the WhatsApp section, register your shop\'s phone number\n\nStep 4: Share these with your developer:\n• WhatsApp Phone Number ID\n• Access Token\n\nOnce connected, customers automatically receive WhatsApp messages for:\n✓ Appointment reminders\n✓ Estimate approvals\n✓ Vehicle ready for pickup\n✓ Repair status updates\n\nFREE: 1,000 messages/month (plenty for most shops).',
+            es: 'Su sitio web ya tiene WhatsApp integrado — solo necesita crear la cuenta para activarlo.\n\nPaso 1: Cree una cuenta Meta Business en el primer enlace de abajo\n\nPaso 2: Cree una app en el segundo enlace → "Mis Apps" → "Crear App" → tipo "Business" → agregar "WhatsApp"\n\nPaso 3: En la sección de WhatsApp, registre el número del taller\n\nPaso 4: Comparta estos datos con su desarrollador:\n• WhatsApp Phone Number ID\n• Access Token\n\nUna vez conectado, los clientes reciben automáticamente mensajes de WhatsApp para:\n✓ Recordatorios de citas\n✓ Aprobación de presupuestos\n✓ Vehículo listo para recoger\n✓ Actualizaciones de reparación\n\nGRATIS: 1,000 mensajes/mes (suficiente para la mayoría de talleres).'
           },
+          links: [
+            { label: { en: 'Create Meta Business Account', es: 'Crear Cuenta Meta Business' }, url: 'https://business.facebook.com/' },
+            { label: { en: 'Meta Developer Portal (Create App)', es: 'Portal de Desarrolladores Meta (Crear App)' }, url: 'https://developers.facebook.com/apps/' }
+          ],
           category: { en: 'Required', es: 'Requerido' }
         },
         {
           id: 'acct-paypal',
-          text: { en: 'PayPal Business (accept online payments)', es: 'PayPal Business (aceptar pagos en línea)' },
+          text: { en: 'PayPal Business (online payments)', es: 'PayPal Business (pagos en línea)' },
           detail: {
-            en: 'Go to paypal.com/business and create a PayPal Business account using your business email. This lets customers pay for care plans and services online.\n\nShare your PayPal developer credentials (Client ID and Secret from developer.paypal.com) with your developer.',
-            es: 'Vaya a paypal.com/business y cree una cuenta PayPal Business con su correo del negocio. Esto permite a los clientes pagar planes de cuidado y servicios en línea.\n\nComparta sus credenciales de desarrollador de PayPal (Client ID y Secret de developer.paypal.com) con su desarrollador.'
+            en: 'Create a PayPal Business account using your business email. This lets customers pay for care plans and services online.\n\nAfter signing up, go to the Developer Dashboard (second link) to get your API credentials (Client ID and Secret). Share both with your developer.',
+            es: 'Cree una cuenta PayPal Business con su correo del negocio. Esto permite a los clientes pagar planes y servicios en línea.\n\nDespués de registrarse, vaya al Panel de Desarrollador (segundo enlace) para obtener sus credenciales API (Client ID y Secret). Comparta ambos con su desarrollador.'
           },
+          links: [
+            { label: { en: 'Sign Up for PayPal Business', es: 'Registrarse en PayPal Business' }, url: 'https://www.paypal.com/business' },
+            { label: { en: 'PayPal Developer Dashboard', es: 'Panel de Desarrollador PayPal' }, url: 'https://developer.paypal.com/dashboard/applications' }
+          ],
           category: { en: 'Required', es: 'Requerido' }
+        },
+        {
+          id: 'acct-stripe',
+          text: { en: 'Stripe (card payments online + in-person)', es: 'Stripe (pagos con tarjeta en línea + en persona)' },
+          detail: {
+            en: 'Create a Stripe account to accept credit/debit card payments on your website and at the shop counter.\n\nAfter signing up, go to Developers → API Keys in your Stripe Dashboard. Share the Secret Key with your developer.\n\nStripe also supports in-person payments with your existing card reader — your developer can connect it.\n\nProcessing fees: 2.9% + 30¢ online, 2.7% + 5¢ in-person.',
+            es: 'Cree una cuenta Stripe para aceptar pagos con tarjeta de crédito/débito en su sitio web y en el mostrador.\n\nDespués de registrarse, vaya a Developers → API Keys en su Dashboard. Comparta la Secret Key con su desarrollador.\n\nStripe también soporta pagos en persona con su lector de tarjetas existente — su desarrollador puede conectarlo.\n\nComisiones: 2.9% + 30¢ en línea, 2.7% + 5¢ en persona.'
+          },
+          links: [
+            { label: { en: 'Sign Up for Stripe', es: 'Registrarse en Stripe' }, url: 'https://dashboard.stripe.com/register' },
+            { label: { en: 'Stripe Dashboard (API Keys)', es: 'Dashboard de Stripe (API Keys)' }, url: 'https://dashboard.stripe.com/apikeys' }
+          ],
+          category: { en: 'Recommended', es: 'Recomendado' }
         },
         {
           id: 'acct-gsc',
           text: { en: 'Google Search Console (SEO)', es: 'Google Search Console (SEO)' },
           detail: {
-            en: 'Go to search.google.com/search-console and sign in with your business Gmail. Add oregon.tires as a property. This shows you how your site appears in Google search results and helps your developer optimize your ranking.\n\nFREE — takes 2 minutes to set up.',
-            es: 'Vaya a search.google.com/search-console e inicie sesión con su Gmail del negocio. Agregue oregon.tires como propiedad. Esto muestra cómo aparece su sitio en los resultados de Google y ayuda a su desarrollador a optimizar su posicionamiento.\n\nGRATIS — toma 2 minutos configurar.'
+            en: 'Sign in with your business Gmail and add oregon.tires as a property. This shows how your site appears in Google search results and helps your developer improve your ranking.\n\nFREE — takes 2 minutes to set up.',
+            es: 'Inicie sesión con su Gmail del negocio y agregue oregon.tires como propiedad. Muestra cómo aparece su sitio en Google y ayuda a su desarrollador a mejorar su posicionamiento.\n\nGRATIS — toma 2 minutos configurar.'
           },
+          links: [
+            { label: { en: 'Open Google Search Console', es: 'Abrir Google Search Console' }, url: 'https://search.google.com/search-console/' }
+          ],
           category: { en: 'Recommended', es: 'Recomendado' }
         },
       ]
@@ -281,6 +318,20 @@
           detailP.className = 'text-xs text-gray-500 dark:text-gray-400 mt-1 whitespace-pre-line';
           detailP.textContent = txt(item.detail);
           content.appendChild(detailP);
+        }
+        if (item.links && item.links.length) {
+          var linksDiv = document.createElement('div');
+          linksDiv.className = 'flex flex-wrap gap-2 mt-2';
+          item.links.forEach(function(link) {
+            var a = document.createElement('a');
+            a.href = link.url;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.className = 'inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800 transition';
+            a.textContent = txt(link.label) + ' \u2197';
+            linksDiv.appendChild(a);
+          });
+          content.appendChild(linksDiv);
         }
 
         row.appendChild(content);
