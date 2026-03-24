@@ -12,6 +12,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/mail.php';
 require_once __DIR__ . '/../includes/vin-decode.php';
+require_once __DIR__ . '/../includes/google-calendar.php';
 
 try {
     requireMethod('POST');
@@ -627,6 +628,15 @@ try {
         }
     } catch (\Throwable $pushErr) {
         error_log("Oregon Tires book.php: push notification queue failed for #{$appointmentId}: " . $pushErr->getMessage());
+    }
+
+    // ─── Google Calendar Sync (non-blocking) ───────────────────────────────
+    try {
+        if (isCalendarSyncEnabled()) {
+            createCalendarEvent($db, $appointmentId);
+        }
+    } catch (\Throwable $calErr) {
+        error_log("book.php: Calendar sync failed for #{$appointmentId}: " . $calErr->getMessage());
     }
 
     $response = [

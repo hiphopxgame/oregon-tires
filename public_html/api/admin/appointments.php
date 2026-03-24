@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../includes/validate.php';
 require_once __DIR__ . '/../../includes/mail.php';
 require_once __DIR__ . '/../../includes/schedule.php';
 require_once __DIR__ . '/../../includes/vin-decode.php';
+require_once __DIR__ . '/../../includes/google-calendar.php';
 
 try {
     $staff = requirePermission('shop_ops');
@@ -488,6 +489,19 @@ try {
             }
         }
 
+        // ─── Google Calendar sync ──────────────────────────────────
+        try {
+            if (isCalendarSyncEnabled()) {
+                if (isset($body['status']) && $body['status'] === 'cancelled') {
+                    deleteCalendarEvent($db, $id);
+                } elseif (isset($body['preferred_date']) || isset($body['preferred_time'])) {
+                    updateCalendarEvent($db, $id);
+                }
+            }
+        } catch (\Throwable $calErr) {
+            error_log("appointments.php: Calendar sync failed for #{$id}: " . $calErr->getMessage());
+        }
+
         jsonSuccess(['updated' => $id]);
     }
 
@@ -652,6 +666,15 @@ try {
             }
         } catch (\Throwable $roErr) {
             error_log("appointments.php: auto-RO failed for admin-created #{$appointmentId}: " . $roErr->getMessage());
+        }
+
+        // Calendar sync (non-blocking)
+        try {
+            if (isCalendarSyncEnabled()) {
+                createCalendarEvent($db, $appointmentId);
+            }
+        } catch (\Throwable $calErr) {
+            error_log("admin/appointments.php: Calendar sync failed for #{$appointmentId}: " . $calErr->getMessage());
         }
 
         $result = ['appointment_id' => $appointmentId, 'reference_number' => $referenceNumber];

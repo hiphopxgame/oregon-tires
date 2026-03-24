@@ -6,6 +6,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/includes/bootstrap.php';
+require_once __DIR__ . '/includes/seo-lang.php';
 
 // Override bootstrap's JSON Content-Type — this is an HTML page
 header('Content-Type: text/html; charset=utf-8');
@@ -18,18 +19,19 @@ $pageDesc = 'Flexible payment options for tire and auto repair services at Orego
 $pageDescEs = 'Opciones de pago flexibles para servicios de llantas y reparacion automotriz en Oregon Tires Auto Care en Portland, OR.';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= htmlspecialchars($pageTitle) ?></title>
-  <meta name="description" content="<?= htmlspecialchars($pageDesc) ?>">
+  <title><?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?></title>
+  <meta name="description" content="<?= htmlspecialchars(seoMeta($pageDesc, $pageDescEs)) ?>">
   <link rel="canonical" href="<?= $canonicalUrl ?>">
   <link rel="alternate" hreflang="en" href="<?= $canonicalUrl ?>?lang=en">
   <link rel="alternate" hreflang="es" href="<?= $canonicalUrl ?>?lang=es">
   <link rel="alternate" hreflang="x-default" href="<?= $canonicalUrl ?>">
-  <meta property="og:title" content="<?= htmlspecialchars($pageTitle) ?>">
-  <meta property="og:description" content="<?= htmlspecialchars($pageDesc) ?>">
+  <meta property="og:title" content="<?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?>">
+  <meta property="og:description" content="<?= htmlspecialchars(seoMeta($pageDesc, $pageDescEs)) ?>">
+  <meta property="og:locale" content="<?= seoOgLocale() ?>">
   <meta property="og:url" content="<?= $canonicalUrl ?>">
   <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
   <meta property="og:type" content="website">

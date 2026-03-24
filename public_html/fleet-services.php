@@ -1,13 +1,18 @@
 <?php
 // Fleet Services B2B page — Oregon Tires Auto Care
+require_once __DIR__ . '/includes/seo-lang.php';
+$pageTitle = 'Fleet Services - Oregon Tires Auto Care Portland, OR';
+$pageTitleEs = 'Servicios de Flota - Oregon Tires Auto Care Portland, OR';
+$pageDesc = 'Fleet tire and auto service for Portland businesses. Volume discounts, dedicated account management, and priority scheduling for 5+ vehicles.';
+$pageDescEs = 'Servicio de llantas y automotriz para flotas de empresas en Portland. Descuentos por volumen, gestión de cuentas dedicada y programación prioritaria para 5+ vehículos.';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fleet Services - Oregon Tires Auto Care Portland, OR</title>
-  <meta name="description" content="Fleet tire and auto service for Portland businesses. Volume discounts, dedicated account management, and priority scheduling for 5+ vehicles.">
+  <title><?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?></title>
+  <meta name="description" content="<?= htmlspecialchars(seoMeta($pageDesc, $pageDescEs)) ?>">
   <link rel="icon" href="/assets/favicon.ico" sizes="any">
   <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
@@ -15,8 +20,9 @@
   <link rel="canonical" href="https://oregon.tires/fleet-services">
   <link rel="alternate" hreflang="en" href="https://oregon.tires/fleet-services?lang=en">
   <link rel="alternate" hreflang="es" href="https://oregon.tires/fleet-services?lang=es">
-  <meta property="og:title" content="Fleet Services - Oregon Tires Auto Care">
-  <meta property="og:description" content="Fleet tire and auto service for Portland businesses. Volume discounts for 5+ vehicles.">
+  <meta property="og:title" content="<?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?>">
+  <meta property="og:description" content="<?= htmlspecialchars(seoMeta($pageDesc, $pageDescEs)) ?>">
+  <meta property="og:locale" content="<?= seoOgLocale() ?>">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://oregon.tires/fleet-services">
   <link rel="stylesheet" href="/assets/styles.css">

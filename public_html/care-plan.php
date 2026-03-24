@@ -8,20 +8,22 @@ $pageTitleEs = 'Plan de Cuidado | Oregon Tires Auto Care';
 $pageDesc = 'Save hundreds per year with Oregon Tires Care Plans. Oil changes, tire rotations, service discounts &amp; priority scheduling starting at $19/month.';
 $pageDescEs = 'Ahorre cientos de d&oacute;lares al a&ntilde;o con los Planes de Cuidado de Oregon Tires. Cambios de aceite, rotaci&oacute;n de llantas, descuentos y programaci&oacute;n prioritaria desde $19/mes.';
 $canonicalUrl = 'https://oregon.tires/care-plan';
+require_once __DIR__ . '/includes/seo-lang.php';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= $pageTitle ?></title>
-  <meta name="description" content="<?= $pageDesc ?>">
+  <title><?= seoMeta($pageTitle, $pageTitleEs) ?></title>
+  <meta name="description" content="<?= seoMeta($pageDesc, $pageDescEs) ?>">
   <link rel="canonical" href="<?= $canonicalUrl ?>">
   <link rel="alternate" hreflang="en" href="<?= $canonicalUrl ?>?lang=en">
   <link rel="alternate" hreflang="es" href="<?= $canonicalUrl ?>?lang=es">
   <link rel="alternate" hreflang="x-default" href="<?= $canonicalUrl ?>">
-  <meta property="og:title" content="<?= $pageTitle ?>">
-  <meta property="og:description" content="<?= $pageDesc ?>">
+  <meta property="og:title" content="<?= seoMeta($pageTitle, $pageTitleEs) ?>">
+  <meta property="og:description" content="<?= seoMeta($pageDesc, $pageDescEs) ?>">
+  <meta property="og:locale" content="<?= seoOgLocale() ?>">
   <meta property="og:url" content="<?= $canonicalUrl ?>">
   <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
   <meta property="og:type" content="website">

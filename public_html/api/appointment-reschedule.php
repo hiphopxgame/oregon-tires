@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/mail.php';
+require_once __DIR__ . '/../includes/google-calendar.php';
 
 try {
     requireMethod('GET', 'POST');
@@ -131,6 +132,15 @@ try {
              cancel_token = ?, cancel_token_expires = ?, updated_at = NOW()
          WHERE id = ?'
     )->execute([$newDate, $newTime, 'new', $newCancelToken, $newCancelExpires, $appointment['id']]);
+
+    // ─── Update Google Calendar event ──────────────────────────────────
+    try {
+        if (isCalendarSyncEnabled()) {
+            updateCalendarEvent($db, (int) $appointment['id']);
+        }
+    } catch (\Throwable $calErr) {
+        error_log("appointment-reschedule.php: Calendar update failed for #{$appointment['id']}: " . $calErr->getMessage());
+    }
 
     // Send reschedule confirmation email
     try {

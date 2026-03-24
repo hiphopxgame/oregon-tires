@@ -146,8 +146,8 @@ try {
         if (!empty($data['items']) && is_array($data['items'])) {
             $insertItem = $db->prepare(
                 'INSERT INTO oretir_estimate_items
-                    (estimate_id, item_type, description, quantity, unit_price, total, sort_order, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())'
+                    (estimate_id, item_type, part_id, description, quantity, unit_price, total, sort_order, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())'
             );
 
             // Get max sort_order so far
@@ -164,12 +164,13 @@ try {
                 $qty      = max(0.01, (float) ($item['quantity'] ?? 1));
                 $price    = (float) ($item['unit_price'] ?? 0);
                 $lineTotal = round($qty * $price, 2);
+                $partId   = !empty($item['part_id']) ? (int) $item['part_id'] : null;
 
                 if ($type === 'discount') {
                     $lineTotal = -abs($lineTotal);
                 }
 
-                $insertItem->execute([$estId, $type, $desc, $qty, $price, $lineTotal, $order++]);
+                $insertItem->execute([$estId, $type, $partId, $desc, $qty, $price, $lineTotal, $order++]);
             }
         }
 

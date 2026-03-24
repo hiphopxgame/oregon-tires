@@ -4,23 +4,25 @@
  * Variables expected: $areaName, $areaNameEs, $areaSlug, $areaSlugEs, $areaZip, $areaDescription, $areaDescriptionEs,
  * $landmarks (array of {name, distance}), $landmarksEs, $testimonial, $testimonialEs, $mapQuery, $nearbyAreas
  */
+require_once __DIR__ . '/../includes/seo-lang.php';
 $pageTitle = "Tires & Auto Care in $areaName | Oregon Tires";
 $pageTitleEs = "Llantas y Servicio Automotriz en $areaNameEs | Oregon Tires";
 $canonicalUrl = "https://oregon.tires/$areaSlug";
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= htmlspecialchars($pageTitle) ?></title>
-  <meta name="description" content="<?= htmlspecialchars($areaDescription) ?>">
+  <title><?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?></title>
+  <meta name="description" content="<?= htmlspecialchars(seoMeta($areaDescription, $areaDescriptionEs)) ?>">
   <link rel="canonical" href="<?= $canonicalUrl ?>">
   <link rel="alternate" hreflang="en" href="<?= $canonicalUrl ?>?lang=en">
   <link rel="alternate" hreflang="es" href="<?= $canonicalUrl ?>?lang=es">
   <link rel="alternate" hreflang="x-default" href="<?= $canonicalUrl ?>">
-  <meta property="og:title" content="<?= htmlspecialchars($pageTitle) ?>">
-  <meta property="og:description" content="<?= htmlspecialchars($areaDescription) ?>">
+  <meta property="og:title" content="<?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?>">
+  <meta property="og:description" content="<?= htmlspecialchars(seoMeta($areaDescription, $areaDescriptionEs)) ?>">
+  <meta property="og:locale" content="<?= seoOgLocale() ?>">
   <meta property="og:url" content="<?= $canonicalUrl ?>">
   <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
   <meta property="og:type" content="website">
@@ -68,7 +70,7 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
     "openingHours": ["Mo-Sa 07:00-19:00"],
     "areaServed": {
       "@type": "Place",
-      "name": "<?= htmlspecialchars($areaName) ?>"
+      "name": "<?= htmlspecialchars(seoMeta($areaName, $areaNameEs)) ?>"
     },
     "knowsLanguage": ["en", "es"],
     "priceRange": "$$"
@@ -79,9 +81,9 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://oregon.tires/"},
-      {"@type": "ListItem", "position": 2, "name": "Service Areas", "item": "https://oregon.tires/#services"},
-      {"@type": "ListItem", "position": 3, "name": "<?= htmlspecialchars($areaName) ?>"}
+      {"@type": "ListItem", "position": 1, "name": "<?= seoMeta('Home', 'Inicio') ?>", "item": "https://oregon.tires/"},
+      {"@type": "ListItem", "position": 2, "name": "<?= seoMeta('Service Areas', 'Áreas de Servicio') ?>", "item": "https://oregon.tires/#services"},
+      {"@type": "ListItem", "position": 3, "name": "<?= htmlspecialchars(seoMeta($areaName, $areaNameEs)) ?>"}
     ]
   }
   </script>

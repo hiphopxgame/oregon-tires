@@ -1831,3 +1831,82 @@ function sendEmailReply(
 
     return $result;
 }
+
+/**
+ * Send a survey invitation email to a customer.
+ */
+function sendSurveyEmail(
+    string $email,
+    string $customerName,
+    string $serviceDisplay,
+    string $surveyUrl,
+    string $language = 'en'
+): array {
+    $baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://oregon.tires', '/');
+    $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+
+    // Try DB template first
+    $result = sendBrandedTemplateEmail(
+        $email,
+        'survey',
+        [
+            'name' => $customerName,
+            'service' => $serviceDisplay,
+        ],
+        $language,
+        $surveyUrl
+    );
+
+    // If template found and sent, return
+    if ($result['success'] ?? false) {
+        logEmail('survey_sent', "Survey email sent to {$email} for service: {$serviceDisplay}");
+        return $result;
+    }
+
+    // Fallback: hardcoded bilingual survey email
+    $subjectEn = "How was your experience at Oregon Tires?";
+    $subjectEs = "¿Cómo fue su experiencia en Oregon Tires?";
+    $subject = $language === 'en'
+        ? "{$subjectEn} | {$subjectEs}"
+        : "{$subjectEs} | {$subjectEn}";
+
+    $htmlBody = <<<HTML
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background-color:#f0fdf4;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0fdf4;">
+<tr><td align="center" style="padding:30px 15px;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+  <tr><td style="background:linear-gradient(135deg,#15803d 0%,#166534 50%,#1a1a2e 100%);padding:32px 30px 24px;text-align:center;">
+    <img src="{$baseUrl}/assets/logo.png" alt="Oregon Tires Auto Care" width="100" style="display:block;margin:0 auto 12px;">
+    <p style="color:#86efac;font-size:13px;margin:0;letter-spacing:2px;text-transform:uppercase;">Your Feedback Matters / Su Opinión Importa</p>
+  </td></tr>
+  <tr><td style="padding:32px 36px;">
+    <h2 style="color:#15803d;font-size:22px;margin:0 0 16px;">Hi {$h($customerName)},</h2>
+    <p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 16px;">Thank you for choosing Oregon Tires for your recent <strong>{$h($serviceDisplay)}</strong> service. We'd love to hear about your experience!</p>
+    <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0 0 16px;">Gracias por elegir Oregon Tires para su reciente servicio de <strong>{$h($serviceDisplay)}</strong>. ¡Nos encantaría conocer su experiencia!</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto;">
+      <tr><td style="background:linear-gradient(135deg,#15803d,#166534);border-radius:12px;">
+        <a href="{$h($surveyUrl)}" target="_blank" style="display:inline-block;padding:14px 36px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;">Take Survey / Completar Encuesta</a>
+      </td></tr>
+    </table>
+    <p style="color:#9ca3af;font-size:12px;text-align:center;margin:16px 0 0;">Your feedback helps us improve. / Sus comentarios nos ayudan a mejorar.</p>
+  </td></tr>
+  <tr><td style="background-color:#1a1a2e;padding:20px 30px;text-align:center;">
+    <p style="color:#9ca3af;font-size:12px;margin:0;">Oregon Tires Auto Care | (503) 367-9714</p>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>
+HTML;
+
+    $textBody = "Hi {$customerName},\n\nThank you for your recent {$serviceDisplay} service at Oregon Tires.\n\nPlease take a moment to share your feedback:\n{$surveyUrl}\n\nOregon Tires Auto Care | (503) 367-9714";
+
+    $result = sendMail($email, $subject, $htmlBody, $textBody);
+
+    if ($result['success'] ?? false) {
+        logEmail('survey_sent', "Survey email sent to {$email} for service: {$serviceDisplay}");
+    }
+
+    return $result;
+}

@@ -8,20 +8,22 @@ $pageTitleEs = "Nuestra Garant\u00eda | Oregon Tires Auto Care";
 $pageDesc = "Oregon Tires backs every service with a 12-month/12,000-mile warranty, price match guarantee, free inspections, and no-surprise pricing. Your satisfaction is guaranteed.";
 $pageDescEs = "Oregon Tires respalda cada servicio con garant\u00eda de 12 meses/12,000 millas, igualaci\u00f3n de precios, inspecciones gratuitas y precios sin sorpresas.";
 $canonicalUrl = 'https://oregon.tires/guarantee';
+require_once __DIR__ . '/includes/seo-lang.php';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= $pageTitle ?></title>
-  <meta name="description" content="<?= $pageDesc ?>">
+  <title><?= seoMeta($pageTitle, $pageTitleEs) ?></title>
+  <meta name="description" content="<?= seoMeta($pageDesc, $pageDescEs) ?>">
   <link rel="canonical" href="<?= $canonicalUrl ?>">
   <link rel="alternate" hreflang="en" href="<?= $canonicalUrl ?>?lang=en">
   <link rel="alternate" hreflang="es" href="<?= $canonicalUrl ?>?lang=es">
   <link rel="alternate" hreflang="x-default" href="<?= $canonicalUrl ?>">
-  <meta property="og:title" content="<?= $pageTitle ?>">
-  <meta property="og:description" content="<?= $pageDesc ?>">
+  <meta property="og:title" content="<?= seoMeta($pageTitle, $pageTitleEs) ?>">
+  <meta property="og:description" content="<?= seoMeta($pageDesc, $pageDescEs) ?>">
+  <meta property="og:locale" content="<?= seoOgLocale() ?>">
   <meta property="og:url" content="<?= $canonicalUrl ?>">
   <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
   <meta property="og:type" content="website">

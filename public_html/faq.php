@@ -7,6 +7,7 @@
 
 // ─── Bootstrap & fetch FAQs ─────────────────────────────────────────────────
 require_once __DIR__ . '/includes/bootstrap.php';
+require_once __DIR__ . '/includes/seo-lang.php';
 
 $faqs = [];
 $dbError = false;
@@ -31,18 +32,19 @@ $pageDescEs = 'Preguntas comunes sobre instalación de llantas, servicio de fren
 $canonicalUrl = 'https://oregon.tires/faq';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title"><?= htmlspecialchars($pageTitle) ?></title>
-  <meta name="description" id="page-desc" content="<?= htmlspecialchars($pageDesc) ?>">
+  <title id="page-title"><?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?></title>
+  <meta name="description" id="page-desc" content="<?= htmlspecialchars(seoMeta($pageDesc, $pageDescEs)) ?>">
   <link rel="canonical" href="<?= $canonicalUrl ?>">
   <link rel="alternate" hreflang="en" href="<?= $canonicalUrl ?>?lang=en">
   <link rel="alternate" hreflang="es" href="<?= $canonicalUrl ?>?lang=es">
   <link rel="alternate" hreflang="x-default" href="<?= $canonicalUrl ?>">
-  <meta property="og:title" content="<?= htmlspecialchars($pageTitle) ?>">
-  <meta property="og:description" content="<?= htmlspecialchars($pageDesc) ?>">
+  <meta property="og:title" content="<?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?>">
+  <meta property="og:description" content="<?= htmlspecialchars(seoMeta($pageDesc, $pageDescEs)) ?>">
+  <meta property="og:locale" content="<?= seoOgLocale() ?>">
   <meta property="og:url" content="<?= $canonicalUrl ?>">
   <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
   <meta property="og:type" content="website">
@@ -81,10 +83,10 @@ $canonicalUrl = 'https://oregon.tires/faq';
       '@type' => 'FAQPage',
       'mainEntity' => array_map(fn($faq) => [
           '@type' => 'Question',
-          'name' => $faq['question_en'],
+          'name' => seoMeta($faq['question_en'], $faq['question_es']),
           'acceptedAnswer' => [
               '@type' => 'Answer',
-              'text' => $faq['answer_en'],
+              'text' => seoMeta($faq['answer_en'], $faq['answer_es']),
           ],
       ], $faqs),
   ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>

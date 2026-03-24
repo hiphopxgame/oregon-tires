@@ -8,20 +8,22 @@ $pageTitleEs = 'Cotización de Llantas | Oregon Tires Auto Care';
 $pageDesc = 'Request a free tire quote from Oregon Tires Auto Care. We offer competitive prices on new and used tires for all vehicle types in Portland, OR.';
 $pageDescEs = 'Solicite una cotización gratuita de llantas de Oregon Tires Auto Care. Ofrecemos precios competitivos en llantas nuevas y usadas para todo tipo de vehículos en Portland, OR.';
 $canonicalUrl = 'https://oregon.tires/tire-quote';
+require_once __DIR__ . '/includes/seo-lang.php';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= $pageTitle ?></title>
-  <meta name="description" content="<?= $pageDesc ?>">
+  <title><?= seoMeta($pageTitle, $pageTitleEs) ?></title>
+  <meta name="description" content="<?= seoMeta($pageDesc, $pageDescEs) ?>">
   <link rel="canonical" href="<?= $canonicalUrl ?>">
   <link rel="alternate" hreflang="en" href="<?= $canonicalUrl ?>?lang=en">
   <link rel="alternate" hreflang="es" href="<?= $canonicalUrl ?>?lang=es">
   <link rel="alternate" hreflang="x-default" href="<?= $canonicalUrl ?>">
-  <meta property="og:title" content="<?= $pageTitle ?>">
-  <meta property="og:description" content="<?= $pageDesc ?>">
+  <meta property="og:title" content="<?= seoMeta($pageTitle, $pageTitleEs) ?>">
+  <meta property="og:description" content="<?= seoMeta($pageDesc, $pageDescEs) ?>">
+  <meta property="og:locale" content="<?= seoOgLocale() ?>">
   <meta property="og:url" content="<?= $canonicalUrl ?>">
   <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
   <meta property="og:type" content="website">

@@ -12,6 +12,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/mail.php';
 require_once __DIR__ . '/../includes/vin-decode.php';
+require_once __DIR__ . '/../includes/google-calendar.php';
 
 try {
     requireMethod('GET', 'POST');
@@ -95,6 +96,15 @@ try {
          SET status = ?, cancel_reason = ?, cancel_token = NULL, cancel_token_expires = NULL, updated_at = NOW()
          WHERE id = ?'
     )->execute(['cancelled', $cancelReason, $appointment['id']]);
+
+    // ─── Delete Google Calendar event ──────────────────────────────────
+    try {
+        if (isCalendarSyncEnabled() && !empty($appointment['google_event_id'])) {
+            deleteCalendarEvent($db, (int) $appointment['id']);
+        }
+    } catch (\Throwable $calErr) {
+        error_log("appointment-cancel.php: Calendar delete failed for #{$appointment['id']}: " . $calErr->getMessage());
+    }
 
     // ─── Cascade cancel to linked RO ──────────────────────────────────
     try {

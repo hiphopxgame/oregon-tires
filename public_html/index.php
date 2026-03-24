@@ -9,6 +9,12 @@ declare(strict_types=1);
 // Load bootstrap and environment
 require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/engine-kit-init.php';
+require_once __DIR__ . '/includes/seo-lang.php';
+
+$pageTitleEn = 'Oregon Tires Auto Care - Tire & Auto Services Portland, OR';
+$pageTitleEs = 'Oregon Tires Auto Care - Llantas y Servicio Automotriz Portland, OR';
+$pageDescEn = 'Professional tire sales, installation, brakes & auto care in Portland, OR. Bilingual English & Spanish service. Call (503) 367-9714';
+$pageDescEs = 'Venta e instalación profesional de llantas, frenos y servicio automotriz en Portland, OR. Servicio bilingüe inglés y español. Llame al (503) 367-9714';
 
 // Override bootstrap's JSON Content-Type — this is an HTML page, not an API endpoint
 header('Content-Type: text/html; charset=utf-8');
@@ -21,12 +27,12 @@ if (ob_get_level() === 0) {
     ob_start();
 }
 ?><!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oregon Tires Auto Care - Tire & Auto Services Portland, OR</title>
-  <meta name="description" content="Professional tire sales, installation, brakes & auto care in Portland, OR. Bilingual English & Spanish service. Call (503) 367-9714">
+  <title><?= htmlspecialchars(seoMeta($pageTitleEn, $pageTitleEs)) ?></title>
+  <meta name="description" content="<?= htmlspecialchars(seoMeta($pageDescEn, $pageDescEs)) ?>">
   <meta name="author" content="Oregon Tires Auto Care">
   <meta name="keywords" content="tires, auto care, brake service, oil change, Portland Oregon, bilingual service, Spanish English speaking">
   <link rel="icon" href="assets/favicon.ico" sizes="any">
@@ -46,10 +52,10 @@ if (ob_get_level() === 0) {
   <link rel="alternate" hreflang="x-default" href="https://oregon.tires/">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Oregon Tires Auto Care">
-  <meta property="og:description" content="Oregon Tires is serving Portland with honest, reliable automotive services since 2008.">
+  <meta property="og:title" content="<?= htmlspecialchars(seoMeta('Oregon Tires Auto Care', 'Oregon Tires Auto Care - Servicio Automotriz')) ?>">
+  <meta property="og:description" content="<?= htmlspecialchars(seoMeta('Oregon Tires is serving Portland with honest, reliable automotive services since 2008.', 'Oregon Tires sirve a Portland con servicios automotrices honestos y confiables desde 2008.')) ?>">
   <meta property="og:type" content="website">
-  <meta property="og:locale" content="en_US">
+  <meta property="og:locale" content="<?= seoOgLocale() ?>">
   <meta property="og:url" content="https://oregon.tires/">
   <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
   <meta property="og:image:width" content="1200">
@@ -60,8 +66,8 @@ if (ob_get_level() === 0) {
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Oregon Tires Auto Care - Tire & Auto Services Portland, OR">
-  <meta name="twitter:description" content="Professional tire sales, installation, brakes & auto care in Portland, OR. Bilingual English & Spanish service.">
+  <meta name="twitter:title" content="<?= htmlspecialchars(seoMeta($pageTitleEn, $pageTitleEs)) ?>">
+  <meta name="twitter:description" content="<?= htmlspecialchars(seoMeta($pageDescEn, $pageDescEs)) ?>">
   <meta name="twitter:image" content="https://oregon.tires/assets/og-image.jpg">
 
   <!-- Structured Data (abbreviated for brevity) -->

@@ -5,23 +5,25 @@
  * $serviceDescription, $serviceDescriptionEs,
  * $serviceBody, $serviceBodyEs, $faqItems, $relatedServices
  */
+require_once __DIR__ . '/../includes/seo-lang.php';
 $pageTitle = "$serviceName in Portland, OR | Oregon Tires Auto Care";
 $pageTitleEs = "$serviceNameEs en Portland, OR | Oregon Tires Auto Care";
 $canonicalUrl = "https://oregon.tires/$serviceSlug";
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= htmlspecialchars($pageTitle) ?></title>
-  <meta name="description" content="<?= htmlspecialchars($serviceDescription) ?>">
+  <title><?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?></title>
+  <meta name="description" content="<?= htmlspecialchars(seoMeta($serviceDescription, $serviceDescriptionEs)) ?>">
   <link rel="canonical" href="<?= $canonicalUrl ?>">
   <link rel="alternate" hreflang="en" href="<?= $canonicalUrl ?>?lang=en">
   <link rel="alternate" hreflang="es" href="<?= $canonicalUrl ?>?lang=es">
   <link rel="alternate" hreflang="x-default" href="<?= $canonicalUrl ?>">
-  <meta property="og:title" content="<?= htmlspecialchars($pageTitle) ?>">
-  <meta property="og:description" content="<?= htmlspecialchars($serviceDescription) ?>">
+  <meta property="og:title" content="<?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?>">
+  <meta property="og:description" content="<?= htmlspecialchars(seoMeta($serviceDescription, $serviceDescriptionEs)) ?>">
+  <meta property="og:locale" content="<?= seoOgLocale() ?>">
   <meta property="og:url" content="<?= $canonicalUrl ?>">
   <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
   <meta property="og:type" content="website">
@@ -57,8 +59,8 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
   {
     "@context": "https://schema.org",
     "@type": "Service",
-    "name": "<?= htmlspecialchars($serviceName) ?>",
-    "description": "<?= htmlspecialchars($serviceDescription) ?>",
+    "name": "<?= htmlspecialchars(seoMeta($serviceName, $serviceNameEs)) ?>",
+    "description": "<?= htmlspecialchars(seoMeta($serviceDescription, $serviceDescriptionEs)) ?>",
     "provider": {
       "@type": "AutomotiveBusiness",
       "name": "Oregon Tires Auto Care",
@@ -97,10 +99,10 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
       <?php foreach ($faqItems as $i => $faq): ?>
       {
         "@type": "Question",
-        "name": "<?= htmlspecialchars($faq['q']) ?>",
+        "name": "<?= htmlspecialchars(seoMeta($faq['q'], $faq['qEs'])) ?>",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "<?= htmlspecialchars($faq['a']) ?>"
+          "text": "<?= htmlspecialchars(seoMeta($faq['a'], $faq['aEs'])) ?>"
         }
       }<?= $i < count($faqItems) - 1 ? ',' : '' ?>
       <?php endforeach; ?>
@@ -115,9 +117,9 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://oregon.tires/"},
-      {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://oregon.tires/#services"},
-      {"@type": "ListItem", "position": 3, "name": "<?= htmlspecialchars($serviceName) ?>"}
+      {"@type": "ListItem", "position": 1, "name": "<?= seoMeta('Home', 'Inicio') ?>", "item": "https://oregon.tires/"},
+      {"@type": "ListItem", "position": 2, "name": "<?= seoMeta('Services', 'Servicios') ?>", "item": "https://oregon.tires/#services"},
+      {"@type": "ListItem", "position": 3, "name": "<?= htmlspecialchars(seoMeta($serviceName, $serviceNameEs)) ?>"}
     ]
   }
   </script>

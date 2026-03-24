@@ -42,12 +42,19 @@
     RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
     RewriteRule ^invoice\.php$ /invoice/%1? [R=301,L]
 
+    # Survey view by token
+    RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
+    RewriteRule ^survey$ /survey/%1? [R=301,L]
+    RewriteCond %{QUERY_STRING} ^token=([a-f0-9]+)$ [NC]
+    RewriteRule ^survey\.php$ /survey/%1? [R=301,L]
+
     # Internal rewrites: /page/TOKEN → page.php?token=TOKEN
     RewriteRule ^inspection/([a-f0-9]+)/?$ inspection.php?token=$1 [L,QSA]
     RewriteRule ^approve/([a-f0-9]+)/?$ approve.php?token=$1 [L,QSA]
     RewriteRule ^cancel/([a-f0-9]+)/?$ cancel.php?token=$1 [L,QSA]
     RewriteRule ^reschedule/([a-f0-9]+)/?$ reschedule.php?token=$1 [L,QSA]
     RewriteRule ^invoice/([a-f0-9]+)/?$ invoice.php?token=$1 [L,QSA]
+    RewriteRule ^survey/([a-f0-9]+)/?$ survey.php?token=$1 [L,QSA]
 
     # Dashboard alias: /dashboard → members.php (unified dashboard)
     RewriteRule ^dashboard/?$ members.php [L,QSA]
@@ -126,7 +133,7 @@
 </IfModule>
 
 # --- Directory Index ---
-DirectoryIndex index.html index.php
+DirectoryIndex index.php index.html
 
 # --- Error Pages ---
 ErrorDocument 404 /404.html

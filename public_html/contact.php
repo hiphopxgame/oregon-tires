@@ -7,6 +7,7 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/includes/bootstrap.php';
+require_once __DIR__ . '/includes/seo-lang.php';
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -27,14 +28,18 @@ FormManager::init($pdo, [
 ]);
 
 $appUrl = htmlspecialchars($_ENV['APP_URL'] ?? 'https://oregon.tires', ENT_QUOTES, 'UTF-8');
+$pageTitle = 'Contact Us - Oregon Tires Auto Care';
+$pageTitleEs = 'Contáctenos - Oregon Tires Auto Care';
+$contactPageDesc = 'Contact Oregon Tires Auto Care in Portland, OR. Professional bilingual automotive service.';
+$contactPageDescEs = 'Contacte a Oregon Tires Auto Care en Portland, OR. Servicio automotriz profesional bilingüe.';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - Oregon Tires Auto Care</title>
-    <meta name="description" content="Contact Oregon Tires Auto Care in Portland, OR. Professional bilingual automotive service.">
+    <title><?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?></title>
+    <meta name="description" content="<?= htmlspecialchars(seoMeta($contactPageDesc, $contactPageDescEs)) ?>">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="<?= $appUrl ?>/contact">
     <link rel="icon" href="assets/favicon.ico" sizes="any">

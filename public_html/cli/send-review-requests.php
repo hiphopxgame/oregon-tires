@@ -63,6 +63,36 @@ try {
 
     foreach ($appointments as $appt) {
         try {
+            // Check if customer has a pending/incomplete survey — skip review request
+            $surveyCheck = $db->prepare(
+                "SELECT sr.id, sr.completed_at,
+                        (SELECT AVG(sa.rating_value)
+                         FROM oretir_survey_answers sa
+                         JOIN oretir_survey_questions sq ON sa.question_id = sq.id
+                         WHERE sa.response_id = sr.id AND sq.question_type = 'rating' AND sa.rating_value IS NOT NULL
+                        ) AS avg_rating
+                 FROM oretir_survey_responses sr
+                 WHERE sr.appointment_id = ?
+                 ORDER BY sr.created_at DESC LIMIT 1"
+            );
+            $surveyCheck->execute([$appt['id']]);
+            $survey = $surveyCheck->fetch(\PDO::FETCH_ASSOC);
+
+            if ($survey) {
+                if (!$survey['completed_at']) {
+                    // Survey pending — skip review request, let them complete survey first
+                    echo "  ⏭ Skipping {$appt['email']} (#{$appt['id']}) — survey pending\n";
+                    continue;
+                }
+                if ($survey['avg_rating'] !== null && (float) $survey['avg_rating'] < 4.0) {
+                    // Low survey score — skip Google review request
+                    $db->prepare("UPDATE oretir_appointments SET review_request_sent = 1 WHERE id = ?")
+                       ->execute([$appt['id']]);
+                    echo "  ⏭ Skipping {$appt['email']} (#{$appt['id']}) — survey score " . round((float) $survey['avg_rating'], 1) . " < 4.0\n";
+                    continue;
+                }
+            }
+
             $success = sendReviewRequestEmail($appt);
 
             if ($success) {

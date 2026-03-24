@@ -8,20 +8,22 @@ $pageTitleEs = 'Áreas de Servicio | Oregon Tires Auto Care Portland OR';
 $pageDesc = 'Oregon Tires Auto Care serves SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell, and Mt. Scott. Professional bilingual auto care near you.';
 $pageDescEs = 'Oregon Tires Auto Care sirve a SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell y Mt. Scott. Servicio automotriz bilingüe profesional cerca de usted.';
 $canonicalUrl = 'https://oregon.tires/service-areas';
+require_once __DIR__ . '/includes/seo-lang.php';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= seoLang() ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title"><?= htmlspecialchars($pageTitle) ?></title>
-  <meta name="description" id="page-desc" content="<?= htmlspecialchars($pageDesc) ?>">
+  <title id="page-title"><?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?></title>
+  <meta name="description" id="page-desc" content="<?= htmlspecialchars(seoMeta($pageDesc, $pageDescEs)) ?>">
   <link rel="canonical" href="<?= $canonicalUrl ?>">
   <link rel="alternate" hreflang="en" href="<?= $canonicalUrl ?>?lang=en">
   <link rel="alternate" hreflang="es" href="<?= $canonicalUrl ?>?lang=es">
   <link rel="alternate" hreflang="x-default" href="<?= $canonicalUrl ?>">
-  <meta property="og:title" content="<?= htmlspecialchars($pageTitle) ?>">
-  <meta property="og:description" content="<?= htmlspecialchars($pageDesc) ?>">
+  <meta property="og:title" content="<?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?>">
+  <meta property="og:description" content="<?= htmlspecialchars(seoMeta($pageDesc, $pageDescEs)) ?>">
+  <meta property="og:locale" content="<?= seoOgLocale() ?>">
   <meta property="og:url" content="<?= $canonicalUrl ?>">
   <meta property="og:image" content="https://oregon.tires/assets/og-image.jpg">
   <meta property="og:type" content="website">
