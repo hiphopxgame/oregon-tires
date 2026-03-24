@@ -25,38 +25,42 @@
       icon: '🖥️',
       title: { en: 'Web Hosting', es: 'Hospedaje Web' },
       description: {
-        en: 'Get your own hosting account. All recommended hosts include free SSL, email, daily backups, and enough storage for your website and data.',
-        es: 'Obtenga su propia cuenta de hospedaje. Todos los hosts recomendados incluyen SSL gratuito, correo electrónico, respaldos diarios y suficiente almacenamiento.'
+        en: 'Get your own hosting account. Your website runs automated tasks (appointment reminders, email fetch, push notifications) every 2–5 minutes, so the host must support frequent cron jobs. Prices shown are renewal rates, not intro pricing.',
+        es: 'Obtenga su propia cuenta de hospedaje. Su sitio web ejecuta tareas automatizadas (recordatorios de citas, correo, notificaciones push) cada 2–5 minutos, así que el host debe soportar tareas cron frecuentes. Los precios mostrados son de renovación, no promocionales.'
       },
       items: [
         {
           id: 'host-choose',
           text: { en: 'Sign up for a web host', es: 'Regístrese en un servicio de hospedaje' },
           detail: {
-            en: 'Pick one — all include free SSL, email, daily backups, and plenty of storage for your website, photos, customer data, and years of backup history. Click a link below to sign up:\n\n• SiteGround ($15/mo, 20GB) — Best support, fastest. Recommended.\n• A2 Hosting ($5/mo, 100GB) — Best value for growing businesses.\n• Hostinger ($3/mo, 100GB) — Budget-friendly, includes everything.',
-            es: 'Elija uno — todos incluyen SSL gratis, correo, respaldos diarios y amplio almacenamiento. Haga clic en un enlace para registrarse:\n\n• SiteGround ($15/mes, 20GB) — Mejor soporte, más rápido. Recomendado.\n• A2 Hosting ($5/mes, 100GB) — Mejor valor para negocios en crecimiento.\n• Hostinger ($3/mes, 100GB) — Económico, incluye todo.'
+            en: 'Pick one tier based on your needs. All include free SSL and backups.\n\n⭐ TIER 1 — Best Value (Recommended)\nVultr Cloud VPS — $6/mo, no markup\n• Seattle datacenter (closest to Portland = fastest)\n• No cron job limits — all 7 automated tasks run perfectly\n• NVMe storage, 2TB bandwidth, full SSH access\n• Your developer handles one-time setup\n\n🔧 TIER 2 — Managed VPS (Hands-Off)\nCloudways — $14/mo, no markup\n• Managed server — auto-scaling, staging environments\n• No cron job limits — everything runs perfectly\n• Best choice if you want zero server management\n\n💰 TIER 3 — Shared Hosting (Budget Fallback)\nA2 Hosting — ~$13/mo after renewal\n• cPanel, SSH, 100GB storage\n• ⚠️ Limitation: cron jobs limited to 15-min intervals\n  (email fetch relaxed from every 2 min to every 15 min)\n\nNote: SiteGround is NOT recommended — they enforce 30-minute minimum cron intervals (breaks 5 of your 7 automated tasks) and renew at $30/mo, not $15.',
+            es: 'Elija un nivel según sus necesidades. Todos incluyen SSL gratis y respaldos.\n\n⭐ NIVEL 1 — Mejor Valor (Recomendado)\nVultr Cloud VPS — $6/mes, sin sobreprecio\n• Centro de datos en Seattle (más cercano a Portland = más rápido)\n• Sin límite de tareas cron — las 7 tareas automatizadas funcionan perfectamente\n• Almacenamiento NVMe, 2TB ancho de banda, acceso SSH completo\n• Su desarrollador se encarga de la configuración inicial\n\n🔧 NIVEL 2 — VPS Administrado (Sin Complicaciones)\nCloudways — $14/mes, sin sobreprecio\n• Servidor administrado — escalado automático, entornos de prueba\n• Sin límite de tareas cron — todo funciona perfectamente\n• La mejor opción si desea cero administración del servidor\n\n💰 NIVEL 3 — Hospedaje Compartido (Opción Económica)\nA2 Hosting — ~$13/mes después de renovación\n• cPanel, SSH, 100GB de almacenamiento\n• ⚠️ Limitación: tareas cron mínimo cada 15 minutos\n  (la revisión de correo se relaja de cada 2 min a cada 15 min)\n\nNota: SiteGround NO se recomienda — impone intervalos cron mínimos de 30 minutos (rompe 5 de sus 7 tareas automatizadas) y renueva a $30/mes, no $15.'
           },
           links: [
-            { label: { en: 'SiteGround (Recommended)', es: 'SiteGround (Recomendado)' }, url: 'https://www.siteground.com/web-hosting.htm' },
-            { label: { en: 'A2 Hosting (Best Value)', es: 'A2 Hosting (Mejor Valor)' }, url: 'https://www.a2hosting.com/web-hosting/' },
-            { label: { en: 'Hostinger (Budget)', es: 'Hostinger (Económico)' }, url: 'https://www.hostinger.com/web-hosting' }
+            { label: { en: 'Vultr Cloud VPS (Recommended)', es: 'Vultr Cloud VPS (Recomendado)' }, url: 'https://www.vultr.com/pricing/#cloud-compute' },
+            { label: { en: 'Cloudways (Managed)', es: 'Cloudways (Administrado)' }, url: 'https://www.cloudways.com/en/pricing.php' },
+            { label: { en: 'A2 Hosting (Shared Fallback)', es: 'A2 Hosting (Compartido)' }, url: 'https://www.a2hosting.com/web-hosting/' }
           ]
         },
         {
           id: 'host-share',
           text: { en: 'Share hosting login with your developer', es: 'Comparta el acceso con su desarrollador' },
           detail: {
-            en: 'After signing up, share your hosting login (cPanel URL, username, password) with your developer. They will handle all the technical setup — database, files, and configuration.',
-            es: 'Después de registrarse, comparta su acceso de hospedaje (URL de cPanel, usuario y contraseña) con su desarrollador. Ellos se encargarán de toda la configuración técnica.'
+            en: 'After signing up, share your hosting login with your developer. They will handle all the technical setup — server configuration, database, files, cron jobs, and SSL.\n\n• Vultr/Cloudways: share your dashboard login\n• A2 Hosting: share your cPanel URL, username, and password',
+            es: 'Después de registrarse, comparta su acceso de hospedaje con su desarrollador. Ellos se encargarán de toda la configuración técnica — servidor, base de datos, archivos, tareas cron y SSL.\n\n• Vultr/Cloudways: comparta su acceso al panel de control\n• A2 Hosting: comparta su URL de cPanel, usuario y contraseña'
           }
         },
         {
           id: 'host-email',
-          text: { en: 'Set up business email accounts', es: 'Configure cuentas de correo del negocio' },
+          text: { en: 'Set up business email', es: 'Configure correo del negocio' },
           detail: {
-            en: 'In your hosting control panel, create email accounts:\n• contact@oregon.tires (for customer inquiries)\n• info@oregon.tires (general business)\n\nYour hosting includes free email. Share the email passwords with your developer so they can connect the website\'s notification system.',
-            es: 'En su panel de control, cree cuentas de correo:\n• contact@oregon.tires (para consultas de clientes)\n• info@oregon.tires (general del negocio)\n\nSu hospedaje incluye correo gratuito. Comparta las contraseñas con su desarrollador para conectar el sistema de notificaciones.'
-          }
+            en: 'Your website uses Cloudflare (already set up) which includes free email routing. Your developer can configure:\n• contact@oregon.tires → forwards to your inbox\n• info@oregon.tires → forwards to your inbox\n\nThis is free with Cloudflare. If you need dedicated mailboxes (not forwarding), options include:\n• Zoho Mail — free for up to 5 users\n• Google Workspace — $7/user/mo (premium, includes Google Drive)',
+            es: 'Su sitio web usa Cloudflare (ya configurado) que incluye redirección de correo gratuita. Su desarrollador puede configurar:\n• contact@oregon.tires → reenvía a su bandeja de entrada\n• info@oregon.tires → reenvía a su bandeja de entrada\n\nEsto es gratis con Cloudflare. Si necesita buzones dedicados (no reenvío), las opciones incluyen:\n• Zoho Mail — gratis hasta 5 usuarios\n• Google Workspace — $7/usuario/mes (premium, incluye Google Drive)'
+          },
+          links: [
+            { label: { en: 'Zoho Mail (Free)', es: 'Zoho Mail (Gratis)' }, url: 'https://www.zoho.com/mail/zohomail-pricing.html' },
+            { label: { en: 'Google Workspace', es: 'Google Workspace' }, url: 'https://workspace.google.com/pricing' }
+          ]
         },
       ]
     },
