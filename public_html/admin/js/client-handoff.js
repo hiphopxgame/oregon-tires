@@ -71,14 +71,13 @@
       items: [
         {
           id: 'dom-registrar',
-          text: { en: 'Create a domain registrar account', es: 'Cree una cuenta de registrador de dominios' },
+          text: { en: 'Create a Porkbun account', es: 'Cree una cuenta en Porkbun' },
           detail: {
-            en: 'Sign up at one of these registrars (both are reputable and affordable). This is where your domain will live — like a title deed for your web address.',
-            es: 'Regístrese en uno de estos registradores (ambos son confiables y económicos). Aquí es donde vivirá su dominio — como la escritura de su dirección web.'
+            en: 'Sign up at Porkbun.com — this is the registrar that supports the .tires domain extension. Most registrars (Namecheap, Cloudflare, GoDaddy) do not support .tires domains, so Porkbun is required.\n\nPorkbun is reputable, affordable, and includes free WHOIS privacy. This is where your domain will live — like a title deed for your web address.',
+            es: 'Regístrese en Porkbun.com — este es el registrador que soporta la extensión de dominio .tires. La mayoría de los registradores (Namecheap, Cloudflare, GoDaddy) no soportan dominios .tires, así que Porkbun es necesario.\n\nPorkbun es confiable, económico e incluye privacidad WHOIS gratis. Aquí es donde vivirá su dominio — como la escritura de su dirección web.'
           },
           links: [
-            { label: { en: 'Namecheap', es: 'Namecheap' }, url: 'https://www.namecheap.com/' },
-            { label: { en: 'Cloudflare Registrar', es: 'Cloudflare Registrar' }, url: 'https://www.cloudflare.com/products/registrar/' }
+            { label: { en: 'Porkbun (Required for .tires)', es: 'Porkbun (Requerido para .tires)' }, url: 'https://porkbun.com/' }
           ]
         },
         {
