@@ -11,10 +11,11 @@
 
   // Items confirmed complete by developer — auto-checked on first load
   var DEV_CONFIRMED = [
-    'gc-project',       // Google Cloud project "Oregon Tires" (oregon-tires, #734338521474)
-    'gc-enable-apis',   // Maps, Places, Calendar, My Business APIs enabled
-    'gc-oauth',         // OAuth credentials configured (Sign in with Google working)
-    'gc-api-key',       // API key active (AIzaSy...5Lw) — Places API verified working
+    'gc-project',           // Google Cloud project "Oregon Tires" (oregon-tires, #734338521474)
+    'gc-enable-apis',       // Maps, Places, Calendar, My Business APIs enabled
+    'gc-oauth',             // OAuth credentials configured (Sign in with Google working)
+    'gc-api-key',           // API key active (AIzaSy...5Lw) — Places API verified working
+    'gc-service-account',   // Service account created + JSON installed on server + auth verified
   ];
 
   function getChecked() {
@@ -229,8 +230,8 @@
           id: 'gc-service-account',
           text: { en: 'Create a Service Account (Calendar + Business Profile)', es: 'Crear una Cuenta de Servicio (Calendario + Perfil de Negocio)' },
           detail: {
-            en: '\u23F3 NEXT STEP — Required to activate Calendar sync and Business Profile management\n\nA service account is like a robot employee for your website. The API key you already created only works for Reviews. Calendar and Business Profile need this separate credential.\n\n━━━ PART A: Create the service account ━━━\n1. Click the "Service Accounts" link below (project: oregon-tires)\n2. Click "+ Create Service Account"\n3. Fill in:\n   - Name: Oregon Tires Website\n   - ID: (auto-fills, leave as-is)\n   - Description: Automated calendar and business profile sync\n4. Click "Create and Continue"\n5. Role: Basic > Editor\n6. Click "Continue" > "Done"\n\n━━━ PART B: Download the key file ━━━\n7. Click the service account email you just created\n8. Click "Keys" tab > "Add Key" > "Create new key"\n9. Select "JSON" > "Create"\n10. A .json file downloads automatically\n\n━━━ SHARE WITH YOUR DEVELOPER ━━━\n- The downloaded JSON file (send securely — email or shared drive)\n- The service account email address (needed for Calendar and GBP steps)\n\nThis unlocks:\n\u2022 Automatic appointment \u2192 Google Calendar sync\n\u2022 Google Business Profile hours/posts/insights management',
-            es: '\u23F3 SIGUIENTE PASO — Requerido para activar sincronizaci\u00f3n de Calendario y gesti\u00f3n del Perfil de Negocio\n\nUna cuenta de servicio es como un empleado robot para su sitio web. La clave API que ya cre\u00f3 solo funciona para Rese\u00f1as. Calendario y Perfil de Negocio necesitan esta credencial separada.\n\n━━━ PARTE A: Crear la cuenta de servicio ━━━\n1. Haga clic en "Cuentas de Servicio" abajo (proyecto: oregon-tires)\n2. Clic en "+ Create Service Account"\n3. Complete:\n   - Nombre: Oregon Tires Website\n   - ID: (se llena autom\u00e1ticamente)\n   - Descripci\u00f3n: Automated calendar and business profile sync\n4. Clic en "Create and Continue"\n5. Rol: Basic > Editor\n6. Clic en "Continue" > "Done"\n\n━━━ PARTE B: Descargar el archivo de clave ━━━\n7. Haga clic en el email de la cuenta de servicio\n8. Pesta\u00f1a "Keys" > "Add Key" > "Create new key"\n9. Seleccione "JSON" > "Create"\n10. Un archivo .json se descarga autom\u00e1ticamente\n\n━━━ COMPARTIR CON SU DESARROLLADOR ━━━\n- El archivo JSON descargado (env\u00ede de forma segura)\n- El email de la cuenta de servicio (necesario para Calendario y GBP)\n\nEsto desbloquea:\n\u2022 Sincronizaci\u00f3n autom\u00e1tica de citas \u2192 Google Calendar\n\u2022 Gesti\u00f3n de horarios/publicaciones/estad\u00edsticas del Perfil de Negocio'
+            en: '\u2705 COMPLETED\n\nService Account: oregon-tires@oregon-tires.iam.gserviceaccount.com\nClient ID: 113123761510421027650\nJSON Key: Installed on server (google-service-account.json)\nAuthentication: Verified \u2014 Bearer token obtained successfully\nGoogle Client Library: v2.19.0 installed\n\nThis service account powers:\n\u2022 Google Calendar API \u2014 appointment sync (needs Calendar sharing \u2014 next step)\n\u2022 Google Business Profile API \u2014 hours/posts/insights (needs GBP access \u2014 next step)',
+            es: '\u2705 COMPLETADO\n\nCuenta de Servicio: oregon-tires@oregon-tires.iam.gserviceaccount.com\nClient ID: 113123761510421027650\nClave JSON: Instalada en el servidor (google-service-account.json)\nAutenticaci\u00f3n: Verificada \u2014 Token Bearer obtenido exitosamente\nLibrer\u00eda Google Client: v2.19.0 instalada\n\nEsta cuenta de servicio alimenta:\n\u2022 Google Calendar API \u2014 sincronizaci\u00f3n de citas (necesita compartir Calendario \u2014 siguiente paso)\n\u2022 Google Business Profile API \u2014 horarios/publicaciones/estad\u00edsticas (necesita acceso GBP \u2014 siguiente paso)'
           },
           links: [
             { label: { en: 'Service Accounts', es: 'Cuentas de Servicio' }, url: 'https://console.cloud.google.com/iam-admin/serviceaccounts' }
