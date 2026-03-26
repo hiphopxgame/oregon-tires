@@ -3459,9 +3459,9 @@
           <div class="grid md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300">Google Analytics ID</label>
             <div class="md:col-span-2">
-              <input id="setting-google_analytics_id-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 font-mono" placeholder="G-CHYMTNB6LH" pattern="^G-[A-Z0-9]{6,12}$" oninput="document.getElementById('setting-google_analytics_id-es').value=this.value">
+              <input id="setting-google_analytics_id-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 font-mono" placeholder="G-PCK6ZYFHQ0" pattern="^G-[A-Z0-9]{6,12}$" oninput="document.getElementById('setting-google_analytics_id-es').value=this.value">
               <input type="hidden" id="setting-google_analytics_id-es">
-              <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">GA4 Measurement ID (e.g. G-CHYMTNB6LH). Same value for both languages.</p>
+              <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">GA4 Measurement ID (e.g. G-PCK6ZYFHQ0). Same value for both languages.</p>
             </div>
           </div>
         </div>
@@ -7859,6 +7859,7 @@ let appointments = [], messages = [], employees = [], emailLogs = [], galleryIma
 let currentNotesId = null, apptPage = 1, apptSortBy = 'created', apptSortOrder = 'desc';
 let calDate = new Date(), calSelectedDate = new Date();
 let adminUsers = [], currentUser = null;
+const PROTECTED_SUPERADMINS = ['oregontirespdx@gmail.com'];
 
 // ===== SERVICE COLOR MAP =====
 var SERVICE_COLORS = {
@@ -10918,7 +10919,7 @@ function renderEmployees() {
           ${isSuperAdmin ? `<div class="flex items-center gap-2 flex-wrap">
             <button onclick="openSetPasswordModal('${u.id}','${esc(u.display_name)}')" class="text-green-700 border border-green-300 px-3 py-1 rounded-lg text-sm hover:bg-green-50 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-900/40">🔑 Set Password</button>
             ${(status === 'invited' || status === 'invite_expired' || status === 'no_invite') ? `<button onclick="resendAdminInvite('${u.id}')" class="text-blue-600 border border-blue-200 px-3 py-1 rounded-lg text-sm hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/40">📨 Send Invite</button>` : ''}
-            <button onclick="revokeAdmin('${u.id}')" class="text-red-600 border border-red-200 px-3 py-1 rounded-lg text-sm hover:bg-red-50 dark:text-red-400 dark:border-red-700 dark:hover:bg-red-900/40">🗑 Revoke</button>
+            ${PROTECTED_SUPERADMINS.includes((u.email||'').toLowerCase()) ? '<span class="text-xs text-gray-400 italic">🔒 Protected</span>' : `<button onclick="revokeAdmin('${u.id}')" class="text-red-600 border border-red-200 px-3 py-1 rounded-lg text-sm hover:bg-red-50 dark:text-red-400 dark:border-red-700 dark:hover:bg-red-900/40">🗑 Revoke</button>`}
           </div>` : ''}
         </div>`;
       }).join('')}</div>` : ''}
@@ -13277,6 +13278,12 @@ async function addAdmin() {
 }
 
 async function revokeAdmin(userId) {
+  // Client-side guard — protected accounts are also enforced server-side
+  var target = adminUsers.find(function(u) { return String(u.id) === String(userId); });
+  if (target && PROTECTED_SUPERADMINS.includes((target.email || '').toLowerCase())) {
+    showToast('This account is protected and cannot be revoked.', true);
+    return;
+  }
   if(!confirm(adminT[currentLang].revokeAdminConfirm)) return;
   try {
     await api('admins.php?id=' + userId, { method: 'DELETE' });
@@ -13343,6 +13350,10 @@ async function updateLanguagePreference() {
 }
 
 async function revokeAdminByEmail(email) {
+  if (PROTECTED_SUPERADMINS.includes((email || '').toLowerCase())) {
+    showToast('This account is protected and cannot be revoked.', true);
+    return;
+  }
   if(!confirm(adminT[currentLang].revokeAdminForConfirm + ' ' + email + '?')) return;
   const admin = adminUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
   if(admin) {
@@ -13363,7 +13374,7 @@ const SITE_SETTINGS_DEFAULTS = {
   hours_sunday: { en: 'Sunday: Closed', es: 'Domingo: Cerrado' },
   rating_value: { en: '4.8', es: '4.8' },
   review_count: { en: '150+', es: '150+' },
-  google_analytics_id: { en: 'G-CHYMTNB6LH', es: 'G-CHYMTNB6LH' },
+  google_analytics_id: { en: 'G-PCK6ZYFHQ0', es: 'G-PCK6ZYFHQ0' },
   price_tire_install: { en: 'From $20', es: 'Desde $20' },
   price_tire_repair: { en: 'From $15', es: 'Desde $15' },
   price_oil_change: { en: 'From $35', es: 'Desde $35' },

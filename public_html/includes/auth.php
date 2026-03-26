@@ -9,6 +9,11 @@ const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_MINUTES    = 15;
 const BCRYPT_COST        = 12;
 
+// Protected accounts — cannot be demoted, deactivated, or deleted via the admin panel.
+const PROTECTED_SUPERADMINS = [
+    'oregontirespdx@gmail.com',
+];
+
 // ─── Permission Bundles ─────────────────────────────────────────────────────
 // Maps each admin API endpoint filename to the required permission bundle.
 // 'my_work' is always granted. Admins bypass all checks.

@@ -131,12 +131,12 @@ if (ob_get_level() === 0) {
     <?php engineHead('oregontires', ['page_title' => 'Oregon Tires Auto Care']); ?>
   <?php else: ?>
     <!-- Fallback: Manual GA if Engine Kit not available -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CHYMTNB6LH"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PCK6ZYFHQ0"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-CHYMTNB6LH');
+      gtag('config', 'G-PCK6ZYFHQ0');
     </script>
   <?php endif; ?>
 

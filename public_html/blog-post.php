@@ -95,7 +95,7 @@ header('Content-Type: text/html; charset=utf-8');
   <!-- GA4 -->
   <script>
   (function(){
-    var id = 'G-CHYMTNB6LH';
+    var id = 'G-PCK6ZYFHQ0';
     try { var c = localStorage.getItem('oregontires_ga_id'); if (c) id = c; } catch(e){}
     var s = document.createElement('script'); s.async = true;
     s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;

@@ -41,7 +41,7 @@ describe('public site — GA4 analytics setup', () => {
   });
 
   it('has GA4 measurement ID configured', () => {
-    expect(publicHtml).toContain('G-CHYMTNB6LH');
+    expect(publicHtml).toContain('G-PCK6ZYFHQ0');
   });
 
   it('has IIFE wrapper for GA initialization', () => {
@@ -92,7 +92,7 @@ describe('admin site — GA4 analytics setup', () => {
   });
 
   it('has GA4 measurement ID configured', () => {
-    expect(adminHtml).toContain('G-CHYMTNB6LH');
+    expect(adminHtml).toContain('G-PCK6ZYFHQ0');
   });
 });
 

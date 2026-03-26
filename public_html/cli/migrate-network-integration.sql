@@ -13,7 +13,7 @@ UPDATE engine_sites SET
         '$.font_heading', 'Inter',
         '$.font_body', 'Inter'
     ),
-    google_analytics_id = 'G-CHYMTNB6LH'
+    google_analytics_id = 'G-PCK6ZYFHQ0'
 WHERE site_key = 'oregontires';
 
 -- 1A. Update 1OH6 Events branding
@@ -38,7 +38,7 @@ WHERE c.is_core = 1
 
 -- 1C. Configure analytics for Oregon Tires
 UPDATE engine_site_components
-SET config = '{"ga4_measurement_id":"G-CHYMTNB6LH"}'
+SET config = '{"ga4_measurement_id":"G-PCK6ZYFHQ0"}'
 WHERE site_key = 'oregontires' AND component_slug = 'analytics';
 
 -- ============================================================================

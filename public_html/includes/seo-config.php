@@ -38,7 +38,7 @@ function getBusinessConfig(): array {
             'instagram' => 'https://www.instagram.com/oregontires',
         ],
         'googlePlaceId' => 'ChIJLSxZDQyflVQRWXEi9LpJGxs',
-        'gaId' => 'G-CHYMTNB6LH',
+        'gaId' => 'G-PCK6ZYFHQ0',
         'services' => (function() {
             try {
                 $db = getDB();

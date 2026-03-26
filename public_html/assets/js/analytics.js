@@ -3,7 +3,7 @@
 
 // === GA4 Hybrid Loader (configurable via admin panel) ===
 (function(){
-  var DEFAULT_GA = 'G-CHYMTNB6LH';
+  var DEFAULT_GA = 'G-PCK6ZYFHQ0';
   var cached = null;
   try { cached = localStorage.getItem('oregontires_ga_id'); } catch(e){}
   var id = cached || DEFAULT_GA;

@@ -191,10 +191,16 @@ try {
         jsonError('You cannot deactivate your own account.', 400);
     }
 
-    // Only superadmins can revoke other superadmins
-    $targetStmt = $db->prepare('SELECT role FROM oretir_admins WHERE id = ? AND is_active = 1 LIMIT 1');
+    // Protected accounts cannot be deactivated
+    $targetStmt = $db->prepare('SELECT email, role FROM oretir_admins WHERE id = ? AND is_active = 1 LIMIT 1');
     $targetStmt->execute([$id]);
     $targetAdmin = $targetStmt->fetch();
+
+    if ($targetAdmin && in_array($targetAdmin['email'], PROTECTED_SUPERADMINS, true)) {
+        jsonError('This account is protected and cannot be deactivated.', 403);
+    }
+
+    // Only superadmins can revoke other superadmins
     if ($targetAdmin && in_array($targetAdmin['role'], ['superadmin', 'super_admin'], true) && !$isSuperAdmin) {
         jsonError('Only superadmins can revoke superadmin accounts.', 403);
     }
