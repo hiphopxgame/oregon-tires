@@ -13611,7 +13611,9 @@ function switchApptView(view) {
 }
 
 // Sub-tab switching for Documentation
-function switchDocsView(view) {
+var _currentDocsView = 'platform';
+function switchDocsView(view, skipUrl) {
+  _currentDocsView = view;
   var tabs = ['platform','manual','handoff'];
   var active = 'px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white';
   var inactive = 'px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
@@ -13623,6 +13625,11 @@ function switchDocsView(view) {
   });
   if (view === 'platform' && typeof renderPlatformTab === 'function') renderPlatformTab();
   if (view === 'handoff' && typeof renderClientHandoff === 'function') renderClientHandoff(document.getElementById('handoff-content'));
+  // Persist sub-tab in URL so refresh keeps the same view
+  if (!skipUrl) {
+    var path = view === 'platform' ? '/admin/docs' : '/admin/docs/' + view;
+    if (location.pathname !== path) history.pushState({ tab: 'docs', docsView: view }, '', path);
+  }
 }
 
 
@@ -15582,28 +15589,39 @@ document.addEventListener('click', function(e) {
 var _navigatingFromPopstate = false;
 
 function _getTabFromUrl() {
-  // Path-based: /admin/docs → 'docs'
-  var match = location.pathname.match(/^\/admin\/([a-z][a-z0-9]*)/);
-  if (match && match[1]) return match[1];
+  // Path-based: /admin/docs/handoff → { tab: 'docs', sub: 'handoff' }
+  var match = location.pathname.match(/^\/admin\/([a-z][a-z0-9]*)(\/([a-z]+))?/);
+  if (match && match[1]) return { tab: match[1], sub: match[3] || '' };
   // Hash fallback for old bookmarks: /admin/#docs → redirect to /admin/docs
   var hash = location.hash.replace('#', '');
   if (hash) {
     history.replaceState(null, '', '/admin/' + hash);
-    return hash;
+    return { tab: hash, sub: '' };
   }
-  return '';
+  return { tab: '', sub: '' };
 }
 
 (function() {
-  var initTab = _getTabFromUrl();
-  if (initTab && document.getElementById('tab-' + initTab)) {
-    setTimeout(function() { switchTab(initTab); }, 100);
+  var init = _getTabFromUrl();
+  if (init.tab && document.getElementById('tab-' + init.tab)) {
+    setTimeout(function() {
+      switchTab(init.tab);
+      if (init.tab === 'docs' && init.sub) {
+        switchDocsView(init.sub, true);
+      }
+    }, 100);
   }
   window.addEventListener('popstate', function() {
-    var tab = _getTabFromUrl() || 'overview';
+    var parsed = _getTabFromUrl();
+    var tab = parsed.tab || 'overview';
     if (document.getElementById('tab-' + tab)) {
       _navigatingFromPopstate = true;
       _origSwitchTab(tab);
+      if (tab === 'docs' && parsed.sub) {
+        switchDocsView(parsed.sub, true);
+      } else if (tab === 'docs') {
+        switchDocsView('platform', true);
+      }
       var mobileSelect = document.getElementById('mobile-tab-select');
       if (mobileSelect) mobileSelect.value = tab;
       _navigatingFromPopstate = false;
@@ -15615,7 +15633,13 @@ function _getTabFromUrl() {
 var _origSwitchTab = switchTab;
 switchTab = function(tab) {
   _origSwitchTab(tab);
-  var targetPath = '/admin/' + tab;
+  // For docs tab, preserve sub-tab in URL; for others, use /admin/tab
+  var targetPath;
+  if (tab === 'docs' && _currentDocsView && _currentDocsView !== 'platform') {
+    targetPath = '/admin/docs/' + _currentDocsView;
+  } else {
+    targetPath = '/admin/' + tab;
+  }
   if (!_navigatingFromPopstate && location.pathname !== targetPath) {
     history.pushState({ tab: tab }, '', targetPath);
   }

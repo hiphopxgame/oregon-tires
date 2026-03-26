@@ -95,7 +95,7 @@
     RewriteRule ^admin/?$ admin/index.html [L]
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^admin/([a-z][a-z0-9]*)/?$ admin/index.html [L]
+    RewriteRule ^admin/([a-z][a-z0-9]*)(/.+)?/?$ admin/index.html [L]
 
     # API Versioning: /api/v1/* → /api/* alias
     RewriteRule ^api/v1/(.+)$ /api/$1 [L,QSA]
