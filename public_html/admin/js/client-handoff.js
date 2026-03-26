@@ -101,24 +101,10 @@
       icon: '🔑',
       title: { en: 'Business Accounts to Create', es: 'Cuentas de Negocio a Crear' },
       description: {
-        en: 'Create these accounts under your business name. You never need to share your Google password — each service below has a safe way to grant access or share only the specific details your developer needs.',
-        es: 'Cree estas cuentas a nombre de su negocio. Nunca necesita compartir su contraseña de Google — cada servicio tiene una forma segura de otorgar acceso o compartir solo los datos específicos que su desarrollador necesita.'
+        en: 'Create these accounts under your business name. All Google-related setup (Analytics, Reviews, Sign-in, Calendar, Business Profile) is in the "Google Cloud Console Setup" section below.',
+        es: 'Cree estas cuentas a nombre de su negocio. Toda la configuracion de Google (Analytics, Resenas, Login, Calendario, Perfil de Negocio) esta en la seccion "Configuracion de Google Cloud Console" mas abajo.'
       },
       items: [
-        {
-          id: 'acct-google',
-          text: { en: 'Google account (Reviews + Analytics + Login)', es: 'Cuenta de Google (Resenas + Analiticas + Login)' },
-          detail: {
-            en: 'Your business Gmail is the foundation for three website features. You never share your Google password — just grant access and share API keys as described below.\n\nDetailed step-by-step setup for Google Cloud Console (OAuth, API keys, service accounts) is in the "Google Cloud Console Setup" section below.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📊 GOOGLE ANALYTICS (visitor tracking)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n1. Open Google Analytics (link below)\n2. Sign in with your business Gmail\n3. Click Admin (gear icon, bottom left)\n4. Under Property, click "Property Access Management"\n5. Click the blue "+" button > "Add users"\n6. Enter your developer\'s email and select "Editor" role\n7. Click "Add"\n\nWhat to share with your developer:\n- Your Analytics Measurement ID (looks like G-XXXXXXXXXX)\n  Find it in: Admin > Data Streams > click your stream > copy Measurement ID\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n⭐ GOOGLE REVIEWS (display on website)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nNo password sharing needed! Your developer only needs:\n- Your Google Place ID: ChIJLSxZDQyflVQRWXEi9LpJGxs\n  (This is already configured — no action needed from you)\n- A Places API key (created in the "Google Cloud Console Setup" section below)\n\nTo verify your business listing is claimed:\n1. Open Google Business Profile (link below)\n2. Sign in with your business Gmail\n3. Confirm "Oregon Tires Auto Care" appears as your business\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🔐 SIGN IN WITH GOOGLE (customer login)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSee the "Google Cloud Console Setup" section below for step-by-step OAuth credential creation. You\'ll create a Client ID and Client Secret (API keys, not your password) and share them with your developer.',
-            es: 'Su Gmail del negocio es la base para tres funciones del sitio web. Nunca comparta su contrasena de Google — solo otorgue acceso y comparta claves API como se describe abajo.\n\nLa configuracion detallada paso a paso de Google Cloud Console (OAuth, claves API, cuentas de servicio) esta en la seccion "Configuracion de Google Cloud Console" mas abajo.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📊 GOOGLE ANALYTICS (seguimiento de visitantes)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n1. Abra Google Analytics (enlace abajo)\n2. Inicie sesion con su Gmail del negocio\n3. Haga clic en Administrar (icono de engranaje, abajo a la izquierda)\n4. En Propiedad, clic en "Gestion de acceso a la propiedad"\n5. Clic en el boton azul "+" > "Anadir usuarios"\n6. Ingrese el correo de su desarrollador y seleccione rol "Editor"\n7. Haga clic en "Anadir"\n\nQue compartir con su desarrollador:\n- Su ID de Medicion de Analytics (se ve como G-XXXXXXXXXX)\n  Encuentrelo en: Administrar > Flujos de datos > clic en su flujo > copiar ID de medicion\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n⭐ RESENAS DE GOOGLE (mostrar en sitio web)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nNo necesita compartir contrasena! Su desarrollador solo necesita:\n- Su Google Place ID: ChIJLSxZDQyflVQRWXEi9LpJGxs\n  (Esto ya esta configurado — no requiere accion de su parte)\n- Una clave API de Places (creada en la seccion "Configuracion de Google Cloud Console" abajo)\n\nPara verificar que su negocio este reclamado:\n1. Abra Google Business Profile (enlace abajo)\n2. Inicie sesion con su Gmail del negocio\n3. Confirme que "Oregon Tires Auto Care" aparece como su negocio\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🔐 INICIAR SESION CON GOOGLE (acceso de clientes)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nVea la seccion "Configuracion de Google Cloud Console" abajo para la creacion paso a paso de credenciales OAuth. Creara un Client ID y Client Secret (claves API, no su contrasena) y los compartira con su desarrollador.'
-          },
-          links: [
-            { label: { en: 'Google Analytics (grant access)', es: 'Google Analytics (otorgar acceso)' }, url: 'https://analytics.google.com/analytics/web/#/a/p/admin/account-access-management' },
-            { label: { en: 'Google Business Profile (verify)', es: 'Google Business Profile (verificar)' }, url: 'https://business.google.com/' },
-            { label: { en: 'Google Cloud Console (OAuth keys)', es: 'Google Cloud Console (claves OAuth)' }, url: 'https://console.cloud.google.com/apis/credentials' }
-          ],
-          category: { en: 'Required', es: 'Requerido' }
-        },
         {
           id: 'acct-whatsapp',
           text: { en: 'WhatsApp Business (FREE customer messaging)', es: 'WhatsApp Business (mensajes a clientes GRATIS)' },
@@ -158,18 +144,6 @@
           ],
           category: { en: 'Recommended', es: 'Recomendado' }
         },
-        {
-          id: 'acct-gsc',
-          text: { en: 'Google Search Console (SEO monitoring)', es: 'Google Search Console (monitoreo SEO)' },
-          detail: {
-            en: 'Sign in with your business Gmail and add oregon.tires as a property. Then grant your developer access — no password sharing needed.\n\nSteps:\n1. Open Google Search Console (link below)\n2. Sign in with your business Gmail\n3. Add "oregon.tires" as a property (choose "Domain" type)\n4. Click Settings (gear icon) → Users and permissions\n5. Click "Add user" → enter your developer\'s email → select "Full" permission\n6. Click "Add"\n\nYour developer can now see search performance and improve your Google ranking without needing your password.\n\nFREE — takes 2 minutes to set up.',
-            es: 'Inicie sesión con su Gmail del negocio y agregue oregon.tires como propiedad. Luego otorgue acceso a su desarrollador — no necesita compartir contraseña.\n\nPasos:\n1. Abra Google Search Console (enlace abajo)\n2. Inicie sesión con su Gmail del negocio\n3. Agregue "oregon.tires" como propiedad (elija tipo "Dominio")\n4. Clic en Configuración (ícono de engranaje) → Usuarios y permisos\n5. Clic en "Añadir usuario" → ingrese el correo de su desarrollador → seleccione permiso "Completo"\n6. Clic en "Añadir"\n\nSu desarrollador podrá ver el rendimiento en búsquedas y mejorar su posicionamiento en Google sin necesitar su contraseña.\n\nGRATIS — toma 2 minutos configurar.'
-          },
-          links: [
-            { label: { en: 'Google Search Console', es: 'Google Search Console' }, url: 'https://search.google.com/search-console/' }
-          ],
-          category: { en: 'Recommended', es: 'Recomendado' }
-        },
       ]
     },
     {
@@ -177,8 +151,8 @@
       icon: '☁️',
       title: { en: 'Google Cloud Console Setup', es: 'Configuracion de Google Cloud Console' },
       description: {
-        en: 'Your website uses Google services for reviews, calendar sync, and customer sign-in. All of these are managed from one place: the Google Cloud Console. Complete these steps to connect your own Google account.',
-        es: 'Su sitio web usa servicios de Google para resenas, sincronizacion de calendario e inicio de sesion de clientes. Todo se administra desde un lugar: Google Cloud Console. Complete estos pasos para conectar su propia cuenta de Google.'
+        en: 'All Google services for your website are set up here: Reviews, Analytics, Sign in with Google, Calendar sync, Business Profile, and Search Console. Sign in with your business Gmail for every step. You never share your Google password — just API keys and access grants.',
+        es: 'Todos los servicios de Google para su sitio web se configuran aqui: Resenas, Analytics, Inicio de sesion con Google, sincronizacion de Calendario, Perfil de Negocio y Search Console. Inicie sesion con su Gmail del negocio en cada paso. Nunca comparta su contrasena de Google — solo claves API y permisos de acceso.'
       },
       items: [
         {
@@ -267,6 +241,42 @@
           },
           links: [
             { label: { en: 'Google Business Profile', es: 'Google Business Profile' }, url: 'https://business.google.com/' }
+          ],
+          category: { en: 'Recommended', es: 'Recomendado' }
+        },
+        {
+          id: 'gc-verify-gbp',
+          text: { en: 'Verify your Google Business Profile listing', es: 'Verificar su listado de Google Business Profile' },
+          detail: {
+            en: 'Make sure your shop is claimed on Google so reviews and business info display correctly.\n\n1. Click the link below and sign in with your business Gmail\n2. Confirm "Oregon Tires Auto Care" appears as your business\n3. If not claimed yet, click "Add your business" and follow Google\'s verification steps (they may call your shop phone or mail a postcard)\n\nYour Google Place ID is already configured: ChIJLSxZDQyflVQRWXEi9LpJGxs\nNo action needed from you on the Place ID — just verify the listing is claimed.\n\n━━━ WHAT TO SHARE WITH YOUR DEVELOPER ━━━\n- Confirmation that the listing is claimed and you can see it in your dashboard',
+            es: 'Asegurese de que su taller este reclamado en Google para que las resenas e informacion del negocio se muestren correctamente.\n\n1. Haga clic en el enlace abajo e inicie sesion con su Gmail del negocio\n2. Confirme que "Oregon Tires Auto Care" aparece como su negocio\n3. Si no esta reclamado, haga clic en "Agregar su negocio" y siga los pasos de verificacion de Google (pueden llamar al telefono de su taller o enviar una postal)\n\nSu Google Place ID ya esta configurado: ChIJLSxZDQyflVQRWXEi9LpJGxs\nNo necesita hacer nada con el Place ID — solo verifique que el listado este reclamado.\n\n━━━ QUE COMPARTIR CON SU DESARROLLADOR ━━━\n- Confirmacion de que el listado esta reclamado y puede verlo en su dashboard'
+          },
+          links: [
+            { label: { en: 'Google Business Profile', es: 'Google Business Profile' }, url: 'https://business.google.com/' }
+          ],
+          category: { en: 'Required', es: 'Requerido' }
+        },
+        {
+          id: 'gc-analytics',
+          text: { en: 'Set up Google Analytics (visitor tracking)', es: 'Configurar Google Analytics (seguimiento de visitantes)' },
+          detail: {
+            en: 'Google Analytics shows you how many people visit your website, which pages they view, and how they found you. FREE and essential for any business website.\n\n━━━ STEP 1: Create an Analytics account ━━━\n1. Click the link below and sign in with your business Gmail\n2. Click "Start measuring"\n3. Account name: Oregon Tires Auto Care\n4. Click "Next"\n5. Property name: oregon.tires\n6. Select your time zone and currency\n7. Click "Next" > choose your business category > click "Create"\n8. Accept the terms of service\n\n━━━ STEP 2: Set up the data stream ━━━\n1. Choose "Web" as the platform\n2. Website URL: https://oregon.tires\n3. Stream name: Oregon Tires Website\n4. Click "Create stream"\n5. Copy the Measurement ID (looks like G-XXXXXXXXXX) — your developer needs this\n\n━━━ STEP 3: Grant your developer access ━━━\n1. Click Admin (gear icon, bottom left)\n2. Under Property, click "Property Access Management"\n3. Click the blue "+" button > "Add users"\n4. Enter your developer\'s email > select "Editor" role > click "Add"\n\n━━━ WHAT TO SHARE WITH YOUR DEVELOPER ━━━\n- Your Measurement ID (G-XXXXXXXXXX)',
+            es: 'Google Analytics muestra cuantas personas visitan su sitio web, que paginas ven y como lo encontraron. GRATIS y esencial para cualquier sitio web de negocio.\n\n━━━ PASO 1: Crear una cuenta de Analytics ━━━\n1. Haga clic en el enlace abajo e inicie sesion con su Gmail del negocio\n2. Clic en "Start measuring"\n3. Account name: Oregon Tires Auto Care\n4. Clic en "Next"\n5. Property name: oregon.tires\n6. Seleccione su zona horaria y moneda\n7. Clic en "Next" > elija la categoria de su negocio > clic en "Create"\n8. Acepte los terminos de servicio\n\n━━━ PASO 2: Configurar el flujo de datos ━━━\n1. Elija "Web" como plataforma\n2. Website URL: https://oregon.tires\n3. Stream name: Oregon Tires Website\n4. Clic en "Create stream"\n5. Copie el Measurement ID (se ve como G-XXXXXXXXXX) — su desarrollador lo necesita\n\n━━━ PASO 3: Otorgar acceso a su desarrollador ━━━\n1. Clic en Admin (icono de engranaje, abajo a la izquierda)\n2. En Property, clic en "Property Access Management"\n3. Clic en el boton azul "+" > "Add users"\n4. Ingrese el correo de su desarrollador > seleccione rol "Editor" > clic en "Add"\n\n━━━ QUE COMPARTIR CON SU DESARROLLADOR ━━━\n- Su Measurement ID (G-XXXXXXXXXX)'
+          },
+          links: [
+            { label: { en: 'Google Analytics', es: 'Google Analytics' }, url: 'https://analytics.google.com/' }
+          ],
+          category: { en: 'Required', es: 'Requerido' }
+        },
+        {
+          id: 'gc-search-console',
+          text: { en: 'Set up Google Search Console (SEO monitoring)', es: 'Configurar Google Search Console (monitoreo SEO)' },
+          detail: {
+            en: 'Google Search Console shows you how your website appears in Google search results — which search terms bring visitors, how often your pages appear, and any issues Google finds. FREE and important for SEO.\n\n1. Click the link below and sign in with your business Gmail\n2. Click "Add property"\n3. Choose "URL prefix" on the right side\n4. Enter: https://oregon.tires\n5. Click "Continue"\n6. For verification, choose "HTML tag" method\n7. Copy the verification code (just the content value, looks like a long string)\n8. Your developer will add this code to the website\n\n━━━ GRANT YOUR DEVELOPER ACCESS ━━━\n1. After verification, click Settings (gear icon) in the left menu\n2. Click "Users and permissions"\n3. Click "Add user"\n4. Enter your developer\'s email > select "Full" permission > click "Add"\n\n━━━ WHAT TO SHARE WITH YOUR DEVELOPER ━━━\n- The HTML tag verification code\n- Confirmation that developer access was granted\n\nFREE — takes 2 minutes. Your developer can then monitor search performance and improve your Google ranking.',
+            es: 'Google Search Console muestra como aparece su sitio web en los resultados de busqueda de Google — que terminos de busqueda traen visitantes, con que frecuencia aparecen sus paginas y cualquier problema que Google encuentre. GRATIS e importante para SEO.\n\n1. Haga clic en el enlace abajo e inicie sesion con su Gmail del negocio\n2. Clic en "Add property"\n3. Elija "URL prefix" en el lado derecho\n4. Ingrese: https://oregon.tires\n5. Clic en "Continue"\n6. Para verificacion, elija el metodo "HTML tag"\n7. Copie el codigo de verificacion (solo el valor de content, se ve como una cadena larga)\n8. Su desarrollador agregara este codigo al sitio web\n\n━━━ OTORGAR ACCESO A SU DESARROLLADOR ━━━\n1. Despues de la verificacion, clic en Settings (icono de engranaje) en el menu izquierdo\n2. Clic en "Users and permissions"\n3. Clic en "Add user"\n4. Ingrese el correo de su desarrollador > seleccione permiso "Full" > clic en "Add"\n\n━━━ QUE COMPARTIR CON SU DESARROLLADOR ━━━\n- El codigo de verificacion HTML tag\n- Confirmacion de que se otorgo acceso al desarrollador\n\nGRATIS — toma 2 minutos. Su desarrollador podra monitorear el rendimiento en busquedas y mejorar su posicionamiento en Google.'
+          },
+          links: [
+            { label: { en: 'Google Search Console', es: 'Google Search Console' }, url: 'https://search.google.com/search-console/' }
           ],
           category: { en: 'Recommended', es: 'Recomendado' }
         },
