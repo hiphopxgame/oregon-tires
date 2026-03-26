@@ -22,6 +22,8 @@
     'dom-registrar',        // Porkbun account created
     'dom-transfer',         // Domain transfer completed
     'gc-search-console',    // TXT record + meta tag set, verification code deployed
+    'host-choose',          // Bluehost account created
+    'host-share',           // cPanel access shared with developer
   ];
 
   function getChecked() {
@@ -49,27 +51,27 @@
       icon: '🖥️',
       title: { en: 'Web Hosting', es: 'Hospedaje Web' },
       description: {
-        en: 'Get your own hosting account. InMotion Hosting includes cPanel, free SSL, email, daily backups, SSH access, and unlimited cron jobs — everything your website needs.',
-        es: 'Obtenga su propia cuenta de hospedaje. InMotion Hosting incluye cPanel, SSL gratuito, correo electronico, respaldos diarios, acceso SSH y tareas cron ilimitadas — todo lo que su sitio web necesita.'
+        en: 'Your hosting account with Bluehost provides cPanel, free SSL, email, daily backups, SSH access, and cron jobs — everything your website needs.',
+        es: 'Su cuenta de hospedaje con Bluehost incluye cPanel, SSL gratuito, correo electr\u00f3nico, respaldos diarios, acceso SSH y tareas cron \u2014 todo lo que su sitio web necesita.'
       },
       items: [
         {
           id: 'host-choose',
-          text: { en: 'Sign up for InMotion Hosting', es: 'Registrese en InMotion Hosting' },
+          text: { en: 'Sign up for hosting', es: 'Registrarse en hospedaje' },
           detail: {
-            en: 'Sign up for InMotion Hosting shared hosting (link below). This is the recommended host for your website.\n\nWhat you get:\n- cPanel control panel (easy website management)\n- Free SSL certificate (secure https://)\n- Free email accounts (contact@oregon.tires, etc.)\n- Daily backups\n- SSH access\n- Unlimited cron jobs (your website runs 8 automated tasks)\n- US-based datacenter\n- Phone + live chat support\n\nChoose any shared hosting plan — they all include what your website needs.',
-            es: 'Registrese en InMotion Hosting hospedaje compartido (enlace abajo). Este es el host recomendado para su sitio web.\n\nLo que obtiene:\n- Panel de control cPanel (gestion facil del sitio)\n- Certificado SSL gratuito (https:// seguro)\n- Cuentas de correo gratuitas (contact@oregon.tires, etc.)\n- Respaldos diarios\n- Acceso SSH\n- Tareas cron ilimitadas (su sitio ejecuta 8 tareas automatizadas)\n- Centro de datos en EE.UU.\n- Soporte por telefono + chat en vivo\n\nElija cualquier plan de hospedaje compartido — todos incluyen lo que su sitio web necesita.'
+            en: '\u2705 COMPLETED\n\nHosting Provider: Bluehost\nFeatures: cPanel, free SSL, email accounts, daily backups, SSH access, cron jobs\n\nBluehost account is active and ready for site migration.',
+            es: '\u2705 COMPLETADO\n\nProveedor de Hospedaje: Bluehost\nCaracter\u00edsticas: cPanel, SSL gratuito, cuentas de correo, respaldos diarios, acceso SSH, tareas cron\n\nLa cuenta de Bluehost est\u00e1 activa y lista para la migraci\u00f3n del sitio.'
           },
           links: [
-            { label: { en: 'InMotion Hosting (Shared Hosting)', es: 'InMotion Hosting (Hospedaje Compartido)' }, url: 'https://www.inmotionhosting.com/shared-hosting' }
+            { label: { en: 'Bluehost Dashboard', es: 'Panel de Bluehost' }, url: 'https://www.bluehost.com/my-account' }
           ]
         },
         {
           id: 'host-share',
           text: { en: 'Share cPanel login with your developer', es: 'Comparta el acceso de cPanel con su desarrollador' },
           detail: {
-            en: 'After signing up, share your cPanel login (URL, username, password) with your developer. They will handle all the technical setup — database, files, cron jobs, email, and SSL configuration.\n\nYour cPanel URL is usually: yourdomain.com/cpanel or yourdomain.com:2083',
-            es: 'Después de registrarse, comparta su acceso de cPanel (URL, usuario y contraseña) con su desarrollador. Ellos se encargarán de toda la configuración técnica — base de datos, archivos, tareas cron, correo y SSL.\n\nSu URL de cPanel suele ser: sudominio.com/cpanel o sudominio.com:2083'
+            en: '\u2705 COMPLETED\n\nBluehost cPanel access has been shared with the developer.\nThe developer will handle all technical setup: database, files, cron jobs, email, SSL, and site migration.',
+            es: '\u2705 COMPLETADO\n\nEl acceso al cPanel de Bluehost ha sido compartido con el desarrollador.\nEl desarrollador se encargar\u00e1 de toda la configuraci\u00f3n t\u00e9cnica: base de datos, archivos, tareas cron, correo, SSL y migraci\u00f3n del sitio.'
           }
         },
         {
