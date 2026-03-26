@@ -126,18 +126,9 @@ if (ob_get_level() === 0) {
     .faq-item[open] summary .faq-chevron { transform: rotate(180deg); }
   </style>
 
-  <!-- Engine Kit Analytics & Network Integration -->
+  <?php require_once __DIR__ . '/includes/gtag.php'; ?>
   <?php if (function_exists('engineHead')): ?>
     <?php engineHead('oregontires', ['page_title' => 'Oregon Tires Auto Care']); ?>
-  <?php else: ?>
-    <!-- Fallback: Manual GA if Engine Kit not available -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PCK6ZYFHQ0"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-PCK6ZYFHQ0');
-    </script>
   <?php endif; ?>
 
   <!-- Basic error tracking via GA4 -->
