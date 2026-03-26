@@ -1,29 +1,12 @@
-// Oregon Tires — GA4 Hybrid Loader + Error Tracking + Enhanced Event Tracking
-// Extracted from index.html inline scripts
+// Oregon Tires — GA4 Enhanced Event Tracking
+// The static gtag.js snippet is loaded in <head> via includes/gtag.php.
+// This file provides enhanced event tracking only — no gtag loader needed.
 
-// === GA4 Hybrid Loader (configurable via admin panel) ===
-(function(){
-  var DEFAULT_GA = 'G-PCK6ZYFHQ0';
-  var cached = null;
-  try { cached = localStorage.getItem('oregontires_ga_id'); } catch(e){}
-  var id = cached || DEFAULT_GA;
-  var s = document.createElement('script');
-  s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
-  document.head.appendChild(s);
+// Ensure gtag is available (static tag should already be loaded)
+if (typeof window.gtag !== 'function') {
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  window.gtag = gtag;
-  gtag('js', new Date());
-  gtag('config', id);
-  window.__gaId = id;
-  window.__updateGaId = function(newId) {
-    if (!newId || newId === window.__gaId) return;
-    if (!/^G-[A-Z0-9]{6,12}$/.test(newId)) return;
-    window.__gaId = newId;
-    try { localStorage.setItem('oregontires_ga_id', newId); } catch(e){}
-    gtag('config', newId, { send_page_view: false });
-  };
-})();
+  window.gtag = function(){dataLayer.push(arguments);};
+}
 
 // === Basic Error Tracking via GA4 ===
 window.addEventListener('error', function(e) {

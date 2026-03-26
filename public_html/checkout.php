@@ -6,6 +6,7 @@ $paypalClientId = $_ENV['PAYPAL_CLIENT_ID'] ?? '';
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <?php require_once __DIR__ . '/includes/gtag.php'; ?>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checkout - Oregon Tires Auto Care Portland, OR</title>

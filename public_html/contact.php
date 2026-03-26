@@ -36,6 +36,7 @@ $contactPageDescEs = 'Contacte a Oregon Tires Auto Care en Portland, OR. Servici
 <!DOCTYPE html>
 <html lang="<?= seoLang() ?>">
 <head>
+  <?php require_once __DIR__ . "/includes/gtag.php"; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars(seoMeta($pageTitle, $pageTitleEs)) ?></title>

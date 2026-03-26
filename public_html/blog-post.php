@@ -92,19 +92,7 @@ header('Content-Type: text/html; charset=utf-8');
     .blog-body strong { font-weight: 600; }
     .dark .blog-body h2, .dark .blog-body h3 { color: #4ade80; }
   </style>
-  <!-- GA4 -->
-  <script>
-  (function(){
-    var id = 'G-PCK6ZYFHQ0';
-    try { var c = localStorage.getItem('oregontires_ga_id'); if (c) id = c; } catch(e){}
-    var s = document.createElement('script'); s.async = true;
-    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
-    document.head.appendChild(s);
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);} window.gtag = gtag;
-    gtag('js', new Date()); gtag('config', id);
-  })();
-  </script>
+  <?php require_once __DIR__ . "/includes/gtag.php"; ?>
   <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
 
   <!-- Article JSON-LD -->

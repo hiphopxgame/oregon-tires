@@ -36,19 +36,7 @@ require_once __DIR__ . '/includes/seo-lang.php';
     :root { --brand-primary: #15803d; --brand-dark: #0D3618; }
     .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   </style>
-  <!-- GA4 -->
-  <script>
-  (function(){
-    var id = 'G-PCK6ZYFHQ0';
-    try { var c = localStorage.getItem('oregontires_ga_id'); if (c) id = c; } catch(e){}
-    var s = document.createElement('script'); s.async = true;
-    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
-    document.head.appendChild(s);
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);} window.gtag = gtag;
-    gtag('js', new Date()); gtag('config', id);
-  })();
-  </script>
+  <?php require_once __DIR__ . "/includes/gtag.php"; ?>
   <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
 
   <!-- BreadcrumbList JSON-LD -->

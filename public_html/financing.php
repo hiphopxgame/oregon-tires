@@ -47,19 +47,7 @@ $pageDescEs = 'Opciones de pago flexibles para servicios de llantas y reparacion
     details summary::before { content: '+'; display: inline-block; width: 1.5rem; font-weight: bold; font-size: 1.25rem; transition: transform 0.2s; }
     details[open] summary::before { content: '\2212'; }
   </style>
-  <!-- GA4 -->
-  <script>
-  (function(){
-    var id = 'G-PCK6ZYFHQ0';
-    try { var c = localStorage.getItem('oregontires_ga_id'); if (c) id = c; } catch(e){}
-    var s = document.createElement('script'); s.async = true;
-    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
-    document.head.appendChild(s);
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);} window.gtag = gtag;
-    gtag('js', new Date()); gtag('config', id);
-  })();
-  </script>
+  <?php require_once __DIR__ . "/includes/gtag.php"; ?>
   <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
 
   <!-- JSON-LD: BreadcrumbList -->

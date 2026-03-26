@@ -185,6 +185,7 @@ $memberDashboardConfig = [
     'default_avatar' => '/assets/logo.png',
     'stylesheets'    => ['/assets/styles.css'],
     'scripts'        => [],
+    'head_extra'     => '<!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-PCK6ZYFHQ0"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-PCK6ZYFHQ0");</script>',
     'nav_include'    => __DIR__ . '/templates/header.php',
     'footer_include' => __DIR__ . '/templates/footer.php',
     'universal_tab_labels' => [

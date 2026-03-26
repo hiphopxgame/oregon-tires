@@ -80,6 +80,7 @@ if (!empty($ro['appointment_id'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <?php require_once __DIR__ . "/includes/gtag.php"; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Order <?= htmlspecialchars($ro['ro_number']) ?> - Oregon Tires Auto Care</title>

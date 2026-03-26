@@ -23,30 +23,13 @@
     .star.filled { color: #f59e0b; }
   </style>
 
-  <!-- Google Analytics 4 -->
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PCK6ZYFHQ0"></script>
   <script>
-  (function(){
-    var DEFAULT_GA = 'G-PCK6ZYFHQ0';
-    var cached = null;
-    try { cached = localStorage.getItem('oregontires_ga_id'); } catch(e){}
-    var id = cached || DEFAULT_GA;
-    var s = document.createElement('script');
-    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
-    document.head.appendChild(s);
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    window.gtag = gtag;
-    gtag('js', new Date());
-    gtag('config', id);
-    window.__gaId = id;
-    window.__updateGaId = function(newId) {
-      if (!newId || newId === window.__gaId) return;
-      if (!/^G-[A-Z0-9]{6,12}$/.test(newId)) return;
-      window.__gaId = newId;
-      try { localStorage.setItem('oregontires_ga_id', newId); } catch(e){}
-      gtag('config', newId, { send_page_view: false });
-    };
-  })();
+    gtag("js", new Date());
+    gtag("config", "G-PCK6ZYFHQ0");
   </script>
   <!-- Dark mode init (prevent FOUC) -->
   <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
