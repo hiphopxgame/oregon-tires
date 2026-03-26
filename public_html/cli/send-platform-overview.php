@@ -512,11 +512,9 @@ function getEnglishContent(): array
         'offer_items' => [
             '<span style="color:#f5d78e;font-weight:700;">Full ownership of oregon.tires</span> <span style="color:#dcfce7;">— the domain is yours, permanently</span>',
             '<span style="color:#f5d78e;font-weight:700;">The complete platform</span> <span style="color:#dcfce7;">— all 113 features, live and working today</span>',
-            '<span style="color:#f5d78e;font-weight:700;">3 months of managed hosting</span> <span style="color:#dcfce7;">— server management, SSL certificates, backups, security patches, Cloudflare CDN, and uptime monitoring ($50/mo value)</span>',
             '<span style="color:#f5d78e;font-weight:700;">3 months of marketing &amp; management support</span> <span style="color:#dcfce7;">— SEO optimization, content updates, blog management, social media support, Google Business management, analytics reporting, platform enhancements, and daily business support (starting at $2,000/mo value)</span>',
         ],
         'after_items' => [
-            'Managed hosting continues at <strong>$50/month</strong>',
             'Marketing &amp; management services available <strong>starting at $2,000/month</strong>',
             'All pricing is flexible — we can customize a plan that works for your budget',
         ],
@@ -776,11 +774,9 @@ function getSpanishContent(): array
         'offer_items' => [
             '<span style="color:#f5d78e;font-weight:700;">Propiedad total de oregon.tires</span> <span style="color:#dcfce7;">— el dominio es tuyo, permanentemente</span>',
             '<span style="color:#f5d78e;font-weight:700;">La plataforma completa</span> <span style="color:#dcfce7;">— las 113 funciones, en vivo y funcionando hoy</span>',
-            '<span style="color:#f5d78e;font-weight:700;">3 meses de hosting administrado</span> <span style="color:#dcfce7;">— administración del servidor, certificados SSL, respaldos, parches de seguridad, Cloudflare CDN, y monitoreo de disponibilidad (valor de $50/mes)</span>',
             '<span style="color:#f5d78e;font-weight:700;">3 meses de soporte de marketing y administración</span> <span style="color:#dcfce7;">— optimización SEO, actualizaciones de contenido, gestión de blog, soporte de redes sociales, gestión de Google Business, reportes de analítica, mejoras a la plataforma, y soporte diario del negocio (valor desde $2,000/mes)</span>',
         ],
         'after_items' => [
-            'El hosting administrado continúa a <strong>$50/mes</strong>',
             'Servicios de marketing y administración disponibles <strong>desde $2,000/mes</strong>',
             'Todos los precios son flexibles — podemos personalizar un plan que funcione para tu presupuesto',
         ],

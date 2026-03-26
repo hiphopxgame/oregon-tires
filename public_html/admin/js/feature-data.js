@@ -306,7 +306,6 @@ var DOMAIN_CONSULTATION = {
 
 // Ongoing service offerings
 var SERVICE_OFFERINGS = [
-  { en: 'Managed Hosting', es: 'Hosting Administrado', price: '$50/mo', desc_en: 'Server management, SSL, backups, uptime monitoring, security patches, Cloudflare CDN', desc_es: 'Gestión de servidor, SSL, respaldos, monitoreo de uptime, parches de seguridad, CDN Cloudflare' },
   { en: 'Marketing & Management', es: 'Marketing y Gestión', price: 'Starting at $500/mo', desc_en: 'SEO optimization, content updates, blog posts, social media, Google Business management, analytics reporting, platform enhancements', desc_es: 'Optimización SEO, actualizaciones de contenido, publicaciones de blog, redes sociales, gestión de Google Business, reportes de analítica, mejoras a la plataforma' }
 ];
 

@@ -76,6 +76,15 @@
     .crop-preview-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
     .crop-preview-visible { border: 2px solid #FFFE03; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); z-index: 10; pointer-events: none; }
 
+    /* ── Dashboard command bar ── */
+    #overview-quick-actions .flex { align-items: center; }
+    #overview-live-status { align-items: center; }
+    /* Smooth chart section expand */
+    #overview-charts-section { animation: fadeIn 0.3s ease-in; }
+    /* Hero stat card subtle gradient on hover */
+    #stat-card-action:hover { background: linear-gradient(135deg, #fff 60%, #fef2f2 100%); }
+    .dark #stat-card-action:hover { background: linear-gradient(135deg, #1f2937 60%, rgba(127,29,29,0.15) 100%); }
+
     /* ── Dark mode overrides for admin dashboard ── */
     /* Text colors */
     .dark .text-gray-800:not(.dark\:text-gray-100) { color: #e5e7eb; }
@@ -372,8 +381,8 @@
 
 <div id="toast-container" class="toast-container"></div>
 
-<!-- LOGIN SCREEN -->
-<div id="login-screen" class="min-h-screen flex items-center justify-center bg-brand">
+<!-- LOGIN SCREEN (hidden until session check completes) -->
+<div id="login-screen" class="min-h-screen flex items-center justify-center bg-brand hidden">
   <div class="bg-white rounded-xl shadow-2xl p-5 md:p-8 w-full max-w-md dark:bg-gray-800 dark:border-gray-700 border-t-4 border-brand-light">
     <div class="text-center mb-6">
       <a href="/" class="block text-center" data-t="backToWebsite">← Back to website</a>
@@ -397,6 +406,19 @@
       <div id="lockout-message" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm mb-4"></div>
       <div id="login-error" class="text-red-600 dark:text-red-400 text-sm text-center hidden"></div>
     </form>
+    <!-- Google Sign-In -->
+    <div class="mt-4">
+      <div class="relative my-4">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300 dark:border-gray-600"></div></div>
+        <div class="relative flex justify-center text-sm"><span class="bg-white dark:bg-gray-800 px-3 text-gray-500 dark:text-gray-400" data-t="orDivider">or</span></div>
+      </div>
+      <a href="/api/admin/google.php" id="google-login-btn" class="w-full flex items-center justify-center gap-3 border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium text-gray-700 dark:text-gray-200">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        <span data-t="signInWithGoogle">Sign in with Google</span>
+      </a>
+    </div>
+    <!-- Login status messages from Google OAuth redirect -->
+    <div id="login-status-msg" class="mt-3 text-sm text-center hidden"></div>
     <div class="mt-4 text-center space-y-2">
       <button type="button" onclick="showForgotPassword()" class="text-brand dark:text-green-400 text-sm hover:underline cursor-pointer" data-t="forgotPassword">Forgot Password?</button>
       <br>
@@ -437,11 +459,10 @@
       <!-- Row 1: Logo + controls -->
       <div class="flex items-center justify-between gap-2 mb-3">
         <div class="flex items-center gap-2 min-w-0">
-          <a href="/"><img src="/assets/logo.png" alt="Oregon Tires" class="h-10 md:h-12"></a>
-          <div class="min-w-0">
-            <h1 class="text-lg md:text-2xl font-bold truncate"><span data-t="headerTitle">Admin Dashboard</span></h1>
-            <p class="text-white/80 text-xs md:text-sm hidden md:block" data-t="managementSubtitle">Oregon Tires Management</p>
-          </div>
+          <a href="/" class="flex items-center gap-2 hover:opacity-90 transition">
+            <img src="/assets/logo.png" alt="Oregon Tires" class="h-10 md:h-12">
+            <span class="text-lg md:text-xl font-bold truncate hidden sm:inline" data-t="headerTitle">Oregon Tires</span>
+          </a>
         </div>
         <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
           <div class="relative hidden md:block" id="global-search-wrap">
@@ -466,7 +487,7 @@
               <div id="notif-empty" class="px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500 hidden" data-t="noNotifications">No new notifications</div>
             </div>
           </div>
-          <a href="/members?tab=profile" class="text-xs md:text-sm hover:text-amber-200 hidden md:inline" data-t="myAccount">My Account</a>
+          <a href="/members?tab=account" class="text-xs md:text-sm hover:text-amber-200 hidden md:inline" data-t="myAccount">My Account</a>
           <a href="/" class="text-xs md:text-sm hover:text-amber-200 hidden md:inline" data-t="viewSite">View Site</a>
           <button onclick="signOut()" class="bg-red-600 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm hover:bg-red-700 transition" data-t="signOut">Sign Out</button>
         </div>
@@ -475,7 +496,7 @@
       <div class="flex items-center justify-between gap-2 mb-3 md:hidden">
         <div class="flex items-center gap-3 text-xs">
           <button onclick="openAccountSettings()" class="text-white/80 hover:text-white">⚙️ <span id="admin-email-mobile" class="sr-only"></span>Account</button>
-          <a href="/members?tab=profile" class="text-white/80 hover:text-white" data-t="myAccount">My Account</a>
+          <a href="/members?tab=account" class="text-white/80 hover:text-white" data-t="myAccount">My Account</a>
           <a href="/" class="text-white/80 hover:text-white" data-t="viewSite">View Site</a>
           <button onclick="signOut()" class="text-red-300 hover:text-white font-semibold" data-t="signOut">Sign Out</button>
         </div>
@@ -596,53 +617,121 @@
 
     <!-- OVERVIEW TAB -->
     <div id="tab-overview" class="tab-content fade-in" role="tabpanel">
-      <h2 class="text-2xl font-bold text-brand dark:text-green-400 mb-6" data-t="dashboardOverview">Dashboard Overview</h2>
-      <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
-        <div onclick="showOverdueAppointments()" class="bg-white rounded-xl shadow p-6 border-l-4 border-red-500 dark:bg-gray-800 dark:border-l-red-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="actionRequired">Action Required</div><div class="text-3xl font-bold text-red-600 dark:text-red-400" id="stat-action">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-action-detail" data-t="awaitingConfirmation">Needs attention</p></div>
-        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-amber-500 dark:bg-gray-800 dark:border-l-amber-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="todaySchedule">Today</div><div class="text-3xl font-bold text-amber-600 dark:text-amber-400" id="stat-today">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-today-detail"></p></div>
-        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-500 dark:bg-gray-800 dark:border-l-blue-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="thisWeek">This Week</div><div class="text-3xl font-bold text-blue-600 dark:text-blue-400" id="stat-week">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-week-detail"></p></div>
-        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-green-500 dark:bg-gray-800 dark:border-l-green-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="upcoming">Upcoming</div><div class="text-3xl font-bold text-green-600 dark:text-green-400" id="stat-upcoming">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-upcoming-detail"></p></div>
-        <div onclick="switchTab('analytics')" class="bg-white rounded-xl shadow p-6 border-l-4 border-gray-400 dark:bg-gray-800 dark:border-l-gray-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="completedLabel">Completed</div><div class="text-3xl font-bold text-gray-600 dark:text-gray-300" id="stat-completed">0</div><p class="text-xs text-gray-400 dark:text-gray-500" data-t="allTime">All time</p></div>
-        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow p-6 border-l-4 border-purple-500 dark:bg-gray-800 dark:border-l-purple-500 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all"><div class="text-sm text-gray-500 dark:text-gray-400" data-t="rpTomorrow">Tomorrow</div><div class="text-3xl font-bold text-purple-600 dark:text-purple-400" id="stat-tomorrow">0</div><p class="text-xs text-gray-400 dark:text-gray-500" id="stat-tomorrow-detail"></p></div>
+
+      <!-- Welcome Bar -->
+      <div id="overview-welcome" class="mb-6"></div>
+
+      <!-- Priority Alerts — urgent items first -->
+      <div id="overview-alerts" class="mb-6 space-y-3"></div>
+
+      <!-- Hero Stats: Action Required + Today (large, prominent) -->
+      <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div onclick="showOverdueAppointments()" class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-red-500 dark:bg-gray-800 cursor-pointer hover:shadow-lg transition-all group" id="stat-card-action">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1" data-t="actionRequired">Action Required</div>
+              <div class="text-4xl font-extrabold text-red-600 dark:text-red-400" id="stat-action">0</div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="stat-action-detail" data-t="awaitingConfirmation">Needs attention</p>
+            </div>
+            <div class="text-5xl opacity-20 group-hover:opacity-40 transition-opacity">&#9888;</div>
+          </div>
+        </div>
+        <div onclick="switchTab('appointments')" class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-amber-500 dark:bg-gray-800 cursor-pointer hover:shadow-lg transition-all group">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1" data-t="todaySchedule">Today</div>
+              <div class="text-4xl font-extrabold text-amber-600 dark:text-amber-400" id="stat-today">0</div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="stat-today-detail"></p>
+            </div>
+            <div class="text-5xl opacity-20 group-hover:opacity-40 transition-opacity">&#128197;</div>
+          </div>
+        </div>
       </div>
-      <!-- Quick Actions -->
-      <div id="overview-quick-actions" class="mb-6"></div>
-      <!-- Live Status Row -->
-      <div id="overview-live-status" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
-      <!-- Recent Reviews Widget -->
-      <div id="overview-reviews-widget" class="mb-6"></div>
-      <div id="overview-alerts" class="mb-8 space-y-3"></div>
+
+      <!-- Secondary Stats Row -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow-sm p-4 dark:bg-gray-800 cursor-pointer hover:shadow-md transition-all border border-transparent hover:border-blue-200 dark:hover:border-blue-800">
+          <div class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide" data-t="thisWeek">This Week</div>
+          <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1" id="stat-week">0</div>
+          <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5" id="stat-week-detail"></p>
+        </div>
+        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow-sm p-4 dark:bg-gray-800 cursor-pointer hover:shadow-md transition-all border border-transparent hover:border-green-200 dark:hover:border-green-800">
+          <div class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide" data-t="upcoming">Upcoming</div>
+          <div class="text-2xl font-bold text-green-600 dark:text-green-400 mt-1" id="stat-upcoming">0</div>
+          <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5" id="stat-upcoming-detail"></p>
+        </div>
+        <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow-sm p-4 dark:bg-gray-800 cursor-pointer hover:shadow-md transition-all border border-transparent hover:border-purple-200 dark:hover:border-purple-800">
+          <div class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide" data-t="rpTomorrow">Tomorrow</div>
+          <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1" id="stat-tomorrow">0</div>
+          <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5" id="stat-tomorrow-detail"></p>
+        </div>
+        <div onclick="switchTab('analytics')" class="bg-white rounded-xl shadow-sm p-4 dark:bg-gray-800 cursor-pointer hover:shadow-md transition-all border border-transparent hover:border-gray-200 dark:hover:border-gray-600">
+          <div class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide" data-t="completedLabel">Completed</div>
+          <div class="text-2xl font-bold text-gray-600 dark:text-gray-300 mt-1" id="stat-completed">0</div>
+          <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5" data-t="allTime">All time</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions + Live Status — unified command bar -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div id="overview-quick-actions"></div>
+          <div id="overview-live-status" class="flex flex-wrap gap-3"></div>
+        </div>
+      </div>
+
+      <!-- Reviews Alert -->
+      <div id="overview-reviews-alert" class="mb-6"></div>
+
       <!-- Shop Floor -->
-      <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 mb-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6 mb-6">
         <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="shopFloor">Shop Floor</h3>
         <div id="shopFloorWidget"></div>
       </div>
-      <!-- Overview Charts -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
-          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="chartWeekBookings">This Week's Bookings</h3>
-          <div id="chart-week-bookings"></div>
+
+      <!-- Schedule: Upcoming + Employee side by side -->
+      <div class="grid lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6">
+          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="upcomingSchedule">Upcoming Schedule</h3>
+          <div id="overview-upcoming" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div>
         </div>
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
-          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="chartServiceBreakdown">Service Breakdown</h3>
-          <div id="chart-service-breakdown"></div>
-        </div>
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
-          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="chartBayUtilization">Bay Utilization Today</h3>
-          <div id="chart-bay-utilization"></div>
-        </div>
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
-          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="chartBookingTrend">Booking Trend (30 Days)</h3>
-          <div id="chart-booking-trend"></div>
-        </div>
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800 lg:col-span-2">
-          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="serviceStaffing">Service Staffing</h3>
-          <div id="chart-service-staffing"></div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6">
+          <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="employeeSchedule">Employee Schedule</h3>
+          <div id="overview-employees" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div>
         </div>
       </div>
-      <div class="grid lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="upcomingSchedule">Upcoming Schedule</h3><div id="overview-upcoming" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div></div>
-        <div class="bg-white rounded-xl shadow p-6 dark:bg-gray-800"><h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="employeeSchedule">Employee Schedule</h3><div id="overview-employees" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div></div>
+
+      <!-- Charts — collapsible section -->
+      <div class="mb-8">
+        <button onclick="toggleOverviewCharts()" id="charts-toggle-btn" class="flex items-center gap-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-green-400 transition mb-4 group">
+          <span id="charts-toggle-icon" class="transform transition-transform duration-200 text-xs">&#9654;</span>
+          <span data-t="chartsInsights">Charts &amp; Insights</span>
+          <span class="h-px flex-1 bg-gray-200 dark:bg-gray-700 ml-2"></span>
+        </button>
+        <div id="overview-charts-section" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6">
+              <h3 class="text-base font-bold text-brand dark:text-green-400 mb-4" data-t="chartWeekBookings">This Week's Bookings</h3>
+              <div id="chart-week-bookings"></div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6">
+              <h3 class="text-base font-bold text-brand dark:text-green-400 mb-4" data-t="chartServiceBreakdown">Service Breakdown</h3>
+              <div id="chart-service-breakdown"></div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6">
+              <h3 class="text-base font-bold text-brand dark:text-green-400 mb-4" data-t="chartBayUtilization">Bay Utilization Today</h3>
+              <div id="chart-bay-utilization"></div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6">
+              <h3 class="text-base font-bold text-brand dark:text-green-400 mb-4" data-t="chartBookingTrend">Booking Trend (30 Days)</h3>
+              <div id="chart-booking-trend"></div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6 lg:col-span-2">
+              <h3 class="text-base font-bold text-brand dark:text-green-400 mb-4" data-t="serviceStaffing">Service Staffing</h3>
+              <div id="chart-service-staffing"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1446,6 +1535,7 @@
             <button id="btn-fetch-google" onclick="fetchFromGoogle()" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition" data-t="reviewFetchGoogle">Fetch from Google</button>
             <div id="google-last-synced" class="text-xs text-green-200 mt-1" data-t="reviewNeverSynced">Never synced</div>
           </div>
+          <a href="https://business.google.com/reviews?placeId=ChIJLSxZDQyflVQRWXEi9LpJGxs" target="_blank" rel="noopener" class="bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-600 transition" data-t="respondOnGoogle">Respond on Google</a>
           <button onclick="toggleReviewForm()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium" data-t="reviewNewBtn">+ New Review</button>
         </div>
       </div>
@@ -4063,6 +4153,21 @@
       </div>
       <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" data-t="acctLanguageHint">Controls which language(s) you receive emails in</p>
     </div>
+    <!-- Google Account -->
+    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg" id="google-account-section">
+      <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2" data-t="googleAccount">Google Account</h4>
+      <div id="google-not-linked" class="hidden">
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-3" data-t="googleConnectHint">Connect your Google account for faster one-click sign-in</p>
+        <a href="/api/admin/google.php?mode=connect" class="inline-flex items-center gap-2 border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 transition text-sm font-medium text-gray-700 dark:text-gray-200">
+          <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          <span data-t="connectGoogle">Connect Google Account</span>
+        </a>
+      </div>
+      <div id="google-linked" class="hidden">
+        <p class="text-xs text-green-600 dark:text-green-400 mb-3">&#10003; <span data-t="googleConnected">Google account connected — you can sign in with Google</span></p>
+        <button onclick="unlinkGoogle()" class="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline" data-t="disconnectGoogle">Disconnect Google</button>
+      </div>
+    </div>
     <!-- Password -->
     <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
       <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2" data-t="updatePassword">Update Password</h4>
@@ -4257,6 +4362,13 @@ const adminT = {
     signIn: 'Sign In',
     backToWebsite: '\u2190 Back to website',
     forgotPassword: 'Forgot Password?',
+    orDivider: 'or',
+    signInWithGoogle: 'Sign in with Google',
+    googleAccount: 'Google Account',
+    googleConnectHint: 'Connect your Google account for faster one-click sign-in',
+    connectGoogle: 'Connect Google Account',
+    googleConnected: 'Google account connected \u2014 you can sign in with Google',
+    disconnectGoogle: 'Disconnect Google',
     resetPassword: 'Reset Password',
     resetSubtitle: 'Enter your email to receive a reset link',
     sendResetLink: 'Send Reset Link',
@@ -5310,14 +5422,17 @@ const adminT = {
     qaNewAppointment: 'New Appointment',
     qaWalkIn: 'Walk-In',
     qaNewRo: 'New RO',
+    qaShopBoard: 'Shop Board',
     qaMessages: 'Messages',
     qaUnassigned: 'Unassigned',
+    refresh: 'Refresh',
+    chartsInsights: 'Charts & Insights',
     // Live Status
-    lsActiveROs: 'Active ROs',
+    lsActiveROs: 'ROs',
     lsInbox: 'Inbox',
-    lsConversations: 'Unread Threads',
-    lsEmployeesOn: 'Team On Duty',
-    lsNeedsDvi: 'Needs Inspection',
+    lsConversations: 'Threads',
+    lsEmployeesOn: 'Team',
+    lsNeedsDvi: 'DVI',
     dviNeedsInspection: 'Needs Inspection',
     clickToView: 'Click to view',
     gaTrafficTitle: 'Website Traffic (Google Analytics)',
@@ -5328,6 +5443,12 @@ const adminT = {
     respondOnGoogle: 'Respond on Google',
     respond: 'Respond',
     viewAll: 'View All',
+    googleReviews: 'Google Reviews',
+    newReview: 'New Google Review',
+    lastSynced: 'Last synced',
+    minAgo: 'm ago',
+    hrAgo: 'h ago',
+    dayAgo: 'd ago',
     statConfirmed: 'confirmed',
     statNew: 'new',
     statAssigned: 'assigned',
@@ -5935,6 +6056,13 @@ const adminT = {
     signIn: 'Iniciar Sesi\u00F3n',
     backToWebsite: '\u2190 Volver al sitio web',
     forgotPassword: '\u00BFOlvidaste tu contrase\u00F1a?',
+    orDivider: 'o',
+    signInWithGoogle: 'Iniciar sesi\u00F3n con Google',
+    googleAccount: 'Cuenta de Google',
+    googleConnectHint: 'Conecta tu cuenta de Google para iniciar sesi\u00F3n m\u00E1s r\u00E1pido',
+    connectGoogle: 'Conectar Cuenta de Google',
+    googleConnected: 'Cuenta de Google conectada \u2014 puedes iniciar sesi\u00F3n con Google',
+    disconnectGoogle: 'Desconectar Google',
     resetPassword: 'Restablecer Contrase\u00F1a',
     resetSubtitle: 'Ingresa tu correo para recibir un enlace de restablecimiento',
     sendResetLink: 'Enviar Enlace',
@@ -6986,14 +7114,17 @@ const adminT = {
     qaNewAppointment: 'Nueva Cita',
     qaWalkIn: 'Sin Cita',
     qaNewRo: 'Nueva OT',
+    qaShopBoard: 'Tablero',
     qaMessages: 'Mensajes',
     qaUnassigned: 'Sin Asignar',
+    refresh: 'Actualizar',
+    chartsInsights: 'Gráficos y Análisis',
     // Live Status
-    lsActiveROs: 'OTs Activas',
+    lsActiveROs: 'OTs',
     lsInbox: 'Bandeja',
-    lsConversations: 'Hilos Sin Leer',
-    lsEmployeesOn: 'Equipo en Turno',
-    lsNeedsDvi: 'Necesita Inspección',
+    lsConversations: 'Hilos',
+    lsEmployeesOn: 'Equipo',
+    lsNeedsDvi: 'IVD',
     dviNeedsInspection: 'Necesita Inspección',
     clickToView: 'Clic para ver',
     gaTrafficTitle: 'Tr\u00e1fico del Sitio Web (Google Analytics)',
@@ -7004,6 +7135,12 @@ const adminT = {
     respondOnGoogle: 'Responder en Google',
     respond: 'Responder',
     viewAll: 'Ver Todas',
+    googleReviews: 'Rese\u00f1as de Google',
+    newReview: 'Nueva Rese\u00f1a de Google',
+    lastSynced: '\u00daltima sincronizaci\u00f3n',
+    minAgo: 'm atr\u00e1s',
+    hrAgo: 'h atr\u00e1s',
+    dayAgo: 'd atr\u00e1s',
     statConfirmed: 'confirmadas',
     statNew: 'nuevas',
     statAssigned: 'asignadas',
@@ -8136,18 +8273,32 @@ document.getElementById('forgot-form').addEventListener('submit', async function
 async function signOut() {
   if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; }
   try { await api('logout.php', { method: 'POST' }); } catch(e) {}
-  window.location.href = '/members';
+  window.location.href = '/admin/';
 }
 
 (async () => {
+  // Handle Google OAuth redirect messages
+  const urlParams = new URLSearchParams(window.location.search);
+  const statusMsg = document.getElementById('login-status-msg');
+  if (urlParams.get('error')) {
+    statusMsg.textContent = decodeURIComponent(urlParams.get('error'));
+    statusMsg.className = 'mt-3 text-sm text-center text-red-600 dark:text-red-400';
+    statusMsg.classList.remove('hidden');
+    window.history.replaceState({}, '', '/admin/');
+  } else if (urlParams.get('success')) {
+    statusMsg.textContent = decodeURIComponent(urlParams.get('success'));
+    statusMsg.className = 'mt-3 text-sm text-center text-green-600 dark:text-green-400';
+    statusMsg.classList.remove('hidden');
+    window.history.replaceState({}, '', '/admin/');
+  }
+
   try {
     const json = await api('session.php');
     csrfToken = json.data.csrf_token;
     showDashboard(json.data);
   } catch(e) {
-    // Not logged in — redirect to unified login at /members
-    window.location.href = '/members';
-    return;
+    // Not logged in — show login screen (already visible by default)
+    document.getElementById('login-screen').classList.remove('hidden');
   }
 })();
 
@@ -8951,9 +9102,20 @@ function renderOverview() {
   var T = adminT[currentLang];
   var stats = getOverviewStats();
 
-  // Stat cards
+  // Welcome bar
+  renderWelcome(stats);
+
+  // Stat cards — hero
   var actionCount = stats.unassigned.length + stats.overdue.length;
   document.getElementById('stat-action').textContent = actionCount;
+  var actionCard = document.getElementById('stat-card-action');
+  if (actionCard) {
+    if (actionCount > 0) {
+      actionCard.classList.add('ring-2', 'ring-red-300', 'dark:ring-red-700');
+    } else {
+      actionCard.classList.remove('ring-2', 'ring-red-300', 'dark:ring-red-700');
+    }
+  }
   var actionEl = document.getElementById('stat-action-detail');
   if (actionEl) actionEl.textContent = stats.unassigned.length + ' ' + (T.nUnassigned || 'unassigned') + ', ' + stats.overdue.length + ' ' + (T.nOverdue || 'overdue');
 
@@ -8965,6 +9127,7 @@ function renderOverview() {
     todayDetail.textContent = tConf + ' ' + (T.statConfirmed || 'confirmed') + ', ' + tNew + ' ' + (T.statNew || 'new');
   }
 
+  // Stat cards — secondary
   document.getElementById('stat-week').textContent = stats.week.length;
   var weekDetail = document.getElementById('stat-week-detail');
   if (weekDetail) {
@@ -8978,16 +9141,107 @@ function renderOverview() {
 
   document.getElementById('stat-completed').textContent = stats.completed.length;
 
-  renderQuickActions(stats);
-  renderLiveStatus();
-  renderRecentReviews();
+  // Alerts first (urgent items at top)
   renderOverviewAlerts(stats);
   if (typeof renderOverviewSkillGapAlerts === 'function') renderOverviewSkillGapAlerts();
+
+  // Command bar
+  renderQuickActions(stats);
+  renderLiveStatus();
+
+  // Reviews + extras
+  renderReviewsAlert();
   if (typeof renderTomorrowStat === 'function') renderTomorrowStat();
+
+  // Schedule
   renderUpcomingSchedule(stats);
   renderEmployeeSchedule(stats);
-  renderOverviewCharts();
+
+  // Charts (lazy — only if already open)
+  if (!document.getElementById('overview-charts-section').classList.contains('hidden')) {
+    renderOverviewCharts();
+  }
 }
+
+function renderWelcome(stats) {
+  var T = adminT[currentLang];
+  var box = document.getElementById('overview-welcome');
+  if (!box) return;
+  box.textContent = '';
+
+  var hour = new Date().getHours();
+  var greeting;
+  if (currentLang === 'es') {
+    greeting = hour < 12 ? 'Buenos d\u00edas' : hour < 18 ? 'Buenas tardes' : 'Buenas noches';
+  } else {
+    greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  }
+
+  var nameEl = document.getElementById('admin-email');
+  var name = nameEl ? (nameEl.textContent || '').split('@')[0] : '';
+  if (name) name = name.charAt(0).toUpperCase() + name.slice(1);
+
+  var wrap = document.createElement('div');
+  wrap.className = 'flex flex-col md:flex-row md:items-center md:justify-between gap-2';
+
+  var left = document.createElement('div');
+  var h2 = document.createElement('h2');
+  h2.className = 'text-2xl font-bold text-gray-900 dark:text-white';
+  h2.textContent = greeting + (name ? ', ' + name : '');
+  left.appendChild(h2);
+
+  var sub = document.createElement('p');
+  sub.className = 'text-sm text-gray-500 dark:text-gray-400 mt-0.5';
+  var now = new Date();
+  var dateStr = now.toLocaleDateString(currentLang === 'es' ? 'es-MX' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  var todayCount = stats.today.length;
+  var actionCount = stats.unassigned.length + stats.overdue.length;
+  if (currentLang === 'es') {
+    sub.textContent = dateStr + ' \u2022 ' + todayCount + ' cita' + (todayCount !== 1 ? 's' : '') + ' hoy' + (actionCount > 0 ? ' \u2022 ' + actionCount + ' requiere' + (actionCount !== 1 ? 'n' : '') + ' atenci\u00f3n' : '');
+  } else {
+    sub.textContent = dateStr + ' \u2022 ' + todayCount + ' appointment' + (todayCount !== 1 ? 's' : '') + ' today' + (actionCount > 0 ? ' \u2022 ' + actionCount + ' need' + (actionCount !== 1 ? '' : 's') + ' attention' : '');
+  }
+  left.appendChild(sub);
+  wrap.appendChild(left);
+
+  var right = document.createElement('div');
+  right.className = 'flex gap-2';
+  var refreshBtn = document.createElement('button');
+  refreshBtn.className = 'text-sm text-gray-400 dark:text-gray-500 hover:text-brand dark:hover:text-green-400 transition px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-brand dark:hover:border-green-600';
+  refreshBtn.textContent = '\u21BB ' + (T.refresh || 'Refresh');
+  refreshBtn.addEventListener('click', function() { loadAppointments(); });
+  right.appendChild(refreshBtn);
+  wrap.appendChild(right);
+
+  box.appendChild(wrap);
+}
+
+function toggleOverviewCharts() {
+  var section = document.getElementById('overview-charts-section');
+  var icon = document.getElementById('charts-toggle-icon');
+  if (section.classList.contains('hidden')) {
+    section.classList.remove('hidden');
+    if (icon) icon.style.transform = 'rotate(90deg)';
+    renderOverviewCharts();
+    try { localStorage.setItem('ot_charts_open', '1'); } catch(e) {}
+  } else {
+    section.classList.add('hidden');
+    if (icon) icon.style.transform = '';
+    try { localStorage.setItem('ot_charts_open', '0'); } catch(e) {}
+  }
+}
+
+// Restore chart section state from previous session
+(function() {
+  try {
+    if (localStorage.getItem('ot_charts_open') === '1') {
+      var section = document.getElementById('overview-charts-section');
+      var icon = document.getElementById('charts-toggle-icon');
+      if (section) section.classList.remove('hidden');
+      if (icon) icon.style.transform = 'rotate(90deg)';
+    }
+  } catch(e) {}
+})();
 
 function renderQuickActions(stats) {
   var T = adminT[currentLang];
@@ -8998,15 +9252,17 @@ function renderQuickActions(stats) {
   wrap.className = 'flex flex-wrap gap-2';
 
   var actions = [
-    { label: T.qaNewAppointment || 'New Appointment', icon: '📅', color: 'bg-green-600 hover:bg-green-700', action: function() { showNewApptModal(); } },
-    { label: T.qaMessages || 'Messages', icon: '💬', color: 'bg-amber-600 hover:bg-amber-700', action: function() { switchTab('messages'); } },
+    { label: T.qaNewAppointment || 'New Appointment', icon: '\uD83D\uDCC5', color: 'bg-brand hover:bg-green-800', action: function() { showNewApptModal(); } },
+    { label: T.qaWalkIn || 'Walk-In', icon: '\uD83D\uDEB6', color: 'bg-cyan-600 hover:bg-cyan-700', action: function() { switchTab('walkinqueue'); } },
+    { label: T.qaShopBoard || 'Shop Board', icon: '\uD83D\uDCCB', color: 'bg-purple-600 hover:bg-purple-700', action: function() { switchTab('repairorders'); } },
+    { label: T.qaMessages || 'Messages', icon: '\uD83D\uDCAC', color: 'bg-amber-600 hover:bg-amber-700', action: function() { switchTab('messages'); } },
   ];
   if (stats.unassigned.length > 0) {
-    actions.unshift({ label: stats.unassigned.length + ' ' + (T.qaUnassigned || 'Unassigned'), icon: '⚠️', color: 'bg-red-600 hover:bg-red-700 animate-pulse', action: function() { showUnassignedAppointments(); } });
+    actions.unshift({ label: stats.unassigned.length + ' ' + (T.qaUnassigned || 'Unassigned'), icon: '\u26A0\uFE0F', color: 'bg-red-600 hover:bg-red-700 animate-pulse', action: function() { showUnassignedAppointments(); } });
   }
   actions.forEach(function(a) {
     var btn = document.createElement('button');
-    btn.className = a.color + ' text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition shadow-sm';
+    btn.className = a.color + ' text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition shadow-sm';
     btn.textContent = a.icon + ' ' + a.label;
     btn.addEventListener('click', a.action);
     wrap.appendChild(btn);
@@ -9026,33 +9282,38 @@ function renderLiveStatus() {
   var contactNew = messages.filter(function(m) { return m.status === 'new' || m.status === 'priority'; }).length;
 
   var items = [
-    { id: 'ls-active-ros', label: T.lsActiveROs || 'Active ROs', value: '...', icon: '🔧', color: 'text-purple-600 dark:text-purple-400', tab: 'repairorders' },
-    { id: 'ls-needs-dvi', label: T.lsNeedsDvi || 'Needs Inspection', value: '...', icon: '🔍', color: 'text-gray-400 dark:text-gray-500', tab: 'repairorders' },
-    { label: T.lsInbox || 'Inbox', value: String(contactNew), icon: '📩', color: contactNew > 0 ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400', tab: 'messages' },
-    { label: T.lsConversations || 'Unread Threads', value: String(unreadCount), icon: '💬', color: unreadCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400', tab: 'messages' },
-    { label: T.lsEmployeesOn || 'Team On Duty', value: String(employees.filter(function(e) { return e.is_active; }).length), icon: '👥', color: 'text-green-600 dark:text-green-400', tab: 'employees' }
+    { id: 'ls-active-ros', label: T.lsActiveROs || 'ROs', value: '\u2026', icon: '\uD83D\uDD27', hasAlert: false, tab: 'repairorders' },
+    { id: 'ls-needs-dvi', label: T.lsNeedsDvi || 'DVI', value: '\u2026', hasAlert: false, tab: 'repairorders' },
+    { label: T.lsInbox || 'Inbox', value: String(contactNew), icon: '\uD83D\uDCE9', hasAlert: contactNew > 0, tab: 'messages' },
+    { label: T.lsConversations || 'Threads', value: String(unreadCount), icon: '\uD83D\uDCAC', hasAlert: unreadCount > 0, tab: 'messages' },
+    { label: T.lsEmployeesOn || 'Team', value: String(employees.filter(function(e) { return e.is_active; }).length), icon: '\uD83D\uDC65', hasAlert: false, tab: 'employees' }
   ];
 
   items.forEach(function(item) {
-    var card = document.createElement('div');
-    card.className = 'bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-3 flex items-center gap-3 cursor-pointer hover:shadow-md hover:border-green-300 dark:hover:border-green-600 transition-all';
-    card.addEventListener('click', function() { switchTab(item.tab); });
+    var chip = document.createElement('button');
+    chip.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition cursor-pointer '
+      + (item.hasAlert
+        ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/50 font-semibold'
+        : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600');
+    chip.addEventListener('click', function() { switchTab(item.tab); });
+
     var iconSpan = document.createElement('span');
-    iconSpan.className = 'text-xl';
+    iconSpan.className = 'text-sm';
     iconSpan.textContent = item.icon;
-    card.appendChild(iconSpan);
-    var info = document.createElement('div');
-    var val = document.createElement('div');
-    val.className = 'text-lg font-bold ' + item.color;
+    chip.appendChild(iconSpan);
+
+    var val = document.createElement('span');
+    val.className = 'font-bold';
     val.textContent = item.value;
     if (item.id) val.id = item.id;
-    info.appendChild(val);
-    var lbl = document.createElement('div');
-    lbl.className = 'text-xs text-gray-500 dark:text-gray-400';
+    chip.appendChild(val);
+
+    var lbl = document.createElement('span');
+    lbl.className = 'text-xs opacity-70';
     lbl.textContent = item.label;
-    info.appendChild(lbl);
-    card.appendChild(info);
-    box.appendChild(card);
+    chip.appendChild(lbl);
+
+    box.appendChild(chip);
   });
 
   // Async: fetch all ROs for counts + DVI queue
@@ -9065,19 +9326,21 @@ function renderLiveStatus() {
       }).length;
 
       var el = document.getElementById('ls-active-ros');
-      if (el) {
-        el.textContent = String(activeCount);
-        el.className = 'text-lg font-bold ' + (activeCount > 0 ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500');
-      }
+      if (el) el.textContent = String(activeCount);
 
-      // DVI: ROs in check_in or diagnosis without completed inspections
+      // DVI: ROs in check_in or diagnosis
       var dviNeeded = data.filter(function(ro) {
         return ro.status === 'check_in' || ro.status === 'diagnosis';
       });
       var dviEl = document.getElementById('ls-needs-dvi');
       if (dviEl) {
         dviEl.textContent = String(dviNeeded.length);
-        dviEl.className = 'text-lg font-bold ' + (dviNeeded.length > 0 ? 'text-purple-600 dark:text-purple-400 animate-pulse' : 'text-gray-400 dark:text-gray-500');
+        if (dviNeeded.length > 0) {
+          var dviChip = dviEl.closest('button');
+          if (dviChip) {
+            dviChip.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition cursor-pointer bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/50 font-semibold';
+          }
+        }
       }
 
       // DVI alert card
@@ -9085,7 +9348,7 @@ function renderLiveStatus() {
     })
     .catch(function() {
       var el = document.getElementById('ls-active-ros');
-      if (el) { el.textContent = '\u2014'; el.className = 'text-lg font-bold text-gray-400 dark:text-gray-500'; }
+      if (el) el.textContent = '\u2014';
     });
 }
 
@@ -9115,81 +9378,73 @@ function renderDviAlert(dviRos) {
   container.innerHTML += alertHtml;
 }
 
-function renderRecentReviews() {
-  var widget = document.getElementById('overview-reviews-widget');
+function renderReviewsAlert() {
+  var widget = document.getElementById('overview-reviews-alert');
   if (!widget) return;
   var T = adminT[currentLang];
-  var RESPOND_URL = 'https://www.google.com/maps/place/?q=place_id:ChIJLSxZDQyflVQRWXEi9LpJGxs';
+  var GBP_URL = 'https://business.google.com/reviews?placeId=ChIJLSxZDQyflVQRWXEi9LpJGxs';
 
-  fetch('/api/testimonials.php?limit=5&source=google', { credentials: 'include' })
+  fetch('/api/testimonials.php?scope=stats', { credentials: 'include' })
     .then(function(r) { return r.json(); })
     .then(function(json) {
-      var reviews = (json.data || []).slice(0, 5);
-      if (!reviews.length) { widget.textContent = ''; return; }
+      if (!json.success) return;
+      var stats = json.data;
+      var count = parseInt(stats.review_count) || 0;
+      var rating = stats.rating_value || '0';
 
       widget.textContent = '';
       var card = document.createElement('div');
-      card.className = 'bg-white dark:bg-gray-800 rounded-xl shadow p-5';
+      card.className = 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 cursor-pointer hover:shadow-md transition';
 
-      var hdr = document.createElement('div');
-      hdr.className = 'flex items-center justify-between mb-3';
-      var hdrLeft = document.createElement('h3');
-      hdrLeft.className = 'text-lg font-bold text-brand dark:text-green-400 flex items-center gap-2';
-      hdrLeft.textContent = '⭐ ' + (T.recentReviews || 'Recent Google Reviews');
-      hdr.appendChild(hdrLeft);
-      var hdrRight = document.createElement('div');
-      hdrRight.className = 'flex gap-2';
-      var viewAllBtn = document.createElement('button');
-      viewAllBtn.className = 'text-xs text-blue-600 dark:text-blue-400 hover:underline';
-      viewAllBtn.textContent = T.viewAll || 'View All';
-      viewAllBtn.addEventListener('click', function() { switchTab('reviews'); });
-      hdrRight.appendChild(viewAllBtn);
-      var respondAllBtn = document.createElement('a');
-      respondAllBtn.href = RESPOND_URL;
-      respondAllBtn.target = '_blank';
-      respondAllBtn.rel = 'noopener';
-      respondAllBtn.className = 'text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded font-medium hover:bg-amber-200 dark:hover:bg-amber-900/50 transition';
-      respondAllBtn.textContent = '📍 ' + (T.respondOnGoogle || 'Respond on Google');
-      hdrRight.appendChild(respondAllBtn);
-      hdr.appendChild(hdrRight);
-      card.appendChild(hdr);
+      var inner = document.createElement('div');
+      inner.className = 'flex items-center justify-between flex-wrap gap-3';
 
-      var list = document.createElement('div');
-      list.className = 'space-y-2';
-      reviews.forEach(function(r) {
-        var row = document.createElement('div');
-        row.className = 'flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border dark:border-gray-700';
+      var left = document.createElement('div');
+      left.className = 'flex items-center gap-3';
+      var icon = document.createElement('span');
+      icon.className = 'text-2xl';
+      icon.textContent = '\u2B50';
+      left.appendChild(icon);
+      var info = document.createElement('div');
+      var title = document.createElement('div');
+      title.className = 'font-semibold text-amber-800 dark:text-amber-300';
+      title.textContent = (T.googleReviews || 'Google Reviews') + ' \u2014 ' + rating + ' \u2605 (' + count + ')';
+      info.appendChild(title);
+      var sub = document.createElement('div');
+      sub.className = 'text-xs text-amber-600 dark:text-amber-400';
+      var lastFetched = stats.last_fetched;
+      if (lastFetched) {
+        var d = new Date(lastFetched + ' UTC');
+        var diff = Math.floor((Date.now() - d.getTime()) / 60000);
+        if (diff < 60) sub.textContent = (T.lastSynced || 'Last synced') + ': ' + diff + (T.minAgo || 'm ago');
+        else if (diff < 1440) sub.textContent = (T.lastSynced || 'Last synced') + ': ' + Math.floor(diff / 60) + (T.hrAgo || 'h ago');
+        else sub.textContent = (T.lastSynced || 'Last synced') + ': ' + Math.floor(diff / 1440) + (T.dayAgo || 'd ago');
+      } else {
+        sub.textContent = T.testimNeverSynced || 'Never synced';
+      }
+      info.appendChild(sub);
+      left.appendChild(info);
+      inner.appendChild(left);
 
-        var stars = document.createElement('div');
-        stars.className = 'text-amber-500 text-sm shrink-0';
-        stars.textContent = '⭐'.repeat(Math.min(r.rating || 0, 5));
-        row.appendChild(stars);
+      var btns = document.createElement('div');
+      btns.className = 'flex gap-2';
+      var viewBtn = document.createElement('button');
+      viewBtn.className = 'text-sm bg-amber-600 text-white px-3 py-1.5 rounded-lg hover:bg-amber-700 transition font-medium';
+      viewBtn.textContent = T.viewAll || 'View All';
+      viewBtn.addEventListener('click', function(e) { e.stopPropagation(); switchTab('reviews'); });
+      btns.appendChild(viewBtn);
+      var respondBtn = document.createElement('a');
+      respondBtn.href = GBP_URL;
+      respondBtn.target = '_blank';
+      respondBtn.rel = 'noopener';
+      respondBtn.className = 'text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition font-medium';
+      respondBtn.textContent = T.respondOnGoogle || 'Respond on Google';
+      respondBtn.addEventListener('click', function(e) { e.stopPropagation(); });
+      btns.appendChild(respondBtn);
+      inner.appendChild(btns);
 
-        var body = document.createElement('div');
-        body.className = 'flex-1 min-w-0';
-        var author = document.createElement('div');
-        author.className = 'text-sm font-medium text-gray-900 dark:text-white';
-        author.textContent = r.customer_name || r.author_name || (T.anonymous || 'Anonymous');
-        body.appendChild(author);
-        if (r.review_text_en || r.review_text_es) {
-          var text = document.createElement('p');
-          text.className = 'text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2';
-          text.textContent = (currentLang === 'es' && r.review_text_es) ? r.review_text_es : (r.review_text_en || r.review_text_es || '');
-          body.appendChild(text);
-        }
-        row.appendChild(body);
-
-        var respondBtn = document.createElement('a');
-        respondBtn.href = RESPOND_URL;
-        respondBtn.target = '_blank';
-        respondBtn.rel = 'noopener';
-        respondBtn.className = 'shrink-0 text-xs text-blue-600 dark:text-blue-400 hover:underline';
-        respondBtn.textContent = T.respond || 'Respond';
-        row.appendChild(respondBtn);
-
-        list.appendChild(row);
-      });
-      card.appendChild(list);
+      card.appendChild(inner);
+      card.addEventListener('click', function() { switchTab('reviews'); });
       widget.appendChild(card);
     })
     .catch(function() { widget.textContent = ''; });
@@ -14719,13 +14974,41 @@ function openAccountSettings() {
   }
   document.getElementById('settings-password').value = '';
   document.getElementById('settings-password-confirm').value = '';
+  document.getElementById('settings-current-password').value = '';
   api('account.php').then(json => {
-    document.getElementById('settings-notification-email').value = json.data?.notification_email || (currentUser ? currentUser.email : '');
+    var d = json.data || {};
+    // Populate fields from API response
+    document.getElementById('settings-name').value = d.display_name || (currentUser ? currentUser.name : '');
+    document.getElementById('settings-email').value = d.email || (currentUser ? currentUser.email : '');
+    document.getElementById('settings-notification-email').value = d.notification_email || d.email || '';
     var sLang = document.getElementById('settings-language');
-    if(json.data?.language && sLang) sLang.value = json.data.language;
+    if(d.language && sLang) sLang.value = d.language;
+    // Google account status
+    var linked = document.getElementById('google-linked');
+    var notLinked = document.getElementById('google-not-linked');
+    if (d.google_linked) {
+      linked.classList.remove('hidden');
+      notLinked.classList.add('hidden');
+    } else {
+      linked.classList.add('hidden');
+      notLinked.classList.remove('hidden');
+    }
+    // Hide admin-only fields for employees
+    var notifSection = document.getElementById('settings-notification-email').closest('.mb-6');
+    if (notifSection) notifSection.style.display = d.staff_type === 'employee' ? 'none' : '';
   }).catch(() => {});
   document.getElementById('account-modal').classList.remove('hidden');
   trapFocus(document.getElementById('account-modal'));
+}
+
+async function unlinkGoogle() {
+  if (!confirm(currentLang === 'es' ? 'Desconectar tu cuenta de Google?' : 'Disconnect your Google account?')) return;
+  try {
+    await api('account.php', { method: 'PUT', body: { action: 'unlink_google' } });
+    document.getElementById('google-linked').classList.add('hidden');
+    document.getElementById('google-not-linked').classList.remove('hidden');
+    showToast(currentLang === 'es' ? 'Google desconectado' : 'Google disconnected');
+  } catch(e) { showToast((adminT[currentLang]?.error || 'Error') + ': ' + e.message, true); }
 }
 
 async function updateNotificationEmail() {
@@ -15079,8 +15362,10 @@ async function showCustomerHistory(email) {
 // ===== NOTIFICATION BELL =====
 let prevApptIds = new Set();
 let prevMsgIds = new Set();
+let prevReviewIds = new Set();
 let notifItems = [];
 let notifInitialized = false;
+let reviewCheckInterval = null;
 
 function checkForNewItems() {
   // Build current ID sets
@@ -15091,6 +15376,12 @@ function checkForNewItems() {
     prevApptIds = curApptIds;
     prevMsgIds = curMsgIds;
     notifInitialized = true;
+    // Initialize review tracking on first run
+    checkForNewReviews(true);
+    // Poll for new reviews every 60 seconds
+    if (!reviewCheckInterval) {
+      reviewCheckInterval = setInterval(function() { checkForNewReviews(false); }, 60000);
+    }
     return;
   }
 
@@ -15135,6 +15426,49 @@ function checkForNewItems() {
   renderNotifications();
 }
 
+function checkForNewReviews(isInit) {
+  fetch('/api/testimonials.php', { credentials: 'include' })
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      var reviews = json.data || [];
+      var curReviewIds = new Set(reviews.map(function(r) { return String(r.id); }));
+
+      if (isInit) {
+        prevReviewIds = curReviewIds;
+        return;
+      }
+
+      var now = Date.now();
+      var newCount = 0;
+      curReviewIds.forEach(function(id) {
+        if (!prevReviewIds.has(id)) {
+          var rev = reviews.find(function(r) { return String(r.id) === id; });
+          if (rev) {
+            newCount++;
+            var stars = '\u2605'.repeat(Math.min(rev.rating || 0, 5));
+            var name = rev.customer_name || (adminT[currentLang].anonymous || 'Anonymous');
+            notifItems.unshift({
+              type: 'review',
+              title: (adminT[currentLang].newReview || 'New Google Review'),
+              detail: name + ' ' + stars + (rev.review_text_en ? ' — ' + rev.review_text_en.substring(0, 50) : ''),
+              time: now,
+              tab: 'reviews'
+            });
+          }
+        }
+      });
+
+      if (newCount > 0) {
+        if (notifItems.length > 20) notifItems = notifItems.slice(0, 20);
+        prevReviewIds = curReviewIds;
+        renderNotifications();
+      } else {
+        prevReviewIds = curReviewIds;
+      }
+    })
+    .catch(function() { /* silent */ });
+}
+
 function ucFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ') : ''; }
 
 function renderNotifications() {
@@ -15164,7 +15498,7 @@ function renderNotifications() {
   notifItems.forEach(function(item, idx) {
     var div = document.createElement('div');
     div.className = 'notif-item';
-    var icon = item.type === 'booking' ? '📅' : '💬';
+    var icon = item.type === 'booking' ? '📅' : item.type === 'review' ? '⭐' : '💬';
     var ago = timeAgo(item.time);
     var titleEl = document.createElement('div');
     titleEl.className = 'flex justify-between items-center';

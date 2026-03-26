@@ -114,6 +114,61 @@ if (($isAdmin || $isEmployee) && !isset($_GET['tab'])) {
     }
 }
 
+// ── Bridge admin session to member-kit session ──────────────────���───────────
+// Admin logged in at /admin/ has admin_id but not member_id. Bridge it so the
+// member dashboard works when admins click "My Account".
+if (!MemberAuth::isMemberLoggedIn() && !empty($_SESSION['admin_id'])) {
+    $adminEmail = $_SESSION['admin_email'] ?? '';
+    if ($adminEmail !== '') {
+        try {
+            // Look up existing member record by email
+            $stmt = $pdo->prepare('SELECT * FROM members WHERE email = ? LIMIT 1');
+            $stmt->execute([$adminEmail]);
+            $memberRow = $stmt->fetch();
+
+            if (!$memberRow) {
+                // Create a member record for this admin
+                $adminName = $_SESSION['admin_name'] ?? explode('@', $adminEmail)[0];
+                $username  = preg_replace('/[^a-zA-Z0-9]/', '', $adminName) ?: 'admin';
+                // Ensure unique username
+                $baseUsername = strtolower($username);
+                $username = $baseUsername;
+                $counter = 0;
+                while ($counter < 100) {
+                    $check = $pdo->prepare('SELECT id FROM members WHERE username = ? LIMIT 1');
+                    $check->execute([$username]);
+                    if (!$check->fetch()) break;
+                    $counter++;
+                    $username = $baseUsername . $counter;
+                }
+
+                $pdo->prepare(
+                    'INSERT INTO members (email, username, display_name, role, is_active, is_admin, email_verified_at, created_at)
+                     VALUES (?, ?, ?, ?, 1, 1, NOW(), NOW())'
+                )->execute([$adminEmail, $username, $_SESSION['admin_name'] ?? $adminName, 'admin']);
+                $newId = (int) $pdo->lastInsertId();
+                $stmt = $pdo->prepare('SELECT * FROM members WHERE id = ? LIMIT 1');
+                $stmt->execute([$newId]);
+                $memberRow = $stmt->fetch();
+            }
+
+            if ($memberRow) {
+                // Bridge: set member-kit session vars directly (don't call
+                // startAuthenticatedSession which regenerates session ID and
+                // would wipe admin session vars)
+                $_SESSION['member_id']         = (int) $memberRow['id'];
+                $_SESSION['member_email']      = $memberRow['email'];
+                $_SESSION['member_username']   = $memberRow['username'] ?? '';
+                $_SESSION['is_super_admin']    = !empty($memberRow['is_admin']);
+                $_SESSION['sso_session_start'] = $_SESSION['login_time'] ?? time();
+                $_SESSION['dashboard_role']    = 'admin';
+            }
+        } catch (\Throwable $e) {
+            error_log('Admin→member session bridge failed: ' . $e->getMessage());
+        }
+    }
+}
+
 // Auth view routing: /members?view=register|forgot-password|reset-password
 $authView = $_GET['view'] ?? 'login';
 $validViews = ['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'resend-verification'];

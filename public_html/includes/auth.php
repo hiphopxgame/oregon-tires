@@ -60,7 +60,7 @@ const ENDPOINT_PERMISSIONS = [
     'email-template-vars.php'=> 'settings',
     'export.php'             => 'settings',
     'admins.php'             => 'settings',
-    'account.php'            => 'settings',
+    // account.php uses requireStaff() directly — all staff can manage their own account
 ];
 
 /**

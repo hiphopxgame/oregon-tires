@@ -16,7 +16,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 ## Client Service Offerings
 - **Client Price**: $5,000 — full software ownership + 3 months marketing & management + domain transfer
 - **Domain**: `oregon.tires` — transfers to client with payment
-- **Managed Hosting**: $50/mo — server management, SSL, backups, uptime monitoring, security patches, Cloudflare CDN
+- **Hosting Requirement**: cPanel shared hosting with SSH access (client-provided or we set up). Not a managed service — client is responsible for their hosting account.
 - **Marketing & Management**: Starting at $500/mo — SEO, content updates, blog, social media, Google Business management, analytics, platform enhancements
 - **Platform Value**: ~$52,400 (freelancer rate @ $50/hr) — 113 features across 17 categories
 
@@ -30,7 +30,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - Local: `public_html/` prefix
 - Server: flat at `---oregon.tires/` level (strip `public_html/` when SCPing)
 - CLI scripts: `cli/` (bootstrap path on server: `__DIR__ . '/../includes/bootstrap.php'`)
-- SQL migrations: `sql/` (outside public_html, 62 migration files)
+- SQL migrations: `sql/` (outside public_html, 81 migration files)
 - Uploads: `uploads/inspections/{ro_number}/` (inspection photos)
 - Market data: `_data/portland-auto-directory.json` (976 businesses, raw)
 - Market data (minified): `admin/js/market-intel-data.json` (served to admin)
@@ -213,7 +213,6 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `GET /api/commerce/orders.php` — order history
 - `GET /api/commerce/stats.php` — commerce stats
 - `POST /api/commerce/webhook.php` — general webhook
-- `POST /api/commerce/crypto-confirm.php` — crypto payment confirm
 
 ### Form (kit wrappers)
 - `POST /api/form/submit.php` — form submission
@@ -307,7 +306,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 ### Utility
 - `send-setup-emails.php` — admin setup email trigger
 
-## Includes (21 files)
+## Includes (33 files)
 - `bootstrap.php` — .env loader, DB connection, session, error tracking init
 - `db.php` — PDO connection helper
 - `auth.php` — session auth, role checks, CSRF
@@ -329,8 +328,23 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `member-translations.php` — bilingual auth UI strings
 - `engine-kit-init.php` — engine-kit error tracking loader
 - `push.php` — Web Push utility: VAPID key management, subscription CRUD, notification queuing, queue processor (minishlink/web-push)
+- `auth-pages.php` — bilingual auth page rendering (login/register/reset templates)
+- `business-hours.php` — business hours configuration and helpers
+- `google-business.php` — Google Business Profile API (posts, insights, Q&A, hours sync)
+- `google-calendar.php` — Google Calendar appointment sync
+- `invoices.php` — invoice generation and helpers
+- `loyalty.php` — loyalty points calculation and helpers
+- `parts.php` — parts inventory helpers
+- `referrals.php` — referral code generation and tracking
+- `seo-lang.php` — SEO language/hreflang tag helpers
+- `sso-handler.php` — SSO authentication handling
+- `survey.php` — customer survey helpers
+- `waitlist.php` — walk-in queue management helpers
 
 ## CLI Scripts
+Production cron scripts live in `public_html/cli/` (deployed to server via `deploy.sh`).
+Dev/migration utilities live in root `cli/` (local-only, not deployed).
+
 - `send-reminders.php` — appointment reminders for next day (cron)
 - `send-review-requests.php` — review request emails (cron)
 - `send-welcome-emails.php` — welcome emails for new subscribers
@@ -347,6 +361,17 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - `send-push-notifications.php` — push notification queue processor (cron, every 5 min)
 - `fetch-inbound-emails.php` — IMAP inbound email fetch into conversations (cron, every 2 min)
 - `collect-portland-auto-shops.php` — Google Places API collector for Market Intel (one-time, 976 businesses)
+- `send-estimate-reminders.php` — estimate expiry reminders (daily cron 10 AM)
+- `health-monitor.php` — site health monitoring
+- `send-admin-credentials.php` — send admin credentials email
+- `send-admin-invite.php` — send admin invitation email
+- `send-platform-overview.php` — send platform overview email
+- `send-ro-guide-email.php` — send RO workflow guide email
+- `send-workflow-update-email.php` — send workflow update email
+- `sync-admins-to-members.php` — sync admin accounts to member-kit
+- `send-surveys.php` — customer satisfaction surveys
+- `retry-calendar-sync.php` — retry failed Google Calendar syncs
+- `run-migration-063.php` — run migration 063
 
 ## Cron Jobs (on server)
 ```
@@ -357,6 +382,7 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 0 9  * * 1  cli/send-service-reminders.php     # automated service due date reminders (Mon 9AM)
 0 7  * * 1  cli/sync-google-business.php       # Google Business Profile sync (Mon 7AM)
 */2 * * * * cli/fetch-inbound-emails.php      # IMAP inbound email fetch (every 2 min)
+0 10 * * *  cli/send-estimate-reminders.php    # estimate expiry reminders (daily 10 AM)
 ```
 
 ## Admin Panel

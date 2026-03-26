@@ -7,6 +7,8 @@
  * Run: php cli/send-workflow-update-email.php
  */
 
+declare(strict_types=1);
+
 $_SERVER['SCRIPT_FILENAME'] = __FILE__;
 require __DIR__ . '/../includes/bootstrap.php';
 require __DIR__ . '/../includes/mail.php';

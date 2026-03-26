@@ -41,22 +41,39 @@
     return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fb;
   }
 
-  // ─── Load Leaflet CSS + JS lazily ─────────────────────────────────────────
+  // ─── Load Leaflet CSS + JS lazily (with CDN fallback) ────────────────────
+  var LEAFLET_CDNS = [
+    { css: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', js: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js' },
+    { css: 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css', js: 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js' },
+    { css: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css', js: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js' },
+  ];
+
   function loadLeaflet() {
-    return new Promise(function(resolve) {
-      if (leafletLoaded) { resolve(); return; }
+    if (leafletLoaded) return Promise.resolve();
 
-      var css = document.createElement('link');
-      css.rel = 'stylesheet';
-      css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      document.head.appendChild(css);
+    function tryLoad(idx) {
+      if (idx >= LEAFLET_CDNS.length) return Promise.resolve(); // all failed
+      var cdn = LEAFLET_CDNS[idx];
+      return new Promise(function(resolve) {
+        var css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = cdn.css;
+        document.head.appendChild(css);
 
-      var script = document.createElement('script');
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.onload = function() { leafletLoaded = true; resolve(); };
-      script.onerror = function() { resolve(); }; // graceful fail
-      document.head.appendChild(script);
-    });
+        var script = document.createElement('script');
+        script.src = cdn.js;
+        script.onload = function() { leafletLoaded = true; resolve(); };
+        script.onerror = function() {
+          // Remove failed CSS + script, try next CDN
+          css.remove();
+          script.remove();
+          resolve(tryLoad(idx + 1));
+        };
+        document.head.appendChild(script);
+      });
+    }
+
+    return tryLoad(0);
   }
 
   // ─── Category colors + labels ─────────────────────────────────────────────

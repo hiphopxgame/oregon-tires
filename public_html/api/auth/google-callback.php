@@ -9,11 +9,225 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../../includes/bootstrap.php';
-require_once __DIR__ . '/../../includes/member-kit-init.php';
 
 startSecureSession();
 
 $pdo = getDB();
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ADMIN GOOGLE OAUTH — handle admin_login / admin_connect modes
+// ═════════════════════════════════════════════════════════════════════════════
+$oauthMode = $_SESSION['google_oauth_mode'] ?? '';
+
+if (in_array($oauthMode, ['admin_login', 'admin_connect'], true)) {
+    require_once __DIR__ . '/../../includes/auth.php';
+
+    $adminUrl = '/admin/';
+
+    // Handle errors from Google
+    if (!empty($_GET['error'])) {
+        error_log('Admin Google OAuth error: ' . ($_GET['error_description'] ?? $_GET['error']));
+        unset($_SESSION['google_oauth_mode']);
+        header('Location: ' . $adminUrl . '?error=' . urlencode('Google sign-in was cancelled.'));
+        exit;
+    }
+
+    // Validate params
+    if (empty($_GET['code']) || empty($_GET['state'])) {
+        unset($_SESSION['google_oauth_mode']);
+        header('Location: ' . $adminUrl . '?error=' . urlencode('Invalid response from Google.'));
+        exit;
+    }
+
+    // Verify CSRF state
+    $expectedState = $_SESSION['google_oauth_state'] ?? '';
+    if (!hash_equals($expectedState, $_GET['state'])) {
+        error_log('Admin Google OAuth: state mismatch');
+        unset($_SESSION['google_oauth_mode']);
+        header('Location: ' . $adminUrl . '?error=' . urlencode('Session expired. Please try again.'));
+        exit;
+    }
+    unset($_SESSION['google_oauth_state']);
+
+    // Exchange code for access token
+    $clientId     = $_ENV['GOOGLE_CLIENT_ID'] ?? '';
+    $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'] ?? '';
+    $redirectUri  = $_ENV['GOOGLE_REDIRECT_URI'] ?? 'https://oregon.tires/api/auth/google-callback.php';
+    $codeVerifier = $_SESSION['google_code_verifier'] ?? '';
+    unset($_SESSION['google_code_verifier'], $_SESSION['google_oauth_mode']);
+
+    $tokenPayload = http_build_query([
+        'grant_type'    => 'authorization_code',
+        'code'          => $_GET['code'],
+        'redirect_uri'  => $redirectUri,
+        'client_id'     => $clientId,
+        'client_secret' => $clientSecret,
+        'code_verifier' => $codeVerifier,
+    ]);
+
+    $ch = curl_init('https://oauth2.googleapis.com/token');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $tokenPayload,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_HTTPHEADER     => ['Content-Type: application/x-www-form-urlencoded'],
+    ]);
+    $tokenResponse = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    if (curl_errno($ch) || $httpCode !== 200) {
+        error_log("Admin Google OAuth token exchange failed: HTTP {$httpCode}, response: {$tokenResponse}");
+        curl_close($ch);
+        header('Location: ' . $adminUrl . '?error=' . urlencode('Google sign-in failed. Please try again.'));
+        exit;
+    }
+    curl_close($ch);
+
+    $tokenData   = json_decode($tokenResponse, true);
+    $accessToken = $tokenData['access_token'] ?? '';
+    if (empty($accessToken)) {
+        header('Location: ' . $adminUrl . '?error=' . urlencode('Google sign-in failed.'));
+        exit;
+    }
+
+    // Fetch user profile
+    $ch = curl_init('https://www.googleapis.com/oauth2/v3/userinfo');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $accessToken],
+    ]);
+    $profileResponse = curl_exec($ch);
+    $profileHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    if (curl_errno($ch) || $profileHttpCode !== 200) {
+        error_log("Admin Google OAuth userinfo failed: HTTP {$profileHttpCode}");
+        curl_close($ch);
+        header('Location: ' . $adminUrl . '?error=' . urlencode('Could not retrieve Google profile.'));
+        exit;
+    }
+    curl_close($ch);
+
+    $profile  = json_decode($profileResponse, true);
+    $googleId = $profile['sub'] ?? '';
+    $gEmail   = strtolower(trim($profile['email'] ?? ''));
+
+    if (empty($gEmail)) {
+        header('Location: ' . $adminUrl . '?error=' . urlencode('Your Google account has no email.'));
+        exit;
+    }
+
+    // Ensure google_id column exists (graceful migration)
+    try {
+        $pdo->query('SELECT google_id FROM oretir_admins LIMIT 0');
+    } catch (\Throwable $_) {
+        try {
+            $pdo->exec('ALTER TABLE oretir_admins ADD COLUMN google_id VARCHAR(255) DEFAULT NULL AFTER notification_email');
+            $pdo->exec('ALTER TABLE oretir_admins ADD UNIQUE INDEX idx_admin_google_id (google_id)');
+        } catch (\Throwable $e2) {
+            error_log('Admin Google OAuth: could not add google_id column: ' . $e2->getMessage());
+        }
+    }
+
+    // ── ADMIN CONNECT MODE ──────────────────────────────────────────────────
+    if ($oauthMode === 'admin_connect') {
+        if (empty($_SESSION['admin_id'])) {
+            header('Location: ' . $adminUrl . '?error=' . urlencode('Session expired. Please sign in and try again.'));
+            exit;
+        }
+
+        $adminId = (int) $_SESSION['admin_id'];
+
+        // Check google_id not already linked to another admin
+        $check = $pdo->prepare('SELECT id FROM oretir_admins WHERE google_id = ? AND id != ? LIMIT 1');
+        $check->execute([$googleId, $adminId]);
+        if ($check->fetch()) {
+            header('Location: ' . $adminUrl . '?error=' . urlencode('This Google account is already linked to another admin.'));
+            exit;
+        }
+
+        $pdo->prepare('UPDATE oretir_admins SET google_id = ?, updated_at = NOW() WHERE id = ?')
+            ->execute([$googleId, $adminId]);
+
+        header('Location: ' . $adminUrl . '?success=' . urlencode('Google account connected!'));
+        exit;
+    }
+
+    // ── ADMIN LOGIN MODE ────────────────────────────────────────────────────
+    // 1. Try by google_id
+    $stmt = $pdo->prepare('SELECT * FROM oretir_admins WHERE google_id = ? AND is_active = 1 LIMIT 1');
+    $stmt->execute([$googleId]);
+    $admin = $stmt->fetch();
+
+    // 2. If not found, try by email (auto-link on first Google login)
+    if (!$admin) {
+        $stmt = $pdo->prepare('SELECT * FROM oretir_admins WHERE email = ? AND is_active = 1 LIMIT 1');
+        $stmt->execute([$gEmail]);
+        $admin = $stmt->fetch();
+
+        if ($admin) {
+            $pdo->prepare('UPDATE oretir_admins SET google_id = ?, updated_at = NOW() WHERE id = ?')
+                ->execute([$googleId, $admin['id']]);
+        }
+    }
+
+    if (!$admin) {
+        header('Location: ' . $adminUrl . '?error=' . urlencode('No admin account found for this Google account.'));
+        exit;
+    }
+
+    // Check lockout
+    if ($admin['locked_until'] && strtotime($admin['locked_until']) > time()) {
+        $remaining = ceil((strtotime($admin['locked_until']) - time()) / 60);
+        header('Location: ' . $adminUrl . '?error=' . urlencode("Account locked. Try again in {$remaining} minute(s)."));
+        exit;
+    }
+
+    // Start admin session
+    $pdo->prepare('UPDATE oretir_admins SET login_attempts = 0, locked_until = NULL, last_login_at = NOW() WHERE id = ?')
+        ->execute([$admin['id']]);
+
+    session_regenerate_id(true);
+
+    $_SESSION['admin_id']       = $admin['id'];
+    $_SESSION['admin_email']    = $admin['email'];
+    $_SESSION['admin_role']     = $admin['role'];
+    $_SESSION['admin_name']     = $admin['display_name'];
+    $_SESSION['admin_language'] = $admin['language'] ?? 'both';
+    $_SESSION['login_time']     = time();
+    $_SESSION['csrf_token']     = bin2hex(random_bytes(32));
+    $_SESSION['dashboard_role'] = 'admin';
+
+    // Detect if admin is also an employee
+    $empStmt = $pdo->prepare('SELECT id, name, role, group_id FROM oretir_employees WHERE email = ? AND is_active = 1 LIMIT 1');
+    $empStmt->execute([$admin['email']]);
+    $emp = $empStmt->fetch();
+    if ($emp) {
+        $_SESSION['employee_id']   = (int) $emp['id'];
+        $_SESSION['employee_name'] = $emp['name'];
+        $_SESSION['employee_role'] = $emp['role'];
+        if ($emp['group_id']) {
+            $grpStmt = $pdo->prepare('SELECT name_en, name_es, permissions FROM oretir_employee_groups WHERE id = ? LIMIT 1');
+            $grpStmt->execute([$emp['group_id']]);
+            $grp = $grpStmt->fetch();
+            if ($grp) {
+                $_SESSION['employee_group_id']     = (int) $emp['group_id'];
+                $_SESSION['employee_group_name']    = $grp['name_en'];
+                $_SESSION['employee_group_name_es'] = $grp['name_es'];
+                $_SESSION['employee_permissions']   = json_decode($grp['permissions'], true) ?: ['my_work'];
+            }
+        }
+    }
+
+    header('Location: ' . $adminUrl);
+    exit;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// MEMBER GOOGLE OAUTH — existing member/customer flow
+// ═════════════════════════════════════════════════════════════════════════════
+require_once __DIR__ . '/../../includes/member-kit-init.php';
 initMemberKit($pdo);
 
 // ── Handle connect mode (linking Google to existing account) ────────────────

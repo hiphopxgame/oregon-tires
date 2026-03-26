@@ -62,6 +62,8 @@ function startSecureSession(): void
     ini_set('session.cookie_samesite', 'Lax');
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
+    ini_set('session.gc_maxlifetime', '28800');  // 8 hours — match app-level timeout
+    ini_set('session.cookie_lifetime', '28800'); // 8 hours — persist across browser restarts
 
     if ($isHttps) {
         ini_set('session.cookie_secure', '1');
