@@ -25,21 +25,19 @@
       icon: '🖥️',
       title: { en: 'Web Hosting', es: 'Hospedaje Web' },
       description: {
-        en: 'Get your own hosting account. All recommended hosts include cPanel, free SSL, email, daily backups, and SSH access. Your website runs automated tasks every 2–5 minutes, so cron job support matters. Prices shown are renewal rates, not intro pricing.',
-        es: 'Obtenga su propia cuenta de hospedaje. Todos los hosts recomendados incluyen cPanel, SSL gratuito, correo electrónico, respaldos diarios y acceso SSH. Su sitio ejecuta tareas automatizadas cada 2–5 minutos, así que el soporte de tareas cron es importante. Los precios son de renovación, no promocionales.'
+        en: 'Get your own hosting account. InMotion Hosting includes cPanel, free SSL, email, daily backups, SSH access, and unlimited cron jobs — everything your website needs.',
+        es: 'Obtenga su propia cuenta de hospedaje. InMotion Hosting incluye cPanel, SSL gratuito, correo electronico, respaldos diarios, acceso SSH y tareas cron ilimitadas — todo lo que su sitio web necesita.'
       },
       items: [
         {
           id: 'host-choose',
-          text: { en: 'Sign up for a web host', es: 'Regístrese en un servicio de hospedaje' },
+          text: { en: 'Sign up for InMotion Hosting', es: 'Registrese en InMotion Hosting' },
           detail: {
-            en: 'Pick one tier based on your needs. All include cPanel, free SSL, email, and backups.\n\n⭐ TIER 1 — Best for This Site (Recommended)\nA2 Hosting Managed VPS — ~$35/mo\n• cPanel included — same familiar control panel\n• No cron job limits — all 7 automated tasks run perfectly\n• Turbo NVMe servers, SSH, free SSL, daily backups\n• Managed by A2 — they handle server updates and security\n\n💰 TIER 2 — Budget Option\nA2 Hosting Turbo Boost (Shared) — ~$13/mo after renewal\n• cPanel, SSH, 100GB NVMe storage\n• ⚠️ Cron jobs limited to 15-min intervals\n  (email fetch relaxed from every 2 min to every 15 min)\n• Great value — only 1 automated task affected\n\n🔧 TIER 3 — Alternative VPS\nInMotion Hosting VPS — ~$25/mo\n• cPanel included, no cron job limits\n• US datacenter, SSH, free SSL, daily backups\n• Good support with phone + live chat\n\nNote: SiteGround is NOT recommended — no cPanel (proprietary panel), 30-minute minimum cron intervals (breaks 5 of your 7 automated tasks), and renews at $30/mo.',
-            es: 'Elija un nivel según sus necesidades. Todos incluyen cPanel, SSL gratis, correo y respaldos.\n\n⭐ NIVEL 1 — Mejor para Este Sitio (Recomendado)\nA2 Hosting Managed VPS — ~$35/mes\n• cPanel incluido — el mismo panel de control familiar\n• Sin límite de tareas cron — las 7 tareas automatizadas funcionan perfectamente\n• Servidores Turbo NVMe, SSH, SSL gratis, respaldos diarios\n• Administrado por A2 — ellos manejan actualizaciones y seguridad\n\n💰 NIVEL 2 — Opción Económica\nA2 Hosting Turbo Boost (Compartido) — ~$13/mes después de renovación\n• cPanel, SSH, 100GB almacenamiento NVMe\n• ⚠️ Tareas cron limitadas a intervalos de 15 minutos\n  (la revisión de correo se relaja de cada 2 min a cada 15 min)\n• Gran valor — solo 1 tarea automatizada afectada\n\n🔧 NIVEL 3 — VPS Alternativo\nInMotion Hosting VPS — ~$25/mes\n• cPanel incluido, sin límite de tareas cron\n• Centro de datos en EE.UU., SSH, SSL gratis, respaldos diarios\n• Buen soporte con teléfono + chat en vivo\n\nNota: SiteGround NO se recomienda — no tiene cPanel (panel propietario), intervalos cron mínimos de 30 minutos (rompe 5 de sus 7 tareas automatizadas), y renueva a $30/mes.'
+            en: 'Sign up for InMotion Hosting shared hosting (link below). This is the recommended host for your website.\n\nWhat you get:\n- cPanel control panel (easy website management)\n- Free SSL certificate (secure https://)\n- Free email accounts (contact@oregon.tires, etc.)\n- Daily backups\n- SSH access\n- Unlimited cron jobs (your website runs 8 automated tasks)\n- US-based datacenter\n- Phone + live chat support\n\nChoose any shared hosting plan — they all include what your website needs.',
+            es: 'Registrese en InMotion Hosting hospedaje compartido (enlace abajo). Este es el host recomendado para su sitio web.\n\nLo que obtiene:\n- Panel de control cPanel (gestion facil del sitio)\n- Certificado SSL gratuito (https:// seguro)\n- Cuentas de correo gratuitas (contact@oregon.tires, etc.)\n- Respaldos diarios\n- Acceso SSH\n- Tareas cron ilimitadas (su sitio ejecuta 8 tareas automatizadas)\n- Centro de datos en EE.UU.\n- Soporte por telefono + chat en vivo\n\nElija cualquier plan de hospedaje compartido — todos incluyen lo que su sitio web necesita.'
           },
           links: [
-            { label: { en: 'A2 Hosting VPS (Recommended)', es: 'A2 Hosting VPS (Recomendado)' }, url: 'https://www.a2hosting.com/vps-hosting/managed/' },
-            { label: { en: 'A2 Hosting Shared (Budget)', es: 'A2 Hosting Compartido (Económico)' }, url: 'https://www.a2hosting.com/web-hosting/' },
-            { label: { en: 'InMotion Hosting VPS', es: 'InMotion Hosting VPS' }, url: 'https://www.inmotionhosting.com/vps-hosting' }
+            { label: { en: 'InMotion Hosting (Shared Hosting)', es: 'InMotion Hosting (Hospedaje Compartido)' }, url: 'https://www.inmotionhosting.com/shared-hosting' }
           ]
         },
         {
