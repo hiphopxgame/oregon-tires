@@ -119,30 +119,30 @@
           category: { en: 'Required', es: 'Requerido' }
         },
         {
-          id: 'acct-paypal',
-          text: { en: 'PayPal Business (online payments)', es: 'PayPal Business (pagos en línea)' },
+          id: 'acct-stripe',
+          text: { en: 'Stripe (card payments online + in-person)', es: 'Stripe (pagos con tarjeta en linea + en persona)' },
           detail: {
-            en: 'Create a PayPal Business account using your business email. This lets customers pay for care plans and services online.\n\nAfter signing up, go to the Developer Dashboard (second link) to get your API credentials (Client ID and Secret). Share both with your developer.',
-            es: 'Cree una cuenta PayPal Business con su correo del negocio. Esto permite a los clientes pagar planes y servicios en línea.\n\nDespués de registrarse, vaya al Panel de Desarrollador (segundo enlace) para obtener sus credenciales API (Client ID y Secret). Comparta ambos con su desarrollador.'
+            en: 'Stripe is the recommended payment processor for your website. It handles credit/debit card payments both online and at the shop counter.\n\n1. Click the "Sign Up" link below and create an account with your business email\n2. Complete the business verification (Stripe will ask for basic business info)\n3. Once approved, click the "API Keys" link below\n4. Copy your Secret Key (starts with "sk_live_...")\n\n━━━ WHAT TO SHARE WITH YOUR DEVELOPER ━━━\n- Secret Key (sk_live_...)\n- Publishable Key (pk_live_...) — also on the same page\n\nStripe also supports in-person payments with a card reader — your developer can connect it.\n\nProcessing fees: 2.9% + 30¢ online, 2.7% + 5¢ in-person.',
+            es: 'Stripe es el procesador de pagos recomendado para su sitio web. Maneja pagos con tarjeta de credito/debito tanto en linea como en el mostrador del taller.\n\n1. Haga clic en el enlace "Registrarse" abajo y cree una cuenta con su correo del negocio\n2. Complete la verificacion del negocio (Stripe pedira informacion basica)\n3. Una vez aprobado, haga clic en el enlace "API Keys" abajo\n4. Copie su Secret Key (empieza con "sk_live_...")\n\n━━━ QUE COMPARTIR CON SU DESARROLLADOR ━━━\n- Secret Key (sk_live_...)\n- Publishable Key (pk_live_...) — tambien en la misma pagina\n\nStripe tambien soporta pagos en persona con un lector de tarjetas — su desarrollador puede conectarlo.\n\nComisiones: 2.9% + 30¢ en linea, 2.7% + 5¢ en persona.'
+          },
+          links: [
+            { label: { en: 'Sign Up for Stripe', es: 'Registrarse en Stripe' }, url: 'https://dashboard.stripe.com/register' },
+            { label: { en: 'Stripe API Keys', es: 'Stripe API Keys' }, url: 'https://dashboard.stripe.com/apikeys' }
+          ],
+          category: { en: 'Required', es: 'Requerido' }
+        },
+        {
+          id: 'acct-paypal',
+          text: { en: 'PayPal Business (alternative payment option)', es: 'PayPal Business (opcion de pago alternativa)' },
+          detail: {
+            en: 'Optional — add PayPal as an additional payment method alongside Stripe. Some customers prefer PayPal.\n\n1. Click the "Sign Up" link below and create a PayPal Business account\n2. After signing up, click the "Developer Dashboard" link\n3. Under "Apps & Credentials", find your app or create one\n4. Copy the Client ID and Secret\n\n━━━ WHAT TO SHARE WITH YOUR DEVELOPER ━━━\n- PayPal Client ID\n- PayPal Secret\n\nNote: Stripe is the primary payment processor. PayPal is an optional add-on for customers who prefer it.',
+            es: 'Opcional — agregue PayPal como metodo de pago adicional junto a Stripe. Algunos clientes prefieren PayPal.\n\n1. Haga clic en el enlace "Registrarse" abajo y cree una cuenta PayPal Business\n2. Despues de registrarse, haga clic en el enlace "Developer Dashboard"\n3. En "Apps & Credentials", encuentre su app o cree una\n4. Copie el Client ID y Secret\n\n━━━ QUE COMPARTIR CON SU DESARROLLADOR ━━━\n- PayPal Client ID\n- PayPal Secret\n\nNota: Stripe es el procesador de pagos principal. PayPal es un complemento opcional para clientes que lo prefieran.'
           },
           links: [
             { label: { en: 'Sign Up for PayPal Business', es: 'Registrarse en PayPal Business' }, url: 'https://www.paypal.com/business' },
             { label: { en: 'PayPal Developer Dashboard', es: 'Panel de Desarrollador PayPal' }, url: 'https://developer.paypal.com/dashboard/applications' }
           ],
-          category: { en: 'Required', es: 'Requerido' }
-        },
-        {
-          id: 'acct-stripe',
-          text: { en: 'Stripe (card payments online + in-person)', es: 'Stripe (pagos con tarjeta en línea + en persona)' },
-          detail: {
-            en: 'Create a Stripe account to accept credit/debit card payments on your website and at the shop counter.\n\nAfter signing up, go to Developers → API Keys in your Stripe Dashboard. Share the Secret Key with your developer.\n\nStripe also supports in-person payments with your existing card reader — your developer can connect it.\n\nProcessing fees: 2.9% + 30¢ online, 2.7% + 5¢ in-person.',
-            es: 'Cree una cuenta Stripe para aceptar pagos con tarjeta de crédito/débito en su sitio web y en el mostrador.\n\nDespués de registrarse, vaya a Developers → API Keys en su Dashboard. Comparta la Secret Key con su desarrollador.\n\nStripe también soporta pagos en persona con su lector de tarjetas existente — su desarrollador puede conectarlo.\n\nComisiones: 2.9% + 30¢ en línea, 2.7% + 5¢ en persona.'
-          },
-          links: [
-            { label: { en: 'Sign Up for Stripe', es: 'Registrarse en Stripe' }, url: 'https://dashboard.stripe.com/register' },
-            { label: { en: 'Stripe Dashboard (API Keys)', es: 'Dashboard de Stripe (API Keys)' }, url: 'https://dashboard.stripe.com/apikeys' }
-          ],
-          category: { en: 'Recommended', es: 'Recomendado' }
+          category: { en: 'Optional', es: 'Opcional' }
         },
       ]
     },
