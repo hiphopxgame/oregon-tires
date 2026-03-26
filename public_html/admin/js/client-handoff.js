@@ -19,6 +19,8 @@
     'gc-calendar',          // Calendar shared with service account, read+write verified
     'gc-analytics',         // GA4 G-PCK6ZYFHQ0 installed on all pages, static tag verified
     'gc-verify-gbp',        // GBP listing claimed by oregontires1@gmail.com, 4.8★ 984 reviews
+    'dom-registrar',        // Porkbun account created
+    'dom-transfer',         // Domain transfer completed
   ];
 
   function getChecked() {
@@ -92,8 +94,8 @@
           id: 'dom-registrar',
           text: { en: 'Create a Porkbun account', es: 'Cree una cuenta en Porkbun' },
           detail: {
-            en: 'Sign up at Porkbun.com — this is the registrar that supports the .tires domain extension. Most registrars (Namecheap, Cloudflare, GoDaddy) do not support .tires domains, so Porkbun is required.\n\nPorkbun is reputable, affordable, and includes free WHOIS privacy. This is where your domain will live — like a title deed for your web address.',
-            es: 'Regístrese en Porkbun.com — este es el registrador que soporta la extensión de dominio .tires. La mayoría de los registradores (Namecheap, Cloudflare, GoDaddy) no soportan dominios .tires, así que Porkbun es necesario.\n\nPorkbun es confiable, económico e incluye privacidad WHOIS gratis. Aquí es donde vivirá su dominio — como la escritura de su dirección web.'
+            en: '\u2705 COMPLETED\n\nPorkbun account created. Porkbun is the registrar for the .tires TLD \u2014 most other registrars (Namecheap, Cloudflare, GoDaddy) do not support .tires domains.\n\nPorkbun includes free WHOIS privacy and competitive renewal pricing.',
+            es: '\u2705 COMPLETADO\n\nCuenta de Porkbun creada. Porkbun es el registrador para el TLD .tires \u2014 la mayor\u00eda de otros registradores (Namecheap, Cloudflare, GoDaddy) no soportan dominios .tires.\n\nPorkbun incluye privacidad WHOIS gratis y precios de renovaci\u00f3n competitivos.'
           },
           links: [
             { label: { en: 'Porkbun (Required for .tires)', es: 'Porkbun (Requerido para .tires)' }, url: 'https://porkbun.com/' }
@@ -103,8 +105,8 @@
           id: 'dom-transfer',
           text: { en: 'Approve the domain transfer', es: 'Apruebe la transferencia del dominio' },
           detail: {
-            en: 'Your developer will send you a transfer code. Enter it in your registrar account to start the transfer. You\'ll receive a confirmation email — click the approval link. The transfer takes 24-48 hours.',
-            es: 'Su desarrollador le enviará un código de transferencia. Ingréselo en su cuenta del registrador. Recibirá un correo de confirmación — haga clic en el enlace de aprobación. La transferencia toma 24-48 horas.'
+            en: '\u2705 COMPLETED\n\nDomain oregon.tires has been transferred to the client\'s Porkbun account.\n\nThe domain is now fully owned by the client.',
+            es: '\u2705 COMPLETADO\n\nEl dominio oregon.tires ha sido transferido a la cuenta Porkbun del cliente.\n\nEl dominio ahora es propiedad total del cliente.'
           }
         },
         {
