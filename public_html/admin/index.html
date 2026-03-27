@@ -3497,6 +3497,21 @@
               <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Displays a badge in the hero section when 6 or fewer appointment slots remain for the day. Disabled by default.</p>
             </div>
           </div>
+
+          <!-- Care Plan Page Toggle -->
+          <div class="grid md:grid-cols-3 gap-4 items-start mt-4">
+            <label class="font-medium text-sm pt-2 dark:text-gray-300">Care Plan Page</label>
+            <div class="md:col-span-2">
+              <label class="relative inline-flex items-center cursor-pointer mt-1">
+                <input type="checkbox" id="setting-show_care_plan_page-toggle" class="sr-only peer" onchange="var v=this.checked?'1':'0';document.getElementById('setting-show_care_plan_page-en').value=v;document.getElementById('setting-show_care_plan_page-es').value=v;">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                <span class="ml-3 text-sm text-gray-600 dark:text-gray-400">Show the Care Plan page publicly at /care-plan</span>
+              </label>
+              <input type="hidden" id="setting-show_care_plan_page-en" value="0">
+              <input type="hidden" id="setting-show_care_plan_page-es" value="0">
+              <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">When disabled, /care-plan returns a 404 page. Enable when care plan pricing and enrollment are ready for customers.</p>
+            </div>
+          </div>
         </div>
 
         <div class="mt-6 flex justify-end">
@@ -13365,7 +13380,7 @@ async function revokeAdminByEmail(email) {
 }
 
 // ===== SITE SETTINGS (Editable Content) =====
-const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count', 'google_analytics_id', 'price_tire_install', 'price_tire_repair', 'price_oil_change', 'price_brake_service', 'price_alignment', 'price_tuneup', 'price_inspection', 'price_suspension', 'price_roadside', 'price_care_plan', 'founding_year', 'pwa_install_enabled', 'show_scarcity'];
+const SITE_SETTINGS_KEYS = ['phone', 'email', 'address', 'hours_weekday', 'hours_sunday', 'rating_value', 'review_count', 'google_analytics_id', 'price_tire_install', 'price_tire_repair', 'price_oil_change', 'price_brake_service', 'price_alignment', 'price_tuneup', 'price_inspection', 'price_suspension', 'price_roadside', 'price_care_plan', 'founding_year', 'pwa_install_enabled', 'show_scarcity', 'show_care_plan_page'];
 const SITE_SETTINGS_DEFAULTS = {
   phone: { en: '(503) 367-9714', es: '(503) 367-9714' },
   email: { en: 'oregontirespdx@gmail.com', es: 'oregontirespdx@gmail.com' },
@@ -13385,6 +13400,7 @@ const SITE_SETTINGS_DEFAULTS = {
   price_suspension: { en: 'From $150', es: 'Desde $150' },
   price_roadside: { en: 'Call for pricing', es: 'Llame para precios' },
   price_care_plan: { en: '$19/mo', es: '$19/mes' },
+  show_care_plan_page: { en: '0', es: '0' },
   founding_year: { en: '2008', es: '2008' }
 };
 
@@ -13425,6 +13441,9 @@ async function loadSiteSettings() {
     const scarcityToggle = document.getElementById('setting-show_scarcity-toggle');
     const scarcityVal = document.getElementById('setting-show_scarcity-en');
     if (scarcityToggle && scarcityVal) scarcityToggle.checked = (scarcityVal.value === '1');
+    const cpToggle = document.getElementById('setting-show_care_plan_page-toggle');
+    const cpVal = document.getElementById('setting-show_care_plan_page-en');
+    if (cpToggle && cpVal) cpToggle.checked = (cpVal.value === '1');
   } catch (err) {
     console.error('loadSiteSettings error:', err);
     showToast(adminT[currentLang].settingsLoadError || 'Could not load site settings', true);

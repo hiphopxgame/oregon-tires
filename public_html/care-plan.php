@@ -2,7 +2,20 @@
 /**
  * Oregon Tires — Care Plan Membership Pricing
  * Bilingual (EN/ES) membership pricing page with enrollment modal.
+ * Visibility controlled via admin site settings (show_care_plan_page).
  */
+require_once __DIR__ . '/includes/bootstrap.php';
+$pdo = getDB();
+$cpStmt = $pdo->prepare("SELECT value_en FROM oretir_site_settings WHERE setting_key = 'show_care_plan_page' LIMIT 1");
+$cpStmt->execute();
+$cpVisible = $cpStmt->fetchColumn();
+if (!$cpVisible || $cpVisible === '0' || $cpVisible === 'false' || $cpVisible === 'off') {
+    http_response_code(404);
+    if (file_exists(__DIR__ . '/404.html')) { include __DIR__ . '/404.html'; }
+    else { echo '<h1>404 Not Found</h1>'; }
+    exit;
+}
+
 $pageTitle = 'Care Plan Membership | Oregon Tires Auto Care';
 $pageTitleEs = 'Plan de Cuidado | Oregon Tires Auto Care';
 $pageDesc = 'Save hundreds per year with Oregon Tires Care Plans. Oil changes, tire rotations, service discounts &amp; priority scheduling starting at $19/month.';
