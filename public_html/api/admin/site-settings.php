@@ -39,7 +39,7 @@ try {
         // Business info
         'founding_year',
         // Feature toggles
-        'pwa_install_enabled', 'show_scarcity', 'show_care_plan_page',
+        'pwa_install_enabled',
         // Email templates — welcome
         'email_tpl_welcome_subject', 'email_tpl_welcome_greeting',
         'email_tpl_welcome_body', 'email_tpl_welcome_button', 'email_tpl_welcome_footer',
