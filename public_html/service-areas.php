@@ -9,6 +9,9 @@ $pageDesc = 'Oregon Tires Auto Care serves SE Portland, Clackamas, Happy Valley,
 $pageDescEs = 'Oregon Tires Auto Care sirve a SE Portland, Clackamas, Happy Valley, Milwaukie, Lents, Woodstock, Foster-Powell y Mt. Scott. Servicio automotriz bilingüe profesional cerca de usted.';
 $canonicalUrl = 'https://oregon.tires/service-areas';
 require_once __DIR__ . '/includes/seo-lang.php';
+require_once __DIR__ . '/includes/bootstrap.php';
+require_once __DIR__ . '/includes/seo-config.php';
+$_rating = getAggregateRating();
 ?>
 <!DOCTYPE html>
 <html lang="<?= seoLang() ?>">
@@ -61,8 +64,8 @@ require_once __DIR__ . '/includes/seo-lang.php';
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "150",
+      "ratingValue": "<?= $_rating['ratingValue'] ?>",
+      "reviewCount": "<?= $_rating['reviewCount'] ?>",
       "bestRating": "5"
     },
     "areaServed": [

@@ -10,6 +10,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/engine-kit-init.php';
 require_once __DIR__ . '/includes/seo-lang.php';
+require_once __DIR__ . '/includes/seo-config.php';
+$_rating = getAggregateRating();
 
 $pageTitleEn = 'Oregon Tires Auto Care - Tire & Auto Services Portland, OR';
 $pageTitleEs = 'Oregon Tires Auto Care - Llantas y Servicio Automotriz Portland, OR';
@@ -92,8 +94,8 @@ if (ob_get_level() === 0) {
     "knowsLanguage": ["en", "es"],
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "150",
+      "ratingValue": "<?= $_rating['ratingValue'] ?>",
+      "reviewCount": "<?= $_rating['reviewCount'] ?>",
       "bestRating": "5"
     },
     "priceRange": "$$",

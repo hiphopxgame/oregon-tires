@@ -6,6 +6,8 @@
  * $serviceBody, $serviceBodyEs, $faqItems, $relatedServices
  */
 require_once __DIR__ . '/../includes/seo-lang.php';
+require_once __DIR__ . '/../includes/seo-config.php';
+$_rating = getAggregateRating();
 $pageTitle = "$serviceName in Portland, OR | Oregon Tires Auto Care";
 $pageTitleEs = "$serviceNameEs en Portland, OR | Oregon Tires Auto Care";
 $canonicalUrl = "https://oregon.tires/$serviceSlug";
@@ -63,7 +65,7 @@ $canonicalUrl = "https://oregon.tires/$serviceSlug";
         "addressCountry": "US"
       },
       "geo": {"@type": "GeoCoordinates", "latitude": 45.46123, "longitude": -122.57895},
-      "aggregateRating": {"@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "150", "bestRating": "5"},
+      "aggregateRating": {"@type": "AggregateRating", "ratingValue": "<?= $_rating['ratingValue'] ?>", "reviewCount": "<?= $_rating['reviewCount'] ?>", "bestRating": "5"},
       "openingHours": ["Mo-Sa 07:00-19:00"],
       "knowsLanguage": ["en", "es"],
       "priceRange": "$$"

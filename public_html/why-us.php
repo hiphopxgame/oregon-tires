@@ -9,6 +9,9 @@ $pageDesc = "15+ years serving Portland with honest, bilingual auto care. 4.8-st
 $pageDescEs = "M&aacute;s de 15 a&ntilde;os sirviendo a Portland con servicio automotriz honesto y biling&uuml;e. 4.8 estrellas, 150+ rese&ntilde;as, garant&iacute;a de 12 meses.";
 $canonicalUrl = "https://oregon.tires/why-us";
 require_once __DIR__ . '/includes/seo-lang.php';
+require_once __DIR__ . '/includes/bootstrap.php';
+require_once __DIR__ . '/includes/seo-config.php';
+$_rating = getAggregateRating();
 ?>
 <!DOCTYPE html>
 <html lang="<?= seoLang() ?>">
@@ -55,7 +58,7 @@ require_once __DIR__ . '/includes/seo-lang.php';
       "addressCountry": "US"
     },
     "geo": {"@type": "GeoCoordinates", "latitude": 45.46123, "longitude": -122.57895},
-    "aggregateRating": {"@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "150", "bestRating": "5"},
+    "aggregateRating": {"@type": "AggregateRating", "ratingValue": "<?= $_rating['ratingValue'] ?>", "reviewCount": "<?= $_rating['reviewCount'] ?>", "bestRating": "5"},
     "openingHours": ["Mo-Sa 07:00-19:00"],
     "knowsLanguage": ["en", "es"],
     "priceRange": "$$",

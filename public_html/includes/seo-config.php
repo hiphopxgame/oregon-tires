@@ -6,7 +6,32 @@ declare(strict_types=1);
  * Single source of truth for business info, services, service areas, and SEO data.
  */
 
+/**
+ * Pull aggregate rating from DB (set by Google Reviews cron), with hardcoded fallback.
+ * @return array{ratingValue: string, reviewCount: string}
+ */
+function getAggregateRating(): array {
+    $fallback = ['ratingValue' => '4.8', 'reviewCount' => '150'];
+    try {
+        $db = getDB();
+        $stmt = $db->query(
+            "SELECT setting_key, value_en FROM oretir_site_settings
+             WHERE setting_key IN ('rating_value', 'review_count')"
+        );
+        $rows = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $ratingValue = $rows['rating_value'] ?? '';
+        $reviewCount = $rows['review_count'] ?? '';
+        if ($ratingValue !== '' && is_numeric($ratingValue) && $reviewCount !== '' && is_numeric($reviewCount)) {
+            return ['ratingValue' => $ratingValue, 'reviewCount' => $reviewCount];
+        }
+    } catch (\Throwable $e) {
+        // DB unavailable — fall through to hardcoded defaults
+    }
+    return $fallback;
+}
+
 function getBusinessConfig(): array {
+    $aggregateRating = getAggregateRating();
     return [
         'name' => 'Oregon Tires Auto Care',
         'nameEs' => 'Oregon Tires Auto Care',
@@ -81,9 +106,8 @@ function getBusinessConfig(): array {
                 'slug' => 'financing',
             ],
         ],
-        // TODO: Pull from DB when review system is built
-        'rating' => '4.8',
-        'reviewCount' => '150',
+        'rating' => $aggregateRating['ratingValue'],
+        'reviewCount' => $aggregateRating['reviewCount'],
         'verification' => [
             'google' => $_ENV['GOOGLE_SITE_VERIFICATION'] ?? '',
             'bing' => $_ENV['BING_SITE_VERIFICATION'] ?? '',

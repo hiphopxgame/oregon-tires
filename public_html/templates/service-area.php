@@ -5,6 +5,8 @@
  * $landmarks (array of {name, distance}), $landmarksEs, $testimonial, $testimonialEs, $mapQuery, $nearbyAreas
  */
 require_once __DIR__ . '/../includes/seo-lang.php';
+require_once __DIR__ . '/../includes/seo-config.php';
+$_rating = getAggregateRating();
 $pageTitle = "Tires & Auto Care in $areaName | Oregon Tires";
 $pageTitleEs = "Llantas y Servicio Automotriz en $areaNameEs | Oregon Tires";
 $canonicalUrl = "https://oregon.tires/$areaSlug";
@@ -54,7 +56,7 @@ $canonicalUrl = "https://oregon.tires/$areaSlug";
       "addressCountry": "US"
     },
     "geo": {"@type": "GeoCoordinates", "latitude": 45.46123, "longitude": -122.57895},
-    "aggregateRating": {"@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "150", "bestRating": "5"},
+    "aggregateRating": {"@type": "AggregateRating", "ratingValue": "<?= $_rating['ratingValue'] ?>", "reviewCount": "<?= $_rating['reviewCount'] ?>", "bestRating": "5"},
     "openingHours": ["Mo-Sa 07:00-19:00"],
     "areaServed": {
       "@type": "Place",

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Server Error - Oregon Tires Auto Care</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    html { scroll-behavior: smooth; }
+    :root { --brand-primary: #15803d; --brand-dark: #0D3618; }
+  </style>
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})();</script>
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-green-700 focus:font-semibold">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="bg-white shadow-md dark:bg-gray-800">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/">
+        <picture><source srcset="/assets/logo.webp" type="image/webp"><img src="/assets/logo.png" alt="Oregon Tires Auto Care" class="h-14 w-auto" width="781" height="275"></picture>
+      </a>
+      <nav class="flex items-center gap-4">
+        <a href="/" class="text-brand dark:text-green-400 font-medium hover:opacity-70">Home</a>
+        <a href="/#services" class="hidden sm:inline text-brand dark:text-green-400 font-medium hover:opacity-70">Services</a>
+        <a href="/book-appointment" class="bg-amber-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-amber-600 transition">Schedule Service</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main id="main-content" class="flex-1 px-4 py-12">
+    <div class="max-w-2xl mx-auto">
+      <!-- 500 Hero -->
+      <div class="text-center mb-10">
+        <div class="text-8xl font-bold text-brand dark:text-green-400 mb-4">500</div>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2" id="t-title">Something Went Wrong</h1>
+        <p class="text-gray-500 dark:text-gray-400 mb-1" id="t-subtitle">Algo Sali&oacute; Mal</p>
+        <p class="text-gray-600 dark:text-gray-300" id="t-desc">We're experiencing a temporary issue. Please try again in a moment.</p>
+      </div>
+
+      <!-- CTAs -->
+      <div class="flex flex-wrap justify-center gap-3 mb-10">
+        <a href="/" class="bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition" id="t-home">Go Home</a>
+        <a href="/book-appointment" class="bg-amber-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 transition" id="t-book">Book Appointment</a>
+        <a href="tel:5033679714" class="border-2 border-brand dark:border-green-400 text-brand dark:text-green-400 px-6 py-3 rounded-lg font-semibold hover:bg-brand/5 transition" id="t-call">Call (503) 367-9714</a>
+      </div>
+
+      <!-- Popular Services -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+        <h2 class="text-lg font-bold text-brand dark:text-green-400 mb-4 text-center" id="t-popular">Popular Services</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <a href="/book-appointment/?service=tire-installation" class="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-center">
+            <span class="text-2xl" aria-hidden="true">🔧</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Tire Installation</span>
+            <span class="text-xs text-brand dark:text-green-400 font-bold" data-setting="price_tire_install">$20+</span>
+          </a>
+          <a href="/book-appointment/?service=oil-change" class="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-center">
+            <span class="text-2xl" aria-hidden="true">🛢️</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Oil Change</span>
+            <span class="text-xs text-brand dark:text-green-400 font-bold" data-setting="price_oil_change">$35+</span>
+          </a>
+          <a href="/book-appointment/?service=brake-service" class="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-center">
+            <span class="text-2xl" aria-hidden="true">🛞</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Brake Service</span>
+            <span class="text-xs text-brand dark:text-green-400 font-bold" data-setting="price_brake_service">$100+</span>
+          </a>
+          <a href="/book-appointment/?service=wheel-alignment" class="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-center">
+            <span class="text-2xl" aria-hidden="true">⚙️</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Alignment</span>
+            <span class="text-xs text-brand dark:text-green-400 font-bold" data-setting="price_alignment">$75+</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+        <h2 class="text-lg font-bold text-brand dark:text-green-400 mb-4 text-center" id="t-links">Quick Links</h2>
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <a href="/" class="text-brand dark:text-green-400 hover:underline py-1">Homepage</a>
+          <a href="/#services" class="text-brand dark:text-green-400 hover:underline py-1">All Services</a>
+          <a href="/book-appointment" class="text-brand dark:text-green-400 hover:underline py-1">Book Appointment</a>
+          <a href="/#faq" class="text-brand dark:text-green-400 hover:underline py-1">FAQ</a>
+          <a href="/care-plan" class="text-brand dark:text-green-400 hover:underline py-1">Care Plan</a>
+          <a href="/guarantee" class="text-brand dark:text-green-400 hover:underline py-1">Our Guarantee</a>
+          <a href="/tires-se-portland" class="text-brand dark:text-green-400 hover:underline py-1">SE Portland</a>
+          <a href="/tires-clackamas" class="text-brand dark:text-green-400 hover:underline py-1">Clackamas</a>
+          <a href="/about/" class="text-brand dark:text-green-400 hover:underline py-1">About Us</a>
+          <a href="/#contact" class="text-brand dark:text-green-400 hover:underline py-1">Contact</a>
+        </div>
+      </div>
+
+      <!-- Help Card -->
+      <div class="text-center">
+        <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 inline-block border-2 border-green-200 dark:border-green-800">
+          <p class="text-gray-700 dark:text-gray-300 mb-2 font-medium" id="t-help">Need help? We're here for you.</p>
+          <a href="tel:5033679714" class="text-2xl font-bold text-brand dark:text-green-400 hover:opacity-80 transition block mb-1"><span aria-hidden="true">📞</span> (503) 367-9714</a>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Mon-Sat 7AM-7PM · Se Habla Espa&ntilde;ol</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-brand text-white py-6">
+    <div class="container mx-auto px-4 text-center">
+      <p class="text-gray-200">&copy; 2026 Oregon Tires Auto Care. All rights reserved.</p>
+      <p class="mt-2 text-xs text-gray-300">Powered by <a href="https://1vsM.com" target="_blank" rel="noopener noreferrer" class="text-amber-200 hover:text-amber-100 transition-colors">1vsM.com</a></p>
+    </div>
+  </footer>
+
+  <!-- Bilingual toggle -->
+  <script>
+  (function() {
+    var lang = localStorage.getItem('oregontires_lang') || 'en';
+    var params = new URLSearchParams(window.location.search);
+    var urlLang = params.get('lang');
+    if (urlLang === 'es' || urlLang === 'en') { lang = urlLang; localStorage.setItem('oregontires_lang', lang); }
+
+    if (lang === 'es') {
+      document.documentElement.lang = 'es';
+      document.title = 'Error del Servidor - Oregon Tires Auto Care';
+
+      var t = {
+        't-title': 'Algo Sali\u00f3 Mal',
+        't-subtitle': 'Something Went Wrong',
+        't-desc': 'Estamos experimentando un problema temporal. Por favor intente de nuevo en un momento.',
+        't-home': 'Ir al Inicio',
+        't-book': 'Programar Cita',
+        't-call': 'Llamar (503) 367-9714',
+        't-popular': 'Servicios Populares',
+        't-links': 'Enlaces R\u00e1pidos',
+        't-help': '\u00bfNecesita ayuda? Estamos para servirle.'
+      };
+      for (var id in t) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = t[id];
+      }
+
+      var serviceMap = {
+        'Tire Installation': 'Instalaci\u00f3n de Llantas',
+        'Oil Change': 'Cambio de Aceite',
+        'Brake Service': 'Servicio de Frenos',
+        'Alignment': 'Alineaci\u00f3n'
+      };
+      document.querySelectorAll('.grid .text-sm.font-medium').forEach(function(el) {
+        var name = el.textContent.trim();
+        if (serviceMap[name]) el.textContent = serviceMap[name];
+      });
+
+      var linkMap = {
+        'Homepage': 'P\u00e1gina Principal',
+        'All Services': 'Todos los Servicios',
+        'Book Appointment': 'Programar Cita',
+        'FAQ': 'Preguntas Frecuentes',
+        'Care Plan': 'Plan de Cuidado',
+        'Our Guarantee': 'Nuestra Garant\u00eda',
+        'SE Portland': 'SE Portland',
+        'Clackamas': 'Clackamas',
+        'About Us': 'Acerca de Nosotros',
+        'Contact': 'Contacto'
+      };
+      document.querySelectorAll('.grid.grid-cols-2.gap-2 a').forEach(function(el) {
+        var name = el.textContent.trim();
+        if (linkMap[name]) el.textContent = linkMap[name];
+      });
+
+      document.querySelectorAll('nav a').forEach(function(el) {
+        if (el.textContent.trim() === 'Home') el.textContent = 'Inicio';
+        if (el.textContent.trim() === 'Services') el.textContent = 'Servicios';
+        if (el.textContent.trim() === 'Schedule Service') el.textContent = 'Programar Servicio';
+      });
+
+      document.querySelectorAll('footer p').forEach(function(el) {
+        if (el.textContent.indexOf('All rights reserved') !== -1) el.textContent = '\u00a9 2026 Oregon Tires Auto Care. Todos los derechos reservados.';
+        if (el.textContent.indexOf('Powered by') !== -1) {
+          var link = el.querySelector('a');
+          if (link) {
+            while (el.firstChild) el.removeChild(el.firstChild);
+            el.appendChild(document.createTextNode('Desarrollado por '));
+            el.appendChild(link);
+          }
+        }
+      });
+
+      document.querySelectorAll('p.text-sm').forEach(function(el) {
+        if (el.textContent.indexOf('Mon-Sat 7AM-7PM') !== -1) el.textContent = 'Lun-S\u00e1b 7AM-7PM \u00b7 Se Habla Espa\u00f1ol';
+      });
+
+      var skipLink = document.querySelector('a[href="#main-content"]');
+      if (skipLink) skipLink.textContent = 'Saltar al contenido principal';
+    }
+
+    fetch('/api/settings.php').then(function(r){return r.json()}).then(function(json){
+      var data = json.data || [];
+      for (var i = 0; i < data.length; i++) {
+        var row = data[i];
+        document.querySelectorAll('[data-setting="' + row.setting_key + '"]').forEach(function(el) {
+          var val = lang === 'es' ? (row.value_es || row.value_en) : row.value_en;
+          if (val) el.textContent = val;
+        });
+      }
+    }).catch(function(){});
+  })();
+  </script>
+</body>
+</html>
