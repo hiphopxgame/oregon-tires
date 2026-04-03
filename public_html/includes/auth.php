@@ -9,10 +9,83 @@ const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_MINUTES    = 15;
 const BCRYPT_COST        = 12;
 
+// The business owner — ALWAYS admin, cannot lose access under any circumstance.
+const OWNER_EMAIL = 'oregontirespdx@gmail.com';
+
 // Protected accounts — cannot be demoted, deactivated, or deleted via the admin panel.
 const PROTECTED_SUPERADMINS = [
-    'oregontirespdx@gmail.com',
+    OWNER_EMAIL,
 ];
+
+/**
+ * Check if an email is the owner email (case-insensitive).
+ */
+function isOwnerEmail(string $email): bool
+{
+    return strtolower(trim($email)) === OWNER_EMAIL;
+}
+
+/**
+ * Enforce admin rights for the business owner.
+ *
+ * Called as a safety net whenever admin auth is checked. If the current session
+ * belongs to the owner (via admin_email or member_email), ensures full admin
+ * session vars are present — even if session_regenerate_id() wiped them.
+ *
+ * @return bool True if owner was detected and admin rights enforced.
+ */
+function enforceOwnerAdmin(PDO $pdo): bool
+{
+    $email = $_SESSION['admin_email'] ?? $_SESSION['member_email'] ?? '';
+    if ($email === '' || !isOwnerEmail($email)) {
+        return false;
+    }
+
+    // Already has valid admin session — nothing to do
+    if (!empty($_SESSION['admin_id']) && !empty($_SESSION['admin_role']) && !empty($_SESSION['login_time'])) {
+        return true;
+    }
+
+    // Look up (or create) the admin row
+    try {
+        $stmt = $pdo->prepare('SELECT id, role, display_name, language FROM oretir_admins WHERE email = ? AND is_active = 1 LIMIT 1');
+        $stmt->execute([OWNER_EMAIL]);
+        $admin = $stmt->fetch();
+
+        if (!$admin) {
+            // Owner row missing — create it so this never fails again
+            $pdo->prepare(
+                'INSERT INTO oretir_admins (email, display_name, role, is_active, created_at, updated_at)
+                 VALUES (?, ?, ?, 1, NOW(), NOW())'
+            )->execute([OWNER_EMAIL, 'Owner', 'admin']);
+            $admin = [
+                'id'           => (int) $pdo->lastInsertId(),
+                'role'         => 'admin',
+                'display_name' => 'Owner',
+                'language'     => 'both',
+            ];
+        }
+
+        $_SESSION['admin_id']       = $admin['id'];
+        $_SESSION['admin_email']    = OWNER_EMAIL;
+        $_SESSION['admin_role']     = $admin['role'] ?: 'admin';
+        $_SESSION['admin_name']     = $admin['display_name'] ?: 'Owner';
+        $_SESSION['admin_language'] = $admin['language'] ?? 'both';
+        $_SESSION['dashboard_role'] = 'admin';
+
+        if (empty($_SESSION['login_time'])) {
+            $_SESSION['login_time'] = time();
+        }
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+
+        return true;
+    } catch (\Throwable $e) {
+        error_log('enforceOwnerAdmin failed: ' . $e->getMessage());
+        return false;
+    }
+}
 
 // ─── Permission Bundles ─────────────────────────────────────────────────────
 // Maps each admin API endpoint filename to the required permission bundle.
@@ -197,6 +270,11 @@ function requireAdmin(): array
     startSecureSession();
 
     if (empty($_SESSION['admin_id'])) {
+        // Safety net: if this is the owner, restore admin rights automatically
+        enforceOwnerAdmin(getDB());
+    }
+
+    if (empty($_SESSION['admin_id'])) {
         jsonError('Authentication required.', 401);
     }
 
@@ -229,6 +307,11 @@ function requireStaff(): array
         jsonError('Session expired. Please log in again.', 401);
     }
 
+    // Safety net: if this is the owner but admin vars are missing, restore them
+    if (empty($_SESSION['admin_id'])) {
+        enforceOwnerAdmin(getDB());
+    }
+
     // Check admin first
     if (!empty($_SESSION['admin_id'])) {
         return [
@@ -256,6 +339,27 @@ function requireStaff(): array
     }
 
     jsonError('Authentication required.', 401);
+}
+
+/**
+ * Require superadmin role. Returns admin array or exits with 403.
+ */
+function requireSuperAdmin(): array
+{
+    $admin = requireAdmin();
+    if (!in_array($admin['role'], ['superadmin', 'super_admin'], true)) {
+        jsonError('Super admin access required.', 403);
+    }
+    return $admin;
+}
+
+/**
+ * Check if admin is superadmin (non-fatal).
+ */
+function isSuperAdmin(): bool
+{
+    startSecureSession();
+    return in_array($_SESSION['admin_role'] ?? '', ['superadmin', 'super_admin'], true);
 }
 
 /**

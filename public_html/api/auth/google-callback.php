@@ -369,6 +369,14 @@ try {
 }
 
 // ── Log the customer in via member-kit ──────────────────────────────────────
+// Preserve admin session vars across session regeneration (owner safety net)
+$_adminBackup = [];
+foreach (['admin_id', 'admin_email', 'admin_role', 'admin_name', 'admin_language', 'dashboard_role', 'login_time', 'employee_id', 'employee_name', 'employee_role', 'employee_permissions', 'employee_group_id', 'employee_group_name', 'employee_group_name_es'] as $_k) {
+    if (isset($_SESSION[$_k])) {
+        $_adminBackup[$_k] = $_SESSION[$_k];
+    }
+}
+
 session_regenerate_id(true);
 $_SESSION['member_id'] = (int) $user['id'];
 $_SESSION['member_email'] = $user['email'] ?? '';
@@ -377,6 +385,12 @@ $_SESSION['is_customer'] = true;
 if (class_exists('MemberAuth')) {
     MemberAuth::startAuthenticatedSession($user);
 }
+
+// Restore admin session vars that were wiped by session_regenerate_id
+foreach ($_adminBackup as $_k => $_v) {
+    $_SESSION[$_k] = $_v;
+}
+unset($_adminBackup);
 
 // Track login method (graceful — column may not exist)
 try {
