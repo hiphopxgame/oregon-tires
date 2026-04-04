@@ -406,8 +406,8 @@
       <div id="lockout-message" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm mb-4"></div>
       <div id="login-error" class="text-red-600 dark:text-red-400 text-sm text-center hidden"></div>
     </form>
-    <!-- Google Sign-In -->
-    <div class="mt-4">
+    <!-- Google Sign-In (hidden until redirect URI is registered in Google Cloud Console) -->
+    <div class="mt-4 hidden" id="google-login-section">
       <div class="relative my-4">
         <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300 dark:border-gray-600"></div></div>
         <div class="relative flex justify-center text-sm"><span class="bg-white dark:bg-gray-800 px-3 text-gray-500 dark:text-gray-400" data-t="orDivider">or</span></div>
@@ -815,6 +815,7 @@
               </select>
               <button onclick="applyBulkAssign()" class="text-sm bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700" data-t="applyAssign">Assign</button>
               <button onclick="exportAppointmentsCsv()" class="text-sm bg-gray-600 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700" data-t="exportCsv">Export CSV</button>
+              <button id="appt-bulk-delete-btn" onclick="applyBulkDeleteAppointments()" class="hidden text-sm bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700">🗑 Delete</button>
             </div>
           </div>
           <div class="overflow-x-auto">
@@ -851,11 +852,13 @@
           <div class="overflow-x-auto">
             <table class="w-full text-sm responsive-table">
               <thead><tr class="bg-amber-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
+                <th class="p-3 w-8" id="msg-select-all-th"></th>
                 <th class="p-3" data-t="thCustomer">Customer</th><th class="p-3" data-t="thContact">Contact</th><th class="p-3" data-t="thMessage">Message</th><th class="p-3" data-t="thDate">Date</th><th class="p-3" data-t="thStatus">Status</th>
               </tr></thead>
               <tbody id="messages-table"></tbody>
             </table>
           </div>
+          <div id="messages-bulk-toolbar"></div>
         </div>
         <div id="msg-subtab-conversations" class="hidden">
           <div class="flex justify-between items-center mb-4">
@@ -880,6 +883,7 @@
             </div>
           </div>
           <div id="conversations-list" class="space-y-3"></div>
+          <div id="conversations-bulk-toolbar"></div>
           <div id="conversation-detail" class="hidden">
             <button onclick="closeConversationDetail()" class="mb-4 text-brand hover:underline text-sm">← Back to list</button>
             <div id="conv-detail-header" class="mb-4 p-4 bg-gray-50 rounded-lg dark:bg-gray-700"></div>
@@ -948,6 +952,7 @@
         <div class="overflow-x-auto">
           <table class="w-full text-sm responsive-table">
             <thead><tr class="bg-amber-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
+              <th class="p-3 w-8" id="cust-select-all-th"></th>
               <th class="p-3" data-t="thCustomer">Customer</th>
               <th class="p-3" data-t="thContact">Contact</th>
               <th class="p-3" data-t="custVehicle">Vehicle</th>
@@ -959,6 +964,7 @@
             <tbody id="customers-table"></tbody>
           </table>
         </div>
+        <div id="customers-bulk-toolbar"></div>
       </div>
     </div>
 
@@ -1162,6 +1168,7 @@
           <table class="w-full text-sm responsive-table">
             <thead class="bg-gray-50 dark:bg-gray-700">
               <tr>
+                <th class="w-10 py-2 px-4" id="blog-select-all-th"></th>
                 <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300" data-t="blogThTitle">Title</th>
                 <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300" data-t="blogThStatus">Status</th>
                 <th class="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-300" data-t="blogThDate">Date</th>
@@ -1171,6 +1178,7 @@
             </thead>
             <tbody id="blog-table-body"></tbody>
           </table>
+          <div id="blog-bulk-toolbar"></div>
         </div>
         <!-- Pagination -->
         <div id="blog-pagination-admin" class="flex items-center justify-center gap-3 mt-4"></div>
@@ -1424,6 +1432,7 @@
           <table class="w-full responsive-table">
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                <th class="w-10 px-4 py-3" id="promo-select-all-th"></th>
                 <th class="px-4 py-3 font-medium" data-t="promoThTitle">Title</th>
                 <th class="px-4 py-3 font-medium" data-t="promoThType">Type</th>
                 <th class="px-4 py-3 font-medium" data-t="promoThImage">Image</th>
@@ -1435,9 +1444,10 @@
               </tr>
             </thead>
             <tbody id="promotions-table-body">
-              <tr><td colspan="8" class="text-center py-8 text-gray-400" data-t="loading">Loading...</td></tr>
+              <tr><td colspan="9" class="text-center py-8 text-gray-400" data-t="loading">Loading...</td></tr>
             </tbody>
           </table>
+          <div id="promotions-bulk-toolbar"></div>
         </div>
       </div>
     </div>
@@ -1509,6 +1519,7 @@
           <table class="w-full responsive-table">
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                <th class="w-10 px-4 py-3" id="faq-select-all-th"></th>
                 <th class="px-4 py-3 font-medium" data-t="faqThQuestion">Question</th>
                 <th class="px-4 py-3 font-medium" data-t="faqThStatus">Status</th>
                 <th class="px-4 py-3 font-medium text-center" data-t="faqThOrder">Order</th>
@@ -1516,9 +1527,10 @@
               </tr>
             </thead>
             <tbody id="faq-table-body">
-              <tr><td colspan="4" class="text-center py-8 text-gray-400" data-t="faqLoadingTd">Loading...</td></tr>
+              <tr><td colspan="5" class="text-center py-8 text-gray-400" data-t="faqLoadingTd">Loading...</td></tr>
             </tbody>
           </table>
+          <div id="faq-bulk-toolbar"></div>
         </div>
       </div>
     </div>
@@ -1601,6 +1613,7 @@
           <table class="w-full responsive-table">
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                <th class="w-10 px-4 py-3" id="testimonials-select-all-th"></th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThSource">Source</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThName">Name</th>
                 <th class="px-4 py-3 font-medium" data-t="reviewThRating">Rating</th>
@@ -1611,9 +1624,10 @@
               </tr>
             </thead>
             <tbody id="testimonials-table-body">
-              <tr><td colspan="7" class="text-center py-8 text-gray-400" data-t="reviewLoadingTd">Loading...</td></tr>
+              <tr><td colspan="8" class="text-center py-8 text-gray-400" data-t="reviewLoadingTd">Loading...</td></tr>
             </tbody>
           </table>
+          <div id="testimonials-bulk-toolbar"></div>
         </div>
       </div>
     </div>
@@ -3878,6 +3892,7 @@
           <table class="w-full responsive-table">
             <thead>
               <tr class="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                <th class="w-10 px-3 py-3" id="services-select-all-th"></th>
                 <th class="px-3 py-3 font-medium w-12"></th>
                 <th class="px-3 py-3 font-medium" data-t="svcThName">Name</th>
                 <th class="px-3 py-3 font-medium" data-t="svcThCategory">Category</th>
@@ -3889,9 +3904,10 @@
               </tr>
             </thead>
             <tbody id="services-table-body">
-              <tr><td colspan="8" class="text-center py-8 text-gray-400" data-t="svcLoadingTd">Loading...</td></tr>
+              <tr><td colspan="9" class="text-center py-8 text-gray-400" data-t="svcLoadingTd">Loading...</td></tr>
             </tbody>
           </table>
+          <div id="services-bulk-toolbar"></div>
         </div>
       </div>
     </div>
@@ -4153,8 +4169,8 @@
       </div>
       <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" data-t="acctLanguageHint">Controls which language(s) you receive emails in</p>
     </div>
-    <!-- Google Account -->
-    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg" id="google-account-section">
+    <!-- Google Account (hidden until redirect URI is registered in Google Cloud Console) -->
+    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hidden" id="google-account-section">
       <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2" data-t="googleAccount">Google Account</h4>
       <div id="google-not-linked" class="hidden">
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-3" data-t="googleConnectHint">Connect your Google account for faster one-click sign-in</p>
@@ -4756,6 +4772,24 @@ const adminT = {
     noMessages: 'No messages found',
     loading: 'Loading...',
     confirmDelete: 'Are you sure you want to delete this?',
+    selectAll: 'Select All',
+    itemsSelected: 'selected',
+    deleteSelected: 'Delete Selected',
+    noItemsSelected: 'No items selected',
+    bulkDeleteConfirm: 'Are you sure you want to delete {count} items? This cannot be undone.',
+    bulkDeleteSuccess: '{count} items deleted',
+    bulkDeleteFail: 'Failed to delete some items',
+    bulkDeleteProtected: 'Some items are protected and cannot be deleted',
+    deleteConfirmSingle: 'Are you sure you want to delete this item? This cannot be undone.',
+    deleteConfirmCustomer: 'Deleting this customer will also remove their vehicles, conversations, invoices, and loyalty points. Continue?',
+    deleteConfirmRO: 'Deleting this repair order will also remove its inspections, estimates, invoices, and labor records. Continue?',
+    deleteConfirmAppointment: 'Are you sure you want to delete this appointment?',
+    deleteConfirmEmployee: 'Deleting this employee will remove their skills and labor records. Appointments will be unassigned. Continue?',
+    superAdminRequired: 'Super admin access required for this action',
+    protectedAccount: 'This account is protected and cannot be deleted',
+    itemsDeleted: 'items deleted',
+    deleted: 'Deleted',
+    deleteFailed: 'Delete failed',
     saved: 'Saved successfully',
     invalidCredentials: 'Invalid credentials',
     accountLocked: 'Too many failed attempts. Please try again in {minutes} minutes.',
@@ -6450,6 +6484,24 @@ const adminT = {
     noMessages: 'No se encontraron mensajes',
     loading: 'Cargando...',
     confirmDelete: '\u00BFEst\u00E1s seguro de que deseas eliminar esto?',
+    selectAll: 'Seleccionar Todo',
+    itemsSelected: 'seleccionados',
+    deleteSelected: 'Eliminar Seleccionados',
+    noItemsSelected: 'Ning\u00FAn elemento seleccionado',
+    bulkDeleteConfirm: '\u00BFEst\u00E1 seguro de que desea eliminar {count} elementos? Esta acci\u00F3n no se puede deshacer.',
+    bulkDeleteSuccess: '{count} elementos eliminados',
+    bulkDeleteFail: 'Error al eliminar algunos elementos',
+    bulkDeleteProtected: 'Algunos elementos est\u00E1n protegidos y no se pueden eliminar',
+    deleteConfirmSingle: '\u00BFEst\u00E1 seguro de que desea eliminar este elemento? Esta acci\u00F3n no se puede deshacer.',
+    deleteConfirmCustomer: 'Al eliminar este cliente tambi\u00E9n se eliminar\u00E1n sus veh\u00EDculos, conversaciones, facturas y puntos de lealtad. \u00BFContinuar?',
+    deleteConfirmRO: 'Al eliminar esta orden de reparaci\u00F3n tambi\u00E9n se eliminar\u00E1n sus inspecciones, estimados, facturas y registros de trabajo. \u00BFContinuar?',
+    deleteConfirmAppointment: '\u00BFEst\u00E1 seguro de que desea eliminar esta cita?',
+    deleteConfirmEmployee: 'Al eliminar este empleado se eliminar\u00E1n sus habilidades y registros de trabajo. Las citas ser\u00E1n desasignadas. \u00BFContinuar?',
+    superAdminRequired: 'Se requiere acceso de super administrador para esta acci\u00F3n',
+    protectedAccount: 'Esta cuenta est\u00E1 protegida y no se puede eliminar',
+    itemsDeleted: 'elementos eliminados',
+    deleted: 'Eliminado',
+    deleteFailed: 'Error al eliminar',
     saved: 'Guardado exitosamente',
     invalidCredentials: 'Credenciales inv\u00E1lidas',
     accountLocked: 'Demasiados intentos fallidos. Intente de nuevo en {minutes} minutos.',
@@ -8432,6 +8484,7 @@ async function loadAppointments() {
   renderOverview(); renderAppointments(); renderCalendar();
 }
 async function loadMessages() {
+  BulkManager.init({ tab: 'messages', endpoint: 'messages.php', onDelete: loadMessages, superAdminOnly: true });
   try { const json = await api('messages.php'); messages = json.data || []; } catch(e) { console.error('loadMessages failed:', e); messages = []; }
   renderMessages(); renderOverview();
 }
@@ -10270,6 +10323,7 @@ function renderAppointments() {
           <option value="completed" ${a.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${a.status==='cancelled'?'selected':''}>Cancelled</option>
         </select>
         <button onclick="openNotesModal('${a.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100">\uD83D\uDCDD Notes</button>
+        ${(currentUser && (currentUser.role === 'superadmin' || currentUser.role === 'super_admin')) ? `<button onclick="event.stopPropagation();deleteSingleAppointment(${a.id},'${esc(a.first_name + ' ' + a.last_name).replace(/'/g, "\\'")}')" class="border border-red-300 text-red-600 rounded px-2 py-1 text-xs hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30">🗑</button>` : ''}
       </div></td>
     </tr>` + roBar;
   }).join('') : '<tr><td colspan="8" class="p-6 text-center text-gray-500">No appointments found</td></tr>';
@@ -10290,8 +10344,13 @@ function renderAppointments() {
 // ===== MESSAGES =====
 function renderMessages() {
   const tbody = document.getElementById('messages-table');
+  BulkManager.reset();
+  var saHead = document.getElementById('msg-select-all-th');
+  if (saHead) saHead.innerHTML = BulkManager.selectAllHtml();
+  var isSA = currentUser && (currentUser.role === 'superadmin' || currentUser.role === 'super_admin');
   tbody.innerHTML = messages.length ? messages.map(m => `
     <tr class="border-b hover:bg-gray-50">
+      <td class="p-3">${BulkManager.checkboxHtml(m.id)}</td>
       <td class="p-3 font-medium text-brand-light">${esc(m.first_name)} ${esc(m.last_name)}</td>
       <td class="p-3 text-sm"><div>${esc(m.email)}</div>${m.phone?`<div class="text-xs text-gray-500">${esc(fmtPhone(m.phone))}</div>`:''}</td>
       <td class="p-3 text-sm max-w-[400px]">
@@ -10303,10 +10362,16 @@ function renderMessages() {
         <select onchange="updateMsgStatus('${m.id}',this.value)" class="border rounded px-2 py-1 text-xs">
           <option value="new" ${m.status==='new'?'selected':''}>New</option><option value="priority" ${m.status==='priority'?'selected':''}>Priority</option><option value="completed" ${m.status==='completed'?'selected':''}>Completed</option>
         </select>
-        <button onclick="openMessageModal('${m.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100 mt-1 block w-full">👁 View</button>
+        <div class="flex gap-1 mt-1">
+          <button onclick="openMessageModal('${m.id}')" class="border rounded px-2 py-1 text-xs hover:bg-gray-100 flex-1">👁 View</button>
+          ${isSA ? `<button onclick="BulkManager.deleteSingle(${m.id},'${esc(m.first_name + ' ' + m.last_name).replace(/'/g, "\\'")}')" class="border border-red-300 text-red-600 rounded px-2 py-1 text-xs hover:bg-red-50 dark:border-red-700 dark:text-red-400">🗑</button>` : ''}
+        </div>
       </td>
     </tr>
-  `).join('') : '<tr><td colspan="5" class="p-6 text-center text-gray-500">No messages found</td></tr>';
+  `).join('') : '<tr><td colspan="6" class="p-6 text-center text-gray-500">No messages found</td></tr>';
+  var tbEl = document.getElementById('messages-bulk-toolbar');
+  if (tbEl) tbEl.innerHTML = BulkManager.toolbarHtml();
+  BulkManager.bind();
 }
 
 // ===== EMAIL LOGS =====
@@ -10509,6 +10574,7 @@ let conversations = [];
 let currentConvId = null;
 
 async function loadConversations() {
+  BulkManager.init({ tab: 'conversations', endpoint: 'conversations.php', onDelete: loadConversations, superAdminOnly: true });
   try {
     const status = document.getElementById('conv-status-filter') ? document.getElementById('conv-status-filter').value : '';
     const source = document.getElementById('conv-source-filter') ? document.getElementById('conv-source-filter').value : '';
@@ -10525,12 +10591,16 @@ async function loadConversations() {
 
 function renderConversations() {
   const list = document.getElementById('conversations-list');
+  BulkManager.reset();
+  var isSA = currentUser && (currentUser.role === 'superadmin' || currentUser.role === 'super_admin');
   if (!conversations.length) {
     list.textContent = '';
     const p = document.createElement('p');
     p.className = 'text-center text-gray-500 py-8';
     p.textContent = adminT[currentLang] && adminT[currentLang].convNoConversations ? adminT[currentLang].convNoConversations : 'No conversations found';
     list.appendChild(p);
+    var tbEl = document.getElementById('conversations-bulk-toolbar');
+    if (tbEl) tbEl.innerHTML = '';
     return;
   }
   const frag = document.createDocumentFragment();
@@ -10546,6 +10616,18 @@ function renderConversations() {
     row.className = 'flex justify-between items-start';
 
     const left = document.createElement('div');
+    left.className = 'flex items-start gap-2';
+
+    // Checkbox for bulk selection
+    if (isSA) {
+      var cbWrap = document.createElement('div');
+      cbWrap.className = 'flex-shrink-0 pt-0.5';
+      cbWrap.onclick = function(e) { e.stopPropagation(); };
+      cbWrap.innerHTML = BulkManager.checkboxHtml(c.id);
+      left.appendChild(cbWrap);
+    }
+
+    var leftText = document.createElement('div');
     const h4 = document.createElement('h4');
     h4.className = 'font-semibold text-sm';
     if (c.source === 'email') {
@@ -10563,11 +10645,12 @@ function renderConversations() {
       badge.textContent = c.unread_count;
       h4.appendChild(badge);
     }
-    left.appendChild(h4);
+    leftText.appendChild(h4);
     const meta = document.createElement('p');
     meta.className = 'text-xs text-gray-500 mt-1';
     meta.textContent = (c.customer_name || '') + ' \u00B7 ' + (c.customer_email || '');
-    left.appendChild(meta);
+    leftText.appendChild(meta);
+    left.appendChild(leftText);
 
     const right = document.createElement('div');
     right.className = 'flex items-center gap-2';
@@ -10579,6 +10662,14 @@ function renderConversations() {
     dateSpan.className = 'text-xs text-gray-400';
     dateSpan.textContent = c.last_message_at ? new Date(c.last_message_at).toLocaleDateString() : '';
     right.appendChild(dateSpan);
+    // Single delete button
+    if (isSA) {
+      var delBtn = document.createElement('button');
+      delBtn.className = 'border border-red-300 text-red-600 rounded px-2 py-0.5 text-xs hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30';
+      delBtn.textContent = '\uD83D\uDDD1';
+      delBtn.onclick = function(e) { e.stopPropagation(); BulkManager.deleteSingle(c.id, c.subject || ''); };
+      right.appendChild(delBtn);
+    }
 
     row.appendChild(left);
     row.appendChild(right);
@@ -10587,6 +10678,11 @@ function renderConversations() {
   });
   list.textContent = '';
   list.appendChild(frag);
+
+  // Bulk toolbar
+  var tbEl = document.getElementById('conversations-bulk-toolbar');
+  if (tbEl) tbEl.innerHTML = BulkManager.toolbarHtml();
+  BulkManager.bind();
 }
 
 async function openConversation(id) {
@@ -11011,6 +11107,7 @@ function renderEmployeeCard(emp, inactive) {
     + (currentUser && currentUser.type === 'admin' ? '<button onclick="toggleEmployeeStatus(\'' + emp.id + '\',' + (!emp.is_active) + ')" class="border rounded px-3 py-1 text-xs ' + (inactive ? 'text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900' : 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900') + '">' + (inactive ? 'Activate' : 'Deactivate') + '</button>' : '')
     + (currentUser && currentUser.type === 'admin' && !inactive && emp.email && !isEmpAdmin ? '<button onclick="makeAdmin(\'' + esc(emp.email) + '\',\'' + esc(emp.name) + '\')" class="border rounded px-3 py-1 text-xs text-blue-600 hover:bg-blue-50 dark:border-gray-600 dark:text-blue-400 dark:hover:bg-blue-900">Make Admin</button>' : '')
     + (currentUser && currentUser.type === 'admin' && isEmpAdmin ? '<button onclick="revokeAdminByEmail(\'' + esc(emp.email) + '\')" class="border rounded px-3 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-gray-600 dark:text-red-400 dark:hover:bg-red-900">Revoke Admin</button>' : '')
+    + (isSuperAdmin && inactive ? '<button onclick="deleteSingleEmployee(' + emp.id + ',\'' + esc(emp.name).replace(/'/g, "\\'") + '\')" class="border border-red-300 rounded px-3 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30">🗑 Delete</button>' : '')
     + '</div>'
     + (empUpcoming.length && !inactive ? '<button onclick="toggleEmpAppts(\'' + emp.id + '\')" class="text-xs px-3 py-1 rounded-full bg-brand/10 text-brand dark:bg-green-900/30 dark:text-green-400 hover:bg-brand/20 cursor-pointer">' + (T.viewSchedule || 'View Schedule') + ' \u25BE</button>' : '')
     + '</div>'
@@ -11042,6 +11139,15 @@ function renderEmployeeCard(emp, inactive) {
 function toggleEmpAppts(empId) {
   var el = document.getElementById('emp-appts-' + empId);
   if (el) el.classList.toggle('hidden');
+}
+
+async function deleteSingleEmployee(id, name) {
+  if (!confirm('Delete employee "' + name + '"? This cannot be undone. Consider deactivating instead.')) return;
+  try {
+    await api('employees.php', { method: 'POST', body: { action: 'delete', id: Number(id) } });
+    showToast('Employee deleted', false);
+    loadEmployees();
+  } catch(e) { showToast('Delete failed: ' + e.message, true); }
 }
 
 // ===== WORK SCHEDULES =====
@@ -12981,6 +13087,12 @@ function updateBulkToolbar() {
   } else {
     toolbar.classList.add('hidden');
   }
+  // Show/hide delete button for superadmin
+  var delBtn = document.getElementById('appt-bulk-delete-btn');
+  if (delBtn) {
+    var isSA = currentUser && (currentUser.role === 'superadmin' || currentUser.role === 'super_admin');
+    delBtn.classList.toggle('hidden', !isSA);
+  }
 }
 
 async function applyBulkStatus() {
@@ -13005,6 +13117,27 @@ async function applyBulkAssign() {
     showToast(ids.length + ' ' + (adminT[currentLang].appointmentsAssigned || 'appointments assigned'));
     loadAppointments();
   } catch(e) { showToast(adminT[currentLang].error + ': '+e.message, true); }
+}
+
+// ===== APPOINTMENT DELETE (superadmin only) =====
+async function applyBulkDeleteAppointments() {
+  var ids = Array.from(document.querySelectorAll('.appt-checkbox:checked')).map(function(cb) { return cb.value; });
+  if (!ids.length) return;
+  if (!confirm('Are you sure you want to delete ' + ids.length + ' appointment(s)? This cannot be undone.')) return;
+  try {
+    await api('appointments.php', { method: 'POST', body: { action: 'bulk_delete', ids: ids.map(Number) } });
+    showToast(ids.length + ' appointment(s) deleted', false);
+    loadAppointments();
+  } catch(e) { showToast('Delete failed: ' + e.message, true); }
+}
+
+async function deleteSingleAppointment(id, name) {
+  if (!confirm('Delete appointment for ' + name + '? This cannot be undone.')) return;
+  try {
+    await api('appointments.php', { method: 'POST', body: { action: 'delete', id: Number(id) } });
+    showToast('Appointment deleted', false);
+    loadAppointments();
+  } catch(e) { showToast('Delete failed: ' + e.message, true); }
 }
 
 function exportAppointmentsCsv() {
@@ -13707,6 +13840,71 @@ function renderPlatformTab() {
   });
   hero.appendChild(statsGrid);
   container.appendChild(hero);
+
+  // ─── ACTION ITEMS ───
+  var actionWrap = el('div', 'mb-8 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-300 dark:border-amber-700 rounded-2xl p-6');
+  var actionHeader = el('div', 'flex items-center gap-3 mb-4');
+  actionHeader.appendChild(el('span', 'text-2xl', '⚠️'));
+  actionHeader.appendChild(el('h3', 'text-xl font-bold text-amber-800 dark:text-amber-200', lang === 'es' ? 'Acciones Requeridas' : 'Action Required'));
+  actionWrap.appendChild(actionHeader);
+  actionWrap.appendChild(el('p', 'text-sm text-amber-700 dark:text-amber-300 mb-4', lang === 'es'
+    ? 'Los siguientes elementos necesitan completarse para habilitar todas las funciones del sitio.'
+    : 'The following items need to be completed to enable all site features.'));
+
+  // Action item 1: Google OAuth
+  var item1 = el('div', 'bg-white dark:bg-gray-800 rounded-xl p-4 border border-amber-200 dark:border-amber-700');
+  var item1Header = el('div', 'flex items-start gap-3');
+  var item1Icon = el('span', 'text-lg mt-0.5', '🔐');
+  var item1Body = el('div', 'flex-1');
+  item1Body.appendChild(el('h4', 'font-bold text-gray-800 dark:text-gray-100 mb-1', lang === 'es'
+    ? 'Habilitar Inicio de Sesion con Google'
+    : 'Enable Google Sign-In'));
+  item1Body.appendChild(el('p', 'text-sm text-gray-600 dark:text-gray-400 mb-3', lang === 'es'
+    ? 'El inicio de sesion con Google esta deshabilitado porque la URI de redireccion no esta registrada en Google Cloud Console.'
+    : 'Google Sign-In is currently disabled because the redirect URI is not registered in Google Cloud Console.'));
+
+  var stepsTitle = el('p', 'text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2', lang === 'es' ? 'Pasos:' : 'Steps:');
+  item1Body.appendChild(stepsTitle);
+  var stepsList = el('ol', 'text-xs text-gray-600 dark:text-gray-400 space-y-1 list-decimal list-inside mb-3');
+  var steps = lang === 'es' ? [
+    'Ir a Google Cloud Console → APIs y Credenciales',
+    'Editar el Cliente OAuth 2.0 (ID: 351264149227-14k...)',
+    'Agregar esta URI de redireccion autorizada:',
+    'Guardar — toma efecto en minutos'
+  ] : [
+    'Go to Google Cloud Console → APIs & Credentials',
+    'Edit the OAuth 2.0 Client (ID: 351264149227-14k...)',
+    'Add this Authorized redirect URI:',
+    'Save — takes effect within minutes'
+  ];
+  steps.forEach(function(s) { stepsList.appendChild(el('li', '', s)); });
+  item1Body.appendChild(stepsList);
+
+  var uriBox = el('div', 'bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2 mb-3 flex items-center gap-2');
+  var uriCode = el('code', 'text-xs text-brand dark:text-green-400 break-all flex-1', 'https://oregon.tires/api/auth/google-callback.php');
+  var copyBtn = el('button', 'text-xs bg-brand text-white px-2 py-1 rounded hover:bg-green-700 transition cursor-pointer whitespace-nowrap', lang === 'es' ? 'Copiar' : 'Copy');
+  copyBtn.addEventListener('click', function() {
+    navigator.clipboard.writeText('https://oregon.tires/api/auth/google-callback.php').then(function() {
+      copyBtn.textContent = '✓';
+      setTimeout(function() { copyBtn.textContent = lang === 'es' ? 'Copiar' : 'Copy'; }, 2000);
+    });
+  });
+  uriBox.appendChild(uriCode);
+  uriBox.appendChild(copyBtn);
+  item1Body.appendChild(uriBox);
+
+  var consoleLink = el('a', 'inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline', lang === 'es' ? 'Abrir Google Cloud Console →' : 'Open Google Cloud Console →');
+  consoleLink.href = 'https://console.cloud.google.com/apis/credentials';
+  consoleLink.target = '_blank';
+  consoleLink.rel = 'noopener noreferrer';
+  item1Body.appendChild(consoleLink);
+
+  item1Header.appendChild(item1Icon);
+  item1Header.appendChild(item1Body);
+  item1.appendChild(item1Header);
+  actionWrap.appendChild(item1);
+
+  container.appendChild(actionWrap);
 
   // ─── 1b. Scope Breakdown: Client Requested vs Developer Added ───
   if (scopeIds.length > 0) {
@@ -14972,6 +15170,7 @@ function switchMessagesSubTab(sub) {
   });
   if(sub === 'emaillogs') loadEmailLogs();
   if(sub === 'conversations') loadConversations();
+  if(sub === 'contacts') { BulkManager.init({ tab: 'messages', endpoint: 'messages.php', onDelete: loadMessages, superAdminOnly: true }); }
 }
 
 // Sub-tab switching for Gallery
@@ -15249,6 +15448,7 @@ async function createAppointment(e) {
 
 // ===== CUSTOMERS =====
 async function loadCustomers() {
+  BulkManager.init({ tab: 'customers', endpoint: 'customers.php', onDelete: loadCustomers, superAdminOnly: true });
   try {
     var json = await api('customers.php');
     customers = json.data || [];
@@ -15261,6 +15461,7 @@ async function loadCustomers() {
 function renderCustomers() {
   var tbody = document.getElementById('customers-table');
   if (!tbody) return;
+  BulkManager.reset();
   var search = (document.getElementById('customer-search')?.value || '').toLowerCase();
   var filtered = customers.filter(function(c) {
     if (!search) return true;
@@ -15273,11 +15474,18 @@ function renderCustomers() {
   var badge = document.getElementById('returning-badge');
   if (badge) badge.textContent = '🔄 ' + (adminT[currentLang].returningCustomers || 'Returning') + ': ' + returning;
 
+  // Select-all checkbox in thead
+  var saHead = document.getElementById('cust-select-all-th');
+  if (saHead) saHead.innerHTML = BulkManager.selectAllHtml();
+
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-gray-500">' + esc(adminT[currentLang].noCustomers || 'No customers found') + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-gray-500">' + esc(adminT[currentLang].noCustomers || 'No customers found') + '</td></tr>';
+    var tbEl = document.getElementById('customers-bulk-toolbar');
+    if (tbEl) tbEl.innerHTML = '';
     return;
   }
 
+  var isSA = currentUser && (currentUser.role === 'superadmin' || currentUser.role === 'super_admin');
   tbody.innerHTML = filtered.map(function(c) {
     var name = esc(c.first_name) + ' ' + esc(c.last_name);
     var vehicleHtml = '—';
@@ -15294,16 +15502,23 @@ function renderCustomers() {
       ? '<span class="inline-block bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-1.5 py-0.5 rounded-full text-xs font-medium">🔄 ' + apptCount + '</span>'
       : '<span class="text-gray-600 dark:text-gray-400">' + apptCount + '</span>';
     if (onlineBookings > 0) apptBadge += '<div class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">' + onlineBookings + ' online</div>';
+    var deleteBtn = isSA ? ' <button onclick="event.stopPropagation();BulkManager.deleteSingle(' + c.id + ',\'' + esc(c.first_name + ' ' + c.last_name).replace(/'/g, "\\'") + '\')" class="border border-red-300 text-red-600 rounded px-2 py-1 text-xs hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30 ml-1">🗑</button>' : '';
     return '<tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="showCustomerHistory(\'' + esc(c.email).replace(/'/g, "\\'") + '\')">'
+      + '<td class="p-3" onclick="event.stopPropagation()">' + BulkManager.checkboxHtml(c.id) + '</td>'
       + '<td class="p-3"><div class="font-medium">' + name + '</div></td>'
       + '<td class="p-3"><div class="text-sm">' + esc(c.email) + '</div>' + (c.phone ? '<div class="text-xs text-gray-500">' + esc(c.phone) + '</div>' : '') + '</td>'
       + '<td class="p-3 text-sm">' + vehicleHtml + '</td>'
       + '<td class="p-3 text-center">' + apptBadge + '</td>'
       + '<td class="p-3 text-sm">' + fmtDate(c.last_visit) + '</td>'
       + '<td class="p-3 text-sm max-w-xs truncate">' + esc((c.services || '').replace(/-/g, ' ').replace(/\b\w/g, function(l){return l.toUpperCase();})) + '</td>'
-      + '<td class="p-3"><button onclick="event.stopPropagation();showCustomerHistory(\'' + esc(c.email).replace(/'/g, "\\'") + '\')" class="bg-brand text-white px-3 py-1 rounded text-xs hover:bg-green-700">' + (adminT[currentLang].viewHistory || 'View History') + '</button></td>'
+      + '<td class="p-3"><button onclick="event.stopPropagation();showCustomerHistory(\'' + esc(c.email).replace(/'/g, "\\'") + '\')" class="bg-brand text-white px-3 py-1 rounded text-xs hover:bg-green-700">' + (adminT[currentLang].viewHistory || 'View History') + '</button>' + deleteBtn + '</td>'
       + '</tr>';
   }).join('');
+
+  // Bulk toolbar
+  var tbEl = document.getElementById('customers-bulk-toolbar');
+  if (tbEl) tbEl.innerHTML = BulkManager.toolbarHtml();
+  BulkManager.bind();
 }
 
 async function showCustomerHistory(email) {
@@ -15936,6 +16151,7 @@ loadMessages = async function() {
 <script src="/admin/js/parts.js" defer></script>
 <script src="/admin/js/surveys.js" defer></script>
 <script src="/admin/js/gbp.js" defer></script>
+<script src="/admin/js/bulk-manager.js"></script>
 <script src="/admin/js/client-handoff.js?v=20260326f" defer></script>
 <script type="module">
   import { showToast as brandShowToast } from '/admin/js/brand-toast.js';
