@@ -8,7 +8,7 @@
  * Only sends to appointments with status 'new', 'pending', or 'confirmed'.
  *
  * Usage:  php send-reminders.php
- * Cron:   0 18 * * * php /home/hiphopwo/public_html/---oregon.tires/cli/send-reminders.php >> /tmp/ot-reminders.log 2>&1
+ * Cron:   0 18 * * * php /home2/avadpnmy/public_html/cli/send-reminders.php >> /tmp/ot-reminders.log 2>&1
  *
  * Recommended: Run daily at 6 PM to remind for next-day appointments.
  */

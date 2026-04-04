@@ -145,7 +145,7 @@ if (function_exists('exec')) {
 
 // Fall back to du for home directory size (capped estimate)
 if ($diskMethod === 'system') {
-    $homeDir = '/home/hiphopwo';
+    $homeDir = '/home2/avadpnmy';
     if (function_exists('exec') && is_dir($homeDir)) {
         @exec('du -sm ' . escapeshellarg($homeDir) . ' 2>/dev/null', $duOut);
         if (!empty($duOut[0]) && preg_match('/^(\d+)/', $duOut[0], $dm)) {
@@ -317,7 +317,7 @@ if ($mode === 'full') {
 
     // 8. Database backup
     echo "\n  [Database backup]\n";
-    $backupDir = '/home/hiphopwo/backups/oregon-tires';
+    $backupDir = '/home2/avadpnmy/backups/oregon-tires';
     if (!is_dir($backupDir)) {
         @mkdir($backupDir, 0750, true);
     }

@@ -25,7 +25,7 @@ require_once $vendorAutoload;
 
 // ─── Environment ────────────────────────────────────────────────────────────
 // Load .env — prefer parent of web root (outside public_html), fall back to project root (local dev)
-$envDir = dirname(__DIR__, 3); // Server: /home/hiphopwo/ (above public_html)
+$envDir = dirname(__DIR__, 2); // Server: /home2/avadpnmy/ (above public_html)
 $envFile = '.env.oregon-tires';
 if (!file_exists($envDir . '/' . $envFile)) {
     $envDir = __DIR__ . '/..'; // Local dev fallback: public_html/

@@ -1,7 +1,7 @@
 <?php
 /**
  * Oregon Tires — CLI: Fetch Google Reviews
- * Cron: 0 3 * * * php /home/hiphopwo/public_html/---oregon.tires/cli/fetch-google-reviews.php
+ * Cron: 0 3 * * * php /home2/avadpnmy/public_html/cli/fetch-google-reviews.php
  */
 
 declare(strict_types=1);

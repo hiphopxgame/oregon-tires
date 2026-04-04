@@ -25,8 +25,8 @@ set -euo pipefail
 # ============================================================
 SITE_NAME="Oregon Tires"
 SITE_DOMAIN="oregon.tires"
-SSH_HOST="hiphopworld"
-REMOTE_ROOT="public_html/---oregon.tires"
+SSH_HOST="oregontires"
+REMOTE_ROOT="public_html"
 DEPLOY_TIER="standard"          # full | standard | simple
 HAS_CSS_BUILD=true              # Tailwind CSS v4
 

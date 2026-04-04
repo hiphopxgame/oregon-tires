@@ -73,10 +73,10 @@ function initMemberKit(PDO $pdo): void
             }
         }
 
-        // 2. Cross-DB: HW super admin overrides local admin
-        if ($email !== '') {
+        // 2. Cross-DB: HW super admin overrides local admin (only if HW_DB_NAME is configured)
+        $hwDb = $_ENV['HW_DB_NAME'] ?? '';
+        if ($email !== '' && $hwDb !== '') {
             try {
-                $hwDb = $_ENV['HW_DB_NAME'] ?? 'hiphopwo_rld_system';
                 $stmt = $pdo->prepare("SELECT 1 FROM {$hwDb}.users WHERE email = ? AND is_admin = 1 AND disabled_at IS NULL LIMIT 1");
                 $stmt->execute([$email]);
                 if ($stmt->fetch()) {

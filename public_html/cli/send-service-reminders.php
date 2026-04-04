@@ -9,7 +9,7 @@
  * Uses DB-driven bilingual templates (email_tpl_service_reminder_*) via sendBrandedTemplateEmail().
  *
  * Usage:  php send-service-reminders.php
- * Cron:   0 9 * * 1 php /home/hiphopwo/public_html/---oregon.tires/cli/send-service-reminders.php >> /tmp/ot-service-reminders.log 2>&1
+ * Cron:   0 9 * * 1 php /home2/avadpnmy/public_html/cli/send-service-reminders.php >> /tmp/ot-service-reminders.log 2>&1
  *
  * Recommended: Run every Monday at 9 AM.
  */
