@@ -56,13 +56,13 @@ function initMemberKit(PDO $pdo): void
         // 1. Check local oretir_admins table
         if ($email !== '') {
             try {
-                $stmt = $pdo->prepare('SELECT id, role, display_name, language FROM oretir_admins WHERE email = ? AND is_active = 1 LIMIT 1');
+                $stmt = $pdo->prepare('SELECT id, email, role, display_name, language FROM oretir_admins WHERE LOWER(email) = LOWER(?) AND is_active = 1 LIMIT 1');
                 $stmt->execute([$email]);
                 $localAdmin = $stmt->fetch();
                 if ($localAdmin) {
                     $detectedRole = 'admin';
                     $_SESSION['admin_id']       = $localAdmin['id'];
-                    $_SESSION['admin_email']    = $email;
+                    $_SESSION['admin_email']    = $localAdmin['email'];
                     $_SESSION['admin_role']     = $localAdmin['role'] ?? 'admin';
                     $_SESSION['admin_name']     = $localAdmin['display_name'] ?? $member['display_name'] ?? $email;
                     $_SESSION['admin_language'] = $localAdmin['language'] ?? 'both';

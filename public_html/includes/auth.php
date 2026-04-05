@@ -26,18 +26,21 @@ function isOwnerEmail(string $email): bool
 }
 
 /**
- * Enforce admin rights for the business owner.
+ * Enforce admin rights for ANY active admin account.
  *
  * Called as a safety net whenever admin auth is checked. If the current session
- * belongs to the owner (via admin_email or member_email), ensures full admin
- * session vars are present — even if session_regenerate_id() wiped them.
+ * email (admin_email or member_email) matches any active row in oretir_admins,
+ * ensures full admin session vars are present — even if session_regenerate_id()
+ * wiped them. Case-insensitive email matching.
  *
- * @return bool True if owner was detected and admin rights enforced.
+ * For the business owner (OWNER_EMAIL), auto-creates the admin row if missing.
+ *
+ * @return bool True if admin was detected and session vars enforced.
  */
-function enforceOwnerAdmin(PDO $pdo): bool
+function enforceAdminSession(PDO $pdo): bool
 {
     $email = $_SESSION['admin_email'] ?? $_SESSION['member_email'] ?? '';
-    if ($email === '' || !isOwnerEmail($email)) {
+    if ($email === '') {
         return false;
     }
 
@@ -46,30 +49,35 @@ function enforceOwnerAdmin(PDO $pdo): bool
         return true;
     }
 
-    // Look up (or create) the admin row
+    // Look up admin by email (case-insensitive via LOWER())
     try {
-        $stmt = $pdo->prepare('SELECT id, role, display_name, language FROM oretir_admins WHERE email = ? AND is_active = 1 LIMIT 1');
-        $stmt->execute([OWNER_EMAIL]);
+        $stmt = $pdo->prepare('SELECT id, email, role, display_name, language FROM oretir_admins WHERE LOWER(email) = LOWER(?) AND is_active = 1 LIMIT 1');
+        $stmt->execute([$email]);
         $admin = $stmt->fetch();
 
-        if (!$admin) {
-            // Owner row missing — create it so this never fails again
+        // Owner-only: auto-create admin row if missing
+        if (!$admin && isOwnerEmail($email)) {
             $pdo->prepare(
                 'INSERT INTO oretir_admins (email, display_name, role, is_active, created_at, updated_at)
                  VALUES (?, ?, ?, 1, NOW(), NOW())'
             )->execute([OWNER_EMAIL, 'Owner', 'admin']);
             $admin = [
                 'id'           => (int) $pdo->lastInsertId(),
+                'email'        => OWNER_EMAIL,
                 'role'         => 'admin',
                 'display_name' => 'Owner',
                 'language'     => 'both',
             ];
         }
 
+        if (!$admin) {
+            return false;
+        }
+
         $_SESSION['admin_id']       = $admin['id'];
-        $_SESSION['admin_email']    = OWNER_EMAIL;
+        $_SESSION['admin_email']    = $admin['email'];
         $_SESSION['admin_role']     = $admin['role'] ?: 'admin';
-        $_SESSION['admin_name']     = $admin['display_name'] ?: 'Owner';
+        $_SESSION['admin_name']     = $admin['display_name'] ?: $admin['email'];
         $_SESSION['admin_language'] = $admin['language'] ?? 'both';
         $_SESSION['dashboard_role'] = 'admin';
 
@@ -82,9 +90,15 @@ function enforceOwnerAdmin(PDO $pdo): bool
 
         return true;
     } catch (\Throwable $e) {
-        error_log('enforceOwnerAdmin failed: ' . $e->getMessage());
+        error_log('enforceAdminSession failed: ' . $e->getMessage());
         return false;
     }
+}
+
+/** @deprecated Use enforceAdminSession() — kept for backwards compatibility */
+function enforceOwnerAdmin(PDO $pdo): bool
+{
+    return enforceAdminSession($pdo);
 }
 
 // ─── Permission Bundles ─────────────────────────────────────────────────────
@@ -270,8 +284,8 @@ function requireAdmin(): array
     startSecureSession();
 
     if (empty($_SESSION['admin_id'])) {
-        // Safety net: if this is the owner, restore admin rights automatically
-        enforceOwnerAdmin(getDB());
+        // Safety net: restore admin rights for any active admin in oretir_admins
+        enforceAdminSession(getDB());
     }
 
     if (empty($_SESSION['admin_id'])) {
@@ -307,9 +321,9 @@ function requireStaff(): array
         jsonError('Session expired. Please log in again.', 401);
     }
 
-    // Safety net: if this is the owner but admin vars are missing, restore them
+    // Safety net: restore admin rights for any active admin in oretir_admins
     if (empty($_SESSION['admin_id'])) {
-        enforceOwnerAdmin(getDB());
+        enforceAdminSession(getDB());
     }
 
     // Check admin first
