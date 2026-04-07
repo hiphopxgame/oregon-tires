@@ -739,7 +739,7 @@
 
     <!-- APPOINTMENTS TAB (combined calendar + list) -->
     <div id="tab-appointments" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div><h2 class="text-2xl font-bold">📅 <span data-t="appointmentsHeading">Appointments</span></h2><p class="text-green-100" data-t="calendarSubtitle">Calendar view with employee assignment</p></div>
         <div class="flex gap-2">
           <button onclick="showNewApptModal()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-50 transition">+ <span data-t="newAppointment">New Appointment</span></button>
@@ -850,7 +850,7 @@
           <button onclick="switchMessagesSubTab('emaillogs')" id="msg-sub-emaillogs" class="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-gray-50">📋 <span data-t="emailLog">Email Log</span></button>
         </div>
         <div id="msg-subtab-contacts">
-          <div class="flex justify-end mb-4"><button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="refresh">↻ Refresh</button></div>
+          <div class="flex flex-wrap justify-end mb-4 gap-2"><button onclick="loadMessages()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="refresh">↻ Refresh</button></div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm responsive-table">
               <thead><tr class="bg-amber-100 border-b text-left dark:bg-gray-700 dark:text-gray-200">
@@ -879,7 +879,7 @@
               </select>
               <label class="flex items-center gap-1 text-sm"><input type="checkbox" id="conv-unread-filter" onchange="loadConversations()"> <span data-t="msgUnreadOnly">Unread only</span></label>
             </div>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
               <button onclick="checkEmail()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="checkEmail">Check Email</button>
               <button onclick="loadConversations()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:opacity-90" data-t="msgRefresh">↻ Refresh</button>
             </div>
@@ -939,7 +939,7 @@
 
     <!-- CUSTOMERS TAB -->
     <div id="tab-customers" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div><h2 class="text-2xl font-bold">👤 <span data-t="customerDirectory">Customer Directory</span></h2><p class="text-green-100" data-t="customerSubtitle">View customer history and returning visitors</p></div>
         <div class="flex items-center gap-3">
           <span id="returning-badge" class="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium"></span>
@@ -972,7 +972,7 @@
 
     <!-- REPAIR ORDERS TAB -->
     <div id="tab-repairorders" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div><h2 class="text-2xl font-bold">📊 <span data-t="repairOrders">Shop Board</span></h2><p class="text-green-100" data-t="roSubtitle">Drag-and-drop kanban board for all active repair orders</p></div>
         <div class="flex items-center gap-3">
           <button onclick="exportRepairOrdersCsv()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30" data-t="exportCsv">Export CSV</button>
@@ -1019,7 +1019,7 @@
 
     <!-- EMPLOYEES TAB -->
     <div id="tab-employees" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div><h2 class="text-2xl font-bold">👥 <span data-t="employeeAdminMgmt">Employee & Admin Management</span></h2><p class="text-green-100" data-t="employeesSubtitle">Manage team members and admin access</p></div>
       </div>
       <div class="bg-white rounded-b-xl shadow p-6 dark:bg-gray-800">
@@ -1067,7 +1067,7 @@
 
         <!-- User Groups & Permissions Section (admin only) -->
         <div id="group-management-section" class="mt-8">
-          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
             <div><h2 class="text-xl font-bold" data-t="userGroups">User Groups & Permissions</h2><p class="text-green-100 text-sm" data-t="userGroupsDesc">Control what each employee role can see and do</p></div>
           </div>
           <div class="bg-white rounded-b-xl shadow dark:bg-gray-800">
@@ -1087,7 +1087,7 @@
 
         <!-- Work Schedules Section -->
         <div id="schedule-management" class="mt-8">
-          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
             <h2 class="text-xl font-bold" data-t="schedWorkSchedules">Work Schedules</h2>
             <div class="flex gap-2">
               <button onclick="showScheduleView('weekly')" id="sched-btn-weekly" class="bg-white text-brand-light px-3 py-1.5 rounded-lg text-sm font-medium" data-t="schedWeekly">Weekly</button>
@@ -1106,7 +1106,7 @@
 
     <!-- GALLERY TAB (with Service Images sub-tab) -->
     <div id="tab-gallery" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <h2 class="text-2xl font-bold" data-t="galleryServiceImages">Gallery & Service Images</h2>
         <button onclick="toggleAddGalleryForm()" id="gallery-add-btn" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium">+ <span data-t="addNewImage">Add Image</span></button>
       </div>
@@ -1151,7 +1151,7 @@
 
     <!-- BLOG TAB -->
     <div id="tab-blog" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div><h2 class="text-2xl font-bold" data-t="blogManagement">Blog Management</h2><p class="text-green-100" data-t="blogManagementDesc">Create and manage blog posts</p></div>
         <button onclick="openBlogEditor()" class="bg-white text-brand-light px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition" data-t="blogNewPostBtn">+ New Post</button>
       </div>
@@ -1189,7 +1189,7 @@
       <!-- Blog Editor Modal -->
       <div id="blog-editor-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-8 overflow-y-auto" onclick="if(event.target===this)closeBlogEditor()">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl mx-4 mb-8">
-          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+          <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
             <h3 id="blog-form-title" class="text-lg font-bold" data-t="blogNewPost">New Blog Post</h3>
             <button onclick="closeBlogEditor()" class="text-white/70 hover:text-white text-2xl leading-none">&times;</button>
           </div>
@@ -1264,7 +1264,7 @@
 
     <!-- PROMOTIONS TAB -->
     <div id="tab-promotions" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🏷 <span data-t="promotionsHeading">Seasonal Promotions</span></h2>
           <p class="text-green-100" data-t="promotionsSubtitle">Manage homepage banner promotions with date scheduling</p>
@@ -1470,7 +1470,7 @@
 
     <!-- FAQ TAB -->
     <div id="tab-faq" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold" data-t="faqHeading">❓ Frequently Asked Questions</h2>
           <p class="text-green-100" data-t="faqSubheading">Manage FAQ items displayed on the homepage</p>
@@ -1636,7 +1636,7 @@
 
     <!-- ANALYTICS TAB -->
     <div id="tab-analytics" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div><h2 class="text-2xl font-bold" data-t="analyticsDashboard">Analytics Dashboard</h2><p class="text-green-100" data-t="analyticsSubtitle">Overview of your business metrics</p></div>
         <button onclick="loadAnalytics()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition" data-t="analyticsRefresh">Refresh</button>
       </div>
@@ -1674,7 +1674,7 @@
 
     <!-- DOCUMENTATION TAB -->
     <div id="tab-docs" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div><h2 class="text-2xl font-bold">📖 <span data-t="documentation">Documentation</span></h2><p class="text-green-50" data-t="docsSubtitle">Instruction manual, feature list, and roadmap</p></div>
       </div>
       <div class="bg-white rounded-b-xl shadow dark:bg-gray-800">
@@ -3345,7 +3345,7 @@
 
     <!-- SITE CONTENT TAB -->
     <div id="tab-sitecontent" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div><h2 class="text-2xl font-bold">📝 <span data-t="siteContentHeading">Site Content</span></h2><p class="text-green-100" data-t="siteContentSubtitle">Edit business info displayed on the website</p></div>
         <button onclick="loadSiteSettings()" class="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30" data-t="refresh">↻ Refresh</button>
       </div>
@@ -3521,7 +3521,7 @@
 
         <!-- EMAIL TEMPLATES SECTION -->
         <div class="mt-10 border-t pt-8">
-          <div class="flex justify-between items-center mb-4">
+          <div class="flex flex-wrap justify-between items-center mb-4 gap-3">
             <div>
               <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">📧 Email Templates / Plantillas de Correo</h3>
               <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Edit the bilingual email templates sent to admins. Use <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-xs font-mono">{{variable}}</code> placeholders for dynamic data.</p>
@@ -3648,7 +3648,7 @@
 
     <!-- SUBSCRIBERS TAB -->
     <div id="tab-subscribers" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">📧 <span data-t="subscribersHeading">Subscribers</span></h2>
           <p class="text-green-100" data-t="subscribersSubtitle">Manage newsletter and notification subscribers</p>
@@ -3670,7 +3670,7 @@
 
     <!-- MY SCHEDULE TAB (staff) -->
     <div id="tab-myschedule" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🕐 <span data-t="tabMySchedule">My Schedule</span></h2>
           <p class="text-green-100" data-t="myScheduleSubtitle">Your weekly work schedule</p>
@@ -3695,7 +3695,7 @@
 
     <!-- INVOICES TAB -->
     <div id="tab-invoices" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🧾 <span data-t="tabInvoices">Invoices</span></h2>
           <p class="text-green-100" data-t="invoicesSubtitle">Generate and manage customer invoices</p>
@@ -3707,7 +3707,7 @@
 
     <!-- WALK-IN QUEUE TAB -->
     <div id="tab-walkinqueue" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🚶 <span data-t="tabWalkInQueue">Walk-In Queue</span></h2>
           <p class="text-green-100" data-t="walkInQueueSubtitle">Manage walk-in customers waiting for service</p>
@@ -3722,7 +3722,7 @@
 
     <!-- ON HOLD TAB (ROs on hold / awaiting parts) -->
     <div id="tab-waitlist" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">⏳ <span data-t="tabOnHold">On Hold</span></h2>
           <p class="text-green-100" data-t="onHoldSubtitle">Repair orders on hold or awaiting parts</p>
@@ -3734,7 +3734,7 @@
 
     <!-- TIRE QUOTES TAB -->
     <div id="tab-tirequotes" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🛞 <span data-t="tabTireQuotes">Tire Quotes</span></h2>
           <p class="text-green-100" data-t="tireQuotesSubtitle">Review and respond to tire quote requests</p>
@@ -3746,7 +3746,7 @@
 
     <!-- SERVICES TAB -->
     <div id="tab-services" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-t-xl flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold" data-t="svcHeading">🔧 Services</h2>
           <p class="text-green-100" data-t="svcSubheading">Manage services displayed on the website and booking form</p>
@@ -3916,7 +3916,7 @@
 
     <!-- VISIT TRACKING TAB -->
     <div id="tab-visits" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">👣 <span data-t="tabVisits">Visit Tracking</span></h2>
           <p class="text-green-100" data-t="visitsSubtitle">Customer check-ins, bay status, and service timers</p>
@@ -3928,7 +3928,7 @@
 
     <!-- LABOR TRACKING TAB -->
     <div id="tab-labor" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">⏱ <span data-t="tabLabor">Labor Tracking</span></h2>
           <p class="text-green-100" data-t="laborSubtitle">Technician hours and labor summary across all ROs</p>
@@ -3940,7 +3940,7 @@
 
     <!-- LOYALTY & REWARDS TAB -->
     <div id="tab-loyalty" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🎁 <span data-t="tabLoyalty">Loyalty &amp; Rewards</span></h2>
           <p class="text-green-100" data-t="loyaltySubtitle">Customer loyalty points and rewards catalog</p>
@@ -3952,7 +3952,7 @@
 
     <!-- REFERRALS TAB -->
     <div id="tab-referrals" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🤝 <span data-t="tabReferrals">Referrals</span></h2>
           <p class="text-green-100" data-t="referralsSubtitle">Customer referral codes and tracking</p>
@@ -3964,7 +3964,7 @@
 
     <!-- SERVICE REMINDERS TAB -->
     <div id="tab-reminders" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🔔 <span data-t="tabReminders">Service Reminders</span></h2>
           <p class="text-green-100" data-t="remindersSubtitle">Automated service due date tracking per vehicle</p>
@@ -3977,7 +3977,7 @@
 
     <!-- RESOURCE PLANNER TAB -->
     <div id="tab-resourceplanner" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">📋 <span data-t="tabResourcePlanner">Resource Planner</span></h2>
           <p class="text-green-100" data-t="rpSubtitle">Service demand, staffing, and skill gap analysis</p>
@@ -4030,7 +4030,7 @@
 
     <!-- MARKET INTEL TAB -->
     <div id="tab-marketintel" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🗺️ <span data-t="tabMarketIntel">Market Intel</span></h2>
           <p class="text-green-100" data-t="marketIntelSubtitle">Portland auto industry directory — competitors, partners, and market landscape</p>
@@ -4042,7 +4042,7 @@
 
     <!-- PARTS & ORDERS TAB -->
     <div id="tab-parts" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🔩 <span data-t="tabParts">Parts &amp; Orders</span></h2>
           <p class="text-green-100">Parts catalog, vendor management, and purchase orders</p>
@@ -4054,7 +4054,7 @@
 
     <!-- SURVEYS TAB -->
     <div id="tab-surveys" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">📊 <span data-t="tabSurveys">Customer Surveys</span></h2>
           <p class="text-green-100">Customer satisfaction surveys, NPS tracking, and feedback analytics</p>
@@ -4066,7 +4066,7 @@
 
     <!-- GOOGLE BUSINESS PROFILE TAB -->
     <div id="tab-gbp" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">📍 <span data-t="tabGBP">Google Business Profile</span></h2>
           <p class="text-green-100">Posts, hours sync, insights, and Q&amp;A management</p>
@@ -4117,7 +4117,7 @@
 
     <!-- SYSTEM HEALTH TAB -->
     <div id="tab-health" class="tab-content hidden fade-in" role="tabpanel">
-      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex justify-between items-center">
+      <div class="bg-brand-light text-white px-6 py-4 rounded-xl mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h2 class="text-2xl font-bold">🩺 <span data-t="tabHealth">System Health</span></h2>
           <p class="text-green-100" data-t="healthSubtitle">Uptime, SSL, backups, and feature monitoring</p>
