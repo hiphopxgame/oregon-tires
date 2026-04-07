@@ -74,6 +74,19 @@ if ($dashboardRole === 'member' && MemberAuth::isMemberLoggedIn()) {
 $isEmployee = in_array($dashboardRole, ['employee', 'admin'], true);
 $isAdmin    = $dashboardRole === 'admin';
 
+// ── Worker mobile dashboard (read-only scaffold) ──────────────────────────
+// Employee role gets the new mobile worker dashboard by default.
+// Admins can opt-in via ?tab=worker (so the existing /admin/ redirect stays).
+$wantWorker = ($_GET['tab'] ?? '') === 'worker';
+if (
+    MemberAuth::isMemberLoggedIn()
+    && ($dashboardRole === 'employee' || ($isAdmin && $wantWorker))
+    && ($dashboardRole === 'employee' || $wantWorker)
+) {
+    require __DIR__ . '/includes/worker-dashboard.php';
+    exit;
+}
+
 // If admin or employee and no explicit tab requested, redirect to admin panel
 if (($isAdmin || $isEmployee) && !isset($_GET['tab'])) {
     // Ensure admin session vars are set before redirecting — the onLogin callback
