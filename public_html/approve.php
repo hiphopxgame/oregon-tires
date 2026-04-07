@@ -239,7 +239,7 @@
 <!-- Footer -->
 <footer class="bg-brand text-white py-8">
     <div class="container mx-auto px-4">
-      <div class="grid sm:grid-cols-3 gap-6 text-sm text-gray-200 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm text-gray-200 mb-6">
         <div>
           <p class="font-semibold text-white mb-1">Oregon Tires Auto Care</p>
           <p>8536 SE 82nd Ave, Portland, OR 97266</p>

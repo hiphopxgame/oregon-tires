@@ -109,3 +109,37 @@
     <a href="/book-appointment" class="block py-2 text-brand dark:text-green-400 font-semibold" data-t="navSchedule">Schedule Service</a>
   </div>
 </header>
+<script>
+(function() {
+  var menu = document.getElementById('mobile-menu');
+  if (!menu) return;
+  var toggle = document.querySelector('[aria-controls="mobile-menu"]');
+  if (!toggle) return;
+
+  function focusables() {
+    return menu.querySelectorAll('a[href], button:not([disabled])');
+  }
+  function isOpen() { return !menu.classList.contains('hidden'); }
+  function closeMenu() {
+    menu.classList.add('hidden');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.focus();
+  }
+  document.addEventListener('keydown', function(e) {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeMenu(); return; }
+    if (e.key === 'Tab') {
+      var f = focusables();
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+  document.addEventListener('click', function(e) {
+    if (!isOpen()) return;
+    if (menu.contains(e.target) || toggle.contains(e.target)) return;
+    closeMenu();
+  });
+})();
+</script>

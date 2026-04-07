@@ -6,7 +6,7 @@
 ?>
 <footer class="bg-brand text-white py-12 pb-24 md:pb-12">
   <div class="container mx-auto px-4">
-    <div class="grid md:grid-cols-4 gap-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
       <div>
         <h3 class="text-xl font-bold mb-4" data-t="footContact">Contact Information</h3>
         <div class="space-y-2 text-gray-200">

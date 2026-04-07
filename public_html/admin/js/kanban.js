@@ -25,6 +25,7 @@ var COLUMNS = [
 ];
 
 var kanbanActive = false;
+var autoRefreshInterval = null;
 
 function t(key, fallback) {
   return (typeof adminT !== 'undefined' && adminT[currentLang] && adminT[currentLang][key]) || fallback;
@@ -57,7 +58,6 @@ function timeAgo(dateStr) {
 function abbreviateVehicle(year, make, model) {
   var parts = [year, make, model].filter(Boolean);
   if (parts.length === 0) return '-';
-  // Abbreviate long model names
   var str = parts.join(' ');
   if (str.length > 22) {
     str = str.substring(0, 20) + '...';
@@ -68,7 +68,6 @@ function abbreviateVehicle(year, make, model) {
 // ─── Next-action logic ───────────────────────────────────────────────────────
 function getNextAction(ro) {
   var s = ro.status || 'intake';
-  var hasInspection = (ro.inspection_count || 0) > 0;
   var hasEstimate = (ro.estimate_count || 0) > 0;
   var dark = isDark();
 
@@ -99,36 +98,54 @@ function getNextStatus(ro) {
     'completed': 'invoiced'
   };
 
-  // diagnosis only advances if it has an estimate
   if (s === 'diagnosis' && hasEstimate) return 'estimate_pending';
-  if (s === 'diagnosis') return null; // can't advance without estimate
+  if (s === 'diagnosis') return null;
 
   return map[s] || null;
+}
+
+// ─── Update column badge counts without full re-render ──────────────────────
+function updateColumnCounts() {
+  COLUMNS.forEach(function(colDef) {
+    var zone = document.querySelector('[data-drop-zone="' + colDef.key + '"]');
+    if (!zone) return;
+    var count = zone.querySelectorAll('[data-ro-id]').length;
+    var col = zone.closest('[data-status]');
+    if (!col) return;
+    // The count badge is the second span in the header
+    var spans = col.querySelectorAll(':scope > div:first-child span');
+    if (spans.length >= 2) {
+      spans[spans.length - 1].textContent = String(count);
+    }
+  });
 }
 
 // ─── Build a kanban card ─────────────────────────────────────────────────────
 
 function createCard(ro) {
-  var dark = isDark();
-
   var card = document.createElement('div');
   card.setAttribute('draggable', 'true');
   card.setAttribute('data-ro-id', String(ro.id));
   card.setAttribute('data-ro-status', ro.status || 'intake');
-  card.style.cssText =
-    'background:' + (dark ? '#374151' : '#ffffff') + ';' +
-    'border-radius:6px;' +
-    'padding:10px;' +
-    'margin-bottom:8px;' +
-    'cursor:grab;' +
-    'box-shadow:0 1px 3px rgba(0,0,0,0.1);' +
-    'transition:box-shadow 0.15s, transform 0.15s;' +
-    'border:1px solid ' + (dark ? '#4b5563' : '#e5e7eb') + ';';
+  card.setAttribute('role', 'listitem');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-label', (ro.ro_number || 'RO') + ' — ' + ((ro.first_name || '') + ' ' + (ro.last_name || '')).trim());
+  card.className = 'bg-white dark:bg-gray-700 rounded-md p-2.5 mb-2 cursor-grab shadow-sm border border-gray-200 dark:border-gray-600 transition-all duration-150 relative overflow-hidden group';
 
-  // Click → detail (also handled by overlay "Open" button)
+  // Click → detail
   card.addEventListener('click', function() {
     if (typeof viewRoDetail === 'function') {
       viewRoDetail(ro.id);
+    }
+  });
+
+  // Keyboard → Enter/Space opens detail
+  card.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (typeof viewRoDetail === 'function') {
+        viewRoDetail(ro.id);
+      }
     }
   });
 
@@ -136,21 +153,15 @@ function createCard(ro) {
   card.addEventListener('dragstart', function(e) {
     e.dataTransfer.setData('text/plain', String(ro.id));
     e.dataTransfer.effectAllowed = 'move';
-    card.style.opacity = '0.5';
-    card.style.cursor = 'grabbing';
+    card.classList.add('opacity-50');
   });
   card.addEventListener('dragend', function() {
-    card.style.opacity = '1';
-    card.style.cursor = 'grab';
+    card.classList.remove('opacity-50');
   });
 
   // RO number
   var roNum = document.createElement('div');
-  roNum.style.cssText =
-    'font-weight:700;' +
-    'font-size:13px;' +
-    'color:' + (dark ? '#4ade80' : '#15803d') + ';' +
-    'margin-bottom:4px;';
+  roNum.className = 'font-bold text-[13px] text-green-700 dark:text-green-400 mb-1';
   roNum.textContent = ro.ro_number || 'RO-???';
   card.appendChild(roNum);
 
@@ -158,11 +169,7 @@ function createCard(ro) {
   var custName = ((ro.first_name || '') + ' ' + (ro.last_name || '')).trim();
   if (custName) {
     var custEl = document.createElement('div');
-    custEl.style.cssText =
-      'font-size:12px;' +
-      'color:' + (dark ? '#d1d5db' : '#374151') + ';' +
-      'margin-bottom:2px;' +
-      'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+    custEl.className = 'text-xs text-gray-700 dark:text-gray-300 mb-0.5 truncate';
     custEl.textContent = custName;
     card.appendChild(custEl);
   }
@@ -170,24 +177,19 @@ function createCard(ro) {
   // Vehicle
   var vehicle = abbreviateVehicle(ro.vehicle_year, ro.vehicle_make, ro.vehicle_model);
   var vehEl = document.createElement('div');
-  vehEl.style.cssText =
-    'font-size:11px;' +
-    'color:' + (dark ? '#9ca3af' : '#6b7280') + ';' +
-    'margin-bottom:4px;' +
-    'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+  vehEl.className = 'text-[11px] text-gray-500 dark:text-gray-400 mb-1 truncate';
   vehEl.textContent = vehicle;
   card.appendChild(vehEl);
 
   // Active labor indicator
   if (ro.active_labor_count > 0) {
     var laborInd = document.createElement('div');
-    laborInd.style.cssText = 'display:flex;align-items:center;gap:4px;margin-bottom:3px;';
+    laborInd.className = 'flex items-center gap-1 mb-0.5';
     var pulseDot = document.createElement('span');
-    pulseDot.style.cssText = 'width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;';
-    pulseDot.className = 'animate-pulse';
+    pulseDot.className = 'w-1.5 h-1.5 rounded-full bg-green-500 inline-block animate-pulse';
     laborInd.appendChild(pulseDot);
     var laborText = document.createElement('span');
-    laborText.style.cssText = 'font-size:10px;font-weight:600;color:' + (dark ? '#4ade80' : '#16a34a') + ';';
+    laborText.className = 'text-[10px] font-semibold text-green-600 dark:text-green-400';
     laborText.textContent = ro.active_labor_count + ' ' + (ro.active_labor_count === 1 ? 'tech working' : 'techs working');
     laborInd.appendChild(laborText);
     card.appendChild(laborInd);
@@ -195,55 +197,33 @@ function createCard(ro) {
 
   // Bottom row: time + next-action badge
   var bottomRow = document.createElement('div');
-  bottomRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:2px;';
+  bottomRow.className = 'flex justify-between items-center mt-0.5';
 
   var timeEl = document.createElement('div');
-  timeEl.style.cssText =
-    'font-size:10px;' +
-    'color:' + (dark ? '#6b7280' : '#9ca3af') + ';';
+  timeEl.className = 'text-[10px] text-gray-400 dark:text-gray-500';
   timeEl.textContent = timeAgo(ro.updated_at);
   bottomRow.appendChild(timeEl);
 
-  // Next-action indicator
+  // Next-action indicator (dynamic colors require inline style)
   var nextAction = getNextAction(ro);
   if (nextAction) {
     var actionBadge = document.createElement('span');
-    actionBadge.style.cssText =
-      'font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;white-space:nowrap;' +
-      'background:' + nextAction.bg + ';color:' + nextAction.color + ';';
+    actionBadge.className = 'text-[9px] font-semibold px-1.5 py-px rounded whitespace-nowrap';
+    actionBadge.style.background = nextAction.bg;
+    actionBadge.style.color = nextAction.color;
     actionBadge.textContent = nextAction.label;
     bottomRow.appendChild(actionBadge);
   }
   card.appendChild(bottomRow);
 
-  // ─── Hover quick-action overlay ───────────────────────────────────────────
+  // ─── Hover quick-action overlay (uses group-hover) ────────────────────────
   var overlay = document.createElement('div');
-  overlay.style.cssText =
-    'position:absolute;bottom:0;left:0;right:0;' +
-    'display:none;' +
-    'justify-content:center;' +
-    'align-items:center;' +
-    'gap:6px;' +
-    'padding:6px;' +
-    'background:' + (dark ? 'rgba(17,24,39,0.88)' : 'rgba(255,255,255,0.88)') + ';' +
-    'backdrop-filter:blur(2px);' +
-    'border-radius:0 0 6px 6px;' +
-    'border-top:1px solid ' + (dark ? '#374151' : '#e5e7eb') + ';';
+  overlay.className = 'absolute bottom-0 left-0 right-0 hidden group-hover:flex justify-center items-center gap-1.5 p-1.5 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 rounded-b-md bg-white/90 dark:bg-gray-900/90';
 
   // "Open" button
   var openBtn = document.createElement('button');
-  openBtn.style.cssText =
-    'font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;border:none;cursor:pointer;' +
-    'background:' + (dark ? '#374151' : '#e5e7eb') + ';' +
-    'color:' + (dark ? '#d1d5db' : '#374151') + ';' +
-    'transition:background 0.15s;';
+  openBtn.className = 'text-[11px] font-semibold px-2.5 py-1 rounded border-none cursor-pointer transition-colors duration-150 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 min-h-[28px]';
   openBtn.textContent = t('kanbanOpen', 'Open');
-  openBtn.addEventListener('mouseenter', function() {
-    openBtn.style.background = dark ? '#4b5563' : '#d1d5db';
-  });
-  openBtn.addEventListener('mouseleave', function() {
-    openBtn.style.background = dark ? '#374151' : '#e5e7eb';
-  });
   openBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     if (typeof viewRoDetail === 'function') {
@@ -256,21 +236,12 @@ function createCard(ro) {
   var nextStatus = getNextStatus(ro);
   if (nextStatus && nextAction) {
     var nextBtn = document.createElement('button');
-    nextBtn.style.cssText =
-      'font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;border:none;cursor:pointer;' +
-      'background:' + nextAction.color + ';' +
-      'color:#ffffff;' +
-      'transition:opacity 0.15s;';
+    nextBtn.className = 'text-[11px] font-semibold px-2.5 py-1 rounded border-none cursor-pointer transition-opacity duration-150 text-white hover:opacity-85 min-h-[28px]';
+    nextBtn.style.background = nextAction.color;
     var friendlyNext = nextStatus.replace(/_/g, ' ');
     friendlyNext = friendlyNext.charAt(0).toUpperCase() + friendlyNext.slice(1);
     nextBtn.textContent = t('kanbanNext', 'Next') + ' \u2192';
     nextBtn.title = friendlyNext;
-    nextBtn.addEventListener('mouseenter', function() {
-      nextBtn.style.opacity = '0.85';
-    });
-    nextBtn.addEventListener('mouseleave', function() {
-      nextBtn.style.opacity = '1';
-    });
     nextBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       handleStatusDrop(ro.id, nextStatus);
@@ -278,22 +249,7 @@ function createCard(ro) {
     overlay.appendChild(nextBtn);
   }
 
-  // Card needs position:relative for the overlay
-  card.style.position = 'relative';
-  card.style.overflow = 'hidden';
   card.appendChild(overlay);
-
-  // Show/hide overlay on hover
-  card.addEventListener('mouseenter', function() {
-    overlay.style.display = 'flex';
-    card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-    card.style.transform = 'translateY(-1px)';
-  });
-  card.addEventListener('mouseleave', function() {
-    overlay.style.display = 'none';
-    card.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-    card.style.transform = 'translateY(0)';
-  });
 
   return card;
 }
@@ -301,38 +257,19 @@ function createCard(ro) {
 // ─── Build a kanban column ───────────────────────────────────────────────────
 
 function createColumn(colDef, cards) {
-  var dark = isDark();
-
   var col = document.createElement('div');
   col.setAttribute('data-status', colDef.key);
-  col.style.cssText =
-    'min-width:180px;' +
-    'max-width:220px;' +
-    'flex:1 0 180px;' +
-    'background:' + (dark ? '#1f2937' : '#f9fafb') + ';' +
-    'border-radius:8px;' +
-    'padding:8px;' +
-    'display:flex;' +
-    'flex-direction:column;' +
-    'border-top:3px solid ' + colDef.color + ';' +
-    'transition:border-color 0.2s, box-shadow 0.2s;';
+  col.setAttribute('role', 'region');
+  col.setAttribute('aria-label', colDef.label + ' column');
+  col.className = 'min-w-[180px] max-w-[220px] flex-[1_0_180px] bg-gray-50 dark:bg-gray-800 rounded-lg p-2 flex flex-col transition-all duration-200';
+  col.style.borderTop = '3px solid ' + colDef.color;
 
   // Header
   var header = document.createElement('div');
-  header.style.cssText =
-    'display:flex;' +
-    'align-items:center;' +
-    'justify-content:space-between;' +
-    'margin-bottom:8px;' +
-    'padding:4px 2px;';
+  header.className = 'flex items-center justify-between mb-2 px-0.5 py-1';
 
   var label = document.createElement('span');
-  label.style.cssText =
-    'font-size:12px;' +
-    'font-weight:700;' +
-    'color:' + (dark ? '#e5e7eb' : '#374151') + ';' +
-    'text-transform:uppercase;' +
-    'letter-spacing:0.5px;';
+  label.className = 'text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wide';
   var labelKeys = {
     intake: 'roStatusIntake',
     check_in: 'roStatusCheckIn',
@@ -350,18 +287,8 @@ function createColumn(colDef, cards) {
   label.textContent = t(labelKeys[colDef.key], colDef.label);
 
   var badge = document.createElement('span');
-  badge.style.cssText =
-    'font-size:11px;' +
-    'font-weight:700;' +
-    'color:' + (dark ? '#d1d5db' : '#ffffff') + ';' +
-    'background:' + colDef.color + ';' +
-    'border-radius:9999px;' +
-    'min-width:20px;' +
-    'height:20px;' +
-    'display:inline-flex;' +
-    'align-items:center;' +
-    'justify-content:center;' +
-    'padding:0 6px;';
+  badge.className = 'text-[11px] font-bold text-white rounded-full min-w-[20px] h-5 inline-flex items-center justify-center px-1.5';
+  badge.style.background = colDef.color;
   badge.textContent = String(cards.length);
 
   header.appendChild(label);
@@ -371,11 +298,9 @@ function createColumn(colDef, cards) {
   // Card list (scrollable)
   var cardList = document.createElement('div');
   cardList.setAttribute('data-drop-zone', colDef.key);
-  cardList.style.cssText =
-    'flex:1;' +
-    'overflow-y:auto;' +
-    'min-height:60px;' +
-    'padding:2px;';
+  cardList.setAttribute('role', 'list');
+  cardList.setAttribute('aria-label', colDef.label + ' orders');
+  cardList.className = 'flex-1 overflow-y-auto min-h-[60px] p-0.5';
 
   cards.forEach(function(ro) {
     cardList.appendChild(createCard(ro));
@@ -384,11 +309,7 @@ function createColumn(colDef, cards) {
   // Empty state
   if (cards.length === 0) {
     var empty = document.createElement('div');
-    empty.style.cssText =
-      'text-align:center;' +
-      'padding:16px 8px;' +
-      'font-size:11px;' +
-      'color:' + (dark ? '#4b5563' : '#d1d5db') + ';';
+    empty.className = 'text-center py-4 px-2 text-[11px] text-gray-300 dark:text-gray-600';
     empty.textContent = t('kanbanNoOrders', 'No orders');
     cardList.appendChild(empty);
   }
@@ -400,21 +321,20 @@ function createColumn(colDef, cards) {
   col.addEventListener('dragover', function(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    col.style.boxShadow = '0 0 0 2px ' + colDef.color;
-    col.style.background = dark ? '#283548' : '#f0fdf4';
+    col.classList.add('ring-2', 'ring-offset-0');
+    col.style.setProperty('--tw-ring-color', colDef.color);
   });
 
   col.addEventListener('dragleave', function(e) {
-    // Only fire when actually leaving the column (not entering a child)
     if (col.contains(e.relatedTarget)) return;
-    col.style.boxShadow = 'none';
-    col.style.background = dark ? '#1f2937' : '#f9fafb';
+    col.classList.remove('ring-2', 'ring-offset-0');
+    col.style.removeProperty('--tw-ring-color');
   });
 
   col.addEventListener('drop', function(e) {
     e.preventDefault();
-    col.style.boxShadow = 'none';
-    col.style.background = dark ? '#1f2937' : '#f9fafb';
+    col.classList.remove('ring-2', 'ring-offset-0');
+    col.style.removeProperty('--tw-ring-color');
 
     var roId = e.dataTransfer.getData('text/plain');
     if (!roId) return;
@@ -427,8 +347,20 @@ function createColumn(colDef, cards) {
 
     if (oldStatus === newStatus) return;
 
-    // Update via API
-    handleStatusDrop(parseInt(roId, 10), newStatus);
+    // Optimistic update: move card DOM immediately
+    if (draggedCard) {
+      draggedCard.setAttribute('data-ro-status', newStatus);
+      cardList.appendChild(draggedCard);
+      // Remove empty state from target if present
+      var emptyEl = cardList.querySelector('.text-center.py-4');
+      if (emptyEl && cardList.querySelectorAll('[data-ro-id]').length > 0) {
+        emptyEl.remove();
+      }
+      updateColumnCounts();
+    }
+
+    // Update via API (rollback on failure)
+    handleStatusDrop(parseInt(roId, 10), newStatus, draggedCard, oldStatus);
   });
 
   return col;
@@ -436,7 +368,7 @@ function createColumn(colDef, cards) {
 
 // ─── Handle drag-and-drop status change ──────────────────────────────────────
 
-async function handleStatusDrop(roId, newStatus) {
+async function handleStatusDrop(roId, newStatus, card, oldStatus) {
   try {
     await api('repair-orders.php', {
       method: 'PUT',
@@ -444,47 +376,145 @@ async function handleStatusDrop(roId, newStatus) {
     });
     var friendlyStatus = newStatus.replace(/_/g, ' ');
     showToast(t('roMovedTo', 'Moved to') + ' ' + friendlyStatus.charAt(0).toUpperCase() + friendlyStatus.slice(1));
-    // Reload the kanban board
-    loadKanban();
-    // Also refresh the table data in the background so switching views stays in sync
+    // Refresh table data in background so switching views stays in sync
     if (typeof loadRepairOrders === 'function') {
       loadRepairOrders();
     }
   } catch (err) {
     showToast(t('kanbanFailedUpdate', 'Failed to update status') + ': ' + (err.message || 'Unknown error'), true);
+    // Rollback: move card back to original column
+    if (card && oldStatus) {
+      card.setAttribute('data-ro-status', oldStatus);
+      var origZone = document.querySelector('[data-drop-zone="' + oldStatus + '"]');
+      if (origZone) {
+        origZone.appendChild(card);
+        updateColumnCounts();
+      }
+    }
   }
 }
 
 // ─── Render the kanban board ─────────────────────────────────────────────────
 
-function renderKanban(orders) {
+var _lastOrders = [];
+
+function isMobileView() {
+  return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 640px)').matches;
+}
+
+// MOBILE_LIST_VIEW
+// Below the sm breakpoint we render a stacked single-column list with a
+// <select> per card for status changes. Drag-and-drop stays desktop-only.
+function renderMobileList(orders) {
   var container = document.getElementById('ro-kanban-view');
   if (!container) return;
   container.textContent = '';
 
-  var dark = isDark();
+  var list = document.createElement('div');
+  list.className = 'flex flex-col gap-3 py-4';
+
+  if (!orders || orders.length === 0) {
+    var empty = document.createElement('div');
+    empty.className = 'text-center text-gray-500 dark:text-gray-400 py-8';
+    empty.textContent = t('kanbanNoOrders', 'No repair orders');
+    list.appendChild(empty);
+    container.appendChild(list);
+    return;
+  }
+
+  orders.forEach(function(ro) {
+    var card = document.createElement('div');
+    card.className = 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm';
+
+    var header = document.createElement('div');
+    header.className = 'flex items-start justify-between gap-2 mb-2';
+
+    var titleBtn = document.createElement('button');
+    titleBtn.className = 'text-left font-semibold text-brand dark:text-green-400 underline min-h-[44px] flex-1';
+    titleBtn.textContent = (ro.ro_number || '#' + ro.id);
+    titleBtn.addEventListener('click', function() {
+      if (typeof viewRoDetail === 'function') viewRoDetail(ro.id);
+    });
+    header.appendChild(titleBtn);
+
+    var ago = document.createElement('span');
+    ago.className = 'text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap';
+    ago.textContent = timeAgo(ro.updated_at || ro.created_at);
+    header.appendChild(ago);
+
+    card.appendChild(header);
+
+    var meta = document.createElement('div');
+    meta.className = 'text-sm text-gray-700 dark:text-gray-300 mb-1';
+    meta.textContent = (ro.customer_name || '') + ' — ' + abbreviateVehicle(ro.vehicle_year, ro.vehicle_make, ro.vehicle_model);
+    card.appendChild(meta);
+
+    if (ro.customer_concern) {
+      var concern = document.createElement('div');
+      concern.className = 'text-xs text-gray-500 dark:text-gray-400 mb-3 line-clamp-2';
+      concern.textContent = ro.customer_concern;
+      card.appendChild(concern);
+    }
+
+    var label = document.createElement('label');
+    label.className = 'block text-xs text-gray-500 dark:text-gray-400 mb-1';
+    label.textContent = t('kanbanStatus', 'Status');
+    card.appendChild(label);
+
+    var sel = document.createElement('select');
+    sel.className = 'w-full min-h-[44px] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100';
+    COLUMNS.forEach(function(col) {
+      var opt = document.createElement('option');
+      opt.value = col.key;
+      opt.textContent = col.label;
+      if ((ro.status || 'intake') === col.key) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    var currentStatus = ro.status || 'intake';
+    sel.addEventListener('change', function() {
+      var newStatus = sel.value;
+      if (newStatus === currentStatus) return;
+      handleStatusDrop(ro.id, newStatus, null, currentStatus).then(function() {
+        currentStatus = newStatus;
+        ro.status = newStatus;
+      }).catch(function() {
+        sel.value = currentStatus;
+      });
+    });
+    card.appendChild(sel);
+
+    list.appendChild(card);
+  });
+
+  container.appendChild(list);
+}
+
+function renderKanban(orders) {
+  _lastOrders = orders || [];
+  var container = document.getElementById('ro-kanban-view');
+  if (!container) return;
+
+  if (isMobileView()) {
+    renderMobileList(_lastOrders);
+    return;
+  }
+
+  container.textContent = '';
 
   // Board wrapper
   var board = document.createElement('div');
-  board.style.cssText =
-    'display:flex;' +
-    'gap:12px;' +
-    'overflow-x:auto;' +
-    'padding:16px 0;' +
-    'min-height:400px;' +
-    '-webkit-overflow-scrolling:touch;';
+  board.className = 'flex gap-3 overflow-x-auto py-4 min-h-[400px] touch-pan-x';
 
   // Group orders by status
   var buckets = {};
   COLUMNS.forEach(function(col) {
     buckets[col.key] = [];
   });
-  orders.forEach(function(ro) {
+  _lastOrders.forEach(function(ro) {
     var status = ro.status || 'intake';
     if (buckets[status]) {
       buckets[status].push(ro);
     }
-    // Skip cancelled — they don't have a column
   });
 
   // Build columns
@@ -495,25 +525,40 @@ function renderKanban(orders) {
   container.appendChild(board);
 }
 
+// Re-render on breakpoint change (debounced)
+(function() {
+  var rerenderTimer = null;
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', function() {
+      if (rerenderTimer) clearTimeout(rerenderTimer);
+      rerenderTimer = setTimeout(function() {
+        var container = document.getElementById('ro-kanban-view');
+        if (container && container.style.display !== 'none' && _lastOrders.length) {
+          renderKanban(_lastOrders);
+        }
+      }, 200);
+    });
+  }
+})();
+
 // ─── loadKanban (exposed globally) ───────────────────────────────────────────
 
 window.loadKanban = async function() {
   var container = document.getElementById('ro-kanban-view');
   if (!container) return;
 
-  // Show loading state
+  // Show loading skeleton
   container.textContent = '';
-  var loadingMsg = document.createElement('div');
-  loadingMsg.style.cssText =
-    'text-align:center;' +
-    'padding:40px;' +
-    'color:' + (isDark() ? '#9ca3af' : '#6b7280') + ';' +
-    'font-size:14px;';
-  loadingMsg.textContent = t('kanbanLoading', 'Loading kanban board...');
-  container.appendChild(loadingMsg);
+  var skeleton = document.createElement('div');
+  skeleton.className = 'flex gap-3 py-4';
+  for (var i = 0; i < 6; i++) {
+    var shimmer = document.createElement('div');
+    shimmer.className = 'skeleton min-w-[180px] h-[300px] rounded-lg';
+    skeleton.appendChild(shimmer);
+  }
+  container.appendChild(skeleton);
 
   try {
-    // Fetch all non-cancelled ROs (up to 100)
     var params = new URLSearchParams({
       limit: 100,
       offset: 0,
@@ -533,11 +578,7 @@ window.loadKanban = async function() {
   } catch (err) {
     container.textContent = '';
     var errMsg = document.createElement('div');
-    errMsg.style.cssText =
-      'text-align:center;' +
-      'padding:40px;' +
-      'color:#ef4444;' +
-      'font-size:14px;';
+    errMsg.className = 'text-center py-10 text-sm text-red-500';
     errMsg.textContent = t('kanbanFailedLoad', 'Failed to load kanban') + ': ' + (err.message || 'Unknown error');
     container.appendChild(errMsg);
     console.error('loadKanban error:', err);
@@ -556,7 +597,6 @@ window.toggleKanbanView = function() {
   kanbanActive = !kanbanActive;
 
   if (kanbanActive) {
-    // Show kanban, hide table
     tableView.style.display = 'none';
     kanbanView.style.display = 'block';
     if (toggleBtn) {
@@ -565,8 +605,8 @@ window.toggleKanbanView = function() {
       toggleBtn.appendChild(tableIcon);
     }
     loadKanban();
+    startAutoRefresh();
   } else {
-    // Show table, hide kanban
     tableView.style.display = '';
     kanbanView.style.display = 'none';
     if (toggleBtn) {
@@ -574,55 +614,76 @@ window.toggleKanbanView = function() {
       var kanbanIcon = document.createTextNode(t('kanbanView', 'Kanban View'));
       toggleBtn.appendChild(kanbanIcon);
     }
+    stopAutoRefresh();
   }
 };
+
+// ─── Auto-refresh when kanban is visible ─────────────────────────────────────
+
+function startAutoRefresh() {
+  stopAutoRefresh();
+  autoRefreshInterval = setInterval(function() {
+    if (document.visibilityState === 'visible' && kanbanActive) {
+      loadKanban();
+    }
+  }, 60000);
+}
+
+function stopAutoRefresh() {
+  if (autoRefreshInterval) {
+    clearInterval(autoRefreshInterval);
+    autoRefreshInterval = null;
+  }
+}
+
+// Stop auto-refresh when page is hidden
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      stopAutoRefresh();
+    } else if (kanbanActive) {
+      startAutoRefresh();
+    }
+  });
+}
 
 // ─── Inject the toggle button and kanban container into the DOM ──────────────
 
 function injectKanbanElements() {
-  // Find the RO tab's existing container
   var roTab = document.getElementById('tab-repairorders');
   if (!roTab) return;
 
-  // Find the header area to add the toggle button
   var headerDiv = roTab.querySelector('.bg-brand-light');
   if (headerDiv) {
     var btnContainer = headerDiv.querySelector('.flex.items-center.gap-3');
     if (btnContainer) {
-      // Check if button already exists
       if (!document.getElementById('ro-view-toggle')) {
         var toggleBtn = document.createElement('button');
         toggleBtn.id = 'ro-view-toggle';
-        toggleBtn.className = 'bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 flex items-center gap-1';
+        toggleBtn.className = 'bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 flex items-center gap-1 min-h-[44px]';
         toggleBtn.textContent = t('kanbanView', 'Kanban View');
         toggleBtn.addEventListener('click', function() {
           toggleKanbanView();
         });
-        // Insert as the first button
         btnContainer.insertBefore(toggleBtn, btnContainer.firstChild);
       }
     }
   }
 
-  // Wrap existing table + pagination in a container div if not already done
   var contentArea = roTab.querySelector('.bg-white.rounded-b-xl, .dark\\:bg-gray-800.rounded-b-xl');
   if (!contentArea) {
-    // Fallback: find by structure
     var allDivs = roTab.querySelectorAll(':scope > div');
     if (allDivs.length >= 2) contentArea = allDivs[1];
   }
   if (!contentArea) return;
 
   if (!document.getElementById('ro-table-view')) {
-    // Find the overflow-x-auto div (table wrapper) and pagination
     var tableWrapper = contentArea.querySelector('.overflow-x-auto');
     var pagination   = document.getElementById('ro-pagination');
 
     if (tableWrapper) {
       var tableViewDiv = document.createElement('div');
       tableViewDiv.id = 'ro-table-view';
-
-      // Move table wrapper and pagination into the new container
       tableWrapper.parentNode.insertBefore(tableViewDiv, tableWrapper);
       tableViewDiv.appendChild(tableWrapper);
       if (pagination) {
@@ -631,7 +692,6 @@ function injectKanbanElements() {
     }
   }
 
-  // Create kanban container if not present
   if (!document.getElementById('ro-kanban-view')) {
     var kanbanDiv = document.createElement('div');
     kanbanDiv.id = 'ro-kanban-view';

@@ -377,6 +377,7 @@
   <script src="/admin/js/shop-performance.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen dark:bg-gray-900 dark:text-gray-100">
+<a href="#admin-dashboard" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[9999] focus:bg-white focus:text-green-700 focus:px-4 focus:py-2 focus:rounded focus:shadow-lg focus:text-sm focus:font-semibold">Skip to main content</a>
 
 
 <div id="toast-container" class="toast-container"></div>
@@ -625,7 +626,7 @@
       <div id="overview-alerts" class="mb-6 space-y-3"></div>
 
       <!-- Hero Stats: Action Required + Today (large, prominent) -->
-      <div class="grid md:grid-cols-2 gap-4 mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div onclick="showOverdueAppointments()" class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-red-500 dark:bg-gray-800 cursor-pointer hover:shadow-lg transition-all group" id="stat-card-action">
           <div class="flex items-center justify-between">
             <div>
@@ -649,7 +650,7 @@
       </div>
 
       <!-- Secondary Stats Row -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <div onclick="switchTab('appointments')" class="bg-white rounded-xl shadow-sm p-4 dark:bg-gray-800 cursor-pointer hover:shadow-md transition-all border border-transparent hover:border-blue-200 dark:hover:border-blue-800">
           <div class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide" data-t="thisWeek">This Week</div>
           <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1" id="stat-week">0</div>
@@ -690,7 +691,7 @@
       </div>
 
       <!-- Schedule: Upcoming + Employee side by side -->
-      <div class="grid lg:grid-cols-2 gap-6 mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6">
           <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="upcomingSchedule">Upcoming Schedule</h3>
           <div id="overview-upcoming" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin"></div>
@@ -753,7 +754,7 @@
 
         <!-- Calendar View -->
         <div id="appt-subtab-calendar" class="p-6">
-          <div class="grid lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Mini Calendar -->
             <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border">
               <div class="flex justify-between items-center mb-4">
@@ -761,7 +762,7 @@
                 <h3 class="font-bold text-brand dark:text-green-400" id="cal-month-label"></h3>
                 <button onclick="calNavMonth(1)" class="px-3 py-1 border rounded hover:bg-gray-100 bg-white">▶</button>
               </div>
-              <div id="cal-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+              <div id="cal-grid" class="grid grid-cols-1 sm:grid-cols-7 gap-1 text-center text-sm"></div>
               <!-- Legend -->
               <div class="mt-4 pt-3 border-t text-xs text-gray-500 dark:text-gray-400 space-y-1">
                 <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-green-100 border-2 border-green-500"></div> <span data-t="apptCalHasAppts">Has appointments</span></div>
@@ -1024,7 +1025,7 @@
         <!-- Add Employee Form -->
         <div id="add-employee-form" class="hidden mb-6 p-4 border rounded-lg bg-gray-50 dark:bg-gray-700">
           <h4 class="font-medium mb-3" data-t="addNewEmployee">Add New Employee</h4>
-          <div class="grid md:grid-cols-4 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="nameRequired">Name *</label><input id="new-emp-name" class="w-full p-2 border rounded mt-1" data-t="empNamePlaceholder" placeholder="Employee name"></div>
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="emailLabel2">Email</label><input id="new-emp-email" type="email" class="w-full p-2 border rounded mt-1" data-t="empEmailPlaceholder" placeholder="email@example.com"></div>
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="phone">Phone</label><input id="new-emp-phone" class="w-full p-2 border rounded mt-1" data-t="empPhonePlaceholder" placeholder="(555) 123-4567"></div>
@@ -1038,7 +1039,7 @@
         <!-- Add Admin Form -->
         <div id="add-admin-form" class="hidden mb-6 p-4 border rounded-lg bg-blue-50 dark:bg-blue-900/30">
           <h4 class="font-medium mb-3" data-t="createAdminAccount">Create Admin Account</h4>
-          <div class="grid md:grid-cols-2 gap-3 mb-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="empEmailLabel">Email Address *</label><input id="new-admin-email" type="email" class="w-full p-2 border rounded mt-1" placeholder="admin@company.com"></div>
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="empDisplayName">Display Name *</label><input id="new-admin-name" class="w-full p-2 border rounded mt-1" placeholder="Full name"></div>
             <div><label class="text-sm font-medium dark:text-gray-300" data-t="empRoleLabel">Role</label>
@@ -1123,11 +1124,11 @@
                 <input type="file" id="gallery-file" accept="image/*" multiple class="w-full p-2 border rounded mt-1">
               </div>
               <div id="gallery-compression-info" class="text-xs text-gray-500 dark:text-gray-400 hidden"><span id="compression-details"></span></div>
-              <div class="grid md:grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div><label class="text-sm font-medium dark:text-gray-300" data-t="galleryTitleEn">Title (EN)</label><input id="gallery-title-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="galleryTitleEnPh" placeholder="Image title in English"></div>
                 <div><label class="text-sm font-medium dark:text-gray-300" data-t="galleryTitleEs">Title (ES)</label><input id="gallery-title-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="galleryTitleEsPh" placeholder="Titulo de la imagen en Español"></div>
               </div>
-              <div class="grid md:grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div><label class="text-sm font-medium dark:text-gray-300" data-t="galleryDescEn">Description (EN)</label><textarea id="gallery-desc-en" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="galleryDescEnPh" placeholder="Image description"></textarea></div>
                 <div><label class="text-sm font-medium dark:text-gray-300" data-t="galleryDescEs">Description (ES)</label><textarea id="gallery-desc-es" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="galleryDescEsPh" placeholder="Descripcion de la imagen"></textarea></div>
               </div>
@@ -1142,7 +1143,7 @@
         </div>
         <div id="gal-subtab-serviceimgs" class="hidden">
           <div class="flex justify-between items-center mb-4"><div><h2 class="text-2xl font-bold text-brand dark:text-green-400" data-t="svcImagesTitle">Service Images Manager</h2><p class="text-gray-600 dark:text-gray-400 mt-1" data-t="svcImagesDesc">Manage the hero background and 7 service images displayed on the home page</p></div></div>
-          <div id="service-images-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+          <div id="service-images-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
       </div>
     </div>
@@ -1208,7 +1209,7 @@
               <input id="blog-slug" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" data-t="blogSlugPlaceholder" placeholder="auto-generated-from-title">
             </div>
             <!-- Excerpt EN / ES -->
-            <div class="grid md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="text-sm font-medium dark:text-gray-300" data-t="blogExcerptEn">Excerpt (EN)</label>
                 <textarea id="blog-excerpt-en" rows="2" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" data-t="blogExcerptEnPh" placeholder="Short description for cards"></textarea>
@@ -1229,7 +1230,7 @@
               <textarea id="blog-body-es" rows="8" class="w-full p-2 border rounded-lg mt-1 font-mono text-sm dark:bg-gray-700 dark:border-gray-600" data-t="blogBodyEsPh" placeholder="<h2>Title</h2><p>Content...</p>"></textarea>
             </div>
             <!-- Featured Image + Author + Status -->
-            <div class="grid md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="text-sm font-medium dark:text-gray-300" data-t="blogFeaturedImage">Featured Image URL</label>
                 <input id="blog-image" class="w-full p-2 border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600" data-t="blogImagePh" placeholder="/uploads/blog/image.jpg">
@@ -1274,7 +1275,7 @@
         <!-- Inline form (hidden by default) -->
         <div id="promotion-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
           <h4 id="promo-form-title" class="font-bold text-lg mb-4 dark:text-gray-200" data-t="promoNewPromo">New Promotion</h4>
-          <div class="grid md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="text-sm font-medium dark:text-gray-300" data-t="promoLabelTitleEn">Title (EN) *</label>
               <input id="promo-title-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Spring Tire Sale..." oninput="updatePromoPreview()">
@@ -1321,7 +1322,7 @@
               <input id="promo-badge-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="OFERTA DE PRIMAVERA">
             </div>
             <!-- Exit-Intent Popup Fields (hidden by default) -->
-            <div id="exit-intent-fields" class="hidden md:col-span-2 grid md:grid-cols-2 gap-4 p-4 border rounded-lg bg-amber-50 dark:bg-gray-600 dark:border-gray-500">
+            <div id="exit-intent-fields" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-amber-50 dark:bg-gray-600 dark:border-gray-500">
               <div class="md:col-span-2">
                 <span class="text-xs font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wide" data-t="promoExitIntentSection">Exit-Intent Popup Fields</span>
               </div>
@@ -1480,7 +1481,7 @@
         <!-- Inline form (hidden by default) -->
         <div id="faq-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
           <h4 id="faq-form-title" class="font-bold text-lg mb-4 dark:text-gray-200" data-t="faqFormTitle">New FAQ</h4>
-          <div class="grid md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="text-sm font-medium dark:text-gray-300" data-t="faqQuestionEnLabel">Question (EN) *</label>
               <input id="faq-question-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="faqQuestionEnPh" placeholder="Question in English">
@@ -1564,7 +1565,7 @@
         <!-- Inline form (hidden by default) -->
         <div id="review-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
           <h4 id="review-form-title" class="font-bold text-lg mb-4 dark:text-gray-200" data-t="reviewFormTitle">New Review</h4>
-          <div class="grid md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="text-sm font-medium dark:text-gray-300" data-t="reviewCustName">Customer Name *</label>
               <input id="review-name" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" data-t="reviewCustPh" placeholder="Customer name">
@@ -2145,7 +2146,7 @@
 
 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Paquetes de Permisos</h3>
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Cada grupo tiene uno o m&aacute;s <strong class="font-semibold text-gray-800 dark:text-gray-200">paquetes de permisos</strong>. Cada paquete otorga acceso a un conjunto de pesta&ntilde;as:</p>
-<table class="w-full border-collapse mb-6">
+<div class="overflow-x-auto -mx-4 sm:mx-0"><table class="w-full border-collapse mb-6">
   <thead><tr><th class="bg-gray-50 dark:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-left">Paquete</th><th class="bg-gray-50 dark:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-left">Pesta&ntilde;as Otorgadas</th></tr></thead>
   <tbody>
     <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Operaciones del Taller</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Citas, &Oacute;rdenes de Reparaci&oacute;n, Facturas, Cola de Espera, En Espera, Cotizaciones, Servicios, Seguimiento de Visitas</td></tr>
@@ -2155,7 +2156,7 @@
     <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Marketing y Contenido</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Blog, Promociones, Preguntas Frecuentes, Rese&ntilde;as, Galer&iacute;a, Suscriptores, Lealtad y Recompensas, Referidos, Recordatorios de Servicio</td></tr>
     <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Configuraci&oacute;n y An&aacute;lisis</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Anal&iacute;ticas, Contenido del Sitio, Documentaci&oacute;n</td></tr>
   </tbody>
-</table>
+</table></div>
 
 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Grupos Predeterminados</h3>
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">El sistema incluye 4 grupos integrados que no se pueden eliminar:</p>
@@ -2564,7 +2565,7 @@
 
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">There are 8 image slots, each controlling a specific part of the website:</p>
 
-<table class="w-full border-collapse mb-6">
+<div class="overflow-x-auto -mx-4 sm:mx-0"><table class="w-full border-collapse mb-6">
   <thead>
     <tr>
       <th class="bg-gray-50 dark:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-left">Slot Name</th>
@@ -2605,7 +2606,7 @@
       <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">The specialized tools section image</td>
     </tr>
   </tbody>
-</table>
+</table></div>
 
 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Uploading a New Service Image</h3>
 
@@ -3162,7 +3163,7 @@
 
 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Permission Bundles</h3>
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">Each group is assigned one or more <strong class="font-semibold text-gray-800 dark:text-gray-200">permission bundles</strong>. Each bundle grants access to a set of tabs:</p>
-<table class="w-full border-collapse mb-6">
+<div class="overflow-x-auto -mx-4 sm:mx-0"><table class="w-full border-collapse mb-6">
   <thead>
     <tr>
       <th class="bg-gray-50 dark:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-left">Bundle</th>
@@ -3177,7 +3178,7 @@
     <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Marketing &amp; Content</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Blog, Promotions, FAQ, Reviews, Gallery, Subscribers, Loyalty &amp; Rewards, Referrals, Service Reminders</td></tr>
     <tr><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400"><strong class="font-semibold text-gray-800 dark:text-gray-200">Settings &amp; Analytics</strong></td><td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Analytics, Site Content, Docs</td></tr>
   </tbody>
-</table>
+</table></div>
 
 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Built-In Groups</h3>
 <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">The system comes with 4 built-in groups that cannot be deleted:</p>
@@ -3212,7 +3213,7 @@
 <!-- Quick Reference: Admin Dashboard Tabs -->
 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">Quick Reference: Admin Dashboard Tabs</h2>
 
-<table class="w-full border-collapse mb-6">
+<div class="overflow-x-auto -mx-4 sm:mx-0"><table class="w-full border-collapse mb-6">
   <thead>
     <tr>
       <th class="bg-gray-50 dark:bg-gray-700 font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-left">Tab</th>
@@ -3309,7 +3310,7 @@
       <td class="border border-gray-200 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">View this instruction manual and platform value overview</td>
     </tr>
   </tbody>
-</table>
+</table></div>
 
 <hr class="border-t border-gray-200 dark:border-gray-600 my-8">
 
@@ -3353,43 +3354,43 @@
 
         <div class="space-y-6">
           <!-- Phone -->
-          <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="settingPhone">Phone Number</label>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-phone-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="(503) 367-9714"></div>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-phone-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="(503) 367-9714"></div>
           </div>
           <!-- Email -->
-          <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="settingEmail">Email Address</label>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-email-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="oregontirespdx@gmail.com"></div>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-email-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="oregontirespdx@gmail.com"></div>
           </div>
           <!-- Address -->
-          <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="settingAddress">Address</label>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-address-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="8536 SE 82nd Ave, Portland, OR 97266"></div>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-address-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="8536 SE 82nd Ave, Portland, OR 97266"></div>
           </div>
           <!-- Hours Weekday -->
-          <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="settingHoursWeekday">Weekday Hours</label>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-hours_weekday-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Mon-Sat 7AM-7PM"></div>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-hours_weekday-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Lun-Sab 7AM-7PM"></div>
           </div>
           <!-- Hours Sunday -->
-          <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="settingHoursSunday">Sunday Hours</label>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-hours_sunday-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Sunday: Closed"></div>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-hours_sunday-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Domingo: Cerrado"></div>
           </div>
           <!-- Rating Value -->
-          <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="settingRatingValue">Rating Value</label>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-rating_value-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="4.8"></div>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-rating_value-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="4.8"></div>
           </div>
           <!-- Review Count -->
-          <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="settingReviewCount">Review Count</label>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-review_count-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="150+"></div>
             <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-review_count-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="150+"></div>
@@ -3401,52 +3402,52 @@
           <h4 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4">Pricing</h4>
           <p class="text-xs text-gray-400 dark:text-gray-500 mb-4">Displayed on the homepage pricing section. Use "From $XX" format.</p>
           <div class="space-y-4">
-            <div class="grid md:grid-cols-3 gap-4 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Tire Installation</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_tire_install-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="From $20"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_tire_install-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Desde $20"></div>
             </div>
-            <div class="grid md:grid-cols-3 gap-4 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Tire Repair</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_tire_repair-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="From $15"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_tire_repair-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Desde $15"></div>
             </div>
-            <div class="grid md:grid-cols-3 gap-4 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Oil Change</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_oil_change-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="From $35"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_oil_change-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Desde $35"></div>
             </div>
-            <div class="grid md:grid-cols-3 gap-4 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Brake Service</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_brake_service-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="From $100"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_brake_service-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Desde $100"></div>
             </div>
-            <div class="grid md:grid-cols-3 gap-4 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Alignment</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_alignment-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="From $75"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_alignment-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Desde $75"></div>
             </div>
-            <div class="grid md:grid-cols-3 gap-4 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Tuneup</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_tuneup-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="From $80"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_tuneup-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Desde $80"></div>
             </div>
-            <div class="grid md:grid-cols-3 gap-4 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Inspection</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_inspection-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="From $50"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_inspection-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Desde $50"></div>
             </div>
-            <div class="grid md:grid-cols-3 gap-4 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Suspension Repair</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_suspension-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="From $150"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_suspension-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Desde $150"></div>
             </div>
-            <div class="grid md:grid-cols-3 gap-4 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Roadside Assistance</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_roadside-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Call for pricing"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_roadside-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Llame para precios"></div>
             </div>
-            <div class="grid md:grid-cols-3 gap-4 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               <label class="font-medium text-sm pt-2 dark:text-gray-300">Care Plan</label>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">EN</label><input id="setting-price_care_plan-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="$19/mo"></div>
               <div><label class="text-xs text-gray-400 dark:text-gray-500">ES</label><input id="setting-price_care_plan-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="$19/mes"></div>
@@ -3457,7 +3458,7 @@
         <!-- Founding Year -->
         <div class="mt-8 border-t pt-6">
           <h4 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4">Business Info</h4>
-          <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300">Founding Year</label>
             <div class="md:col-span-2">
               <input id="setting-founding_year-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600" placeholder="2008" oninput="document.getElementById('setting-founding_year-es').value=this.value">
@@ -3470,7 +3471,7 @@
         <!-- Integrations -->
         <div class="mt-8 border-t pt-6">
           <h4 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4">Integrations</h4>
-          <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300">Google Analytics ID</label>
             <div class="md:col-span-2">
               <input id="setting-google_analytics_id-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 font-mono" placeholder="G-PCK6ZYFHQ0" pattern="^G-[A-Z0-9]{6,12}$" oninput="document.getElementById('setting-google_analytics_id-es').value=this.value">
@@ -3483,7 +3484,7 @@
         <!-- Feature Toggles -->
         <div class="mt-8 border-t pt-6">
           <h4 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4">Feature Toggles</h4>
-          <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <label class="font-medium text-sm pt-2 dark:text-gray-300">App Install Popup</label>
             <div class="md:col-span-2">
               <label class="relative inline-flex items-center cursor-pointer mt-1">
@@ -3498,7 +3499,7 @@
           </div>
 
           <!-- Scarcity Messaging Toggle -->
-          <div class="grid md:grid-cols-3 gap-4 items-start mt-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start mt-4">
             <label class="font-medium text-sm pt-2 dark:text-gray-300">Scarcity Messaging</label>
             <div class="md:col-span-2">
               <label class="relative inline-flex items-center cursor-pointer mt-1">
@@ -3540,27 +3541,27 @@
               <p class="text-xs font-medium text-blue-700 dark:text-blue-300"><span data-t="etplAvailableVars">Available variables:</span> <code>{{name}}</code> <code>{{role}}</code> <code>{{setup_url}}</code> <code>{{expiry_days}}</code> <code>{{email}}</code></p>
             </div>
             <div class="space-y-4">
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplSubjectLine">Subject Line</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><input id="etpl-welcome-subject-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><input id="etpl-welcome-subject-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplGreeting">Greeting</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><input id="etpl-welcome-greeting-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><input id="etpl-welcome-greeting-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplBodyText">Body Text</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><textarea id="etpl-welcome-body-en" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><textarea id="etpl-welcome-body-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplButtonText">Button Text</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><input id="etpl-welcome-button-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><input id="etpl-welcome-button-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplFooterExpiry">Footer / Expiry</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><textarea id="etpl-welcome-footer-en" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><textarea id="etpl-welcome-footer-es" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
@@ -3574,27 +3575,27 @@
               <p class="text-xs font-medium text-amber-700 dark:text-amber-300"><span data-t="etplAvailableVars">Available variables:</span> <code>{{name}}</code> <code>{{setup_url}}</code> <code>{{email}}</code></p>
             </div>
             <div class="space-y-4">
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplSubjectLine">Subject Line</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><input id="etpl-reset-subject-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><input id="etpl-reset-subject-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplGreeting">Greeting</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><input id="etpl-reset-greeting-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><input id="etpl-reset-greeting-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplBodyText">Body Text</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><textarea id="etpl-reset-body-en" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><textarea id="etpl-reset-body-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplButtonText">Button Text</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><input id="etpl-reset-button-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><input id="etpl-reset-button-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplFooterExpiry">Footer / Expiry</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><textarea id="etpl-reset-footer-en" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><textarea id="etpl-reset-footer-es" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
@@ -3608,27 +3609,27 @@
               <p class="text-xs font-medium text-purple-700 dark:text-purple-300"><span data-t="etplAvailableVars">Available variables:</span> <code>{{name}}</code> <code>{{email}}</code> <code>{{message}}</code></p>
             </div>
             <div class="space-y-4">
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplSubjectLine">Subject Line</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><input id="etpl-contact-subject-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><input id="etpl-contact-subject-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplGreeting">Greeting</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><input id="etpl-contact-greeting-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><input id="etpl-contact-greeting-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplBodyText">Body Text</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><textarea id="etpl-contact-body-en" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><textarea id="etpl-contact-body-es" rows="3" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplButtonText">Button Text</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><input id="etpl-contact-button-en" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><input id="etpl-contact-button-es" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></div>
               </div>
-              <div class="grid md:grid-cols-3 gap-4 items-start">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 <label class="font-medium text-sm pt-2 dark:text-gray-300" data-t="etplFooterNote">Footer Note</label>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇺🇸 EN</label><textarea id="etpl-contact-footer-en" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
                 <div><label class="text-xs text-gray-400 dark:text-gray-500">🇲🇽 ES</label><textarea id="etpl-contact-footer-es" rows="2" class="w-full p-2 border rounded mt-1 dark:bg-gray-700 dark:border-gray-600 text-sm"></textarea></div>
@@ -3756,7 +3757,7 @@
         <!-- Service form (hidden by default) -->
         <div id="service-form-panel" class="hidden mb-6 p-5 border rounded-xl bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
           <h4 id="svc-form-title" class="font-bold text-lg mb-4 dark:text-gray-200" data-t="svcFormTitle">New Service</h4>
-          <div class="grid md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="text-sm font-medium dark:text-gray-300" data-t="svcNameEnLabel">Name (EN) *</label>
               <input id="svc-name-en" oninput="autoServiceSlug()" class="w-full p-2 border rounded mt-1 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100" placeholder="Tire Installation">
@@ -3857,7 +3858,7 @@
           </div>
           <!-- FAQ inline form -->
           <div id="service-faq-form" class="hidden mb-4 p-4 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600">
-            <div class="grid md:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label class="text-xs font-medium dark:text-gray-300">Question (EN) *</label>
                 <input id="sfaq-question-en" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
@@ -3996,7 +3997,7 @@
       </div>
 
       <!-- Heatmap + Unassigned -->
-      <div class="grid lg:grid-cols-3 gap-6 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         <div class="lg:col-span-2 bg-white rounded-xl shadow p-6 dark:bg-gray-800">
           <h3 class="text-lg font-bold text-brand dark:text-green-400 mb-4" data-t="rpHourlyHeatmap">Hourly Service Heatmap</h3>
           <div id="rp-heatmap"></div>
@@ -4310,7 +4311,7 @@
             <option value="other">Other</option>
           </select>
         </label>
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <label class="block"><span class="text-sm font-medium text-gray-700 dark:text-gray-300">Date *</span>
             <input type="date" name="appt-date" required class="mt-1 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
           </label>
@@ -4322,7 +4323,7 @@
           </label>
         </div>
       </div>
-      <div class="grid grid-cols-3 sm:grid-cols-3 gap-2 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
         <label class="block"><span class="text-xs text-gray-500 dark:text-gray-400">Year</span>
           <input type="text" name="appt-vehicle-year" maxlength="4" placeholder="2024" class="mt-1 w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
         </label>
@@ -11120,7 +11121,7 @@ function renderEmployeeCard(emp, inactive) {
     + '</div>'
     // Edit mode
     + '<div id="emp-edit-' + emp.id + '" class="hidden">'
-    + '<div class="grid md:grid-cols-4 gap-3 items-end">'
+    + '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 items-end">'
     + '<div><label class="text-xs font-medium dark:text-gray-300">Name *</label><input id="edit-emp-name-' + emp.id + '" value="' + esc(emp.name) + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>'
     + '<div><label class="text-xs font-medium dark:text-gray-300">Email</label><input id="edit-emp-email-' + emp.id + '" value="' + esc(emp.email || '') + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>'
     + '<div><label class="text-xs font-medium dark:text-gray-300">Phone</label><input id="edit-emp-phone-' + emp.id + '" value="' + esc(emp.phone || '') + '" class="w-full p-2 border rounded mt-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></div>'
@@ -15568,7 +15569,7 @@ async function showCustomerHistory(email) {
       return;
     }
 
-    tableDiv.innerHTML = '<table class="w-full text-sm">'
+    tableDiv.innerHTML = '<div class="overflow-x-auto -mx-4 sm:mx-0"><table class="w-full text-sm">'
       + '<thead><tr class="bg-gray-100 dark:bg-gray-700 text-left">'
       + '<th class="p-2">' + (adminT[currentLang].thDateTime || 'Date & Time') + '</th>'
       + '<th class="p-2">' + (adminT[currentLang].thService || 'Service') + '</th>'
@@ -15584,7 +15585,7 @@ async function showCustomerHistory(email) {
             + '<td class="p-2 text-sm">' + esc(empName) + '</td>'
             + '</tr>';
         }).join('')
-      + '</tbody></table>';
+      + '</tbody></table></div>';
   } catch(e) {
     console.error('showCustomerHistory error:', e);
     tableDiv.innerHTML = '<p class="text-center text-red-500 py-4">' + esc(e.message || adminT[currentLang].error || 'Error') + '</p>'
@@ -16095,6 +16096,82 @@ function debounce(fn, ms) {
   }
 })();
 
+// ===== ENHANCEMENT 6c: SKELETON LOADING UTILITY =====
+function showSkeleton(containerId, type) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  var html = '';
+  if (type === 'table') {
+    for (var i = 0; i < 5; i++) html += '<div class="skeleton h-10 mb-2 rounded"></div>';
+  } else if (type === 'cards') {
+    html = '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">';
+    for (var i = 0; i < 6; i++) html += '<div class="skeleton h-32 rounded-xl"></div>';
+    html += '</div>';
+  } else if (type === 'kanban') {
+    html = '<div class="flex gap-3 py-4">';
+    for (var i = 0; i < 6; i++) html += '<div class="skeleton min-w-[180px] h-[300px] rounded-lg"></div>';
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+
+// ===== ENHANCEMENT 6d: FORM VALIDATION UTILITY =====
+function showFieldError(input, message) {
+  if (!input) return;
+  input.classList.add('border-red-500', 'dark:border-red-400');
+  input.setAttribute('aria-invalid', 'true');
+  var errId = (input.id || 'field') + '-error';
+  input.setAttribute('aria-describedby', errId);
+  var existing = input.parentElement ? input.parentElement.querySelector('.field-error') : null;
+  if (existing) { existing.textContent = message; return; }
+  var span = document.createElement('span');
+  span.id = errId;
+  span.className = 'field-error text-xs text-red-500 dark:text-red-400 mt-1 block';
+  span.setAttribute('role', 'alert');
+  span.textContent = message;
+  if (input.parentElement) input.parentElement.appendChild(span);
+}
+
+function clearFieldError(input) {
+  if (!input) return;
+  input.classList.remove('border-red-500', 'dark:border-red-400');
+  input.removeAttribute('aria-invalid');
+  input.removeAttribute('aria-describedby');
+  var existing = input.parentElement ? input.parentElement.querySelector('.field-error') : null;
+  if (existing) existing.remove();
+}
+
+function validateForm(formEl) {
+  if (!formEl) return false;
+  var isValid = true;
+  var inputs = formEl.querySelectorAll('[required], input[type="email"]');
+  inputs.forEach(function(input) {
+    clearFieldError(input);
+    if (!input.checkValidity()) {
+      isValid = false;
+      var msg = input.validationMessage || (typeof t === 'function' ? t('fieldRequired', 'This field is required') : 'This field is required');
+      showFieldError(input, msg);
+    }
+  });
+  // Focus first invalid input
+  if (!isValid) {
+    var firstInvalid = formEl.querySelector('[aria-invalid="true"]');
+    if (firstInvalid) firstInvalid.focus();
+  }
+  return isValid;
+}
+
+// Attach blur validation to required fields
+document.querySelectorAll('#admin-dashboard [required]').forEach(function(input) {
+  input.addEventListener('blur', function() {
+    if (!input.checkValidity()) {
+      showFieldError(input, input.validationMessage || 'This field is required');
+    } else {
+      clearFieldError(input);
+    }
+  });
+});
+
 // ===== ENHANCEMENT 6b: LAZY LOAD TAB CONTENT =====
 var loadedTabs = new Set(['overview']);
 
@@ -16106,9 +16183,30 @@ switchTab = function(tab) {
     switch(tab) {
       case 'appointments': loadAppointments(); break;
       case 'customers': loadCustomers(); break;
-      case 'messages': loadMessages(); break;
+      case 'messages': if (typeof loadMessages === 'function') loadMessages(); break;
       case 'employees': loadEmployees(); break;
-      case 'gallery': if (typeof loadGalleryImages === 'function') loadGalleryImages(); break;
+      case 'gallery': if (typeof renderGallery === 'function') renderGallery(); break;
+      case 'blog': if (typeof loadBlogPosts === 'function') loadBlogPosts(); break;
+      case 'faq': if (typeof loadFaqs === 'function') loadFaqs(); break;
+      case 'promotions': if (typeof loadPromotions === 'function') loadPromotions(); break;
+      case 'reviews': if (typeof loadTestimonials === 'function') loadTestimonials(); break;
+      case 'subscribers': if (typeof loadSubscribers === 'function') loadSubscribers(); break;
+      case 'invoices': if (typeof loadInvoices === 'function') loadInvoices(); break;
+      case 'labor': if (typeof loadLaborSummary === 'function') loadLaborSummary(); break;
+      case 'loyalty': if (typeof loadLoyalty === 'function') loadLoyalty(); break;
+      case 'referrals': if (typeof loadReferrals === 'function') loadReferrals(); break;
+      case 'reminders': if (typeof loadServiceReminders === 'function') loadServiceReminders(); break;
+      case 'services': if (typeof loadServices === 'function') loadServices(); break;
+      case 'parts': if (typeof loadParts === 'function') loadParts(); break;
+      case 'surveys': if (typeof loadSurveys === 'function') loadSurveys(); break;
+      case 'waitlist': if (typeof loadWaitlist === 'function') loadWaitlist(); break;
+      case 'walkinqueue': if (typeof loadWalkInQueue === 'function') loadWalkInQueue(); break;
+      case 'tirequotes': if (typeof loadTireQuotes === 'function') loadTireQuotes(); break;
+      case 'visits': if (typeof loadVisitTracker === 'function') loadVisitTracker(); break;
+      case 'resourceplanner': if (typeof loadResourcePlanner === 'function') loadResourcePlanner(); break;
+      case 'marketintel': if (typeof loadMarketIntel === 'function') loadMarketIntel(); break;
+      case 'health': if (typeof loadHealthDashboard === 'function') loadHealthDashboard(); break;
+      case 'gbp': if (typeof loadGBP === 'function') loadGBP(); break;
     }
   }
   _origSwitchTab2(tab);
