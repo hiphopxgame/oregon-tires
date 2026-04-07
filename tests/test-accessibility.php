@@ -49,7 +49,7 @@ function curlGet(string $url): array
     return [$code, (string) $body];
 }
 
-function checkPage(string $url, string $label, bool $shellOnly = false): void
+function checkPage(string $url, string $label, bool $shellOnly): void
 {
     [$code, $body] = curlGet($url);
     test("{$label}: HTTP < 500", $code > 0 && $code < 500, "got {$code}");
