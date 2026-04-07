@@ -31,7 +31,6 @@ curl_setopt_array($ch, [
 ]);
 $body = (string) curl_exec($ch);
 $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
 
 test('kanban.js HTTP 200', $code === 200, "got {$code}");
 test('kanban.js contains // MOBILE_LIST_VIEW sentinel', strpos($body, '// MOBILE_LIST_VIEW') !== false);
