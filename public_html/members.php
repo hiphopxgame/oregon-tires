@@ -269,12 +269,15 @@ if (!empty($showStaffBanner)): ?>
 </div>
 <?php endif;
 
-// Load universal dashboard template — buffer output to inject a11y landmarks
-// (skip-to-content link + <main id="main"> wrapper) without modifying shared kit.
-ob_start();
+// Load universal dashboard template — buffer output via callback to inject a11y
+// landmarks (skip-to-content link + <main id="main"> wrapper) even when the
+// shared kit calls exit() mid-render (login view does this).
+ob_start(function (string $html): string {
+    if (stripos($html, '<body') === false) return $html;
+    $skip = '<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 bg-white text-black px-4 py-2 rounded shadow">Skip to content</a><main id="main">';
+    $html = preg_replace('/(<body\b[^>]*>)/i', '$1' . $skip, $html, 1);
+    $html = preg_replace('/(<\/body>)/i', '</main>$1', $html, 1);
+    return $html;
+});
 require MEMBER_KIT_PATH . '/templates/member/dashboard.php';
-$__html = ob_get_clean();
-$__skip = '<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 bg-white text-black px-4 py-2 rounded shadow">Skip to content</a><main id="main">';
-$__html = preg_replace('/(<body\b[^>]*>)/i', '$1' . $__skip, $__html, 1);
-$__html = preg_replace('/(<\/body>)/i', '</main>$1', $__html, 1);
-echo $__html;
+ob_end_flush();
