@@ -5,7 +5,7 @@
  * Connects to IMAP, fetches unseen emails, threads them into conversations.
  * Uses flock() to prevent concurrent runs.
  *
- * Cron: */2 * * * *   php cli/fetch-inbound-emails.php
+ * Cron: (every 2 min) php cli/fetch-inbound-emails.php
  */
 
 declare(strict_types=1);
