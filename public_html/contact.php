@@ -104,6 +104,8 @@ $contactPageDescEs = 'Contacte a Oregon Tires Auto Care en Portland, OR. Servici
 </head>
 <body class="bg-white dark:bg-[#0A0A0A] min-h-screen flex flex-col">
 
+<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 bg-white text-black px-4 py-2 rounded shadow">Skip to content</a>
+
 <!-- Header -->
 <header class="sticky top-0 z-50 bg-white/90 dark:bg-[#111827]/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -118,7 +120,7 @@ $contactPageDescEs = 'Contacte a Oregon Tires Auto Care en Portland, OR. Servici
 </header>
 
 <!-- Page Content -->
-<main class="flex-1 py-12">
+<main id="main" class="flex-1 py-12">
     <div class="container mx-auto px-4 max-w-5xl">
         <div class="grid lg:grid-cols-5 gap-12">
             <!-- Contact Info -->

@@ -211,7 +211,7 @@ $_rating = getAggregateRating();
           </div>
           <div class="flex items-center gap-3">
             <span id="reviews-showing" class="text-sm text-gray-500 dark:text-gray-400"></span>
-            <select id="sort-select" class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-200 cursor-pointer">
+            <select id="sort-select" aria-label="Sort reviews" class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-200 cursor-pointer">
               <option value="newest" data-t="sortNewest">Newest</option>
               <option value="highest" data-t="sortHighest">Highest Rated</option>
               <option value="lowest" data-t="sortLowest">Lowest Rated</option>

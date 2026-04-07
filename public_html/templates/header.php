@@ -31,6 +31,7 @@
   }
   .member-page { padding-top: 1rem; }
 </style>
+<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 bg-white text-black px-4 py-2 rounded shadow">Skip to content</a>
 <!-- Top Info Bar -->
 <div class="bg-brand text-white text-sm py-2">
   <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
