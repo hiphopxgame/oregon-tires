@@ -17,6 +17,11 @@
     return csrfToken ? csrfToken.getAttribute('content') : '';
   }
 
+  // ─── BulkManager Init ──────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'subscribers', endpoint: 'subscribers.php', onDelete: function() { loadSubscribers(); }, superAdminOnly: false, deleteWarning: 'subscriberBulkDeleteWarn' });
+  }
+
   // ─── Load Subscribers ─────────────────────────────────────────
   window.loadSubscribers = async function(page, search) {
     if (typeof page === 'number') currentPage = page;
@@ -55,6 +60,8 @@
   function renderSubscribers(subscribers, total, activeCount, page, pages) {
     var grid = document.getElementById('subscribers-grid');
     if (!grid) return;
+
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
 
     // Clear existing content
     grid.textContent = '';
@@ -99,18 +106,23 @@
     var thead = document.createElement('thead');
     thead.className = 'bg-gray-50 dark:bg-gray-700';
     var headerRow = document.createElement('tr');
-    var headers = [
+    var headers = [];
+    if (typeof BulkManager !== 'undefined') {
+      headers.push({ html: BulkManager.selectAllHtml(), align: 'left', isHtml: true });
+    }
+    headers = headers.concat([
       { text: t('subscriberThEmail', 'Email'), align: 'left' },
       { text: t('subscriberThLanguage', 'Language'), align: 'left' },
       { text: t('subscriberThSource', 'Source'), align: 'left' },
       { text: t('subscriberThSubscribed', 'Subscribed'), align: 'left' },
       { text: t('subscriberThStatus', 'Status'), align: 'left' },
       { text: t('subscriberThActions', 'Actions'), align: 'right' }
-    ];
+    ]);
     headers.forEach(function(h) {
       var th = document.createElement('th');
-      th.className = 'text-' + h.align + ' p-3 font-medium text-gray-600 dark:text-gray-300';
-      th.textContent = h.text;
+      th.className = (h.isHtml ? 'w-10 ' : '') + 'text-' + h.align + ' p-3 font-medium text-gray-600 dark:text-gray-300';
+      if (h.isHtml) th.innerHTML = h.html;
+      else th.textContent = h.text;
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -125,6 +137,14 @@
       tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition';
 
       var isActive = !sub.unsubscribed_at;
+
+      // Checkbox cell
+      if (typeof BulkManager !== 'undefined') {
+        var tdCb = document.createElement('td');
+        tdCb.className = 'p-3';
+        tdCb.innerHTML = BulkManager.checkboxHtml(sub.id);
+        tr.appendChild(tdCb);
+      }
 
       // Email cell
       var tdEmail = document.createElement('td');
@@ -181,6 +201,14 @@
         dateSpan.textContent = formatDate(sub.unsubscribed_at);
         tdAction.appendChild(dateSpan);
       }
+      // Delete button via BulkManager
+      if (typeof BulkManager !== 'undefined') {
+        var delBtn = document.createElement('button');
+        delBtn.className = 'text-red-600 dark:text-red-400 hover:text-red-800 text-xs font-medium ml-2';
+        delBtn.textContent = t('actionDelete', 'Delete');
+        delBtn.addEventListener('click', (function(id, email) { return function() { BulkManager.deleteSingle(id, email); }; })(sub.id, sub.email));
+        tdAction.appendChild(delBtn);
+      }
       tr.appendChild(tdAction);
 
       tbody.appendChild(tr);
@@ -188,7 +216,17 @@
 
     table.appendChild(tbody);
     tableWrap.appendChild(table);
+
+    // Bulk toolbar
+    if (typeof BulkManager !== 'undefined') {
+      var toolbarDiv = document.createElement('div');
+      toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+      tableWrap.appendChild(toolbarDiv);
+    }
+
     grid.appendChild(tableWrap);
+
+    if (typeof BulkManager !== 'undefined') BulkManager.bind();
 
     // Pagination
     if (pages > 1) {

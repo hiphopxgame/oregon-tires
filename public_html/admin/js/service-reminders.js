@@ -52,6 +52,11 @@
     overdue:   { en: 'Overdue', es: 'Vencido', cls: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' }
   };
 
+  // ─── BulkManager Init ──────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'service-reminders', endpoint: 'service-reminders.php', onDelete: function() { loadServiceReminders(); }, superAdminOnly: false, deleteWarning: 'reminderBulkDeleteWarn' });
+  }
+
   // ─── Load Reminders ───────────────────────────────────────────
   window.loadServiceReminders = async function() {
     var params = new URLSearchParams();
@@ -82,6 +87,7 @@
     var container = document.getElementById('reminders-container');
     if (!container) return;
     container.textContent = '';
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
 
     // Filter bar
     var filterBar = document.createElement('div');
@@ -151,6 +157,13 @@
     thead.className = 'bg-gray-50 dark:bg-gray-700';
     var hRow = document.createElement('tr');
     var lang = locale() === 'es-MX' ? 'es' : 'en';
+    // Checkbox header
+    if (typeof BulkManager !== 'undefined') {
+      var thCb = document.createElement('th');
+      thCb.className = 'w-10 p-3';
+      thCb.innerHTML = BulkManager.selectAllHtml();
+      hRow.appendChild(thCb);
+    }
     var headers = [
       { en: 'Customer', es: 'Cliente' }, { en: 'Vehicle', es: 'Veh\u00edculo' },
       { en: 'Service Type', es: 'Tipo de Servicio' }, { en: 'Due Date', es: 'Fecha L\u00edmite' },
@@ -177,6 +190,14 @@
       tr.className = isOverdue
         ? 'bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 transition'
         : 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition';
+
+      // Checkbox cell
+      if (typeof BulkManager !== 'undefined') {
+        var tdCb = document.createElement('td');
+        tdCb.className = 'p-3';
+        tdCb.innerHTML = BulkManager.checkboxHtml(r.id);
+        tr.appendChild(tdCb);
+      }
 
       var tdCust = document.createElement('td');
       tdCust.className = 'p-3 font-medium text-gray-800 dark:text-gray-200';
@@ -247,7 +268,10 @@
       var delBtn = document.createElement('button');
       delBtn.className = 'text-red-600 hover:text-red-800 text-xs font-medium dark:text-red-400';
       delBtn.textContent = t('actionDelete', 'Delete');
-      delBtn.addEventListener('click', function() { deleteReminder(r.id); });
+      delBtn.addEventListener('click', function() {
+        if (typeof BulkManager !== 'undefined') BulkManager.deleteSingle(r.id, r.customer_name || 'this reminder');
+        else deleteReminder(r.id);
+      });
       actWrap.appendChild(delBtn);
 
       tdAct.appendChild(actWrap);
@@ -257,7 +281,17 @@
 
     table.appendChild(tbody);
     wrap.appendChild(table);
+
+    // Bulk toolbar
+    if (typeof BulkManager !== 'undefined') {
+      var toolbarDiv = document.createElement('div');
+      toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+      wrap.appendChild(toolbarDiv);
+    }
+
     container.appendChild(wrap);
+
+    if (typeof BulkManager !== 'undefined') BulkManager.bind();
   }
 
   // ─── Form Panel ───────────────────────────────────────────────

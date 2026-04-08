@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 
 try {
     $staff = requirePermission('shop_ops');
-    requireMethod('GET', 'PUT');
+    requireMethod('GET', 'PUT', 'DELETE');
 
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
@@ -91,6 +91,35 @@ try {
         $quotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         jsonList($quotes, $total, $page, $limit);
+    }
+
+    // ─── DELETE: Remove tire quote(s) ──────────────────────────────────
+    if ($method === 'DELETE') {
+        verifyCsrf();
+        $data = getJsonBody();
+        $action = $data['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $data['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $db->prepare("DELETE FROM oretir_tire_quotes WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
+        // ── Single delete ──
+        requireAdmin();
+        $id = (int) ($data['id'] ?? 0);
+        if ($id <= 0) jsonError('Quote ID is required.', 400);
+
+        $db->prepare('DELETE FROM oretir_tire_quotes WHERE id = ?')->execute([$id]);
+        jsonSuccess(['deleted' => 1]);
     }
 
     // ─── PUT: Update quote ──────────────────────────────────────────────

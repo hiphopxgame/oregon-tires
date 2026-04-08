@@ -48,6 +48,11 @@
 
   function removeModal() { var m = document.getElementById('tq-modal-overlay'); if (m) m.remove(); }
 
+  // ─── BulkManager Init ──────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'tire-quotes', endpoint: 'tire-quotes.php', onDelete: function() { loadTireQuotes(); }, superAdminOnly: false, deleteWarning: 'tqBulkDeleteWarn' });
+  }
+
   // ─── Load ───────────────────────────────────────────────────
   async function loadTireQuotes() {
     var url = currentFilter !== 'all' ? API + '?status=' + encodeURIComponent(currentFilter) : API;
@@ -67,6 +72,7 @@
     var c = document.getElementById('tirequotes-container');
     if (!c) return;
     c.textContent = '';
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
 
     // Stats bar
     var newCount = quotes.filter(function(q) { return q.status === 'new'; }).length;
@@ -105,14 +111,38 @@
       return;
     }
 
+    // Select all checkbox
+    if (typeof BulkManager !== 'undefined') {
+      var selectAllWrap = el('div', 'flex items-center gap-2 mb-3');
+      selectAllWrap.innerHTML = BulkManager.selectAllHtml();
+      var selectLabel = el('span', 'text-sm text-gray-500 dark:text-gray-400', t('tqSelectAll', 'Select All'));
+      selectAllWrap.appendChild(selectLabel);
+      c.appendChild(selectAllWrap);
+    }
+
     // Cards layout (mobile-friendly)
     var grid = el('div', 'space-y-3');
     quotes.forEach(function(q) { grid.appendChild(buildCard(q)); });
     c.appendChild(grid);
+
+    // Bulk toolbar
+    if (typeof BulkManager !== 'undefined') {
+      var toolbarDiv = el('div');
+      toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+      c.appendChild(toolbarDiv);
+      BulkManager.bind();
+    }
   }
 
   function buildCard(q) {
     var card = el('div', 'bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-4 hover:shadow-md transition');
+
+    // Checkbox row
+    if (typeof BulkManager !== 'undefined') {
+      var cbWrap = el('div', 'mb-2');
+      cbWrap.innerHTML = BulkManager.checkboxHtml(q.id);
+      card.appendChild(cbWrap);
+    }
 
     // Header row: customer + status
     var header = el('div', 'flex justify-between items-start mb-2');
@@ -211,6 +241,12 @@
     var nb = el('button', 'px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition', t('tqEditNotes', 'Notes'));
     nb.addEventListener('click', function() { openNotesForm(q); });
     actions.appendChild(nb);
+    // Delete button
+    if (typeof BulkManager !== 'undefined') {
+      var delB = el('button', 'px-3 py-1.5 bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 rounded-lg text-xs font-medium hover:bg-red-200 transition', t('actionDelete', 'Delete'));
+      delB.addEventListener('click', function() { BulkManager.deleteSingle(q.id, customerName(q)); });
+      actions.appendChild(delB);
+    }
     card.appendChild(actions);
 
     return card;

@@ -27,6 +27,7 @@ try {
                 "SELECT s.*, e.name AS employee_name, e.is_active
                  FROM oretir_schedules s
                  JOIN oretir_employees e ON s.employee_id = e.id
+                 WHERE e.is_active = 1
                  ORDER BY e.name ASC, s.day_of_week ASC"
             );
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -151,6 +152,7 @@ try {
                  FROM oretir_schedule_overrides ov
                  LEFT JOIN oretir_employees e ON ov.employee_id = e.id
                  WHERE ov.override_date BETWEEN ? AND ?
+                   AND (e.is_active = 1 OR ov.employee_id IS NULL)
                  ORDER BY ov.override_date ASC"
             );
             $stmt->execute([$from, $to]);

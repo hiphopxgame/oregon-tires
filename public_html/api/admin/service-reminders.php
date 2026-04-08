@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 
 try {
     $staff = requirePermission('shop_ops');
-    requireMethod('GET', 'PUT');
+    requireMethod('GET', 'PUT', 'DELETE');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
 
@@ -111,35 +111,65 @@ try {
     }
 
     // ─── PUT — update reminder status ─────────────────────────────────────
-    verifyCsrf();
-    $body = getJsonBody();
+    if ($method === 'PUT') {
+        verifyCsrf();
+        $body = getJsonBody();
 
-    $id = (int) ($body['id'] ?? 0);
-    if ($id < 1) {
-        jsonError('Missing reminder id.', 400);
+        $id = (int) ($body['id'] ?? 0);
+        if ($id < 1) {
+            jsonError('Missing reminder id.', 400);
+        }
+
+        $validStatuses = ['pending', 'sent', 'booked', 'dismissed'];
+        $newStatus = $body['status'] ?? '';
+
+        if (!in_array($newStatus, $validStatuses, true)) {
+            jsonError('Invalid status. Must be one of: pending, sent, booked, dismissed.', 400);
+        }
+
+        // Verify reminder exists
+        $checkStmt = $db->prepare('SELECT id, status FROM oretir_service_reminders WHERE id = ?');
+        $checkStmt->execute([$id]);
+        $existing = $checkStmt->fetch();
+
+        if (!$existing) {
+            jsonError('Reminder not found.', 404);
+        }
+
+        $db->prepare(
+            'UPDATE oretir_service_reminders SET status = ?, updated_at = NOW() WHERE id = ?'
+        )->execute([$newStatus, $id]);
+
+        jsonSuccess(['updated' => $id, 'status' => $newStatus]);
     }
 
-    $validStatuses = ['pending', 'sent', 'booked', 'dismissed'];
-    $newStatus = $body['status'] ?? '';
+    // ─── DELETE: Remove service reminder(s) ─────────────────────────────────
+    if ($method === 'DELETE') {
+        verifyCsrf();
+        $body = getJsonBody();
+        $action = $body['action'] ?? '';
 
-    if (!in_array($newStatus, $validStatuses, true)) {
-        jsonError('Invalid status. Must be one of: pending, sent, booked, dismissed.', 400);
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $body['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $db->prepare("DELETE FROM oretir_service_reminders WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
+        // ── Single delete ──
+        $id = (int) ($body['id'] ?? 0);
+        if ($id <= 0) jsonError('Missing reminder id.', 400);
+
+        $db->prepare('DELETE FROM oretir_service_reminders WHERE id = ?')->execute([$id]);
+        jsonSuccess(['deleted' => 1]);
     }
-
-    // Verify reminder exists
-    $checkStmt = $db->prepare('SELECT id, status FROM oretir_service_reminders WHERE id = ?');
-    $checkStmt->execute([$id]);
-    $existing = $checkStmt->fetch();
-
-    if (!$existing) {
-        jsonError('Reminder not found.', 404);
-    }
-
-    $db->prepare(
-        'UPDATE oretir_service_reminders SET status = ?, updated_at = NOW() WHERE id = ?'
-    )->execute([$newStatus, $id]);
-
-    jsonSuccess(['updated' => $id, 'status' => $newStatus]);
 
 } catch (\Throwable $e) {
     error_log('service-reminders.php error: ' . $e->getMessage());

@@ -141,7 +141,33 @@ try {
     // ─── DELETE ────────────────────────────────────────────────────────────
     if ($method === 'DELETE') {
         verifyCsrf();
-        $id = (int) ($_GET['id'] ?? 0);
+        $delBody = getJsonBody();
+        $action = $delBody['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $delBody['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            // Check RO references for each
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $roCheck = $db->prepare("SELECT vehicle_id, COUNT(*) as cnt FROM oretir_repair_orders WHERE vehicle_id IN ($placeholders) GROUP BY vehicle_id HAVING cnt > 0");
+            $roCheck->execute($ids);
+            $blocked = $roCheck->fetch(PDO::FETCH_ASSOC);
+            if ($blocked) {
+                jsonError('Cannot delete vehicles with existing repair orders.', 409);
+            }
+
+            $db->beginTransaction();
+            $db->prepare("DELETE FROM oretir_vehicles WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
+        // ── Single delete ──
+        $id = (int) ($_GET['id'] ?? ((int) ($delBody['id'] ?? 0)));
         if ($id <= 0) jsonError('Vehicle ID is required.');
 
         $roCheck = $db->prepare('SELECT COUNT(*) FROM oretir_repair_orders WHERE vehicle_id = ?');

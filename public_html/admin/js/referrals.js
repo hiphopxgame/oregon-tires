@@ -38,6 +38,11 @@
     s.textContent = statusMap[status] || status; return s;
   }
 
+  // ─── BulkManager Init ──────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'referrals', endpoint: 'referrals.php', onDelete: function() { loadReferrals(); }, superAdminOnly: false, deleteWarning: 'refBulkDeleteWarn' });
+  }
+
   // ─── Load Referrals ──────────────────────────────────────────
   window.loadReferrals = async function() {
     var box = document.getElementById('referrals-container');
@@ -62,6 +67,7 @@
   // ─── Render ──────────────────────────────────────────────────
   function render(box, referrals, stats) {
     box.textContent = '';
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
 
     var sd = document.createElement('div');
     sd.className = 'flex flex-wrap gap-4 mb-4';
@@ -106,6 +112,13 @@
     var thead = document.createElement('thead');
     thead.className = 'bg-gray-50 dark:bg-gray-700';
     var hr = document.createElement('tr');
+    // Checkbox header
+    if (typeof BulkManager !== 'undefined') {
+      var thCb = document.createElement('th');
+      thCb.className = 'w-10 p-3';
+      thCb.innerHTML = BulkManager.selectAllHtml();
+      hr.appendChild(thCb);
+    }
     var colLabels = { code: t('refCode','Referral Code'), referrer: t('refReferrer','Referrer'), referred: t('refReferred','Referred Customer'), status: t('refStatus','Status'), points: t('refPoints','Bonus Points'), created: t('refCreated','Created'), actions: t('refActions','Actions') };
     ['code','referrer','referred','status','points','created','actions'].forEach(function(k) {
       var th = document.createElement('th'); th.className = 'text-left p-3 font-medium text-gray-600 dark:text-gray-300';
@@ -118,6 +131,14 @@
     referrals.forEach(function(ref) {
       var tr = document.createElement('tr');
       tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition';
+
+      // Checkbox cell
+      if (typeof BulkManager !== 'undefined') {
+        var tdCb = document.createElement('td');
+        tdCb.className = 'p-3';
+        tdCb.innerHTML = BulkManager.checkboxHtml(ref.id);
+        tr.appendChild(tdCb);
+      }
 
       var cells = [
         { text: ref.referral_code || '-', cls: 'p-3 font-mono text-xs text-gray-800 dark:text-gray-200' },
@@ -141,7 +162,17 @@
     });
     table.appendChild(tbody);
     wrap.appendChild(table);
+
+    // Bulk toolbar
+    if (typeof BulkManager !== 'undefined') {
+      var toolbarDiv = document.createElement('div');
+      toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+      wrap.appendChild(toolbarDiv);
+    }
+
     box.appendChild(wrap);
+
+    if (typeof BulkManager !== 'undefined') BulkManager.bind();
   }
 
   // ─── Action Buttons ──────────────────────────────────────────
@@ -161,6 +192,14 @@
       a.textContent = t('refAwardPoints', 'Award Points');
       a.addEventListener('click', function() { awardPoints(ref.id, a); });
       div.appendChild(a);
+    }
+    // Delete button
+    if (typeof BulkManager !== 'undefined') {
+      var d = document.createElement('button');
+      d.className = 'text-red-600 dark:text-red-400 hover:text-red-800 text-xs font-medium';
+      d.textContent = t('actionDelete', 'Delete');
+      d.addEventListener('click', function() { BulkManager.deleteSingle(ref.id, ref.referral_code || 'this referral'); });
+      div.appendChild(d);
     }
     return div;
   }

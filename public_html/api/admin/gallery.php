@@ -248,7 +248,37 @@ try {
     if ($method === 'DELETE') {
         verifyCsrf();
 
-        $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+        $delBody = json_decode(file_get_contents('php://input'), true) ?: [];
+        $action = $delBody['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $delBody['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            // Delete physical files
+            $imgStmt = $db->prepare("SELECT image_url FROM oretir_gallery_images WHERE id IN ($placeholders)");
+            $imgStmt->execute($ids);
+            foreach ($imgStmt->fetchAll(PDO::FETCH_COLUMN) as $imgUrl) {
+                if ($imgUrl && strpos($imgUrl, '/uploads/') === 0) {
+                    $fp = __DIR__ . '/../../' . ltrim($imgUrl, '/');
+                    $rb = realpath(__DIR__ . '/../../uploads');
+                    $rf = realpath($fp);
+                    if ($rf !== false && $rb !== false && strpos($rf, $rb) === 0 && is_file($rf)) {
+                        unlink($rf);
+                    }
+                }
+            }
+            $db->prepare("DELETE FROM oretir_gallery_images WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
+        $id = isset($_GET['id']) ? (int) $_GET['id'] : ((int) ($delBody['id'] ?? 0));
         if ($id <= 0) {
             jsonError('Valid image ID is required.', 400);
         }

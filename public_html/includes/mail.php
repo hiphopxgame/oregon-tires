@@ -10,7 +10,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 /**
  * Send an email using PHPMailer with SMTP settings from .env
  */
-function sendMail(string $to, string $subject, string $htmlBody, string $textBody = '', string $replyTo = '', array $customHeaders = []): array
+function sendMail(string $to, string $subject, string $htmlBody, string $textBody = '', string $replyTo = '', array $customHeaders = [], array $embeddedImages = []): array
 {
     $mail = new PHPMailer(true);
 
@@ -54,6 +54,26 @@ function sendMail(string $to, string $subject, string $htmlBody, string $textBod
         // Apply custom headers (e.g. In-Reply-To, References, Message-ID)
         foreach ($customHeaders as $headerName => $headerValue) {
             $mail->addCustomHeader($headerName, $headerValue);
+        }
+
+        // Embed inline images (CID attachments)
+        $projectRoot = realpath(__DIR__ . '/..');
+        foreach ($embeddedImages as $img) {
+            $imgPath = $img['path'] ?? '';
+            $imgCid  = $img['cid'] ?? '';
+            $imgName = $img['name'] ?? basename($imgPath);
+
+            $realImgPath = realpath($imgPath);
+            if ($realImgPath === false) {
+                error_log("Oregon Tires mail: embedded image not found: {$imgPath}");
+                continue;
+            }
+            if (strpos($realImgPath, $projectRoot) !== 0) {
+                error_log("Oregon Tires mail: embedded image path outside project: {$imgPath}");
+                continue;
+            }
+
+            $mail->addEmbeddedImage($realImgPath, $imgCid, $imgName);
         }
 
         $mail->send();

@@ -31,6 +31,11 @@
     specialized: { en: 'Specialized', es: 'Especializado' },
   };
 
+  // ─── BulkManager Init ──────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'services', endpoint: 'services.php', onDelete: function() { loadServices(); }, superAdminOnly: false, deleteWarning: 'svcBulkDeleteWarn' });
+  }
+
   // ─── Load Services ────────────────────────────────────────
   async function loadServices() {
     try {
@@ -49,12 +54,20 @@
     var container = document.getElementById('services-table-body');
     if (!container) return;
 
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
+
+    var selectAllTh = document.getElementById('services-select-all-th');
+    if (selectAllTh && typeof BulkManager !== 'undefined') selectAllTh.innerHTML = BulkManager.selectAllHtml();
+
+    var toolbarDiv = document.getElementById('services-bulk-toolbar');
+    if (toolbarDiv && typeof BulkManager !== 'undefined') toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+
     container.textContent = '';
 
     if (!services.length) {
       var tr = document.createElement('tr');
       var td = document.createElement('td');
-      td.colSpan = 8;
+      td.colSpan = 9;
       td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
       td.textContent = t('svcNoServices', 'No services yet. Click "New Service" to create one.');
       tr.appendChild(td);
@@ -65,6 +78,14 @@
     services.forEach(function(svc) {
       var tr = document.createElement('tr');
       tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+
+      // Checkbox cell
+      if (typeof BulkManager !== 'undefined') {
+        var tdCb = document.createElement('td');
+        tdCb.className = 'px-3 py-3';
+        tdCb.innerHTML = BulkManager.checkboxHtml(svc.id);
+        tr.appendChild(tdCb);
+      }
 
       // Icon cell
       var tdIcon = document.createElement('td');
@@ -151,13 +172,18 @@
       var delBtn = document.createElement('button');
       delBtn.className = 'text-red-600 hover:text-red-800 text-sm font-medium dark:text-red-400';
       delBtn.textContent = t('actionDelete', 'Delete');
-      delBtn.addEventListener('click', function() { deleteService(svc.id); });
+      delBtn.addEventListener('click', function() {
+        if (typeof BulkManager !== 'undefined') BulkManager.deleteSingle(svc.id, svc.name_en || 'this service');
+        else deleteService(svc.id);
+      });
       actionsWrap.appendChild(delBtn);
 
       tdActions.appendChild(actionsWrap);
       tr.appendChild(tdActions);
       container.appendChild(tr);
     });
+
+    if (typeof BulkManager !== 'undefined') BulkManager.bind();
   }
 
   // ─── Toggle form visibility ───────────────────────────────

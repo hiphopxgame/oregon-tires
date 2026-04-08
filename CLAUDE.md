@@ -9,8 +9,14 @@ See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htac
 - **Google Place ID**: `ChIJLSxZDQyflVQRWXEi9LpJGxs`
 - **Site type**: `client` (independent mode, `MEMBER_MODE=independent`)
 - **Deploy**: `./deploy.sh` (builds CSS, stages changed files, SCPs to server)
-- **Server**: `ssh hiphopworld` → `/home/hiphopwo/public_html/---oregon.tires/`
-- **DB**: `hiphopwo_oregon_tires`, prefix `oretir_`
+- **Server**: `ssh oregontires` (Bluehost, port 2222, user `avadpnmy`, host `129.121.65.201`)
+- **Server home**: `/home2/avadpnmy/`
+- **Web root**: `/home2/avadpnmy/public_html/`
+- **Local source**: `Oregon.Tires/` (pulled from server, git-tracked)
+- **.env location**: `/home2/avadpnmy/.env.oregon-tires` (above web root)
+- **Shared kits**: `/home2/avadpnmy/shared/{engine,member,form,commerce}-kit/`
+- **PHP**: 8.3.30, **MySQL**: Percona 8.0.45
+- **DB**: `avadpnmy_ot` (Bluehost), prefix `oretir_`
 - **Bilingual**: EN/ES — inline JS `t` object with `data-t` attributes, `currentLang` variable
 
 ## Client Service Offerings

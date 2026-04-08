@@ -1,0 +1,16 @@
+# Allow image files only — block PHP execution
+<FilesMatch "\.ph(p[345s]?|t|tml)$">
+    Deny from all
+</FilesMatch>
+
+# Only serve images
+<FilesMatch "\.(jpe?g|png|gif|webp|svg|ico)$">
+    Allow from all
+</FilesMatch>
+
+# Remove PHP handler completely (LiteSpeed + Apache compatible)
+RemoveHandler .php .php5 .php7 .phtml .phps
+RemoveType .php .php5 .php7 .phtml .phps
+
+# Prevent directory listing
+Options -Indexes

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$version": "1.0.0",
+  "$description": "Layer 2 — HipHop.World Premium Luxe Theme. Dark + gold luxury aesthetic with glow effects.",
+  "$theme": "hiphop-world-premium",
+
+  "meta": {
+    "displayName": "HipHop.World Premium Luxe",
+    "mode": "dark",
+    "hue": 45,
+    "selector": "[data-theme=\"black_gold_green\"]"
+  },
+
+  "colors": {
+    "bg":        { "$value": "#0B0B0B", "$type": "color", "$description": "Page background" },
+    "bg-card":   { "$value": "#111118", "$type": "color", "$description": "Card/panel background" },
+    "bg-elevated": { "$value": "#1A1A24", "$type": "color", "$description": "Elevated surface" },
+    "bg-input":  { "$value": "#111118", "$type": "color", "$description": "Form input background" },
+
+    "text":         { "$value": "#FFFFFF", "$type": "color" },
+    "text-secondary": { "$value": "rgba(255,255,255,0.6)", "$type": "color" },
+    "text-muted":   { "$value": "rgba(255,255,255,0.4)", "$type": "color" },
+    "text-inverse": { "$value": "#0B0B0B", "$type": "color" },
+
+    "primary":       { "$value": "#FFD700", "$type": "color", "$description": "Gold — primary brand" },
+    "primary-hover": { "$value": "#FFC000", "$type": "color" },
+    "primary-muted": { "$value": "#D4AF37", "$type": "color" },
+    "primary-dark":  { "$value": "#B8860B", "$type": "color" },
+
+    "accent":        { "$value": "#E5B80B", "$type": "color" },
+    "accent-green":  { "$value": "#0F6F4F", "$type": "color" },
+
+    "border":        { "$value": "rgba(255,255,255,0.1)", "$type": "color" },
+    "border-subtle": { "$value": "rgba(255,255,255,0.05)", "$type": "color" },
+    "border-strong": { "$value": "rgba(255,255,255,0.2)", "$type": "color" }
+  },
+
+  "typography": {
+    "fontFamily": {
+      "brand":   { "$value": "'Oswald', sans-serif", "$description": "Logo / display" },
+      "heading": { "$value": "'Inter', sans-serif" },
+      "body":    { "$value": "'Roboto', sans-serif" },
+      "ui":      { "$value": "'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" },
+      "mono":    { "$value": "'JetBrains Mono', monospace" }
+    }
+  },
+
+  "glow": {
+    "$description": "Gold glow effects for Premium Luxe dark theme",
+    "primary":    { "$value": "0 0 15px rgba(255,215,0,0.3)", "$type": "shadow" },
+    "primary-lg": { "$value": "0 0 30px rgba(255,215,0,0.4)", "$type": "shadow" },
+    "primary-xl": { "$value": "0 0 40px rgba(255,215,0,0.5)", "$type": "shadow" }
+  },
+
+  "motion": {
+    "$description": "Smooth motion profile (200-800ms)",
+    "profile": "smooth",
+    "easing": "cubic-bezier(.4,0,.2,1)",
+    "duration-fast": "200ms",
+    "duration-normal": "400ms",
+    "duration-slow": "800ms"
+  },
+
+  "interactive": {
+    "focus-ring": { "$value": "0 0 0 2px #FFD700", "$type": "shadow" },
+    "hover-lift":  { "$value": "translateY(-1px)" },
+    "active-press": { "$value": "translateY(0px)" }
+  },
+
+  "chart": {
+    "$description": "Data visualization palette",
+    "series": ["#FFD700", "#E5B80B", "#0F6F4F", "#D4AF37", "#FFC000", "#B8860B", "#43B581", "#FFB800"],
+    "grid":       { "$value": "rgba(255,255,255,0.06)", "$type": "color" },
+    "axis":       { "$value": "rgba(255,255,255,0.3)", "$type": "color" },
+    "label":      { "$value": "rgba(255,255,255,0.5)", "$type": "color" },
+    "tooltip-bg": { "$value": "#111118", "$type": "color" }
+  }
+}

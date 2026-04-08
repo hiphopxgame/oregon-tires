@@ -52,6 +52,11 @@
     return ov;
   }
 
+  // ─── BulkManager Init ──────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'loyalty', endpoint: 'loyalty-rewards.php', onDelete: function() { loadLoyalty(); }, superAdminOnly: false, deleteWarning: 'loyaltyBulkDeleteWarn' });
+  }
+
   // ─── Load ─────────────────────────────────────────────────
   async function loadLoyalty() {
     try {
@@ -72,6 +77,7 @@
     var c = document.getElementById('loyalty-container');
     if (!c) return;
     c.textContent = '';
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
     c.appendChild(renderStats());
     c.appendChild(renderPointsSection());
     c.appendChild(renderRewardsSection());
@@ -215,7 +221,14 @@
   function renderRewardsSection() {
     var sec = el('div', 'mb-8');
     var hdr = el('div', 'flex items-center justify-between mb-3');
-    hdr.appendChild(el('h3', 'text-lg font-semibold dark:text-gray-100', t('loyaltyRewardsCatalog', 'Rewards Catalog')));
+    var hdrLeft = el('div', 'flex items-center gap-3');
+    hdrLeft.appendChild(el('h3', 'text-lg font-semibold dark:text-gray-100', t('loyaltyRewardsCatalog', 'Rewards Catalog')));
+    if (typeof BulkManager !== 'undefined') {
+      var saWrap = el('span');
+      saWrap.innerHTML = BulkManager.selectAllHtml();
+      hdrLeft.appendChild(saWrap);
+    }
+    hdr.appendChild(hdrLeft);
     var nb = el('button', 'bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90', t('loyaltyNewReward', 'New Reward'));
     nb.addEventListener('click', function() { openRewardForm(); }); hdr.appendChild(nb);
     sec.appendChild(hdr);
@@ -225,6 +238,12 @@
     } else {
       rewards.forEach(function(rw) {
         var card = el('div', 'bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-4 flex flex-col');
+        // Checkbox
+        if (typeof BulkManager !== 'undefined') {
+          var cbDiv = el('div', 'mb-2');
+          cbDiv.innerHTML = BulkManager.checkboxHtml(rw.id);
+          card.appendChild(cbDiv);
+        }
         var top = el('div', 'flex items-start justify-between mb-2');
         top.appendChild(el('h4', 'font-semibold dark:text-gray-100 text-sm', (currentLang === 'es' ? rw.name_es : rw.name_en) || rw.name_en || '(unnamed)'));
         top.appendChild(badge(Number(rw.active) ? t('loyaltyActive', 'Active') : t('loyaltyInactive', 'Inactive'), Number(rw.active) ? 'green' : 'gray'));
@@ -238,11 +257,22 @@
           Number(rw.active) ? t('actionDeactivate', 'Deactivate') : t('actionActivate', 'Activate'));
         tB.addEventListener('click', function() { toggleRewardActive(rw); }); acts.appendChild(tB);
         var xB = el('button', 'text-red-600 hover:text-red-800 text-sm font-medium dark:text-red-400', t('actionDelete', 'Delete'));
-        xB.addEventListener('click', function() { deleteReward(rw.id); }); acts.appendChild(xB);
+        xB.addEventListener('click', function() {
+          if (typeof BulkManager !== 'undefined') BulkManager.deleteSingle(rw.id, rw.name_en || 'this reward');
+          else deleteReward(rw.id);
+        }); acts.appendChild(xB);
         card.appendChild(acts); grid.appendChild(card);
       });
     }
-    sec.appendChild(grid); return sec;
+    sec.appendChild(grid);
+    // Bulk toolbar
+    if (typeof BulkManager !== 'undefined') {
+      var toolbarDiv = el('div');
+      toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+      sec.appendChild(toolbarDiv);
+      setTimeout(function() { BulkManager.bind(); }, 0);
+    }
+    return sec;
   }
 
   // ─── Reward Form Modal ────────────────────────────────────

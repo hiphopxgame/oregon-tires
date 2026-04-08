@@ -743,6 +743,30 @@ try {
         jsonSuccess(['updated' => $updated, 'skipped' => $skipped]);
     }
 
+    // ─── Delete single appointment ──────────────────────────────────
+    if ($action === 'delete') {
+        requireSuperAdmin();
+        $id = (int) ($body['id'] ?? 0);
+        if ($id <= 0) jsonError('Invalid ID.', 400);
+
+        $db->prepare('DELETE FROM oretir_appointments WHERE id = ?')->execute([$id]);
+        jsonSuccess(['deleted' => 1]);
+    }
+
+    // ─── Bulk delete appointments ────────────────────────────────────
+    if ($action === 'bulk_delete') {
+        requireSuperAdmin();
+        $ids = array_filter(array_map('intval', $body['ids'] ?? []), fn(int $v) => $v > 0);
+        if (empty($ids)) jsonError('No valid IDs.', 400);
+        if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+        $db->beginTransaction();
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $db->prepare("DELETE FROM oretir_appointments WHERE id IN ($placeholders)")->execute($ids);
+        $db->commit();
+        jsonSuccess(['deleted' => count($ids)]);
+    }
+
     jsonError('Invalid action.', 400);
 
 } catch (\Throwable $e) {

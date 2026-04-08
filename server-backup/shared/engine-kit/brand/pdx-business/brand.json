@@ -1,0 +1,32 @@
+{
+  "name": "PDX Business Network",
+  "theme": "pdx-business",
+  "mode": "light",
+  "identity": {
+    "tagline": "Portland's Business Community",
+    "description": "Clean, professional, light-mode design with mode-switchable brand colors.",
+    "palette": {
+      "primary": "#7C3AED",
+      "background": "#FFFFFF",
+      "surface": "#F9FAFB"
+    },
+    "subModes": {
+      "play": { "hue": 160, "primary": "#0B835B", "label": "Play" },
+      "discover": { "hue": 263, "primary": "#7C3AED", "label": "Discover" },
+      "explore": { "hue": 331, "primary": "#DB2777", "label": "Explore" },
+      "give": { "hue": 172, "primary": "#2A9D8F", "label": "Give" },
+      "care": { "hue": 192, "primary": "#077E9B", "label": "Care" }
+    },
+    "typography": {
+      "brand": "DM Sans",
+      "heading": "DM Sans",
+      "body": "Inter"
+    },
+    "motionProfile": "standard",
+    "motionNotes": "Clean, professional transitions. Standard easing, 150-300ms."
+  },
+  "assets": {
+    "logo": "/assets/img/pdx-logo.svg",
+    "favicon": "/assets/img/pdx-favicon.ico"
+  }
+}

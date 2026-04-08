@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../includes/mail.php';
 
 try {
     $admin = requirePermission('settings');
-    requireMethod('GET', 'POST', 'DELETE');
+    requireMethod('GET', 'POST', 'PUT', 'DELETE');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
 
@@ -179,6 +179,125 @@ try {
             'email_sent' => $mailResult['success'],
             'email_error' => $mailResult['error'],
         ], 201);
+    }
+
+    // ─── PUT: Update admin details ────────────────────────────────────────
+    if ($method === 'PUT') {
+        $body = getJsonBody();
+        $id = (int) ($body['id'] ?? 0);
+        if ($id < 1) {
+            jsonError('Missing admin id.', 400);
+        }
+
+        // Verify target exists
+        $stmt = $db->prepare('SELECT id, email, role FROM oretir_admins WHERE id = ? LIMIT 1');
+        $stmt->execute([$id]);
+        $target = $stmt->fetch();
+        if (!$target) {
+            jsonError('Admin not found.', 404);
+        }
+
+        // Protected account check
+        if (in_array($target['email'], PROTECTED_SUPERADMINS, true)) {
+            // Protected accounts: only allow language and notification_email updates
+            $allowed = ['language', 'notification_email'];
+            $otherKeys = array_diff(array_keys($body), ['id', ...$allowed]);
+            if (!empty($otherKeys)) {
+                jsonError('This account is protected. Only language and notification preferences can be changed.', 403);
+            }
+        }
+
+        $fields = [];
+        $params = [];
+
+        if (isset($body['display_name'])) {
+            $name = sanitize($body['display_name'], 100);
+            if (empty($name)) {
+                jsonError('Display name cannot be empty.', 400);
+            }
+            $fields[] = 'display_name = ?';
+            $params[] = $name;
+        }
+
+        if (isset($body['email'])) {
+            $email = sanitize($body['email'], 255);
+            if (!isValidEmail($email)) {
+                jsonError('Invalid email address.', 400);
+            }
+            // Check uniqueness (exclude self)
+            $dup = $db->prepare('SELECT id FROM oretir_admins WHERE email = ? AND id != ? LIMIT 1');
+            $dup->execute([$email, $id]);
+            if ($dup->fetch()) {
+                jsonError('An admin with that email already exists.', 409);
+            }
+            $fields[] = 'email = ?';
+            $params[] = $email;
+        }
+
+        if (isset($body['role'])) {
+            $role = $body['role'];
+            if (!in_array($role, ['admin', 'superadmin'], true)) {
+                jsonError('Invalid role. Must be admin or superadmin.', 400);
+            }
+            // Only superadmins can promote to superadmin
+            if ($role === 'superadmin' && !$isSuperAdmin) {
+                jsonError('Only superadmins can assign the superadmin role.', 403);
+            }
+            // Only superadmins can demote superadmins
+            if ($target['role'] === 'superadmin' && $role !== 'superadmin' && !$isSuperAdmin) {
+                jsonError('Only superadmins can change a superadmin\'s role.', 403);
+            }
+            $fields[] = 'role = ?';
+            $params[] = $role;
+        }
+
+        if (isset($body['language'])) {
+            if (!in_array($body['language'], ['en', 'es', 'both'], true)) {
+                jsonError('Invalid language. Must be en, es, or both.', 400);
+            }
+            $fields[] = 'language = ?';
+            $params[] = $body['language'];
+        }
+
+        if (array_key_exists('notification_email', $body)) {
+            $notifEmail = $body['notification_email'] ? sanitize($body['notification_email'], 255) : null;
+            if ($notifEmail && !isValidEmail($notifEmail)) {
+                jsonError('Invalid notification email address.', 400);
+            }
+            $fields[] = 'notification_email = ?';
+            $params[] = $notifEmail;
+        }
+
+        if (array_key_exists('is_active', $body)) {
+            $newActive = $body['is_active'] ? 1 : 0;
+            // Reactivation: any admin can do
+            // Deactivation: check protections
+            if ($newActive === 0) {
+                if ($id === (int) $admin['id']) {
+                    jsonError('You cannot deactivate your own account.', 400);
+                }
+                if (in_array($target['email'], PROTECTED_SUPERADMINS, true)) {
+                    jsonError('This account is protected and cannot be deactivated.', 403);
+                }
+                if (in_array($target['role'], ['superadmin', 'super_admin'], true) && !$isSuperAdmin) {
+                    jsonError('Only superadmins can deactivate superadmin accounts.', 403);
+                }
+            }
+            $fields[] = 'is_active = ?';
+            $params[] = $newActive;
+        }
+
+        if (empty($fields)) {
+            jsonError('No fields to update.', 400);
+        }
+
+        $fields[] = 'updated_at = NOW()';
+        $params[] = $id;
+
+        $sql = 'UPDATE oretir_admins SET ' . implode(', ', $fields) . ' WHERE id = ?';
+        $db->prepare($sql)->execute($params);
+
+        jsonSuccess(['updated' => $id]);
     }
 
     // ─── DELETE: Deactivate admin ───────────────────────────────────────

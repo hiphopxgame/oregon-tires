@@ -1,0 +1,7 @@
+Reporting-MTA: dns; s1012.use1.mysecurecloudhost.com
+
+Action: failed
+Final-Recipient: rfc822;oregontirespdx@gmail.com
+Status: 5.0.0
+Remote-MTA: dns; smtp.antispamcloud.com
+Diagnostic-Code: smtp; 550 This message contains a known spam email address.

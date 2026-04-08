@@ -1,0 +1,38 @@
+RewriteEngine On
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Redirect www to non-www
+RewriteCond %{HTTP_HOST} ^www\.oregon\.tires$ [NC]
+RewriteRule ^(.*)$ https://oregon.tires/$1 [L,R=301]
+
+# Strip .php extension (301 redirect)
+RewriteCond %{THE_REQUEST} \s/+(.+)\.php[\s?] [NC]
+RewriteCond %{THE_REQUEST} !/api/ [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# Internal rewrite /page → page.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.+)$ $1.php [L,QSA]
+
+# Directory index
+DirectoryIndex index.php index.html
+
+# Error pages
+ErrorDocument 404 /404.html
+
+# Block dotfiles
+<FilesMatch "^\.(?!htaccess)">
+    Require all denied
+</FilesMatch>
+
+# Block sensitive files
+<FilesMatch "^\.env|\.sql$|\.git|^composer\.(json|lock)$|^google-service-account\.json$">
+    Require all denied
+</FilesMatch>
+
+Options -Indexes

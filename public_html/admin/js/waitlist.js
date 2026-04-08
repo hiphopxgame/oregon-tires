@@ -39,6 +39,11 @@
     waiting_parts: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
   };
 
+  // ─── BulkManager Init ──────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'waitlist', endpoint: 'waitlist.php', onDelete: function() { loadWaitlist(); }, superAdminOnly: false, deleteWarning: 'wlBulkDeleteWarn' });
+  }
+
   // ─── Load waitlist (on_hold + waiting_parts ROs) ──────────────
   window.loadWaitlist = async function() {
     var box = document.getElementById('waitlist-container');
@@ -74,6 +79,7 @@
   // ─── Render ────────────────────────────────────────────────────
   function render(box, orders) {
     box.textContent = '';
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
 
     // Summary badges
     var summary = el('div', 'flex gap-4 mb-4 flex-wrap');
@@ -108,6 +114,12 @@
     var tbl = el('table', 'w-full text-sm');
     var thead = el('thead', 'bg-gray-50 dark:bg-gray-700');
     var hr = document.createElement('tr');
+    // Checkbox header
+    if (typeof BulkManager !== 'undefined') {
+      var thCb = el('th', 'w-10 p-3');
+      thCb.innerHTML = BulkManager.selectAllHtml();
+      hr.appendChild(thCb);
+    }
     var cols = [
       t('wlRoNumber', 'RO #'),
       t('wlCustomer', 'Customer'),
@@ -125,6 +137,13 @@
     var tbody = el('tbody', 'divide-y divide-gray-200 dark:divide-gray-700');
     orders.forEach(function(ro) {
       var tr = el('tr', 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition');
+
+      // Checkbox cell
+      if (typeof BulkManager !== 'undefined') {
+        var tdCb = el('td', 'p-3');
+        tdCb.innerHTML = BulkManager.checkboxHtml(ro.id);
+        tr.appendChild(tdCb);
+      }
 
       // RO Number
       var tdRo = el('td', 'p-3 font-semibold text-green-700 dark:text-green-400', ro.ro_number || '-');
@@ -169,6 +188,13 @@
       }; })(ro.id));
       btnWrap.appendChild(viewBtn);
 
+      // Delete button
+      if (typeof BulkManager !== 'undefined') {
+        var delBtn = el('button', 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/40 dark:text-red-300 text-xs font-medium px-2 py-1 rounded transition', t('actionDelete', 'Delete'));
+        delBtn.addEventListener('click', (function(id, num) { return function() { BulkManager.deleteSingle(id, num || 'this entry'); }; })(ro.id, ro.ro_number));
+        btnWrap.appendChild(delBtn);
+      }
+
       tdActions.appendChild(btnWrap);
       tr.appendChild(tdActions);
 
@@ -176,6 +202,15 @@
     });
     tbl.appendChild(tbody);
     wrap.appendChild(tbl);
+
+    // Bulk toolbar
+    if (typeof BulkManager !== 'undefined') {
+      var toolbarDiv = el('div');
+      toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+      wrap.appendChild(toolbarDiv);
+      setTimeout(function() { BulkManager.bind(); }, 0);
+    }
+
     return wrap;
   }
 

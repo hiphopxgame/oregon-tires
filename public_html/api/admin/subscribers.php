@@ -78,6 +78,24 @@ try {
     if ($method === 'DELETE') {
         verifyCsrf();
         $body = getJsonBody();
+        $action = $body['action'] ?? '';
+
+        // ── Bulk delete (soft-unsubscribe) ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $body['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $db->prepare(
+                "UPDATE oretir_subscribers SET unsubscribed_at = NOW() WHERE id IN ($placeholders) AND unsubscribed_at IS NULL"
+            )->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
         $id = (int)($body['id'] ?? 0);
         if ($id <= 0) {
             jsonError('Missing subscriber id', 400);

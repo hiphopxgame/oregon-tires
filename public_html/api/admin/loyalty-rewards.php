@@ -150,6 +150,22 @@ try {
 
     // ─── DELETE: Soft-delete (deactivate) reward ────────────────────
     if ($method === 'DELETE') {
+        $action = $body['action'] ?? '';
+
+        // ── Bulk delete (deactivate) ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $body['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $db->prepare("UPDATE oretir_loyalty_rewards SET is_active = 0 WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
         $id = (int) ($body['id'] ?? 0);
         if ($id <= 0) {
             jsonError('Missing reward id.', 400);

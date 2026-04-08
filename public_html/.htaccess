@@ -2,10 +2,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Cloudflare Real IP Restoration
-    <IfModule mod_remoteip.c>
-        RemoteIPHeader CF-Connecting-IP
-    </IfModule>
+    # Cloudflare Real IP Restoration — disabled: RemoteIPHeader is not
+    # permitted in .htaccess context on this Bluehost; would 500 the site.
+    # <IfModule mod_remoteip.c>
+    #     RemoteIPHeader CF-Connecting-IP
+    # </IfModule>
 
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
@@ -96,6 +97,18 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^admin/([a-z][a-z0-9]*)(/.+)?/?$ admin/index.html [L]
+
+    # Admin SPA shell + admin API: never cache. Stale responses cause the
+    # dashboard to render with reduced permissions until a hard refresh.
+    # Use mod_rewrite env var (compatible with older Apache than <If>).
+    RewriteCond %{REQUEST_URI} ^/admin(/|$) [OR]
+    RewriteCond %{REQUEST_URI} ^/api/admin/
+    RewriteRule .* - [E=NOCACHE:1]
+    <IfModule mod_headers.c>
+        Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0, private" env=NOCACHE
+        Header always set Pragma "no-cache" env=NOCACHE
+        Header always set Expires "Thu, 01 Jan 1970 00:00:00 GMT" env=NOCACHE
+    </IfModule>
 
     # API Versioning: /api/v1/* → /api/* alias
     RewriteRule ^api/v1/(.+)$ /api/$1 [L,QSA]

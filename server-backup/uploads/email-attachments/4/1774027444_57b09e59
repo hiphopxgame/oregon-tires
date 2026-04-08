@@ -1,0 +1,9 @@
+Reporting-MTA: dns; mx201.antispamcloud.com
+
+Action: failed
+Final-Recipient: rfc822;david@gmail.com
+Status: 5.0.0
+Remote-MTA: dns; gmail-smtp-in.l.google.com
+Diagnostic-Code: smtp; 552-5.2.2 The recipient's inbox is out of storage space and inactive. Please
+ 552-5.2.2 direct the recipient to
+ 552 5.2.2  https://support.google.com/mail/?p=OverQuotaPerm a92af1059eb24-12a736c281asi9952676c88.42 - gsmtp

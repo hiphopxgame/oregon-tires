@@ -177,6 +177,24 @@ try {
     if ($method === 'DELETE') {
         verifyCsrf();
 
+        $delBody = json_decode(file_get_contents('php://input'), true) ?: [];
+        $action = $delBody['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $delBody['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $db->prepare("DELETE FROM oretir_waitlist WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            advanceQueue($db);
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
         $id = (int) ($_GET['id'] ?? 0);
         if ($id <= 0) {
             jsonError('Entry ID is required.');

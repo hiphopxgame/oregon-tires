@@ -1,0 +1,42 @@
+{
+  "name": "HipHop.World",
+  "theme": "hiphop-world",
+  "mode": "dark",
+  "hue": 45,
+  "identity": {
+    "tagline": "The Culture, Connected",
+    "description": "Premium dark aesthetic with gold accents. Luxury meets street culture.",
+    "palette": {
+      "primary": "#FFD700",
+      "secondary": "#08D9D6",
+      "tertiary": "#FF2E63",
+      "background": "#0B0B0B",
+      "surface": "#111118"
+    },
+    "typography": {
+      "brand": "Oswald",
+      "heading": "Inter",
+      "body": "Roboto",
+      "ui": "Outfit"
+    },
+    "motionProfile": "smooth",
+    "motionNotes": "Premium = smooth 180-260ms. Subtle reveals, elegant transitions."
+  },
+  "assets": {
+    "logo": "/assets/img/logo.svg",
+    "favicon": "/assets/img/favicon.ico",
+    "ogImage": "/assets/img/og-default.jpg"
+  },
+  "dualTheme": {
+    "premium": {
+      "name": "Premium Luxe",
+      "palette": "black_gold_green",
+      "motion": "smooth 180-260ms"
+    },
+    "classic": {
+      "name": "Classic Sticker",
+      "palette": "white_blue_red",
+      "motion": "snappy 120-180ms"
+    }
+  }
+}

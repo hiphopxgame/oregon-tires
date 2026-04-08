@@ -18,7 +18,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 try {
     startSecureSession();
     $admin = requirePermission('customers');
-    requireMethod('GET', 'POST', 'PUT');
+    requireMethod('GET', 'POST', 'PUT', 'DELETE');
     $db = getDB();
 
     $method = $_SERVER['REQUEST_METHOD'];
@@ -199,6 +199,52 @@ try {
 
         $db->prepare('UPDATE oretir_customers SET ' . implode(', ', $fields) . ' WHERE id = ?')->execute($params);
         jsonSuccess(['message' => 'Customer updated.']);
+    }
+
+    // ─── DELETE: Remove customer(s) ────────────────────────────────────────
+    if ($method === 'DELETE') {
+        verifyCsrf();
+        $data = getJsonBody();
+        $action = $data['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $data['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            // Check for protected emails
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $emailStmt = $db->prepare("SELECT id, email FROM oretir_customers WHERE id IN ($placeholders)");
+            $emailStmt->execute($ids);
+            foreach ($emailStmt->fetchAll(PDO::FETCH_ASSOC) as $cust) {
+                if (in_array($cust['email'], PROTECTED_SUPERADMINS, true)) {
+                    jsonError("Cannot delete protected account: {$cust['email']}", 403);
+                }
+            }
+
+            $db->beginTransaction();
+            $db->prepare("DELETE FROM oretir_customers WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
+        // ── Single delete ──
+        requireSuperAdmin();
+        $id = (int) ($data['id'] ?? 0);
+        if ($id <= 0) jsonError('Customer ID is required.', 400);
+
+        // Check protected
+        $emailStmt = $db->prepare('SELECT email FROM oretir_customers WHERE id = ?');
+        $emailStmt->execute([$id]);
+        $custEmail = $emailStmt->fetchColumn();
+        if ($custEmail && in_array($custEmail, PROTECTED_SUPERADMINS, true)) {
+            jsonError('Cannot delete protected account.', 403);
+        }
+
+        $db->prepare('DELETE FROM oretir_customers WHERE id = ?')->execute([$id]);
+        jsonSuccess(['deleted' => 1]);
     }
 
 } catch (\Throwable $e) {

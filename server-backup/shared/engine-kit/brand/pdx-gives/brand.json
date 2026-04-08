@@ -1,0 +1,27 @@
+{
+  "name": "PDX.Gives",
+  "theme": "pdx-gives",
+  "mode": "light",
+  "hue": 172,
+  "identity": {
+    "tagline": "Portland Gives Back",
+    "description": "Warm teal community giving platform. Approachable, trustworthy, optimistic.",
+    "palette": {
+      "primary": "#2A9D8F",
+      "accent": "#F59E0B",
+      "background": "#FAFFFE",
+      "surface": "#F0FDF9"
+    },
+    "typography": {
+      "brand": "DM Sans",
+      "heading": "DM Sans",
+      "body": "Inter"
+    },
+    "motionProfile": "standard",
+    "motionNotes": "Friendly, approachable transitions. Standard easing."
+  },
+  "assets": {
+    "logo": "/assets/img/pdx-gives-logo.svg",
+    "favicon": "/assets/img/pdx-gives-favicon.ico"
+  }
+}

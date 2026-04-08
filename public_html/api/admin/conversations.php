@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../includes/mail.php';
 
 try {
     $admin = requirePermission('messaging');
-    requireMethod('GET', 'POST', 'PUT');
+    requireMethod('GET', 'POST', 'PUT', 'DELETE');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
     $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
@@ -267,6 +267,38 @@ try {
            ->execute([$status, $id]);
 
         jsonSuccess(['message' => 'Status updated.', 'status' => $status]);
+    }
+
+    // ─── DELETE: Remove conversation(s) ─────────────────────────────────
+    if ($method === 'DELETE') {
+        $data = getJsonBody();
+        $action = $data['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $data['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $db->prepare("DELETE FROM oretir_conversation_messages WHERE conversation_id IN ($placeholders)")->execute($ids);
+            $db->prepare("DELETE FROM oretir_conversations WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
+        // ── Single delete ──
+        requireAdmin();
+        $delId = (int) ($data['id'] ?? 0);
+        if ($delId <= 0) jsonError('Conversation ID is required.', 400);
+
+        $db->beginTransaction();
+        $db->prepare('DELETE FROM oretir_conversation_messages WHERE conversation_id = ?')->execute([$delId]);
+        $db->prepare('DELETE FROM oretir_conversations WHERE id = ?')->execute([$delId]);
+        $db->commit();
+        jsonSuccess(['deleted' => 1]);
     }
 
 } catch (\Throwable $e) {

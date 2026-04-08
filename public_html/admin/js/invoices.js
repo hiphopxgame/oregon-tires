@@ -52,6 +52,11 @@
     return opts;
   }
 
+  // ─── BulkManager Init ──────────────────────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'invoices', endpoint: 'invoices.php', onDelete: function() { loadInvoices(); }, superAdminOnly: true, deleteWarning: 'invBulkDeleteWarn' });
+  }
+
   // ─── Filter Bar ────────────────────────────────────────────────────────────
   function renderFilterBar(container) {
     var bar = document.createElement('div');
@@ -112,6 +117,13 @@
     var thead = document.createElement('thead');
     var headRow = document.createElement('tr');
     headRow.className = 'border-b bg-gray-50 dark:bg-gray-700 text-left';
+    // Checkbox header
+    if (typeof BulkManager !== 'undefined') {
+      var thCb = document.createElement('th');
+      thCb.className = 'w-10 px-3 py-2';
+      thCb.innerHTML = BulkManager.selectAllHtml();
+      headRow.appendChild(thCb);
+    }
     var colKeys = [
       ['invInvoiceNum', 'Invoice #'], ['invCustomer', 'Customer'], ['invRoNum', 'RO #'],
       ['invTotal', 'Total'], ['invStatus', 'Status'], ['invDate', 'Date'], ['invActions', 'Actions']
@@ -129,7 +141,7 @@
     if (!invoices || invoices.length === 0) {
       var emptyRow = document.createElement('tr');
       var emptyTd = document.createElement('td');
-      emptyTd.colSpan = 7;
+      emptyTd.colSpan = 8;
       emptyTd.className = 'px-3 py-8 text-center text-gray-400 dark:text-gray-500';
       emptyTd.textContent = t('invNoInvoices', 'No invoices found.');
       emptyRow.appendChild(emptyTd);
@@ -138,6 +150,14 @@
       invoices.forEach(function(inv) {
         var tr = document.createElement('tr');
         tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+
+        // Checkbox cell
+        if (typeof BulkManager !== 'undefined') {
+          var tdCb = document.createElement('td');
+          tdCb.className = 'px-3 py-2';
+          tdCb.innerHTML = BulkManager.checkboxHtml(inv.id);
+          tr.appendChild(tdCb);
+        }
 
         var tdNum = document.createElement('td');
         tdNum.className = 'px-3 py-2 font-mono dark:text-gray-200';
@@ -212,6 +232,11 @@
         if (confirm(t('invConfirmVoid', 'Void this invoice? This cannot be undone.'))) voidInvoice(inv.id);
       }));
     }
+    if (typeof BulkManager !== 'undefined') {
+      td.appendChild(makeBtn(t('actionDelete', 'Delete'), 'bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-900/40 dark:text-red-300', function() {
+        BulkManager.deleteSingle(inv.id, inv.invoice_number || 'this invoice');
+      }));
+    }
   }
 
   function makeBtn(label, cls, handler) {
@@ -255,6 +280,8 @@
     var container = document.getElementById('invoices-container');
     if (!container) return;
 
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
+
     while (container.firstChild) container.removeChild(container.firstChild);
 
     renderFilterBar(container);
@@ -271,6 +298,13 @@
           return;
         }
         renderTable(container, json.data || []);
+        // Bulk toolbar
+        if (typeof BulkManager !== 'undefined') {
+          var toolbarDiv = document.createElement('div');
+          toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+          container.appendChild(toolbarDiv);
+          BulkManager.bind();
+        }
         var totalPages = Math.ceil((json.total || 0) / perPage) || 1;
         renderPagination(container, totalPages);
       })

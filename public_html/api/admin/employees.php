@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 
 try {
     $staff = requirePermission('team');
-    requireMethod('GET', 'POST', 'PUT');
+    requireMethod('GET', 'POST', 'PUT', 'DELETE');
     $db = getDB();
     $method = $_SERVER['REQUEST_METHOD'];
 
@@ -104,6 +104,56 @@ try {
         }
 
         jsonSuccess(['id' => $newEmpId], 201);
+    }
+
+    // ─── DELETE: Remove employee(s) ─────────────────────────────────────
+    if ($method === 'DELETE') {
+        $data = getJsonBody();
+        $action = $data['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $data['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            // Self-delete prevention
+            $adminEmail = $staff['email'] ?? '';
+            if ($adminEmail) {
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                $selfStmt = $db->prepare("SELECT id FROM oretir_employees WHERE id IN ($placeholders) AND email = ?");
+                $selfStmt->execute(array_merge($ids, [$adminEmail]));
+                if ($selfStmt->fetch()) {
+                    jsonError('Cannot delete your own employee record.', 403);
+                }
+            }
+
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $db->beginTransaction();
+            $db->prepare("DELETE FROM oretir_employees WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
+        // ── Single delete ──
+        requireSuperAdmin();
+        $id = (int) ($data['id'] ?? 0);
+        if ($id <= 0) jsonError('Missing employee id.', 400);
+
+        // Self-delete prevention
+        $adminEmail = $staff['email'] ?? '';
+        if ($adminEmail) {
+            $selfStmt = $db->prepare('SELECT email FROM oretir_employees WHERE id = ?');
+            $selfStmt->execute([$id]);
+            $empEmail = $selfStmt->fetchColumn();
+            if ($empEmail && $empEmail === $adminEmail) {
+                jsonError('Cannot delete your own employee record.', 403);
+            }
+        }
+
+        $db->prepare('DELETE FROM oretir_employees WHERE id = ?')->execute([$id]);
+        jsonSuccess(['deleted' => 1]);
     }
 
     // PUT

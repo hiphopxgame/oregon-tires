@@ -1,0 +1,77 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$version": "1.0.0",
+  "$description": "Layer 2 — HipHop.World Classic Sticker Theme. Light + blue/red sticker aesthetic.",
+  "$theme": "hiphop-world-classic",
+
+  "meta": {
+    "displayName": "HipHop.World Classic Sticker",
+    "mode": "light",
+    "hue": 230,
+    "selector": "[data-theme=\"white_blue_red\"]"
+  },
+
+  "colors": {
+    "bg":        { "$value": "#FCFCFF", "$type": "color", "$description": "Page background" },
+    "bg-card":   { "$value": "#F0F0F8", "$type": "color", "$description": "Card/panel background" },
+    "bg-elevated": { "$value": "#E8E8F0", "$type": "color", "$description": "Elevated surface" },
+    "bg-input":  { "$value": "#FFFFFF", "$type": "color", "$description": "Form input background" },
+
+    "text":         { "$value": "#0B1A3A", "$type": "color" },
+    "text-secondary": { "$value": "#4A5568", "$type": "color" },
+    "text-muted":   { "$value": "#6B7280", "$type": "color" },
+    "text-inverse": { "$value": "#FFFFFF", "$type": "color" },
+
+    "primary":       { "$value": "#1F4DFF", "$type": "color", "$description": "Blue — primary brand" },
+    "primary-hover": { "$value": "#1A40D9", "$type": "color" },
+    "primary-muted": { "$value": "#4A6FFF", "$type": "color" },
+    "primary-dark":  { "$value": "#1533B3", "$type": "color" },
+
+    "accent":       { "$value": "#E10600", "$type": "color" },
+
+    "border":        { "$value": "rgba(11,26,58,0.12)", "$type": "color" },
+    "border-subtle": { "$value": "rgba(11,26,58,0.05)", "$type": "color" },
+    "border-strong": { "$value": "rgba(11,26,58,0.2)", "$type": "color" }
+  },
+
+  "typography": {
+    "fontFamily": {
+      "brand":   { "$value": "'Oswald', sans-serif", "$description": "Logo / display" },
+      "heading": { "$value": "'Inter', sans-serif" },
+      "body":    { "$value": "'Roboto', sans-serif" },
+      "ui":      { "$value": "'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" },
+      "mono":    { "$value": "'JetBrains Mono', monospace" }
+    }
+  },
+
+  "glow": {
+    "$description": "Flat shadows for light theme (no glow)",
+    "primary":    { "$value": "0 1px 3px rgba(11,26,58,0.1)", "$type": "shadow" },
+    "primary-lg": { "$value": "0 4px 6px rgba(11,26,58,0.1)", "$type": "shadow" },
+    "primary-xl": { "$value": "0 10px 15px rgba(11,26,58,0.1)", "$type": "shadow" }
+  },
+
+  "motion": {
+    "$description": "Snappy motion profile (120-400ms) with bounce easing",
+    "profile": "snappy",
+    "easing": "cubic-bezier(.34,1.56,.64,1)",
+    "duration-fast": "120ms",
+    "duration-normal": "250ms",
+    "duration-slow": "400ms"
+  },
+
+  "interactive": {
+    "focus-ring": { "$value": "0 0 0 2px #1F4DFF", "$type": "shadow" },
+    "hover-lift":  { "$value": "translateY(-1px)" },
+    "active-press": { "$value": "translateY(0px)" }
+  },
+
+  "chart": {
+    "$description": "Data visualization palette",
+    "series": ["#1F4DFF", "#E10600", "#4A6FFF", "#1533B3", "#1A40D9", "#FF4444", "#0B1A3A", "#6B7280"],
+    "grid":       { "$value": "rgba(11,26,58,0.08)", "$type": "color" },
+    "axis":       { "$value": "#4A5568", "$type": "color" },
+    "label":      { "$value": "#4A5568", "$type": "color" },
+    "tooltip-bg": { "$value": "#FFFFFF", "$type": "color" }
+  }
+}

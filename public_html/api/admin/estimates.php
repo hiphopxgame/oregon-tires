@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../includes/vin-decode.php';
 try {
     startSecureSession();
     $staff = requirePermission('shop_ops');
-    requireMethod('GET', 'POST', 'PUT');
+    requireMethod('GET', 'POST', 'PUT', 'DELETE');
     $db = getDB();
 
     $method = $_SERVER['REQUEST_METHOD'];
@@ -416,6 +416,39 @@ try {
         recalculateEstimateTotals($id, $db);
 
         jsonSuccess(['message' => 'Estimate updated.']);
+    }
+
+    // ─── DELETE: Remove estimate(s) ─────────────────────────────────────
+    if ($method === 'DELETE') {
+        verifyCsrf();
+        $data = getJsonBody();
+        $action = $data['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $data['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $db->prepare("DELETE FROM oretir_estimate_items WHERE estimate_id IN ($placeholders)")->execute($ids);
+            $db->prepare("DELETE FROM oretir_estimates WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
+        // ── Single delete ──
+        requireSuperAdmin();
+        $id = (int) ($data['id'] ?? 0);
+        if ($id <= 0) jsonError('Estimate ID is required.', 400);
+
+        $db->beginTransaction();
+        $db->prepare('DELETE FROM oretir_estimate_items WHERE estimate_id = ?')->execute([$id]);
+        $db->prepare('DELETE FROM oretir_estimates WHERE id = ?')->execute([$id]);
+        $db->commit();
+        jsonSuccess(['deleted' => 1]);
     }
 
 } catch (\Throwable $e) {

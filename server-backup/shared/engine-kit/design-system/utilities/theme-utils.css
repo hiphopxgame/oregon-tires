@@ -1,0 +1,86 @@
+/*
+ * Theme Utilities — Helpers for multi-brand responsive design
+ *
+ * Use alongside theme-loader.css and component-tokens.css.
+ * These utilities provide theme-aware responsive patterns.
+ */
+
+/* ============================================
+   Dark/Light mode helpers
+   ============================================ */
+
+/* Show only in dark themes */
+[data-theme="hiphop-world"] .light-only { display: none !important; }
+[data-theme="pdx-business"] .dark-only,
+[data-theme="pdx-gives"] .dark-only { display: none !important; }
+[data-theme="black_gold_green"] .light-only { display: none !important; }
+[data-theme="white_blue_red"] .dark-only { display: none !important; }
+
+/* ============================================
+   Transition utilities
+   ============================================ */
+.transition-fast {
+  transition-duration: var(--motion-fast);
+  transition-timing-function: var(--ease-standard);
+}
+
+.transition-normal {
+  transition-duration: var(--motion-normal);
+  transition-timing-function: var(--ease-standard);
+}
+
+.transition-slow {
+  transition-duration: var(--motion-slow);
+  transition-timing-function: var(--ease-standard);
+}
+
+.transition-bounce {
+  transition-timing-function: var(--ease-bounce);
+}
+
+/* ============================================
+   Reduced motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   Focus visible (keyboard only)
+   ============================================ */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ============================================
+   Container
+   ============================================ */
+.container-theme {
+  width: 100%;
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .container-theme {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-theme {
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}

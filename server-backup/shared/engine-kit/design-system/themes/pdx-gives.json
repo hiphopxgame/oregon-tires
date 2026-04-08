@@ -1,0 +1,65 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$version": "1.0.0",
+  "$description": "Layer 2 — PDX.Gives Brand Theme. Warm teal, giving/community focused.",
+  "$theme": "pdx-gives",
+
+  "meta": {
+    "displayName": "PDX.Gives",
+    "mode": "light",
+    "hue": 172,
+    "selector": "[data-theme=\"pdx-gives\"]"
+  },
+
+  "colors": {
+    "bg":        { "$value": "#FAFFFE", "$type": "color" },
+    "bg-card":   { "$value": "#FFFFFF", "$type": "color" },
+    "bg-elevated": { "$value": "#F0FDF9", "$type": "color" },
+    "bg-input":  { "$value": "#FFFFFF", "$type": "color" },
+
+    "text":         { "$value": "#111827", "$type": "color" },
+    "text-secondary": { "$value": "#4B5563", "$type": "color" },
+    "text-muted":   { "$value": "#6B7280", "$type": "color" },
+    "text-inverse": { "$value": "#FFFFFF", "$type": "color" },
+
+    "primary":       { "$value": "#2A9D8F", "$type": "color", "$description": "Teal — giving/community" },
+    "primary-hover": { "$value": "#1F7A6F", "$type": "color" },
+    "primary-muted": { "$value": "#2DD4BF", "$type": "color" },
+    "primary-dark":  { "$value": "#115E56", "$type": "color" },
+
+    "accent":       { "$value": "#F59E0B", "$type": "color", "$description": "Warm amber accent" },
+
+    "border":        { "$value": "#E5E7EB", "$type": "color" },
+    "border-subtle": { "$value": "#F3F4F6", "$type": "color" },
+    "border-strong": { "$value": "#D1D5DB", "$type": "color" }
+  },
+
+  "typography": {
+    "fontFamily": {
+      "brand":   { "$value": "'DM Sans', sans-serif" },
+      "heading": { "$value": "'DM Sans', sans-serif" },
+      "body":    { "$value": "'Inter', sans-serif" },
+      "ui":      { "$value": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" },
+      "mono":    { "$value": "'JetBrains Mono', monospace" }
+    }
+  },
+
+  "glow": {
+    "primary":    { "$value": "0 0 12px rgba(42, 157, 143, 0.15)", "$type": "shadow" },
+    "primary-lg": { "$value": "0 0 24px rgba(42, 157, 143, 0.2)", "$type": "shadow" }
+  },
+
+  "interactive": {
+    "focus-ring": { "$value": "0 0 0 2px #FFFFFF, 0 0 0 4px #2A9D8F", "$type": "shadow" },
+    "hover-lift":  { "$value": "translateY(-2px)" },
+    "active-press": { "$value": "translateY(0px)" }
+  },
+
+  "chart": {
+    "series": ["#2A9D8F", "#F59E0B", "#3B82F6", "#EF4444", "#8B5CF6", "#10B981", "#EC4899", "#6366F1"],
+    "grid":       { "$value": "rgba(0,0,0,0.06)", "$type": "color" },
+    "axis":       { "$value": "rgba(0,0,0,0.3)", "$type": "color" },
+    "label":      { "$value": "rgba(0,0,0,0.5)", "$type": "color" },
+    "tooltip-bg": { "$value": "#FFFFFF", "$type": "color" }
+  }
+}

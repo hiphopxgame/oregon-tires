@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../includes/loyalty.php';
 try {
     startSecureSession();
     $admin = requirePermission('marketing');
-    requireMethod('GET', 'PUT', 'POST');
+    requireMethod('GET', 'PUT', 'POST', 'DELETE');
     $db = getDB();
 
     $method = $_SERVER['REQUEST_METHOD'];
@@ -71,6 +71,35 @@ try {
             ],
         ], JSON_UNESCAPED_UNICODE);
         exit;
+    }
+
+    // ─── DELETE: Remove referral(s) ────────────────────────────────
+    if ($method === 'DELETE') {
+        verifyCsrf();
+        $data = getJsonBody();
+        $action = $data['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $data['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $db->prepare("DELETE FROM oretir_referrals WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
+        // ── Single delete ──
+        requireAdmin();
+        $id = (int) ($data['id'] ?? 0);
+        if ($id <= 0) jsonError('Referral ID is required.', 400);
+
+        $db->prepare('DELETE FROM oretir_referrals WHERE id = ?')->execute([$id]);
+        jsonSuccess(['deleted' => 1]);
     }
 
     // ─── PUT: Mark referral complete ──────────────────────────────

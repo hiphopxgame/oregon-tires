@@ -1,0 +1,111 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$version": "1.0.0",
+  "$description": "Layer 2 — PDX Business Brand Theme. Light, professional, mode-switchable.",
+  "$theme": "pdx-business",
+
+  "meta": {
+    "displayName": "PDX Business Network",
+    "mode": "light",
+    "selector": "[data-theme=\"pdx-business\"]",
+    "subModes": ["play", "discover", "explore", "give", "care"],
+    "subModeAttr": "data-pdx-mode"
+  },
+
+  "colors": {
+    "bg":        { "$value": "#FFFFFF", "$type": "color" },
+    "bg-card":   { "$value": "#FFFFFF", "$type": "color" },
+    "bg-elevated": { "$value": "#F9FAFB", "$type": "color" },
+    "bg-input":  { "$value": "#FFFFFF", "$type": "color" },
+
+    "text":         { "$value": "#111827", "$type": "color" },
+    "text-secondary": { "$value": "#4B5563", "$type": "color" },
+    "text-muted":   { "$value": "#6B7280", "$type": "color" },
+    "text-inverse": { "$value": "#FFFFFF", "$type": "color" },
+
+    "primary":       { "$value": "#7C3AED", "$type": "color", "$description": "Default violet — overridden by sub-mode" },
+    "primary-hover": { "$value": "#6D28D9", "$type": "color" },
+    "primary-muted": { "$value": "#A78BFA", "$type": "color" },
+    "primary-dark":  { "$value": "#5B21B6", "$type": "color" },
+
+    "accent":       { "$value": "#7C3AED", "$type": "color" },
+
+    "border":        { "$value": "#E5E7EB", "$type": "color" },
+    "border-subtle": { "$value": "#F3F4F6", "$type": "color" },
+    "border-strong": { "$value": "#D1D5DB", "$type": "color" }
+  },
+
+  "subModes": {
+    "play": {
+      "primary":       { "$value": "#0B835B", "$type": "color", "$description": "Emerald — hue 160" },
+      "primary-hover": { "$value": "#065F46", "$type": "color" },
+      "primary-muted": { "$value": "#10B981", "$type": "color" },
+      "surface":       { "$value": "hsl(160, 76%, 96%)", "$type": "color" },
+      "surface-alt":   { "$value": "hsl(160, 70%, 90%)", "$type": "color" },
+      "border-brand":  { "$value": "hsl(160, 66%, 78%)", "$type": "color" }
+    },
+    "discover": {
+      "primary":       { "$value": "#7C3AED", "$type": "color", "$description": "Violet — hue 263" },
+      "primary-hover": { "$value": "#6D28D9", "$type": "color" },
+      "primary-muted": { "$value": "#A78BFA", "$type": "color" },
+      "surface":       { "$value": "hsl(263, 78%, 97%)", "$type": "color" },
+      "surface-alt":   { "$value": "hsl(263, 72%, 93%)", "$type": "color" },
+      "border-brand":  { "$value": "hsl(263, 66%, 85%)", "$type": "color" }
+    },
+    "explore": {
+      "primary":       { "$value": "#DB2777", "$type": "color", "$description": "Rose — hue 331" },
+      "primary-hover": { "$value": "#BE185D", "$type": "color" },
+      "primary-muted": { "$value": "#F472B6", "$type": "color" },
+      "surface":       { "$value": "hsl(331, 76%, 97%)", "$type": "color" },
+      "surface-alt":   { "$value": "hsl(331, 72%, 93%)", "$type": "color" },
+      "border-brand":  { "$value": "hsl(331, 66%, 85%)", "$type": "color" }
+    },
+    "give": {
+      "primary":       { "$value": "#2A9D8F", "$type": "color", "$description": "Teal — hue 172" },
+      "primary-hover": { "$value": "#1F7A6F", "$type": "color" },
+      "primary-muted": { "$value": "#2DD4BF", "$type": "color" },
+      "surface":       { "$value": "hsl(172, 70%, 96%)", "$type": "color" },
+      "surface-alt":   { "$value": "hsl(172, 65%, 90%)", "$type": "color" },
+      "border-brand":  { "$value": "hsl(172, 60%, 80%)", "$type": "color" }
+    },
+    "care": {
+      "primary":       { "$value": "#077E9B", "$type": "color", "$description": "Cyan — hue 192" },
+      "primary-hover": { "$value": "#065F76", "$type": "color" },
+      "primary-muted": { "$value": "#0891B2", "$type": "color" },
+      "surface":       { "$value": "hsl(192, 78%, 96%)", "$type": "color" },
+      "surface-alt":   { "$value": "hsl(192, 72%, 91%)", "$type": "color" },
+      "border-brand":  { "$value": "hsl(192, 68%, 80%)", "$type": "color" }
+    }
+  },
+
+  "typography": {
+    "fontFamily": {
+      "brand":   { "$value": "'DM Sans', sans-serif", "$description": "PDX brand display" },
+      "heading": { "$value": "'DM Sans', sans-serif" },
+      "body":    { "$value": "'Inter', sans-serif" },
+      "ui":      { "$value": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" },
+      "mono":    { "$value": "'JetBrains Mono', monospace" }
+    }
+  },
+
+  "glow": {
+    "$description": "Light theme — subtle shadows instead of glows",
+    "primary":    { "$value": "0 0 12px rgba(124, 58, 237, 0.15)", "$type": "shadow" },
+    "primary-lg": { "$value": "0 0 24px rgba(124, 58, 237, 0.2)", "$type": "shadow" }
+  },
+
+  "interactive": {
+    "focus-ring": { "$value": "0 0 0 2px #FFFFFF, 0 0 0 4px var(--color-primary, #7C3AED)", "$type": "shadow" },
+    "hover-lift":  { "$value": "translateY(-2px)" },
+    "active-press": { "$value": "translateY(0px)" }
+  },
+
+  "chart": {
+    "$description": "Light theme chart palette",
+    "series": ["#7C3AED", "#0B835B", "#DB2777", "#2A9D8F", "#F59E0B", "#3B82F6", "#EF4444", "#6366F1"],
+    "grid":       { "$value": "rgba(0,0,0,0.06)", "$type": "color" },
+    "axis":       { "$value": "rgba(0,0,0,0.3)", "$type": "color" },
+    "label":      { "$value": "rgba(0,0,0,0.5)", "$type": "color" },
+    "tooltip-bg": { "$value": "#FFFFFF", "$type": "color" }
+  }
+}

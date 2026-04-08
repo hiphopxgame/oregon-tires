@@ -287,6 +287,32 @@ try {
 
     // ─── DELETE: Remove service ────────────────────────────────
     if ($method === 'DELETE') {
+        $action = $body['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $body['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $slugStmt = $db->prepare("SELECT id, slug FROM oretir_services WHERE id IN ($placeholders)");
+            $slugStmt->execute($ids);
+            foreach ($slugStmt->fetchAll(\PDO::FETCH_ASSOC) as $svcRow) {
+                $ref = $db->prepare('SELECT COUNT(*) FROM oretir_appointments WHERE service = ? OR services_json LIKE ?');
+                $ref->execute([$svcRow['slug'], '%' . $svcRow['slug'] . '%']);
+                if ((int) $ref->fetchColumn() > 0) {
+                    jsonError("Cannot delete service '{$svcRow['slug']}': has appointment references. Deactivate instead.", 409);
+                }
+            }
+
+            $db->beginTransaction();
+            $db->prepare("DELETE FROM oretir_services WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
         $id = (int) ($body['id'] ?? 0);
         if ($id <= 0) jsonError('Missing service id', 400);
 

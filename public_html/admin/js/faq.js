@@ -25,6 +25,11 @@
     return h;
   }
 
+  // ─── BulkManager Init ──────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'faq', endpoint: 'faq.php', onDelete: function() { loadFaqs(); }, superAdminOnly: false, deleteWarning: 'faqBulkDeleteWarn' });
+  }
+
   // ─── Load FAQs ──────────────────────────────────────────────
   async function loadFaqs() {
     try {
@@ -43,6 +48,14 @@
     const container = document.getElementById('faq-table-body');
     if (!container) return;
 
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
+
+    var selectAllTh = document.getElementById('faq-select-all-th');
+    if (selectAllTh && typeof BulkManager !== 'undefined') selectAllTh.innerHTML = BulkManager.selectAllHtml();
+
+    var toolbarDiv = document.getElementById('faq-bulk-toolbar');
+    if (toolbarDiv && typeof BulkManager !== 'undefined') toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+
     container.textContent = '';
 
     if (!faqs.length) {
@@ -59,6 +72,14 @@
     faqs.forEach(function(faq) {
       const tr = document.createElement('tr');
       tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+
+      // Checkbox cell
+      if (typeof BulkManager !== 'undefined') {
+        var tdCb = document.createElement('td');
+        tdCb.className = 'px-4 py-3';
+        tdCb.innerHTML = BulkManager.checkboxHtml(faq.id);
+        tr.appendChild(tdCb);
+      }
 
       // Question cell
       const tdQ = document.createElement('td');
@@ -120,7 +141,10 @@
       const delBtn = document.createElement('button');
       delBtn.className = 'text-red-600 hover:text-red-800 text-sm font-medium dark:text-red-400';
       delBtn.textContent = t('actionDelete', 'Delete');
-      delBtn.addEventListener('click', function() { deleteFaq(faq.id); });
+      delBtn.addEventListener('click', function() {
+        if (typeof BulkManager !== 'undefined') BulkManager.deleteSingle(faq.id, faq.question_en || 'this FAQ');
+        else deleteFaq(faq.id);
+      });
       actionsWrap.appendChild(delBtn);
 
       tdActions.appendChild(actionsWrap);
@@ -128,6 +152,8 @@
 
       container.appendChild(tr);
     });
+
+    if (typeof BulkManager !== 'undefined') BulkManager.bind();
   }
 
   // ─── Toggle form visibility ─────────────────────────────────

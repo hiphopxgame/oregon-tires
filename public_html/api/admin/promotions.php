@@ -266,7 +266,29 @@ try {
 
     // ─── DELETE: Remove promotion ─────────────────────────────────
     if ($method === 'DELETE') {
-        $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        $delBody = getJsonBody();
+        $action = $delBody['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $delBody['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $imgStmt = $db->prepare("SELECT image_url FROM oretir_promotions WHERE id IN ($placeholders)");
+            $imgStmt->execute($ids);
+            foreach ($imgStmt->fetchAll(\PDO::FETCH_COLUMN) as $imgUrl) {
+                deletePromoImageFile($imgUrl);
+            }
+            $db->prepare("DELETE FROM oretir_promotions WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
+        $id = isset($_GET['id']) ? (int)$_GET['id'] : ((int)($delBody['id'] ?? 0));
         if ($id <= 0) {
             jsonError('Missing promotion id', 400);
         }

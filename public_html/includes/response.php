@@ -10,6 +10,14 @@ $_scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
 if (!headers_sent() && (str_contains($_scriptName, '/api/') || str_contains($_scriptName, '/cli/'))) {
     header('X-API-Version: v1');
     header('X-Request-ID: ' . bin2hex(random_bytes(8)));
+
+    // Admin endpoints must never be cached — stale session/permission responses
+    // cause the dashboard to render with a reduced nav until a hard refresh.
+    if (str_contains($_scriptName, '/api/admin/')) {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0, private');
+        header('Pragma: no-cache');
+        header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+    }
 }
 
 /**

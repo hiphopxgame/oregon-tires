@@ -50,6 +50,11 @@
     return str.length > len ? str.substring(0, len) + '...' : str;
   }
 
+  // ── BulkManager Init ────────────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'blog', endpoint: 'blog.php', onDelete: function() { loadBlogPosts(blogCurrentPage); }, superAdminOnly: false, deleteWarning: 'blogBulkDeleteWarn' });
+  }
+
   // ── Load Posts ───────────────────────────────────────────────────
   window.loadBlogPosts = function (page) {
     page = page || 1;
@@ -93,12 +98,22 @@
     var tbody = document.getElementById('blog-table-body');
     if (!tbody) return;
 
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
+
+    // Populate select-all checkbox in thead
+    var selectAllTh = document.getElementById('blog-select-all-th');
+    if (selectAllTh && typeof BulkManager !== 'undefined') selectAllTh.innerHTML = BulkManager.selectAllHtml();
+
+    // Populate toolbar
+    var toolbarDiv = document.getElementById('blog-bulk-toolbar');
+    if (toolbarDiv && typeof BulkManager !== 'undefined') toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+
     tbody.textContent = '';
 
     if (blogPosts.length === 0) {
       var tr = document.createElement('tr');
       var td = document.createElement('td');
-      td.setAttribute('colspan', '5');
+      td.setAttribute('colspan', '6');
       td.className = 'text-center py-8 text-gray-500 dark:text-gray-400';
       td.textContent = t('blogNoPostsFound', 'No blog posts found.');
       tr.appendChild(td);
@@ -109,6 +124,14 @@
     blogPosts.forEach(function (post) {
       var tr = document.createElement('tr');
       tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+
+      // Checkbox cell
+      if (typeof BulkManager !== 'undefined') {
+        var tdCb = document.createElement('td');
+        tdCb.className = 'py-3 px-4';
+        tdCb.innerHTML = BulkManager.checkboxHtml(post.id);
+        tr.appendChild(tdCb);
+      }
 
       // Title cell
       var tdTitle = document.createElement('td');
@@ -170,7 +193,10 @@
       var delBtn = document.createElement('button');
       delBtn.className = 'text-xs px-2 py-1 rounded bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800';
       delBtn.textContent = t('actionDelete', 'Delete');
-      delBtn.addEventListener('click', function () { deleteBlogPost(post.id, post.title_en); });
+      delBtn.addEventListener('click', function () {
+        if (typeof BulkManager !== 'undefined') BulkManager.deleteSingle(post.id, post.title_en || 'this post');
+        else deleteBlogPost(post.id, post.title_en);
+      });
       actionsWrap.appendChild(delBtn);
 
       tdActions.appendChild(actionsWrap);
@@ -178,6 +204,8 @@
 
       tbody.appendChild(tr);
     });
+
+    if (typeof BulkManager !== 'undefined') BulkManager.bind();
   }
 
   // ── Render Pagination ────────────────────────────────────────────

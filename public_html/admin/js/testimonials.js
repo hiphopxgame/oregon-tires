@@ -26,6 +26,11 @@
     return h;
   }
 
+  // ─── BulkManager Init ──────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'testimonials', endpoint: 'testimonials.php', onDelete: function() { loadTestimonials(); }, superAdminOnly: false, deleteWarning: 'testimBulkDeleteWarn' });
+  }
+
   // ─── Load testimonials ──────────────────────────────────────
   async function loadTestimonials() {
     try {
@@ -115,13 +120,21 @@
     const container = document.getElementById('testimonials-table-body');
     if (!container) return;
 
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
+
+    var selectAllTh = document.getElementById('testimonials-select-all-th');
+    if (selectAllTh && typeof BulkManager !== 'undefined') selectAllTh.innerHTML = BulkManager.selectAllHtml();
+
+    var toolbarDiv = document.getElementById('testimonials-bulk-toolbar');
+    if (toolbarDiv && typeof BulkManager !== 'undefined') toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+
     container.textContent = '';
     var filtered = getFilteredTestimonials();
 
     if (!filtered.length) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
-      td.colSpan = 7;
+      td.colSpan = 8;
       td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
       td.textContent = t('reviewNoReviews', 'No reviews match this filter.');
       tr.appendChild(td);
@@ -132,6 +145,14 @@
     filtered.forEach(function(rev) {
       const tr = document.createElement('tr');
       tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+
+      // Checkbox cell
+      if (typeof BulkManager !== 'undefined') {
+        var tdCb = document.createElement('td');
+        tdCb.className = 'px-4 py-3';
+        tdCb.innerHTML = BulkManager.checkboxHtml(rev.id);
+        tr.appendChild(tdCb);
+      }
 
       // Source badge cell
       var tdSource = document.createElement('td');
@@ -232,7 +253,10 @@
       const delBtn = document.createElement('button');
       delBtn.className = 'text-red-600 hover:text-red-800 text-sm font-medium dark:text-red-400';
       delBtn.textContent = t('actionDelete', 'Delete');
-      delBtn.addEventListener('click', function() { deleteReview(rev.id); });
+      delBtn.addEventListener('click', function() {
+        if (typeof BulkManager !== 'undefined') BulkManager.deleteSingle(rev.id, rev.customer_name || 'this review');
+        else deleteReview(rev.id);
+      });
       actionsWrap.appendChild(delBtn);
 
       tdActions.appendChild(actionsWrap);
@@ -240,6 +264,8 @@
 
       container.appendChild(tr);
     });
+
+    if (typeof BulkManager !== 'undefined') BulkManager.bind();
   }
 
   // ─── Toggle homepage star ─────────────────────────────────────

@@ -35,6 +35,11 @@
     updatePreview();
   }
 
+  // ─── BulkManager Init ──────────────────────────────────────
+  if (typeof BulkManager !== 'undefined') {
+    BulkManager.init({ tab: 'promotions', endpoint: 'promotions.php', onDelete: function() { loadPromotions(); }, superAdminOnly: false, deleteWarning: 'promoBulkDeleteWarn' });
+  }
+
   // ─── Load promotions ──────────────────────────────────────────
   async function loadPromotions() {
     try {
@@ -57,12 +62,20 @@
     const container = document.getElementById('promotions-table-body');
     if (!container) return;
 
+    if (typeof BulkManager !== 'undefined') BulkManager.reset();
+
+    var selectAllTh = document.getElementById('promo-select-all-th');
+    if (selectAllTh && typeof BulkManager !== 'undefined') selectAllTh.innerHTML = BulkManager.selectAllHtml();
+
+    var toolbarDiv = document.getElementById('promotions-bulk-toolbar');
+    if (toolbarDiv && typeof BulkManager !== 'undefined') toolbarDiv.innerHTML = BulkManager.toolbarHtml();
+
     container.textContent = '';
 
     if (!promotions.length) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
-      td.colSpan = 8;
+      td.colSpan = 9;
       td.className = 'text-center py-8 text-gray-400 dark:text-gray-500';
       td.textContent = t('promoNoPromos', 'No promotions yet. Click "New Promotion" to create one.');
       tr.appendChild(td);
@@ -73,6 +86,14 @@
     promotions.forEach(function(promo) {
       const tr = document.createElement('tr');
       tr.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+
+      // Checkbox cell
+      if (typeof BulkManager !== 'undefined') {
+        var tdCb = document.createElement('td');
+        tdCb.className = 'px-4 py-3';
+        tdCb.innerHTML = BulkManager.checkboxHtml(promo.id);
+        tr.appendChild(tdCb);
+      }
 
       // Title cell
       const tdTitle = document.createElement('td');
@@ -216,7 +237,10 @@
       const delBtn = document.createElement('button');
       delBtn.className = 'text-red-600 hover:text-red-800 text-sm font-medium dark:text-red-400';
       delBtn.textContent = t('actionDelete', 'Delete');
-      delBtn.addEventListener('click', function() { deletePromotion(promo.id); });
+      delBtn.addEventListener('click', function() {
+        if (typeof BulkManager !== 'undefined') BulkManager.deleteSingle(promo.id, promo.title_en || 'this promotion');
+        else deletePromotion(promo.id);
+      });
       actionsWrap.appendChild(delBtn);
 
       tdActions.appendChild(actionsWrap);
@@ -224,6 +248,8 @@
 
       container.appendChild(tr);
     });
+
+    if (typeof BulkManager !== 'undefined') BulkManager.bind();
   }
 
   // ─── Toggle form visibility ───────────────────────────────────

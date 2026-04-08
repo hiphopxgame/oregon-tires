@@ -123,6 +123,22 @@ try {
 
     // ─── DELETE: Remove testimonial ─────────────────────────────
     if ($method === 'DELETE') {
+        $action = $body['action'] ?? '';
+
+        // ── Bulk delete ──
+        if ($action === 'bulk_delete') {
+            requireSuperAdmin();
+            $ids = array_filter(array_map('intval', $body['ids'] ?? []), fn(int $v) => $v > 0);
+            if (empty($ids)) jsonError('No valid IDs.', 400);
+            if (count($ids) > 100) jsonError('Maximum 100 items per batch.', 400);
+
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $db->prepare("DELETE FROM oretir_testimonials WHERE id IN ($placeholders)")->execute($ids);
+            $db->commit();
+            jsonSuccess(['deleted' => count($ids)]);
+        }
+
         $id = (int)($body['id'] ?? 0);
         if ($id <= 0) {
             jsonError('Missing testimonial id', 400);
