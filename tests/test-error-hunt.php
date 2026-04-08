@@ -91,5 +91,22 @@ foreach ($urls as $url) {
     test("{$url}: no error text", $foundErr === '', "found '" . substr($foundErr, 0, 60) . "'");
 }
 
+// Member API endpoints — unauthenticated GET must NOT 500 (expect 401/302/200)
+$memberEndpoints = [
+    'my-schedule', 'my-assigned-work', 'my-messages', 'conversations',
+    'my-customers', 'my-bookings', 'my-vehicles', 'my-estimates',
+    'my-care-plan', 'my-invoices', 'my-loyalty', 'my-referral',
+];
+foreach ($memberEndpoints as $ep) {
+    $url = "https://oregon.tires/api/member/{$ep}.php";
+    [$code, $body] = curlGet($url);
+    test("{$url}: no 500 unauth", $code > 0 && $code < 500, "got {$code}");
+    $foundErr = '';
+    foreach ($errorPatterns as $p) {
+        if (preg_match($p, $body, $m)) { $foundErr = $m[0]; break; }
+    }
+    test("{$url}: no error text", $foundErr === '', "found '" . substr($foundErr, 0, 60) . "'");
+}
+
 echo "\n=== {$passed} passed, {$failed} failed ===\n";
 exit($failed === 0 ? 0 : 1);
