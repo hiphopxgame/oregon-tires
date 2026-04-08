@@ -119,7 +119,12 @@ $wdName = htmlspecialchars($_SESSION['member_email'] ?? 'Worker');
       empty_messages: "No messages.",
       error_loading: "Could not load. Tap refresh to try again.",
       more_actions_soon: "More actions coming soon",
-      tap_for_details: "Tap for details"
+      tap_for_details: "Tap for details",
+      saved: "Saved",
+      note_added: "Note added",
+      note_required: "Please enter a note",
+      reply_sent: "Reply sent",
+      reply_required: "Please enter a reply"
     },
     es: {
       worker_dashboard: "Panel del Trabajador",
@@ -135,7 +140,12 @@ $wdName = htmlspecialchars($_SESSION['member_email'] ?? 'Worker');
       empty_messages: "Sin mensajes.",
       error_loading: "No se pudo cargar. Toque actualizar para reintentar.",
       more_actions_soon: "Más acciones próximamente",
-      tap_for_details: "Toque para detalles"
+      tap_for_details: "Toque para detalles",
+      saved: "Guardado",
+      note_added: "Nota agregada",
+      note_required: "Por favor escriba una nota",
+      reply_sent: "Respuesta enviada",
+      reply_required: "Por favor escriba una respuesta"
     }
   };
   function tr(k) { return (t[lang] && t[lang][k]) || t.en[k] || k; }
@@ -206,12 +216,6 @@ $wdName = htmlspecialchars($_SESSION['member_email'] ?? 'Worker');
       return;
     }
     listEl.appendChild(card);
-
-    // Append a "more actions coming soon" placeholder per slice spec
-    var note = document.createElement('div');
-    note.className = 'wd-card mt-3 text-center text-xs text-gray-500 italic';
-    note.textContent = tr('more_actions_soon');
-    listEl.appendChild(note);
   }
 
   function loadTab(name, force) {
@@ -258,6 +262,103 @@ $wdName = htmlspecialchars($_SESSION['member_email'] ?? 'Worker');
     btn.addEventListener('click', function () {
       activateTab(btn.getAttribute('data-wd-tab'));
     });
+  });
+
+  // ── Toast helper (no innerHTML) ──
+  function toast(msg, kind) {
+    var d = document.createElement('div');
+    d.setAttribute('role', 'status');
+    d.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:' + (kind === 'error' ? '#dc2626' : '#047857') + ';color:#fff;padding:10px 18px;border-radius:9999px;font-weight:600;font-size:14px;z-index:60;box-shadow:0 4px 14px rgba(0,0,0,0.18);';
+    d.textContent = msg;
+    document.body.appendChild(d);
+    setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 3000);
+  }
+
+  function postJson(url, payload) {
+    return fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      return r.json().catch(function () { return { success: false, error: 'Bad response' }; })
+        .then(function (j) { return { ok: r.ok, status: r.status, body: j }; });
+    });
+  }
+
+  // ── Event delegation: RO status buttons + RO note form + message reply form ──
+  document.addEventListener('click', function (ev) {
+    var btn = ev.target.closest && ev.target.closest('button[data-ro-action="status"]');
+    if (!btn) return;
+    var card = btn.closest('[data-ro-number]');
+    if (!card) return;
+    var roNum = card.getAttribute('data-ro-number');
+    var toStatus = btn.getAttribute('data-to-status');
+    if (!roNum || !toStatus) return;
+    btn.disabled = true;
+    postJson('/api/member/ro-status.php', { ro_number: roNum, new_status: toStatus })
+      .then(function (res) {
+        btn.disabled = false;
+        if (res.ok && res.body && res.body.success) {
+          toast(tr('saved'));
+          loadTab('work', true);
+        } else {
+          toast((res.body && res.body.error) || tr('error_loading'), 'error');
+        }
+      })
+      .catch(function () { btn.disabled = false; toast(tr('error_loading'), 'error'); });
+  });
+
+  document.addEventListener('submit', function (ev) {
+    var form = ev.target;
+    if (!form || !form.matches) return;
+
+    if (form.matches('form[data-ro-action="note"]')) {
+      ev.preventDefault();
+      var card = form.closest('[data-ro-number]');
+      if (!card) return;
+      var roNum = card.getAttribute('data-ro-number');
+      var ta = form.querySelector('[data-ro-note]');
+      var note = (ta && ta.value || '').trim();
+      if (!note) { toast(tr('note_required'), 'error'); return; }
+      var subBtn = form.querySelector('button[type="submit"]');
+      if (subBtn) subBtn.disabled = true;
+      postJson('/api/member/ro-note.php', { ro_number: roNum, note: note })
+        .then(function (res) {
+          if (subBtn) subBtn.disabled = false;
+          if (res.ok && res.body && res.body.success) {
+            if (ta) ta.value = '';
+            toast(tr('note_added'));
+            loadTab('work', true);
+          } else {
+            toast((res.body && res.body.error) || tr('error_loading'), 'error');
+          }
+        })
+        .catch(function () { if (subBtn) subBtn.disabled = false; toast(tr('error_loading'), 'error'); });
+      return;
+    }
+
+    if (form.matches('form[data-test="message-reply-form"]')) {
+      ev.preventDefault();
+      var convId = parseInt(form.getAttribute('data-conv-id'), 10);
+      var rta = form.querySelector('[data-reply-body]');
+      var body = (rta && rta.value || '').trim();
+      if (!convId || !body) { toast(tr('reply_required'), 'error'); return; }
+      var sb = form.querySelector('button[type="submit"]');
+      if (sb) sb.disabled = true;
+      postJson('/api/member/message-reply.php', { conversation_id: convId, body: body })
+        .then(function (res) {
+          if (sb) sb.disabled = false;
+          if (res.ok && res.body && res.body.success) {
+            if (rta) rta.value = '';
+            toast(tr('reply_sent'));
+            loadTab('messages', true);
+          } else {
+            toast((res.body && res.body.error) || tr('error_loading'), 'error');
+          }
+        })
+        .catch(function () { if (sb) sb.disabled = false; toast(tr('error_loading'), 'error'); });
+    }
   });
 
   var refreshBtn = document.getElementById('wd-refresh');

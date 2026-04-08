@@ -45,7 +45,7 @@ try {
     // Fetch active ROs assigned to this employee
     $stmt = $pdo->prepare("
         SELECT ro.ro_number, ro.status, ro.created_at,
-               c.first_name, c.last_name,
+               c.first_name, c.last_name, c.phone,
                v.year, v.make, v.model
         FROM oretir_repair_orders ro
         LEFT JOIN oretir_customers c ON ro.customer_id = c.id
@@ -86,11 +86,25 @@ try {
             $customer = trim(($ro['first_name'] ?? '') . ' ' . ($ro['last_name'] ?? ''));
             $vehicle  = trim(($ro['year'] ?? '') . ' ' . ($ro['make'] ?? '') . ' ' . ($ro['model'] ?? ''));
             $dateStr  = date('M j', strtotime($ro['created_at']));
+            $phoneRaw = preg_replace('/[^0-9+]/', '', (string) ($ro['phone'] ?? ''));
+            $roNum    = (string) ($ro['ro_number'] ?? '');
 
-            echo '<div style="padding:1rem;border-radius:var(--member-radius);background:var(--member-surface);border:1px solid var(--member-border);">';
+            // Worker pipeline: visible transitions per current status
+            $transitions = [
+                'intake'        => ['diagnosis' => 'Start Diagnosis', 'in_progress' => 'Start Work'],
+                'check_in'      => ['diagnosis' => 'Start Diagnosis', 'in_progress' => 'Start Work'],
+                'diagnosis'     => ['estimate_pending' => 'Send to Estimate', 'in_progress' => 'Start Work'],
+                'approved'      => ['in_progress' => 'Start Work'],
+                'in_progress'   => ['ready' => 'Mark Ready', 'on_hold' => 'On Hold', 'waiting_parts' => 'Waiting Parts'],
+                'on_hold'       => ['in_progress' => 'Resume'],
+                'waiting_parts' => ['in_progress' => 'Resume'],
+            ];
+            $nextActions = $transitions[$ro['status']] ?? [];
+
+            echo '<div data-test="ro-card" data-ro-number="' . htmlspecialchars($roNum) . '" data-ro-status="' . htmlspecialchars($ro['status']) . '" style="padding:1rem;border-radius:var(--member-radius);background:var(--member-surface);border:1px solid var(--member-border);">';
             echo '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;gap:0.5rem;">';
-            echo '<span style="font-weight:700;font-family:monospace;">' . htmlspecialchars($ro['ro_number'] ?? '') . '</span>';
-            echo '<span style="display:inline-block;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.75rem;font-weight:600;color:#fff;background:' . $color . ';">' . htmlspecialchars($statusLabel) . '</span>';
+            echo '<span style="font-weight:700;font-family:monospace;">' . htmlspecialchars($roNum) . '</span>';
+            echo '<span data-ro-status-pill style="display:inline-block;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.75rem;font-weight:600;color:#fff;background:' . $color . ';">' . htmlspecialchars($statusLabel) . '</span>';
             echo '</div>';
             if ($customer) {
                 echo '<div style="color:var(--member-text);">' . htmlspecialchars($customer) . '</div>';
@@ -99,6 +113,34 @@ try {
                 echo '<div style="color:var(--member-text-muted);font-size:0.875rem;">' . htmlspecialchars($vehicle) . '</div>';
             }
             echo '<div style="color:var(--member-text-muted);font-size:0.75rem;margin-top:0.25rem;">' . htmlspecialchars($dateStr) . '</div>';
+
+            // tap-to-call / tap-to-text
+            if ($phoneRaw !== '') {
+                echo '<div data-test="ro-contact" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.75rem;">';
+                echo '<a href="tel:' . htmlspecialchars($phoneRaw) . '" aria-label="Call customer" style="flex:1;min-width:120px;text-align:center;padding:0.75rem;background:#10b981;color:#fff;border-radius:var(--member-radius);text-decoration:none;font-weight:600;font-size:0.85rem;min-height:44px;display:inline-flex;align-items:center;justify-content:center;">&#128222; Call</a>';
+                echo '<a href="sms:' . htmlspecialchars($phoneRaw) . '" aria-label="Text customer" style="flex:1;min-width:120px;text-align:center;padding:0.75rem;background:#3b82f6;color:#fff;border-radius:var(--member-radius);text-decoration:none;font-weight:600;font-size:0.85rem;min-height:44px;display:inline-flex;align-items:center;justify-content:center;">&#128172; Text</a>';
+                echo '</div>';
+            }
+
+            // Status pipeline + transition buttons
+            if (!empty($nextActions)) {
+                echo '<div data-test="status-pipeline" style="margin-top:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">';
+                echo '<div style="font-size:0.7rem;font-weight:600;color:var(--member-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Next Steps</div>';
+                echo '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">';
+                foreach ($nextActions as $toStatus => $label) {
+                    echo '<button type="button" data-ro-action="status" data-to-status="' . htmlspecialchars($toStatus) . '" aria-label="' . htmlspecialchars($label) . '" style="flex:1;min-width:140px;min-height:56px;padding:0.75rem 1rem;background:var(--member-accent,#047857);color:#fff;border:none;border-radius:var(--member-radius);font-weight:600;font-size:0.85rem;cursor:pointer;">' . htmlspecialchars($label) . '</button>';
+                }
+                echo '</div>';
+                echo '</div>';
+            }
+
+            // Note form
+            echo '<form data-test="ro-note-form" data-ro-action="note" style="margin-top:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">';
+            echo '<label style="font-size:0.7rem;font-weight:600;color:var(--member-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Add Tech Note</label>';
+            echo '<textarea data-ro-note rows="2" maxlength="2000" placeholder="What did you find?" aria-label="Technician note" style="width:100%;padding:0.5rem;border:1px solid var(--member-border);border-radius:var(--member-radius);background:var(--member-surface);color:var(--member-text);font-size:0.85rem;resize:vertical;box-sizing:border-box;min-height:60px;"></textarea>';
+            echo '<button type="submit" aria-label="Add note" style="min-height:44px;padding:0.5rem 1rem;background:#374151;color:#fff;border:none;border-radius:var(--member-radius);font-weight:600;font-size:0.85rem;cursor:pointer;">Add Note</button>';
+            echo '</form>';
+
             echo '</div>';
         }
         echo '</div>';

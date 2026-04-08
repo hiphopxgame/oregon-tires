@@ -46,6 +46,51 @@ try {
     $custStmt->execute([$memberId, $memberEmail]);
     $customerId = (int) $custStmt->fetchColumn();
 
+    // Worker view: employees/admins see all open conversations + inline reply form
+    $dashRole = $_SESSION['dashboard_role'] ?? 'member';
+    if (in_array($dashRole, ['employee', 'admin'], true)) {
+        $wStmt = $pdo->query(
+            "SELECT c.id, c.subject, c.status, c.last_message_at,
+                    CONCAT(COALESCE(cu.first_name,''),' ',COALESCE(cu.last_name,'')) AS customer_name,
+                    (SELECT COUNT(*) FROM oretir_conversation_messages m
+                     WHERE m.conversation_id = c.id AND m.is_read = 0 AND m.sender_type = 'customer') AS unread_count
+             FROM oretir_conversations c
+             LEFT JOIN oretir_customers cu ON c.customer_id = cu.id
+             WHERE c.status != 'closed'
+             ORDER BY c.last_message_at DESC
+             LIMIT 25"
+        );
+        $wConvs = $wStmt->fetchAll(PDO::FETCH_ASSOC);
+        header('Content-Type: text/html; charset=utf-8');
+        echo '<div data-test="worker-messages" class="member-tab-content">';
+        echo '<h3 class="member-tab-title">' . htmlspecialchars(memberT('messages', $lang)) . '</h3>';
+        if (empty($wConvs)) {
+            echo '<div class="member-alert member-alert--info">No open conversations.</div>';
+        } else {
+            echo '<div style="display:flex;flex-direction:column;gap:0.75rem;">';
+            foreach ($wConvs as $wc) {
+                $unread = (int) $wc['unread_count'];
+                $cid = (int) $wc['id'];
+                echo '<div data-test="worker-message-thread" data-conv-id="' . $cid . '" style="padding:0.85rem;border-radius:var(--member-radius);background:var(--member-surface);border:1px solid var(--member-border);">';
+                echo '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">';
+                echo '<div style="font-weight:600;">' . htmlspecialchars(trim($wc['customer_name']) ?: 'Customer') . '</div>';
+                if ($unread > 0) {
+                    echo '<span style="background:#ef4444;color:#fff;font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:9999px;">' . $unread . ' new</span>';
+                }
+                echo '</div>';
+                echo '<div style="font-size:0.85rem;color:var(--member-text-muted);margin-top:0.25rem;">' . htmlspecialchars((string) ($wc['subject'] ?? '(no subject)')) . '</div>';
+                echo '<form data-test="message-reply-form" data-conv-id="' . $cid . '" style="margin-top:0.6rem;display:flex;flex-direction:column;gap:0.4rem;">';
+                echo '<textarea data-reply-body rows="2" maxlength="5000" placeholder="Type a reply…" aria-label="Reply to customer" style="width:100%;padding:0.5rem;border:1px solid var(--member-border);border-radius:var(--member-radius);background:var(--member-surface);color:var(--member-text);font-size:0.85rem;resize:vertical;min-height:60px;box-sizing:border-box;"></textarea>';
+                echo '<button type="submit" aria-label="Send reply" style="min-height:44px;padding:0.5rem 1rem;background:var(--member-accent,#047857);color:#fff;border:none;border-radius:var(--member-radius);font-weight:600;font-size:0.85rem;cursor:pointer;">Send Reply</button>';
+                echo '</form>';
+                echo '</div>';
+            }
+            echo '</div>';
+        }
+        echo '</div>';
+        exit;
+    }
+
     // Load conversations (if customer record exists)
     $conversations = [];
     if ($customerId) {

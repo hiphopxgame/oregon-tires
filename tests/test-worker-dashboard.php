@@ -94,6 +94,72 @@ test('references /api/member/my-messages or conversations',
     strpos($src, '/api/member/my-messages') !== false
     || strpos($src, '/api/member/conversations') !== false);
 
+// ─── Slice 3: mutation wiring ────────────────────────────────────────────────
+test('worker JS references /api/member/ro-status',     strpos($src, '/api/member/ro-status') !== false);
+test('worker JS references /api/member/ro-note',       strpos($src, '/api/member/ro-note') !== false);
+test('worker JS references /api/member/message-reply', strpos($src, '/api/member/message-reply') !== false);
+
+$workSrc = (string) file_get_contents(realpath(__DIR__ . '/../public_html/api/member/my-assigned-work.php'));
+test('my-assigned-work has status-pipeline sentinel',  strpos($workSrc, 'data-test="status-pipeline"') !== false);
+test('my-assigned-work has ro-note-form sentinel',     strpos($workSrc, 'data-test="ro-note-form"') !== false);
+test('my-assigned-work has tel: links',                strpos($workSrc, 'href="tel:') !== false);
+test('my-assigned-work has sms: links',                strpos($workSrc, 'href="sms:') !== false);
+test('my-assigned-work selects customer phone',        strpos($workSrc, 'c.phone') !== false);
+
+$msgSrc = (string) file_get_contents(realpath(__DIR__ . '/../public_html/api/member/my-messages.php'));
+test('my-messages has message-reply-form sentinel',    strpos($msgSrc, 'data-test="message-reply-form"') !== false);
+test('my-messages has worker branch',                  strpos($msgSrc, "in_array(\$dashRole, ['employee', 'admin']") !== false);
+
+// ─── New endpoint files: lint + role check + content-type ───────────────────
+$newEndpoints = [
+    'public_html/api/member/ro-status.php',
+    'public_html/api/member/ro-note.php',
+    'public_html/api/member/message-reply.php',
+];
+foreach ($newEndpoints as $rel) {
+    $abs = realpath(__DIR__ . '/../' . $rel);
+    test("{$rel}: file exists", $abs !== false && is_file($abs));
+    if ($abs) {
+        $out = []; $rc = 0;
+        exec('php -l ' . escapeshellarg($abs) . ' 2>&1', $out, $rc);
+        test("{$rel}: php -l clean", $rc === 0, implode(' ', $out));
+        $body = (string) file_get_contents($abs);
+        test("{$rel}: requires employee or admin role",
+            strpos($body, "in_array(\$role, ['employee', 'admin']") !== false);
+        test("{$rel}: sets application/json header",
+            strpos($body, "Content-Type: application/json") !== false);
+        test("{$rel}: catches \\Throwable",
+            strpos($body, 'catch (\\Throwable') !== false);
+        test("{$rel}: calls MemberAuth::isMemberLoggedIn",
+            strpos($body, 'MemberAuth::isMemberLoggedIn') !== false);
+    }
+}
+
+// Live curl: 3 new endpoints (unauth) — must be 401 JSON, no PHP error text
+$mutEndpoints = [
+    'https://oregon.tires/api/member/ro-status.php',
+    'https://oregon.tires/api/member/ro-note.php',
+    'https://oregon.tires/api/member/message-reply.php',
+];
+foreach ($mutEndpoints as $url) {
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => false,
+        CURLOPT_TIMEOUT        => 30,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => '{}',
+        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+        CURLOPT_USERAGENT      => 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15',
+    ]);
+    $eb = (string) curl_exec($ch);
+    $ec = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    test("{$url}: not a PHP fatal",
+        !preg_match('/Fatal error|Parse error|Warning:|Notice:/i', $eb), "code {$ec}");
+    test("{$url}: HTTP < 500",
+        $ec > 0 && $ec < 500, "got {$ec}");
+}
+
 // members.php branch
 $members = (string) file_get_contents(realpath(__DIR__ . '/../public_html/members.php'));
 test('members.php branches to worker-dashboard',
