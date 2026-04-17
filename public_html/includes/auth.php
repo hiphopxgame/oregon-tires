@@ -13,8 +13,11 @@ const BCRYPT_COST        = 12;
 const OWNER_EMAIL = 'oregontirespdx@gmail.com';
 
 // Protected accounts — cannot be demoted, deactivated, or deleted via the admin panel.
+// Any email listed here is auto-provisioned in oretir_admins with role='super_admin'
+// on every auth check (via enforceAdminSession) and cannot be revoked by the admin panel.
 const PROTECTED_SUPERADMINS = [
     OWNER_EMAIL,
+    'tyronenorris@gmail.com',
 ];
 
 /**
@@ -26,55 +29,87 @@ function isOwnerEmail(string $email): bool
 }
 
 /**
+ * Check if an email is in PROTECTED_SUPERADMINS (case-insensitive).
+ */
+function isProtectedSuperAdmin(string $email): bool
+{
+    $needle = strtolower(trim($email));
+    if ($needle === '') return false;
+    foreach (PROTECTED_SUPERADMINS as $e) {
+        if (strtolower($e) === $needle) return true;
+    }
+    return false;
+}
+
+/**
  * Enforce admin rights for ANY active admin account.
  *
- * Called as a safety net whenever admin auth is checked. If the current session
- * email (admin_email or member_email) matches any active row in oretir_admins,
- * ensures full admin session vars are present — even if session_regenerate_id()
- * wiped them. Case-insensitive email matching.
+ * Called as a safety net whenever admin auth is checked. Resolves the logged-in
+ * email from admin_email → member_email → employee_email (in that order) and,
+ * if it matches any active row in oretir_admins, populates the admin session.
  *
- * For the business owner (OWNER_EMAIL), auto-creates the admin row if missing.
+ * For emails in PROTECTED_SUPERADMINS, auto-provisions an active row with
+ * role='super_admin' (creates it, reactivates an inactive row, or upgrades the
+ * role if it's not already super_admin) — guaranteeing those accounts always
+ * retain full access.
  *
  * @return bool True if admin was detected and session vars enforced.
  */
 function enforceAdminSession(PDO $pdo): bool
 {
-    $email = $_SESSION['admin_email'] ?? $_SESSION['member_email'] ?? '';
+    $email = strtolower(trim(
+        $_SESSION['admin_email']
+        ?? $_SESSION['member_email']
+        ?? $_SESSION['employee_email']
+        ?? ''
+    ));
     if ($email === '') {
         return false;
     }
 
-    // Already has valid admin session — nothing to do
+    $isProtected = isProtectedSuperAdmin($email);
+
+    // Fast path: already-valid admin session. For protected emails, also require
+    // super_admin role — otherwise fall through so we can upgrade the row.
     if (!empty($_SESSION['admin_id']) && !empty($_SESSION['admin_role']) && !empty($_SESSION['login_time'])) {
-        return true;
+        if (!$isProtected) return true;
+        if (in_array($_SESSION['admin_role'], ['super_admin', 'superadmin'], true)) return true;
     }
 
-    // Look up admin by email (case-insensitive via LOWER())
     try {
-        $stmt = $pdo->prepare('SELECT id, email, role, display_name, language FROM oretir_admins WHERE LOWER(email) = LOWER(?) AND is_active = 1 LIMIT 1');
+        // Protected emails: ensure an active super_admin row exists.
+        if ($isProtected) {
+            $stmt = $pdo->prepare('SELECT id, role, is_active FROM oretir_admins WHERE LOWER(email) = ? LIMIT 1');
+            $stmt->execute([$email]);
+            $existing = $stmt->fetch();
+
+            if ($existing) {
+                $needsUpdate = ((int) $existing['is_active']) !== 1
+                    || !in_array($existing['role'], ['super_admin', 'superadmin'], true);
+                if ($needsUpdate) {
+                    $pdo->prepare(
+                        "UPDATE oretir_admins SET is_active = 1, role = 'super_admin', updated_at = NOW() WHERE id = ?"
+                    )->execute([$existing['id']]);
+                }
+            } else {
+                $defaultName = isOwnerEmail($email) ? 'Owner' : ucfirst(explode('@', $email)[0]);
+                $pdo->prepare(
+                    "INSERT INTO oretir_admins (email, display_name, role, is_active, created_at, updated_at)
+                     VALUES (?, ?, 'super_admin', 1, NOW(), NOW())"
+                )->execute([$email, $defaultName]);
+            }
+        }
+
+        // Look up the active admin row (case-insensitive)
+        $stmt = $pdo->prepare('SELECT id, email, role, display_name, language FROM oretir_admins WHERE LOWER(email) = ? AND is_active = 1 LIMIT 1');
         $stmt->execute([$email]);
         $admin = $stmt->fetch();
-
-        // Owner-only: auto-create admin row if missing
-        if (!$admin && isOwnerEmail($email)) {
-            $pdo->prepare(
-                'INSERT INTO oretir_admins (email, display_name, role, is_active, created_at, updated_at)
-                 VALUES (?, ?, ?, 1, NOW(), NOW())'
-            )->execute([OWNER_EMAIL, 'Owner', 'admin']);
-            $admin = [
-                'id'           => (int) $pdo->lastInsertId(),
-                'email'        => OWNER_EMAIL,
-                'role'         => 'admin',
-                'display_name' => 'Owner',
-                'language'     => 'both',
-            ];
-        }
 
         if (!$admin) {
             return false;
         }
 
-        $_SESSION['admin_id']       = $admin['id'];
+        $_SESSION['admin_id']       = (int) $admin['id'];
         $_SESSION['admin_email']    = $admin['email'];
         $_SESSION['admin_role']     = $admin['role'] ?: 'admin';
         $_SESSION['admin_name']     = $admin['display_name'] ?: $admin['email'];
