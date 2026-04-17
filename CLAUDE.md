@@ -2,6 +2,18 @@
 
 See parent `/Users/hiphop/CLAUDE.md` for network-wide conventions (naming, .htaccess, directory structure, kit patterns).
 
+## Do not re-add pdx.tires bridge
+
+The "pdx.tires data bridge + admin referral tracking" work (commit `addb95c`, 2026-04-11) was fully reverted on 2026-04-17 — client direction: oregon.tires does not cross-link with pdx.tires. Do NOT re-add unless explicitly authorized by the client.
+
+Banned files (blocked by `.githooks/pre-commit`):
+- `public_html/api/admin/referral-stats.php`
+- `public_html/api/partner-data.php`
+
+If you need to re-introduce any referral/partner data flow, get written authorization first and update this section + the hook before bypassing it. Do not use `--no-verify` without that authorization.
+
+The hook is activated locally via `git config core.hooksPath .githooks` — any fresh clone must run this once (see `.githooks/README` if present, or this note).
+
 ## Quick Reference
 - **Stack**: Static HTML + Tailwind CSS v4 + PHP API + MySQL
 - **Live**: https://oregon.tires

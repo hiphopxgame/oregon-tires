@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Oregon Tires — pre-commit guard
+# Prevents re-adding the pdx.tires bridge (reverted 2026-04-17).
+# See CLAUDE.md § "Do not re-add pdx.tires bridge".
+
+set -e
+
+BANNED_FILES=(
+  "public_html/api/admin/referral-stats.php"
+  "public_html/api/partner-data.php"
+)
+
+fail() {
+  echo ""
+  echo "  pre-commit BLOCKED: pdx.tires bridge re-introduction detected"
+  echo "  ----------------------------------------------------------------"
+  echo "  $1"
+  echo ""
+  echo "  The pdx.tires data bridge + admin referral tracking was reverted"
+  echo "  on 2026-04-17. See CLAUDE.md § 'Do not re-add pdx.tires bridge'."
+  echo ""
+  echo "  To bypass in an emergency: git commit --no-verify  (DO NOT DO THIS"
+  echo "  unless you have explicit authorization to restore the bridge)."
+  echo ""
+  exit 1
+}
+
+added=$(git diff --cached --name-only --diff-filter=A)
+for f in "${BANNED_FILES[@]}"; do
+  if printf '%s\n' "$added" | grep -qxF "$f"; then
+    fail "Banned file added: $f"
+  fi
+done
+
+# Block content markers that indicate bridge reintroduction.
+# Scans only non-doc, non-hook files so CLAUDE.md / .githooks can mention
+# the banned filenames in warnings without tripping the guard.
+changed=$(git diff --cached --name-only --diff-filter=ACMR \
+  | grep -vE '\.(md|markdown|txt)$' \
+  | grep -vE '^\.githooks/' || true)
+
+if [ -n "$changed" ]; then
+  # -I skips binary, patterns anchored to added lines (^\+)
+  if git diff --cached -U0 -- $changed | grep -qE '^\+[^+].*(referral-stats\.php|partner-data\.php)'; then
+    fail "Staged changes reference a reverted bridge endpoint (referral-stats.php or partner-data.php)."
+  fi
+fi
+
+exit 0
